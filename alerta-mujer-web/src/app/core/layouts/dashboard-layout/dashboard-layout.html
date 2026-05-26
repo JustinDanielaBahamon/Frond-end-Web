@@ -1,0 +1,71 @@
+<div class="min-h-screen flex bg-gray-100">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-pink-700 text-white p-5 hidden md:block">
+  
+      <h1 class="text-3xl font-bold mb-10">
+        Alerta Mujer
+      </h1>
+  
+      <nav class="flex flex-col gap-4">
+  
+        <a
+          routerLink="/dashboard/home"
+          class="p-3 rounded-lg hover:bg-pink-800 transition"
+        >
+          Inicio
+        </a>
+  
+        <a
+          routerLink="/dashboard/reportes"
+          class="p-3 rounded-lg hover:bg-pink-800 transition"
+        >
+          Reportes
+        </a>
+  
+        <a
+          routerLink="/dashboard/contactos"
+          class="p-3 rounded-lg hover:bg-pink-800 transition"
+        >
+          Contactos
+        </a>
+  
+        <a
+          routerLink="/dashboard/configuracion"
+          class="p-3 rounded-lg hover:bg-pink-800 transition"
+        >
+          Configuración
+        </a>
+  
+      </nav>
+  
+    </aside>
+  
+    <!-- CONTENIDO -->
+    <div class="flex-1 flex flex-col">
+  
+      <!-- NAVBAR -->
+      <header class="bg-white shadow-md p-4 flex justify-between items-center">
+  
+        <h2 class="text-2xl font-semibold">
+          Panel Principal
+        </h2>
+  
+        <button
+          class="bg-pink-700 text-white px-4 py-2 rounded-lg hover:bg-pink-800 transition"
+        >
+          Cerrar sesión
+        </button>
+  
+      </header>
+  
+      <!-- MAIN -->
+      <main class="flex-1 p-6">
+  
+        <router-outlet></router-outlet>
+  
+      </main>
+  
+    </div>
+  
+  </div>

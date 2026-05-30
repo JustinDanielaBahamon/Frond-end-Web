@@ -3,10 +3,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Fuente ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+/* ── Tokens de color ────────────────────────────────── */
+:root {
+  /* Púrpuras */
+  --color-purple-dark   : #350569;
+  --color-purple        : #2b0c5e;
+  --color-purple-mid    : #762dca;
+  --color-purple-light  : #2c0652;
+
+  /* Rosas / Pinks */
+  --color-pink          : #c02271;
+  --color-pink-hot      : #e91e8c;
+  --color-pink-light    : #e62d8c;
+
+  /* Textos */
+  --color-text-dark     : #2d1457;
+  --color-text-mid      : #000000;
+  --color-text-muted    : #570ea0;
+
+  /* Superficies */
+  --color-white         : #680ca5;
+  --color-card-bg       : rgba(111, 16, 155, 0.92);
+   --color-input-bg : #5509ac;  // ← blanco puro en vez de semitransparente
+
+  /* Bordes */
+  --color-border   : rgba(124, 58, 237, 0.322);  // ← borde morado más visible
+  --color-border-focus  : var(--color-purple-light);
+
+  /* Gradientes */
+  --gradient-bg : linear-gradient(135deg, #3b0764 0%, #6d28d9 35%, #be185d 70%, #da1168 100%);
+  --gradient-btn: linear-gradient(90deg, #be185d 0%, #ec4899 50%, #f472b6 100%);
+  --color-card-bg: rgba(142, 10, 160, 0.918);
+
+  /* Sombras */
+  --shadow-card         : 0 24px 60px rgba(78, 16, 177, 0.18), 0 4px 16px rgba(91, 33, 182, 0.10);
+  --shadow-btn          : 0 8px 24px rgba(233, 30, 140, 0.38);
+  --shadow-btn-hover    : 0 12px 32px rgba(233, 30, 140, 0.48);
+  --shadow-card-badge   : 0 12px 36px rgba(80, 20, 180, 0.22);
+
+  /* Tipografía */
+  --font-base           : 'Nunito', sans-serif;
+
+  /* Radios */
+  --radius-card         : 28px;
+  --radius-input        : 14px;
+  --radius-btn          : 50px;
+  --radius-checkbox     : 5px;
+
+  /* Transiciones */
+  --transition-fast     : 0.2s ease;
+  --transition-normal   : 0.3s ease;
+
+  
+
+}
+
+/* ── Reset / Base ───────────────────────────────────── */
 html,
 body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  margin      : 0;
+  padding     : 0;
+  font-family : var(--font-base);
+  color       : var(--color-text-dark);
+  background: var(--gradient-bg) !important;
+  min-height: 100vh;
 }

@@ -59,6 +59,10 @@
           </button>
         </div>
 
+        <p *ngIf="error" style="color:#E91E8C; font-size:0.85rem; margin-top:-0.5rem; margin-bottom:0.5rem;">
+          {{ error }}
+        </p>
+
         <div class="form__options">
           <label class="checkbox">
             <input type="checkbox">

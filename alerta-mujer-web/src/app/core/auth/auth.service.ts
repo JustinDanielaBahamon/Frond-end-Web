@@ -20,15 +20,15 @@ const fake_users = [
   {
     id: 1,
     nombre: 'Admin Alerta',
-    email: 'admin@alertamujer.com',
+    email: 'admin',
     password: '123456',
     rol: 'admin',
     token: 'fake-jwt-token-admin-001',
   },
   {
     id: 2,
-    nombre: 'Sebastián',
-    email: 'sebas@alertamujer.com',
+    nombre: 'Usuario',
+    email: 'usuario',
     password: '123456',
     rol: 'operador',
     token: 'fake-jwt-token-sebas-002',

@@ -1,0 +1,95 @@
+<div class="register-page">
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+
+  <div class="register-page__wrapper">
+
+    
+
+    <app-card>
+
+      <div class="brand">
+        <div class="brand__icon">
+          <img src="logo.png" alt="Logo">
+        </div>
+        <div class="brand__text">
+          <span class="brand__name">
+            ALERTA<br><strong>MUJER</strong>
+          </span>
+          <span class="brand__tagline">Seguridad para todas</span>
+        </div>
+      </div>
+
+      <h1 class="card__title">Crear <span style="color:#ae10df">cuenta</span></h1>
+      <p class="card__subtitle">
+        Únete y empieza a proteger lo que más importa.
+      </p>
+
+      <form class="form" #registerForm="ngForm">
+
+        <div class="form__row">
+          <div class="field">
+            <span class="field__icon">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <input [(ngModel)]="nombre" name="nombre" type="text" class="field__input" placeholder="Nombre" required>
+          </div>
+          <div class="field">
+            <span class="field__icon">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <input [(ngModel)]="apellido" name="apellido" type="text" class="field__input" placeholder="Apellido" required>
+          </div>
+        </div>
+
+        <div class="form__row">
+          <div class="field">
+            <span class="field__icon">
+              <i class="fa-regular fa-calendar"></i>
+            </span>
+            <input [(ngModel)]="edad" name="edad" type="number" class="field__input" placeholder="Edad" min="13" max="120" required>
+          </div>
+          <div class="field">
+            <span class="field__icon">
+              <i class="fa-solid fa-phone"></i>
+            </span>
+            <input [(ngModel)]="telefono" name="telefono" type="tel" class="field__input" placeholder="Teléfono" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field__icon">
+            <i class="fa-regular fa-envelope"></i>
+          </span>
+          <input [(ngModel)]="correo" name="correo" type="email" class="field__input" placeholder="Correo electrónico" required>
+        </div>
+
+        <p *ngIf="error" class="form__error">{{ error }}</p>
+
+        <label class="checkbox">
+          <input type="checkbox" [(ngModel)]="aceptaTerminos" name="terminos">
+          <span class="checkbox__mark"></span>
+          <span class="checkbox__label">
+            Acepto los <span class="form__link">Términos y Condiciones</span>
+            y la <span class="form__link">Política de Privacidad</span>
+          </span>
+        </label>
+
+        <button type="button" (click)="registrar()" [disabled]="!formularioValido()" class="btn-submit">
+          <i class="fa-solid fa-shield-halved"></i>
+          CREAR CUENTA
+        </button>
+
+      </form>
+
+      <p class="card__footer">
+        ¿Ya tienes cuenta?
+        <span class="form__link" (click)="irALogin()">Inicia sesión</span>
+      </p>
+
+    </app-card>
+    <div class="register-page__visual">
+      <img src="register.png" alt="Alerta Mujer">
+    </div>
+  </div>
+</div>

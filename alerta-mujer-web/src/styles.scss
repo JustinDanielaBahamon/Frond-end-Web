@@ -9,15 +9,15 @@
 /* ── Tokens de color ────────────────────────────────── */
 :root {
   /* Púrpuras */
-  --color-purple-dark   : #350569;
-  --color-purple        : #2b0c5e;
-  --color-purple-mid    : #762dca;
-  --color-purple-light  : #2c0652;
+  --color-purple-dark   : #c205b8;
+  --color-purple        : #c900ae;
+  --color-purple-mid    : #c52dca;
+  --color-purple-light  : #b502bb;
 
   /* Rosas / Pinks */
-  --color-pink          : #c02271;
-  --color-pink-hot      : #e91e8c;
-  --color-pink-light    : #e62d8c;
+  --color-pink          : #a70ac7;
+  --color-pink-hot      : #ae10df;
+  --color-pink-light    : #410166;
 
   /* Textos */
   --color-text-dark     : #2d1457;
@@ -34,8 +34,8 @@
   --color-border-focus  : var(--color-purple-light);
 
   /* Gradientes */
-  --gradient-bg : linear-gradient(135deg, #3b0764 0%, #6d28d9 35%, #be185d 70%, #da1168 100%);
-  --gradient-btn: linear-gradient(90deg, #be185d 0%, #ec4899 50%, #f472b6 100%);
+  --gradient-bg : linear-gradient(135deg, #db079c 0%, #af0763 35%, #9a07a7 70%, #430261 100%);
+  --gradient-btn: linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
   --color-card-bg: rgba(142, 10, 160, 0.918);
 
   /* Sombras */

@@ -4,11 +4,11 @@
 
   <div class="login-page__wrapper">
     <div class="login-page__visual">
-    <img src="login.png" alt="Alerta Mujer">
+      <img src="login.png" alt="Alerta Mujer">
     </div>
+
     <app-card>
 
-      <!-- Logo -->
       <div class="brand">
         <div class="brand__icon">
           <img src="logo.png" alt="Logo">
@@ -21,13 +21,11 @@
         </div>
       </div>
 
-      <!-- Título -->
       <h1 class="card__title">Inicia <span style="color:#ec4899">sesión</span></h1>
       <p class="card__subtitle">
         Accede a tu cuenta para continuar protegiendo lo que más importa.
       </p>
 
-      <!-- Formulario -->
       <form class="form">
 
         <div class="field">
@@ -69,7 +67,7 @@
             <span class="checkbox__mark"></span>
             <span class="checkbox__label">Recuérdame</span>
           </label>
-          <a class="form__link">¿Olvidaste tu contraseña?</a>
+          <span class="form__link" (click)="irAOlvidePassword()">¿Olvidaste tu contraseña?</span>
         </div>
 
         <button type="button" (click)="iniciarSesion()" class="btn-submit">
@@ -81,11 +79,9 @@
 
       <p class="card__footer">
         ¿No tienes cuenta?
-        <a class="form__link">Crea una cuenta</a>
+        <span class="form__link" (click)="irARegistro()">Crea una cuenta</span>
       </p>
 
     </app-card>
-    
   </div>
-
 </div>

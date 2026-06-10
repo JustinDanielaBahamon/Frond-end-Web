@@ -71,3 +71,338 @@ body {
   background: var(--gradient-bg) !important;
   min-height: 100vh;
 }
+
+
+/* ══════════════════════════════════════════════════
+   ESTILOS COMPARTIDOS AUTH (login + register)
+   ══════════════════════════════════════════════════ */
+
+/* ── Orbes de fondo ─────────────────────────────── */
+.bg-orb {
+  position      : fixed;
+  border-radius : 50%;
+  filter        : blur(80px);
+  opacity       : 0.35;
+  pointer-events: none;
+  z-index       : 0;
+
+  &--1 {
+    width      : 520px; height: 520px;
+    background : radial-gradient(circle, var(--color-purple), transparent);
+    top: -120px; left: -120px;
+  }
+  &--2 {
+    width      : 420px; height: 420px;
+    background : radial-gradient(circle, var(--color-pink), transparent);
+    bottom: -100px; right: 10%;
+  }
+  &--3 {
+    width      : 320px; height: 320px;
+    background : radial-gradient(circle, var(--color-purple-light), transparent);
+    top: 40%; left: 45%;
+    opacity    : 0.2;
+  }
+}
+
+/* ── Títulos de la card ─────────────────────────── */
+.card__title {
+  font-size              : 2rem;
+  font-weight            : 900;
+  background             : linear-gradient(90deg, #4c1675, #be185d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top             : 20px;
+  line-height            : 1.1;
+}
+
+.card__subtitle {
+  font-size  : 0.875rem;
+  color      : var(--color-text-muted);
+  margin-top : 6px;
+  line-height: 1.5;
+}
+
+.card__footer {
+  text-align : center;
+  font-size  : 0.85rem;
+  color      : var(--color-text-muted);
+  margin-top : 20px;
+}
+
+/* ── Brand / Logo ───────────────────────────────── */
+.brand {
+  display       : flex;
+  align-items   : center;
+  gap           : 12px;
+  padding-bottom: 20px;
+  border-bottom : 1.5px solid rgba(236, 72, 153, 0.15);
+
+  &__icon {
+    width      : 72px;
+    height     : 72px;
+    flex-shrink: 0;
+    filter     : drop-shadow(0 4px 10px rgba(110, 39, 233, 0.35));
+
+    img { width: 100%; height: 100%; object-fit: contain; }
+  }
+
+  &__text {
+    display       : flex;
+    flex-direction: column;
+  }
+
+  &__name {
+    font-size     : 1.05rem;
+    font-weight   : 700;
+    color         : var(--color-purple);
+    line-height   : 1.15;
+    letter-spacing: 0.04em;
+
+    strong {
+      font-size  : 1.35rem;
+      font-weight: 900;
+      color      : var(--color-text-dark);
+    }
+  }
+
+  &__tagline {
+    font-size     : 0.62rem;
+    font-weight   : 600;
+    color         : var(--color-text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top    : 2px;
+  }
+}
+
+/* ── Formulario ─────────────────────────────────── */
+.form {
+  display       : flex;
+  flex-direction: column;
+  gap           : 16px;
+  margin-top    : 28px;
+
+  &__row {
+    display              : grid;
+    grid-template-columns: 1fr 1fr;
+    gap                  : 14px;
+  }
+
+  &__options {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    margin-top     : -4px;
+  }
+
+  &__link {
+    color          : var(--color-pink-hot);
+    font-size      : 0.82rem;
+    font-weight    : 600;
+    text-decoration: none;
+    cursor         : pointer;
+    transition     : color var(--transition-fast);
+
+    &:hover {
+      color          : #b8166e;
+      text-decoration: underline;
+    }
+  }
+
+  &__error {
+    color      : #E91E8C;
+    font-size  : 0.85rem;
+    margin-top : -0.5rem;
+  }
+}
+
+/* ── Campos ─────────────────────────────────────── */
+.field {
+  position   : relative;
+  display    : flex;
+  align-items: center;
+
+  &__icon {
+    position      : absolute;
+    left          : 16px;
+    width         : 18px;
+    height        : 18px;
+    color         : #691fb8;
+    pointer-events: none;
+  }
+
+  &__input {
+    width        : 100%;
+    padding      : 15px 44px 15px 46px;
+    border       : 2px solid rgba(236, 72, 153, 0.15);
+    border-radius: 16px;
+    font-family  : var(--font-base);
+    font-size    : 0.9rem;
+    color        : var(--color-text-dark);
+    background   : rgba(245, 233, 233, 0.9);
+    outline      : none;
+    transition   : border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+    &::placeholder { color: #9f69da; }
+
+    &:focus {
+      border-color: #db1879;
+      box-shadow  : 0 0 0 4px rgba(236, 72, 153, 0.12);
+    }
+  }
+
+  &__eye {
+    position       : absolute;
+    right          : 14px;
+    background     : none;
+    border         : none;
+    cursor         : pointer;
+    color          : #c4b5d4;
+    width          : 20px;
+    height         : 20px;
+    padding        : 0;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    transition     : color var(--transition-fast);
+
+    &:hover { color: #f02389; }
+  }
+}
+
+/* ── Checkbox ───────────────────────────────────── */
+.checkbox {
+  display    : flex;
+  align-items: center;
+  gap        : 7px;
+  cursor     : pointer;
+
+  input[type='checkbox'] { display: none; }
+
+  &__mark {
+    width        : 18px;
+    height       : 18px;
+    border       : 2px solid rgba(236, 72, 153, 0.3);
+    border-radius: 6px;
+    background   : white;
+    flex-shrink  : 0;
+    transition   : background var(--transition-fast), border-color var(--transition-fast);
+    position     : relative;
+
+    &::after {
+      content    : '';
+      position   : absolute;
+      top: 2px; left: 5px;
+      width: 5px; height: 9px;
+      border     : 2.5px solid white;
+      border-top : none;
+      border-left: none;
+      transform  : rotate(45deg) scale(0);
+      transition : transform 0.15s;
+    }
+  }
+
+  input:checked + .checkbox__mark {
+    background  : linear-gradient(135deg, #be185d, #ec4899);
+    border-color: #ec4899;
+
+    &::after { transform: rotate(45deg) scale(1); }
+  }
+
+  &__label {
+    font-size  : 0.82rem;
+    color      : var(--color-text-muted);
+    user-select: none;
+  }
+}
+
+/* ── Botón principal ────────────────────────────── */
+.btn-submit {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  gap            : 10px;
+  width          : 100%;
+  padding        : 16px;
+  border         : none;
+  border-radius  : 16px;
+  background     : linear-gradient(90deg, #be185d, #dd1378, #ac0c5f);
+  color          : white;
+  font-family    : var(--font-base);
+  font-size      : 1rem;
+  font-weight    : 800;
+  letter-spacing : 0.15em;
+  cursor         : pointer;
+  box-shadow     : 0 8px 30px rgba(190, 24, 93, 0.45);
+  transition     : transform var(--transition-fast), box-shadow var(--transition-fast);
+  margin-top     : 4px;
+
+  &:hover {
+    transform : translateY(-3px);
+    box-shadow: 0 12px 40px rgba(190, 24, 93, 0.55);
+  }
+
+  &:active { transform: translateY(0); }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor : not-allowed;
+    transform: none !important;
+  }
+}
+
+/* ── Wrapper páginas auth ───────────────────────── */
+.login-page,
+.register-page {
+  min-height     : 100vh;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  padding        : 40px 0;
+  position       : relative;
+  overflow       : hidden;
+
+  &__wrapper {
+    position        : relative;
+    z-index         : 1;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    gap             : 64px;
+    padding         : 30px 48px;
+    width           : 100%;
+    max-width       : 1300px;
+    margin          : 0 auto;
+  }
+
+  &__visual {
+    flex           : 1;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+
+    img {
+      width    : 100%;
+      max-width: 600px;
+      height   : auto;
+      filter   : drop-shadow(0 20px 40px rgba(91, 33, 182, 0.3));
+    }
+  }
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 760px) {
+  .login-page__wrapper,
+  .register-page__wrapper {
+    flex-direction: column;
+    padding       : 24px 16px;
+    gap           : 28px;
+  }
+
+  .login-page__visual,
+  .register-page__visual { display: none; }
+
+  .form__row {
+    grid-template-columns: 1fr;
+  }
+}

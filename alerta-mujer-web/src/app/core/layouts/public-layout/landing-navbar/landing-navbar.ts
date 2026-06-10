@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
   templateUrl: './landing-navbar.html',
   styleUrl: './landing-navbar.scss',
 })
+
 export class navbarComponente {}

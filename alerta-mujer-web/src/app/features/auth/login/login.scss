@@ -2,7 +2,7 @@
 
 /* ── Página completa ───────────────────────────────── */
 .login-page {
-  min-height      : 100vh;
+  height      : 100vh;
   display         : flex;
   align-items     : center;
   justify-content : center;
@@ -45,10 +45,11 @@
     align-items     : center;
     justify-content : center;
     gap             : 64px;
-    padding         : 30px 48px;
+    padding         : 0 48px;
     width           : 100%;
     max-width       : 1300px;
     margin          : 0 auto;
+    max-height     : 100vh; 
   }
 }
 

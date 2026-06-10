@@ -5,6 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './landing-navbar.html',
-  styleUrl: './navbar.scss',
+  styleUrl: './landing-navbar.scss',
 })
 export class navbarComponente {}

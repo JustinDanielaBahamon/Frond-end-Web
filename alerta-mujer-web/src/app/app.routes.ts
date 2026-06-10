@@ -13,8 +13,26 @@ export const routes: Routes = [
     ]
   },
 
-  { path: 'dashboard', loadComponent: () =>
-      import('./features/dashboard/home/home').then((m) => m.Home)
+  {
+    path: 'dashboard',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/dashboard/home/home').then(m => m.Home)
+      },
+      {
+        path: 'phone-location',
+        loadComponent: () => import('./features/dashboard/phone-location/phone-location').then(m => m.PhoneLocationComponent)
+      },
+      {
+        path: 'location-history',
+        loadComponent: () => import('./features/dashboard/location-history/location-history').then(m => m.LocationHistoryComponent)
+      },
+      {
+        path: 'device-status',
+        loadComponent: () => import('./features/dashboard/device-status/device-status').then(m => m.DeviceStatusComponent)
+      },
+    ]
   },
 
   { path: '**', redirectTo: 'auth/login' }

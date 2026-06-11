@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { DashboardLayoutComponent } from './core/layouts/dashboard-layout/dashboard-layout';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -15,6 +16,7 @@ export const routes: Routes = [
 
   {
     path: 'dashboard',
+    component: DashboardLayoutComponent,
     children: [
       {
         path: '',

@@ -34,6 +34,11 @@ export const routes: Routes = [
         path: 'device-status',
         loadComponent: () => import('./features/dashboard/device-status/device-status').then(m => m.DeviceStatusComponent)
       },
+
+      {
+        path:  'alert-history',
+        loadComponent: () => import('./features/dashboard/alert-history/alert-history').then(m => m.AlertHistory)   
+      },
     ]
   },
 

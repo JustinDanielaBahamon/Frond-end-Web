@@ -22,7 +22,7 @@
   margin-bottom: 1.5rem;
 
   .ah-stat {
-    background: #fff;
+    background: #d3baf5;  // ← morado claro como en la captura
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 2px 8px rgba(91, 33, 182, 0.08);
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: #d3baf5; ;
   border: 1.5px solid rgba(124, 58, 237, 0.2);
   border-radius: 10px;
   padding: 0 14px;
@@ -86,7 +86,7 @@
   font-size: 0.875rem;
 
   thead tr {
-    background: linear-gradient(90deg, #f5f0ff, #fdf2f8);
+    background: linear-gradient(90deg, #d9a7fa, #e1a0fa);
   }
 
   th {
@@ -130,10 +130,12 @@
   font-size: 0.78rem;
   font-weight: 700;
 
-  &.badge-sos       { background: #fce7f3; color: #9d174d; }
-  &.badge-caida     { background: #ede9fe; color: #5b21b6; }
-  &.badge-zona      { background: #fef3c7; color: #92400e; }
-  &.badge-manual    { background: #dbeafe; color: #1e40af; }
+  // tipos
+  &.badge-boton    { background: #fce7f3; color: #9d174d; }
+  &.badge-wigert   { background: #ede9fe; color: #5b21b6; }
+  &.badge-sacudida { background: #fdf4ff; color: #86198f; }
+
+  // estados
   &.badge-ok        { background: #d1fae5; color: #065f46; }
   &.badge-pendiente { background: #fef3c7; color: #92400e; }
   &.badge-fallido   { background: #fee2e2; color: #991b1b; }

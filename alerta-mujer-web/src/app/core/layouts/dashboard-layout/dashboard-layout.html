@@ -31,9 +31,7 @@
 
   <div class="layout__body">
     <header class="topbar">
-
       <div class="topbar__left">
-        <!-- HAMBURGUESA -->
         <button class="topbar__hamburger" (click)="toggleSidebar()" title="Menú">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -45,7 +43,6 @@
         <img src="/logo.png" alt="AlertaMujer" class="topbar__logo w-10 h-10" />
         <span class="topbar__brand">AlertaMujer</span>
       </div>
-
       <div class="topbar__actions">
         <button class="topbar__btn" title="Cambiar tema" (click)="toggleTheme()">
           @if (isDark) {
@@ -71,11 +68,36 @@
         <div class="topbar__avatar">S</div>
         <span class="topbar__username">Ver Perfil</span>
       </div>
-
     </header>
+
     <main class="layout__main">
       <router-outlet></router-outlet>
     </main>
+
+    <!-- BOTTOM NAV — solo visible en móvil -->
+    <nav class="bottom-nav">
+      <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active"
+         [routerLinkActiveOptions]="{exact:true}" class="bottom-nav__item">
+        <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/dashboard/alert-history" routerLinkActive="bottom-nav__item--active"
+         class="bottom-nav__item">
+        <i class="ti ti-bell" aria-hidden="true"></i>
+        <span>Alertas</span>
+      </a>
+      <a routerLink="/dashboard/phone-location" routerLinkActive="bottom-nav__item--active"
+         class="bottom-nav__item">
+        <i class="ti ti-map-pin" aria-hidden="true"></i>
+        <span>Ubicación</span>
+      </a>
+      <a routerLink="/dashboard/device-status" routerLinkActive="bottom-nav__item--active"
+         class="bottom-nav__item">
+        <i class="ti ti-device-mobile" aria-hidden="true"></i>
+        <span>Dispositivo</span>
+      </a>
+    </nav>
+
   </div>
 
 </div>

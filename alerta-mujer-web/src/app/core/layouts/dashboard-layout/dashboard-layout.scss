@@ -256,4 +256,126 @@ body.dark-mode {
   }
 }
 
+// ── RESPONSIVE ──────────────────────────────────
+
+// Tablet
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 90px;
+    min-width: 90px;
+    padding: 1rem 6px;
+
+    &__section {
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    &__link {
+      font-size: 0.75rem;
+      padding: 8px 6px;
+      text-align: center;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__divider {
+      margin-bottom: 8px;
+    }
+  }
+}
+
+// Móvil
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  // Ocultar sidebar en móvil
+  .sidebar {
+    display: none;
+  }
+
+  // Topbar móvil
+  .topbar {
+    padding: 0.75rem 1rem;
+
+    &__search { display: none; }
+    &__username { display: none; }
+  }
+
+  // Contenido
+  .layout__main {
+    padding: 1rem;
+  }
+
+  // Stats 2 columnas
+  .ah-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Tabla: ocultar ubicación
+  .ah-table {
+    th:nth-child(4),
+    td:nth-child(4) {
+      display: none;
+    }
+
+    th, td {
+      padding: 10px 8px;
+    }
+  }
+
+  // Bottom nav
+  .bottom-nav {
+    display: flex !important;
+  }
+}
+
+// Pantallas muy pequeñas
+@media (max-width: 480px) {
+  .ah-title { font-size: 1.2rem; }
+
+  .ah-table {
+    font-size: 0.78rem;
+
+    th:nth-child(5),
+    td:nth-child(5) {
+      display: none;
+    }
+  }
+}
+
+// ── BOTTOM NAV (solo móvil) ──────────────────────
+.bottom-nav {
+  display: none;
+  background: #2d1457;
+  justify-content: space-around;
+  padding: 8px 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: color 0.15s;
+
+    i { font-size: 20px; }
+
+    &:hover { color: rgba(255,255,255,0.8); }
+
+    &--active {
+      color: #e879f9;
+    }
+  }
+}
 

@@ -1,0 +1,117 @@
+<div class="ev-wrap">
+
+  <h1 class="ev-title">Evidencias</h1>
+  <p class="ev-sub">Archivos capturados automáticamente durante las alertas</p>
+
+  <!-- STATS -->
+  <div class="ev-stats">
+    <div class="ev-stat">
+      <p class="ev-stat-label">Total archivos</p>
+      <p class="ev-stat-val pink">9</p>
+    </div>
+    <div class="ev-stat">
+      <p class="ev-stat-label">Videos</p>
+      <p class="ev-stat-val purple">3</p>
+    </div>
+    <div class="ev-stat">
+      <p class="ev-stat-label">Fotos</p>
+      <p class="ev-stat-val pink">3</p>
+    </div>
+    <div class="ev-stat">
+      <p class="ev-stat-label">Audios</p>
+      <p class="ev-stat-val green">3</p>
+    </div>
+  </div>
+
+  <!-- BANNER NUBE -->
+  <div class="ev-banner">
+    <i class="ti ti-cloud" aria-hidden="true"></i>
+    <p>
+      <strong>Nube Activa — Sincronización Automática:</strong>
+      Todas las evidencias se suben automáticamente al activar una alerta.
+      Se conservan incluso si el móvil se pierde o formatea.
+    </p>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="ev-filtros">
+    @for (f of filtros; track f.key) {
+      <button class="ev-pill" [ngClass]="{'ev-pill--active': filtroActivo === f.key}"
+              (click)="setFiltro(f.key)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <!-- GALERÍA -->
+  <div class="ev-grid">
+    @for (e of evidenciasFiltradas; track e.id) {
+      <div class="ev-card" (click)="abrirModal(e)">
+        <div class="ev-card__preview" [ngClass]="getColor(e.tipo)">
+          <i class="ti" [ngClass]="getIcono(e.tipo)" aria-hidden="true"></i>
+        </div>
+        <div class="ev-card__body">
+            
+          <p class="ev-card__nombre">{{ e.nombre }}</p>
+          <p class="ev-card__meta">{{ e.tamanio }} · {{ e.fecha }}</p>
+          <p class="ev-card__alerta">Alerta {{ e.alerta }}</p>
+          <span class="ev-card__estado" [ngClass]="e.estado === 'En la nube' ? 'estado-nube' : 'estado-pendiente'">
+            <i class="ti" [ngClass]="e.estado === 'En la nube' ? 'ti-cloud-check' : 'ti-clock'" aria-hidden="true"></i>
+            {{ e.estado }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p class="ev-footer">
+    * Las evidencias sincronizadas se conservan incluso si el móvil se formatea o se pierde.
+  </p>
+
+</div>
+
+<!-- MODAL -->
+@if (modalAbierto && evidenciaSeleccionada) {
+  <div class="ev-modal-bg" (click)="cerrarModal()">
+    <div class="ev-modal" (click)="$event.stopPropagation()">
+
+      <div class="ev-modal-header">
+        <p class="ev-modal-title">{{ evidenciaSeleccionada.nombre }}</p>
+        <button class="ev-modal-close" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="ev-modal-body">
+        <div class="ev-modal-preview" [ngClass]="getColor(evidenciaSeleccionada.tipo)">
+          <i class="ti" [ngClass]="getIcono(evidenciaSeleccionada.tipo)" aria-hidden="true"></i>
+        </div>
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Tipo</span>
+          <span>{{ evidenciaSeleccionada.tipo | titlecase }}</span>
+        </div>
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Tamaño</span>
+          <span>{{ evidenciaSeleccionada.tamanio }}</span>
+        </div>
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Fecha</span>
+          <span>{{ evidenciaSeleccionada.fecha }}</span>
+        </div>
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Alerta asociada</span>
+          <span>{{ evidenciaSeleccionada.alerta }}</span>
+        </div>
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Estado</span>
+          <span class="ev-card__estado" [ngClass]="evidenciaSeleccionada.estado === 'En la nube' ? 'estado-nube' : 'estado-pendiente'">
+            {{ evidenciaSeleccionada.estado }}
+          </span>
+        </div>
+        <button class="ev-download-btn">
+          <i class="ti ti-download" aria-hidden="true"></i>
+          Descargar evidencia
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

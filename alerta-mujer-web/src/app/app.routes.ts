@@ -39,6 +39,11 @@ export const routes: Routes = [
         path:  'alert-history',
         loadComponent: () => import('./features/dashboard/alert-history/alert-history').then(m => m.AlertHistory)   
       },
+      {
+        path: 'evidence',
+        loadComponent: () => import('./features/dashboard/evidence/evidence').then(m => m.Evidence)
+      },
+
     ]
   },
 

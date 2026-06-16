@@ -1,6 +1,7 @@
 <div class="ah-wrap">
 
-  <h1 class="ah-title">Historial de alertas</h1>
+  <h1 class="ah-title">Historial de a
+    lertas</h1>
   <p class="ah-sub">Registro de todas las alertas emitidas por la usuaria</p>
 
   <!-- STATS -->
@@ -83,10 +84,9 @@
       <div class="ah-modal-body">
 
         <!-- MAPA -->
-        <div class="ah-map">
-          <iframe [src]="getMapUrl(alertaSeleccionada.lat, alertaSeleccionada.lng) | safeUrl"
-                  loading="lazy">
-          </iframe>
+        <div class="ah-map" style="position: relative;">
+          <div id="leaflet-map" style="height: 260px; width: 100%; border-radius: 8px;"></div>
+          <button class="ah-map-fullscreen" (click)="toggleFullscreen()">⛶</button>
         </div>
 
         <!-- DETALLES -->

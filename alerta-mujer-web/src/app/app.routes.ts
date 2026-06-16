@@ -27,23 +27,17 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/phone-location/phone-location').then(m => m.PhoneLocationComponent)
       },
       {
-        path: 'location-history',
-        loadComponent: () => import('./features/dashboard/location-history/location-history').then(m => m.LocationHistoryComponent)
-      },
-      {
         path: 'device-status',
         loadComponent: () => import('./features/dashboard/device-status/device-status').then(m => m.DeviceStatusComponent)
       },
-
       {
-        path:  'alert-history',
-        loadComponent: () => import('./features/dashboard/alert-history/alert-history').then(m => m.AlertHistory)   
+        path: 'alert-history',
+        loadComponent: () => import('./features/dashboard/alert-history/alert-history').then(m => m.AlertHistory)
       },
       {
         path: 'evidence',
         loadComponent: () => import('./features/dashboard/evidence/evidence').then(m => m.Evidence)
       },
-
     ]
   },
 

@@ -1,15 +1,161 @@
-*{
+/* 1. Reset básico (Ya lo tenías, ¡perfecto!) */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body{
+/* 2. Contenedor principal de la barra (da fondo y espacio interno) */
+.navbar-container {
+    background-color: #ffffff; /* Puedes cambiar el color al de tu proyecto */
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Una leve sombra para dar profundidad */
+}
+
+/* 3. El contenedor flex (Tu código con un ancho del 100%) */
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* 4. Alinear el Logo e Imagen */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre el logo y el texto "Alerta Mujer" */
+}
+
+.logo img {
+    height: 40px; /* Ajusta el tamaño de tu logo */
+    width: auto;
+}
+
+.logo span {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* 5. ¡Aquí estaba el truco! Alinear los links horizontalmente */
+.nav-links ul {
+    display: flex;
+    list-style: none; /* Quita los puntos negros de la lista */
+    gap: 20px; /* Espacio entre cada enlace */
+}
+
+.nav-links a {
+    text-decoration: none; /* Quita la línea de abajo de los links */
+    color: #555;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #e91e63; /* Color que resalte al pasar el mouse */
+}
+
+/* 6. Contenedor de botones de sesión */
+.container-session{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.container-session-icon{
+    position: relative;
+}
+
+.container-icon-lenguage{
+    position: relative;
+}
+
+.fa-solid{
+    font-size: 24px;
+    cursor: pointer;
+    color: #4B1D73;
+    transition: .3s;
+}
+
+.fa-solid:hover{
+    transform: scale(1.1);
+}
+
+/* ===========================
+   MENÚ DE SESIÓN
+=========================== */
+
+.session-menu{
+    position: absolute;
+
+    top: 40px;
+    right: 0;
+
+    min-width: 180px;
+
+    background-color: white;
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.15);
+
+    z-index: 1000;
+}
+
+.session-menu ul{
+    list-style: none;
+}
+
+.session-menu li{
+    padding: 12px 15px;
+}
+
+.session-menu li:hover{
     background-color: #f5f5f5;
 }
 
-.nav-content{
-    display:flex;
-    justify-content : space-between;
-    align-items: center;
+.session-menu a{
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+/* ===========================
+   MENÚ DE IDIOMAS
+=========================== */
+
+.language-menu{
+    position: absolute;
+
+    top: 40px;
+    right: 0;
+
+    min-width: 150px;
+
+    background-color: white;
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.15);
+
+    z-index: 1000;
+}
+
+.language-menu ul{
+    list-style: none;
+}
+
+.language-menu li{
+    padding: 12px 15px;
+}
+
+.language-menu li:hover{
+    background-color: #f5f5f5;
+}
+
+.language-menu a{
+    text-decoration: none;
+    color: #333;
+    display: block;
 }

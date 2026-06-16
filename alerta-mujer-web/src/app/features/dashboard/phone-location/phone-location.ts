@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, signal, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 
@@ -12,7 +12,6 @@ interface LocationEntry {
   lng: number;
 }
 
-// Fix de los iconos por defecto de Leaflet con Webpack/Angular
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -22,6 +21,16 @@ const iconDefault = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+const iconRed = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 L.Marker.prototype.options.icon = iconDefault;
 
 @Component({
@@ -45,13 +54,15 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
   dateRanges = ['Hoy', 'Últimos 3 días', 'Última semana'];
   showDeviceDropdown = signal(false);
   showDateDropdown = signal(false);
+  isFullscreen = signal(false);
+  showFullscreenBtn = signal(false);
 
   locationHistory = signal<LocationEntry[]>([
-    { id: 1, time: '11:30 AM', address: 'Calle Principal 123, Ciudad', gpsSignal: 'Fuerte',   battery: 85, lat: 4.7110,  lng: -74.0721 },
-    { id: 2, time: '11:15 AM', address: 'Parque Central',              gpsSignal: 'Fuerte',   battery: 82, lat: 4.7095,  lng: -74.0698 },
-    { id: 3, time: '10:45 AM', address: 'Centro Comercial',            gpsSignal: 'Moderada', battery: 79, lat: 4.7080,  lng: -74.0750 },
-    { id: 4, time: '10:30 AM', address: 'Av. Libertad 456',            gpsSignal: 'Fuerte',   battery: 76, lat: 4.7060,  lng: -74.0730 },
-    { id: 5, time: '9:30 AM',  address: 'Zona Norte, Barrio El Prado', gpsSignal: 'Débil',    battery: 70, lat: 4.7040,  lng: -74.0710 },
+    { id: 1, time: '11:30 AM', address: 'Calle Principal 123, Ciudad', gpsSignal: 'Fuerte',   battery: 85, lat: 4.7110, lng: -74.0721 },
+    { id: 2, time: '11:15 AM', address: 'Parque Central',              gpsSignal: 'Fuerte',   battery: 82, lat: 4.7095, lng: -74.0698 },
+    { id: 3, time: '10:45 AM', address: 'Centro Comercial',            gpsSignal: 'Moderada', battery: 79, lat: 4.7080, lng: -74.0750 },
+    { id: 4, time: '10:30 AM', address: 'Av. Libertad 456',            gpsSignal: 'Fuerte',   battery: 76, lat: 4.7060, lng: -74.0730 },
+    { id: 5, time: '9:30 AM',  address: 'Zona Norte, Barrio El Prado', gpsSignal: 'Débil',    battery: 70, lat: 4.7040, lng: -74.0710 },
   ]);
 
   currentLocation = this.locationHistory()[0];
@@ -80,15 +91,14 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
       center: [center.lat, center.lng],
       zoom: 15,
       zoomControl: true,
+      scrollWheelZoom: false,
     });
 
-    // Tiles de OpenStreetMap (gratis, sin API key)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     }).addTo(this.map);
 
-    // icono especial para la posicion actual
     const currentIcon = L.divIcon({
       className: '',
       html: `<div class="you-marker">YOU</div>`,
@@ -96,22 +106,19 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
       iconAnchor: [24, 24],
     });
 
-    // Marcador de posicion actual
     const currentMarker = L.marker([center.lat, center.lng], { icon: currentIcon })
       .addTo(this.map)
       .bindPopup(`<b>Ubicación actual</b><br>${center.address}<br>${center.time}`);
     this.markers.push(currentMarker);
 
-    // Marcadores del historial
     const history = this.locationHistory().slice(1);
     history.forEach(entry => {
-      const marker = L.marker([entry.lat, entry.lng])
+      const marker = L.marker([entry.lat, entry.lng], { icon: iconRed })
         .addTo(this.map)
         .bindPopup(`<b>${entry.time}</b><br>${entry.address}<br>GPS: ${entry.gpsSignal} | Batería: ${entry.battery}%`);
       this.markers.push(marker);
     });
 
-    // Linea de ruta entre puntos
     const coords: L.LatLngExpression[] = this.locationHistory().map(e => [e.lat, e.lng]);
     this.polyline = L.polyline(coords, {
       color: '#7c3aed',
@@ -120,8 +127,28 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
       dashArray: '6, 6',
     }).addTo(this.map);
 
-    // Ajustar el mapa para mostrar todos los puntos
     this.map.fitBounds(this.polyline.getBounds(), { padding: [40, 40] });
+  }
+
+  onMapMouseEnter() {
+    this.showFullscreenBtn.set(true);
+    this.map.scrollWheelZoom.enable();
+  }
+
+  onMapMouseLeave() {
+    this.showFullscreenBtn.set(false);
+    this.map.scrollWheelZoom.disable();
+  }
+
+  toggleFullscreen() {
+    const el = this.mapContainer.nativeElement;
+    if (!document.fullscreenElement) {
+      el.requestFullscreen();
+      this.isFullscreen.set(true);
+    } else {
+      document.exitFullscreen();
+      this.isFullscreen.set(false);
+    }
   }
 
   flyTo(entry: LocationEntry) {

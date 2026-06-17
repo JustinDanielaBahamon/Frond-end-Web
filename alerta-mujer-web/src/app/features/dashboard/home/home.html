@@ -1,15 +1,14 @@
 <div class="db-wrap">
-
+  
   <!-- STATS CARDS -->
   <div class="db-stats">
-
     <div class="db-card db-card--purple">
       <div class="db-card-info">
         <p class="db-card-label">Total Alertas</p>
         <p class="db-card-val">24</p>
         <p class="db-card-sub">últimas 2 horas</p>
       </div>
-      <div class="db-card-icon">🛟</div>
+      <div class="db-card-icon"><i class="ti ti-bell-ringing"></i></div>
     </div>
 
     <div class="db-card db-card--pink">
@@ -18,7 +17,7 @@
         <p class="db-card-val">12</p>
         <p class="db-card-sub">Desde dispositivo: Samsung S21</p>
       </div>
-      <div class="db-card-icon">❗</div>
+      <div class="db-card-icon"><i class="ti ti-alert-triangle"></i></div>
     </div>
 
     <div class="db-card db-card--teal">
@@ -27,9 +26,8 @@
         <p class="db-card-val db-card-val--sm">Hace 5min</p>
         <p class="db-card-sub">Desde dispositivo: iPhone 13 Pro</p>
       </div>
-      <div class="db-card-icon">🔄</div>
+      <div class="db-card-icon"><i class="ti ti-refresh"></i></div>
     </div>
-
   </div>
 
   <!-- FILA MEDIA -->
@@ -38,7 +36,7 @@
     <!-- GRÁFICA -->
     <div class="db-chart-box">
       <div class="db-section-header">
-        <span>📊</span>
+        <i class="ti ti-chart-bar"></i>
         <h2 class="db-section-title">Gráfica de Tendencia de Alertas</h2>
       </div>
       <p class="db-chart-sub">Alertas por Mes</p>
@@ -57,10 +55,26 @@
       </div>
     </div>
 
-    <!-- ACTIVIDAD RECIENTE -->
+    <!-- MAPA DE ZONAS ← hermano, no hijo de db-chart-box -->
+    <div class="db-map-box">
+      <div class="db-section-header">
+        <i class="ti ti-map-pin"></i>
+        <h2 class="db-section-title">Zonas de Riesgo</h2>
+      </div>
+      <div id="dashboard-map" class="db-map"></div>
+      <div class="db-map-legend">
+        <span class="db-legend-item db-legend--alto">● Alto</span>
+        <span class="db-legend-item db-legend--medio">● Medio</span>
+        <span class="db-legend-item db-legend--bajo">● Bajo</span>
+      </div>
+    </div>
+
+  </div>
+
+   <!-- ACTIVIDAD RECIENTE -->
     <div class="db-activity-box">
       <div class="db-section-header">
-        <span>🕐</span>
+        <i class="ti ti-clock"></i>
         <h2 class="db-section-title">Actividad Reciente</h2>
       </div>
       <table class="db-activity-table">
@@ -92,21 +106,19 @@
       <a class="db-ver-mas" routerLink="/dashboard/alert-history">Ver historial completo...</a>
     </div>
 
-  </div>
-
   <!-- ACCESOS RÁPIDOS -->
   <div class="db-accesos">
     <div class="db-section-header">
-      <span>🚀</span>
+      <i class="ti ti-bolt"></i>
       <h2 class="db-section-title">Accesos Rápidos</h2>
     </div>
     <div class="db-accesos-grid">
       <a class="db-acceso-card" routerLink="/dashboard/alert-history">
-        <span class="db-acceso-icon">🗺️</span>
+        <i class="ti ti-map-2 db-acceso-icon"></i>
         <span class="db-acceso-label">Ver Historial</span>
       </a>
       <a class="db-acceso-card" routerLink="/dashboard/evidencias">
-        <span class="db-acceso-icon">📷</span>
+        <i class="ti ti-camera db-acceso-icon"></i>
         <span class="db-acceso-label">Nube de Evidencias</span>
       </a>
     </div>

@@ -1,80 +1,115 @@
-<div class="space-y-6">
+<div class="db-wrap">
 
-    <!-- TITULO -->
-    <div>
-      <h1 class="text-3xl font-bold text-gray-800">
-        Bienvenida al sistema
-      </h1>
-  
-      <p class="text-gray-500">
-        Panel de control de Alerta Mujer
-      </p>
-    </div>
-  
-    <!-- CARDS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-  
-      <div class="bg-white p-5 rounded-lg shadow">
-        <h2 class="text-xl font-bold">Alertas</h2>
-        <p class="text-3xl text-pink-600">12</p>
+  <!-- STATS CARDS -->
+  <div class="db-stats">
+
+    <div class="db-card db-card--purple">
+      <div class="db-card-info">
+        <p class="db-card-label">Total Alertas</p>
+        <p class="db-card-val">24</p>
+        <p class="db-card-sub">últimas 2 horas</p>
       </div>
-  
-      <div class="bg-white p-5 rounded-lg shadow">
-        <h2 class="text-xl font-bold">Contactos</h2>
-        <p class="text-3xl text-pink-600">8</p>
-      </div>
-  
-      <div class="bg-white p-5 rounded-lg shadow">
-        <h2 class="text-xl font-bold">Usuarios activos</h2>
-        <p class="text-3xl text-pink-600">3</p>
-      </div>
-  
+      <div class="db-card-icon">🛟</div>
     </div>
-  
-    <!-- LISTA -->
-    <div class="bg-white p-5 rounded-lg shadow">
-  
-      <h2 class="text-xl font-bold mb-3">
-        Últimas alertas
-      </h2>
-  
-      <ul class="space-y-2">
-  
-        <li class="p-3 bg-gray-100 rounded">
-          Alerta recibida - 10:32 AM
-        </li>
-  
-        <li class="p-3 bg-gray-100 rounded">
-          Contacto agregado - ayer
-        </li>
-  
-      </ul>
-  
+
+    <div class="db-card db-card--pink">
+      <div class="db-card-info">
+        <p class="db-card-label">Alertas Pendientes</p>
+        <p class="db-card-val">12</p>
+        <p class="db-card-sub">Desde dispositivo: Samsung S21</p>
+      </div>
+      <div class="db-card-icon">❗</div>
     </div>
+
+    <div class="db-card db-card--teal">
+      <div class="db-card-info">
+        <p class="db-card-label">Sincronización</p>
+        <p class="db-card-val db-card-val--sm">Hace 5min</p>
+        <p class="db-card-sub">Desde dispositivo: iPhone 13 Pro</p>
+      </div>
+      <div class="db-card-icon">🔄</div>
+    </div>
+
+  </div>
+
+  <!-- FILA MEDIA -->
+  <div class="db-mid">
+
+    <!-- GRÁFICA -->
+    <div class="db-chart-box">
+      <div class="db-section-header">
+        <span>📊</span>
+        <h2 class="db-section-title">Gráfica de Tendencia de Alertas</h2>
+      </div>
+      <p class="db-chart-sub">Alertas por Mes</p>
+      <div class="db-chart">
+        @for (item of chartData; track item.mes) {
+          <div class="db-bar-wrap">
+            <div class="db-bar" [style.height.px]="item.valor * 8"></div>
+            <span class="db-bar-label">{{ item.mes }}</span>
+          </div>
+        }
+      </div>
+      <div class="db-chart-yaxis">
+        @for (y of yAxis; track y) {
+          <span>{{ y }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- ACTIVIDAD RECIENTE -->
+    <div class="db-activity-box">
+      <div class="db-section-header">
+        <span>🕐</span>
+        <h2 class="db-section-title">Actividad Reciente</h2>
+      </div>
+      <table class="db-activity-table">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Tipo</th>
+            <th>Ubicación</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (act of actividad; track act.n) {
+            <tr>
+              <td>{{ act.n }}</td>
+              <td>{{ act.tipo }}</td>
+              <td class="db-ubicacion">{{ act.ubicacion }}</td>
+              <td class="db-fecha">{{ act.fecha }}</td>
+              <td>
+                <span class="db-estado" [ngClass]="act.estado === 'VALIDADA' ? 'db-estado--validada' : 'db-estado--ok'">
+                  {{ act.estado }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <a class="db-ver-mas" routerLink="/dashboard/alert-history">Ver historial completo...</a>
+    </div>
+
+  </div>
+
   <!-- ACCESOS RÁPIDOS -->
-  <div class="bg-white p-5 rounded-lg shadow">
-
-    <h2 class="text-xl font-bold mb-3">Accesos rápidos</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-      <a routerLink="/dashboard/phone-location"
-         class="flex items-center gap-3 p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
-        <span class="font-semibold text-gray-700">Phone Location</span>
-      </a>
-
-      <a routerLink="/dashboard/location-history"
-         class="flex items-center gap-3 p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
-        <span class="font-semibold text-gray-700">Location History</span>
-      </a>
-
-      <a routerLink="/dashboard/device-status"
-         class="flex items-center gap-3 p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
-        <span class="font-semibold text-gray-700">Device Status</span>
-      </a>
-
+  <div class="db-accesos">
+    <div class="db-section-header">
+      <span>🚀</span>
+      <h2 class="db-section-title">Accesos Rápidos</h2>
     </div>
-
+    <div class="db-accesos-grid">
+      <a class="db-acceso-card" routerLink="/dashboard/alert-history">
+        <span class="db-acceso-icon">🗺️</span>
+        <span class="db-acceso-label">Ver Historial</span>
+      </a>
+      <a class="db-acceso-card" routerLink="/dashboard/evidencias">
+        <span class="db-acceso-icon">📷</span>
+        <span class="db-acceso-label">Nube de Evidencias</span>
+      </a>
+    </div>
   </div>
 
 </div>

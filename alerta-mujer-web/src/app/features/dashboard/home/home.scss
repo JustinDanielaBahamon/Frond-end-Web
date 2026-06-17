@@ -1,0 +1,236 @@
+.db-wrap {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// STATS
+.db-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.db-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  color: #fff;
+
+  &--purple { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
+  &--pink   { background: linear-gradient(135deg, #be185d, #db2777); }
+  &--green  { background: linear-gradient(135deg, #059669, #10b981); }
+  &--teal   { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+
+  &-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.85;
+    margin: 0 0 4px;
+  }
+
+  &-val {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 4px;
+    line-height: 1;
+
+    &--sm { font-size: 1.4rem; }
+  }
+
+  &-sub {
+    font-size: 0.72rem;
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  &-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+  }
+}
+
+// FILA MEDIA
+.db-mid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.db-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.db-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d1457;
+  margin: 0;
+}
+
+// GRÁFICA
+.db-chart-box {
+  background: #fff;
+  border: 1px solid #c4b5fd;
+  border-radius: 16px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.db-chart-sub {
+  font-size: 0.78rem;
+  color: #a78bfa;
+  margin: 0 0 1rem;
+}
+
+.db-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 200px;
+  padding-left: 32px;
+}
+
+.db-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+}
+
+.db-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #a78bfa, #c4b5fd);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(180deg, #7c3aed, #a78bfa);
+  }
+}
+
+.db-bar-label {
+  font-size: 0.7rem;
+  color: #7c3aed;
+}
+
+.db-chart-yaxis {
+  position: absolute;
+  left: 1.25rem;
+  top: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  font-size: 0.65rem;
+  color: #a78bfa;
+}
+
+// ACTIVIDAD
+.db-activity-box {
+  background: #fff;
+  border: 1px solid #c4b5fd;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.db-activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+
+  th {
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #7c3aed;
+    border-bottom: 1px solid #ede9fe;
+  }
+
+  td {
+    padding: 8px 8px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #2d1457;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.db-ubicacion { font-size: 0.75rem; color: #7c3aed; }
+.db-fecha     { font-size: 0.75rem; color: #a78bfa; white-space: nowrap; }
+
+.db-estado {
+  display: inline-flex;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &--validada { background: #ede9fe; color: #5b21b6; }
+  &--ok       { background: #d1fae5; color: #065f46; }
+}
+
+.db-ver-mas {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ACCESOS RÁPIDOS
+.db-accesos {
+  background: #fff;
+  border: 1px solid #c4b5fd;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.db-accesos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.db-acceso-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #2d1457;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #fdf4ff;
+    border-color: #a78bfa;
+  }
+}
+
+.db-acceso-icon { font-size: 1.8rem; }

@@ -1,74 +1,83 @@
-    <div class="navbar-container">
-        <div class="nav-content">
-            <div class="logo">
-                <img src="assets/images/logo.png" alt="Logo">
-                <span>Alerta Mujer</span>
-            </div>
-            <div class="nav-links">
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Nosotros</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">FQA</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="container-session">
+<div class="navbar-container">
 
-            <!-- Usuario -->
-                <div class="container-session-icon">
+    <div class="navbar-logo">
+        <img src="logo.png" alt="Logo">
+        <span>Alerta Mujer</span>
+    </div>
+       
+    <nav class="navbar-links">
+        <a href="#" style="color: blueviolet; font-weight: 700;">Inicio</a>
+        <a href="#">Nosotros</a>
+        <a href="#">Servicios</a>
+        <a href="#">FAQ</a>
+        <a href="#">Contacto</a>
+    </nav>
+    <button
+            class="hamburger-btn"
+            (click)="toggleMobileMenu()">
 
-                    <i
-                        class="fa-solid fa-circle-user"
-                        (click)="toggleSessionMenu()">
-                    </i>
+            @if(!menuMobileOpen){
+                <i class="fa-solid fa-bars"></i>
+            } @else {
+                <i class="fa-solid fa-xmark"></i>
+            }
 
-                    @if(menuOpendSession){
-
-                        <div class="session-menu">
-                            <ul>
-                                <li>
-                                    <a href="#">Iniciar sesión</a>
-                                </li>
-
-                                <li>
-                                    <a href="#">Registrarse</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                    }
-
+        </button>
+    <div class="navbar-actions">
+        
+        <div class="language-selector">
+            <button class="language-btn" (click)="toggleIdiomsMenu()">
+                @if (idiomActual === 'ES') { <img src="https://flagcdn.com/es.svg" class="flag-nav" alt="ES"> }
+                @if (idiomActual === 'EN') { <img src="https://flagcdn.com/us.svg" class="flag-nav" alt="EN"> }
+                @if (idiomActual === 'FR') { <img src="https://flagcdn.com/fr.svg" class="flag-nav" alt="FR"> }
+                <span>{{ idiomActual }} <i class="fa-solid fa-caret-down" style="margin-left: 2px;"></i></span>
+            </button>
+            
+            @if (menuOpneIdioms) {
+                <div class="language-menu">
+                    <ul>
+                        <li (click)="changeIdiom('ES')">
+                            <img src="https://flagcdn.com/es.svg" class="flag-dropdown" alt="ES"> ES
+                        </li>
+                        <li (click)="changeIdiom('EN')">
+                            <img src="https://flagcdn.com/us.svg" class="flag-dropdown" alt="EN"> EN
+                        </li>
+                        <li (click)="changeIdiom('FR')">
+                            <img src="https://flagcdn.com/fr.svg" class="flag-dropdown" alt="FR"> FR
+                        </li>
+                    </ul>
                 </div>
-
-                <!-- Idioma -->
-                <div class="container-icon-lenguage">
-
-                    <i
-                        class="fa-solid fa-language"
-                        (click)="toggleIdiomsMenu()">
-                    </i>
-
-                    @if(menuOpneIdioms){
-
-                        <div class="language-menu">
-                            <ul>
-                                <li>
-                                    <a href="#">Español</a>
-                                </li>
-
-                                <li>
-                                    <a href="#">English</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                    }
-
-                </div>
-
-            </div>
-
+            }
+            
         </div>
 
+         
+        <button class="login-btn">
+            Iniciar sesión
+        </button>
+
+        <button class="register-btn"> 
+            Regístrate 
+        </button>
     </div>
+</div>
+
+@if(menuMobileOpen){
+
+<div class="mobile-menu">
+
+    
+    
+    <div class="mobile-divider"></div>
+
+    <button class="login-btn">
+        Iniciar sesión
+    </button>
+
+    <button class="register-btn">
+        Regístrate
+    </button>
+
+</div>
+
+}

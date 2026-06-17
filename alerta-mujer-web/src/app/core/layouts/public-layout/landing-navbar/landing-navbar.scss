@@ -1,161 +1,233 @@
-/* 1. Reset básico (Ya lo tenías, ¡perfecto!) */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* 2. Contenedor principal de la barra (da fondo y espacio interno) */
+/* --- CONTENEDOR PRINCIPAL Y DISEÑO --- */
 .navbar-container {
-    background-color: #ffffff; /* Puedes cambiar el color al de tu proyecto */
-    padding: 15px 30px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Una leve sombra para dar profundidad */
-}
-
-/* 3. El contenedor flex (Tu código con un ancho del 100%) */
-.nav-content {
+    height: 80px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    width: 100%;
+    padding: 0 40px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
 }
 
-/* 4. Alinear el Logo e Imagen */
-.logo {
+/* --- LOGOTIPO --- */
+.navbar-logo {
     display: flex;
     align-items: center;
-    gap: 10px; /* Espacio entre el logo y el texto "Alerta Mujer" */
+    gap: 10px;
 }
 
-.logo img {
-    height: 40px; /* Ajusta el tamaño de tu logo */
-    width: auto;
+.navbar-logo img {
+    height: 45px;
 }
 
-.logo span {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #333;
+.navbar-logo span {
+    font-size: 28px;
+    font-weight: 700;
 }
 
-/* 5. ¡Aquí estaba el truco! Alinear los links horizontalmente */
-.nav-links ul {
+/* --- ENLACES DE NAVEGACIÓN --- */
+.navbar-links {
     display: flex;
-    list-style: none; /* Quita los puntos negros de la lista */
-    gap: 20px; /* Espacio entre cada enlace */
+    gap: 35px;
+    align-items: center;
 }
 
-.nav-links a {
-    text-decoration: none; /* Quita la línea de abajo de los links */
-    color: #555;
+.navbar-links a {
+    text-decoration: none;
+    color: #1b2d5b;              /* Tu color azul oscuro base */
     font-weight: 500;
-    transition: color 0.3s;
+    font-size: 16px;
+    position: relative;          /* Necesario para trucos visuales si deseas luego */
+    padding: 6px 0;
+    transition: all 0.25s ease;  /* Animación suave para el cambio de color */
+    cursor: pointer;
 }
 
-.nav-links a:hover {
-    color: #e91e63; /* Color que resalte al pasar el mouse */
+/* El efecto HOVER para los enlaces del menú */
+.navbar-links a:hover {
+    color: #8529b5 !important;   /* Cambia al morado de tu marca al pasar el mouse */
+    transform: translateY(-2px); /* Un sutil levante hacia arriba que se ve genial */
+    text-shadow: 0 2px 4px rgba(133, 41, 181, 0.15); /* Pequeño destello en el texto */
 }
-
-/* 6. Contenedor de botones de sesión */
-.container-session{
+/* --- BOTONES DE ACCIÓN (LOGIN Y REGISTRO) --- */
+.navbar-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
-.container-session-icon{
-    position: relative;
-}
-
-.container-icon-lenguage{
-    position: relative;
-}
-
-.fa-solid{
-    font-size: 24px;
+.login-btn {
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 17px;
+    border: 1px solid #8529b5;
+    background: transparent;
+    color: #8529b5;
+    font-weight: 600;
     cursor: pointer;
-    color: #4B1D73;
-    transition: .3s;
 }
 
-.fa-solid:hover{
-    transform: scale(1.1);
+.login-btn:hover{
+    background-color: #8529b5;
+    color: white;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(133, 41, 181, 0.15);
+    text-shadow: 0 2px 4px rgba(133, 41, 181, 0.15);
+    border: none;
+    outline: none;
+
 }
 
-/* ===========================
-   MENÚ DE SESIÓN
-=========================== */
+.register-btn {
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 17px;
+    border: none;
+    background: #8529b5;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-.session-menu{
+/* --- SELECTOR DE IDIOMAS --- */
+/* --- SELECTOR DE IDIOMAS (REFACTORIZADO) --- */
+.language-selector {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.language-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Menú Desplegable */
+.language-selector .language-menu {
     position: absolute;
-
-    top: 40px;
+    top: 55px;
     right: 0;
-
-    min-width: 180px;
-
-    background-color: white;
-
-    border-radius: 10px;
-
-    box-shadow: 0 4px 15px rgba(0,0,0,.15);
-
-    z-index: 1000;
+    min-width: 130px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .15);
+    z-index: 999;
+    padding: 5px 0; /* Un pequeño respiro interno */
 }
 
-.session-menu ul{
+.language-selector .language-menu ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.session-menu li{
-    padding: 12px 15px;
+/* Forzamos el selector para que Angular no lo ignore */
+.language-selector .language-menu ul li {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 16px !important;
+    color: #1b2d5b !important; /* Usamos el azul de tus otros links */
+    border-radius: 0px; /* Quitamos el radio para que la barra de selección cubra todo el ancho */
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
 }
 
-.session-menu li:hover{
-    background-color: #f5f5f5;
+/* El efecto HOVER super reforzado */
+.language-selector .language-menu ul li:hover {
+    background-color: rgba(133, 41, 181, 0.15) !important; /* Tu morado #8529b5 con transparencia */
+    color: #8529b5 !important;                             /* Texto en morado sólido */
+    padding-left: 22px !important;                         /* Desplazamiento sutil */
 }
 
-.session-menu a{
-    text-decoration: none;
-    color: #333;
-    display: block;
+/* --- BANDERAS (SVG) --- */
+.flag-nav, .flag-dropdown {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-/* ===========================
-   MENÚ DE IDIOMAS
-=========================== */
-
-.language-menu{
-    position: absolute;
-
-    top: 40px;
-    right: 0;
-
-    min-width: 150px;
-
-    background-color: white;
-
-    border-radius: 10px;
-
-    box-shadow: 0 4px 15px rgba(0,0,0,.15);
-
-    z-index: 1000;
+.flag-nav {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.language-menu ul{
-    list-style: none;
+/* =======================================
+   HAMBURGUESA
+======================================= */
+
+.hamburger-btn{
+    display: none;
+
+    background: transparent;
+
+    border: none;
+
+    font-size: 28px;
+
+    color: #8529b5;
+
+    cursor: pointer;
 }
 
-.language-menu li{
-    padding: 12px 15px;
+/* =======================================
+   MENÚ MÓVIL
+======================================= */
+
+.mobile-menu{
+    display: none;
 }
 
-.language-menu li:hover{
-    background-color: #f5f5f5;
+.mobile-divider{
+    width: 100%;
+    height: 1px;
+    background: #ececec;
 }
 
-.language-menu a{
-    text-decoration: none;
-    color: #333;
-    display: block;
+
+/* =======================================
+   RESPONSIVE 992px
+======================================= */
+
+@media(max-width:1150px){
+
+   
+
+    .navbar-actions{
+        display:none;
+    }
+
+    .hamburger-btn{
+        display:block;
+    }
+
+    .mobile-menu{
+        display:flex;
+
+        flex-direction:column;
+
+        gap:20px;
+
+        padding:25px;
+
+        background:white;
+
+        box-shadow:0 5px 20px rgba(0,0,0,.08);
+    }
+
+    .mobile-menu a{
+        text-decoration:none;
+
+        color:#1b2d5b;
+
+        font-weight:600;
+    }
+
 }

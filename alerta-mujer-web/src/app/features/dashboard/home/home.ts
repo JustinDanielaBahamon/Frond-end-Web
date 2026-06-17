@@ -9,17 +9,17 @@ import * as L from 'leaflet';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-
 export class Home implements AfterViewInit, OnDestroy {
 
   private map: L.Map | null = null;
+  panelAbierto = false;
 
   zonas = [
-    { lat: 2.2964, lng: -75.0199, nombre: 'Campoalegre Centro',     alertas: 24, porcentaje: 42, nivel: 'alto',  color: '#ef4444' },
-    { lat: 2.9273, lng: -75.2819, nombre: 'Av. Santander, Neiva',   alertas: 15, porcentaje: 26, nivel: 'medio', color: '#f59e0b' },
-    { lat: 2.9356, lng: -75.2945, nombre: 'Terminal Neiva',          alertas: 10, porcentaje: 17, nivel: 'medio', color: '#f59e0b' },
-    { lat: 2.1978, lng: -75.6273, nombre: 'Parque Central, Garzón', alertas: 6,  porcentaje: 10, nivel: 'bajo',  color: '#10b981' },
-    { lat: 2.2971, lng: -75.0210, nombre: 'Calle 15, Campoalegre',  alertas: 3,  porcentaje: 5,  nivel: 'bajo',  color: '#10b981' },
+    { lat: 2.2964, lng: -75.0199, nombre: 'Campoalegre Centro',      alertas: 24, porcentaje: 42, nivel: 'alto',  color: '#ef4444' },
+    { lat: 2.9273, lng: -75.2819, nombre: 'Av. Santander, Neiva',    alertas: 15, porcentaje: 26, nivel: 'medio', color: '#f59e0b' },
+    { lat: 2.9356, lng: -75.2945, nombre: 'Terminal Neiva',           alertas: 10, porcentaje: 17, nivel: 'medio', color: '#f59e0b' },
+    { lat: 2.1978, lng: -75.6273, nombre: 'Parque Central, Garzón',  alertas: 6,  porcentaje: 10, nivel: 'bajo',  color: '#10b981' },
+    { lat: 2.2971, lng: -75.0210, nombre: 'Calle 15, Campoalegre',   alertas: 3,  porcentaje: 5,  nivel: 'bajo',  color: '#10b981' },
   ];
 
   chartData = [
@@ -39,6 +39,28 @@ export class Home implements AfterViewInit, OnDestroy {
     { n: 5, tipo: 'Check-in diario',   ubicacion: 'N/A',              fecha: 'Lunes 18:45 PM', estado: 'OK' },
   ];
 
+  togglePanel() {
+    this.panelAbierto = !this.panelAbierto;
+    setTimeout(() => this.map?.invalidateSize(), 300);
+  }
+
+  irAZona(zona: any) {
+    if (this.map) {
+      this.map.flyTo([zona.lat, zona.lng], 13, { duration: 1 });
+      this.map.eachLayer((layer: any) => {
+        if (layer instanceof L.Circle) {
+          const latlng = layer.getLatLng();
+          if (
+            Math.abs(latlng.lat - zona.lat) < 0.001 &&
+            Math.abs(latlng.lng - zona.lng) < 0.001
+          ) {
+            layer.openPopup();
+          }
+        }
+      });
+    }
+  }
+
   ngAfterViewInit() {
     const iconDefault = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -48,7 +70,6 @@ export class Home implements AfterViewInit, OnDestroy {
       iconAnchor: [12, 41],
     });
     L.Marker.prototype.options.icon = iconDefault;
-
     setTimeout(() => this.inicializarMapa(), 100);
   }
 
@@ -66,7 +87,6 @@ export class Home implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.zonas.forEach(zona => {
-      // Círculo semitransparente proporcional a alertas
       L.circle([zona.lat, zona.lng], {
         color: zona.color,
         fillColor: zona.color,
@@ -95,7 +115,6 @@ export class Home implements AfterViewInit, OnDestroy {
         </div>
       `);
 
-      // Punto central con color según nivel
       const nivelIcon = L.divIcon({
         className: '',
         html: `
@@ -127,5 +146,4 @@ export class Home implements AfterViewInit, OnDestroy {
       this.map = null;
     }
   }
-
-}  // ← única llave de cierre de la clase
+}

@@ -1,5 +1,5 @@
 <div class="db-wrap">
-  
+
   <!-- STATS CARDS -->
   <div class="db-stats">
     <div class="db-card db-card--purple">
@@ -56,18 +56,49 @@
     </div>
 
     <!-- MAPA DE ZONAS ← hermano, no hijo de db-chart-box -->
-    <div class="db-map-box">
-      <div class="db-section-header">
-        <i class="ti ti-map-pin"></i>
-        <h2 class="db-section-title">Zonas de Riesgo</h2>
+   <div class="db-map-box">
+  <div class="db-section-header">
+    <i class="ti ti-map-pin"></i>
+    <h2 class="db-section-title">Zonas de Riesgo</h2>
+    <button class="db-map-btn-zonas" (click)="togglePanel()">
+      <i class="ti ti-list"></i> Ver zonas
+    </button>
+  </div>
+
+  <div class="db-map-container">
+    <div id="dashboard-map" class="db-map"></div>
+
+    <!-- PANEL LATERAL -->
+    <div class="db-zonas-panel" [class.db-zonas-panel--open]="panelAbierto">
+      <div class="db-zonas-panel-header">
+        <span>Zonas de Peligro</span>
+        <button class="db-zonas-close" (click)="togglePanel()">
+          <i class="ti ti-x"></i>
+        </button>
       </div>
-      <div id="dashboard-map" class="db-map"></div>
-      <div class="db-map-legend">
-        <span class="db-legend-item db-legend--alto">● Alto</span>
-        <span class="db-legend-item db-legend--medio">● Medio</span>
-        <span class="db-legend-item db-legend--bajo">● Bajo</span>
+      <div class="db-zonas-list">
+        @for (zona of zonas; track zona.nombre) {
+          <div class="db-zona-item" (click)="irAZona(zona)">
+            <div class="db-zona-dot" [style.background]="zona.color"></div>
+            <div class="db-zona-info">
+              <p class="db-zona-nombre">{{ zona.nombre }}</p>
+              <p class="db-zona-meta">🔔 {{ zona.alertas }} alertas · {{ zona.porcentaje }}%</p>
+            </div>
+            <span class="db-zona-nivel" [style.background]="zona.color + '22'" [style.color]="zona.color">
+              {{ zona.nivel | uppercase }}
+            </span>
+          </div>
+        }
       </div>
     </div>
+  </div>
+
+  <div class="db-map-legend">
+    <span class="db-legend-item db-legend--alto">● Alto</span>
+    <span class="db-legend-item db-legend--medio">● Medio</span>
+    <span class="db-legend-item db-legend--bajo">● Bajo</span>
+  </div>
+</div>
 
   </div>
 

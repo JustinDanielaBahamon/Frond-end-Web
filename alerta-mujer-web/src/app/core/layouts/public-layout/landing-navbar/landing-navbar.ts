@@ -13,8 +13,8 @@ export class LandingNavbarComponent {
   menuOpendSession = false;  // Controla el menú de sesión
   menuOpneIdioms = false;    // Controla el menú de idiomas
   idiomActual = 'ES';
-
   menuMobileOpen = false;
+  menuOpneIdiomsMobile = false;
 
 
   // Inyectamos ElementRef para que Angular pueda rastrear los clics dentro de este componente
@@ -39,6 +39,10 @@ export class LandingNavbarComponent {
 
   toggleMobileMenu() {
   this.menuMobileOpen = !this.menuMobileOpen;
+}
+
+toggleIdiomsMenuMobile() {
+  this.menuOpneIdiomsMobile = !this.menuOpneIdiomsMobile;
 }
 
   // 🔥 Escucha global de clics para cerrar menús al hacer clic fuera

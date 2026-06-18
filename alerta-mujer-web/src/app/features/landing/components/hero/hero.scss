@@ -1,0 +1,193 @@
+
+
+        /* ======================================
+           HERO (Modificado para ser Banner)
+        ====================================== */
+      .container-hero {
+            position: relative;
+            min-height: 89vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 80px 60px;
+            background-image: linear-gradient(rgb(255 255 255 / 55%), rgb(255 255 255 / 0%)), url(/videoAlerta.mp4);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+        }
+
+        /* ======================================
+           INFORMACIÓN
+        ====================================== */
+        .container-information {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .container-texts {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .text-banner {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #1b2d5b;
+            margin: 0;
+        }
+
+        .text-banner span {
+            color: #b83dcd;
+        }
+
+        .container-text-second {
+            max-width: 520px;
+        }
+
+        .container-text-second p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #333; /* Un poco más oscuro para legibilidad sobre fondo */
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* ======================================
+           BOTONES
+        ====================================== */
+        .container-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .comenzar-btn {
+            height: 52px;
+            padding: 0 28px;
+            border: none;
+            border-radius: 12px;
+            background: #8529b5;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .comenzar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(133,41,181,.25);
+        }
+
+        .conocer-btn {
+            height: 52px;
+            padding: 0 28px;
+            border-radius: 12px;
+            border: 2px solid #8529b5; /* Borde más grueso para destacar */
+            background: transparent;
+            color: #8529b5;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .conocer-btn:hover {
+            background: #8529b5;
+            color: white;
+        }
+
+        /* ======================================
+           ESTADÍSTICAS
+        ====================================== */
+        .container-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .container-stats p {
+            margin: 0;
+            color: #1b2d5b;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .img-stats img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ======================================
+           RESPONSIVE (TABLET)
+        ====================================== */
+        @media (max-width: 1200px) {
+            .container-hero {
+                padding: 60px 40px;
+                min-height: 60vh;
+            }
+
+            .text-banner {
+                font-size: 52px;
+            }
+        }
+
+        /* ======================================
+           RESPONSIVE (MOBILE)
+        ====================================== */
+        @media (max-width: 900px) {
+            .container-hero {
+                justify-content: center;
+                text-align: center;
+                padding: 80px 25px;
+                /* Ajustamos el gradiente para mejor legibilidad en móvil */
+                background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)), url('/bannerHero.png');
+            }
+
+            .container-information {
+                max-width: 100%;
+            }
+
+            .container-text-second {
+                max-width: 100%;
+            }
+
+            .container-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .container-stats {
+                justify-content: center;
+            }
+
+            .text-banner {
+                font-size: 42px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container-hero {
+                min-height: 100vh; /* Ocupa toda la pantalla en móviles pequeños */
+            }
+
+            .text-banner {
+                font-size: 34px;
+            }
+
+            .container-text-second p {
+                font-size: 16px;
+            }
+
+            .comenzar-btn,
+            .conocer-btn {
+                width: 100%;
+            }
+        }

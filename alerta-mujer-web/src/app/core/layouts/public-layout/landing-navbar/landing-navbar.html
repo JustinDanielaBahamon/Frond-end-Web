@@ -1,80 +1,154 @@
 <div class="navbar-container">
 
+    <!-- LOGO -->
     <div class="navbar-logo">
         <img src="logo.png" alt="Logo">
         <span>Alerta Mujer</span>
     </div>
-       
+
+    <!-- LINKS DESKTOP -->
     <nav class="navbar-links">
-        <a href="#" style="color: blueviolet; font-weight: 700;">Inicio</a>
+        <a href="#" class="active-link">Inicio</a>
         <a href="#">Nosotros</a>
         <a href="#">Servicios</a>
         <a href="#">FAQ</a>
         <a href="#">Contacto</a>
     </nav>
-    <button
-            class="hamburger-btn"
-            (click)="toggleMobileMenu()">
 
-            @if(!menuMobileOpen){
-                <i class="fa-solid fa-bars"></i>
-            } @else {
-                <i class="fa-solid fa-xmark"></i>
-            }
-
-        </button>
+    <!-- ACCIONES -->
     <div class="navbar-actions">
-        
+
         <div class="language-selector">
-            <button class="language-btn" (click)="toggleIdiomsMenu()">
-                @if (idiomActual === 'ES') { <img src="https://flagcdn.com/es.svg" class="flag-nav" alt="ES"> }
-                @if (idiomActual === 'EN') { <img src="https://flagcdn.com/us.svg" class="flag-nav" alt="EN"> }
-                @if (idiomActual === 'FR') { <img src="https://flagcdn.com/fr.svg" class="flag-nav" alt="FR"> }
-                <span>{{ idiomActual }} <i class="fa-solid fa-caret-down" style="margin-left: 2px;"></i></span>
+
+            <button
+                class="language-btn"
+                (click)="toggleIdiomsMenu()">
+
+                @if (idiomActual === 'ES') {
+                    <img src="https://flagcdn.com/es.svg" class="flag-nav">
+                }
+
+                @if (idiomActual === 'EN') {
+                    <img src="https://flagcdn.com/us.svg" class="flag-nav">
+                }
+
+                @if (idiomActual === 'FR') {
+                    <img src="https://flagcdn.com/fr.svg" class="flag-nav">
+                }
+
+                <span>
+                    {{ idiomActual }}
+                    <i class="fa-solid fa-caret-down"></i>
+                </span>
+
             </button>
-            
-            @if (menuOpneIdioms) {
+
+            @if(menuOpneIdioms){
+
                 <div class="language-menu">
+
                     <ul>
+
                         <li (click)="changeIdiom('ES')">
-                            <img src="https://flagcdn.com/es.svg" class="flag-dropdown" alt="ES"> ES
+                            <img src="https://flagcdn.com/es.svg" class="flag-dropdown">
+                            ES
                         </li>
+
                         <li (click)="changeIdiom('EN')">
-                            <img src="https://flagcdn.com/us.svg" class="flag-dropdown" alt="EN"> EN
+                            <img src="https://flagcdn.com/us.svg" class="flag-dropdown">
+                            EN
                         </li>
+
                         <li (click)="changeIdiom('FR')">
-                            <img src="https://flagcdn.com/fr.svg" class="flag-dropdown" alt="FR"> FR
+                            <img src="https://flagcdn.com/fr.svg" class="flag-dropdown">
+                            FR
                         </li>
+
                     </ul>
+
                 </div>
+
             }
-            
+
         </div>
 
-         
-        <button class="login-btn">
+        <!-- HAMBURGUESA -->
+    <button
+        class="hamburger-btn"
+        (click)="toggleMobileMenu()">
+
+        @if(!menuMobileOpen){
+            <i class="fa-solid fa-bars"></i>
+        } @else {
+            <i class="fa-solid fa-xmark"></i>
+        }
+
+    </button>
+
+        <button class="login-btn desktop-btn">
             Iniciar sesión
         </button>
 
-        <button class="register-btn"> 
-            Regístrate 
+        <button class="register-btn desktop-btn">
+            Regístrate
         </button>
+
     </div>
+
+    
+
 </div>
 
 @if(menuMobileOpen){
 
 <div class="mobile-menu">
 
+    <a href="#"><i class="fa-solid fa-house"></i> Inicio</a>
+    <a href="#"><i class="fa-solid fa-user"></i> Nosotros</a>
+    <a href="#"><i class="fa-solid fa-briefcase"></i> Servicios</a>
+    <a href="#"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+    <a href="#"><i class="fa-solid fa-envelope"></i> Contacto</a>
+
+     <div class="mobile-divider"></div>
+    <h4 style="margin-left: 16px; " (click)="toggleIdiomsMenuMobile()" ><i class="fa-solid fa-globe " style="margin-right: 0px;"></i> Idioma</h4>
+    @if(menuOpneIdiomsMobile){
+        <div class="mobile-language-options">
+
+    <button (click)="changeIdiom('ES')">
+        <img
+            src="https://flagcdn.com/es.svg"
+            class="flag-mobile"
+            alt="ES">
+        Español
+    </button>
+
+    <button (click)="changeIdiom('EN')">
+        <img
+            src="https://flagcdn.com/us.svg"
+            class="flag-mobile"
+            alt="EN">
+        English
+    </button>
+
+    <button (click)="changeIdiom('FR')">
+        <img
+            src="https://flagcdn.com/fr.svg"
+            class="flag-mobile"
+            alt="FR">
+        Français
+    </button>
+
+    </div>
+    }
     
-    
+
     <div class="mobile-divider"></div>
 
-    <button class="login-btn">
+    <button class="login-btn mobile-btn">
         Iniciar sesión
     </button>
 
-    <button class="register-btn">
+    <button class="register-btn mobile-btn">
         Regístrate
     </button>
 

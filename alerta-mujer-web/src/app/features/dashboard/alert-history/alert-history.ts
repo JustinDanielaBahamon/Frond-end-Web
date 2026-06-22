@@ -16,6 +16,7 @@ const iconDefault = L.icon({
   templateUrl: './alert-history.html',
   styleUrl: './alert-history.scss',
 })
+
 export class AlertHistory implements OnDestroy {
 
   alertas = [

@@ -37,7 +37,6 @@
     font-weight: 800;
     margin: 0 0 4px;
     line-height: 1;
-
     &--sm { font-size: 1.4rem; }
   }
 
@@ -56,14 +55,11 @@
 // FILA MEDIA
 .db-mid {
   display: grid;
-  grid-template-columns: 1fr 1fr; // ← antes era 1fr 1fr
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
-
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
+// HEADER DE SECCIÓN (reutilizable)
 .db-section-header {
   display: flex;
   align-items: center;
@@ -78,15 +74,20 @@
   margin: 0;
 }
 
-// GRÁFICA
-.db-chart-box {
+// CARD BASE (reutilizable para chart, mapa, actividad, accesos)
+%db-box {
   background: #fff;
   border: 1px solid #c4b5fd;
   border-radius: 16px;
   padding: 1.25rem;
-  position: relative;
 }
 
+.db-chart-box  { @extend %db-box; position: relative; }
+.db-map-box    { @extend %db-box; }
+.db-activity-box { @extend %db-box; }
+.db-accesos    { @extend %db-box; }
+
+// GRÁFICA
 .db-chart-sub {
   font-size: 0.78rem;
   color: #a78bfa;
@@ -116,9 +117,7 @@
   min-height: 4px;
   transition: height 0.3s ease;
 
-  &:hover {
-    background: linear-gradient(180deg, #7c3aed, #a78bfa);
-  }
+  &:hover { background: linear-gradient(180deg, #7c3aed, #a78bfa); }
 }
 
 .db-bar-label {
@@ -138,112 +137,7 @@
   color: #a78bfa;
 }
 
-// ACTIVIDAD
-.db-activity-box {
-  background: #fff;
-  border: 1px solid #c4b5fd;
-  border-radius: 16px;
-  padding: 1.25rem;
-}
-
-.db-activity-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8rem;
-
-  th {
-    text-align: left;
-    padding: 6px 8px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #7c3aed;
-    border-bottom: 1px solid #ede9fe;
-  }
-
-  td {
-    padding: 8px 8px;
-    border-bottom: 1px solid #f3f4f6;
-    color: #2d1457;
-    vertical-align: middle;
-  }
-
-  tr:last-child td { border-bottom: none; }
-}
-
-.db-ubicacion { font-size: 0.75rem; color: #7c3aed; }
-.db-fecha     { font-size: 0.75rem; color: #a78bfa; white-space: nowrap; }
-
-.db-estado {
-  display: inline-flex;
-  padding: 2px 10px;
-  border-radius: 50px;
-  font-size: 0.72rem;
-  font-weight: 700;
-
-  &--validada { background: #ede9fe; color: #5b21b6; }
-  &--ok       { background: #d1fae5; color: #065f46; }
-}
-
-.db-ver-mas {
-  display: block;
-  text-align: center;
-  margin-top: 12px;
-  font-size: 0.8rem;
-  color: #7c3aed;
-  text-decoration: none;
-  font-weight: 600;
-
-  &:hover { text-decoration: underline; }
-}
-
-// ACCESOS RÁPIDOS
-.db-accesos {
-  background: #fff;
-  border: 1px solid #c4b5fd;
-  border-radius: 16px;
-  padding: 1.25rem;
-}
-
-.db-accesos-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.db-acceso-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 1rem 1.25rem;
-  border: 1.5px solid #c4b5fd;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #2d1457;
-  font-weight: 700;
-  font-size: 0.9rem;
-  transition: all 0.15s;
-
-  &:hover {
-    background: #fdf4ff;
-    border-color: #a78bfa;
-  }
-}
-
-.db-acceso-icon { font-size: 1.8rem; }
-
-
-// MAPA DE ZONAS
-.db-map-box {
-  background: #fff;
-  border: 1px solid #c4b5fd;
-  border-radius: 16px;
-  padding: 1.25rem;
-}
-
+// MAPA
 .db-map {
   width: 100%;
   height: 220px;
@@ -267,8 +161,8 @@
   &.db-legend--bajo  { color: #10b981; }
 }
 
-.db-map-btn-zonas {
-  margin-left: auto;
+// BOTÓN PILL (reutilizable: Ver zonas y Ver mapa completo)
+%db-btn-pill {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -281,6 +175,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 
   &:hover {
     background: #f5f3ff;
@@ -288,128 +183,10 @@
   }
 }
 
-.db-map-container {
-  position: relative;
-  width: 100%;
-}
+.db-map-btn-zonas     { @extend %db-btn-pill; margin-left: auto; }
+.db-map-btn-fullscreen { @extend %db-btn-pill; margin-left: 4px; }
 
-.db-zonas-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 100%;
-  background: #fff;
-  border-radius: 0 10px 10px 0;
-  border-left: 1px solid #ede9fe;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-
-  &--open {
-    width: 220px;
-  }
-}
-
-.db-zonas-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid #ede9fe;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #2d1457;
-}
-
-.db-zonas-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #a78bfa;
-  font-size: 1rem;
-  padding: 2px;
-
-  &:hover { color: #7c3aed; }
-}
-
-.db-zonas-list {
-  overflow-y: auto;
-  flex: 1;
-  padding: 8px 0;
-}
-
-.db-zona-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background 0.12s;
-
-  &:hover { background: #f5f3ff; }
-}
-
-.db-zona-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.db-zona-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.db-zona-nombre {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #2d1457;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.db-zona-meta {
-  font-size: 0.7rem;
-  color: #a78bfa;
-  margin: 2px 0 0;
-}
-
-.db-zona-nivel {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 50px;
-  white-space: nowrap;
-}
-
-
-.db-map-btn-zonas {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1.5px solid #c4b5fd;
-  background: #fff;
-  color: #7c3aed;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-
-  &:hover {
-    background: #f5f3ff;
-    border-color: #7c3aed;
-  }
-}
-
+// PANEL LATERAL DE ZONAS
 .db-map-container {
   position: relative;
   width: 100%;
@@ -509,3 +286,149 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+// WRAPPER FULLSCREEN
+// Botón flotante base (reutilizado por zonas-fs y exit-fs)
+%db-btn-floating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.18);
+  transition: background 0.2s, box-shadow 0.2s;
+
+  i { font-size: 16px; }
+
+  &:hover {
+    background: #f3f0ff;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.28);
+  }
+}
+
+.db-map-wrapper {
+  position: relative;
+
+  .db-map-btn-zonas-fs,
+  .db-map-btn-exit-fs { display: none; }
+
+  &:fullscreen {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+
+    .db-map-container { flex: 1; height: 100%; }
+    .db-map           { height: 100% !important; }
+
+    .db-map-btn-zonas-fs {
+      @extend %db-btn-floating;
+      top: 90px;
+      left: 12px;
+
+      &--open {
+        background: #ede9fe;
+        border-color: #7c3aed;
+      }
+    }
+
+    .db-map-btn-exit-fs {
+      @extend %db-btn-floating;
+      top: 12px;
+      right: 12px;
+
+      &::after {
+        content: 'Salir';
+        margin-left: 2px;
+      }
+    }
+  }
+}
+
+// ACTIVIDAD
+.db-activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+
+  th {
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #7c3aed;
+    border-bottom: 1px solid #ede9fe;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #2d1457;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.db-ubicacion { font-size: 0.75rem; color: #7c3aed; }
+.db-fecha     { font-size: 0.75rem; color: #a78bfa; white-space: nowrap; }
+
+.db-estado {
+  display: inline-flex;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &--validada { background: #ede9fe; color: #5b21b6; }
+  &--ok       { background: #d1fae5; color: #065f46; }
+}
+
+.db-ver-mas {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ACCESOS RÁPIDOS
+.db-accesos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.db-acceso-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #2d1457;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #fdf4ff;
+    border-color: #a78bfa;
+  }
+}
+
+.db-acceso-icon { font-size: 1.8rem; }

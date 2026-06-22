@@ -55,87 +55,104 @@
       </div>
     </div>
 
-    <!-- MAPA DE ZONAS ← hermano, no hijo de db-chart-box -->
-   <div class="db-map-box">
-  <div class="db-section-header">
-    <i class="ti ti-map-pin"></i>
-    <h2 class="db-section-title">Zonas de Riesgo</h2>
-    <button class="db-map-btn-zonas" (click)="togglePanel()">
-      <i class="ti ti-list"></i> Ver zonas
-    </button>
-  </div>
-
-  <div class="db-map-container">
-    <div id="dashboard-map" class="db-map"></div>
-
-    <!-- PANEL LATERAL -->
-    <div class="db-zonas-panel" [class.db-zonas-panel--open]="panelAbierto">
-      <div class="db-zonas-panel-header">
-        <span>Zonas de Peligro</span>
-        <button class="db-zonas-close" (click)="togglePanel()">
-          <i class="ti ti-x"></i>
+    <!-- MAPA DE ZONAS -->
+    <div class="db-map-box">
+      <div class="db-section-header">
+        <i class="ti ti-map-pin"></i>
+        <h2 class="db-section-title">Zonas de Riesgo</h2>
+        <button class="db-map-btn-zonas" (click)="togglePanel()">
+          <i class="ti ti-list"></i> Ver zonas
+        </button>
+        <button class="db-map-btn-zonas db-map-btn-fullscreen" (click)="toggleFullscreen()">
+          <i class="ti ti-arrows-maximize"></i> Ver mapa completo
         </button>
       </div>
-      <div class="db-zonas-list">
-        @for (zona of zonas; track zona.nombre) {
-          <div class="db-zona-item" (click)="irAZona(zona)">
-            <div class="db-zona-dot" [style.background]="zona.color"></div>
-            <div class="db-zona-info">
-              <p class="db-zona-nombre">{{ zona.nombre }}</p>
-              <p class="db-zona-meta">🔔 {{ zona.alertas }} alertas · {{ zona.porcentaje }}%</p>
+
+      <div class="db-map-wrapper" #mapWrapper>
+        <div class="db-map-container">
+          <div id="dashboard-map" class="db-map"></div>
+
+          <div class="db-zonas-panel" [class.db-zonas-panel--open]="panelAbierto">
+            <div class="db-zonas-panel-header">
+              <span>Zonas de Peligro</span>
+              <button class="db-zonas-close" (click)="togglePanel()">
+                <i class="ti ti-x"></i>
+              </button>
             </div>
-            <span class="db-zona-nivel" [style.background]="zona.color + '22'" [style.color]="zona.color">
-              {{ zona.nivel | uppercase }}
-            </span>
+            <div class="db-zonas-list">
+              @for (zona of zonas; track zona.nombre) {
+                <div class="db-zona-item" (click)="irAZona(zona)">
+                  <div class="db-zona-dot" [style.background]="zona.color"></div>
+                  <div class="db-zona-info">
+                    <p class="db-zona-nombre">{{ zona.nombre }}</p>
+                    <p class="db-zona-meta">🔔 {{ zona.alertas }} alertas · {{ zona.porcentaje }}%</p>
+                  </div>
+                  <span class="db-zona-nivel" [style.background]="zona.color + '22'" [style.color]="zona.color">
+                    {{ zona.nivel | uppercase }}
+                  </span>
+                </div>
+              }
+            </div>
           </div>
-        }
+        </div>
+
+        <!-- Botón flotante Ver zonas (solo fullscreen) -->
+        <button
+          class="db-map-btn-zonas-fs"
+          [class.db-map-btn-zonas-fs--open]="panelAbierto"
+          (click)="togglePanel()">
+          <i class="ti ti-list"></i> Ver zonas
+        </button>
+
+        <!-- Botón salir fullscreen -->
+        <button class="db-map-btn-exit-fs" (click)="toggleFullscreen()">
+          <i class="ti ti-arrows-minimize"></i>
+        </button>
+      </div>
+
+      <div class="db-map-legend">
+        <span class="db-legend-item db-legend--alto">● Alto</span>
+        <span class="db-legend-item db-legend--medio">● Medio</span>
+        <span class="db-legend-item db-legend--bajo">● Bajo</span>
       </div>
     </div>
-  </div>
-
-  <div class="db-map-legend">
-    <span class="db-legend-item db-legend--alto">● Alto</span>
-    <span class="db-legend-item db-legend--medio">● Medio</span>
-    <span class="db-legend-item db-legend--bajo">● Bajo</span>
-  </div>
-</div>
 
   </div>
 
-   <!-- ACTIVIDAD RECIENTE -->
-    <div class="db-activity-box">
-      <div class="db-section-header">
-        <i class="ti ti-clock"></i>
-        <h2 class="db-section-title">Actividad Reciente</h2>
-      </div>
-      <table class="db-activity-table">
-        <thead>
+  <!-- ACTIVIDAD RECIENTE -->
+  <div class="db-activity-box">
+    <div class="db-section-header">
+      <i class="ti ti-clock"></i>
+      <h2 class="db-section-title">Actividad Reciente</h2>
+    </div>
+    <table class="db-activity-table">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Tipo</th>
+          <th>Ubicación</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (act of actividad; track act.n) {
           <tr>
-            <th>N°</th>
-            <th>Tipo</th>
-            <th>Ubicación</th>
-            <th>Fecha</th>
-            <th>Estado</th>
+            <td>{{ act.n }}</td>
+            <td>{{ act.tipo }}</td>
+            <td class="db-ubicacion">{{ act.ubicacion }}</td>
+            <td class="db-fecha">{{ act.fecha }}</td>
+            <td>
+              <span class="db-estado" [ngClass]="act.estado === 'VALIDADA' ? 'db-estado--validada' : 'db-estado--ok'">
+                {{ act.estado }}
+              </span>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (act of actividad; track act.n) {
-            <tr>
-              <td>{{ act.n }}</td>
-              <td>{{ act.tipo }}</td>
-              <td class="db-ubicacion">{{ act.ubicacion }}</td>
-              <td class="db-fecha">{{ act.fecha }}</td>
-              <td>
-                <span class="db-estado" [ngClass]="act.estado === 'VALIDADA' ? 'db-estado--validada' : 'db-estado--ok'">
-                  {{ act.estado }}
-                </span>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <a class="db-ver-mas" routerLink="/dashboard/alert-history">Ver historial completo...</a>
-    </div>
+        }
+      </tbody>
+    </table>
+    <a class="db-ver-mas" routerLink="/dashboard/alert-history">Ver historial completo...</a>
+  </div>
 
   <!-- ACCESOS RÁPIDOS -->
   <div class="db-accesos">

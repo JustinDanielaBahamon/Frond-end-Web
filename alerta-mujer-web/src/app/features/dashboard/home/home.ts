@@ -1,4 +1,4 @@
-import { Component, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
@@ -11,15 +11,17 @@ import * as L from 'leaflet';
 })
 export class Home implements AfterViewInit, OnDestroy {
 
+  @ViewChild('mapWrapper') mapWrapper!: ElementRef<HTMLDivElement>;
+
   private map: L.Map | null = null;
   panelAbierto = false;
 
   zonas = [
-    { lat: 2.2964, lng: -75.0199, nombre: 'Campoalegre Centro',      alertas: 24, porcentaje: 42, nivel: 'alto',  color: '#ef4444' },
-    { lat: 2.9273, lng: -75.2819, nombre: 'Av. Santander, Neiva',    alertas: 15, porcentaje: 26, nivel: 'medio', color: '#f59e0b' },
-    { lat: 2.9356, lng: -75.2945, nombre: 'Terminal Neiva',           alertas: 10, porcentaje: 17, nivel: 'medio', color: '#f59e0b' },
-    { lat: 2.1978, lng: -75.6273, nombre: 'Parque Central, Garzón',  alertas: 6,  porcentaje: 10, nivel: 'bajo',  color: '#10b981' },
-    { lat: 2.2971, lng: -75.0210, nombre: 'Calle 15, Campoalegre',   alertas: 3,  porcentaje: 5,  nivel: 'bajo',  color: '#10b981' },
+    { lat: 2.2964, lng: -75.0199, nombre: 'Campoalegre Centro',     alertas: 24, porcentaje: 42, nivel: 'alto',  color: '#ef4444' },
+    { lat: 2.9273, lng: -75.2819, nombre: 'Av. Santander, Neiva',   alertas: 15, porcentaje: 26, nivel: 'medio', color: '#f59e0b' },
+    { lat: 2.9356, lng: -75.2945, nombre: 'Terminal Neiva',          alertas: 10, porcentaje: 17, nivel: 'medio', color: '#f59e0b' },
+    { lat: 2.1978, lng: -75.6273, nombre: 'Parque Central, Garzón', alertas: 6,  porcentaje: 10, nivel: 'bajo',  color: '#10b981' },
+    { lat: 2.2971, lng: -75.0210, nombre: 'Calle 15, Campoalegre',  alertas: 3,  porcentaje: 5,  nivel: 'bajo',  color: '#10b981' },
   ];
 
   chartData = [
@@ -39,12 +41,30 @@ export class Home implements AfterViewInit, OnDestroy {
     { n: 5, tipo: 'Check-in diario',   ubicacion: 'N/A',              fecha: 'Lunes 18:45 PM', estado: 'OK' },
   ];
 
-  togglePanel() {
+  togglePanel(): void {
     this.panelAbierto = !this.panelAbierto;
     setTimeout(() => this.map?.invalidateSize(), 300);
   }
 
-  irAZona(zona: any) {
+  toggleFullscreen(): void {
+    const el = this.mapWrapper.nativeElement;
+
+    if (!document.fullscreenElement) {
+      el.requestFullscreen().then(() => {
+        setTimeout(() => this.map?.invalidateSize(), 200);
+      }).catch(err => {
+        console.error('Error al entrar en fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setTimeout(() => this.map?.invalidateSize(), 200);
+      }).catch(err => {
+        console.error('Error al salir de fullscreen:', err);
+      });
+    }
+  }
+
+  irAZona(zona: any): void {
     if (this.map) {
       this.map.flyTo([zona.lat, zona.lng], 13, { duration: 1 });
       this.map.eachLayer((layer: any) => {
@@ -61,7 +81,7 @@ export class Home implements AfterViewInit, OnDestroy {
     }
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     const iconDefault = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
       iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -73,7 +93,7 @@ export class Home implements AfterViewInit, OnDestroy {
     setTimeout(() => this.inicializarMapa(), 100);
   }
 
-  private inicializarMapa() {
+  private inicializarMapa(): void {
     this.map = L.map('dashboard-map', {
       center: [2.6, -75.15],
       zoom: 8,
@@ -140,7 +160,7 @@ export class Home implements AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.map) {
       this.map.remove();
       this.map = null;

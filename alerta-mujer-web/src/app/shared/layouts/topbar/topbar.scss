@@ -1,0 +1,93 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__brand {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #2d1457;
+    white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__btn {
+    background: #f3eeff;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #be185d, #7c3aed);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__username {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2d1457;
+    cursor: pointer;
+    &:hover { color: #7c3aed; }
+  }
+}
+
+.topbar__hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  &:hover { background: #f3eeff; }
+}
+
+// Modo oscuro
+:host-context(body.dark-mode) {
+  .topbar {
+    background: #2d1457;
+    border-color: rgba(255,255,255,0.05);
+    &__brand { color: #fff; }
+    &__btn { background: #3d1f6e; }
+    &__username { color: #fff; }
+  }
+}
+
+// Móvil
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0.75rem 1rem;
+    &__username { display: none; }
+  }
+}

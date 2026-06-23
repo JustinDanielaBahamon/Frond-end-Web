@@ -1,4 +1,24 @@
-<p>admin-layout works!</p>
-<main>
-  <router-outlet />
-</main>
+<div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <app-sidebar
+    [links]="links"
+    sectionTitle="Administración"
+    [collapsed]="sidebarCollapsed"
+    accentColor="#1a3a5c">
+  </app-sidebar>
+
+  <div class="layout__body">
+
+    <app-topbar
+      brand="Alerta Mujer — Admin"
+      avatarLetter="A"
+      (sidebarToggle)="toggleSidebar()"
+      (themeToggle)="toggleTheme()">
+    </app-topbar>
+
+    <main class="layout__main">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>

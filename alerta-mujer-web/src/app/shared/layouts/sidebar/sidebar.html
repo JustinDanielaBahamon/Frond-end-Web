@@ -1,0 +1,19 @@
+<aside class="sidebar"
+  [class.sidebar--collapsed]="collapsed"
+  [style.background]="accentColor">
+  <div class="sidebar__header">
+    <p class="sidebar__section">{{ sectionTitle }}</p>
+    <div class="sidebar__divider"></div>
+  </div>
+  <nav class="sidebar__nav">
+    @for (link of links; track link.route) {
+      <a
+        [routerLink]="link.route"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
+        class="sidebar__link">
+        {{ link.label }}
+      </a>
+    }
+  </nav>
+</aside>

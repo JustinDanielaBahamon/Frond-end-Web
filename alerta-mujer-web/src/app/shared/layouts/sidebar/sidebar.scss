@@ -1,0 +1,84 @@
+.sidebar {
+  width: 300px;
+  min-width: 300px;
+  min-height: 100vh; 
+  background: #2d1457; // fallback, se sobreescribe con [style.background]
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  gap: 0;
+  overflow: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
+
+  &--collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+  }
+
+  &__header {
+    margin-bottom: 1.5rem;
+  }
+
+  &__divider {
+    height: 2px;
+    background: linear-gradient(90deg, #7c3aed, #e607ae, transparent);
+    border-radius: 2px;
+  }
+
+  &__section {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(253, 249, 249, 0.856);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 0.75rem;
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__link {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    &--active {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+  }
+
+  // Tablet
+  @media (max-width: 1024px) {
+    width: 90px;
+    min-width: 90px;
+    padding: 1rem 6px;
+
+    &__section { font-size: 0.6rem; }
+    &__link {
+      font-size: 0.75rem;
+      padding: 8px 6px;
+      text-align: center;
+    }
+  }
+
+  // Móvil
+  @media (max-width: 768px) {
+    display: none;
+  }
+}

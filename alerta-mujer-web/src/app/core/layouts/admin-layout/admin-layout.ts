@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/sidebar';
-import { TopbarComponent } from '../../../shared/layouts/topbar/topbar';
+import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
 
 @Component({
   selector: 'app-admin-layout',

@@ -1,16 +1,17 @@
-
-
-        /* ======================================
+  /* ======================================
            HERO (Modificado para ser Banner)
         ====================================== */
-      .container-hero {
+        .container-hero {
             position: relative;
-            min-height: 89vh;
+            min-height: 88vh; /* Altura mínima para que se vea el banner */
             display: flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-start; /* Alinea el contenido a la izquierda */
+            
             padding: 80px 60px;
-            background-image: linear-gradient(rgb(255 255 255 / 55%), rgb(255 255 255 / 0%)), url(/videoAlerta.mp4);
+            
+            /* Imagen de fondo como Banner */
+               background-image: linear-gradient(rgb(255 255 255 / 40%), rgb(255 255 255 / 59%)), url(/bannerHero.png);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -50,10 +51,10 @@
 
         .container-text-second p {
             font-size: 18px;
-            line-height: 1.8;
-            color: #333; /* Un poco más oscuro para legibilidad sobre fondo */
+            line-height: 1.5;
+            color: black;
             margin: 0;
-            font-weight: 500;
+            font-weight: 800;
         }
 
         /* ======================================
@@ -146,9 +147,10 @@
             .container-hero {
                 justify-content: center;
                 text-align: center;
-                padding: 80px 25px;
+                padding: 80px 70px;
                 /* Ajustamos el gradiente para mejor legibilidad en móvil */
-                background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)), url('/bannerHero.png');
+                background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255)), url(/bannerHero.png);
+                min-height: 58vh;
             }
 
             .container-information {
@@ -175,7 +177,7 @@
 
         @media (max-width: 500px) {
             .container-hero {
-                min-height: 100vh; /* Ocupa toda la pantalla en móviles pequeños */
+                min-height: 68vh; /* Ocupa toda la pantalla en móviles pequeños */
             }
 
             .text-banner {

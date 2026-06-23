@@ -2,44 +2,108 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { DashboardLayoutComponent } from './core/layouts/dashboard-layout/dashboard-layout';
+import { AdminLayoutComponent } from './core/layouts/admin-layout/admin-layout';
+import { authGuard, adminGuard, userGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+
+  // ─── Raíz ───────────────────────────────────────────────────────────────────
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
+  // ─── Auth ────────────────────────────────────────────────────────────────────
   {
     path: 'auth',
     children: [
       { path: 'login',    component: LoginComponent },
       { path: 'register', component: RegisterComponent },
-    ]
+    ],
   },
 
+  // ─── Dashboard usuaria ───────────────────────────────────────────────────────
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
+    canActivate: [authGuard, userGuard],
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/dashboard/home/home').then(m => m.Home)
+        loadComponent: () =>
+          import('./features/dashboard/home/home').then((m) => m.Home),
       },
       {
         path: 'phone-location',
-        loadComponent: () => import('./features/dashboard/phone-location/phone-location').then(m => m.PhoneLocationComponent)
+        loadComponent: () =>
+          import('./features/dashboard/phone-location/phone-location').then(
+            (m) => m.PhoneLocationComponent
+          ),
       },
       {
         path: 'device-status',
-        loadComponent: () => import('./features/dashboard/device-status/device-status').then(m => m.DeviceStatusComponent)
+        loadComponent: () =>
+          import('./features/dashboard/device-status/device-status').then(
+            (m) => m.DeviceStatusComponent
+          ),
       },
       {
         path: 'alert-history',
-        loadComponent: () => import('./features/dashboard/alert-history/alert-history').then(m => m.AlertHistory)
+        loadComponent: () =>
+          import('./features/dashboard/alert-history/alert-history').then(
+            (m) => m.AlertHistory
+          ),
       },
       {
         path: 'evidence',
-        loadComponent: () => import('./features/dashboard/evidence/evidence').then(m => m.Evidence)
+        loadComponent: () =>
+          import('./features/dashboard/evidence/evidence').then(
+            (m) => m.Evidence
+          ),
       },
-    ]
+    ],
   },
 
-  { path: '**', redirectTo: 'auth/login' }
+  // ─── Dashboard administrador ─────────────────────────────────────────────────
+
+  
+  {
+   path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard, adminGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/dashboard/dashboard').then(
+            (m) => m.AdminDashboardComponent
+          ),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+        import('./features/admin/user/user').then(m => m.UserComponent)
+      },
+      {
+        path: 'alertas',
+        loadComponent: () =>
+          import('./features/admin/alert-admin/alert-admin').then(  // ← era "alertas-admin/alertas-admin"
+            (m) => m.AlertAdminComponent
+          ),
+      },
+      {
+        path: 'zonas-riesgo',
+        loadComponent: () =>
+          import('./features/admin/risk-area/risk-area').then(  // ← era "zonas-riesgo/zonas-riesgo"
+            (m) => m.RiskAreaComponent
+          ),
+      },
+    ],
+  },
+  
+
+  // ─── Fallback ────────────────────────────────────────────────────────────────
+  { path: '**', redirectTo: 'auth/login' },
 ];

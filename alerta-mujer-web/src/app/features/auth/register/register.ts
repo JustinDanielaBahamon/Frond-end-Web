@@ -1,8 +1,10 @@
+// register.ts
 import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -14,6 +16,7 @@ import { CardComponent } from '../../../shared/components/card/card';
 })
 export class RegisterComponent {
   private router = inject(Router);
+  private auth   = inject(AuthService);
 
   nombre         = '';
   apellido       = '';
@@ -45,6 +48,14 @@ export class RegisterComponent {
       this.error = 'Por favor completa todos los campos correctamente.';
       return;
     }
-    this.router.navigate(['/auth/login']);
+
+    // Simula registro guardando sesión con rol 'operador'
+    this.auth.registrarUsuaria({
+      nombre: `${this.nombre} ${this.apellido}`,
+      email: this.correo,
+      rol: 'operador'
+    });
+
+    this.router.navigate(['/dashboard']);
   }
 }

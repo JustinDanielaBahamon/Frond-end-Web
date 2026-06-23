@@ -31,14 +31,22 @@ export class LoginComponent {
   }
 
   iniciarSesion() {
-    this.error   = '';
-    this.loading = true;
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: ()     => this.router.navigate(['/dashboard']),
-      error: (err) => {
-        this.error   = err.message;
-        this.loading = false;
+  this.error   = '';
+  this.loading = true;
+  this.auth.login({ email: this.email, password: this.password }).subscribe({
+    next: (user) => {
+      this.loading = false;
+      if (user.rol === 'admin') {
+        this.router.navigate(['/admin/dashboard']);
+      } else {
+        this.router.navigate(['/dashboard']);
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.error   = err.message;
+      this.loading = false;
+    }
+  });
 }
+}
+

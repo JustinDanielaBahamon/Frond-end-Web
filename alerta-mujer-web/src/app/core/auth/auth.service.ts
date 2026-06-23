@@ -15,7 +15,6 @@ export interface LoginCredentials {
   password: string;
 }
 
-// aca estan los usuarios usuarios falsos para las pruebas
 const fake_users = [
   {
     id: 1,
@@ -41,18 +40,13 @@ const STORAGE_KEY = 'alerta_session';
 export class AuthService {
   private router = inject(Router);
 
-  private _currentUser$ = new BehaviorSubject<User | null>(
-    this.loadSession()
-  );
+  private _currentUser$ = new BehaviorSubject<User | null>(this.loadSession());
 
   currentUser$: Observable<User | null> = this._currentUser$.asObservable();
 
-  // inicio de sesion falso
   login(credentials: LoginCredentials): Observable<User> {
     const found = fake_users.find(
-      (u) =>
-        u.email === credentials.email &&
-        u.password === credentials.password
+      (u) => u.email === credentials.email && u.password === credentials.password
     );
 
     if (!found) {
@@ -64,24 +58,38 @@ export class AuthService {
     return of(user).pipe(
       delay(800),
       tap((u) => {
-        this.saveSession(u, token); // guardar sesion
+        this.saveSession(u, token);
         this._currentUser$.next(u);
       })
     );
   }
-
-  // cerrar sesion
+registrarUsuaria(data: { nombre: string; email: string; rol: string }): void {
+  const nuevaUsuaria: User = {
+    id: Date.now(),
+    nombre: data.nombre,
+    email: data.email,
+    rol: data.rol,       // ← siempre 'operador' para registro normal
+  };
+  const token = `fake-token-${Date.now()}`;
+  this.saveSession(nuevaUsuaria, token);
+  this._currentUser$.next(nuevaUsuaria);
+}
   logout(): void {
     localStorage.removeItem(STORAGE_KEY);
     this._currentUser$.next(null);
     this.router.navigate(['/login']);
   }
 
-  // ayudantes de sesion
   getToken(): string | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw).token ?? null;
+  }
+
+  getRol(): string {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return '';
+    return JSON.parse(raw).user?.rol ?? '';
   }
 
   isLoggedIn(): boolean {

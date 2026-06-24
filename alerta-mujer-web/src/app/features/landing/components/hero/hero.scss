@@ -108,6 +108,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .container-stats p {
@@ -117,6 +118,8 @@
             font-weight: 600;
         }
 
+        
+
         .img-stats img {
             width: 50px;
             height: 50px;
@@ -124,6 +127,7 @@
             object-fit: cover;
             border: 3px solid white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            
         }
 
         /* ======================================
@@ -177,7 +181,8 @@
 
         @media (max-width: 500px) {
             .container-hero {
-                min-height: 68vh; /* Ocupa toda la pantalla en móviles pequeños */
+                min-height: 68vh;
+                padding: 23px 14%; 
             }
 
             .text-banner {

@@ -1,0 +1,30 @@
+.container-features{
+    background-color: white;
+    padding: 30px 125px;
+}
+
+ .title-features{
+            font-size: 32px;
+            font-weight: 800;
+            color: #000;
+}
+        
+.subtitle-features{
+            font-size: 16px;
+            font-weight: 400;
+            color: #000;
+}
+
+.text-features{
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    padding-bottom: 19px;
+}
+
+.card-group > .card {
+    margin: 0 10px;
+    border: 1px solid #000;
+    border-radius: 10px;
+    padding: 20px;
+}

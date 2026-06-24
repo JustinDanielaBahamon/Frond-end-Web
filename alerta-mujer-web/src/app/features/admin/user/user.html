@@ -1,1 +1,321 @@
-<p>user works!</p>
+<div class="users-page">
+
+  <!-- HEADER -->
+  <div class="users-header">
+    <h1 class="users-title">Administración de Cuentas</h1>
+    <div class="users-stats">
+      <div class="mini-stat">
+        <span class="mini-stat__value">{{ totalUsuarias }}</span>
+        <span class="mini-stat__label">Total</span>
+      </div>
+      <div class="mini-stat mini-stat--green">
+        <span class="mini-stat__value">{{ usuariasActivas }}</span>
+        <span class="mini-stat__label">Activas</span>
+      </div>
+      <div class="mini-stat mini-stat--red">
+        <span class="mini-stat__value">{{ usuariasBloqueadas }}</span>
+        <span class="mini-stat__label">Bloqueadas</span>
+      </div>
+      <div class="mini-stat mini-stat--amber">
+        <span class="mini-stat__value">{{ usuariasInactivas }}</span>
+        <span class="mini-stat__label">Inactivas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="users-toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Buscar por nombre, email, etc."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
+      <button *ngIf="searchTerm" class="search-clear" (click)="clearSearch()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="filter-wrap">
+      <select class="filter-select" [(ngModel)]="filtroEstado" (change)="applyFilters()">
+        <option value="Todos">Filtrar por Estado (Todos)</option>
+        <option value="Activa">Activa</option>
+        <option value="Inactiva">Inactiva</option>
+        <option value="Bloqueada por Fraude">Bloqueada por Fraude</option>
+      </select>
+    </div>
+
+    <button class="btn-add" (click)="abrirModalNueva()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Añadir Usuaria
+    </button>
+  </div>
+
+  <!-- FILTER CHIPS -->
+  <div class="filter-chips">
+    <button
+      *ngFor="let chip of chips"
+      class="chip"
+      [class.chip--active]="filtroEstado === chip.value"
+      (click)="setChip(chip.value)"
+    >
+      <span class="chip__dot" [style.background]="chip.color"></span>
+      {{ chip.label }}
+      <span class="chip__count">{{ chip.count }}</span>
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <colgroup>
+          <col class="col-check">
+          <col class="col-nombre">
+          <col class="col-email">
+          <col class="col-fecha">
+          <col class="col-alertas">
+          <col class="col-activ">
+          <col class="col-estado">
+          <col class="col-acc">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" (change)="toggleAll($event)" [checked]="allSelected" />
+            </th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Registro</th>
+            <th>Alertas</th>
+            <th>Última Actividad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of usuariasFiltradas" [class.row--blocked]="u.estado === 'Bloqueada por Fraude'">
+            <td>
+              <input type="checkbox" [(ngModel)]="u.selected" (change)="updateSelection()" />
+            </td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" [style.background]="u.avatarColor">
+                  {{ u.nombre.charAt(0) }}
+                </div>
+                <div class="user-info">
+                  <span class="user-name">{{ u.nombre }}</span>
+                  <span class="user-role">{{ u.rol }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="email-cell">{{ u.email }}</td>
+            <td>{{ u.fechaRegistro }}</td>
+            <td>
+              <span class="alerts-badge" [class.alerts-badge--high]="u.alertas > 5">
+                {{ u.alertas }}
+              </span>
+            </td>
+            <td class="muted">{{ u.ultimaActividad }}</td>
+            <td>
+              <span class="estado-badge" [ngClass]="getEstadoClass(u.estado)">
+                <svg *ngIf="u.estado === 'Bloqueada por Fraude'" width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+                </svg>
+                {{ u.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <!-- Ver detalle -->
+                <button class="action-btn action-btn--view" title="Ver detalle" (click)="verDetalle(u)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <!-- Restablecer contraseña -->
+                <button class="action-btn action-btn--reset" title="Restablecer contraseña" (click)="restablecerPassword(u)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                  </svg>
+                </button>
+                <!-- Bloquear / Desbloquear -->
+                <button
+                  class="action-btn"
+                  [class.action-btn--block]="u.estado !== 'Bloqueada por Fraude'"
+                  [class.action-btn--unblock]="u.estado === 'Bloqueada por Fraude'"
+                  [title]="u.estado === 'Bloqueada por Fraude' ? 'Desbloquear cuenta' : 'Bloquear por fraude'"
+                  (click)="toggleBloqueo(u)"
+                >
+                  <svg *ngIf="u.estado !== 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <svg *ngIf="u.estado === 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="usuariasFiltradas.length === 0">
+            <td colspan="8" class="empty-state">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <p>No se encontraron usuarias con ese criterio.</p>
+              <button class="btn-clear-filter" (click)="clearAll()">Limpiar filtros</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER: acciones masivas + paginación -->
+    <div class="table-footer">
+      <div class="bulk-actions" *ngIf="selectedCount > 0">
+        <span class="bulk-label">{{ selectedCount }} seleccionada(s)</span>
+        <button class="bulk-btn bulk-btn--danger" (click)="bloquearSeleccionadas()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Bloquear seleccionadas
+        </button>
+        <button class="bulk-btn" (click)="deselectAll()">Cancelar</button>
+      </div>
+      <div class="pagination" *ngIf="selectedCount === 0">
+        <span class="pagination__info">
+          Mostrando {{ (paginaActual - 1) * porPagina + 1 }}–{{ Math.min(paginaActual * porPagina, totalFiltradas) }} de {{ totalFiltradas }}
+        </span>
+        <div class="pagination__controls">
+          <button class="page-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button
+            *ngFor="let p of paginas"
+            class="page-btn"
+            [class.page-btn--active]="p === paginaActual"
+            (click)="cambiarPagina(p)"
+          >{{ p }}</button>
+          <button class="page-btn" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+        <select class="per-page-select" [(ngModel)]="porPagina" (change)="applyFilters()">
+          <option [value]="10">10 / página</option>
+          <option [value]="25">25 / página</option>
+          <option [value]="50">50 / página</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== MODAL: VER DETALLE ===================== -->
+<div class="modal-overlay" *ngIf="modalDetalle" (click)="cerrarModales()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>Detalle de Usuaria</h2>
+      <button class="modal__close" (click)="cerrarModales()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal__body" *ngIf="usuariaSeleccionada">
+      <div class="detail-hero">
+        <div class="avatar avatar--lg" [style.background]="usuariaSeleccionada.avatarColor">
+          {{ usuariaSeleccionada.nombre.charAt(0) }}
+        </div>
+        <div>
+          <h3 class="detail-name">{{ usuariaSeleccionada.nombre }}</h3>
+          <p class="detail-email">{{ usuariaSeleccionada.email }}</p>
+          <span class="estado-badge" [ngClass]="getEstadoClass(usuariaSeleccionada.estado)">
+            {{ usuariaSeleccionada.estado }}
+          </span>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Teléfono</span>
+          <span class="detail-value">{{ usuariaSeleccionada.telefono }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Fecha de registro</span>
+          <span class="detail-value">{{ usuariaSeleccionada.fechaRegistro }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Alertas enviadas</span>
+          <span class="detail-value">{{ usuariaSeleccionada.alertas }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Última actividad</span>
+          <span class="detail-value">{{ usuariaSeleccionada.ultimaActividad }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Contacto de emergencia</span>
+          <span class="detail-value">{{ usuariaSeleccionada.contactoEmergencia }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Rol</span>
+          <span class="detail-value">{{ usuariaSeleccionada.rol }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn-secondary" (click)="cerrarModales()">Cerrar</button>
+      <button class="btn-primary" (click)="restablecerPassword(usuariaSeleccionada!)">Restablecer contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CONFIRMAR BLOQUEO ===================== -->
+<div class="modal-overlay" *ngIf="modalBloqueo" (click)="cerrarModales()">
+  <div class="modal modal--sm" (click)="$event.stopPropagation()">
+    <div class="modal__header modal__header--danger">
+      <h2>{{ accionBloqueo === 'bloquear' ? 'Bloquear cuenta' : 'Desbloquear cuenta' }}</h2>
+      <button class="modal__close" (click)="cerrarModales()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal__body" *ngIf="usuariaSeleccionada">
+      <p class="confirm-text">
+        ¿Estás segura de que deseas
+        <strong>{{ accionBloqueo === 'bloquear' ? 'bloquear por fraude' : 'desbloquear' }}</strong>
+        la cuenta de <strong>{{ usuariaSeleccionada.nombre }}</strong>?
+      </p>
+      <p class="confirm-sub" *ngIf="accionBloqueo === 'bloquear'">
+        La usuaria no podrá acceder a la aplicación hasta que su cuenta sea reactivada.
+      </p>
+    </div>
+    <div class="modal__footer">
+      <button class="btn-secondary" (click)="cerrarModales()">Cancelar</button>
+      <button
+        class="btn-danger"
+        *ngIf="accionBloqueo === 'bloquear'"
+        (click)="confirmarBloqueo()"
+      >Bloquear cuenta</button>
+      <button
+        class="btn-primary"
+        *ngIf="accionBloqueo === 'desbloquear'"
+        (click)="confirmarBloqueo()"
+      >Desbloquear cuenta</button>
+    </div>
+  </div>
+</div>

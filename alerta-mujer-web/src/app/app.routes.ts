@@ -93,13 +93,6 @@ export const routes: Routes = [
             (m) => m.AlertAdminComponent
           ),
       },
-      {
-        path: 'zonas-riesgo',
-        loadComponent: () =>
-          import('./features/admin/risk-area/risk-area').then(  // ← era "zonas-riesgo/zonas-riesgo"
-            (m) => m.RiskAreaComponent
-          ),
-      },
     ],
   },
   

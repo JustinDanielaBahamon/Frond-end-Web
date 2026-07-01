@@ -1,24 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 
-export interface Alert {
-  hora: string;
-  ubicacion: string;
-  coordenadas: string;
+import { AlertsService } from '../../../core/services/alerts.services';
+import { RiskZonesService } from '../../../core/services/risk-zones.services';
+import { UsersService } from '../../../core/services/users.services';
+import { Alerta } from '../../../core/models/alert.model';
+import { ZonaManual } from '../../../core/models/zona.model';
+
+export interface AlertaPorTipo {
   tipo: string;
-  estado: 'Active' | 'Inactive';
+  cantidad: number;
+  porcentaje: number;
+  color: string;
 }
 
-export interface ZonaCritica {
+export interface ZonaCriticaVM {
   nombre: string;
   alertas: number;
 }
 
-export interface AlertaPorTipo {
-  tipo: string;
-  porcentaje: number;
-  color: string;
-}
+const COLOR_POR_TIPO: Record<string, string> = {
+  SOS: '#ef4444',
+  Medical: '#7c3aed',
+  Robo: '#a78bfa',
+  Acoso: '#c4b5fd',
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -26,77 +33,165 @@ export interface AlertaPorTipo {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
+
+  private alertsService = inject(AlertsService);
+  private riskZonesService = inject(RiskZonesService);
+  private usersService = inject(UsersService);
+
+  cargando = true;
 
   // --- Período ---
-  periodoGlobal = 'Últimos 7 días';
-  periodos = ['Últimos 7 días', 'Últimos 30 días', 'Este mes', 'Este año'];
+  periodoGlobal = 'Todos los datos';
+  periodos = ['Todos los datos'];
   showPeriodoMenu = false;
 
-  // --- Stat Cards ---
-  totalUsuarias = 15230;
-  alertasActivas = 152;
-  zonasCriticas = 34;
-  alertasAltas = 25;
-  alertasMedias = 127;
-  alertasEmergencia = 15;
-  alertasOtras = 127;
-  alertasAtivas = 72;
+  // --- Datos base ---
+  private alertas: Alerta[] = [];
+  private zonas: ZonaManual[] = [];
 
-  // --- Zonas Críticas ---
-  topZonas: ZonaCritica[] = [
-    { nombre: 'Centro', alertas: 12 },
-    { nombre: 'Centro', alertas: 8 },
-    { nombre: 'Colmgro', alertas: 3 },
-  ];
+  // --- Stat Cards (reales) ---
+  totalUsuarias = 0;
+  alertasActivas = 0;
+  zonasCriticas = 0;
+  alertasAltas = 0;
+  alertasMedias = 0;
+  alertasEmergencia = 0;
+  alertasOtras = 0;
+  alertasAtivas = 0;
 
-  // --- Comportamiento ---
-  diasLabels = ['1d','1d','1d','1d','2d','7d','2d','7d','2d','3d','3d','3d','3d'];
+  // --- Zonas Críticas: top 3 reales ---
+  topZonas: ZonaCriticaVM[] = [];
 
-  tendenciaData = {
-    robo:  [80, 95, 60, 110, 130, 100, 150, 90,  70, 120, 140, 100, 80],
-    acoso: [50, 70, 80,  60,  90, 110,  80, 130, 100,  70,  60,  90, 110],
-    roero: [30, 45, 55,  40,  60,  75,  55,  80,  65,  50,  45,  60,  70],
-    otros: [20, 30, 25,  35,  45,  30,  50,  40,  30,  45,  35,  25,  30],
-  };
+  // --- Comportamiento: ahora agrupado por ZONA en vez de por día
+  // (no tenemos fecha real por alerta, así que usamos algo que SÍ es real: alertas por zona)
+  zonasLabels: string[] = [];
+  alertasPorZonaSerie: number[] = [];
 
-  registroData = [2000, 4000, 5000, 3000, 6000, 8000, 5000, 9000, 7000, 4000, 3000, 5000, 6000];
+  // --- Donut: alertas por tipo (real) ---
+  alertasPorTipo: AlertaPorTipo[] = [];
 
-  // --- Donut ---
-  alertasPorTipo: AlertaPorTipo[] = [
-    { tipo: 'Acoso',            porcentaje: 40, color: '#7c3aed' },
-    { tipo: 'Robo',             porcentaje: 20, color: '#a78bfa' },
-    { tipo: 'Emergencia Médica',porcentaje: 15, color: '#c4b5fd' },
-    { tipo: 'Otros',            porcentaje: 25, color: '#ddd6fe' },
-  ];
+  // --- Barras: ahora "alertas por tipo" en vez de "por horario" (dato real que sí tenemos) ---
+  horariosLabels: string[] = [];
+  horariosData: number[] = [];
 
-  // --- Barras ---
-  horariosLabels = ['00:00','03:00','06:00','09:00','12:00','15:00','18:00'];
-  horariosData   = [120, 80, 60, 180, 250, 200, 300];
+  // --- Mini chart usuarias: usamos el total real como único valor visible ---
+  miniUsuariasData: number[] = [];
 
-  // --- Mini charts data ---
-  miniUsuariasData = [60, 80, 55, 90, 70, 100, 85, 110, 95, 120];
+  // --- Tabla: últimas 5 alertas reales ---
+  alertasRecientes: Alerta[] = [];
 
-  // --- Tabla ---
-  alertasRecientes: Alert[] = [
-    { hora: '07:29:09 AM', ubicacion: 'Centro', coordenadas: '-0.715425, -0.095805', tipo: 'Robo',              estado: 'Active' },
-    { hora: '07:38:36 AM', ubicacion: 'Centro', coordenadas: '-0.715538, -0.096875', tipo: 'Acoso',             estado: 'Active' },
-    { hora: '07:08:59 AM', ubicacion: 'Centro', coordenadas: '-0.715333, -0.099875', tipo: 'Emergencia Médica', estado: 'Active' },
-    { hora: '07:08:45 AM', ubicacion: 'Centro', coordenadas: '-0.715528, -0.098875', tipo: 'Emergencia',        estado: 'Active' },
-    { hora: '07:08:49 PM', ubicacion: 'Centro', coordenadas: '-0.715523, -0.095875', tipo: 'Otros',             estado: 'Active' },
-  ];
+  ngOnInit(): void {
+    this.cargarDatos();
+  }
 
-  // ===================== MÉTODOS SVG =====================
+  private cargarDatos(): void {
+    this.cargando = true;
+    forkJoin({
+      alertas: this.alertsService.getAll(),
+      zonas: this.riskZonesService.getZonas(),
+      usuarios: this.usersService.getAll(),
+    }).subscribe({
+      next: ({ alertas, zonas, usuarios }) => {
+        this.alertas = alertas;
+        this.zonas = zonas;
+
+        // Mismos números que en alert-admin
+        this.alertasActivas = alertas.filter(a => a.estado === 'Pendiente').length;
+        this.zonasCriticas = zonas.length;
+        this.totalUsuarias = usuarios.length;
+
+        // Desglose real por tipo
+        this.alertasPorTipo = this.calcularAlertasPorTipo(alertas);
+        this.alertasAltas = alertas.filter(a => a.tipo === 'SOS').length;
+        this.alertasMedias = alertas.filter(a => a.tipo === 'Robo' || a.tipo === 'Acoso').length;
+        this.alertasEmergencia = alertas.filter(a => a.tipo === 'Medical').length;
+        this.alertasOtras = alertas.length - this.alertasAltas - this.alertasMedias - this.alertasEmergencia;
+        this.alertasAtivas = this.alertasActivas;
+
+        // Top 3 zonas reales
+        this.topZonas = [...zonas]
+          .sort((a, b) => b.alertasEnZona - a.alertasEnZona)
+          .slice(0, 3)
+          .map(z => ({ nombre: z.nombre, alertas: z.alertasEnZona }));
+
+        // Barras: reutilizamos el gráfico de barras para mostrar alertas por tipo (dato real)
+        this.horariosLabels = this.alertasPorTipo.map(t => t.tipo);
+        this.horariosData = this.alertasPorTipo.map(t => t.cantidad);
+
+        // Línea de "comportamiento": alertas agrupadas por ubicación (dato real)
+        const porUbicacion = this.calcularAlertasPorUbicacion(alertas);
+        this.zonasLabels = porUbicacion.map(u => u.ubicacion);
+        this.alertasPorZonaSerie = porUbicacion.map(u => u.cantidad);
+
+        // Mini gráfico usuarias: repetimos el total para dar forma de línea plana real
+        this.miniUsuariasData = new Array(6).fill(this.totalUsuarias);
+
+        // Tabla: últimas 5 alertas reales
+        this.alertasRecientes = alertas.slice(-5).reverse();
+
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando dashboard:', err);
+        this.cargando = false;
+      }
+    });
+  }
+
+  private calcularAlertasPorTipo(alertas: Alerta[]): AlertaPorTipo[] {
+    const total = alertas.length || 1;
+    const conteo: Record<string, number> = {};
+    alertas.forEach(a => { conteo[a.tipo] = (conteo[a.tipo] ?? 0) + 1; });
+
+    return Object.entries(conteo).map(([tipo, cantidad]) => ({
+      tipo,
+      cantidad,
+      porcentaje: Math.round((cantidad / total) * 100),
+      color: COLOR_POR_TIPO[tipo] ?? '#c4b5fd',
+    }));
+  }
+
+  private calcularAlertasPorUbicacion(alertas: Alerta[]): { ubicacion: string; cantidad: number }[] {
+    const conteo: Record<string, number> = {};
+    alertas.forEach(a => { conteo[a.ubicacion] = (conteo[a.ubicacion] ?? 0) + 1; });
+    return Object.entries(conteo).map(([ubicacion, cantidad]) => ({ ubicacion, cantidad }));
+  }
+
+  // ===================== MÉTODOS SVG (se mantienen, ahora alimentados con datos reales) =====================
 
   miniLinePoints(data: number[], w = 180, h = 55): string {
+    if (data.length === 0) return '';
     const max = Math.max(...data);
     const min = Math.min(...data);
     const range = max - min || 1;
     return data.map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
+      const x = (i / (data.length - 1 || 1)) * w;
       const y = h - ((v - min) / range) * h;
       return `${x},${y}`;
     }).join(' ');
+  }
+
+  polylinePoints(data: number[], w = 475, h = 170): string {
+    if (data.length === 0) return '';
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+    return data.map((v, i) => {
+      const x = (i / (data.length - 1 || 1)) * w;
+      const y = h - ((v - min) / range) * (h - 10);
+      return `${x},${y}`;
+    }).join(' ');
+  }
+
+  get registroPolygonPoints(): string {
+    const pts = this.polylinePoints(this.alertasPorZonaSerie, 475, 180);
+    if (!pts) return '25,185 500,185';
+    const shifted = pts.split(' ').map(p => {
+      const [x, y] = p.split(',');
+      return `${parseFloat(x) + 25},${y}`;
+    }).join(' ');
+    return `25,185 ${shifted} 500,185`;
   }
 
   donutSegments(): { d: string; color: string; tipo: string; porcentaje: number }[] {
@@ -116,40 +211,20 @@ export class AdminDashboardComponent {
     });
   }
 
-  barMaxValue(): number { return Math.max(...this.horariosData); }
+  barMaxValue(): number {
+    return this.horariosData.length ? Math.max(...this.horariosData) : 1;
+  }
 
   barHeight(val: number, maxH = 120): number {
     return (val / this.barMaxValue()) * maxH;
   }
 
-  // Getter para el área rellena del registro de usuarias (usado en [attr.points] del polygon)
-  get registroPolygonPoints(): string {
-    const pts = this.polylinePoints(this.registroData, 475, 180);
-    const shifted = pts.split(' ').map(p => {
-      const [x, y] = p.split(',');
-      return `${parseFloat(x) + 25},${y}`;
-    }).join(' ');
-    return `25,185 ${shifted} 500,185`;
-  }
-
-  polylinePoints(data: number[], w = 475, h = 170): string {
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-    return data.map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - ((v - min) / range) * (h - 10);
-      return `${x},${y}`;
-    }).join(' ');
-  }
-
   getTipoBadgeClass(tipo: string): string {
     const map: Record<string, string> = {
-      'Robo':             'badge-robo',
-      'Acoso':            'badge-acoso',
-      'Emergencia Médica':'badge-emergencia-medica',
-      'Emergencia':       'badge-emergencia',
-      'Otros':            'badge-otros',
+      SOS: 'badge-robo',
+      Medical: 'badge-emergencia-medica',
+      Robo: 'badge-robo',
+      Acoso: 'badge-acoso',
     };
     return map[tipo] ?? 'badge-otros';
   }

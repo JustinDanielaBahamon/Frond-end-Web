@@ -1,21 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-export interface Usuaria {
-  id: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  fechaRegistro: string;
-  alertas: number;
-  ultimaActividad: string;
-  estado: 'Activa' | 'Inactiva' | 'Bloqueada por Fraude';
-  rol: string;
-  contactoEmergencia: string;
-  avatarColor: string;
-  selected?: boolean;
-}
+import { UsersService } from '../../../core/services/users.services';
+import { Usuario } from '../../../core/models/user.model';
+
+// Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
+type UsuariaUI = Usuario & { selected?: boolean };
 
 interface Chip {
   label: string;
@@ -33,24 +24,15 @@ interface Chip {
 })
 export class UserComponent implements OnInit {
 
-  // ── Datos mock ──────────────────────────────────────────────
-  private todasLasUsuarias: Usuaria[] = [
-    { id: 1,  nombre: 'María Gómez',    email: 'mariagomez@gmail.com',  telefono: '+57 311 000 0001', fechaRegistro: '29/05/2023', alertas: 7,  ultimaActividad: 'hace 2 horas',   estado: 'Activa',               rol: 'Usuaria', contactoEmergencia: 'Ana Gómez (+57 311 111 0001)',      avatarColor: '#7c3aed' },
-    { id: 2,  nombre: 'Carmen Díaz',    email: 'carmendiaz@gmail.com',  telefono: '+57 312 000 0002', fechaRegistro: '27/05/2023', alertas: 2,  ultimaActividad: 'hace 3 días',    estado: 'Inactiva',             rol: 'Usuaria', contactoEmergencia: 'Luis Díaz (+57 312 111 0002)',       avatarColor: '#a78bfa' },
-    { id: 3,  nombre: 'Ana Flores',     email: 'anaflores@gmail.com',   telefono: '+57 313 000 0003', fechaRegistro: '27/05/2023', alertas: 12, ultimaActividad: 'hace 1 semana',  estado: 'Bloqueada por Fraude', rol: 'Usuaria', contactoEmergencia: 'Pedro Flores (+57 313 111 0003)',    avatarColor: '#ec4899' },
-    { id: 4,  nombre: 'Aaría Gomez',    email: 'aanflores@gmail.com',   telefono: '+57 314 000 0004', fechaRegistro: '27/05/2023', alertas: 9,  ultimaActividad: 'hace 5 días',    estado: 'Bloqueada por Fraude', rol: 'Usuaria', contactoEmergencia: 'Rosa Gomez (+57 314 111 0004)',      avatarColor: '#6d28d9' },
-    { id: 5,  nombre: 'Marielilania',   email: 'mariatian@gmail.com',   telefono: '+57 315 000 0005', fechaRegistro: '27/05/2023', alertas: 3,  ultimaActividad: 'hace 1 hora',    estado: 'Activa',               rol: 'Usuaria', contactoEmergencia: 'José Tian (+57 315 111 0005)',       avatarColor: '#7c3aed' },
-    { id: 6,  nombre: 'Díaz Giores',    email: 'anaflores2@gmail.com',  telefono: '+57 316 000 0006', fechaRegistro: '27/05/2023', alertas: 15, ultimaActividad: 'hace 2 semanas', estado: 'Bloqueada por Fraude', rol: 'Usuaria', contactoEmergencia: 'N/A',                               avatarColor: '#c4b5fd' },
-    { id: 7,  nombre: 'Ana Flores',     email: 'anaflarta@gmail.com',   telefono: '+57 317 000 0007', fechaRegistro: '27/05/2023', alertas: 6,  ultimaActividad: 'hace 4 días',    estado: 'Bloqueada por Fraude', rol: 'Usuaria', contactoEmergencia: 'María Flores (+57 317 111 0007)',    avatarColor: '#ec4899' },
-    { id: 8,  nombre: 'María Gómez',    email: 'mariagona@gmail.com',   telefono: '+57 318 000 0008', fechaRegistro: '27/05/2023', alertas: 1,  ultimaActividad: 'hace 30 min',    estado: 'Activa',               rol: 'Usuaria', contactoEmergencia: 'Carlos Gómez (+57 318 111 0008)',    avatarColor: '#a78bfa' },
-    { id: 9,  nombre: 'Clarna Díaz',    email: 'carmendiaz2@gmail.com', telefono: '+57 319 000 0009', fechaRegistro: '27/05/2023', alertas: 4,  ultimaActividad: 'hace 2 horas',   estado: 'Activa',               rol: 'Usuaria', contactoEmergencia: 'Sofía Díaz (+57 319 111 0009)',      avatarColor: '#7c3aed' },
-    { id: 10, nombre: 'Martia Gómez',   email: 'marflorerz@gmail.com',  telefono: '+57 320 000 0010', fechaRegistro: '27/05/2023', alertas: 11, ultimaActividad: 'hace 1 semana',  estado: 'Bloqueada por Fraude', rol: 'Usuaria', contactoEmergencia: 'Juan Gómez (+57 320 111 0010)',      avatarColor: '#6d28d9' },
-    { id: 11, nombre: 'Laura Martínez', email: 'lauramtz@gmail.com',    telefono: '+57 321 000 0011', fechaRegistro: '01/06/2023', alertas: 0,  ultimaActividad: 'hace 6 días',    estado: 'Inactiva',             rol: 'Usuaria', contactoEmergencia: 'Pablo Martínez (+57 321 111 0011)', avatarColor: '#c4b5fd' },
-    { id: 12, nombre: 'Sofía Herrera',  email: 'sofiaherr@gmail.com',   telefono: '+57 322 000 0012', fechaRegistro: '05/06/2023', alertas: 5,  ultimaActividad: 'hace 3 horas',   estado: 'Activa',               rol: 'Usuaria', contactoEmergencia: 'Luis Herrera (+57 322 111 0012)',    avatarColor: '#ec4899' },
-  ];
+  private usersService = inject(UsersService);
+
+  cargando = true;
+
+  // ── Datos reales (ya no mock) ──────────────────────────────
+  private todasLasUsuarias: UsuariaUI[] = [];
 
   // ── Estado UI ────────────────────────────────────────────────
-  usuariasFiltradas: Usuaria[] = [];
+  usuariasFiltradas: UsuariaUI[] = [];
   searchTerm = '';
   filtroEstado = 'Todos';
 
@@ -66,19 +48,18 @@ export class UserComponent implements OnInit {
   // ── Modales ──────────────────────────────────────────────────
   modalDetalle = false;
   modalBloqueo = false;
-  usuariaSeleccionada: Usuaria | null = null;
+  usuariaSeleccionada: UsuariaUI | null = null;
   accionBloqueo: 'bloquear' | 'desbloquear' = 'bloquear';
 
-  // ── Math para template ───────────────────────────────────────
   Math = Math;
 
   // ── Chips ────────────────────────────────────────────────────
   get chips(): Chip[] {
     return [
-      { label: 'Todas',                 value: 'Todos',               color: '#7c3aed', count: this.todasLasUsuarias.length },
-      { label: 'Activas',               value: 'Activa',              color: '#16a34a', count: this.todasLasUsuarias.filter(u => u.estado === 'Activa').length },
-      { label: 'Inactivas',             value: 'Inactiva',            color: '#d97706', count: this.todasLasUsuarias.filter(u => u.estado === 'Inactiva').length },
-      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude',color: '#dc2626', count: this.todasLasUsuarias.filter(u => u.estado === 'Bloqueada por Fraude').length },
+      { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.todasLasUsuarias.length },
+      { label: 'Activas',               value: 'Activa',               color: '#16a34a', count: this.todasLasUsuarias.filter(u => u.estado === 'Activa').length },
+      { label: 'Inactivas',             value: 'Inactiva',             color: '#d97706', count: this.todasLasUsuarias.filter(u => u.estado === 'Inactiva').length },
+      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#dc2626', count: this.todasLasUsuarias.filter(u => u.estado === 'Bloqueada por Fraude').length },
     ];
   }
 
@@ -90,7 +71,22 @@ export class UserComponent implements OnInit {
 
   // ── Lifecycle ────────────────────────────────────────────────
   ngOnInit(): void {
-    this.applyFilters();
+    this.cargarUsuarias();
+  }
+
+  private cargarUsuarias(): void {
+    this.cargando = true;
+    this.usersService.getAll().subscribe({
+      next: (usuarios) => {
+        this.todasLasUsuarias = usuarios;
+        this.applyFilters();
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando usuarias:', err);
+        this.cargando = false;
+      }
+    });
   }
 
   // ── Filtros y paginación ─────────────────────────────────────
@@ -160,42 +156,57 @@ export class UserComponent implements OnInit {
     this.updateSelection();
   }
 
+  // ── Bloqueo masivo vía API ────────────────────────────────────
   bloquearSeleccionadas(): void {
-    this.usuariasFiltradas
-      .filter(u => u.selected)
-      .forEach(u => {
-        const original = this.todasLasUsuarias.find(x => x.id === u.id);
-        if (original) original.estado = 'Bloqueada por Fraude';
+    const seleccionadas = this.usuariasFiltradas.filter(u => u.selected);
+
+    seleccionadas.forEach(u => {
+      this.usersService.updateEstado(u.id, 'Bloqueada por Fraude').subscribe({
+        next: (usuarioActualizado) => {
+          const original = this.todasLasUsuarias.find(x => x.id === usuarioActualizado.id);
+          if (original) original.estado = usuarioActualizado.estado;
+          this.applyFilters();
+        },
+        error: (err) => console.error('Error bloqueando usuaria:', err)
       });
+    });
+
     this.deselectAll();
-    this.applyFilters();
   }
 
   // ── Acciones de fila ─────────────────────────────────────────
-  verDetalle(u: Usuaria): void {
+  verDetalle(u: UsuariaUI): void {
     this.usuariaSeleccionada = u;
     this.modalDetalle = true;
   }
 
-  restablecerPassword(u: Usuaria): void {
+  restablecerPassword(u: UsuariaUI): void {
     alert(`Se envió un correo de restablecimiento a ${u.email}`);
     this.cerrarModales();
   }
 
-  toggleBloqueo(u: Usuaria): void {
+  toggleBloqueo(u: UsuariaUI): void {
     this.usuariaSeleccionada = u;
     this.accionBloqueo = u.estado === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear';
     this.modalBloqueo = true;
   }
 
+  // ── Confirmar bloqueo/desbloqueo vía API ─────────────────────
   confirmarBloqueo(): void {
     if (!this.usuariaSeleccionada) return;
-    const original = this.todasLasUsuarias.find(x => x.id === this.usuariaSeleccionada!.id);
-    if (original) {
-      original.estado = this.accionBloqueo === 'bloquear' ? 'Bloqueada por Fraude' : 'Activa';
-    }
-    this.cerrarModales();
-    this.applyFilters();
+
+    const nuevoEstado: Usuario['estado'] =
+      this.accionBloqueo === 'bloquear' ? 'Bloqueada por Fraude' : 'Activa';
+
+    this.usersService.updateEstado(this.usuariaSeleccionada.id, nuevoEstado).subscribe({
+      next: (usuarioActualizado) => {
+        const original = this.todasLasUsuarias.find(x => x.id === usuarioActualizado.id);
+        if (original) original.estado = usuarioActualizado.estado;
+        this.cerrarModales();
+        this.applyFilters();
+      },
+      error: (err) => console.error('Error actualizando estado:', err)
+    });
   }
 
   abrirModalNueva(): void {

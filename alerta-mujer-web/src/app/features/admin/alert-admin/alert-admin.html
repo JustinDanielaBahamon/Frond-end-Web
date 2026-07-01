@@ -1,1 +1,408 @@
-<p>alert-admin works!</p>
+<div class="alertas-page">
+
+  <!-- TÍTULO -->
+  <div class="alertas-header">
+    <h1 class="alertas-title">Centro de Vigilancia y Respuesta</h1>
+    <div class="alertas-header__right">
+      <span class="live-dot"></span>
+      <span class="live-label">En vivo</span>
+      <span class="alertas-count">{{ alertas.length }} alertas activas</span>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="alertas-layout">
+
+    <!-- ── PANEL IZQUIERDO ── -->
+    <div class="alertas-panel">
+
+      <!-- Tabs -->
+      <div class="panel-tabs">
+        <button class="panel-tab" [class.panel-tab--active]="tabActivo === 'alertas'" (click)="tabActivo = 'alertas'">
+          🔴 Alertas
+          <span class="tab-badge">{{ alertasPendientes }}</span>
+        </button>
+        <button class="panel-tab" [class.panel-tab--active]="tabActivo === 'zonas'" (click)="tabActivo = 'zonas'">
+          🗺️ Zonas
+          <span class="tab-badge tab-badge--purple">{{ zonasManuales.length }}</span>
+        </button>
+      </div>
+
+      <!-- ── TAB ALERTAS ── -->
+      <ng-container *ngIf="tabActivo === 'alertas'">
+        <div class="panel-filters">
+          <select class="panel-select" [(ngModel)]="filtroTipo" (change)="filtrarAlertas()">
+            <option value="Todos">Todos los tipos</option>
+            <option value="SOS">SOS / Pánico</option>
+            <option value="Medical">Emergencia Médica</option>
+            <option value="Robo">Robo</option>
+            <option value="Acoso">Acoso</option>
+          </select>
+          <select class="panel-select" [(ngModel)]="filtroEstado" (change)="filtrarAlertas()">
+            <option value="Todos">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Atendida">Atendida</option>
+          </select>
+        </div>
+
+        <div class="alertas-list">
+          <div
+            *ngFor="let alerta of alertasFiltradas"
+            class="alerta-card"
+            [class.alerta-card--active]="alertaActiva?.id === alerta.id"
+            [class.alerta-card--atendida]="alerta.estado === 'Atendida'"
+            (click)="seleccionarAlerta(alerta)"
+          >
+            <div class="alerta-icon" [ngClass]="'alerta-icon--' + alerta.tipo.toLowerCase()">
+              <span *ngIf="alerta.tipo === 'SOS'">SOS</span>
+              <svg *ngIf="alerta.tipo === 'Medical'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <svg *ngIf="alerta.tipo === 'Robo'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg *ngIf="alerta.tipo === 'Acoso'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            </div>
+
+            <div class="alerta-info">
+              <div class="alerta-top">
+                <span class="alerta-nombre">{{ alerta.nombre }}</span>
+                <span class="alerta-tiempo">{{ alerta.tiempo }}</span>
+              </div>
+              <span class="alerta-desc">{{ alerta.descripcion }}</span>
+              <div class="alerta-coords">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ alerta.lat.toFixed(4) }}, {{ alerta.lng.toFixed(4) }}
+              </div>
+            </div>
+
+            <button
+              class="btn-atender"
+              [class.btn-atender--done]="alerta.estado === 'Atendida'"
+              (click)="$event.stopPropagation(); atenderAlerta(alerta)"
+            >{{ alerta.estado === 'Atendida' ? '✓' : 'Atender' }}</button>
+          </div>
+
+          <div class="list-empty" *ngIf="alertasFiltradas.length === 0">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <p>No hay alertas con ese filtro</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ── TAB ZONAS ── -->
+      <ng-container *ngIf="tabActivo === 'zonas'">
+
+        <!-- Botones para agregar zona -->
+        <div class="zona-add-row">
+          <button class="btn-add-zona btn-add-zona--pin" (click)="abrirModalZona('pin')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Pin de peligro
+          </button>
+          <button class="btn-add-zona btn-add-zona--area" (click)="abrirModalZona('area')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
+            Área de riesgo
+          </button>
+        </div>
+
+        <!-- Zonas automáticas por densidad -->
+        <div class="zonas-section">
+          <div class="zonas-section__title">
+            <span>🔥 Zonas calientes</span>
+            <span class="zonas-section__sub">Por densidad de alertas</span>
+          </div>
+          <div class="zona-auto-card" *ngFor="let z of zonasCalientes" (click)="irAZona(z.lat, z.lng)">
+            <div class="zona-auto__nivel" [ngClass]="'nivel--' + z.nivel.toLowerCase()">{{ z.nivel }}</div>
+            <div class="zona-auto__info">
+              <span class="zona-auto__nombre">{{ z.nombre }}</span>
+              <span class="zona-auto__alertas">{{ z.alertas }} alertas en esta área</span>
+            </div>
+            <!-- BOTÓN: marcar directamente esta zona caliente en el mapa -->
+            <button
+              class="btn-marcar-zona"
+              (click)="$event.stopPropagation(); marcarZonaCaliente(z)"
+              title="Marcar esta zona en el mapa"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Marcar
+            </button>
+          </div>
+        </div>
+
+        <!-- Zonas marcadas manualmente -->
+        <div class="zonas-section">
+          <div class="zonas-section__title">
+            <span>📍 Zonas marcadas</span>
+            <span class="zonas-section__sub">{{ zonasManuales.length }} total</span>
+          </div>
+
+          <!-- Filtro nivel -->
+          <div class="zona-filtros">
+            <button *ngFor="let f of filtrosNivel" class="zona-chip"
+              [class.zona-chip--active]="filtroNivel === f.value"
+              (click)="filtroNivel = f.value">
+              {{ f.label }}
+            </button>
+          </div>
+
+          <div class="zona-manual-card" *ngFor="let z of zonasManualesFiltradas" (click)="irAZona(z.centroLat, z.centroLng)">
+            <div class="zona-manual__header">
+              <div class="zona-manual__nombre-row">
+                <!-- Ícono según método -->
+                <span class="zona-metodo-icon" *ngIf="z.metodo === 'pin'">📍</span>
+                <span class="zona-metodo-icon" *ngIf="z.metodo === 'area'">⭕</span>
+                <span class="zona-manual__nombre">{{ z.nombre }}</span>
+              </div>
+              <span class="zona-nivel-badge" [ngClass]="'nivel-badge--' + z.nivel.toLowerCase()">{{ z.nivel }}</span>
+            </div>
+            <div class="zona-manual__meta">
+              <span>{{ z.alertasEnZona }} alertas dentro</span>
+              <span *ngIf="z.metodo === 'area' && z.radio" class="zona-radio-label">r: {{ z.radio }}m</span>
+              <button class="btn-eliminar-zona" (click)="$event.stopPropagation(); eliminarZona(z.id)" title="Eliminar zona">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="list-empty" *ngIf="zonasManualesFiltradas.length === 0">
+            <p>No hay zonas marcadas.<br>Usa los botones de arriba para agregar.</p>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- ── PANEL DERECHO: Mapa ── -->
+    <div class="mapa-container" [class.cursor-crosshair]="esperandoClickZona || esperandoClickPunto">
+      <div id="mapa-leaflet" class="mapa"></div>
+
+      <!-- Banner modo click en mapa -->
+      <div class="modo-dibujo-banner" *ngIf="esperandoClickZona || esperandoClickPunto">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Haz click en el mapa para colocar el
+        {{ esperandoClickZona ? (modoZona === 'pin' ? 'pin de peligro' : 'centro del área') : 'punto' }}
+        <button class="btn-cancelar-dibujo" (click)="esperandoClickZona = false; esperandoClickPunto = false">Cancelar</button>
+      </div>
+
+      <!-- FAB -->
+      <div class="fab-menu">
+        <div class="fab-options" *ngIf="fabOpen">
+          <button class="fab-option" (click)="abrirModalZona('pin')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Pin de zona peligrosa
+          </button>
+          <button class="fab-option" (click)="abrirModalZona('area')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            Área de riesgo
+          </button>
+          <button class="fab-option" (click)="agregarPuntoCAI()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar CAI / Hospital
+          </button>
+          <button class="fab-option" (click)="limpiarVista()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/><path d="M12 8v4l3 3"/></svg>
+            Centrar mapa
+          </button>
+        </div>
+        <button class="fab-main" (click)="fabOpen = !fabOpen">
+          <svg *ngIf="!fabOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <svg *ngIf="fabOpen"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Filtros capas -->
+      <div class="filtros-capas">
+        <button class="filtros-toggle" (click)="filtrosOpen = !filtrosOpen">
+          Capas
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path [attr.d]="filtrosOpen ? 'm18 15-6-6-6 6' : 'm6 9 6 6 6-6'"/>
+          </svg>
+        </button>
+        <div class="filtros-body" *ngIf="filtrosOpen">
+          <div class="filtro-row">
+            <span class="filtro-label">Alertas</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.alertas" (change)="toggleCapa('alertas')"><span class="toggle__slider"></span></label>
+          </div>
+          <div class="filtro-row">
+            <span class="filtro-label">Zonas de Riesgo</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.zonas" (change)="toggleCapa('zonas')"><span class="toggle__slider"></span></label>
+          </div>
+          <div class="filtro-row">
+            <span class="filtro-label">CAIs</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.cais" (change)="toggleCapa('cais')"><span class="toggle__slider"></span></label>
+          </div>
+          <div class="filtro-row">
+            <span class="filtro-label">Hospitales</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.hospitales" (change)="toggleCapa('hospitales')"><span class="toggle__slider"></span></label>
+          </div>
+          <div class="filtro-row">
+            <span class="filtro-label">Calor</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.calor" (change)="toggleCapa('calor')"><span class="toggle__slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup alerta activa -->
+      <div class="mapa-popup" *ngIf="alertaActiva">
+        <button class="mapa-popup__close" (click)="cerrarPopup()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="mapa-popup__tipo" [ngClass]="'popup-tipo--' + alertaActiva.tipo.toLowerCase()">{{ alertaActiva.tipo }}</div>
+        <div class="mapa-popup__nombre">{{ alertaActiva.nombre }}</div>
+        <div class="mapa-popup__desc">{{ alertaActiva.descripcion }}</div>
+        <div class="mapa-popup__row">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          {{ alertaActiva.lat.toFixed(6) }}, {{ alertaActiva.lng.toFixed(6) }}
+        </div>
+        <div class="mapa-popup__row">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ alertaActiva.tiempo }}
+        </div>
+        <button class="mapa-popup__atender" (click)="atenderAlerta(alertaActiva)">
+          {{ alertaActiva.estado === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Nueva zona de peligro (PIN o ÁREA)
+     ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="modalZona" (click)="cancelarModalZona()">
+  <div class="modal modal--zona" (click)="$event.stopPropagation()">
+
+    <div class="modal__header">
+      <h2>{{ modoZona === 'pin' ? '📍 Pin de zona peligrosa' : '⭕ Área de riesgo' }}</h2>
+      <button class="modal__close" (click)="cancelarModalZona()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Selector de modo dentro del modal -->
+    <div class="modal__mode-tabs">
+      <button class="modal__mode-tab" [class.modal__mode-tab--active]="modoZona === 'pin'" (click)="modoZona = 'pin'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Pin puntual
+      </button>
+      <button class="modal__mode-tab" [class.modal__mode-tab--active]="modoZona === 'area'" (click)="modoZona = 'area'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        Área circular
+      </button>
+    </div>
+
+    <div class="modal__body">
+
+      <!-- PASO 1: Colocar en el mapa -->
+      <div class="form-step">
+        <div class="form-step__num">1</div>
+        <div class="form-step__content">
+          <p class="form-step__label">
+            {{ modoZona === 'pin' ? 'Colocar pin en el mapa' : 'Elegir centro del área' }}
+          </p>
+          <button class="btn-click-mapa" [class.btn-click-mapa--activo]="esperandoClickZona" (click)="activarClickEnMapa()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ esperandoClickZona ? '⏳ Haz click en el mapa...' : (nuevaZona.lat !== 0 ? '✓ Ubicación seleccionada' : 'Seleccionar en el mapa') }}
+          </button>
+          <p class="form-coords" *ngIf="nuevaZona.lat !== 0">
+            {{ nuevaZona.lat.toFixed(5) }}, {{ nuevaZona.lng.toFixed(5) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- PASO 2: Radio (solo para área) -->
+      <div class="form-step" *ngIf="modoZona === 'area'">
+        <div class="form-step__num">2</div>
+        <div class="form-step__content">
+          <p class="form-step__label">Radio del área</p>
+          <div class="radio-slider-row">
+            <input
+              type="range" min="100" max="1500" step="50"
+              [(ngModel)]="nuevaZona.radio"
+              (input)="onRadioChange()"
+              class="radio-slider"
+            />
+            <span class="radio-value">{{ nuevaZona.radio }}m</span>
+          </div>
+          <div class="radio-presets">
+            <button *ngFor="let r of [150, 300, 500, 1000]" class="radio-preset-btn"
+              [class.radio-preset-btn--active]="nuevaZona.radio === r"
+              (click)="nuevaZona.radio = r; onRadioChange()">
+              {{ r }}m
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 2/3: Nivel -->
+      <div class="form-step">
+        <div class="form-step__num">{{ modoZona === 'area' ? '3' : '2' }}</div>
+        <div class="form-step__content">
+          <p class="form-step__label">Nivel de peligro</p>
+          <div class="nivel-options">
+            <button *ngFor="let n of nivelesRiesgo"
+              class="nivel-btn"
+              [class.nivel-btn--active]="nuevaZona.nivel === n.value"
+              [ngClass]="'nivel-btn--' + n.value.toLowerCase()"
+              (click)="setNivel(n.value)">
+              {{ n.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 3/4: Nombre -->
+      <div class="form-step">
+        <div class="form-step__num">{{ modoZona === 'area' ? '4' : '3' }}</div>
+        <div class="form-step__content">
+          <p class="form-step__label">Nombre</p>
+          <input class="form-input" type="text" [(ngModel)]="nuevaZona.nombre"
+            placeholder="{{ modoZona === 'pin' ? 'Ej: Esquina calle 13' : 'Ej: Sector La Candelaria' }}" />
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal__footer">
+      <button class="btn-secondary" (click)="cancelarModalZona()">Cancelar</button>
+      <button class="btn-primary"
+        [disabled]="!nuevaZona.nombre || nuevaZona.lat === 0"
+        (click)="guardarZona()">
+        Guardar zona
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Agregar CAI / Hospital
+     ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="modalPunto" (click)="modalPunto = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>Agregar punto al mapa</h2>
+      <button class="modal__close" (click)="modalPunto = false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <div class="nivel-options">
+          <button class="nivel-btn" [class.nivel-btn--active]="nuevoPunto.tipo === 'CAI'" (click)="nuevoPunto.tipo = 'CAI'">🚔 CAI</button>
+          <button class="nivel-btn" [class.nivel-btn--active]="nuevoPunto.tipo === 'Hospital'" (click)="nuevoPunto.tipo = 'Hospital'">🏥 Hospital</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input class="form-input" type="text" [(ngModel)]="nuevoPunto.nombre" placeholder="Ej: CAI Centro" />
+      </div>
+      <p class="form-hint">
+        💡 Haz click en el mapa para elegir la ubicación exacta.
+        <span *ngIf="nuevoPunto.lat !== 0"> ✓ {{ nuevoPunto.lat | number:'1.5-5' }}, {{ nuevoPunto.lng | number:'1.5-5' }}</span>
+        <span *ngIf="nuevoPunto.lat === 0"> Coordenadas: —</span>
+      </p>
+    </div>
+    <div class="modal__footer">
+      <button class="btn-secondary" (click)="modalPunto = false">Cancelar</button>
+      <button class="btn-primary" (click)="guardarPunto()">Guardar</button>
+    </div>
+  </div>
+</div>

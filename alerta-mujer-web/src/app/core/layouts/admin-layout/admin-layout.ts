@@ -17,7 +17,7 @@ export class AdminLayoutComponent {
     { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
     { label: 'Usuarios',     route: '/admin/usuarios' },
     { label: 'Alertas',      route: '/admin/alertas' },
-    { label: 'Zonas de Riesgo', route: '/admin/zonas-riesgo' },
+  
   ];
 
   toggleTheme() {

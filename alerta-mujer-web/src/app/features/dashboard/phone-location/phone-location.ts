@@ -1,16 +1,9 @@
-import { Component, signal, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-
-interface LocationEntry {
-  id: number;
-  time: string;
-  address: string;
-  gpsSignal: 'Fuerte' | 'Moderada' | 'Débil';
-  battery: number;
-  lat: number;
-  lng: number;
-}
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
+import { UbicacionEntry } from '../../../core/models/location.model';
+import { AuthService } from '../../../core/auth/auth.service';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -40,13 +33,23 @@ L.Marker.prototype.options.icon = iconDefault;
   templateUrl: './phone-location.html',
   styleUrl: './phone-location.scss'
 })
-export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
+export class PhoneLocationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('mapContainer') mapContainer!: ElementRef;
+
+  private phoneLocationService = inject(PhoneLocationService);
+  private authService = inject(AuthService);
 
   private map!: L.Map;
   private markers: L.Marker[] = [];
   private polyline!: L.Polyline;
+
+  private viewReady = false;
+  private dataReady = false;
+  private mapInitialized = false;
+
+  cargando = true;
+  error = false;
 
   selectedDevice = signal('Dispositivo 1');
   selectedDateRange = signal('Hoy');
@@ -57,15 +60,8 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
   isFullscreen = signal(false);
   showFullscreenBtn = signal(false);
 
-  locationHistory = signal<LocationEntry[]>([
-    { id: 1, time: '11:30 AM', address: 'Calle Principal 123, Ciudad', gpsSignal: 'Fuerte',   battery: 85, lat: 4.7110, lng: -74.0721 },
-    { id: 2, time: '11:15 AM', address: 'Parque Central',              gpsSignal: 'Fuerte',   battery: 82, lat: 4.7095, lng: -74.0698 },
-    { id: 3, time: '10:45 AM', address: 'Centro Comercial',            gpsSignal: 'Moderada', battery: 79, lat: 4.7080, lng: -74.0750 },
-    { id: 4, time: '10:30 AM', address: 'Av. Libertad 456',            gpsSignal: 'Fuerte',   battery: 76, lat: 4.7060, lng: -74.0730 },
-    { id: 5, time: '9:30 AM',  address: 'Zona Norte, Barrio El Prado', gpsSignal: 'Débil',    battery: 70, lat: 4.7040, lng: -74.0710 },
-  ]);
-
-  currentLocation = this.locationHistory()[0];
+  locationHistory = signal<UbicacionEntry[]>([]);
+  currentLocation: UbicacionEntry | null = null;
   visibleCount = signal(3);
 
   get visibleHistory() {
@@ -80,12 +76,45 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
     this.visibleCount.set(this.locationHistory().length);
   }
 
+  ngOnInit() {
+    this.authService.currentUser$.subscribe((usuario) => {
+      if (!usuario) {
+        this.error = true;
+        this.cargando = false;
+        return;
+      }
+
+      this.phoneLocationService.getByUsuario(usuario.id).subscribe({
+        next: (data) => {
+          this.locationHistory.set(data);
+          this.currentLocation = data[0] ?? null;
+          this.cargando = false;
+          this.dataReady = true;
+          this.tryInitMap();
+        },
+        error: () => {
+          this.error = true;
+          this.cargando = false;
+        },
+      });
+    });
+  }
+
   ngAfterViewInit() {
-    this.initMap();
+    this.viewReady = true;
+    this.tryInitMap();
+  }
+
+  private tryInitMap() {
+    if (this.viewReady && this.dataReady && !this.mapInitialized && this.locationHistory().length > 0) {
+      this.initMap();
+      this.mapInitialized = true;
+    }
   }
 
   private initMap() {
-    const center = this.locationHistory()[0];
+    const history = this.locationHistory();
+    const center = history[0];
 
     this.map = L.map(this.mapContainer.nativeElement, {
       center: [center.lat, center.lng],
@@ -111,15 +140,15 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
       .bindPopup(`<b>Ubicación actual</b><br>${center.address}<br>${center.time}`);
     this.markers.push(currentMarker);
 
-    const history = this.locationHistory().slice(1);
-    history.forEach(entry => {
+    const rest = history.slice(1);
+    rest.forEach(entry => {
       const marker = L.marker([entry.lat, entry.lng], { icon: iconRed })
         .addTo(this.map)
         .bindPopup(`<b>${entry.time}</b><br>${entry.address}<br>GPS: ${entry.gpsSignal} | Batería: ${entry.battery}%`);
       this.markers.push(marker);
     });
 
-    const coords: L.LatLngExpression[] = this.locationHistory().map(e => [e.lat, e.lng]);
+    const coords: L.LatLngExpression[] = history.map(e => [e.lat, e.lng]);
     this.polyline = L.polyline(coords, {
       color: '#7c3aed',
       weight: 3,
@@ -132,12 +161,12 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
 
   onMapMouseEnter() {
     this.showFullscreenBtn.set(true);
-    this.map.scrollWheelZoom.enable();
+    this.map?.scrollWheelZoom.enable();
   }
 
   onMapMouseLeave() {
     this.showFullscreenBtn.set(false);
-    this.map.scrollWheelZoom.disable();
+    this.map?.scrollWheelZoom.disable();
   }
 
   toggleFullscreen() {
@@ -151,8 +180,8 @@ export class PhoneLocationComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  flyTo(entry: LocationEntry) {
-    this.map.flyTo([entry.lat, entry.lng], 16, { duration: 1 });
+  flyTo(entry: UbicacionEntry) {
+    this.map?.flyTo([entry.lat, entry.lng], 16, { duration: 1 });
     this.currentLocation = entry;
   }
 

@@ -1,6 +1,9 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import * as L from 'leaflet';
+import { AlertsService } from '../../../core/services/alerts.services';
+import { Alerta } from '../../../core/models/alert.model';
+import { AuthService } from '../../../core/auth/auth.service';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -16,36 +19,78 @@ const iconDefault = L.icon({
   templateUrl: './alert-history.html',
   styleUrl: './alert-history.scss',
 })
+export class AlertHistory implements OnInit, OnDestroy {
 
-export class AlertHistory implements OnDestroy {
+  private alertsService = inject(AlertsService);
+  private authService = inject(AuthService);
 
-  alertas = [
-    { id: '024', fecha: '13 jun 2026', hora: '10:32 AM', tipo: 'Botón de activación', ubicacion: 'Cra 5 #12-34, Campoalegre', estado: 'Pendiente', lat: 2.2964, lng: -75.0199, desc: 'La usuaria presionó el botón de emergencia.' },
-    { id: '023', fecha: '12 jun 2026', hora: '08:15 PM', tipo: 'Sacudida', ubicacion: 'Av. Santander, Neiva', estado: 'Atendida', lat: 2.9273, lng: -75.2819, desc: 'El sensor detectó un movimiento brusco del dispositivo.' },
-    { id: '022', fecha: '10 jun 2026', hora: '03:47 PM', tipo: 'Wigert', ubicacion: 'Parque Central, Garzón', estado: 'Atendida', lat: 2.1978, lng: -75.6273, desc: 'Alerta activada desde el widget del dispositivo.' },
-    { id: '021', fecha: '08 jun 2026', hora: '11:20 AM', tipo: 'Botón de activación', ubicacion: 'Terminal de Transporte, Neiva', estado: 'Fallido', lat: 2.9356, lng: -75.2945, desc: 'No se pudo notificar a los contactos de confianza.' },
-    { id: '020', fecha: '05 jun 2026', hora: '07:05 PM', tipo: 'Sacudida', ubicacion: 'Calle 15 #8-22, Campoalegre', estado: 'Atendida', lat: 2.2971, lng: -75.0210, desc: 'Alerta de emergencia atendida por contacto de confianza.' },
-  ];
+  alertas: Alerta[] = [];
+  cargando = true;
+  error = false;
+
+  totalAlertas = 0;
+  alertasEsteMes = 0;
+  alertasPendientes = 0;
+  alertasAtendidas = 0;
 
   tipoBadge: Record<string, string> = {
-    'Botón de activación': 'badge-boton',
-    'Wigert': 'badge-wigert',
-    'Sacudida': 'badge-sacudida',
+    'SOS': 'badge-sos',
+    'Medical': 'badge-medical',
+    'Robo': 'badge-robo',
+    'Acoso': 'badge-acoso',
   };
 
   estadoBadge: Record<string, string> = {
     'Atendida': 'badge-ok',
     'Pendiente': 'badge-pendiente',
-    'Fallido': 'badge-fallido',
   };
 
-  alertaSeleccionada: any = null;
+  alertaSeleccionada: Alerta | null = null;
   modalAbierto = false;
 
   private map: L.Map | null = null;
   private mapInitialized = false;
 
-  abrirModal(alerta: any) {
+  ngOnInit() {
+    this.authService.currentUser$.subscribe((usuario) => {
+      if (!usuario) {
+        this.error = true;
+        this.cargando = false;
+        return;
+      }
+
+      this.alertsService.getByUsuario(usuario.id).subscribe({
+        next: (data) => {
+          this.alertas = data;
+          this.calcularStats(data);
+          this.cargando = false;
+        },
+        error: () => {
+          this.error = true;
+          this.cargando = false;
+        },
+      });
+    });
+  }
+
+  private calcularStats(alertas: Alerta[]) {
+    this.totalAlertas = alertas.length;
+    this.alertasPendientes = alertas.filter(a => a.estado === 'Pendiente').length;
+    this.alertasAtendidas = alertas.filter(a => a.estado === 'Atendida').length;
+
+    // 👇 asume que 'tiempo' es parseable como fecha (ej. "2026-06-13T10:32:00").
+    // Si tu formato es distinto (ej. "13 jun 2026, 10:32 AM"), dime el formato exacto
+    // y ajusto el parseo.
+    const hoy = new Date();
+    this.alertasEsteMes = alertas.filter(a => {
+      const fechaAlerta = new Date(a.tiempo);
+      if (isNaN(fechaAlerta.getTime())) return false;
+      return fechaAlerta.getMonth() === hoy.getMonth() &&
+             fechaAlerta.getFullYear() === hoy.getFullYear();
+    }).length;
+  }
+
+  abrirModal(alerta: Alerta) {
     this.alertaSeleccionada = alerta;
     this.modalAbierto = true;
     this.mapInitialized = false;
@@ -75,7 +120,7 @@ export class AlertHistory implements OnDestroy {
       scrollWheelZoom: true,
     });
 
-   L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     }).addTo(this.map);
@@ -98,17 +143,15 @@ export class AlertHistory implements OnDestroy {
   }
 
   toggleFullscreen() {
-  const el = document.getElementById('leaflet-map');
-  if (!el) return;
+    const el = document.getElementById('leaflet-map');
+    if (!el) return;
 
-  if (!document.fullscreenElement) {
-    el.requestFullscreen();
-  } else {
-    document.exitFullscreen();
+    if (!document.fullscreenElement) {
+      el.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+
+    setTimeout(() => this.map?.invalidateSize(), 300);
   }
-
-  // le dice a Leaflet que recalcule el tamaño después del cambio
-  setTimeout(() => this.map?.invalidateSize(), 300);
 }
-}
-

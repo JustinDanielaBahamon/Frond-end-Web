@@ -147,29 +147,15 @@
           <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
         </div>
       </div>
-      <p class="chart-subtitle">Tendencia de Alertas (Últimos 30 días) vs Registro de Usuarias</p>
+      <p class="chart-subtitle">Alertas registradas por zona/ubicación</p>
 
-      <!-- Leyenda -->
-      <div class="legend-row">
-        <span class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span>Robo</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#ec4899"></span>Acoso</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>Roero</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#c4b5fd"></span>Otros</span>
-      </div>
-
-      <!-- SVG gráfica de líneas -->
+      <!-- SVG gráfica de línea -->
       <div class="chart-wrap">
         <svg class="behavior-svg" viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg">
-          <!-- Eje Y izquierdo (alertas) -->
-          <text x="2" y="15" font-size="9" fill="#9ca3af">200</text>
-          <text x="2" y="55" font-size="9" fill="#9ca3af">150</text>
-          <text x="2" y="95" font-size="9" fill="#9ca3af">100</text>
-          <text x="2" y="135" font-size="9" fill="#9ca3af">50</text>
-
-          <!-- Eje Y derecho (usuarias) -->
-          <text x="505" y="15" font-size="9" fill="#9ca3af">10,000</text>
-          <text x="510" y="65" font-size="9" fill="#9ca3af">8,000</text>
-          <text x="510" y="115" font-size="9" fill="#9ca3af">200</text>
+          <!-- Eje Y izquierdo (cantidad de alertas) -->
+          <text x="2" y="15" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() }}</text>
+          <text x="2" y="95" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() / 2 | number:'1.0-0' }}</text>
+          <text x="2" y="175" font-size="9" fill="#9ca3af">0</text>
 
           <!-- Líneas de cuadrícula -->
           <line x1="25" y1="10"  x2="500" y2="10"  stroke="#e5e0f8" stroke-width="0.5"/>
@@ -178,34 +164,10 @@
           <line x1="25" y1="130" x2="500" y2="130" stroke="#e5e0f8" stroke-width="0.5"/>
           <line x1="25" y1="170" x2="500" y2="170" stroke="#e5e0f8" stroke-width="0.5"/>
 
-          <!-- Robo -->
-          <polyline
-            [attr.points]="polylinePoints(tendenciaData.robo, 475, 180)"
-            fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round"
-            transform="translate(25,5)"/>
-
-          <!-- Acoso -->
-          <polyline
-            [attr.points]="polylinePoints(tendenciaData.acoso, 475, 180)"
-            fill="none" stroke="#ec4899" stroke-width="2" stroke-linejoin="round"
-            transform="translate(25,5)"/>
-
-          <!-- Roero -->
-          <polyline
-            [attr.points]="polylinePoints(tendenciaData.roero, 475, 180)"
-            fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"
-            transform="translate(25,5)"/>
-
-          <!-- Otros -->
-          <polyline
-            [attr.points]="polylinePoints(tendenciaData.otros, 475, 180)"
-            fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linejoin="round" stroke-dasharray="4,3"
-            transform="translate(25,5)"/>
-
-          <!-- Registro Usuarias (área) -->
+          <!-- Área + línea: alertas por zona -->
           <defs>
             <linearGradient id="grad-reg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.2"/>
+              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
               <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
             </linearGradient>
           </defs>
@@ -213,15 +175,15 @@
             [attr.points]="registroPolygonPoints"
             fill="url(#grad-reg)"/>
           <polyline
-            [attr.points]="polylinePoints(registroData, 475, 180)"
-            fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5"
+            [attr.points]="polylinePoints(alertasPorZonaSerie, 475, 180)"
+            fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round"
             transform="translate(25,5)"/>
 
-          <!-- Eje X días -->
+          <!-- Eje X zonas -->
           <g transform="translate(25,190)">
-            <text *ngFor="let d of diasLabels; let i = index"
-              [attr.x]="(i/(diasLabels.length-1))*475"
-              y="0" font-size="8" fill="#9ca3af" text-anchor="middle">{{ d }}</text>
+            <text *ngFor="let z of zonasLabels; let i = index"
+              [attr.x]="(i/(zonasLabels.length-1 || 1))*475"
+              y="0" font-size="8" fill="#9ca3af" text-anchor="middle">{{ z }}</text>
           </g>
         </svg>
       </div>
@@ -325,10 +287,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let a of alertasRecientes">
-              <td>{{ a.hora }}</td>
+              <td>{{ a.tiempo }}</td>
               <td>
                 {{ a.ubicacion }}
-                <span class="coords">({{ a.coordenadas }})</span>
+                <span class="coords">({{ a.lat }}, {{ a.lng }})</span>
               </td>
               <td>
                 <span class="tipo-badge" [ngClass]="getTipoBadgeClass(a.tipo)">{{ a.tipo }}</span>

@@ -9,8 +9,19 @@ export class AlertsService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/alertas`;
 
+  // Usado por ADMIN: todas las alertas
   getAll(): Observable<Alerta[]> {
     return this.http.get<Alerta[]>(this.url);
+  }
+
+  // Usado por USUARIA: solo sus propias alertas
+  // json-server soporta filtros por query param: /alertas?usuarioId=1
+  getByUsuario(usuarioId: number): Observable<Alerta[]> {
+    return this.http.get<Alerta[]>(`${this.url}?usuarioId=${usuarioId}`);
+  }
+
+  getById(id: number): Observable<Alerta> {
+    return this.http.get<Alerta>(`${this.url}/${id}`);
   }
 
   update(alerta: Alerta): Observable<Alerta> {

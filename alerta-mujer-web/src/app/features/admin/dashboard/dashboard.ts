@@ -215,6 +215,10 @@ export class AdminDashboardComponent implements OnInit {
     return this.horariosData.length ? Math.max(...this.horariosData) : 1;
   }
 
+  barMaxValueZonas(): number {
+    return this.alertasPorZonaSerie.length ? Math.max(...this.alertasPorZonaSerie) : 1;
+  }
+
   barHeight(val: number, maxH = 120): number {
     return (val / this.barMaxValue()) * maxH;
   }

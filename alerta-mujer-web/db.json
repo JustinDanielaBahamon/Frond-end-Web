@@ -1,15 +1,15 @@
 {
   "alertas": [
-    { "id": 1,  "nombre": "María Pérez",   "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 2 min",  "ubicacion": "Centro",      "lat": 4.7110, "lng": -74.0721, "estado": "Pendiente" },
-    { "id": 2,  "nombre": "María Pérez",   "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 2 min",  "ubicacion": "Centro",      "lat": 4.7118, "lng": -74.0715, "estado": "Pendiente" },
-    { "id": 3,  "nombre": "Ana Gómez",     "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 3 min",  "ubicacion": "Centro",      "lat": 4.7105, "lng": -74.0728, "estado": "Pendiente" },
-    { "id": 4,  "nombre": "María Pérez",   "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 5 min",  "ubicacion": "Chapinero",   "lat": 4.7200, "lng": -74.0650, "estado": "Pendiente" },
-    { "id": 5,  "nombre": "María Pérez",   "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 6 min",  "ubicacion": "Centro",      "lat": 4.7112, "lng": -74.0719, "estado": "Pendiente" },
-    { "id": 6,  "nombre": "Laura Torres",  "descripcion": "Robo a mano armada",  "tipo": "Robo",    "tiempo": "Hace 8 min",  "ubicacion": "Calle 80",    "lat": 4.7160, "lng": -74.0680, "estado": "Pendiente" },
-    { "id": 7,  "nombre": "Sofía Ruiz",    "descripcion": "Acoso en transporte", "tipo": "Acoso",   "tiempo": "Hace 10 min", "ubicacion": "Av. Caracas", "lat": 4.7055, "lng": -74.0760, "estado": "Pendiente" },
-    { "id": 8,  "nombre": "Camila Ortiz",  "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 12 min", "ubicacion": "Chapinero",   "lat": 4.7210, "lng": -74.0640, "estado": "Atendida"  },
-    { "id": 9,  "nombre": "Diana Morales", "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 15 min", "ubicacion": "Centro",      "lat": 4.7108, "lng": -74.0724, "estado": "Pendiente" },
-    { "id": 10, "nombre": "Paola Vargas",  "descripcion": "Acoso en calle",      "tipo": "Acoso",   "tiempo": "Hace 18 min", "ubicacion": "Av. Caracas", "lat": 4.7060, "lng": -74.0758, "estado": "Pendiente" }
+    { "id": 1,  "usuarioId": 1, "nombre": "María Pérez",   "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 2 min",  "ubicacion": "Centro",      "lat": 4.7110, "lng": -74.0721, "estado": "Pendiente" },
+    { "id": 2,  "usuarioId": 1, "nombre": "María Pérez",   "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 2 min",  "ubicacion": "Centro",      "lat": 4.7118, "lng": -74.0715, "estado": "Pendiente" },
+    { "id": 3,  "usuarioId": 2, "nombre": "Ana Gómez",     "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 3 min",  "ubicacion": "Centro",      "lat": 4.7105, "lng": -74.0728, "estado": "Pendiente" },
+    { "id": 4,  "usuarioId": 1, "nombre": "María Pérez",   "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 5 min",  "ubicacion": "Chapinero",   "lat": 4.7200, "lng": -74.0650, "estado": "Pendiente" },
+    { "id": 5,  "usuarioId": 1, "nombre": "María Pérez",   "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 6 min",  "ubicacion": "Centro",      "lat": 4.7112, "lng": -74.0719, "estado": "Pendiente" },
+    { "id": 6,  "usuarioId": 3, "nombre": "Laura Torres",  "descripcion": "Robo a mano armada",  "tipo": "Robo",    "tiempo": "Hace 8 min",  "ubicacion": "Calle 80",    "lat": 4.7160, "lng": -74.0680, "estado": "Pendiente" },
+    { "id": 7,  "usuarioId": 4, "nombre": "Sofía Ruiz",    "descripcion": "Acoso en transporte", "tipo": "Acoso",   "tiempo": "Hace 10 min", "ubicacion": "Av. Caracas", "lat": 4.7055, "lng": -74.0760, "estado": "Pendiente" },
+    { "id": 8,  "usuarioId": 5, "nombre": "Camila Ortiz",  "descripcion": "Emergencia médica",   "tipo": "Medical", "tiempo": "Hace 12 min", "ubicacion": "Chapinero",   "lat": 4.7210, "lng": -74.0640, "estado": "Atendida"  },
+    { "id": 9,  "usuarioId": 6, "nombre": "Diana Morales", "descripcion": "Pánico activado",     "tipo": "SOS",     "tiempo": "Hace 15 min", "ubicacion": "Centro",      "lat": 4.7108, "lng": -74.0724, "estado": "Pendiente" },
+    { "id": 10, "usuarioId": 7, "nombre": "Paola Vargas",  "descripcion": "Acoso en calle",      "tipo": "Acoso",   "tiempo": "Hace 18 min", "ubicacion": "Av. Caracas", "lat": 4.7060, "lng": -74.0758, "estado": "Pendiente" }
   ],
   "zonasManuales": [],
   "puntosMapa": [

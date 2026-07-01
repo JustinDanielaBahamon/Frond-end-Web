@@ -1,73 +1,90 @@
 <div class="ah-wrap">
 
-  <h1 class="ah-title">Historial de a
-    lertas</h1>
+  <h1 class="ah-title">Historial de alertas</h1>
   <p class="ah-sub">Registro de todas las alertas emitidas por la usuaria</p>
 
-  <!-- STATS -->
-  <div class="ah-stats">
-    <div class="ah-stat">
-      <p class="ah-stat-label">Total alertas</p>
-      <p class="ah-stat-val pink">24</p>
-    </div>
-    <div class="ah-stat">
-      <p class="ah-stat-label">Este mes</p>
-      <p class="ah-stat-val purple">8</p>
-    </div>
-    <div class="ah-stat">
-      <p class="ah-stat-label">Pendientes</p>
-      <p class="ah-stat-val amber">3</p>
-    </div>
-    <div class="ah-stat">
-      <p class="ah-stat-label">Atendidas</p>
-      <p class="ah-stat-val green">21</p>
-    </div>
-  </div>
+  <!-- LOADING -->
+  @if (cargando) {
+    <p class="ah-loading">Cargando alertas...</p>
+  }
 
-  <!-- BUSCADOR -->
-  <div class="ah-search">
-    <span class="ah-search-icon">🔍</span>
-    <input type="text" placeholder="Buscar por fecha, tipo o estado..." />
-  </div>
+  <!-- ERROR -->
+  @if (error) {
+    <p class="ah-error">No se pudieron cargar las alertas. Intenta de nuevo.</p>
+  }
 
-  <!-- TABLA -->
-  <div class="ah-table-wrap">
-    <table class="ah-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Fecha y hora</th>
-          <th>Tipo</th>
-          <th>Ubicación</th>
-          <th>Estado</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (alerta of alertas; track alerta.id) {
-          <tr (click)="abrirModal(alerta)">
-            <td class="ah-id">#{{ alerta.id }}</td>
-            <td>
-              <span class="ah-fecha">{{ alerta.fecha }}</span><br>
-              <span class="ah-hora">{{ alerta.hora }}</span>
-            </td>
-            <td>
-              <span class="ah-badge" [ngClass]="tipoBadge[alerta.tipo]">
-                {{ alerta.tipo }}
-              </span>
-            </td>
-            <td class="ah-ubicacion">{{ alerta.ubicacion }}</td>
-            <td>
-              <span class="ah-badge" [ngClass]="estadoBadge[alerta.estado]">
-                {{ alerta.estado }}
-              </span>
-            </td>
-            <td class="ah-chevron">›</td>
+  @if (!cargando && !error) {
+
+    <!-- STATS -->
+    <div class="ah-stats">
+      <div class="ah-stat">
+        <p class="ah-stat-label">Total alertas</p>
+        <p class="ah-stat-val pink">{{ totalAlertas }}</p>
+      </div>
+      <div class="ah-stat">
+        <p class="ah-stat-label">Este mes</p>
+        <p class="ah-stat-val purple">{{ alertasEsteMes }}</p>
+      </div>
+      <div class="ah-stat">
+        <p class="ah-stat-label">Pendientes</p>
+        <p class="ah-stat-val amber">{{ alertasPendientes }}</p>
+      </div>
+      <div class="ah-stat">
+        <p class="ah-stat-label">Atendidas</p>
+        <p class="ah-stat-val green">{{ alertasAtendidas }}</p>
+      </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="ah-search">
+      <span class="ah-search-icon">🔍</span>
+      <input type="text" placeholder="Buscar por fecha, tipo o estado..." />
+    </div>
+
+    <!-- TABLA -->
+    <div class="ah-table-wrap">
+      <table class="ah-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha y hora</th>
+            <th>Tipo</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th></th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (alerta of alertas; track alerta.id) {
+            <tr (click)="abrirModal(alerta)">
+              <td class="ah-id">#{{ alerta.id }}</td>
+              <td>
+                <span class="ah-fecha">{{ alerta.tiempo }}</span>
+              </td>
+              <td>
+                <span class="ah-badge" [ngClass]="tipoBadge[alerta.tipo]">
+                  {{ alerta.tipo }}
+                </span>
+              </td>
+              <td class="ah-ubicacion">{{ alerta.ubicacion }}</td>
+              <td>
+                <span class="ah-badge" [ngClass]="estadoBadge[alerta.estado]">
+                  {{ alerta.estado }}
+                </span>
+              </td>
+              <td class="ah-chevron">›</td>
+            </tr>
+          }
+          @empty {
+            <tr>
+              <td colspan="6" class="ah-empty">Aún no tienes alertas registradas.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  }
 
 </div>
 
@@ -92,7 +109,7 @@
         <!-- DETALLES -->
         <div class="ah-detail-row">
           <span class="ah-detail-label">Fecha y hora</span>
-          <span>{{ alertaSeleccionada.fecha }} — {{ alertaSeleccionada.hora }}</span>
+          <span>{{ alertaSeleccionada.tiempo }}</span>
         </div>
         <div class="ah-detail-row">
           <span class="ah-detail-label">Tipo</span>
@@ -112,7 +129,7 @@
         </div>
         <div class="ah-detail-row">
           <span class="ah-detail-label">Descripción</span>
-          <span class="ah-desc">{{ alertaSeleccionada.desc }}</span>
+          <span class="ah-desc">{{ alertaSeleccionada.descripcion }}</span>
         </div>
 
       </div>

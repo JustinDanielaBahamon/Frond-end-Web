@@ -8,4 +8,5 @@ export interface Alerta {
   lat: number;
   lng: number;
   estado: 'Pendiente' | 'Atendida';
+  usuarioId?: number; // 👈 opcional: admin no lo usa, usuaria sí lo necesita para filtrar
 }

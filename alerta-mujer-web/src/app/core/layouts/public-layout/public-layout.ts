@@ -4,6 +4,7 @@ import { LandingNavbarComponent } from './landing-navbar/landing-navbar';
 import { heroComponent } from '../../../features/landing/components/hero/hero';
 import { HowItWorksComponent } from '../../../features/landing/components/how-it-works/how-it-works';
 import { FeaturesSectionComponent } from '../../../features/landing/components/features-section/features-section';
+import { ReviewComponent } from '../../../features/landing/components/review/review';
 
 @Component({
   selector: 'app-public-layout',
@@ -13,7 +14,8 @@ import { FeaturesSectionComponent } from '../../../features/landing/components/f
     LandingNavbarComponent,
     heroComponent,
     FeaturesSectionComponent,
-    HowItWorksComponent
+    HowItWorksComponent,
+    ReviewComponent,
   ],
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.scss',

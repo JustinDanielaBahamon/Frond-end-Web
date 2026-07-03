@@ -1,0 +1,241 @@
+/* Estilos generales de la sección */
+.steps-section {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    box-shadow: 0 11px 28px rgba(2, 30, 12, 0.19);
+}
+
+.steps-main-title {
+    font-size: 26px;
+    color: #1e1e38;
+    font-weight: 700;
+}
+
+.steps-subtitle {
+    font-size: 16px;
+    color: #616173;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+/* Contenedor de los pasos */
+.steps-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* Cada columna de paso */
+.step-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 0 10px;
+}
+
+/* El círculo contenedor del icono */
+.icon-wrapper {
+    width: 90px;
+    height: 90px;
+    background-color: #f7f5fa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* Iconos (Morados por defecto) */
+.step-icon {
+    font-size: 32px;
+    color: #58249c;
+}
+
+/* La burbuja con el número del paso */
+.step-number {
+    position: absolute;
+    top: -10px;
+    background-color: #4a1d82;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Textos */
+.step-title {
+    font-size: 16px;
+    color: #1e1e38;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.step-text {
+    font-size: 13px;
+    color: #616173;
+    line-height: 1.4;
+    max-width: 180px;
+    margin: 0;
+}
+
+/* -------------------------------------------
+   Estilos especiales para el Paso 3 (Alerta Roja)
+------------------------------------------- */
+.step-alert .icon-wrapper {
+    background-color: #e02b57; /* Fondo rojo/rosa vibrante */
+    box-shadow: 0 6px 15px rgba(224, 43, 87, 0.3);
+}
+
+.step-alert .step-icon {
+    color: #ffffff; /* Icono blanco */
+    font-size: 40px;
+}
+
+/* -------------------------------------------
+   Línea de puntos conectores (Diseño IDÉNTICO)
+------------------------------------------- */
+.step-item:not(:last-child)::after {
+    content: "................";
+    position: absolute;
+    left: 60%;
+    top: 45px; /* Alineado exactamente a la mitad del círculo */
+    width: 80%;
+    letter-spacing: 5px;
+    font-size: 32px;
+    color: #d1cbdc;
+    overflow: hidden;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Contenedor general externo */
+.container-fluid-work {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 60px 20px;
+}
+
+/* Caja contenedora interna (Alinea Imagen a la izquierda y Texto a la derecha) */
+.container-work {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px; /* Espacio de separación entre la imagen y los textos */
+}
+
+/* Control del tamaño de la imagen */
+.img-work {
+    flex: 1;
+    max-width: 450px;
+    display: flex;
+    justify-content: center;
+}
+
+.img-fluid {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Bloque de contenido derecho */
+.text-work {
+    flex: 1.2;
+}
+
+/* Título idéntico a la imagen */
+.text-title-work {
+    font-size: 28px;
+    color: #12183a; /* Azul oscuro corporativo */
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+/* Grid de dos columnas para los beneficios */
+.text-prop-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Crea exactamente 2 columnas iguales */
+    gap: 16px 30px; /* 16px de espacio arriba/abajo y 30px entre columnas */
+}
+
+/* Cada beneficio individual */
+.text-prop-grid li {
+    font-size: 15px;
+    color: #33334d; /* Color gris oscuro nítido */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Separación entre el check morado y el texto */
+}
+
+/* Estilo del ícono Check (Morado) */
+.check-icon {
+    color: #58249c; /* El mismo tono morado de tu marca */
+    font-size: 16px;
+    font-weight: 900;
+}
+
+
+/* -------------------------------------------
+   Responsivo: Perfecto para celulares
+------------------------------------------- */
+@media(max-width:1037px){
+    .steps-container {
+        gap: 40px;
+        align-items: center;
+    }
+
+    /* Ocultamos los puntos horizontales en celular */
+    .step-item:not(:last-child)::after {
+        display: none; 
+    }
+}
+
+@media (max-width: 730px) {
+    .steps-container {
+    flex-direction: column;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .step-item {
+        width: 100%;
+    }
+
+    /* Ocultamos los puntos horizontales en celular */
+    .step-item:not(:last-child)::after {
+        display: none; 
+    }
+
+    .container-work {
+            max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    flex-direction: column;
+    }
+
+    .container-fluid-work{
+        padding: 40px 15px;
+    }
+}

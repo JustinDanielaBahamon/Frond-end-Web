@@ -7,6 +7,7 @@ import { RiskZonesService } from '../../../core/services/risk-zones.services';
 import { UsersService } from '../../../core/services/users.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { ZonaManual } from '../../../core/models/zona.model';
+import { PeriodBadge } from '../../../shared/components/period-badge/period-badge';
 
 export interface AlertaPorTipo {
   tipo: string;
@@ -29,7 +30,7 @@ const COLOR_POR_TIPO: Record<string, string> = {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, PeriodBadge],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -44,7 +45,6 @@ export class AdminDashboardComponent implements OnInit {
   // --- Período ---
   periodoGlobal = 'Todos los datos';
   periodos = ['Todos los datos'];
-  showPeriodoMenu = false;
 
   // --- Datos base ---
   private alertas: Alerta[] = [];
@@ -57,28 +57,19 @@ export class AdminDashboardComponent implements OnInit {
   alertasAltas = 0;
   alertasMedias = 0;
   alertasEmergencia = 0;
-  alertasOtras = 0;
-  alertasAtivas = 0;
 
-  // --- Zonas Críticas: top 3 reales ---
   topZonas: ZonaCriticaVM[] = [];
 
-  // --- Comportamiento: ahora agrupado por ZONA en vez de por día
-  // (no tenemos fecha real por alerta, así que usamos algo que SÍ es real: alertas por zona)
   zonasLabels: string[] = [];
   alertasPorZonaSerie: number[] = [];
 
-  // --- Donut: alertas por tipo (real) ---
   alertasPorTipo: AlertaPorTipo[] = [];
 
-  // --- Barras: ahora "alertas por tipo" en vez de "por horario" (dato real que sí tenemos) ---
   horariosLabels: string[] = [];
   horariosData: number[] = [];
 
-  // --- Mini chart usuarias: usamos el total real como único valor visible ---
   miniUsuariasData: number[] = [];
 
-  // --- Tabla: últimas 5 alertas reales ---
   alertasRecientes: Alerta[] = [];
 
   ngOnInit(): void {
@@ -96,38 +87,29 @@ export class AdminDashboardComponent implements OnInit {
         this.alertas = alertas;
         this.zonas = zonas;
 
-        // Mismos números que en alert-admin
         this.alertasActivas = alertas.filter(a => a.estado === 'Pendiente').length;
         this.zonasCriticas = zonas.length;
         this.totalUsuarias = usuarios.length;
 
-        // Desglose real por tipo
         this.alertasPorTipo = this.calcularAlertasPorTipo(alertas);
         this.alertasAltas = alertas.filter(a => a.tipo === 'SOS').length;
         this.alertasMedias = alertas.filter(a => a.tipo === 'Robo' || a.tipo === 'Acoso').length;
         this.alertasEmergencia = alertas.filter(a => a.tipo === 'Medical').length;
-        this.alertasOtras = alertas.length - this.alertasAltas - this.alertasMedias - this.alertasEmergencia;
-        this.alertasAtivas = this.alertasActivas;
 
-        // Top 3 zonas reales
         this.topZonas = [...zonas]
           .sort((a, b) => b.alertasEnZona - a.alertasEnZona)
           .slice(0, 3)
           .map(z => ({ nombre: z.nombre, alertas: z.alertasEnZona }));
 
-        // Barras: reutilizamos el gráfico de barras para mostrar alertas por tipo (dato real)
         this.horariosLabels = this.alertasPorTipo.map(t => t.tipo);
         this.horariosData = this.alertasPorTipo.map(t => t.cantidad);
 
-        // Línea de "comportamiento": alertas agrupadas por ubicación (dato real)
-        const porUbicacion = this.calcularAlertasPorUbicacion(alertas);
-        this.zonasLabels = porUbicacion.map(u => u.ubicacion);
+        const porUbicacion = this.contarPor(alertas, a => a.ubicacion);
+        this.zonasLabels = porUbicacion.map(u => u.clave);
         this.alertasPorZonaSerie = porUbicacion.map(u => u.cantidad);
 
-        // Mini gráfico usuarias: repetimos el total para dar forma de línea plana real
         this.miniUsuariasData = new Array(6).fill(this.totalUsuarias);
 
-        // Tabla: últimas 5 alertas reales
         this.alertasRecientes = alertas.slice(-5).reverse();
 
         this.cargando = false;
@@ -139,49 +121,49 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  // ── Helpers de agregación ──────────────────────────────────────
+  // Único punto de verdad para "contar ocurrencias agrupadas por una clave"
+  // (antes duplicado en calcularAlertasPorTipo y calcularAlertasPorUbicacion)
+  private contarPor<T>(items: T[], obtenerClave: (item: T) => string): { clave: string; cantidad: number }[] {
+    const conteo: Record<string, number> = {};
+    items.forEach(item => {
+      const clave = obtenerClave(item);
+      conteo[clave] = (conteo[clave] ?? 0) + 1;
+    });
+    return Object.entries(conteo).map(([clave, cantidad]) => ({ clave, cantidad }));
+  }
+
   private calcularAlertasPorTipo(alertas: Alerta[]): AlertaPorTipo[] {
     const total = alertas.length || 1;
-    const conteo: Record<string, number> = {};
-    alertas.forEach(a => { conteo[a.tipo] = (conteo[a.tipo] ?? 0) + 1; });
-
-    return Object.entries(conteo).map(([tipo, cantidad]) => ({
-      tipo,
+    return this.contarPor(alertas, a => a.tipo).map(({ clave, cantidad }) => ({
+      tipo: clave,
       cantidad,
       porcentaje: Math.round((cantidad / total) * 100),
-      color: COLOR_POR_TIPO[tipo] ?? '#c4b5fd',
+      color: COLOR_POR_TIPO[clave] ?? '#c4b5fd',
     }));
   }
 
-  private calcularAlertasPorUbicacion(alertas: Alerta[]): { ubicacion: string; cantidad: number }[] {
-    const conteo: Record<string, number> = {};
-    alertas.forEach(a => { conteo[a.ubicacion] = (conteo[a.ubicacion] ?? 0) + 1; });
-    return Object.entries(conteo).map(([ubicacion, cantidad]) => ({ ubicacion, cantidad }));
-  }
-
-  // ===================== MÉTODOS SVG (se mantienen, ahora alimentados con datos reales) =====================
-
-  miniLinePoints(data: number[], w = 180, h = 55): string {
+  // ── Helpers de gráficos ──────────────────────────────────────
+  // Único punto de verdad para normalizar un array de valores en puntos
+  // de un polyline SVG (antes duplicado en miniLinePoints y polylinePoints)
+  private normalizarPuntos(data: number[], w: number, h: number, margenSuperior = 0): string {
     if (data.length === 0) return '';
     const max = Math.max(...data);
     const min = Math.min(...data);
     const range = max - min || 1;
     return data.map((v, i) => {
       const x = (i / (data.length - 1 || 1)) * w;
-      const y = h - ((v - min) / range) * h;
+      const y = h - ((v - min) / range) * (h - margenSuperior);
       return `${x},${y}`;
     }).join(' ');
+  }
+
+  miniLinePoints(data: number[], w = 180, h = 55): string {
+    return this.normalizarPuntos(data, w, h);
   }
 
   polylinePoints(data: number[], w = 475, h = 170): string {
-    if (data.length === 0) return '';
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-    return data.map((v, i) => {
-      const x = (i / (data.length - 1 || 1)) * w;
-      const y = h - ((v - min) / range) * (h - 10);
-      return `${x},${y}`;
-    }).join(' ');
+    return this.normalizarPuntos(data, w, h, 10);
   }
 
   get registroPolygonPoints(): string {
@@ -211,12 +193,18 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  // Único punto de verdad para "altura máxima de un set de barras"
+  // (antes duplicado en barMaxValue y barMaxValueZonas)
+  private maxDe(data: number[]): number {
+    return data.length ? Math.max(...data) : 1;
+  }
+
   barMaxValue(): number {
-    return this.horariosData.length ? Math.max(...this.horariosData) : 1;
+    return this.maxDe(this.horariosData);
   }
 
   barMaxValueZonas(): number {
-    return this.alertasPorZonaSerie.length ? Math.max(...this.alertasPorZonaSerie) : 1;
+    return this.maxDe(this.alertasPorZonaSerie);
   }
 
   barHeight(val: number, maxH = 120): number {
@@ -231,12 +219,5 @@ export class AdminDashboardComponent implements OnInit {
       Acoso: 'badge-acoso',
     };
     return map[tipo] ?? 'badge-otros';
-  }
-
-  togglePeriodo(): void { this.showPeriodoMenu = !this.showPeriodoMenu; }
-
-  selectPeriodo(p: string): void {
-    this.periodoGlobal = p;
-    this.showPeriodoMenu = false;
   }
 }

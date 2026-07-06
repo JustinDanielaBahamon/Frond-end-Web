@@ -1,0 +1,10 @@
+<div class="period-badge" [class.period-badge--clickable]="conDropdown" (click)="toggleMenu()">
+  <span>{{ periodo }}</span>
+  <svg width="10" height="10" viewBox="0 0 10 10">
+    <path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </svg>
+
+  <ul class="period-badge__dropdown" *ngIf="conDropdown && menuAbierto">
+    <li *ngFor="let p of opciones" (click)="seleccionar(p)">{{ p }}</li>
+  </ul>
+</div>

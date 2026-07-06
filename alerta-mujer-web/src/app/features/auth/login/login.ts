@@ -14,13 +14,13 @@ import { AuthService } from '../../../core/auth/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
-  private auth   = inject(AuthService);
+  private auth = inject(AuthService);
   private router = inject(Router);
 
-  email    = '';
+  email = '';
   password = '';
-  error    = '';
-  loading  = false;
+  error = '';
+  loading = false;
 
   irARegistro() {
     this.router.navigate(['/auth/register']);
@@ -31,22 +31,28 @@ export class LoginComponent {
   }
 
   iniciarSesion() {
-  this.error   = '';
-  this.loading = true;
-  this.auth.login({ email: this.email, password: this.password }).subscribe({
-    next: (user) => {
-      this.loading = false;
-      if (user.rol === 'admin') {
-        this.router.navigate(['/admin/dashboard']);
-      } else {
+    this.error = '';
+    this.loading = true;
+    this.auth.login({ email: this.email, password: this.password }).subscribe({
+      next: (user) => {
+        this.loading = false;
+        // if (user.rol === 'admin') {
+        //   this.router.navigate(['/admin/dashboard']);
+        // } else {
+        //   this.router.navigate(['/dashboard']);
+        // }
+
+        if (user.rol === 'admin') {
+          this.router.navigate(['/admin/dashboard']);
+        }
         this.router.navigate(['/dashboard']);
+
+      },
+      error: (err) => {
+        this.error = err.message;
+        this.loading = false;
       }
-    },
-    error: (err) => {
-      this.error   = err.message;
-      this.loading = false;
-    }
-  });
-}
+    });
+  }
 }
 

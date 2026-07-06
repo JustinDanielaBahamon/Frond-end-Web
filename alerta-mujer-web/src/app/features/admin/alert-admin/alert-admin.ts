@@ -7,13 +7,15 @@ import { AlertsService } from '../../../core/services/alerts.services';
 import { RiskZonesService } from '../../../core/services/risk-zones.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
+import { Modal } from '../../../shared/components/modal/modal';
+import { Chip } from '../../../shared/components/chip/chip';
 
 declare const L: any;
 
 @Component({
   selector: 'app-alert-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Modal, Chip],
   templateUrl: './alert-admin.html',
   styleUrl: './alert-admin.scss',
 })
@@ -77,7 +79,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   nuevoPunto = { tipo: 'CAI', nombre: '', lat: 0, lng: 0 };
   esperandoClickPunto = false;
 
-  // ── Datos — ahora vacíos, se llenan vía API ─────────────────────
+  // ── Datos — vienen vía API ─────────────────────
   alertas: Alerta[] = [];
   zonasManuales: ZonaManual[] = [];
   puntosMapa: PuntoMapa[] = [];
@@ -169,21 +171,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   private repintarZonasGuardadas(): void {
     this.zonasManuales.forEach(z => {
-      const color = this.colorPorNivel(z.nivel);
-      let capa: any;
-
-      if (z.metodo === 'area') {
-        capa = L.circle(
-          [z.centroLat, z.centroLng],
-          { radius: z.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
-        ).bindTooltip(`${z.nombre} (${z.nivel})`).addTo(this.mapa);
-      } else {
-        const svg = this.crearSvgPin(color);
-        const icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
-        capa = L.marker([z.centroLat, z.centroLng], { icon })
-          .bindTooltip(`⚠️ ${z.nombre} (${z.nivel})`).addTo(this.mapa);
-      }
-
+      const capa = this.pintarZonaEnMapa(z);
       this.capasZonas.set(z.id, capa);
     });
   }
@@ -287,21 +275,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
     this.riskZonesService.createZona(payload).subscribe({
       next: (zonaCreada) => {
-        const color = this.colorPorNivel(zonaCreada.nivel);
-        let capa: any;
-
-        if (zonaCreada.metodo === 'area') {
-          capa = L.circle(
-            [zonaCreada.centroLat, zonaCreada.centroLng],
-            { radius: zonaCreada.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
-          ).bindTooltip(`${zonaCreada.nombre} (${zonaCreada.nivel})`).addTo(this.mapa);
-        } else {
-          const svg = this.crearSvgPin(color);
-          const icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
-          capa = L.marker([zonaCreada.centroLat, zonaCreada.centroLng], { icon })
-            .bindTooltip(`⚠️ ${zonaCreada.nombre} (${zonaCreada.nivel})`).addTo(this.mapa);
-        }
-
+        const capa = this.pintarZonaEnMapa(zonaCreada);
         this.capasZonas.set(zonaCreada.id, capa);
         this.zonasManuales.push(zonaCreada);
         this.zonasManuales.sort((a, b) => b.alertasEnZona - a.alertasEnZona);
@@ -330,12 +304,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
     this.riskZonesService.createZona(payload).subscribe({
       next: (zonaCreada) => {
-        const color = this.colorPorNivel(zonaCreada.nivel);
-        const capa = L.circle(
-          [zonaCreada.centroLat, zonaCreada.centroLng],
-          { radius: zonaCreada.radio, color, fillColor: color, fillOpacity: 0.25, weight: 2 }
-        ).bindTooltip(`${zonaCreada.nombre} (${zonaCreada.nivel})`).addTo(this.mapa);
-
+        const capa = this.pintarZonaEnMapa(zonaCreada);
         this.capasZonas.set(zonaCreada.id, capa);
         this.zonasManuales.push(zonaCreada);
         this.zonasManuales.sort((a, b) => b.alertasEnZona - a.alertasEnZona);
@@ -388,9 +357,29 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Helpers iconos ────────────────────────────────────────────
+  // ── Helpers iconos / zonas ────────────────────────────────────
   private colorPorNivel(nivel: 'Alto' | 'Medio' | 'Bajo'): string {
     return nivel === 'Alto' ? '#ef4444' : nivel === 'Medio' ? '#f97316' : '#eab308';
+  }
+
+  /**
+   * Único punto de verdad para pintar una ZonaManual en el mapa
+   * (se usaba duplicado en repintarZonasGuardadas, guardarZona y marcarZonaCaliente)
+   */
+  private pintarZonaEnMapa(zona: ZonaManual): any {
+    const color = this.colorPorNivel(zona.nivel);
+
+    if (zona.metodo === 'area') {
+      return L.circle(
+        [zona.centroLat, zona.centroLng],
+        { radius: zona.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
+      ).bindTooltip(`${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
+    }
+
+    const svg = this.crearSvgPin(color);
+    const icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
+    return L.marker([zona.centroLat, zona.centroLng], { icon })
+      .bindTooltip(`⚠️ ${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
   }
 
   private crearSvgPin(color: string): string {

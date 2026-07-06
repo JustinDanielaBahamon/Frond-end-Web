@@ -3,15 +3,8 @@
   <!-- ===== HEADER ===== -->
   <div class="dash-header">
     <h1 class="dash-title">Dashboard de un vistazo</h1>
-    <div class="dash-period-selector" (click)="togglePeriodo()">
-      <span>{{ periodoGlobal }}</span>
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <ul class="period-dropdown" *ngIf="showPeriodoMenu">
-        <li *ngFor="let p of periodos" (click)="selectPeriodo(p)">{{ p }}</li>
-      </ul>
-    </div>
+    <app-period-badge [periodo]="periodoGlobal" [opciones]="periodos" [conDropdown]="true"
+      (periodoChange)="periodoGlobal = $event"></app-period-badge>
   </div>
 
   <!-- ===== STAT CARDS ROW ===== -->
@@ -21,30 +14,24 @@
     <div class="stat-card">
       <div class="stat-card__top">
         <span class="stat-card__label">Total Usuarias</span>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
       <div class="stat-card__value">
         {{ totalUsuarias | number }}
         <svg class="stat-card__trend up" width="18" height="18" viewBox="0 0 18 18">
-          <path d="M9 14V4M4 9l5-5 5 5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M9 14V4M4 9l5-5 5 5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" fill="none" />
         </svg>
       </div>
       <svg class="stat-card__chart" viewBox="0 0 180 60" preserveAspectRatio="none">
         <defs>
           <linearGradient id="grad-usuarias" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
           </linearGradient>
         </defs>
-        <polygon
-          [attr.points]="'0,60 ' + miniLinePoints(miniUsuariasData) + ' 180,60'"
-          fill="url(#grad-usuarias)"/>
-        <polyline
-          [attr.points]="miniLinePoints(miniUsuariasData)"
-          fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/>
+        <polygon [attr.points]="'0,60 ' + miniLinePoints(miniUsuariasData) + ' 180,60'" fill="url(#grad-usuarias)" />
+        <polyline [attr.points]="miniLinePoints(miniUsuariasData)" fill="none" stroke="#a78bfa" stroke-width="2"
+          stroke-linejoin="round" />
       </svg>
       <div class="stat-card__axis">
         <span *ngFor="let d of ['Días','Lun','Mar','Mié','May','Jun','Días']">{{ d }}</span>
@@ -55,33 +42,28 @@
     <div class="stat-card">
       <div class="stat-card__top">
         <span class="stat-card__label">Alertas Activas</span>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
       <div class="stat-card__value alert-value">{{ alertasActivas }}</div>
       <div class="alert-breakdown">
         <div class="alert-item alta">
-          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 13H1L7 1Z" stroke="#ef4444" stroke-width="1.5" fill="none"/></svg>
-          {{ alertasAltas }} Altas
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <path d="M7 1L13 13H1L7 1Z" stroke="#ef4444" stroke-width="1.5" fill="none" />
+          </svg>
+          {{ alertasAltas }} Altas (SOS)
         </div>
         <div class="alert-item media">
-          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 13H1L7 1Z" stroke="#f59e0b" stroke-width="1.5" fill="none"/></svg>
-          {{ alertasMedias }} Medias
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <path d="M7 1L13 13H1L7 1Z" stroke="#f59e0b" stroke-width="1.5" fill="none" />
+          </svg>
+          {{ alertasMedias }} Medias (Robo/Acoso)
         </div>
         <div class="alert-item emergencia">
-          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" stroke="#ec4899" stroke-width="1.5" fill="none"/><path d="M7 4v4M7 10v.5" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <circle cx="7" cy="7" r="6" stroke="#ec4899" stroke-width="1.5" fill="none" />
+            <path d="M7 4v4M7 10v.5" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
           {{ alertasEmergencia }} Emergencia Médica
-        </div>
-        <div class="alert-item media-r">
-          <span class="dot media-dot"></span> {{ alertasOtras }} Medias
-        </div>
-        <div class="alert-item ativa">
-          <span class="dot ativa-dot"></span> {{ alertasAtivas }} Atvas
-        </div>
-        <div class="alert-item otros">
-          <span class="dot otros-dot"></span> Otros
         </div>
       </div>
     </div>
@@ -90,10 +72,7 @@
     <div class="stat-card zonas-card">
       <div class="stat-card__top">
         <span class="stat-card__label">Zonas Críticas</span>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
       <div class="zonas-content">
         <div class="zonas-left">
@@ -101,22 +80,20 @@
           <!-- Mini mapa estático placeholder -->
           <div class="mini-mapa">
             <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
-              <rect width="120" height="70" rx="6" fill="#f0eeff"/>
-              <!-- Cuadrícula simulada -->
-              <line x1="0" y1="20" x2="120" y2="20" stroke="#d4cef5" stroke-width="0.5"/>
-              <line x1="0" y1="40" x2="120" y2="40" stroke="#d4cef5" stroke-width="0.5"/>
-              <line x1="0" y1="60" x2="120" y2="60" stroke="#d4cef5" stroke-width="0.5"/>
-              <line x1="30" y1="0" x2="30" y2="70" stroke="#d4cef5" stroke-width="0.5"/>
-              <line x1="60" y1="0" x2="60" y2="70" stroke="#d4cef5" stroke-width="0.5"/>
-              <line x1="90" y1="0" x2="90" y2="70" stroke="#d4cef5" stroke-width="0.5"/>
-              <!-- Puntos de calor simulados -->
-              <circle cx="55" cy="32" r="16" fill="#ef4444" opacity="0.35"/>
-              <circle cx="55" cy="32" r="8"  fill="#ef4444" opacity="0.5"/>
-              <circle cx="55" cy="32" r="3"  fill="#ef4444" opacity="0.9"/>
-              <circle cx="80" cy="20" r="10" fill="#f59e0b" opacity="0.3"/>
-              <circle cx="80" cy="20" r="4"  fill="#f59e0b" opacity="0.6"/>
-              <circle cx="35" cy="50" r="8"  fill="#a78bfa" opacity="0.35"/>
-              <circle cx="35" cy="50" r="3"  fill="#a78bfa" opacity="0.7"/>
+              <rect width="120" height="70" rx="6" fill="#f0eeff" />
+              <line x1="0" y1="20" x2="120" y2="20" stroke="#d4cef5" stroke-width="0.5" />
+              <line x1="0" y1="40" x2="120" y2="40" stroke="#d4cef5" stroke-width="0.5" />
+              <line x1="0" y1="60" x2="120" y2="60" stroke="#d4cef5" stroke-width="0.5" />
+              <line x1="30" y1="0" x2="30" y2="70" stroke="#d4cef5" stroke-width="0.5" />
+              <line x1="60" y1="0" x2="60" y2="70" stroke="#d4cef5" stroke-width="0.5" />
+              <line x1="90" y1="0" x2="90" y2="70" stroke="#d4cef5" stroke-width="0.5" />
+              <circle cx="55" cy="32" r="16" fill="#ef4444" opacity="0.35" />
+              <circle cx="55" cy="32" r="8" fill="#ef4444" opacity="0.5" />
+              <circle cx="55" cy="32" r="3" fill="#ef4444" opacity="0.9" />
+              <circle cx="80" cy="20" r="10" fill="#f59e0b" opacity="0.3" />
+              <circle cx="80" cy="20" r="4" fill="#f59e0b" opacity="0.6" />
+              <circle cx="35" cy="50" r="8" fill="#a78bfa" opacity="0.35" />
+              <circle cx="35" cy="50" r="3" fill="#a78bfa" opacity="0.7" />
               <text x="2" y="68" font-size="5" fill="#9ca3af">Map data</text>
             </svg>
           </div>
@@ -142,48 +119,35 @@
     <div class="chart-card behavior-card">
       <div class="chart-card__header">
         <h3>Estadísticas de Comportamiento</h3>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
       <p class="chart-subtitle">Alertas registradas por zona/ubicación</p>
 
-      <!-- SVG gráfica de línea -->
       <div class="chart-wrap">
         <svg class="behavior-svg" viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg">
-          <!-- Eje Y izquierdo (cantidad de alertas) -->
           <text x="2" y="15" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() }}</text>
           <text x="2" y="95" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() / 2 | number:'1.0-0' }}</text>
           <text x="2" y="175" font-size="9" fill="#9ca3af">0</text>
 
-          <!-- Líneas de cuadrícula -->
-          <line x1="25" y1="10"  x2="500" y2="10"  stroke="#e5e0f8" stroke-width="0.5"/>
-          <line x1="25" y1="50"  x2="500" y2="50"  stroke="#e5e0f8" stroke-width="0.5"/>
-          <line x1="25" y1="90"  x2="500" y2="90"  stroke="#e5e0f8" stroke-width="0.5"/>
-          <line x1="25" y1="130" x2="500" y2="130" stroke="#e5e0f8" stroke-width="0.5"/>
-          <line x1="25" y1="170" x2="500" y2="170" stroke="#e5e0f8" stroke-width="0.5"/>
+          <line x1="25" y1="10" x2="500" y2="10" stroke="#e5e0f8" stroke-width="0.5" />
+          <line x1="25" y1="50" x2="500" y2="50" stroke="#e5e0f8" stroke-width="0.5" />
+          <line x1="25" y1="90" x2="500" y2="90" stroke="#e5e0f8" stroke-width="0.5" />
+          <line x1="25" y1="130" x2="500" y2="130" stroke="#e5e0f8" stroke-width="0.5" />
+          <line x1="25" y1="170" x2="500" y2="170" stroke="#e5e0f8" stroke-width="0.5" />
 
-          <!-- Área + línea: alertas por zona -->
           <defs>
             <linearGradient id="grad-reg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
-              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0" />
             </linearGradient>
           </defs>
-          <polygon
-            [attr.points]="registroPolygonPoints"
-            fill="url(#grad-reg)"/>
-          <polyline
-            [attr.points]="polylinePoints(alertasPorZonaSerie, 475, 180)"
-            fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round"
-            transform="translate(25,5)"/>
+          <polygon [attr.points]="registroPolygonPoints" fill="url(#grad-reg)" />
+          <polyline [attr.points]="polylinePoints(alertasPorZonaSerie, 475, 180)" fill="none" stroke="#7c3aed"
+            stroke-width="2" stroke-linejoin="round" transform="translate(25,5)" />
 
-          <!-- Eje X zonas -->
           <g transform="translate(25,190)">
-            <text *ngFor="let z of zonasLabels; let i = index"
-              [attr.x]="(i/(zonasLabels.length-1 || 1))*475"
-              y="0" font-size="8" fill="#9ca3af" text-anchor="middle">{{ z }}</text>
+            <text *ngFor="let z of zonasLabels; let i = index" [attr.x]="(i/(zonasLabels.length-1 || 1))*475" y="0"
+              font-size="8" fill="#9ca3af" text-anchor="middle">{{ z }}</text>
           </g>
         </svg>
       </div>
@@ -193,26 +157,20 @@
     <div class="chart-card category-card">
       <div class="chart-card__header">
         <h3>Resumen de Categorización</h3>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
 
       <div class="category-charts">
 
-        <!-- Donut -->
         <div class="donut-wrap">
           <p class="category-subtitle">Alertas por tipo</p>
           <div class="donut-container">
             <svg viewBox="0 0 160 160" class="donut-svg">
               <g *ngFor="let seg of donutSegments()">
-                <path [attr.d]="seg.d" [attr.fill]="seg.color"/>
+                <path [attr.d]="seg.d" [attr.fill]="seg.color" />
               </g>
-              <!-- Agujero central -->
-              <circle cx="80" cy="80" r="30" fill="#ffffff"/>
+              <circle cx="80" cy="80" r="30" fill="#ffffff" />
             </svg>
-            <!-- Leyenda donut -->
             <div class="donut-legend">
               <div *ngFor="let item of alertasPorTipo" class="donut-legend-item">
                 <span class="legend-dot" [style.background]="item.color"></span>
@@ -222,38 +180,27 @@
           </div>
         </div>
 
-        <!-- Barras por horario -->
         <div class="bars-wrap">
           <p class="category-subtitle">Alertas por Horario</p>
           <svg viewBox="0 0 280 180" class="bars-svg" xmlns="http://www.w3.org/2000/svg">
-            <!-- Eje Y -->
-            <text x="0" y="12"  font-size="9" fill="#9ca3af">300</text>
-            <text x="0" y="52"  font-size="9" fill="#9ca3af">200</text>
-            <text x="0" y="92"  font-size="9" fill="#9ca3af">100</text>
+            <text x="0" y="12" font-size="9" fill="#9ca3af">300</text>
+            <text x="0" y="52" font-size="9" fill="#9ca3af">200</text>
+            <text x="0" y="92" font-size="9" fill="#9ca3af">100</text>
             <text x="0" y="132" font-size="9" fill="#9ca3af">50</text>
 
-            <!-- Cuadrícula -->
-            <line x1="25" y1="10"  x2="275" y2="10"  stroke="#e5e0f8" stroke-width="0.5"/>
-            <line x1="25" y1="50"  x2="275" y2="50"  stroke="#e5e0f8" stroke-width="0.5"/>
-            <line x1="25" y1="90"  x2="275" y2="90"  stroke="#e5e0f8" stroke-width="0.5"/>
-            <line x1="25" y1="130" x2="275" y2="130" stroke="#e5e0f8" stroke-width="0.5"/>
+            <line x1="25" y1="10" x2="275" y2="10" stroke="#e5e0f8" stroke-width="0.5" />
+            <line x1="25" y1="50" x2="275" y2="50" stroke="#e5e0f8" stroke-width="0.5" />
+            <line x1="25" y1="90" x2="275" y2="90" stroke="#e5e0f8" stroke-width="0.5" />
+            <line x1="25" y1="130" x2="275" y2="130" stroke="#e5e0f8" stroke-width="0.5" />
 
-            <!-- Barras -->
             <g *ngFor="let val of horariosData; let i = index">
-              <rect
-                [attr.x]="25 + i * 36 + 5"
-                [attr.y]="145 - barHeight(val, 130)"
-                [attr.height]="barHeight(val, 130)"
-                width="22"
-                [attr.fill]="i === 6 ? '#7c3aed' : (i === 5 ? '#a78bfa' : '#c4b5fd')"
-                rx="3"/>
+              <rect [attr.x]="25 + i * 36 + 5" [attr.y]="145 - barHeight(val, 130)" [attr.height]="barHeight(val, 130)"
+                width="22" [attr.fill]="i === 6 ? '#7c3aed' : (i === 5 ? '#a78bfa' : '#c4b5fd')" rx="3" />
             </g>
 
-            <!-- Etiquetas X -->
             <g>
-              <text *ngFor="let h of horariosLabels; let i = index"
-                [attr.x]="25 + i * 36 + 16"
-                y="165" font-size="8" fill="#9ca3af" text-anchor="middle">{{ h }}</text>
+              <text *ngFor="let h of horariosLabels; let i = index" [attr.x]="25 + i * 36 + 16" y="165" font-size="8"
+                fill="#9ca3af" text-anchor="middle">{{ h }}</text>
             </g>
           </svg>
         </div>
@@ -270,10 +217,7 @@
     <div class="table-card">
       <div class="chart-card__header">
         <h3>Monitoreo de Alertas Recientes (Top 5)</h3>
-        <div class="stat-card__period">
-          <span>{{ periodoGlobal }}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-        </div>
+        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
       </div>
       <div class="table-wrap">
         <table>
@@ -311,22 +255,24 @@
 
         <button class="acceso-btn acceso-primary">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="2" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M6 6V4a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="2" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" />
+            <path d="M6 6V4a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
           Bloquear Cuenta Sospechosa
         </button>
 
         <button class="acceso-btn acceso-secondary">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 15l3-1 8-8a1.41 1.41 0 10-2-2L4 12l-1 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M3 15l3-1 8-8a1.41 1.41 0 10-2-2L4 12l-1 3z" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round" />
           </svg>
           Editar Mapa de Riesgo
         </button>
 
         <button class="acceso-btn acceso-secondary">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 13v2h12v-2M9 3v8M5 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 13v2h12v-2M9 3v8M5 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
           Descargar Reporte Mensual
         </button>

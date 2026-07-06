@@ -1,0 +1,109 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 26, 60, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: $bg-card;
+  border-radius: $radius-card;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+
+  &--sm   { max-width: 400px; }
+  &--md   { max-width: 520px; }
+  &--lg   { max-width: 640px; }
+  &--zona { max-width: 420px; }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid $border;
+    background: $purple-pale;
+
+    h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
+    }
+
+    &--danger {
+      background: $red-pale;
+      border-bottom-color: color.adjust($red, $lightness: 25%);
+    }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0, 0, 0, 0.08); color: $text-primary; }
+  }
+
+  &__mode-tabs {
+    display: flex;
+    border-bottom: 1px solid $border;
+  }
+
+  &__mode-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border: none;
+    background: $bg-base;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-muted;
+    cursor: pointer;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+
+    &:hover { background: $bg-card-hover; color: $text-primary; }
+
+    &--active {
+      background: $bg-card;
+      color: $purple-deep;
+      border-bottom-color: $purple-deep;
+    }
+  }
+
+  &__body {
+    padding: 18px 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid $border;
+    background: $bg-base;
+  }
+}

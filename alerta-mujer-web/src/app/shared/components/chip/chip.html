@@ -1,0 +1,9 @@
+<button
+  class="chip"
+  [class.chip--active]="active"
+  (click)="chipClick.emit()"
+>
+  <span class="chip__dot" *ngIf="dotColor" [style.background]="dotColor"></span>
+  {{ label }}
+  <span class="chip__count" *ngIf="count !== undefined">{{ count }}</span>
+</button>

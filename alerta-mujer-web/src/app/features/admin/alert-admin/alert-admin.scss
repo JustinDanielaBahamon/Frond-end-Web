@@ -1,30 +1,10 @@
-// =============================================
-// VARIABLES
-// =============================================
-$bg-base:     #f5f4ff;
-$bg-card:     #ffffff;
-$bg-hover:    #f0eeff;
-$border:      #c4b5fd;
-$text-primary:#1e1a3c;
-$text-muted:  #6b7280;
-$text-dim:    #9ca3af;
+@use 'sass:color';
+@use '../../../shared/styles/variables' as *;
 
-$purple-deep: #7c3aed;
-$purple-mid:  #a78bfa;
-$purple-pale: #ede9fe;
-
-$green:       #16a34a;
-$green-pale:  #dcfce7;
-$red:         #ef4444;
-$red-pale:    #fee2e2;
-$blue:        #3b82f6;
-$amber:       #f59e0b;
-$orange:      #f97316;
-$yellow:      #eab308;
-
-$radius-card: 12px;
-$radius-sm:   6px;
-$shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
+// Variables propias de esta pantalla (no están en el set compartido)
+$blue:   #3b82f6;
+$orange: #f97316;
+$yellow: #eab308;
 
 // =============================================
 // PAGE
@@ -110,7 +90,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   border: 1.5px solid $border;
   border-top: 3px solid $purple-mid;
   border-radius: $radius-card;
-  box-shadow: $shadow;
+  box-shadow: $shadow-card;
   overflow: hidden;
 }
 
@@ -138,7 +118,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   transition: all 0.15s;
   border-bottom: 2px solid transparent;
 
-  &:hover { background: $bg-hover; color: $text-primary; }
+  &:hover { background: $bg-card-hover; color: $text-primary; }
 
   &--active {
     background: $bg-card;
@@ -205,7 +185,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   transition: all 0.15s;
   margin-bottom: 5px;
 
-  &:hover { background: $bg-hover; border-color: $border; }
+  &:hover { background: $bg-card-hover; border-color: $border; }
   &--active { background: $purple-pale; border-color: $purple-deep; }
   &--atendida { opacity: 0.5; }
 }
@@ -313,7 +293,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   margin-bottom: 5px;
   background: $bg-card;
 
-  &:hover { background: $bg-hover; border-color: $purple-mid; }
+  &:hover { background: $bg-card-hover; border-color: $purple-mid; }
 }
 
 .zona-auto__nivel {
@@ -326,7 +306,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
 
   &.nivel--alto  { background: $red-pale;          color: $red;    }
   &.nivel--medio { background: rgba($orange,.15);  color: $orange; }
-  &.nivel--bajo  { background: rgba($yellow,.2);   color: darken($yellow, 15%); }
+  &.nivel--bajo  { background: rgba($yellow,.2);   color: color.adjust($yellow, $lightness: -15%); }
 }
 
 .zona-auto__info {
@@ -348,28 +328,54 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   color: $text-muted;
 }
 
-.zona-auto__arrow {
-  color: $text-dim;
-  flex-shrink: 0;
+// ── Botón agregar zona (fila superior del tab) ─
+.zona-add-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid rgba($border, 0.5);
 }
 
-// ── Botón nueva zona ──────────────────────────
-.btn-nueva-zona {
+.btn-add-zona {
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 4px 10px;
-  background: $purple-pale;
-  border: 1.5px solid $purple-mid;
-  border-radius: 100px;
-  color: $purple-deep;
+  padding: 7px 8px;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: $bg-card;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
+  color: $text-muted;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
 
-  &:hover { background: darken($purple-pale, 4%); }
+  &:hover { background: $bg-card-hover; }
+
+  &--pin:hover  { border-color: $purple-deep; color: $purple-deep; background: $purple-pale; }
+  &--area:hover { border-color: $purple-deep; color: $purple-deep; background: $purple-pale; }
+}
+
+.btn-marcar-zona {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 100px;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover { background: $purple-pale; border-color: $purple-deep; color: $purple-deep; }
 }
 
 // ── Filtro chips zona ─────────────────────────
@@ -378,22 +384,6 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   gap: 5px;
   margin-bottom: 8px;
   flex-wrap: wrap;
-}
-
-.zona-chip {
-  padding: 3px 10px;
-  border-radius: 100px;
-  border: 1.5px solid $border;
-  background: $bg-card;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: $text-muted;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-
-  &:hover { background: $bg-hover; }
-  &--active { background: $purple-pale; border-color: $purple-deep; color: $purple-deep; font-weight: 700; }
 }
 
 // ── Zona manual card ──────────────────────────
@@ -406,7 +396,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   margin-bottom: 5px;
   background: $bg-card;
 
-  &:hover { background: $bg-hover; border-color: $purple-mid; }
+  &:hover { background: $bg-card-hover; border-color: $purple-mid; }
 }
 
 .zona-manual__header {
@@ -414,6 +404,16 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
+}
+
+.zona-manual__nombre-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.zona-metodo-icon {
+  font-size: 0.75rem;
 }
 
 .zona-manual__nombre {
@@ -430,7 +430,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
 
   &.nivel-badge--alto  { background: $red-pale;         color: $red;    }
   &.nivel-badge--medio { background: rgba($orange,.15); color: $orange; }
-  &.nivel-badge--bajo  { background: rgba($yellow,.2);  color: darken($yellow,15%); }
+  &.nivel-badge--bajo  { background: rgba($yellow,.2);  color: color.adjust($yellow, $lightness: -15%); }
 }
 
 .zona-manual__meta {
@@ -439,6 +439,12 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   justify-content: space-between;
   font-size: 0.7rem;
   color: $text-muted;
+  gap: 8px;
+}
+
+.zona-radio-label {
+  font-family: monospace;
+  color: $text-dim;
 }
 
 .btn-eliminar-zona {
@@ -451,6 +457,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   padding: 2px;
   border-radius: 4px;
   transition: all 0.15s;
+  margin-left: auto;
 
   &:hover { color: $red; background: $red-pale; }
 }
@@ -463,7 +470,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   border-radius: $radius-card;
   overflow: hidden;
   border: 1.5px solid $border;
-  box-shadow: $shadow;
+  box-shadow: $shadow-card;
   height: 100%;
   min-height: 500px;
 }
@@ -549,7 +556,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   box-shadow: 0 2px 12px rgba(0,0,0,0.12);
   transition: all 0.15s;
 
-  &:hover { background: $bg-hover; border-color: $purple-deep; color: $purple-deep; }
+  &:hover { background: $bg-card-hover; border-color: $purple-deep; color: $purple-deep; }
 
   &--danger:hover { background: $red-pale; border-color: $red; color: $red; }
 }
@@ -587,7 +594,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   font-size: 0.8rem; font-weight: 700; color: $text-primary;
   cursor: pointer; font-family: inherit; gap: 8px;
 
-  &:hover { background: $bg-hover; }
+  &:hover { background: $bg-card-hover; }
 }
 
 .filtros-body {
@@ -599,7 +606,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   display: flex; align-items: center; justify-content: space-between;
   padding: 6px 13px;
 
-  &:hover { background: $bg-hover; }
+  &:hover { background: $bg-card-hover; }
 }
 
 .filtro-label {
@@ -650,7 +657,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
     position: absolute; top: 8px; right: 8px;
     background: none; border: none; cursor: pointer; color: $text-dim;
     display: flex; align-items: center; padding: 2px; border-radius: 4px;
-    &:hover { color: $text-primary; background: $bg-hover; }
+    &:hover { color: $text-primary; background: $bg-card-hover; }
   }
 
   &__tipo {
@@ -697,50 +704,118 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
 }
 
 // =============================================
-// MODALES
+// FORMULARIOS DE MODALES
+// (los estilos del contenedor del modal en sí
+// ahora viven en shared/components/modal/modal.scss)
 // =============================================
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(30,26,60,0.45);
-  backdrop-filter: blur(2px);
-  z-index: 2000;
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-}
-
-.modal {
-  background: $bg-card;
-  border-radius: $radius-card;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  width: 100%; max-width: 420px;
-  overflow: hidden;
-
-  &__header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 15px 18px;
-    border-bottom: 1px solid $border;
-    background: $purple-pale;
-
-    h2 { font-size: 0.92rem; font-weight: 700; color: $text-primary; margin: 0; }
-  }
-
-  &__close {
-    background: none; border: none; cursor: pointer; color: $text-muted;
-    display: flex; align-items: center; padding: 4px; border-radius: 6px;
-    &:hover { background: rgba(0,0,0,0.07); color: $text-primary; }
-  }
-
-  &__body { padding: 18px; }
-
-  &__footer {
-    display: flex; justify-content: flex-end; gap: 10px;
-    padding: 13px 18px;
-    border-top: 1px solid $border;
-    background: $bg-base;
-  }
-}
-
 .form-group { margin-bottom: 14px; }
+
+.form-step {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+
+  &__num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: $purple-pale;
+    color: $purple-deep;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__content { flex: 1; }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 8px;
+  }
+}
+
+.btn-click-mapa {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: $radius-sm;
+  border: 1.5px dashed $purple-mid;
+  background: $purple-pale;
+  color: $purple-deep;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover { background: color.adjust($purple-pale, $lightness: -3%); }
+
+  &--activo {
+    border-style: solid;
+    background: $purple-deep;
+    color: #fff;
+  }
+}
+
+.form-coords {
+  font-size: 0.72rem;
+  color: $purple-deep;
+  font-family: monospace;
+  margin: 6px 0 0;
+}
+
+.radio-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.radio-slider {
+  flex: 1;
+  accent-color: $purple-deep;
+}
+
+.radio-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $purple-deep;
+  min-width: 45px;
+  text-align: right;
+}
+
+.radio-presets {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.radio-preset-btn {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; }
+
+  &--active {
+    border-color: $purple-deep;
+    background: $purple-pale;
+    color: $purple-deep;
+  }
+}
 
 .form-label {
   display: block;
@@ -778,7 +853,7 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
   cursor: pointer; font-family: inherit;
   transition: all 0.15s; text-align: center;
 
-  &:hover { background: $bg-hover; }
+  &:hover { background: $bg-card-hover; }
 
   &--active {
     border-color: $purple-deep;
@@ -788,33 +863,8 @@ $shadow:      0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124,58,237,0.10);
 
   &--alto:hover,  &--alto.nivel-btn--active  { border-color: $red;    background: $red-pale;         color: $red;    }
   &--medio:hover, &--medio.nivel-btn--active { border-color: $orange; background: rgba($orange,.12); color: $orange; }
-  &--bajo:hover,  &--bajo.nivel-btn--active  { border-color: $yellow; background: rgba($yellow,.15); color: darken($yellow,15%); }
+  &--bajo:hover,  &--bajo.nivel-btn--active  { border-color: $yellow; background: rgba($yellow,.15); color: color.adjust($yellow, $lightness: -15%); }
 }
-
-.zona-preview {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 0.78rem; color: $text-muted;
-  padding: 8px 11px; background: $purple-pale; border-radius: $radius-sm;
-}
-
-// ── Botones modales ───────────────────────────
-.btn-primary {
-  padding: 8px 18px;
-  background: linear-gradient(135deg, $purple-deep, #6d28d9);
-  color: #fff; border: none; border-radius: $radius-sm;
-  font-size: 0.84rem; font-weight: 600; cursor: pointer; font-family: inherit;
-  transition: filter 0.2s;
-  &:hover { filter: brightness(1.1); }
-}
-
-.btn-secondary {
-  padding: 8px 18px;
-  background: $bg-card; color: $text-muted;
-  border: 1.5px solid $border; border-radius: $radius-sm;
-  font-size: 0.84rem; font-weight: 600; cursor: pointer; font-family: inherit;
-  &:hover { background: $bg-hover; }
-}
-
 // =============================================
 // RESPONSIVE
 // =============================================

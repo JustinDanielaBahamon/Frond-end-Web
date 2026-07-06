@@ -1,0 +1,44 @@
+@use '../../styles/variables' as *;
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1.5px solid $border;
+  border-radius: 100px;
+  background: $bg-card;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $bg-card-hover;
+    color: $text-primary;
+  }
+
+  &--active {
+    background: $purple-pale;
+    border-color: $purple-deep;
+    color: $purple-deep;
+    font-weight: 600;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__count {
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 100px;
+    padding: 1px 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+}

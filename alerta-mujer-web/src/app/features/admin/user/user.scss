@@ -1,30 +1,5 @@
-// =============================================
-// VARIABLES (misma paleta que dashboard.scss)
-// =============================================
-$bg-base:       #f5f4ff;
-$bg-card:       #ffffff;
-$bg-card-hover: #f0eeff;
-$border:        #c4b5fd;
-$text-primary:  #1e1a3c;
-$text-muted:    #6b7280;
-$text-dim:      #9ca3af;
-
-$purple-deep:   #7c3aed;
-$purple-mid:    #a78bfa;
-$purple-light:  #c4b5fd;
-$purple-pale:   #ede9fe;
-$pink:          #ec4899;
-
-$green:         #16a34a;
-$green-pale:    #dcfce7;
-$red:           #dc2626;
-$red-pale:      #fee2e2;
-$amber:         #d97706;
-$amber-pale:    #fef3c7;
-
-$radius-card:   12px;
-$radius-sm:     6px;
-$shadow-card:   0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124, 58, 237, 0.10);
+@use 'sass:color';
+@use '../../../shared/styles/variables' as *;
 
 // =============================================
 // PAGE WRAPPER
@@ -487,7 +462,7 @@ table {
   font-family: inherit;
   transition: background 0.15s;
 
-  &:hover { background: darken($purple-pale, 4%); }
+  &:hover { background: color.adjust($purple-pale, $lightness: -4%); }
 }
 
 // =============================================
@@ -540,7 +515,7 @@ table {
     border-color: $red;
     color: $red;
 
-    &:hover { background: darken($red-pale, 4%); }
+    &:hover { background: color.adjust($red-pale, $lightness: -4%); }
   }
 }
 
@@ -609,76 +584,10 @@ table {
 }
 
 // =============================================
-// MODALES
+// FORMULARIOS DE MODALES
+// (los estilos del modal en sí ahora viven en
+// shared/components/modal/modal.scss)
 // =============================================
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(30, 26, 60, 0.45);
-  backdrop-filter: blur(2px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal {
-  background: $bg-card;
-  border-radius: $radius-card;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 520px;
-  overflow: hidden;
-
-  &--sm { max-width: 400px; }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px;
-    border-bottom: 1px solid $border;
-    background: $purple-pale;
-
-    h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: $text-primary;
-      margin: 0;
-    }
-
-    &--danger {
-      background: $red-pale;
-      border-bottom-color: lighten($red, 25%);
-    }
-  }
-
-  &__close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: $text-muted;
-    display: flex;
-    align-items: center;
-    padding: 4px;
-    border-radius: 6px;
-    transition: background 0.15s;
-
-    &:hover { background: rgba(0,0,0,0.08); color: $text-primary; }
-  }
-
-  &__body { padding: 20px; }
-
-  &__footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 14px 20px;
-    border-top: 1px solid $border;
-    background: $bg-base;
-  }
-}
 
 // ── Detalle modal ────────────────────────────
 .detail-hero {
@@ -745,52 +654,6 @@ table {
   background: $red-pale;
   border-radius: $radius-sm;
   border-left: 3px solid $red;
-}
-
-// ── Botones modales ──────────────────────────
-.btn-primary {
-  padding: 9px 20px;
-  background: linear-gradient(135deg, $purple-deep, #6d28d9);
-  color: #fff;
-  border: none;
-  border-radius: $radius-sm;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: filter 0.2s;
-
-  &:hover { filter: brightness(1.1); }
-}
-
-.btn-secondary {
-  padding: 9px 20px;
-  background: $bg-card;
-  color: $text-muted;
-  border: 1.5px solid $border;
-  border-radius: $radius-sm;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s;
-
-  &:hover { background: $bg-card-hover; }
-}
-
-.btn-danger {
-  padding: 9px 20px;
-  background: $red;
-  color: #fff;
-  border: none;
-  border-radius: $radius-sm;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: filter 0.2s;
-
-  &:hover { filter: brightness(0.92); }
 }
 
 // =============================================

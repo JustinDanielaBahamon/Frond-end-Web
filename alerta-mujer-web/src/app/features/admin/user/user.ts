@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 
 import { UsersService } from '../../../core/services/users.services';
 import { Usuario } from '../../../core/models/user.model';
+import { Chip } from '../../../shared/components/chip/chip';
+import { Modal } from '../../../shared/components/modal/modal';
 
 // Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
 type UsuariaUI = Usuario & { selected?: boolean };
 
-interface Chip {
+// Renombrado a ChipData para no chocar con el componente Chip importado arriba
+interface ChipData {
   label: string;
   value: string;
   color: string;
@@ -18,7 +21,7 @@ interface Chip {
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Modal, Chip],
   templateUrl: './user.html',
   styleUrl: './user.scss',
 })
@@ -54,7 +57,7 @@ export class UserComponent implements OnInit {
   Math = Math;
 
   // ── Chips ────────────────────────────────────────────────────
-  get chips(): Chip[] {
+  get chips(): ChipData[] {
     return [
       { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.todasLasUsuarias.length },
       { label: 'Activas',               value: 'Activa',               color: '#16a34a', count: this.todasLasUsuarias.filter(u => u.estado === 'Activa').length },

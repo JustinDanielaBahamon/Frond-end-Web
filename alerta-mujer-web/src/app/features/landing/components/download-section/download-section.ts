@@ -6,4 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './download-section.html',
   styleUrl: './download-section.scss',
 })
-export class DownloadSection {}
+export class DownloadSectionComponent {}

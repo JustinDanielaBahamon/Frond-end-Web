@@ -1,0 +1,308 @@
+/*==========================
+CONTACTO
+==========================*/
+
+.container-contacts{
+
+    background:#fff;
+
+    padding:40px 0;
+
+}
+
+.text-contacts{
+
+    text-align:center;
+
+    margin-bottom:36px;
+}
+
+.text-contacts h1{
+
+    font-size:42px;
+
+    color:#1b2d5b;
+
+    font-weight:900;
+
+    margin-bottom:8px;
+}
+
+.text-contacts p{
+
+    color:#6d6d6d;
+
+    font-size:18px;
+}
+
+/*==========================
+CONTENIDO
+==========================*/
+
+.container-content{
+
+    width:90%;
+
+    max-width:1350px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns: 1.1fr 1.6fr;
+
+    gap:30px;
+
+    align-items:center;
+}
+
+/*==========================
+FORMULARIO
+==========================*/
+
+.form{
+
+    width:100%;
+}
+
+.form-control{
+
+    height:56px;
+
+    border-radius:12px;
+
+    border:1px solid #ececec;
+
+    box-shadow:none;
+
+    font-size:15px;
+
+    padding:16px;
+}
+
+textarea.form-control{
+
+    height:170px;
+
+    resize:none;
+}
+
+.form-control:focus{
+
+    border-color:#8529b5;
+
+    box-shadow:none;
+}
+
+.btn-contacto{
+
+    width:100%;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#8529b5;
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    transition:.3s;
+}
+
+.btn-contacto:hover{
+
+    background:#6d20a5;
+}
+
+/*==========================
+CONTACTO
+==========================*/
+
+.contacts{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-direction: column-reverse;
+
+    gap:35px;
+}
+
+.contact-info{
+
+    display: flex;
+    flex-direction: row;
+    gap: 19px;
+}
+
+.contact-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:11px;
+}
+
+.icon-circle{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    background:#f4ecff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-shrink:0;
+}
+
+.icon-circle i{
+
+    color:#8529b5;
+
+    font-size:20px;
+}
+
+.contact-item h5{
+
+    margin:0;
+
+    font-size:19px;
+
+    font-weight:800;
+
+    color:#1b2d5b;
+}
+
+.contact-item p{
+
+    margin:4px 0 0;
+
+    color:#666;
+
+    font-size:14.5px;
+}
+
+/*==========================
+IMAGEN
+==========================*/
+
+.contact-image{
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:flex-end;
+}
+
+.contact-image img{
+
+    width:320px;
+
+    max-width:100%;
+}
+
+.text-form{
+    text-align: center;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+
+/*==========================
+TABLET
+==========================*/
+
+@media(max-width:1200px){
+
+.container-content{
+
+    gap: 50px;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.contacts{
+
+    justify-content:center;
+
+}
+
+.contact-image{
+
+    justify-content:center;
+}
+
+}
+
+/*==========================
+MOBILE
+==========================*/
+
+@media(max-width:576px){
+
+.container-contacts{
+
+    padding:60px 0;
+}
+
+.text-contacts h1{
+
+    font-size:30px;
+}
+
+.text-contacts p{
+
+    font-size:15px;
+}
+
+.contact-info[_ngcontent-ng-c871230503] {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 19px;
+}
+
+/* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+.contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
+    grid-column: span 2; 
+}
+
+.contact-item{
+
+    justify-content:center;
+
+    text-align:left;
+}
+
+
+}
+
+@media(max-width:548px){
+    .contact-info{
+        display: grid;
+        grid-template-columns: repeat(1, 1fr) !important;
+        gap: 19px;
+    }
+
+    /* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+.contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
+    grid-column: span 1; 
+}
+}

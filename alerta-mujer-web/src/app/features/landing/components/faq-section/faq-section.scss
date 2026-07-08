@@ -1,0 +1,282 @@
+/*==================================================
+PREGUNTAS FRECUENTES
+==================================================*/
+
+.container-Questions{
+    width:100%;
+    background:#fff;
+    padding:80px 20px;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+
+.container-Questions h1{
+
+    text-align:center;
+
+    font-size:40px;
+
+    font-weight:800;
+
+    color:#1b2d5b;
+
+    margin-bottom:45px;
+}
+
+
+/*==================================================
+GRID
+==================================================*/
+
+.container-Dropdowns{
+
+    width:100%;
+
+    max-width:1250px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(0,1fr));
+
+    gap:22px;
+}
+
+
+/*==================================================
+DROPDOWN
+==================================================*/
+
+.dropdown{
+
+    width:100%;
+
+    min-width:0;
+}
+
+
+/* BOTÓN */
+
+.dropdown .btn{
+
+    width:100%;
+
+    min-width:0;
+
+    min-height:70px;
+
+    padding:18px 22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    white-space:normal;
+
+    word-break:break-word;
+
+    text-align:left;
+
+    background:#f7f1ff;
+
+    border:1px solid #eadcff;
+
+    border-radius:16px;
+
+    color:#1b2d5b;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    transition:.25s;
+
+    box-sizing:border-box;
+}
+
+
+.dropdown .btn:hover{
+
+    background:#f2e8ff;
+
+    border-color:#b84cff;
+}
+
+.dropdown .btn:focus{
+
+    box-shadow:none;
+}
+
+
+/*==================================================
+MENU
+==================================================*/
+
+.dropdown-menu{
+
+    width:100%;
+
+    min-width:0;
+
+    position:relative !important;
+
+    inset:auto !important;
+
+    transform:none !important;
+
+    margin-top:12px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#faf8ff;
+
+    padding:18px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    box-sizing:border-box;
+}
+
+.dropdown-item-text{
+
+    margin:0;
+
+    font-size:15px;
+
+    color:#555;
+
+    line-height:1.7;
+
+    white-space:normal;
+
+    word-break:break-word;
+}
+
+
+/*==================================================
+TABLET
+==================================================*/
+
+@media(max-width:992px){
+
+.container-Questions{
+
+    padding:60px 18px;
+}
+
+.container-Dropdowns{
+
+    grid-template-columns:1fr;
+
+    gap:18px;
+}
+
+.container-Questions h1{
+
+    font-size:34px;
+}
+
+.dropdown .btn{
+
+    font-size:17px;
+}
+
+}
+
+
+/*==================================================
+MOBILE
+==================================================*/
+
+@media(max-width:576px){
+
+.container-Questions{
+
+    padding:45px 15px;
+}
+
+.container-Questions h1{
+
+    font-size:28px;
+
+    margin-bottom:28px;
+}
+
+.dropdown .btn{
+
+    min-height:60px;
+
+    padding:15px 18px;
+
+    font-size:15px;
+}
+
+.dropdown-item-text{
+
+    font-size:14px;
+}
+
+}
+
+
+/*==================================================
+MÓVILES MUY PEQUEÑOS
+==================================================*/
+
+@media(max-width:370px){
+
+.container-Questions{
+
+    padding:35px 10px;
+}
+
+.container-Questions h1{
+
+    font-size:24px;
+}
+
+.container-Dropdowns{
+
+    gap:14px;
+}
+
+.dropdown{
+
+    width:100%;
+}
+
+.dropdown .btn{
+
+    width:100%;
+
+    min-width:0;
+
+    padding:14px;
+
+    font-size:14px;
+
+    border-radius:14px;
+
+    overflow-wrap:anywhere;
+}
+
+.dropdown-menu{
+
+    width:100%;
+
+    padding:14px;
+}
+
+.dropdown-item-text{
+
+    font-size:13px;
+
+    line-height:1.6;
+}
+
+}

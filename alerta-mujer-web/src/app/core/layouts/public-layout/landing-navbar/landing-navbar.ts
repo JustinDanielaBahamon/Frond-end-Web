@@ -45,6 +45,10 @@ toggleIdiomsMenuMobile() {
   this.menuOpneIdiomsMobile = !this.menuOpneIdiomsMobile;
 }
 
+closeMobileMenu(): void {
+  this.menuMobileOpen = false;
+}
+
   // 🔥 Escucha global de clics para cerrar menús al hacer clic fuera
   @HostListener('document:click', ['$event'])
   clickOut(event: Event) {

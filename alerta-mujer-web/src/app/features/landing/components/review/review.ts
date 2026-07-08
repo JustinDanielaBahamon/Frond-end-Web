@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, HostListener, AfterViewInit, OnDestroy, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Testimonial {
@@ -47,10 +47,15 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
   @ViewChild('carousel') carousel!: ElementRef;
 
   currentIndex = 0;
-  autoplayInterval: any;
+  autoplayInterval: ReturnType<typeof setInterval> | null = null;
   isTransitioning = false;
 
+  constructor() {
+    afterNextRender(() => this.updateTrackTransform());
+  }
+
   ngAfterViewInit() {
+    this.updateTrackTransform();
     this.startAutoplay();
   }
 
@@ -70,15 +75,16 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
     return Math.max(0, this.testimonials.length - this.slidesPerView);
   }
 
-  get trackTransform(): string {
-    if (this.carousel) {
-      const containerWidth = this.carousel.nativeElement.offsetWidth;
-      const slideWidth = containerWidth / this.slidesPerView;
-      const gap = 24;
-      const translateX = -(this.currentIndex * (slideWidth + gap));
-      return `translateX(${translateX}px)`;
+  private updateTrackTransform(): void {
+    if (!this.carousel?.nativeElement || !this.track?.nativeElement) {
+      return;
     }
-    return 'translateX(0px)';
+
+    const containerWidth = this.carousel.nativeElement.offsetWidth;
+    const slideWidth = containerWidth / this.slidesPerView;
+    const gap = 24;
+    const translateX = -(this.currentIndex * (slideWidth + gap));
+    this.track.nativeElement.style.transform = `translateX(${translateX}px)`;
   }
 
   nextSlide() {
@@ -90,6 +96,8 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
     } else {
       this.currentIndex++;
     }
+
+    this.updateTrackTransform();
 
     setTimeout(() => {
       this.isTransitioning = false;
@@ -106,6 +114,8 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
       this.currentIndex--;
     }
 
+    this.updateTrackTransform();
+
     setTimeout(() => {
       this.isTransitioning = false;
     }, 300);
@@ -114,6 +124,7 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
   goToSlide(index: number) {
     if (this.isTransitioning || index === this.currentIndex) return;
     this.currentIndex = index;
+    this.updateTrackTransform();
   }
 
   startAutoplay() {
@@ -139,5 +150,6 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   onResize() {
     this.currentIndex = Math.min(this.currentIndex, this.maxIndex);
+    this.updateTrackTransform();
   }
 }

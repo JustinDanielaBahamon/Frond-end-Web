@@ -10,10 +10,6 @@ import { PublicLayoutComponent } from './core/layouts/public-layout/public-layou
 
 export const routes: Routes = [
 
-<<<<<<< HEAD
-  // ─── Raíz ───────────────────────────────────────────────────────────────────
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-=======
   {
     path: '',
     component: PublicLayoutComponent,
@@ -26,13 +22,11 @@ export const routes: Routes = [
       }
     ]
   },
->>>>>>> LandingPage
 
   // ─── Auth ────────────────────────────────────────────────────────────────────
   {
     path: 'auth',
     children: [
-<<<<<<< HEAD
       { path: 'login',    component: LoginComponent },
       { path: 'register', component: RegisterComponent },
     ],
@@ -118,29 +112,4 @@ export const routes: Routes = [
 
   // ─── Fallback ────────────────────────────────────────────────────────────────
   { path: '**', redirectTo: 'auth/login' },
-=======
-      {
-        path: 'login',
-        component: LoginComponent
-      },
-      {
-        path: 'register',
-        component: RegisterComponent
-      }
-    ]
-  },
-
-  {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('./features/dashboard/home/home')
-        .then(m => m.Home)
-  },
-
-  {
-    path: '**',
-    redirectTo: ''
-  }
-
->>>>>>> LandingPage
 ];

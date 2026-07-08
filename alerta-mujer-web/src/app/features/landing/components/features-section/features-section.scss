@@ -1,0 +1,176 @@
+/* ======================================
+   FEATURES SECTION
+====================================== */
+
+.container-features{
+    background-color: white;
+    padding: 39px 125px;
+}
+
+
+
+/* ======================================
+   TITULOS
+====================================== */
+
+.text-features{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.title-features{
+    font-size: 42px;
+    font-weight: 800;
+    color: #1b2d5b;
+}
+
+.subtitle-features{
+    font-size: 19px;
+    color: #666;
+    margin-top: 15px;
+}
+
+.line-features{
+    width: 90px;
+    height: 5px;
+    border-radius: 20px;
+    background: linear-gradient(
+        90deg,
+        #8529b5,
+        #c54be6
+    );
+}
+
+/* ======================================
+   CARDS
+====================================== */
+
+.card-group{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.card-group > .card{
+    border: 2px solid #f3effb;
+    border-radius: 24px;
+    padding: 35px 25px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background: white;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,.05);
+
+    transition: all .3s ease;
+
+    cursor: pointer;
+}
+
+.card-group > .card:hover{
+    transform: translateY(-10px);
+
+    box-shadow: 0 20px 40px rgba(133,41,181,.15);
+
+    border-color: #d8c1f0;
+}
+
+/* ======================================
+   IMAGENES
+====================================== */
+
+.card-img-top{
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+/* ======================================
+   BODY CARD
+====================================== */
+
+.card-body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.card-title{
+    font-size: 22px;
+    font-weight: 700;
+    color: #1b2d5b;
+    margin-bottom: 15px;
+}
+
+.card-text{
+    font-size: 15px;
+    line-height: 1.7;
+    color: #666;
+    margin: 0;
+}
+
+.fa-arrow-right-arrow-left{
+    font-size: 40px;
+    color: #1b2d5b;
+}
+
+/* ======================================
+   RESPONSIVE TABLET
+====================================== */
+
+@media(max-width:1350px){
+
+    .container-features{
+        padding: 54px 50px;
+    }
+
+    .card-group{
+        grid-template-columns: repeat(2,1fr);
+    }
+
+}
+
+/* ======================================
+   RESPONSIVE MOBILE
+====================================== */
+
+@media(max-width:900px){
+
+
+    .container-features{
+        padding: 35px 25px;
+    }
+
+    .title-features{
+        font-size: 32px;
+    }
+
+    .subtitle-features{
+        font-size: 16px;
+    }
+
+    .card-group{
+        grid-template-columns: 1fr;
+    }
+
+    .card-group > .card{
+        padding: 30px 20px;
+    }
+
+    .card-img-top{
+        width: 75px;
+        height: 75px;
+    }
+
+    .card-title{
+        font-size: 20px;
+    }
+
+}

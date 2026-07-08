@@ -1,0 +1,200 @@
+  /* ======================================
+           HERO (Modificado para ser Banner)
+        ====================================== */
+        .container-hero {
+            position: relative;
+            min-height: 88vh; /* Altura mínima para que se vea el banner */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Alinea el contenido a la izquierda */
+            
+            padding: 80px 60px;
+            
+            /* Imagen de fondo como Banner */
+               background-image: linear-gradient(rgb(255 255 255 / 40%), rgb(255 255 255 / 59%)), url(/bannerHero.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+        }
+
+        /* ======================================
+           INFORMACIÓN
+        ====================================== */
+        .container-information {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .container-texts {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .text-banner {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #1b2d5b;
+            margin: 0;
+        }
+
+        .text-banner span {
+            color: #b83dcd;
+        }
+
+        .container-text-second {
+            max-width: 520px;
+        }
+
+        .container-text-second p {
+            font-size: 18px;
+            line-height: 1.5;
+            color: black;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        /* ======================================
+           BOTONES
+        ====================================== */
+        .container-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .comenzar-btn {
+            height: 52px;
+            padding: 0 28px;
+            border: none;
+            border-radius: 12px;
+            background: #8529b5;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .comenzar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(133,41,181,.25);
+        }
+
+        .conocer-btn {
+            height: 52px;
+            padding: 0 28px;
+            border-radius: 12px;
+            border: 2px solid #8529b5; /* Borde más grueso para destacar */
+            background: transparent;
+            color: #8529b5;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .conocer-btn:hover {
+            background: #8529b5;
+            color: white;
+        }
+
+        /* ======================================
+           ESTADÍSTICAS
+        ====================================== */
+        .container-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .container-stats p {
+            margin: 0;
+            color: #1b2d5b;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        
+
+        .img-stats img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            
+        }
+
+        /* ======================================
+           RESPONSIVE (TABLET)
+        ====================================== */
+        @media (max-width: 1200px) {
+            .container-hero {
+                padding: 60px 40px;
+                min-height: 60vh;
+            }
+
+            .text-banner {
+                font-size: 52px;
+            }
+        }
+
+        /* ======================================
+           RESPONSIVE (MOBILE)
+        ====================================== */
+        @media (max-width: 900px) {
+            .container-hero {
+                justify-content: center;
+                text-align: center;
+                padding: 80px 70px;
+                /* Ajustamos el gradiente para mejor legibilidad en móvil */
+                background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255)), url(/bannerHero.png);
+                min-height: 58vh;
+            }
+
+            .container-information {
+                max-width: 100%;
+            }
+
+            .container-text-second {
+                max-width: 100%;
+            }
+
+            .container-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .container-stats {
+                justify-content: center;
+            }
+
+            .text-banner {
+                font-size: 42px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container-hero {
+                min-height: 68vh;
+                padding: 23px 14%; 
+            }
+
+            .text-banner {
+                font-size: 34px;
+            }
+
+            .container-text-second p {
+                font-size: 16px;
+            }
+
+            .comenzar-btn,
+            .conocer-btn {
+                width: 100%;
+            }
+        }

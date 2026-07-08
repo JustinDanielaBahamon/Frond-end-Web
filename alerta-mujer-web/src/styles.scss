@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html{
+  scroll-behavior: smooth;
+}
+
 /* ── Fuente ─────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
@@ -70,6 +74,7 @@ body {
   color       : var(--color-text-dark);
   background: var(--gradient-bg) !important;
   min-height: 100vh;
+<<<<<<< HEAD
 }
 
 
@@ -405,4 +410,6 @@ body {
   .form__row {
     grid-template-columns: 1fr;
   }
+=======
+>>>>>>> LandingPage
 }

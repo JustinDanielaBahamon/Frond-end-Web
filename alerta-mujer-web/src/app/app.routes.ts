@@ -1,19 +1,38 @@
 import { Routes } from '@angular/router';
+
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { DashboardLayoutComponent } from './core/layouts/dashboard-layout/dashboard-layout';
 import { AdminLayoutComponent } from './core/layouts/admin-layout/admin-layout';
 import { authGuard, adminGuard, userGuard } from './core/guards/role.guard';
 
+import { PublicLayoutComponent } from './core/layouts/public-layout/public-layout';
+
 export const routes: Routes = [
 
+<<<<<<< HEAD
   // ─── Raíz ───────────────────────────────────────────────────────────────────
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+=======
+  {
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/landing/home/home')
+            .then(m => m.LandingHomeComponent)
+      }
+    ]
+  },
+>>>>>>> LandingPage
 
   // ─── Auth ────────────────────────────────────────────────────────────────────
   {
     path: 'auth',
     children: [
+<<<<<<< HEAD
       { path: 'login',    component: LoginComponent },
       { path: 'register', component: RegisterComponent },
     ],
@@ -99,4 +118,29 @@ export const routes: Routes = [
 
   // ─── Fallback ────────────────────────────────────────────────────────────────
   { path: '**', redirectTo: 'auth/login' },
+=======
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
+      }
+    ]
+  },
+
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/home/home')
+        .then(m => m.Home)
+  },
+
+  {
+    path: '**',
+    redirectTo: ''
+  }
+
+>>>>>>> LandingPage
 ];

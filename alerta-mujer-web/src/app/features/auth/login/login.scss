@@ -1,14 +1,13 @@
-
-
 /* ── Página completa ───────────────────────────────── */
 .login-page {
-  height      : 100vh;
+  height          : 100vh;
   display         : flex;
   align-items     : center;
   justify-content : center;
   padding         : 40px 0;
   position        : relative;
   overflow        : hidden;
+  background      : linear-gradient(135deg, #f3e6fb 0%, #fdeef7 60%, #ffffff 100%);
 
   /* ── Orbes de fondo ──────────────────────────────── */
   .bg-orb {
@@ -21,17 +20,17 @@
 
     &--1 {
       width      : 520px; height: 520px;
-      background : radial-gradient(circle, var(--color-purple), transparent);
+      background : radial-gradient(circle, #9b5de5, transparent);
       top: -120px; left: -120px;
     }
     &--2 {
       width      : 420px; height: 420px;
-      background : radial-gradient(circle, var(--color-pink), transparent);
+      background : radial-gradient(circle, #f15bb5, transparent);
       bottom: -100px; right: 10%;
     }
     &--3 {
       width      : 320px; height: 320px;
-      background : radial-gradient(circle, var(--color-purple-light), transparent);
+      background : radial-gradient(circle, #c9a2f0, transparent);
       top: 40%; left: 45%;
       opacity    : 0.2;
     }
@@ -42,12 +41,12 @@
     position        : relative;
     z-index         : 1;
     display         : flex;
-    align-items     : center;
+    align-items     : stretch;   // antes "center": ahora ambas columnas igualan altura
     justify-content : center;
-    gap             : 64px;
+    gap             : 48px;
     padding         : 0 48px;
     width           : 100%;
-    max-width       : 1300px;
+    max-width       : 1400px;
     margin          : 0 auto;
     max-height     : 100vh; 
   }
@@ -263,7 +262,7 @@
   padding        : 16px;
   border         : none;
   border-radius  : 16px;
-  background     : linear-gradient(90deg, #be185d, #dd1378, #ac0c5f);
+  background     : linear-gradient(90deg, #7c3aed, #be185d, #ec4899);
   color          : white;
   font-family    : var(--font-base);
   font-size      : 1rem;
@@ -282,18 +281,110 @@
   &:active { transform: translateY(0); }
 }
 
-/* ── Imagen izquierda ──────────────────────────────── */
+/* ── Imagen izquierda (por capas) ──────────────────── */
 .login-page__visual {
+    overflow: visible;  
+  position       : relative;
   flex           : 1;
   display        : flex;
   align-items    : center;
   justify-content: center;
+  // sin height fija: el wrapper (align-items: stretch) le da automáticamente
+  // la misma altura que la tarjeta de al lado
 
-  img {
-    width     : 100%;
-    max-width : 600px;
-    height    : auto;
-    filter    : drop-shadow(0 20px 40px rgba(91, 33, 182, 0.3));
+  /* la imagen real: llena el 100% del alto que le tocó, igual que la tarjeta */
+  .hero-image {
+    position  : relative;
+    z-index   : 2;
+    width     : auto;
+    height    : 900%;      // antes 95% de un contenedor fijo a la página;
+                           // ahora 100% de un contenedor que iguala la tarjeta
+    max-width : 100%;
+    object-fit: contain;
+    transform : scale(1.15);
+    filter    : drop-shadow(0 35px 55px rgba(50, 15, 90, 0.5));
+  }
+
+  /* respaldo claro detrás del teléfono: esto es lo que da el contraste */
+  .phone-glow {
+    position     : absolute;
+    z-index      : 1;
+    width        : 420px;
+    height       : 420px;
+    left         : 50%;
+    top          : 48%;
+    transform    : translate(-50%, -50%);
+    border-radius: 50%;
+    background   : radial-gradient(circle, rgba(255,255,255,0.85), rgba(255,255,255,0) 70%);
+    pointer-events: none;
+  }
+
+  /* orbes de color difuminados, dan ambiente detrás de todo */
+  .halo {
+    position      : absolute;
+    border-radius : 50%;
+    filter        : blur(70px);
+    opacity       : 0.5;
+    z-index       : 0;
+    pointer-events: none;
+
+    &--1 {
+      width     : 340px; height: 340px;
+      top: -30px; left: -30px;
+      background: radial-gradient(circle, #9b5de5, transparent 70%);
+    }
+    &--2 {
+      width     : 280px; height: 280px;
+      bottom: -20px; right: -10px;
+      background: radial-gradient(circle, #f15bb5, transparent 70%);
+    }
+    &--3 {
+      width     : 220px; height: 220px;
+      top: 45%; left: 55%;
+      background: radial-gradient(circle, #d9b8f7, transparent 70%);
+      opacity   : 0.3;
+    }
+  }
+
+  /* sombra de "plataforma" bajo la imagen */
+  .podium {
+    position     : absolute;
+    width        : 300px;
+    height       : 44px;
+    left         : 50%;
+    bottom       : 60px;
+    transform    : translateX(-50%);
+    background   : #d8c9f0;
+    border-radius: 50%;
+    filter       : blur(4px);
+    opacity      : 0.6;
+    z-index      : 1;
+  }
+
+  /* hojas decorativas a los lados, tono lavanda/rosa */
+  .leaf {
+    position: absolute;
+    z-index : 1;
+    opacity : 0.6;
+    width   : 105px;
+    fill    : #d9b3f0;
+
+    &--left  { left: -10px; bottom: 40px;  transform: rotate(-10deg); }
+    &--right { right: -10px; bottom: 130px; transform: rotate(15deg) scaleX(-1); fill: #f3b8dd; }
+  }
+
+  /* destellos, blancos con resplandor sutil */
+  .spark {
+    position      : absolute;
+    z-index       : 3;
+    color         : #ffffff;
+    text-shadow   : 0 0 6px rgba(155, 93, 229, 0.6);
+    pointer-events: none;
+
+    &--1 { top: 10px;  left: 120px; font-size: 20px; }
+    &--2 { top: 60px;  right: 30px; font-size: 14px; opacity: .8; }
+    &--3 { bottom: 200px; left: 10px; font-size: 16px; opacity: .7; }
+    &--4 { bottom: 70px; right: 60px; font-size: 22px; opacity: .9; }
   }
 }
 

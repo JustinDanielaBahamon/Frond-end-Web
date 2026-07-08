@@ -4,7 +4,40 @@
 
   <div class="login-page__wrapper">
     <div class="login-page__visual">
-      <img src="login.png" alt="Alerta Mujer">
+      <div class="halo halo--1"></div>
+      <div class="halo halo--2"></div>
+      <div class="halo halo--3"></div>
+
+      <div class="podium"></div>
+
+      <svg class="leaf leaf--left" viewBox="0 0 140 300" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+        <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+        <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+        <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+        <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+        <ellipse cx="64" cy="95"  rx="12" ry="5" transform="rotate(-45 64 95)"/>
+        <ellipse cx="70" cy="60"  rx="10" ry="4" transform="rotate(47 70 60)"/>
+        <ellipse cx="68" cy="30"  rx="8"  ry="3" transform="rotate(20 68 30)"/>
+      </svg>
+
+      <svg class="leaf leaf--right" viewBox="0 0 140 300" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+        <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+        <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+        <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+        <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+        <ellipse cx="64" cy="95"  rx="12" ry="5" transform="rotate(-45 64 95)"/>
+        <ellipse cx="70" cy="60"  rx="10" ry="4" transform="rotate(47 70 60)"/>
+        <ellipse cx="68" cy="30"  rx="8"  ry="3" transform="rotate(20 68 30)"/>
+      </svg>
+
+      <img class="hero-image" src="login.png" alt="Alerta Mujer">
+
+      <span class="spark spark--1">✦</span>
+      <span class="spark spark--2">✦</span>
+      <span class="spark spark--3">✦</span>
+      <span class="spark spark--4">✦</span>
     </div>
 
     <app-card>
@@ -32,26 +65,15 @@
           <span class="field__icon">
             <i class="fa-regular fa-user"></i>
           </span>
-          <input
-            [(ngModel)]="email"
-            name="email"
-            type="email"
-            class="field__input"
-            placeholder="Correo electrónico o usuario"
-          >
+          <input [(ngModel)]="email" name="email" type="email" class="field__input"
+            placeholder="Correo electrónico o usuario">
         </div>
 
         <div class="field">
           <span class="field__icon">
             <i class="fa-solid fa-lock"></i>
           </span>
-          <input
-            [(ngModel)]="password"
-            name="password"
-            type="password"
-            class="field__input"
-            placeholder="Contraseña"
-          >
+          <input [(ngModel)]="password" name="password" type="password" class="field__input" placeholder="Contraseña">
           <button type="button" class="field__eye">
             <i class="fa-regular fa-eye"></i>
           </button>

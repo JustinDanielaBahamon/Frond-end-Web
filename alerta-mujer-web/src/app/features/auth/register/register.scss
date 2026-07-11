@@ -1,14 +1,48 @@
 // register.component.scss
-// Solo layout propio de la página + form__row (grid de 2 columnas)
+// Layout propio de la página + identidad visual Alerta Mujer aplicada.
+// IMPORTANTE: app-card no define tamaño aquí (eso vive en el componente
+// compartido shared/components/card, que no se toca). Los espaciados de
+// abajo se dejaron al mínimo posible para no inflar el tamaño de la card
+// respecto a la primera versión — solo se aplican colores/estilo.
 
 .register-page {
   height     : 100vh;
   display        : flex;
   align-items    : center;
   justify-content: center;
-  padding        : 40px 0;
+  padding        : 56px;      // aire uniforme en los 4 lados, igual que login
+  box-sizing     : border-box;
   position       : relative;
   overflow       : hidden;
+  // "atardecer estrellado" en tonos pastel: recorre TODA la página, suave
+  // a la izquierda (detrás de la card) y más intenso a la derecha (detrás
+  // de la imagen), como en la referencia
+  background     :
+    // estrellitas dispersas (puntos pequeños y tenues)
+    radial-gradient(circle at 78% 15%, rgba(255,255,255,0.9) 0px, rgba(255,255,255,0.9) 1.5px, transparent 2px),
+    radial-gradient(circle at 85% 30%, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 1px,   transparent 1.5px),
+    radial-gradient(circle at 65% 10%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    radial-gradient(circle at 92% 55%, rgba(255,255,255,0.9) 0px, rgba(255,255,255,0.9) 1.5px, transparent 2px),
+    radial-gradient(circle at 73% 68%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    radial-gradient(circle at 60% 45%, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px,   transparent 1.5px),
+    radial-gradient(circle at 95% 80%, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 1.5px, transparent 2px),
+    radial-gradient(circle at 55% 85%, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px,   transparent 1.5px),
+    radial-gradient(circle at 80% 92%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    // resplandor suave y sereno, centrado en la imagen — transmite calma
+    radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 55%),
+    // degradado base en tonos lavanda-azulado, pensado para transmitir
+    // paz, confianza y armonía — más claro que la versión anterior,
+    // sin llegar a colores intensos o cálidos
+    linear-gradient(
+      115deg,
+      #faf7ff 0%,
+      #f0e9fb 18%,
+      #e3d7f5 36%,
+      #d2c3ee 52%,
+      #bfb0e6 66%,
+      #a89bd6 80%,
+      #8f87c9 100%
+    );
 
   .bg-orb {
     position      : fixed;
@@ -20,12 +54,14 @@
 
     &--1 {
       width      : 520px; height: 520px;
-      background : radial-gradient(circle, var(--color-purple), transparent);
+      background : radial-gradient(circle, var(--color-purple, #7c3aed), transparent);
       top: -120px; left: -120px;
     }
     &--2 {
       width      : 420px; height: 420px;
-      background : radial-gradient(circle, var(--color-pink), transparent);
+      background : radial-gradient(circle, #8f87c9, transparent);  // antes rosa, ahora
+                                                                     // lavanda-azulado, igual
+                                                                     // que el resto de la paleta calmada
       bottom: -100px; right: 10%;
     }
   }
@@ -34,56 +70,355 @@
     position       : relative;
     z-index        : 1;
     display        : flex;
-    align-items    : center;
+    align-items    : center;   // igual que el original: NO afecta el tamaño de la card
     justify-content: center;
-    gap            : 64px;
-    padding        : 0 48px;   // quita el padding vertical
+    gap            : 40px;
     width          : 100%;
     max-width      : 1300px;
     margin         : 0 auto;
-    max-height     : 100vh; 
+    max-height     : 100%;
   }
 
   &__visual {
-    flex           : 1;
+    flex           : 1.4;              // antes: 1 → más espacio para la imagen
     display        : flex;
     align-items    : center;
     justify-content: center;
+    overflow       : visible;
+    position       : relative;
+    // sin background propio, sin padding y sin box-shadow: el panel NO
+    // se ve como una card/bloque — el color viene del degradado pastel
+    // del fondo de la página (arriba), que ya se extiende hasta aquí
+
+    // glow sereno, azul-lavanda, detrás de la imagen — combina con el
+    // degradado calmado del fondo, sin crear un borde/silueta duro
+    &::before {
+      content       : '';
+      position      : absolute;
+      width         : 85%;
+      height        : 85%;
+      background    : radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(191, 176, 230, 0.35) 45%, rgba(143, 135, 201, 0.15) 70%, transparent 85%);
+      filter        : blur(70px);
+      z-index       : 0;
+      pointer-events: none;
+    }
 
     img {
-      width    : 150%;
-      max-width: 800px; 
-      height   : auto;
-      filter   : drop-shadow(0 20px 40px rgba(91, 33, 182, 0.3));
+      position     : relative;
+      z-index      : 1;
+      width        : auto;
+      height       : 80vh;               // altura fija respecto al viewport,
+                                          // totalmente independiente de la card
+      max-height   : 620px;              // tope razonable en pantallas muy altas
+      max-width    : 100%;
+      object-fit   : contain;            // conserva proporción, sin deformar ni recortar
+      border-radius: 28px;
+      filter       : drop-shadow(0 20px 45px rgba(91, 33, 182, 0.22));  // sombra suave,
+                                                                          // sin forzar brillo/saturación
     }
   }
 }
 
-// ── Grid de 2 columnas (único aporte nuevo) ──────────
+// ── Marca (logo + nombre) ────────────────────────────
+.brand {
+  display     : flex;
+  align-items : center;
+  gap         : 12px;
+  padding-bottom: 12px;
+  margin-bottom : 12px;
+  border-bottom : 1px solid rgba(124, 58, 237, 0.12);
+
+  &__icon {
+    width         : 48px;
+    height        : 48px;
+    border-radius : 50%;
+    overflow      : hidden;
+    flex-shrink   : 0;
+    background    : radial-gradient(circle at 35% 30%, #3a1768, #1a0b2e 75%);
+    border        : 2px solid #caa14d;
+    box-shadow    : 0 0 0 3px rgba(202, 161, 77, 0.15);
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__text {
+    display        : flex;
+    flex-direction : column;
+    line-height    : 1.15;
+  }
+
+  &__name {
+    font-size   : 1rem;
+    font-weight : 800;
+    letter-spacing: 0.03em;
+    color       : var(--color-pink, #E91E8C);
+
+    strong {
+      display     : block;
+      font-size   : 1.15rem;
+      color       : #2d1457;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  &__tagline {
+    margin-top  : 2px;
+    font-size   : 0.65rem;
+    font-weight : 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color       : var(--color-purple, #7c3aed);
+  }
+}
+
+// ── Títulos ───────────────────────────────────────────
+.card__title {
+  font-size   : 1.4rem;
+  font-weight : 800;
+  color       : #2d1457;
+  line-height : 1.2;
+  margin-bottom: 4px;
+  position    : relative;
+
+  .highlight {
+    color: var(--color-pink, #E91E8C);
+  }
+
+  &-icon {
+    color: var(--color-pink, #E91E8C);
+    font-size: 0.85rem;
+    margin-left: 4px;
+  }
+}
+
+.card__subtitle {
+  font-size   : 0.88rem;
+  color       : #6b5b8a;
+  margin-bottom: 10px;
+
+  strong { color: #4c2a91; }
+}
+
+// ── Divisor decorativo con guiones ───────────────────
+.form__divider {
+  display     : flex;
+  align-items : center;
+  gap         : 10px;
+  margin-bottom: 12px;
+  color       : var(--color-pink, #E91E8C);
+  opacity     : 0.6;
+
+  span {
+    flex-grow : 1;
+    height    : 1px;
+    background: repeating-linear-gradient(
+      to right, currentColor 0 6px, transparent 6px 10px
+    );
+  }
+
+  i { font-size: 0.55rem; }
+}
+
+// ── Formulario enmarcado (borde punteado tipo mockup) ─
+// padding reducido al mínimo necesario para que el marco
+// se note sin inflar la altura total de la card
+.form--framed {
+  border        : 1.5px dashed rgba(124, 58, 237, 0.25);
+  border-radius : 16px;
+  padding       : 14px 14px;
+  background    : rgba(238, 241, 251, 0.5);
+}
+
+// ── Grid de 2 columnas ────────────────────────────────
 .form__row {
   display              : grid;
   grid-template-columns: 1fr 1fr;
-  gap                  : 16px;
+  gap                  : 12px;
+}
+
+// ── Campos ────────────────────────────────────────────
+.field {
+  position      : relative;
+  margin-bottom : 10px;
+
+  &__icon {
+    position  : absolute;
+    left      : 14px;
+    top       : 50%;
+    transform : translateY(-50%);
+    color     : #9b7fd4;
+    font-size : 0.9rem;
+  }
+
+  &__input {
+    width        : 100%;
+    padding      : 10px 14px 10px 40px;
+    border-radius: 10px;
+    border       : 1px solid rgba(124, 58, 237, 0.14);
+    background   : #eef1fb;
+    font-size    : 0.88rem;
+    color        : #2d1457;
+    transition   : border-color .2s, box-shadow .2s;
+
+    &::placeholder { color: #a99fd1; }
+
+    &:focus {
+      outline    : none;
+      background : #ffffff;
+      border-color: var(--color-purple, #7c3aed);
+      box-shadow : 0 0 0 3px rgba(124, 58, 237, 0.14);
+    }
+  }
 }
 
 // ── Error message ────────────────────────────────────
 .form__error {
   color      : #E91E8C;
-  font-size  : 0.85rem;
-  margin-top : -0.5rem;
+  font-size  : 0.82rem;
+  margin-top : -0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+// ── Checkbox términos ─────────────────────────────────
+.checkbox {
+  display     : flex;
+  align-items : flex-start;
+  gap         : 8px;
+  margin      : 4px 0 12px;
+  cursor      : pointer;
+  font-size   : 0.8rem;
+  color       : #6b5b8a;
+
+  input { accent-color: var(--color-pink, #E91E8C); margin-top: 2px; }
+}
+
+.form__link {
+  color       : var(--color-pink, #E91E8C);
+  font-weight : 700;
+  cursor      : pointer;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ── Botón principal ───────────────────────────────────
+.btn-submit__wrap {
+  position    : relative;
+  display     : flex;
+  align-items : center;
+  justify-content: center;
+}
+
+.btn-submit {
+  width         : 100%;
+  padding       : 13px;
+  border        : none;
+  border-radius : 12px;
+  background    : linear-gradient(90deg, #6D28D9, var(--color-pink, #E91E8C));
+  color         : #fff;
+  font-weight   : 800;
+  letter-spacing: 0.04em;
+  font-size     : 0.92rem;
+  display       : flex;
+  align-items   : center;
+  justify-content: center;
+  gap           : 10px;
+  cursor        : pointer;
+  box-shadow    : 0 10px 24px rgba(147, 51, 234, 0.35);
+  transition    : transform .15s, box-shadow .15s, opacity .15s;
+
+  &:hover:not(:disabled) {
+    transform : translateY(-2px);
+    box-shadow: 0 14px 28px rgba(233, 30, 140, 0.4);
+  }
+
+  &:disabled {
+    opacity   : 0.5;
+    cursor    : not-allowed;
+    box-shadow: none;
+  }
+}
+
+.btn-submit__tick {
+  position: absolute;
+  top: -6px;
+  width: 14px;
+  height: 2px;
+  background: var(--color-pink, #E91E8C);
+  opacity: 0.5;
+  transform: rotate(-25deg);
+
+  &--left  { left: 6px; }
+  &--right { right: 6px; transform: rotate(25deg); }
+}
+
+// ── Footer con flecha decorativa ──────────────────────
+.card__footer {
+  position    : relative;
+  text-align  : center;
+  margin-top  : 10px;
+  font-size   : 0.85rem;
+  color       : #6b5b8a;
+}
+
+.card__footer-arrow {
+  position: absolute;
+  width   : 42px;
+  height  : 28px;
+  right   : -10px;
+  bottom  : 20px;
+  color   : #2d1457;
+  opacity : 0.7;
+  transform: scaleX(-1);
 }
 
 // ── Responsive ───────────────────────────────────────
+
+// Tablets / pantallas medianas: la imagen se reduce en vez de ocultarse,
+// para que ambos paneles quepan sin que la imagen se vea gigante o cortada
+@media (max-width: 1100px) {
+  .register-page {
+    padding: 32px;
+  }
+
+  .register-page__wrapper {
+    gap: 24px;
+  }
+
+  .register-page__visual img {
+    height    : 55vh;
+    max-height: 440px;
+  }
+}
+
+// Mobile: se oculta la imagen y todo pasa a una sola columna,
+// igual que en login
 @media (max-width: 760px) {
+  .register-page {
+    height        : auto;
+    min-height    : 100vh;
+    padding       : 24px 16px;
+    overflow-y    : auto;   // evita que el contenido se corte en pantallas
+                             // cortas o con teclado abierto
+  }
+
   .register-page__wrapper {
     flex-direction: column;
-    padding       : 24px 16px;
+    padding       : 0;
     gap           : 28px;
   }
 
   .register-page__visual { display: none; }
 
   .form__row {
-    grid-template-columns: 1fr; // apila en móvil
+    grid-template-columns: 1fr;
+  }
+
+  .card__footer-arrow { display: none; }
+}
+
+// Móviles muy pequeños: reduce un poco más el aire alrededor
+@media (max-width: 380px) {
+  .register-page {
+    padding: 16px 12px;
   }
 }

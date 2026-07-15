@@ -72,6 +72,8 @@ export class LoginComponent {
   }
 
   // ------------------------
+  // Navegación
+  // ------------------------
 
   irARegistro() {
     this.router.navigate(['/auth/register']);
@@ -79,6 +81,10 @@ export class LoginComponent {
 
   irAOlvidePassword() {
     this.router.navigate(['/auth/forgot-password']);
+  }
+
+  irAlLanding() {
+    this.router.navigate(['/']);
   }
 
   // ------------------------

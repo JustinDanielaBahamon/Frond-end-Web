@@ -1,0 +1,134 @@
+<div class="verify-code-page">
+
+    <!-- Fondo con Orbes Animados -->
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
+    <div class="bg-orb bg-orb--3"></div>
+  
+    <div class="verify-code-page__wrapper">
+  
+      <!-- Sección Visual Izquierda con Elementos Decorativos -->
+      <div class="verify-code-page__visual">
+        <div class="halo halo--1"></div>
+        <div class="halo halo--2"></div>
+        <div class="halo halo--3"></div>
+        <div class="podium"></div>
+        <svg class="leaf leaf--left" viewBox="0 0 140 300" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+          <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+          <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+          <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+          <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+          <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
+          <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
+        </svg>
+        <svg class="leaf leaf--right" viewBox="0 0 140 300" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+          <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+          <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+          <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+          <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+          <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
+          <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
+        </svg>
+        <img class="hero-image" src="login.png" alt="Alerta Mujer">
+        <span class="spark spark--1">✦</span>
+        <span class="spark spark--2">✦</span>
+        <span class="spark spark--3">✦</span>
+        <span class="spark spark--4">✦</span>
+      </div>
+  
+      <!-- Tarjeta Principal de Verificación -->
+      <app-card class="card">
+  
+        <!-- Sección de Marca (Logo y Nombre) -->
+        <div class="brand">
+          <div class="brand__icon">
+            <img src="logo.png" alt="Logo Alerta Mujer">
+          </div>
+          <div class="brand__text">
+            <span class="brand__name">
+              ALERTA
+              <br>
+              <strong>MUJER</strong>
+            </span>
+            <span class="brand__tagline">
+              Seguridad para todas
+            </span>
+          </div>
+        </div>
+  
+        <!-- Icono de Característica (Escudo) -->
+        <div class="feature-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+  
+        <!-- Título y Subtítulo de la Tarjeta -->
+        <h1 class="card__title">
+          Verifica tu <span class="card__title--accent">código</span>
+        </h1>
+        <p class="card__subtitle">
+          {{ mensajeEnvio }}
+        </p>
+  
+        <!-- Formulario de Verificación de Código -->
+        <form class="form" (ngSubmit)="verificarCodigo()">
+  
+          <!-- Campos de Entrada para el Código OTP -->
+          <div class="code-inputs">
+            <input
+              *ngFor="let digito of codigo; let i = index; trackBy: trackByIndex"
+              #codeInput
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              [name]="'codigo' + i"
+              [value]="digito"
+              (input)="onInput($event, i)"
+              (keydown)="onKeyDown($event, i)"
+              (paste)="onPaste($event)"
+              aria-label="Dígito {{i + 1}} del código de verificación">
+          </div>
+  
+          <!-- Sección de Temporizador y Reenvío de Código -->
+          <div class="timer-section">
+            <span class="timer">
+              {{ tiempoFormateado }}
+            </span>
+            <button
+              type="button"
+              class="resend-link"
+              [class.resend-link--disabled]="!puedeReenviar"
+              [disabled]="!puedeReenviar"
+              (click)="reenviarCodigo()">
+              Reenviar código
+            </button>
+          </div>
+  
+          <!-- Botón de Verificación -->
+          <button
+            class="btn-submit"
+            type="submit"
+            [disabled]="!codigoCompleto">
+            <i class="fa-solid fa-shield-halved"></i>
+            VERIFICAR CÓDIGO
+          </button>
+  
+        </form>
+  
+        <!-- Pie de Tarjeta (Cambiar Método de Recuperación) -->
+        <p class="card__footer">
+          <span
+            class="form__link"
+            (click)="cambiarMetodo()">
+            Cambiar método de recuperación
+          </span>
+        </p>
+  
+      </app-card>
+  
+    </div>
+  
+  </div>
+  

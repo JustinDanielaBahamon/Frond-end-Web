@@ -1,0 +1,198 @@
+<div class="forgot-phone-page">
+
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
+
+    <div class="forgot-phone-page__wrapper">
+
+        <div class="forgot-phone-page__visual">
+
+            <div class="halo halo--1"></div>
+            <div class="halo halo--2"></div>
+            <div class="halo halo--3"></div>
+
+            <div class="podium"></div>
+
+            <svg
+                class="leaf leaf--left"
+                viewBox="0 0 140 300"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+                <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+                <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+                <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+                <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+                <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
+                <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
+            </svg>
+
+            <svg
+                class="leaf leaf--right"
+                viewBox="0 0 140 300"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <ellipse cx="72" cy="270" rx="22" ry="9" transform="rotate(35 72 270)"/>
+                <ellipse cx="64" cy="235" rx="20" ry="8" transform="rotate(-37 64 235)"/>
+                <ellipse cx="72" cy="200" rx="18" ry="7" transform="rotate(39 72 200)"/>
+                <ellipse cx="64" cy="165" rx="16" ry="6" transform="rotate(-41 64 165)"/>
+                <ellipse cx="72" cy="130" rx="14" ry="5" transform="rotate(43 72 130)"/>
+                <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
+                <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
+            </svg>
+
+            <img
+                class="hero-image"
+                src="login.png"
+                alt="Alerta Mujer">
+
+            <span class="spark spark--1">✦</span>
+            <span class="spark spark--2">✦</span>
+            <span class="spark spark--3">✦</span>
+            <span class="spark spark--4">✦</span>
+
+        </div>
+
+        <app-card class="card">
+
+            <button
+                class="back-button"
+                type="button"
+                (click)="volverLogin()">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Volver al inicio de sesión
+
+            </button>
+
+            <div class="brand">
+
+                <div class="brand__icon">
+                    <img src="logo.png" alt="logo">
+                </div>
+
+                <div class="brand__text">
+
+                    <span class="brand__name">
+
+                        ALERTA
+
+                        <br>
+
+                        <strong>MUJER</strong>
+
+                    </span>
+
+                    <span class="brand__tagline">
+
+                        Seguridad para todas
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="feature-icon">
+
+                <i class="fa-solid fa-phone"></i>
+
+            </div>
+
+            <h1 class="card__title">
+
+                Recuperar mediante <span class="card__title--accent">celular</span>
+
+            </h1>
+
+            <p class="card__subtitle">
+
+                Ingresa tu número celular y te enviaremos un código de verificación para restablecer tu contraseña.
+
+            </p>
+
+            <form
+                class="form"
+                (ngSubmit)="enviarCodigo()">
+
+                <div class="field field--phone">
+
+                    <span class="field__icon">
+
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+
+                    </span>
+
+                    <span class="field__prefix">+57   |</span>
+
+                    <input
+                    [(ngModel)]="telefono"
+                    (input)="validarTelefono()"
+                    (keydown)="soloNumeros($event)"
+                    name="telefono"
+                    type="tel"
+                    inputmode="numeric"
+                    maxlength="10"
+                    class="field__input field__input--phone"
+                    placeholder="3001234567">
+
+                </div>
+
+                <p
+                    class="input-error"
+                    *ngIf="!telefonoValido">
+
+                    Debe ingresar un número celular (+57) / colombiano válido.
+
+                </p>
+
+                <button
+                    class="btn-submit"
+                    type="submit"
+                    [disabled]="!telefonoValido || !telefono">
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                    ENVIAR CÓDIGO
+
+                </button>
+
+                <div class="separator">
+
+                    <span>o</span>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-outline"
+                    (click)="irARecuperarCorreo()">
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                    Recuperar mediante correo
+
+                </button>
+
+            </form>
+
+            <p class="card__footer">
+
+                ¿Recordaste tu contraseña?
+
+                <span
+                    class="form__link"
+                    (click)="volverLogin()">
+
+                    Iniciar sesión
+
+                </span>
+
+            </p>
+
+        </app-card>
+
+    </div>
+
+</div>

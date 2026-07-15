@@ -2,13 +2,27 @@ import { Routes } from '@angular/router';
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+
 import { DashboardLayoutComponent } from './core/layouts/dashboard-layout/dashboard-layout';
 import { AdminLayoutComponent } from './core/layouts/admin-layout/admin-layout';
-import { authGuard, adminGuard, userGuard } from './core/guards/role.guard';
-
 import { PublicLayoutComponent } from './core/layouts/public-layout/public-layout';
 
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone';
+import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+
+import {
+  authGuard,
+  adminGuard,
+  userGuard,
+} from './core/guards/role.guard';
+
 export const routes: Routes = [
+
+  // ─────────────────────────────────────────────────────────────
+  // Landing pública
+  // ─────────────────────────────────────────────────────────────
 
   {
     path: '',
@@ -23,93 +37,139 @@ export const routes: Routes = [
     ]
   },
 
-  // ─── Auth ────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Auth
+  // ─────────────────────────────────────────────────────────────
+
   {
     path: 'auth',
     children: [
-      { path: 'login',    component: LoginComponent },
+      { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
-    ],
+      {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./features/auth/forgot-password/forgot-password')
+            .then(m => m.ForgotPasswordComponent)
+      },
+      {
+        path: 'forgot-phone',
+        loadComponent: () =>
+          import('./features/auth/forgot-phone/forgot-phone')
+            .then(m => m.ForgotPhoneComponent)
+      },
+      {
+        path: 'verify-code',
+        loadComponent: () =>
+          import('./features/auth/verify-code/verify-code')
+            .then(m => m.VerifyCodeComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () =>
+          import('./features/auth/reset-password/reset-password')
+            .then(m => m.ResetPasswordComponent)
+      }
+    ]
   },
 
-  // ─── Dashboard usuaria ───────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Dashboard Usuaria
+  // ─────────────────────────────────────────────────────────────
+
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
     canActivate: [authGuard, userGuard],
+
     children: [
+
       {
         path: '',
         loadComponent: () =>
-          import('./features/dashboard/home/home').then((m) => m.Home),
+          import('./features/dashboard/home/home')
+            .then(m => m.Home),
       },
+
       {
         path: 'phone-location',
         loadComponent: () =>
-          import('./features/dashboard/phone-location/phone-location').then(
-            (m) => m.PhoneLocationComponent
-          ),
+          import('./features/dashboard/phone-location/phone-location')
+            .then(m => m.PhoneLocationComponent),
       },
+
       {
         path: 'device-status',
         loadComponent: () =>
-          import('./features/dashboard/device-status/device-status').then(
-            (m) => m.DeviceStatusComponent
-          ),
+          import('./features/dashboard/device-status/device-status')
+            .then(m => m.DeviceStatusComponent),
       },
+
       {
         path: 'alert-history',
         loadComponent: () =>
-          import('./features/dashboard/alert-history/alert-history').then(
-            (m) => m.AlertHistory
-          ),
+          import('./features/dashboard/alert-history/alert-history')
+            .then(m => m.AlertHistory),
       },
+
       {
         path: 'evidence',
         loadComponent: () =>
-          import('./features/dashboard/evidence/evidence').then(
-            (m) => m.Evidence
-          ),
-      },
+          import('./features/dashboard/evidence/evidence')
+            .then(m => m.Evidence),
+      }
+
     ],
   },
 
-  // ─── Dashboard administrador ─────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Dashboard Administrador
+  // ─────────────────────────────────────────────────────────────
 
-  
   {
-   path: 'admin',
+    path: 'admin',
     component: AdminLayoutComponent,
     canActivate: [authGuard, adminGuard],
+
     children: [
+
       {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',
       },
+
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./features/admin/dashboard/dashboard').then(
-            (m) => m.AdminDashboardComponent
-          ),
+          import('./features/admin/dashboard/dashboard')
+            .then(m => m.AdminDashboardComponent),
       },
+
       {
         path: 'usuarios',
         loadComponent: () =>
-        import('./features/admin/user/user').then(m => m.UserComponent)
+          import('./features/admin/user/user')
+            .then(m => m.UserComponent),
       },
+
       {
         path: 'alertas',
         loadComponent: () =>
-          import('./features/admin/alert-admin/alert-admin').then(  // ← era "alertas-admin/alertas-admin"
-            (m) => m.AlertAdminComponent
-          ),
-      },
+          import('./features/admin/alert-admin/alert-admin')
+            .then(m => m.AlertAdminComponent),
+      }
+
     ],
   },
-  
 
-  // ─── Fallback ────────────────────────────────────────────────────────────────
-  { path: '**', redirectTo: 'auth/login' },
+  // ─────────────────────────────────────────────────────────────
+  // Ruta por defecto
+  // ─────────────────────────────────────────────────────────────
+
+  {
+    path: '**',
+    redirectTo: 'auth/login',
+  },
+
 ];

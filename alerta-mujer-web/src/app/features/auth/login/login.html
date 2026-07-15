@@ -59,8 +59,9 @@
           Accede a tu cuenta para continuar protegiendo lo que más importa.
         </p>
 
-        <form class="form">
-
+        <form
+        class="form"
+        (ngSubmit)="iniciarSesion()">
           <div class="field">
 
             <span class="field__icon">
@@ -137,10 +138,14 @@
             <span class="form__link" (click)="irAOlvidePassword()">¿Olvidaste tu contraseña?</span>
           </div>
 
-          <button type="button" (click)="iniciarSesion()" class="btn-submit">
-            <i class="fa-solid fa-shield-halved"></i>
-            INGRESAR
-          </button>
+          <button
+          type="submit"
+          class="btn-submit">
+      
+          <i class="fa-solid fa-shield-halved"></i>
+          INGRESAR
+      
+      </button>
 
         </form>
 

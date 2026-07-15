@@ -89,41 +89,33 @@ export class LoginComponent {
 
     this.validarCorreo();
     this.validarPassword();
-
+  
     if (!this.emailValido || !this.passwordValida) {
-      this.error = "Corrige los campos antes de continuar.";
       return;
     }
-
+  
     this.error = '';
     this.loading = true;
-
+  
     this.auth.login({
       email: this.email,
       password: this.password
     }).subscribe({
-
       next: (user) => {
-
         this.loading = false;
-
+  
         if (user.rol === 'admin') {
           this.router.navigate(['/admin/dashboard']);
-          return;
+        } else {
+          this.router.navigate(['/dashboard']);
         }
-
-        this.router.navigate(['/dashboard']);
       },
-
       error: (err) => {
-
-        this.loading = false;
         this.error = err.message;
-
+        this.loading = false;
       }
-
     });
-
+  
   }
 
 }

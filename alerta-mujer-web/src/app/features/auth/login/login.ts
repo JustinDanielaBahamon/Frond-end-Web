@@ -14,13 +14,64 @@ import { AuthService } from '../../../core/auth/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
+
   private auth = inject(AuthService);
   private router = inject(Router);
 
   email = '';
   password = '';
+
   error = '';
   loading = false;
+
+  viewpassword = false;
+
+  emailValido = true;
+  passwordValida = true;
+
+  // ------------------------
+  // Mostrar/Ocultar contraseña
+  // ------------------------
+
+  showpassword() {
+    this.viewpassword = !this.viewpassword;
+  }
+
+  // ------------------------
+  // Validación correo
+  // ------------------------
+
+  validarCorreo() {
+
+    if (!this.email) {
+      this.emailValido = true;
+      return;
+    }
+
+    const regex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    this.emailValido = regex.test(this.email);
+  }
+
+  // ------------------------
+  // Validación contraseña
+  // ------------------------
+
+  validarPassword() {
+
+    if (!this.password) {
+      this.passwordValida = true;
+      return;
+    }
+
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,}$/;
+
+    this.passwordValida = regex.test(this.password);
+  }
+
+  // ------------------------
 
   irARegistro() {
     this.router.navigate(['/auth/register']);
@@ -30,29 +81,49 @@ export class LoginComponent {
     this.router.navigate(['/auth/forgot-password']);
   }
 
+  // ------------------------
+  // Login
+  // ------------------------
+
   iniciarSesion() {
+
+    this.validarCorreo();
+    this.validarPassword();
+
+    if (!this.emailValido || !this.passwordValida) {
+      this.error = "Corrige los campos antes de continuar.";
+      return;
+    }
+
     this.error = '';
     this.loading = true;
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
+
+    this.auth.login({
+      email: this.email,
+      password: this.password
+    }).subscribe({
+
       next: (user) => {
+
         this.loading = false;
-        // if (user.rol === 'admin') {
-        //   this.router.navigate(['/admin/dashboard']);
-        // } else {
-        //   this.router.navigate(['/dashboard']);
-        // }
 
         if (user.rol === 'admin') {
           this.router.navigate(['/admin/dashboard']);
+          return;
         }
+
         this.router.navigate(['/dashboard']);
-
       },
-      error: (err) => {
-        this.error = err.message;
-        this.loading = false;
-      }
-    });
-  }
-}
 
+      error: (err) => {
+
+        this.loading = false;
+        this.error = err.message;
+
+      }
+
+    });
+
+  }
+
+}

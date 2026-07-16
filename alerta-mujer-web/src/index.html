@@ -32,5 +32,13 @@
   </head>
   <body>
     <app-root></app-root>
+
+    <script>
+  (function () {
+    var saved = localStorage.getItem('alerta-mujer-theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
   </body>
 </html>

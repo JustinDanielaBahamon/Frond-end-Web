@@ -8,33 +8,31 @@
 
     <!-- LINKS DESKTOP -->
     <nav class="navbar-links">
-        <nav class="navbar-links">
 
-            <a href="#inicio" class="active-link">
-                Inicio
-            </a>
-        
-            <a href="#funciones">
-                Funciones
-            </a>
-        
-            <a href="#como-funciona">
-                Cómo funciona
-            </a>
-        
-            <a href="#testimonios">
-                Testimonios
-            </a>
-        
-            <a href="#faq">
-                FAQ
-            </a>
-        
-            <a href="#contacto">
-                Contacto
-            </a>
-        
-        </nav>
+        <a href="#inicio" class="active-link">
+            Inicio
+        </a>
+
+        <a href="#funciones">
+            Funciones
+        </a>
+
+        <a href="#como-funciona">
+            Cómo funciona
+        </a>
+
+        <a href="#testimonios">
+            Testimonios
+        </a>
+
+        <a href="#faq">
+            FAQ
+        </a>
+
+        <a href="#contacto">
+            Contacto
+        </a>
+
     </nav>
 
     <!-- ACCIONES -->
@@ -93,6 +91,13 @@
             }
 
         </div>
+
+        <button
+            (click)="themeService.toggleTheme()"
+            class="theme-toggle"
+            [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+            {{ themeService.currentTheme() === 'dark' ? '☀️' : '🌙' }}
+        </button>
 
         <!-- HAMBURGUESA -->
     <button

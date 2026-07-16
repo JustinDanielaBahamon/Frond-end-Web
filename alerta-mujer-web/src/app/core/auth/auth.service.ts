@@ -27,8 +27,8 @@ const fake_users = [
   {
     id: 2,
     nombre: 'Usuario',
-    email: 'usuario',
-    password: '123456',
+    email: 'Raquel@gmail.com',
+    password: 'Noruega@123',
     rol: 'operador',
     token: 'fake-jwt-token-sebas-002',
   },

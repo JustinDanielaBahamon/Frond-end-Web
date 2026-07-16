@@ -1,5 +1,5 @@
 @use 'sass:color';
-@use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/variables.scss' as *;
 
 // Variables propias de esta pantalla (no están en el set compartido)
 $blue:   #3b82f6;
@@ -754,7 +754,7 @@ $yellow: #eab308;
   font-family: inherit;
   transition: all 0.15s;
 
-  &:hover { background: color.adjust($purple-pale, $lightness: -3%); }
+  &:hover { background: $purple-pale-hover; }
 
   &--activo {
     border-style: solid;

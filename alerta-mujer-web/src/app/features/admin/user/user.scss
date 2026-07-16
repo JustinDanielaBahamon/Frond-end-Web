@@ -1,5 +1,5 @@
 @use 'sass:color';
-@use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/variables.scss' as *;
 
 // =============================================
 // PAGE WRAPPER
@@ -462,7 +462,7 @@ table {
   font-family: inherit;
   transition: background 0.15s;
 
-  &:hover { background: color.adjust($purple-pale, $lightness: -4%); }
+  &:hover { background: $purple-pale-hover; }
 }
 
 // =============================================
@@ -515,7 +515,7 @@ table {
     border-color: $red;
     color: $red;
 
-    &:hover { background: color.adjust($red-pale, $lightness: -4%); }
+    &:hover { background: $red-pale-hover; }
   }
 }
 

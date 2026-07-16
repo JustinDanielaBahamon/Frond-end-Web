@@ -5,8 +5,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 40px;
-    background-color: #f6f5fc;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+    background-color: var(--navbar-bg);
+    box-shadow: 0 2px 10px var(--navbar-shadow);
 }
 
 /* --- LOGOTIPO --- */
@@ -23,6 +23,7 @@
 .navbar-logo span {
     font-size: 28px;
     font-weight: 700;
+    color: var(--navbar-text);
 }
 
 /* --- ENLACES DE NAVEGACIÓN --- */
@@ -34,21 +35,21 @@
 
 .navbar-links a {
     text-decoration: none;
-    color: #1b2d5b;              /* Tu color azul oscuro base */
+    color: var(--navbar-text);
     font-weight: 800;
     font-size: 16px;
-    position: relative;          /* Necesario para trucos visuales si deseas luego */
+    position: relative;
     padding: 6px 0;
-    transition: all 0.25s ease;  /* Animación suave para el cambio de color */
+    transition: all 0.25s ease;
     cursor: pointer;
 }
 
-/* El efecto HOVER para los enlaces del menú */
 .navbar-links a:hover {
-    color: #8529b5 !important;   /* Cambia al morado de tu marca al pasar el mouse */
-    transform: translateY(-2px); /* Un sutil levante hacia arriba que se ve genial */
-    text-shadow: 0 2px 4px rgba(133, 41, 181, 0.15); /* Pequeño destello en el texto */
+    color: var(--navbar-purple) !important;
+    transform: translateY(-2px);
+    text-shadow: 0 2px 4px var(--navbar-hover-bg);
 }
+
 /* --- BOTONES DE ACCIÓN (LOGIN Y REGISTRO) --- */
 .navbar-actions {
     display: flex;
@@ -60,22 +61,21 @@
     height: 48px;
     padding: 0 15px;
     border-radius: 17px;
-    border: 1px solid #8529b5;
+    border: 1px solid var(--navbar-purple);
     background: transparent;
-    color: #8529b5;
+    color: var(--navbar-purple);
     font-weight: 600;
     cursor: pointer;
 }
 
 .login-btn:hover{
-    background-color: #8529b5;
+    background-color: var(--navbar-purple);
     color: white;
     transition: all 0.25s ease;
-    box-shadow: 0 2px 4px rgba(133, 41, 181, 0.15);
-    text-shadow: 0 2px 4px rgba(133, 41, 181, 0.15);
+    box-shadow: 0 2px 4px var(--navbar-hover-bg);
+    text-shadow: 0 2px 4px var(--navbar-hover-bg);
     border: none;
     outline: none;
-
 }
 
 .register-btn {
@@ -83,14 +83,33 @@
     padding: 0 15px;
     border-radius: 17px;
     border: none;
-    background: #8529b5;
+    background: var(--navbar-purple);
     color: white;
     font-weight: 600;
     cursor: pointer;
 }
 
+/* --- TOGGLE DE TEMA --- */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--navbar-border);
+    background: transparent;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--navbar-purple);
+    background: var(--navbar-hover-bg);
+}
+
 /* --- SELECTOR DE IDIOMAS --- */
-/* --- SELECTOR DE IDIOMAS (REFACTORIZADO) --- */
 .language-selector {
     position: relative;
     display: flex;
@@ -102,11 +121,12 @@
     align-items: center;
     gap: 8px;
     background: transparent;
-    border: 1px solid #ddd;
+    border: 1px solid var(--navbar-border);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 16px;
     cursor: pointer;
+    color: var(--navbar-text);
 }
 
 /* Menú Desplegable */
@@ -115,11 +135,11 @@
     top: 55px;
     right: 0;
     min-width: 130px;
-    background-color: #f6f5fc;
+    background-color: var(--navbar-bg);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, .15);
     z-index: 999;
-    padding: 5px 0; /* Un pequeño respiro interno */
+    padding: 5px 0;
 }
 
 .language-selector .language-menu ul {
@@ -128,23 +148,21 @@
     margin: 0;
 }
 
-/* Forzamos el selector para que Angular no lo ignore */
 .language-selector .language-menu ul li {
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
     padding: 10px 16px !important;
-    color: #1b2d5b !important; /* Usamos el azul de tus otros links */
-    border-radius: 0px; /* Quitamos el radio para que la barra de selección cubra todo el ancho */
+    color: var(--navbar-text) !important;
+    border-radius: 0px;
     cursor: pointer !important;
     transition: all 0.2s ease-in-out !important;
 }
 
-/* El efecto HOVER super reforzado */
 .language-selector .language-menu ul li:hover {
-    background-color: rgba(133, 41, 181, 0.15) !important; /* Tu morado #8529b5 con transparencia */
-    color: #8529b5 !important;                             /* Texto en morado sólido */
-    padding-left: 22px !important;                         /* Desplazamiento sutil */
+    background-color: var(--navbar-hover-bg) !important;
+    color: var(--navbar-purple) !important;
+    padding-left: 22px !important;
 }
 
 /* --- BANDERAS (SVG) --- */
@@ -168,7 +186,7 @@
     border:none;
     background:transparent;
     font-size:30px;
-    color:#8529b5;
+    color: var(--navbar-purple);
     cursor:pointer;
 }
 
@@ -183,7 +201,7 @@
 .mobile-divider{
     width:100%;
     height:1px;
-    background:#ececec;
+    background: var(--navbar-divider);
 }
 
 .mobile-language{
@@ -193,7 +211,7 @@
 }
 
 .mobile-language h4{
-    color:#1b2d5b;
+    color: var(--navbar-text);
     font-size:16px;
     font-weight:700;
 }
@@ -208,15 +226,16 @@
     height:45px;
     border:none;
     border-radius:12px;
-    background:#f7f7f7;
+    background: var(--navbar-btn-bg);
     cursor:pointer;
     font-weight:600;
     text-align:left;
     padding:0 19px;
+    color: var(--navbar-text);
 }
 
 .mobile-language-options button:hover{
-    background:#8529b5;
+    background: var(--navbar-purple);
     color:white;
 }
 
@@ -245,8 +264,6 @@
         gap:10px;
     }
 
-    /* SOLO ocultamos los botones desktop */
-
     .desktop-btn{
         display:none;
     }
@@ -256,72 +273,70 @@
         flex-direction:column;
         gap:20px;
         padding:25px;
-        background-color: #f0eff6;
+        background-color: var(--navbar-bg-mobile);
         box-shadow:0 5px 20px rgba(0,0,0,.08);
     }
 
     .mobile-menu a{
-    text-decoration: none;
-    color: #1b2d5b;
-    font-weight: 600;
+        text-decoration: none;
+        color: var(--navbar-text);
+        font-weight: 600;
 
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
 
-    border-radius: 12px;
+        border-radius: 12px;
 
-    transition: all .25s ease;
+        transition: all .25s ease;
     }
 
     .mobile-menu a:hover{
-    background: #8529b5;
-    color: white;
+        background: var(--navbar-purple);
+        color: white;
 
         transform: translateX(8px);
 
-        box-shadow: 0 4px 12px rgba(133,41,181,.25);
+        box-shadow: 0 4px 12px var(--navbar-hover-bg);
     }
 
     .mobile-menu a:hover i{
         color: white;
     }
-        .language-btn{
-            margin-right: 20px;
-        }
-        .fa-solid{
-            margin-right: 10px;
-        }
+    .language-btn{
+        margin-right: 20px;
+    }
+    .fa-solid{
+        margin-right: 10px;
+    }
 }
 
 
 @media(max-width:900px){
-    
 
-   
     .navbar-container {
         padding: 0 20px;
     }
 
     .navbar-container {
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    background-color:#ffffff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        background-color: var(--navbar-bg-mobile-sm);
+        box-shadow: 0 2px 10px var(--navbar-shadow);
     }
 
-     .mobile-menu{
+    .mobile-menu{
         display:flex;
         flex-direction:column;
         gap:20px;
         padding:25px;
-        background-color: #ffffff;
+        background-color: var(--navbar-bg-mobile-sm);
         box-shadow:0 5px 20px rgba(0,0,0,.08);
     }
-    
+
 }
 
 
@@ -339,35 +354,35 @@
         display: none;
     }
     .flag-mobile{
-    width: 22px;
-    height: 22px;
+        width: 22px;
+        height: 22px;
 
-    border-radius: 50%;
+        border-radius: 50%;
 
-    object-fit: cover;
+        object-fit: cover;
 
-    margin-right: 10px;
+        margin-right: 10px;
 
-    box-shadow: 0 2px 4px rgba(0,0,0,.15);
-}
-.mobile-language-options button{
-    display: flex;
-    align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    }
+    .mobile-language-options button{
+        display: flex;
+        align-items: center;
 
-    height: 45px;
+        height: 45px;
 
-    border: none;
+        border: none;
 
-    border-radius: 12px;
+        border-radius: 12px;
 
-    background: #f7f7f7;
+        background: var(--navbar-btn-bg);
 
-    cursor: pointer;
+        cursor: pointer;
 
-    font-weight: 600;
+        font-weight: 600;
 
-    padding: 0 15px;
+        padding: 0 15px;
 
-    transition: all .25s ease;
-}
+        transition: all .25s ease;
+    }
 }

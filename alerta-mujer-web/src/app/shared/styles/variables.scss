@@ -1,24 +1,35 @@
-$bg-base:       #f5f4ff;
-$bg-card:       #ffffff;
-$bg-card-hover: #f0eeff;
-$border:        #c4b5fd;
-$text-primary:  #1e1a3c;
-$text-muted:    #6b7280;
-$text-dim:      #9ca3af;
+// ══════════════════════════════════════════════════════
+// variables.scss — SOLO el puente Sass → CSS custom
+// properties. Los valores reales (--red, --purple-deep,
+// --bg-base, etc.) se definen en src/styles.scss (:root
+// y [data-theme="dark"]). Este archivo no declara ningún
+// color fijo, solo mapea nombres.
+// ══════════════════════════════════════════════════════
 
-$purple-deep:   #7c3aed;
-$purple-mid:    #a78bfa;
-$purple-light:  #c4b5fd;
-$purple-pale:   #ede9fe;
-$pink:          #ec4899;
+$bg-base:            var(--bg-base);
+$bg-card:             var(--bg-card);
+$bg-card-hover:       var(--bg-card-hover);
+$border:              var(--border);
+$text-primary:        var(--text-primary);
+$text-muted:          var(--text-muted);
+$text-dim:            var(--text-dim);
 
-$green:         #16a34a;
-$green-pale:    #dcfce7;
-$red:           #dc2626;
-$red-pale:      #fee2e2;
-$amber:         #d97706;
-$amber-pale:    #fef3c7;
+$purple-deep:         var(--purple-deep);
+$purple-mid:          var(--purple-mid);
+$purple-light:        var(--purple-light);
+$purple-pale:         var(--purple-pale);
+$purple-pale-hover:   var(--purple-pale-hover);
+$pink:                var(--pink);
 
-$radius-card:   12px;
-$radius-sm:     6px;
-$shadow-card:   0 0 0 1.5px $border, 0 4px 16px rgba(124, 58, 237, 0.10);
+$green:               var(--green);
+$green-pale:          var(--green-pale);
+$red:                 var(--red);
+$red-light:           var(--red-light);
+$red-pale:            var(--red-pale);
+$red-pale-hover:      var(--red-pale-hover);
+$amber:               var(--amber);
+$amber-pale:          var(--amber-pale);
+
+$radius-card:         var(--dash-radius-card);
+$radius-sm:           var(--dash-radius-sm);
+$shadow-card:         var(--dash-shadow-card);

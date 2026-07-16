@@ -1,5 +1,6 @@
 import { Component, HostListener, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ThemeService } from '../../../theme/theme.service'; // ajusta la ruta real
 
 @Component({
   selector: 'app-landing-navbar',
@@ -10,16 +11,17 @@ import { RouterLink } from '@angular/router';
 })
 export class LandingNavbarComponent {
 
-  menuOpened = false;        // Controla el menú principal (ej. hamburguesa en móvil)
-  menuOpendSession = false;  // Controla el menú de sesión
-  menuOpneIdioms = false;    // Controla el menú de idiomas
+  menuOpened = false;
+  menuOpendSession = false;
+  menuOpneIdioms = false;
   idiomActual = 'ES';
   menuMobileOpen = false;
   menuOpneIdiomsMobile = false;
 
-
-  // Inyectamos ElementRef para que Angular pueda rastrear los clics dentro de este componente
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    public themeService: ThemeService   // público para poder usarlo en el HTML
+  ) {}
 
   toggleMenu() {
     this.menuOpened = !this.menuOpened;
@@ -35,29 +37,25 @@ export class LandingNavbarComponent {
 
   changeIdiom(idiom: string) {
     this.idiomActual = idiom;
-    this.menuOpneIdioms = false; // Se cierra automáticamente al elegir idioma
+    this.menuOpneIdioms = false;
   }
 
   toggleMobileMenu() {
-  this.menuMobileOpen = !this.menuMobileOpen;
-}
+    this.menuMobileOpen = !this.menuMobileOpen;
+  }
 
-toggleIdiomsMenuMobile() {
-  this.menuOpneIdiomsMobile = !this.menuOpneIdiomsMobile;
-}
+  toggleIdiomsMenuMobile() {
+    this.menuOpneIdiomsMobile = !this.menuOpneIdiomsMobile;
+  }
 
-closeMobileMenu(): void {
-  this.menuMobileOpen = false;
-}
+  closeMobileMenu(): void {
+    this.menuMobileOpen = false;
+  }
 
-  // 🔥 Escucha global de clics para cerrar menús al hacer clic fuera
   @HostListener('document:click', ['$event'])
   clickOut(event: Event) {
-    // Verificamos si el clic fue fuera de todo el navbar
     const clickedOutside = !this.elementRef.nativeElement.contains(event.target);
-
     if (clickedOutside) {
-      // Si hizo clic afuera, reseteamos todos los menús a false (cerrados)
       this.menuOpened = false;
       this.menuOpendSession = false;
       this.menuOpneIdioms = false;

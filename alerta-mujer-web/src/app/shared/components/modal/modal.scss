@@ -1,5 +1,5 @@
 @use 'sass:color';
-@use '../../styles/variables' as *;
+@use '../../styles/variables.scss' as *;
 
 .modal-overlay {
   position: fixed;
@@ -43,7 +43,7 @@
 
     &--danger {
       background: $red-pale;
-      border-bottom-color: color.adjust($red, $lightness: 25%);
+      border-bottom-color: $red-light;
     }
   }
 

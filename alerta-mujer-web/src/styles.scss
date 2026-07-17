@@ -571,3 +571,88 @@ body {
   }
 
 }
+
+/* ======================================
+   MODO OSCURO — CÓMO FUNCIONA / STEPS SECTION
+====================================== */
+
+[data-theme="dark"] {
+
+  .steps-section{
+    background-color: var(--bg-base) !important;
+    box-shadow: 0 11px 28px rgba(0,0,0,.4) !important;
+  }
+
+  .steps-main-title{
+    color: var(--text-primary) !important;
+  }
+
+  .steps-subtitle{
+    color: var(--text-muted) !important;
+  }
+
+  .icon-wrapper{
+    background-color: var(--purple-pale) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,.25) !important;
+  }
+
+  .step-icon{
+    color: var(--purple-deep) !important;
+  }
+
+  .step-number{
+    background-color: var(--purple-deep) !important;
+    color: #fff !important;
+  }
+
+  .step-title{
+    color: var(--text-primary) !important;
+  }
+
+  .step-text{
+    color: var(--text-muted) !important;
+  }
+
+  .step-alert .icon-wrapper{
+    background-color: var(--red) !important;
+    box-shadow: 0 6px 15px rgba(0,0,0,.4) !important;
+  }
+
+  .step-alert .step-icon{
+    color: #ffffff !important;
+  }
+
+  .step-item:not(:last-child)::after{
+    color: var(--border) !important;
+  }
+
+  .container-fluid-work{
+    background-color: var(--bg-base) !important;
+  }
+
+  .text-title-work{
+    color: var(--text-primary) !important;
+  }
+
+  .text-prop-grid li{
+    color: var(--text-muted) !important;
+  }
+
+  .check-icon{
+    color: var(--purple-deep) !important;
+  }
+
+}
+
+/* ======================================
+   IMAGEN "POR QUÉ ELEGIR" — SOPORTE DARK MODE
+====================================== */
+
+.img-work-dark{
+  display: none;
+}
+
+[data-theme="dark"] {
+  .img-work-light{ display: none !important; }
+  .img-work-dark{ display: block !important; }
+}

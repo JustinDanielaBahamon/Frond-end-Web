@@ -32,10 +32,10 @@ html{
   /* Superficies */
   --color-white         : #680ca5;
   --color-card-bg       : rgba(111, 16, 155, 0.92);
-   --color-input-bg : #5509ac;  // ← blanco puro en vez de semitransparente
+  --color-input-bg : #5509ac;
 
   /* Bordes */
-  --color-border   : rgba(124, 58, 237, 0.322);  // ← borde morado más visible
+  --color-border   : rgba(124, 58, 237, 0.322);
   --color-border-focus  : var(--color-purple-light);
 
   /* Gradientes */
@@ -65,8 +65,6 @@ html{
 
   /* ══════════════════════════════════════════════
      Tokens del PANEL ADMIN / DASHBOARD (alertas, zonas, etc.)
-     Namespace separado del de auth para no chocar con
-     los de arriba. Soportan modo oscuro vía [data-theme].
      ══════════════════════════════════════════════ */
   --bg-base:       #f5f4ff;
   --bg-card:       #ffffff;
@@ -92,13 +90,44 @@ html{
   --amber:         #d97706;
   --amber-pale:    #fef3c7;
 
-  /* renombrada para no chocar con --shadow-card de auth */
   --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.10);
   --dash-radius-card: 12px;
   --dash-radius-sm:   6px;
+
+  /* ══════════════════════════════════════════════
+     Navbar landing
+     ══════════════════════════════════════════════ */
+  --navbar-bg          : #f6f5fc;
+  --navbar-bg-mobile    : #f0eff6;
+  --navbar-bg-mobile-sm : #ffffff;
+  --navbar-text        : #1b2d5b;
+  --navbar-purple      : #8529b5;
+  --navbar-border      : #ddd;
+  --navbar-divider     : #ececec;
+  --navbar-shadow      : rgba(0, 0, 0, .05);
+  --navbar-hover-bg    : rgba(133, 41, 181, .15);
+  --navbar-btn-bg      : #f7f7f7;
+
+  /* ══════════════════════════════════════════════
+     Hero landing — valores IDÉNTICOS a tu diseño
+     original en hex, solo movidos a variable.
+     ══════════════════════════════════════════════ */
+  --hero-bg-image       : url('/bannerHero.png');
+  --hero-overlay-from   : rgb(255 255 255 / 40%);
+  --hero-overlay-to     : rgb(255 255 255 / 59%);
+  --hero-overlay-mobile : rgb(255, 255, 255);
+  --hero-heading        : #1b2d5b;
+  --hero-accent         : #b83dcd;
+  --hero-body-text      : #000000;
+  --hero-stats-text     : #1b2d5b;
+  --hero-btn-primary-bg     : #8529b5;
+  --hero-btn-primary-shadow : rgba(133, 41, 181, .25);
+  --hero-btn-secondary-border: #8529b5;
+  --hero-btn-secondary-text  : #8529b5;
+  --hero-img-border      : #ffffff;
 }
 
-/* Modo oscuro — solo afecta a los tokens del dashboard */
+/* Modo oscuro — solo estos tokens cambian */
 [data-theme="dark"] {
   --bg-base:       #14101f;
   --bg-card:       #1e1833;
@@ -125,6 +154,33 @@ html{
   --amber-pale:    #3a2a0a;
 
   --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Navbar landing en oscuro */
+  --navbar-bg          : #1a1428;
+  --navbar-bg-mobile    : #1e1833;
+  --navbar-bg-mobile-sm : #14101f;
+  --navbar-text        : #ede9fe;
+  --navbar-purple      : #b779e8;
+  --navbar-border      : #4c3a80;
+  --navbar-divider     : #4c3a80;
+  --navbar-shadow      : rgba(0, 0, 0, .35);
+  --navbar-hover-bg    : rgba(183, 121, 232, .18);
+  --navbar-btn-bg      : #241d3d;
+
+  /* Hero landing en oscuro */
+  --hero-bg-image       : url('/landingoscuro.png');
+  --hero-overlay-from   : rgb(10 6 20 / 45%);
+  --hero-overlay-to     : rgb(10 6 20 / 70%);
+  --hero-overlay-mobile : rgb(10, 6, 20);
+  --hero-heading        : #ffffff;
+  --hero-accent         : #d47ee8;
+  --hero-body-text      : #d8d3e8;
+  --hero-stats-text     : #c4b5fd;
+  --hero-btn-primary-bg     : #9d6ff0;
+  --hero-btn-primary-shadow : rgba(157, 111, 240, .35);
+  --hero-btn-secondary-border: #9d6ff0;
+  --hero-btn-secondary-text  : #b779e8;
+  --hero-img-border      : #7c3aed;
 }
 
 /* ── Reset / Base ───────────────────────────────────── */
@@ -471,36 +527,4 @@ body {
   .form__row {
     grid-template-columns: 1fr;
   }
-}
-
-:root {
-  /* ...todo lo que ya tienes... */
-
-  /* Navbar landing */
-  --navbar-bg          : #f6f5fc;
-  --navbar-bg-mobile    : #f0eff6;
-  --navbar-bg-mobile-sm : #ffffff;
-  --navbar-text        : #1b2d5b;
-  --navbar-purple      : #8529b5;
-  --navbar-border      : #ddd;
-  --navbar-divider     : #ececec;
-  --navbar-shadow      : rgba(0, 0, 0, .05);
-  --navbar-hover-bg    : rgba(133, 41, 181, .15);
-  --navbar-btn-bg      : #f7f7f7;
-}
-
-[data-theme="dark"] {
-  /* ...todo lo que ya tienes... */
-
-  /* Navbar landing en oscuro */
-  --navbar-bg          : #1a1428;
-  --navbar-bg-mobile    : #1e1833;
-  --navbar-bg-mobile-sm : #14101f;
-  --navbar-text        : #ede9fe;
-  --navbar-purple      : #b779e8;
-  --navbar-border      : #4c3a80;
-  --navbar-divider     : #4c3a80;
-  --navbar-shadow      : rgba(0, 0, 0, .35);
-  --navbar-hover-bg    : rgba(183, 121, 232, .18);
-  --navbar-btn-bg      : #241d3d;
 }

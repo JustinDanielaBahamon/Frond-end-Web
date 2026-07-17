@@ -1,200 +1,204 @@
-  /* ======================================
-           HERO (Modificado para ser Banner)
-        ====================================== */
-        .container-hero {
-            position: relative;
-            min-height: 88vh; /* Altura mínima para que se vea el banner */
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; /* Alinea el contenido a la izquierda */
-            
-            padding: 80px 60px;
-            
-            /* Imagen de fondo como Banner */
-               background-image: linear-gradient(rgb(255 255 255 / 40%), rgb(255 255 255 / 59%)), url(/bannerHero.png);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: scroll;
-        }
+/* ======================================
+   HERO (Modificado para ser Banner)
+====================================== */
+.container-hero {
+    position: relative;
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 
-        /* ======================================
-           INFORMACIÓN
-        ====================================== */
-        .container-information {
-            position: relative;
-            z-index: 2;
-            max-width: 650px;
-        }
+    padding: 80px 60px;
 
-        .container-texts {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
+    background-image: linear-gradient(var(--hero-overlay-from), var(--hero-overlay-to)), var(--hero-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    transition: background-image 0.3s ease;
+}
 
-        .text-banner {
-            font-size: 64px;
-            font-weight: 800;
-            line-height: 1.1;
-            color: #1b2d5b;
-            margin: 0;
-        }
+/* Ajuste de encuadre solo para el tema oscuro:
+   landingoscuro.png tiene proporción distinta a bannerHero.png,
+   así que "cover" recorta distinto. Empujamos el foco un poco
+   hacia arriba para no perder el teléfono/la mujer. */
+[data-theme="dark"] .container-hero {
+    background-position: center top;
+}
 
-        .text-banner span {
-            color: #b83dcd;
-        }
+/* ======================================
+   INFORMACIÓN
+====================================== */
+.container-information {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+}
 
-        .container-text-second {
-            max-width: 520px;
-        }
+.container-texts {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
 
-        .container-text-second p {
-            font-size: 18px;
-            line-height: 1.5;
-            color: black;
-            margin: 0;
-            font-weight: 800;
-        }
+.text-banner {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--hero-heading);
+    margin: 0;
+}
 
-        /* ======================================
-           BOTONES
-        ====================================== */
-        .container-buttons {
-            display: flex;
-            gap: 15px;
-        }
+.text-banner span {
+    color: var(--hero-accent);
+}
 
-        .comenzar-btn {
-            height: 52px;
-            padding: 0 28px;
-            border: none;
-            border-radius: 12px;
-            background: #8529b5;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: .3s;
-        }
+.container-text-second {
+    max-width: 520px;
+}
 
-        .comenzar-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(133,41,181,.25);
-        }
+.container-text-second p {
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--hero-body-text);
+    margin: 0;
+    font-weight: 800;
+}
 
-        .conocer-btn {
-            height: 52px;
-            padding: 0 28px;
-            border-radius: 12px;
-            border: 2px solid #8529b5; /* Borde más grueso para destacar */
-            background: transparent;
-            color: #8529b5;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: .3s;
-        }
+/* ======================================
+   BOTONES
+====================================== */
+.container-buttons {
+    display: flex;
+    gap: 15px;
+}
 
-        .conocer-btn:hover {
-            background: #8529b5;
-            color: white;
-        }
+.comenzar-btn {
+    height: 52px;
+    padding: 0 28px;
+    border: none;
+    border-radius: 12px;
+    background: var(--hero-btn-primary-bg);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
 
-        /* ======================================
-           ESTADÍSTICAS
-        ====================================== */
-        .container-stats {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+.comenzar-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px var(--hero-btn-primary-shadow);
+}
 
-        .container-stats p {
-            margin: 0;
-            color: #1b2d5b;
-            font-size: 15px;
-            font-weight: 600;
-        }
+.conocer-btn {
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 12px;
+    border: 2px solid var(--hero-btn-secondary-border);
+    background: transparent;
+    color: var(--hero-btn-secondary-text);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
 
-        
+.conocer-btn:hover {
+    background: var(--hero-btn-primary-bg);
+    color: white;
+}
 
-        .img-stats img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            
-        }
+/* ======================================
+   ESTADÍSTICAS
+====================================== */
+.container-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
 
-        /* ======================================
-           RESPONSIVE (TABLET)
-        ====================================== */
-        @media (max-width: 1200px) {
-            .container-hero {
-                padding: 60px 40px;
-                min-height: 60vh;
-            }
+.container-stats p {
+    margin: 0;
+    color: var(--hero-stats-text);
+    font-size: 15px;
+    font-weight: 600;
+}
 
-            .text-banner {
-                font-size: 52px;
-            }
-        }
+.img-stats img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--hero-img-border);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
-        /* ======================================
-           RESPONSIVE (MOBILE)
-        ====================================== */
-        @media (max-width: 900px) {
-            .container-hero {
-                justify-content: center;
-                text-align: center;
-                padding: 80px 70px;
-                /* Ajustamos el gradiente para mejor legibilidad en móvil */
-                background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255)), url(/bannerHero.png);
-                min-height: 58vh;
-            }
+/* ======================================
+   RESPONSIVE (TABLET)
+====================================== */
+@media (max-width: 1200px) {
+    .container-hero {
+        padding: 60px 40px;
+        min-height: 60vh;
+    }
 
-            .container-information {
-                max-width: 100%;
-            }
+    .text-banner {
+        font-size: 52px;
+    }
+}
 
-            .container-text-second {
-                max-width: 100%;
-            }
+/* ======================================
+   RESPONSIVE (MOBILE)
+====================================== */
+@media (max-width: 900px) {
+    .container-hero {
+        justify-content: center;
+        text-align: center;
+        padding: 80px 70px;
+        background-image: linear-gradient(var(--hero-overlay-mobile), var(--hero-overlay-mobile)), var(--hero-bg-image);
+        min-height: 58vh;
+    }
 
-            .container-buttons {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
+    .container-information {
+        max-width: 100%;
+    }
 
-            .container-stats {
-                justify-content: center;
-            }
+    .container-text-second {
+        max-width: 100%;
+    }
 
-            .text-banner {
-                font-size: 42px;
-            }
-        }
+    .container-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 
-        @media (max-width: 500px) {
-            .container-hero {
-                min-height: 68vh;
-                padding: 23px 14%; 
-            }
+    .container-stats {
+        justify-content: center;
+    }
 
-            .text-banner {
-                font-size: 34px;
-            }
+    .text-banner {
+        font-size: 42px;
+    }
+}
 
-            .container-text-second p {
-                font-size: 16px;
-            }
+@media (max-width: 500px) {
+    .container-hero {
+        min-height: 68vh;
+        padding: 23px 14%;
+    }
 
-            .comenzar-btn,
-            .conocer-btn {
-                width: 100%;
-            }
-        }
+    .text-banner {
+        font-size: 34px;
+    }
+
+    .container-text-second p {
+        font-size: 16px;
+    }
+
+    .comenzar-btn,
+    .conocer-btn {
+        width: 100%;
+    }
+}

@@ -528,3 +528,46 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ======================================
+   MODO OSCURO — FEATURES SECTION
+====================================== */
+
+[data-theme="dark"] {
+
+  .container-features{
+    background-color: var(--bg-base) !important;
+  }
+
+  .title-features{
+    color: var(--text-primary) !important;
+  }
+
+  .subtitle-features{
+    color: var(--text-muted) !important;
+  }
+
+  .card-group > .card{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,.35) !important;
+  }
+
+  .card-group > .card:hover{
+    box-shadow: 0 20px 40px rgba(157, 111, 240, .25) !important;
+    border-color: var(--purple-mid) !important;
+  }
+
+  .card-title{
+    color: var(--text-primary) !important;
+  }
+
+  .card-text{
+    color: var(--text-muted) !important;
+  }
+
+  .fa-arrow-right-arrow-left{
+    color: var(--purple-deep) !important;
+  }
+
+}

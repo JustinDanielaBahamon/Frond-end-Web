@@ -656,3 +656,233 @@ body {
   .img-work-light{ display: none !important; }
   .img-work-dark{ display: block !important; }
 }
+
+/* ======================================
+   MODO OSCURO — REVIEW / TESTIMONIOS SECTION
+====================================== */
+
+[data-theme="dark"] {
+
+  .review-section{
+    background: var(--bg-base) !important;
+  }
+
+  .title{
+    color: var(--text-primary) !important;
+  }
+
+  .testimonial-card{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .testimonial-card:hover{
+    box-shadow: 0 15px 35px rgba(157, 111, 240, .18) !important;
+  }
+
+  .comment{
+    color: var(--text-muted) !important;
+  }
+
+  .user-name{
+    color: var(--text-primary) !important;
+  }
+
+  .nav-button{
+    background: var(--purple-deep) !important;
+  }
+
+  .nav-button:hover{
+    background: var(--purple-mid) !important;
+  }
+
+  .dot{
+    background: var(--border) !important;
+  }
+
+  .dot.active{
+    background: var(--purple-deep) !important;
+  }
+
+}
+
+/* ======================================
+   MODO OSCURO — DOWNLOAD SECTION
+====================================== */
+.img-download-dark{
+  display: none;
+}
+
+[data-theme="dark"] {
+  .container-Image{
+    background-color: var(--bg-base) !important;
+  }
+
+  .img-download-light{ display: none !important; }
+  .img-download-dark{ display: block !important; }
+}
+
+/* ======================================
+   MODO OSCURO — PREGUNTAS FRECUENTES
+====================================== */
+
+[data-theme="dark"] {
+
+  .container-Questions{
+    background: var(--bg-base) !important;
+  }
+
+  .container-Questions h1{
+    color: var(--text-primary) !important;
+  }
+
+  .dropdown .btn{
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .dropdown .btn:hover{
+    background: var(--purple-pale-hover) !important;
+    border-color: var(--purple-mid) !important;
+  }
+
+  .dropdown-menu{
+    background: var(--bg-card) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4) !important;
+  }
+
+  .dropdown-item-text{
+    color: var(--text-muted) !important;
+  }
+
+}
+
+/* ======================================
+   MODO OSCURO — CONTACTO
+====================================== */
+
+/*===============================
+=         IMÁGENES
+===============================*/
+
+.img-contact-light{
+    display: block;
+}
+
+.img-contact-dark{
+    display: none;
+}
+
+.contact-image{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-image img{
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+}
+
+/*====================================
+=            MODO OSCURO
+====================================*/
+
+[data-theme="dark"] {
+
+  .container-contacts{
+    background: var(--bg-base) !important;
+  }
+
+  .text-contacts h1{
+    color: var(--text-primary) !important;
+  }
+
+  .text-contacts p{
+    color: var(--text-muted) !important;
+  }
+
+  .form-control{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .form-control::placeholder{
+    color: var(--text-dim) !important;
+  }
+
+  .form-control:focus{
+    border-color: var(--purple-mid) !important;
+    box-shadow: 0 0 0 .2rem rgba(168,85,247,.15);
+  }
+
+  .btn-contacto{
+    background: var(--purple-deep) !important;
+    color: white !important;
+  }
+
+  .btn-contacto:hover{
+    background: var(--purple-mid) !important;
+  }
+
+  .icon-circle{
+    background: var(--purple-pale) !important;
+  }
+
+  .icon-circle i{
+    color: var(--purple-deep) !important;
+  }
+
+  .contact-item h5{
+    color: var(--text-primary) !important;
+  }
+
+  .contact-item p{
+    color: var(--text-muted) !important;
+  }
+
+  .text-form{
+    color: var(--text-primary) !important;
+  }
+
+  /*=============
+      IMÁGENES
+  =============*/
+
+  .img-contact-light{
+      display: none !important;
+  }
+
+  .img-contact-dark{
+      display: block !important;
+  }
+
+}
+
+/* ======================================
+   MODO OSCURO — FOOTER
+====================================== */
+
+[data-theme="dark"] {
+
+  .footer{
+    background: linear-gradient(135deg, var(--purple-deep), #2b204a) !important;
+  }
+
+  .social-icons a{
+    background: var(--bg-card) !important;
+    color: var(--purple-deep) !important;
+  }
+
+  .social-icons a:hover{
+    background: var(--purple-pale) !important;
+  }
+
+  .footer hr{
+    background: rgba(255,255,255,.12) !important;
+  }
+
+}

@@ -11,3 +11,4 @@ import { CommonModule } from '@angular/common';
   encapsulation: ViewEncapsulation.None  // ← agrega esto
 })
 export class CardComponent {}
+

@@ -1282,9 +1282,7 @@ html {
     &:hover {
         background: #ffffff;
         border-color: #7c3aed;
-        transform: translateX(-3px); // se desliza un poco hacia la
-        // izquierda al pasar el mouse,
-        // refuerza la idea de "regresar"
+        transform: translateX(-3px);
     }
 
     &:active {
@@ -1292,10 +1290,137 @@ html {
     }
 }
 
-// en mobile lo acercamos un poco más a la esquina
 @media (max-width: 760px) {
     .back-btn {
         top: 16px;
         left: 16px;
     }
+}
+
+
+/*==================================================
+=            MODO OSCURO — LOGIN PAGE               =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .login-page{
+    background: linear-gradient(180deg,
+      #1a1428 0%,
+      #14101f 50%,
+      #0d0916 100%) !important;
+  }
+
+  .halo{
+    &--1{ background: var(--purple-pale) !important; opacity: .25 !important; }
+    &--2{ background: var(--pink) !important; opacity: .18 !important; }
+    &--3{ border-color: rgba(157, 111, 240, .25) !important; }
+  }
+
+  .podium{
+    background: rgba(157, 111, 240, .18) !important;
+  }
+
+  .leaf{
+    fill: var(--purple-mid) !important;
+    opacity: .35 !important;
+  }
+
+  .card{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    box-shadow:
+      0 32px 80px rgba(0, 0, 0, .5),
+      0 0 0 1px rgba(157, 111, 240, .15) inset !important;
+  }
+
+  .brand{
+    border-bottom-color: var(--border) !important;
+  }
+
+  .brand__name{
+    color: var(--purple-mid) !important;
+  }
+
+  .brand__name strong{
+    color: var(--text-primary) !important;
+  }
+
+  .brand__tagline{
+    color: var(--text-muted) !important;
+  }
+
+  .card__title{
+    color: var(--text-primary) !important;
+  }
+
+  .card__subtitle{
+    color: var(--text-muted) !important;
+  }
+
+  .field__icon{
+    color: var(--purple-mid) !important;
+  }
+
+  .field__input{
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .field__input::placeholder{
+    color: var(--text-dim) !important;
+  }
+
+  .field__input:focus{
+    border-color: var(--purple-mid) !important;
+    box-shadow: 0 0 0 4px rgba(157, 111, 240, .18) !important;
+  }
+
+  .field__eye{
+    color: var(--text-dim) !important;
+
+    &:hover{ color: var(--purple-mid) !important; }
+  }
+
+  .checkbox__mark{
+    border-color: var(--purple-mid) !important;
+    background: var(--bg-base) !important;
+  }
+
+  .checkbox input:checked + .checkbox__mark{
+    background: var(--purple-deep) !important;
+    border-color: var(--purple-deep) !important;
+  }
+
+  .checkbox__label{
+    color: var(--text-muted) !important;
+  }
+
+  .form__link{
+    color: var(--pink) !important;
+
+    &:hover{ color: #ff85bd !important; }
+  }
+
+  .card__footer{
+    color: var(--text-muted) !important;
+  }
+
+  .card__footer span{
+    color: var(--pink) !important;
+  }
+
+  .back-btn{
+    background: rgba(30, 24, 51, 0.65) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+
+    &:hover{
+      background: var(--bg-card) !important;
+      border-color: var(--purple-mid) !important;
+    }
+  }
+
 }

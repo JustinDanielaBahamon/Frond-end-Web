@@ -886,3 +886,19 @@ body {
   }
 
 }
+
+/*==================================================
+=         IMAGEN HERO — LIGHT / DARK                =
+==================================================*/
+
+.hero-image-dark{
+  display: none;
+}
+
+[data-theme="dark"] {
+
+  .hero-image-light{ display: none !important; }
+  .hero-image-dark{ display: block !important; }
+
+  /* ... el resto de tu bloque de dark mode que ya tienes ... */
+}

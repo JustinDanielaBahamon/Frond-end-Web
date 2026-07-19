@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/sidebar';
 import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
+import { ThemeService } from '../../../core/theme/theme.service'; // ajusta la ruta si es distinta
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -11,6 +12,8 @@ import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
   styleUrl: './dashboard-layout.scss'
 })
 export class DashboardLayoutComponent {
+  private themeService = inject(ThemeService);
+
   sidebarCollapsed = false;
 
   links: SidebarLink[] = [
@@ -21,7 +24,7 @@ export class DashboardLayoutComponent {
   ];
 
   toggleTheme() {
-    document.body.classList.toggle('dark-mode');
+    this.themeService.toggleTheme(); // esto sí pone data-theme="dark"/"light" en <html>
   }
 
   toggleSidebar() {

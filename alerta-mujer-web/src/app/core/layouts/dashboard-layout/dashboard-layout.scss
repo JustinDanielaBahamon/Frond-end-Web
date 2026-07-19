@@ -97,47 +97,6 @@
   background: #f3eeff;
 }
 
-// Modo oscuro
-body.dark-mode {
-  background: #1a0a2e !important;
-
-  .layout__body,
-  .layout__main { background: #1a0a2e; }
-
-  .topbar {
-    background: #2d1457;
-    border-color: rgba(255,255,255,0.05);
-
-    &__brand { color: #fff; }
-    &__btn { background: #3d1f6e; }
-    &__username { color: #fff; }
-  }
-
-  .ah-wrap { background: #1a0a2e; }
-  .ah-title { color: #fff; }
-  .ah-sub { color: #c084fc; }
-
-  .ah-stat {
-    background: #2d1457;
-    .ah-stat-label { color: #c084fc; }
-  }
-
-  .ah-search {
-    background: #2d1457;
-    border-color: rgba(192, 132, 252, 0.3);
-    input { color: #fff; }
-  }
-
-  .ah-table-wrap { background: #2d1457; }
-
-  .ah-table {
-    th { color: #c084fc; }
-    td { color: #e9d5ff; border-color: rgba(192,132,252,0.1); }
-    thead tr { background: #3d1f6e; }
-    tbody tr:hover { background: #3d1f6e; }
-  }
-}
-
 // Responsive
 @media (max-width: 768px) {
   .layout { flex-direction: column; }
@@ -198,3 +157,15 @@ body.dark-mode {
     &--active { color: #e879f9; }
   }
 }
+
+/* El modo oscuro de este layout ya NO vive aquí.
+   Vive en app/shared/styles/theme/dashboard-dark.scss,
+   bajo el bloque:
+   [data-theme="dark"] {
+     .layout__body,
+     .layout__main { background: var(--bg-base) !important; }
+     .bottom-nav { ... }
+   }
+   No agregues aquí ningún bloque "body.dark-mode" ni
+   "[data-theme='dark']" — todo el dark mode del dashboard
+   se centraliza en ese único archivo de tema. */

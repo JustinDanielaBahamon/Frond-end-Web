@@ -202,3 +202,426 @@
     }
   }
 }
+
+/*==================================================
+=            MODO OSCURO — DASHBOARD HOME           =
+==================================================*/
+
+[data-theme="dark"] {
+
+  /* ── Stat cards ────────────────────────────── */
+  .db-card {
+    &--purple { background: linear-gradient(135deg, var(--purple-deep), #2d1457) !important; }
+    &--pink   { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; }
+    &--green  { background: linear-gradient(135deg, #065f46, #064e3b) !important; }
+    &--teal   { background: linear-gradient(135deg, #0e7490, #164e63) !important; }
+  }
+
+  /* ── Título de sección (reutilizable) ───────── */
+  .db-section-title {
+    color: var(--text-primary) !important;
+  }
+
+  .db-section-header i {
+    color: var(--purple-mid) !important;
+  }
+
+  /* ── Cards base (chart, mapa, actividad, accesos) ─ */
+  .db-chart-box,
+  .db-map-box,
+  .db-activity-box,
+  .db-accesos {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* ── Gráfica ─────────────────────────────────── */
+  .db-chart-sub {
+    color: var(--purple-mid) !important;
+  }
+
+  .db-bar {
+    background: linear-gradient(180deg, var(--purple-mid), var(--purple-deep)) !important;
+
+    &:hover {
+      background: linear-gradient(180deg, var(--purple-deep), var(--purple-mid)) !important;
+    }
+  }
+
+  .db-bar-label {
+    color: var(--purple-mid) !important;
+  }
+
+  .db-chart-yaxis {
+    color: var(--text-dim) !important;
+  }
+
+  /* ── Mapa ────────────────────────────────────── */
+  .db-map {
+    border-color: var(--border) !important;
+  }
+
+  /* ── Botones pill (Ver zonas / Ver mapa completo) ─ */
+  .db-map-btn-zonas,
+  .db-map-btn-fullscreen {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+
+    &:hover {
+      background: var(--purple-pale) !important;
+      border-color: var(--purple-deep) !important;
+    }
+  }
+
+  /* ── Panel lateral de zonas ──────────────────── */
+  .db-zonas-panel {
+    background: var(--bg-card) !important;
+    border-left-color: var(--border) !important;
+  }
+
+  .db-zonas-panel-header {
+    border-bottom-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .db-zonas-close {
+    color: var(--text-dim) !important;
+
+    &:hover { color: var(--purple-mid) !important; }
+  }
+
+  .db-zona-item:hover {
+    background: var(--purple-pale) !important;
+  }
+
+  .db-zona-nombre {
+    color: var(--text-primary) !important;
+  }
+
+  .db-zona-meta {
+    color: var(--text-muted) !important;
+  }
+
+  /* ── Botones flotantes en fullscreen ─────────── */
+  .db-map-wrapper:fullscreen {
+    background: var(--bg-card) !important;
+  }
+
+  .db-map-btn-zonas-fs,
+  .db-map-btn-exit-fs {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4) !important;
+
+    &:hover {
+      background: var(--purple-pale) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+    }
+  }
+
+  .db-map-btn-zonas-fs--open {
+    background: var(--purple-pale) !important;
+    border-color: var(--purple-deep) !important;
+  }
+
+  /* ── Tabla de actividad ──────────────────────── */
+  .db-activity-table {
+    th {
+      color: var(--purple-mid) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    td {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+  }
+
+  .db-ubicacion {
+    color: var(--purple-mid) !important;
+  }
+
+  .db-fecha {
+    color: var(--text-muted) !important;
+  }
+
+  .db-estado {
+    &--validada { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &--ok       { background: var(--green-pale) !important; color: var(--green) !important; }
+  }
+
+  .db-ver-mas {
+    color: var(--pink) !important;
+  }
+
+  /* ── Accesos rápidos ─────────────────────────── */
+  .db-acceso-card {
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &:hover {
+      background: var(--purple-pale) !important;
+      border-color: var(--purple-mid) !important;
+    }
+  }
+}
+
+/*==================================================
+=       MODO OSCURO — UBICACIÓN DEL TELÉFONO        =
+   (escopado con .pl-page para no chocar con .card,
+   .dropdown-menu, etc. de otros módulos)
+==================================================*/
+
+[data-theme="dark"] {
+
+  .pl-page {
+
+    /* ── Tailwind utilities usadas inline en el template ─ */
+    .text-gray-800 { color: var(--text-primary) !important; }
+    .text-gray-500 { color: var(--text-muted) !important; }
+    .text-gray-400 { color: var(--text-dim) !important; }
+    .text-red-500  { color: var(--red) !important; }
+
+    /* ── Cards ───────────────────────────────────── */
+    .card {
+      background: var(--bg-card) !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .card-title {
+      color: var(--purple-mid) !important;
+    }
+
+    .address-text,
+    .info-value {
+      color: var(--text-primary) !important;
+    }
+
+    .info-label {
+      color: var(--text-muted) !important;
+    }
+
+    /* ── Historial ───────────────────────────────── */
+    .history-item {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+      }
+    }
+
+    .history-num {
+      color: var(--text-primary) !important;
+    }
+
+    .history-time {
+      color: var(--text-muted) !important;
+    }
+
+    .load-more-btn {
+      border-color: var(--border) !important;
+      background: var(--purple-pale) !important;
+      color: var(--purple-mid) !important;
+
+      &:hover {
+        background: var(--purple-pale-hover) !important;
+      }
+    }
+
+    /* ── Filtros ─────────────────────────────────── */
+    .filter-btn {
+      border-color: var(--border) !important;
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+
+      &:hover {
+        border-color: var(--purple-mid) !important;
+      }
+    }
+
+    .dropdown-menu {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .dropdown-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+
+    /* ── Mapa ────────────────────────────────────── */
+    .map-container {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .fullscreen-btn {
+      background: rgba(30, 24, 51, 0.85) !important;
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background: var(--bg-card-hover) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+  }
+}
+
+/*==================================================
+=   MODO OSCURO — MAPA (filtro sobre tiles OSM)     =
+   Solo afecta .leaflet-tile-pane; markers, popups,
+   polylines y controles NO se ven afectados porque
+   viven en otro pane del DOM de Leaflet.
+==================================================*/
+
+[data-theme="dark"] {
+
+  .pl-page .map-container {
+
+    .leaflet-tile-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+    }
+
+    /* Controles de zoom (+ / -) */
+    .leaflet-control-zoom a {
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border) !important;
+
+      &:hover {
+        background: var(--bg-card-hover) !important;
+      }
+    }
+
+    /* Popups al hacer click en un marker */
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+    }
+
+    .leaflet-popup-content {
+      color: var(--text-primary) !important;
+    }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — EVIDENCIAS               =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .ev-title { color: var(--text-primary) !important; }
+  .ev-sub { color: var(--purple-mid) !important; }
+
+  /* ── Stats ───────────────────────────────────── */
+  .ev-stats .ev-stat {
+    &:nth-child(1) { background: linear-gradient(135deg, var(--purple-deep), #2d1457) !important; border-color: var(--border) !important; }
+    &:nth-child(2) { background: linear-gradient(135deg, var(--purple-mid), var(--purple-deep)) !important; border-color: var(--border) !important; }
+    &:nth-child(3) { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; border-color: var(--border) !important; }
+    &:nth-child(4) { background: linear-gradient(135deg, #0e7490, #164e63) !important; border-color: var(--border) !important; }
+
+    .ev-stat-label { color: rgba(255, 255, 255, 0.75) !important; }
+
+    .ev-stat-val {
+      &.pink, &.purple, &.green { color: #fff !important; }
+    }
+  }
+
+  /* ── Banner nube ─────────────────────────────── */
+  .ev-banner {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    i { color: var(--pink) !important; }
+    strong { color: var(--pink) !important; }
+  }
+
+  /* ── Filtros (pills) ─────────────────────────── */
+  .ev-pill {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-muted) !important;
+
+    &:hover { background: var(--purple-pale) !important; }
+
+    &--active {
+      background: var(--purple-deep) !important;
+      color: #fff !important;
+    }
+  }
+
+  /* ── Galería ─────────────────────────────────── */
+  .ev-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    &__nombre { color: var(--text-primary) !important; }
+    &__meta { color: var(--text-muted) !important; }
+    &__alerta { color: var(--pink) !important; }
+  }
+
+  .tipo-video {
+    background: linear-gradient(135deg, var(--purple-pale), var(--purple-pale-hover)) !important;
+    i { color: var(--purple-mid) !important; }
+  }
+
+  .tipo-foto {
+    background: linear-gradient(135deg, var(--red-pale), #4a0a2e) !important;
+    i { color: var(--pink) !important; }
+  }
+
+  .tipo-audio {
+    background: linear-gradient(135deg, #164e63, #0e7490) !important;
+    i { color: #67e8f9 !important; }
+  }
+
+  .estado-nube {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .estado-pendiente {
+    background: var(--red-pale) !important;
+    color: var(--pink) !important;
+  }
+
+  .ev-footer {
+    color: var(--text-dim) !important;
+  }
+
+  /* ── Modal ───────────────────────────────────── */
+  .ev-modal {
+    background: var(--bg-card) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+
+    &-header {
+      background: var(--purple-deep) !important;
+      border-bottom-color: var(--border) !important;
+    }
+  }
+
+  .ev-detail-row {
+    border-bottom-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    .ev-detail-label { color: var(--text-muted) !important; }
+  }
+
+  .ev-download-btn {
+    background: var(--purple-deep) !important;
+  }
+}

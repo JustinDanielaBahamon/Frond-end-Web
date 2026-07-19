@@ -123,6 +123,8 @@ export class PhoneLocationComponent implements OnInit, AfterViewInit, OnDestroy 
       scrollWheelZoom: false,
     });
 
+    // Mapa siempre con el tile normal de OpenStreetMap (a color),
+    // sin importar el tema claro/oscuro de la app.
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,

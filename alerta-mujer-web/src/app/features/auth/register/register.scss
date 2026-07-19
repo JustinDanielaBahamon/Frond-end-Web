@@ -439,3 +439,17 @@
     padding: 16px 12px;
   }
 }
+
+[data-theme="dark"] {
+
+  .card{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    box-shadow:
+      0 32px 80px rgba(0, 0, 0, .5),
+      0 0 0 1px rgba(157, 111, 240, .15) inset !important;
+  }
+
+  /* ... el resto de tu bloque que ya tienes ... */
+}

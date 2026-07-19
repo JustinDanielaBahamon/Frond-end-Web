@@ -1,0 +1,204 @@
+/*==================================================
+=            MODO OSCURO — SIDEBAR                  =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .sidebar {
+    background: var(--bg-card) !important; // pisa el [style.background] inline
+
+    &__section {
+      color: var(--text-muted) !important;
+    }
+
+    &__divider {
+      background: linear-gradient(90deg, var(--purple-mid), var(--pink), transparent) !important;
+    }
+
+    &__link {
+      color: var(--text-muted) !important;
+      border-bottom-color: var(--border) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        color: var(--text-primary) !important;
+      }
+
+      &--active {
+        background: var(--purple-pale-hover) !important;
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — TOPBAR                   =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .topbar {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &__brand { color: var(--text-primary) !important; }
+    &__btn { background: var(--purple-pale) !important; }
+    &__username { color: var(--text-primary) !important; }
+  }
+
+  .topbar__hamburger:hover {
+    background: var(--purple-pale) !important;
+  }
+
+  .profile-menu {
+    background: var(--bg-card) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+
+    &__item {
+      color: var(--text-primary) !important;
+
+      svg { stroke: var(--text-primary) !important; }
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        color: var(--text-primary) !important;
+
+        svg { stroke: var(--purple-mid) !important; }
+      }
+
+      &--danger {
+        color: var(--red) !important;
+        svg { stroke: var(--red) !important; }
+
+        &:hover {
+          background: var(--red-pale) !important;
+          color: var(--red) !important;
+          svg { stroke: var(--red) !important; }
+        }
+      }
+    }
+
+    &__divider { background: var(--border) !important; }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — ALERT HISTORY            =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .ah-title { color: var(--text-primary) !important; }
+  .ah-sub { color: var(--purple-mid) !important; }
+
+  .ah-stats .ah-stat {
+    &:nth-child(1) { background: var(--red-pale) !important; border-color: var(--red-light) !important; }
+    &:nth-child(2) { background: var(--purple-pale) !important; border-color: var(--border) !important; }
+    &:nth-child(3) { background: var(--bg-card) !important; border-color: var(--border) !important; }
+    &:nth-child(4) { background: var(--purple-pale-hover) !important; border-color: var(--purple-mid) !important; }
+
+    .ah-stat-label { color: var(--text-muted) !important; }
+
+    .ah-stat-val {
+      &.pink, &.green { color: var(--pink) !important; }
+      &.purple, &.amber { color: var(--purple-deep) !important; }
+    }
+  }
+
+  .ah-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &-icon { color: var(--purple-mid) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+  }
+
+  .ah-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .ah-table {
+    thead tr { background: var(--purple-pale) !important; }
+    th { color: var(--text-primary) !important; }
+
+    td {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    tbody tr:hover { background: var(--bg-card-hover) !important; }
+
+    .ah-id { color: var(--pink) !important; }
+    .ah-fecha { color: var(--text-primary) !important; }
+    .ah-hora { color: var(--text-muted) !important; }
+    .ah-ubicacion { color: var(--purple-mid) !important; }
+    .ah-chevron { color: var(--border) !important; }
+  }
+
+  .ah-badge {
+    &.badge-boton { background: var(--red-pale) !important; color: var(--red) !important; }
+    &.badge-wigert { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &.badge-sacudida { background: var(--bg-card) !important; color: var(--pink) !important; }
+    &.badge-ok { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &.badge-pendiente { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-fallido { background: var(--red-pale) !important; color: var(--red) !important; }
+  }
+
+  .ah-modal {
+    background: var(--bg-card) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .5) !important;
+
+    &-header { background: var(--purple-pale) !important; border-bottom-color: var(--border) !important; }
+    &-title { color: var(--text-primary) !important; }
+    &-close {
+      background: rgba(255, 255, 255, .08) !important;
+      color: var(--text-primary) !important;
+      &:hover { background: rgba(255, 255, 255, .15) !important; }
+    }
+  }
+
+  .ah-map {
+    border-color: var(--border) !important;
+
+    .ah-map-fullscreen {
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+      &:hover { background: var(--bg-card-hover) !important; }
+    }
+  }
+
+  .ah-detail-row {
+    border-bottom-color: var(--border) !important;
+
+    .ah-detail-label { color: var(--text-muted) !important; }
+    .ah-desc { color: var(--text-primary) !important; }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — LAYOUT / BOTTOM NAV      =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .layout__body,
+  .layout__main {
+    background: var(--bg-base) !important;
+  }
+
+  .bottom-nav {
+    background: var(--bg-card) !important;
+
+    &__item {
+      color: var(--text-dim) !important;
+      &:hover { color: var(--text-primary) !important; }
+      &--active { color: var(--pink) !important; }
+    }
+  }
+}

@@ -1,0 +1,168 @@
+/* ── Tokens de color ────────────────────────────────── */
+:root {
+  /* Púrpuras */
+  --color-purple-dark   : #c205b8;
+  --color-purple        : #c900ae;
+  --color-purple-mid    : #c52dca;
+  --color-purple-light  : #b502bb;
+
+  /* Rosas / Pinks */
+  --color-pink          : #a70ac7;
+  --color-pink-hot      : #ae10df;
+  --color-pink-light    : #410166;
+
+  /* Textos */
+  --color-text-dark     : #2d1457;
+  --color-text-mid      : #000000;
+  --color-text-muted    : #570ea0;
+
+  /* Superficies */
+  --color-white         : #680ca5;
+  --color-card-bg       : rgba(142, 10, 160, 0.918);
+  --color-input-bg      : #5509ac;
+
+  /* Bordes */
+  --color-border        : rgba(124, 58, 237, 0.322);
+  --color-border-focus  : var(--color-purple-light);
+
+  /* Gradientes */
+  --gradient-bg  : linear-gradient(135deg, #db079c 0%, #af0763 35%, #9a07a7 70%, #430261 100%);
+  --gradient-btn : linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
+
+  /* Sombras (auth) */
+  --shadow-card       : 0 24px 60px rgba(78, 16, 177, 0.18), 0 4px 16px rgba(91, 33, 182, 0.10);
+  --shadow-btn        : 0 8px 24px rgba(233, 30, 140, 0.38);
+  --shadow-btn-hover  : 0 12px 32px rgba(233, 30, 140, 0.48);
+  --shadow-card-badge : 0 12px 36px rgba(80, 20, 180, 0.22);
+
+  /* Tipografía */
+  --font-base : 'Nunito', sans-serif;
+
+  /* Radios */
+  --radius-card     : 28px;
+  --radius-input    : 14px;
+  --radius-btn      : 50px;
+  --radius-checkbox : 5px;
+
+  /* Transiciones */
+  --transition-fast   : 0.2s ease;
+  --transition-normal : 0.3s ease;
+
+  /* ══════════════════════════════════════════════
+     Tokens del PANEL ADMIN / DASHBOARD (alertas, zonas, etc.)
+     ══════════════════════════════════════════════ */
+  --bg-base       : #f5f4ff;
+  --bg-card       : #ffffff;
+  --bg-card-hover : #f0eeff;
+  --border        : #c4b5fd;
+  --text-primary  : #1e1a3c;
+  --text-muted    : #6b7280;
+  --text-dim      : #9ca3af;
+
+  --purple-deep       : #7c3aed;
+  --purple-mid        : #a78bfa;
+  --purple-light      : #c4b5fd;
+  --purple-pale       : #ede9fe;
+  --purple-pale-hover : #e0d8fc;
+  --pink              : #ec4899;
+
+  --green         : #16a34a;
+  --green-pale    : #dcfce7;
+  --red           : #dc2626;
+  --red-light     : #f3a5a5;
+  --red-pale      : #fee2e2;
+  --red-pale-hover: #fdc9c9;
+  --amber         : #d97706;
+  --amber-pale    : #fef3c7;
+
+  --dash-shadow-card : 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.10);
+  --dash-radius-card : 12px;
+  --dash-radius-sm   : 6px;
+
+  /* ══════════════════════════════════════════════
+     Navbar landing
+     ══════════════════════════════════════════════ */
+  --navbar-bg           : #f6f5fc;
+  --navbar-bg-mobile    : #f0eff6;
+  --navbar-bg-mobile-sm : #ffffff;
+  --navbar-text         : #1b2d5b;
+  --navbar-purple       : #8529b5;
+  --navbar-border       : #ddd;
+  --navbar-divider      : #ececec;
+  --navbar-shadow       : rgba(0, 0, 0, .05);
+  --navbar-hover-bg     : rgba(133, 41, 181, .15);
+  --navbar-btn-bg       : #f7f7f7;
+
+  /* ══════════════════════════════════════════════
+     Hero landing
+     ══════════════════════════════════════════════ */
+  --hero-bg-image       : url('/bannerHero.png');
+  --hero-overlay-from   : rgb(255 255 255 / 40%);
+  --hero-overlay-to     : rgb(255 255 255 / 59%);
+  --hero-overlay-mobile : rgb(255, 255, 255);
+  --hero-heading        : #1b2d5b;
+  --hero-accent         : #b83dcd;
+  --hero-body-text      : #000000;
+  --hero-stats-text     : #1b2d5b;
+  --hero-btn-primary-bg      : #8529b5;
+  --hero-btn-primary-shadow  : rgba(133, 41, 181, .25);
+  --hero-btn-secondary-border: #8529b5;
+  --hero-btn-secondary-text  : #8529b5;
+  --hero-img-border      : #ffffff;
+}
+
+/* Modo oscuro — solo estos tokens cambian */
+[data-theme="dark"] {
+  --bg-base       : #14101f;
+  --bg-card       : #1e1833;
+  --bg-card-hover : #241d3d;
+  --border        : #4c3a80;
+  --text-primary  : #ede9fe;
+  --text-muted    : #a8a0c4;
+  --text-dim      : #766e94;
+
+  --purple-deep       : #9d6ff0;
+  --purple-mid        : #b79bf5;
+  --purple-light      : #6d4fae;
+  --purple-pale       : #2b204a;
+  --purple-pale-hover : #342659;
+  --pink              : #ff5fa8;
+
+  --green         : #4ade80;
+  --green-pale    : #113322;
+  --red           : #f87171;
+  --red-light     : #c65c5c;
+  --red-pale      : #3a1414;
+  --red-pale-hover: #4a1a1a;
+  --amber         : #fbbf24;
+  --amber-pale    : #3a2a0a;
+
+  --dash-shadow-card : 0 0 0 1.5px var(--border), 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Navbar landing en oscuro */
+  --navbar-bg           : #1a1428;
+  --navbar-bg-mobile    : #1e1833;
+  --navbar-bg-mobile-sm : #14101f;
+  --navbar-text         : #ede9fe;
+  --navbar-purple       : #b779e8;
+  --navbar-border       : #4c3a80;
+  --navbar-divider      : #4c3a80;
+  --navbar-shadow       : rgba(0, 0, 0, .35);
+  --navbar-hover-bg     : rgba(183, 121, 232, .18);
+  --navbar-btn-bg       : #241d3d;
+
+  /* Hero landing en oscuro */
+  --hero-bg-image       : url('/landingoscuro.png');
+  --hero-overlay-from   : rgb(10 6 20 / 45%);
+  --hero-overlay-to     : rgb(10 6 20 / 70%);
+  --hero-overlay-mobile : rgb(10, 6, 20);
+  --hero-heading        : #ffffff;
+  --hero-accent         : #d47ee8;
+  --hero-body-text      : #d8d3e8;
+  --hero-stats-text     : #c4b5fd;
+  --hero-btn-primary-bg      : #9d6ff0;
+  --hero-btn-primary-shadow  : rgba(157, 111, 240, .35);
+  --hero-btn-secondary-border: #9d6ff0;
+  --hero-btn-secondary-text  : #b779e8;
+  --hero-img-border      : #7c3aed;
+}

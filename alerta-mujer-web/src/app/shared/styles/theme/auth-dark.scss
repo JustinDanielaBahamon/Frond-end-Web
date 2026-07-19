@@ -1,0 +1,111 @@
+/*==================================================
+=            MODO OSCURO — REGISTER / LOGIN PAGE    =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .register-page,
+  .login-page {
+    background:
+      radial-gradient(circle at 78% 15%, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 1.5px, transparent 2px),
+      radial-gradient(circle at 85% 30%, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px,   transparent 1.5px),
+      radial-gradient(circle at 65% 10%, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 1px,   transparent 1.5px),
+      radial-gradient(circle at 92% 55%, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 1.5px, transparent 2px),
+      radial-gradient(circle at 73% 68%, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 1px,   transparent 1.5px),
+      radial-gradient(circle at 60% 45%, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px,   transparent 1.5px),
+      radial-gradient(circle at 95% 80%, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1.5px, transparent 2px),
+      radial-gradient(circle at 55% 85%, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px,   transparent 1.5px),
+      radial-gradient(circle at 80% 92%, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 1px,   transparent 1.5px),
+      radial-gradient(circle at 22% 12%, rgba(157, 111, 240, 0.15) 0%, transparent 42%),
+      radial-gradient(circle at 75% 50%, rgba(157, 111, 240, 0.12) 0%, transparent 55%),
+      linear-gradient(
+        135deg,
+        #0d0916 0%,
+        #14101f 50%,
+        #0d0916 100%
+      ) !important;
+  }
+
+  .bg-orb {
+    &--1{ background: radial-gradient(circle, var(--purple-mid), transparent) !important; }
+    &--2{ background: radial-gradient(circle, var(--pink), transparent) !important; }
+  }
+
+  .register-page__visual::before,
+  .login-page__visual::before {
+    background: radial-gradient(circle, rgba(157,111,240,0.25), rgba(109,79,174,0.15) 45%, rgba(60,40,100,0.08) 70%, transparent 85%) !important;
+  }
+
+  .brand {
+    border-bottom-color: var(--border) !important;
+  }
+
+  .brand__name {
+    color: var(--pink) !important;
+
+    strong { color: var(--text-primary) !important; }
+  }
+
+  .brand__tagline {
+    color: var(--purple-mid) !important;
+  }
+
+  .card__title {
+    color: var(--text-primary) !important;
+  }
+
+  .card__subtitle {
+    color: var(--text-muted) !important;
+
+    strong { color: var(--text-primary) !important; }
+  }
+
+  .form__divider {
+    color: var(--pink) !important;
+  }
+
+  .form--framed {
+    border-color: rgba(157, 111, 240, 0.35) !important;
+    background: rgba(157, 111, 240, 0.06) !important;
+  }
+
+  .field__icon {
+    color: var(--purple-mid) !important;
+  }
+
+  .field__input {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &::placeholder { color: var(--text-dim) !important; }
+
+    &:hover { border-color: var(--purple-mid) !important; }
+
+    &:focus {
+      background: var(--bg-card) !important;
+      border-color: var(--purple-deep) !important;
+      box-shadow: 0 0 0 3px rgba(157, 111, 240, 0.2) !important;
+    }
+  }
+
+  .form__error {
+    color: var(--pink) !important;
+  }
+
+  .checkbox {
+    color: var(--text-muted) !important;
+  }
+
+  .form__link {
+    color: var(--pink) !important;
+  }
+
+  .card__footer {
+    color: var(--text-muted) !important;
+  }
+
+  .card__footer-arrow {
+    color: var(--text-primary) !important;
+  }
+}

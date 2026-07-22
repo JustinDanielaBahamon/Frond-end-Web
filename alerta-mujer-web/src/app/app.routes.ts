@@ -18,6 +18,7 @@ import {
   userGuard,
 } from './core/guards/role.guard';
 import { Path } from 'leaflet';
+import { EmergencyManagementComponent } from './features/admin/emergency-management/emergency-management';
 
 export const routes: Routes = [
 
@@ -171,6 +172,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/report-management/report-management')
             .then(m => m.ReportManagementComponent),
+      },
+      {
+        path: 'emergency-management',
+        loadComponent: ()=> 
+           import('./features/admin/emergency-management/emergency-management')
+           .then(m =>m.EmergencyManagementComponent),
       },
 
     ],

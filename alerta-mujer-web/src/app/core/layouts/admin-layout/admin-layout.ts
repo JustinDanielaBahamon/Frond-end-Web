@@ -19,6 +19,7 @@ export class AdminLayoutComponent {
     { label: 'Alertas',      route: '/admin/alertas' },
     { label: 'Gestion de Zonas', route: '/admin/zone-management' },
     { label: 'Gestion de Reportes', route: '/admin/report-management' },
+    { label: 'Gestion  Contactos de Emergencia', route: '/admin/emergency-management'},
   ];
 
   toggleTheme() {

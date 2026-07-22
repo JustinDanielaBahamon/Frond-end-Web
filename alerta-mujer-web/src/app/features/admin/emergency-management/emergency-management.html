@@ -1,0 +1,279 @@
+<div class="emergency-contacts-management">
+
+    <!--==========================
+        PAGE HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Contactos de Emergencia</h1>
+        <p>Consulta los contactos de emergencia registrados por las usuarias.</p>
+      </div>
+      <button class="btn-export">
+        <i class="fa-solid fa-file-export"></i>
+        Exportar Lista
+      </button>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Usuarias con contactos</span>
+          <h2>{{ usersWithContacts }}</h2>
+          <p>Con al menos 1 contacto</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Total de contactos</span>
+          <h2>{{ totalContacts }}</h2>
+          <p>Registrados en total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-phone-volume"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>Usuarias sin contactos</span>
+          <h2>{{ usersWithoutContacts }}</h2>
+          <p>Sin contactos registrados</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-user-slash"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Promedio por usuaria</span>
+          <h2>{{ avgContactsPerUser }}</h2>
+          <p>Contactos por usuaria</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Nombre, correo o teléfono..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          aria-label="Buscar usuaria"
+        />
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterCity"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Ciudad"
+          >
+            <option value="all">Ciudad</option>
+            <option value="all">Todas</option>
+            <option value="Neiva">Neiva</option>
+            <option value="Bogotá">Bogotá</option>
+            <option value="Cali">Cali</option>
+            <option value="Medellín">Medellín</option>
+            <option value="Barranquilla">Barranquilla</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterStatus"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Estado de la usuaria"
+          >
+            <option value="all">Estado de la usuaria</option>
+            <option value="all">Todas</option>
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+          </select>
+        </div>
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        USER TABLE
+    ==========================-->
+  
+    <section class="users-section">
+      <h2><i class="fa-solid fa-users"></i> Usuarias</h2>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuaria</th>
+              <th>Ciudad</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Contactos</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of paginatedUsers; trackBy: trackByIndex">
+              <td>
+                <div class="user-name">
+                  <img [src]="user.avatar" alt="{{ user.name }}">
+                  {{ user.name }}
+                </div>
+              </td>
+              <td>{{ user.city }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phone }}</td>
+              <td>
+                <span class="contacts-badge">
+                  <i class="fa-solid fa-user-group"></i> {{ user.contactsCount }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [class]="getUserStatusBadgeClass(user.status)">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-view-contacts" (click)="openDrawer(user)">
+                  <i class="fa-solid fa-eye"></i> Ver contactos
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <!--==========================
+            PAGINATION
+        ==========================-->
+  
+        <div class="table-footer">
+          <div class="table-info">
+            Mostrando
+            <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ (currentPage - 1) * itemsPerPage + paginatedUsers.length }}</strong>
+            de
+            <strong>{{ filteredUsers.length }}</strong>
+            usuarias
+          </div>
+          <div class="pagination">
+            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Página anterior">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <ng-container *ngFor="let page of getPagesArray(); trackBy: trackByIndex">
+              <button
+                class="page-btn"
+                [class.active]="currentPage === page"
+                (click)="goToPage(page)"
+                aria-label="Página {{page}}"
+              >
+                {{ page }}
+              </button>
+            </ng-container>
+            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        SIDE DRAWER (CONTACTS DETAIL)
+    ==========================-->
+  
+    <div class="drawer-overlay" [class.show]="showDrawer" (click)="closeDrawer()"></div>
+  
+    <div class="drawer" [class.show]="showDrawer">
+      <div class="drawer-header">
+        <h2>Contactos de Emergencia</h2>
+        <button class="btn-close-drawer" (click)="closeDrawer()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+  
+      <div class="drawer-content" *ngIf="selectedUser">
+        <div class="user-profile-card">
+          <img [src]="selectedUser.avatar" alt="{{ selectedUser.name }}">
+          <div class="user-name-drawer">{{ selectedUser.name }}</div>
+          <span class="user-role-badge">Usuaria</span>
+          <div class="user-detail-item">
+            <i class="fa-solid fa-envelope"></i>
+            <span>{{ selectedUser.email }}</span>
+          </div>
+          <div class="user-detail-item">
+            <i class="fa-solid fa-phone"></i>
+            <span>{{ selectedUser.phone }}</span>
+          </div>
+          <div class="user-detail-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>{{ selectedUser.city }}</span>
+          </div>
+        </div>
+  
+        <h3 class="contacts-list-header">Contactos registrados ({{ selectedUser.emergencyContacts.length }})</h3>
+  
+        <div class="emergency-contact-card" *ngFor="let contact of selectedUser.emergencyContacts; trackBy: trackByIndex">
+          <img [src]="contact.avatar" alt="{{ contact.name }}">
+          <div class="contact-details">
+            <div class="contact-name">
+              {{ contact.name }}
+              <span class="relationship-badge" [class]="getRelationshipBadgeClass(contact.relationship)">
+                {{ contact.relationship }}
+              </span>
+            </div>
+            <div class="contact-info-item">
+              <i class="fa-solid fa-phone"></i>
+              <span>{{ contact.phone }}</span>
+            </div>
+            <div class="contact-info-item alerts" *ngIf="contact.receivesAlerts">
+              <i class="fa-solid fa-bell"></i>
+              <span>Recibe alertas</span>
+            </div>
+          </div>
+          <div class="contact-actions">
+            <button class="edit" aria-label="Editar contacto">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="delete" aria-label="Eliminar contacto">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+  
+        <button class="btn-add-contact">
+          <i class="fa-solid fa-user-plus"></i>
+          Agregar contacto
+        </button>
+      </div>
+  
+      <div class="drawer-footer">
+        <button class="btn-close-footer" (click)="closeDrawer()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  
+  </div>
+  

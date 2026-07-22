@@ -158,7 +158,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/alert-admin/alert-admin')
             .then(m => m.AlertAdminComponent),
-      }
+      },
+      {
+        path: 'zone-management',
+        loadComponent: () =>
+          import('./features/admin/zone-management/zone-management')
+            .then(m => m.ZoneManagement),
+      },
 
     ],
   },

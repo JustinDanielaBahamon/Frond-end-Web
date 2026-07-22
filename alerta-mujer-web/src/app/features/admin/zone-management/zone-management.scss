@@ -1,0 +1,506 @@
+@use 'sass:color';
+@use '../../../shared/styles/variables.scss' as *;
+
+$orange:      #f97316;
+$orange-pale: #ffedd5;
+$yellow:      #eab308;
+$yellow-pale: #fef9c3;
+$blue:        #3b82f6;
+$blue-pale:   #dbeafe;
+
+// =============================================
+// PAGE WRAPPER
+// =============================================
+.risk-zones {
+  padding: 24px 24px 40px;
+  background: $bg-base;
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: $text-primary;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+// =============================================
+// HEADER
+// =============================================
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $text-primary;
+  margin: 0;
+}
+
+.page-header p {
+  margin: 4px 0 0;
+  color: $text-muted;
+  font-size: 0.85rem;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: $radius-sm;
+  background: linear-gradient(135deg, $purple-deep, #6d28d9);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba($purple-deep, 0.3);
+  transition: filter 0.2s, transform 0.15s;
+
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  i { font-size: 0.9rem; }
+}
+
+// =============================================
+// STAT CARDS
+// =============================================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: $bg-card;
+  border: 1.5px solid $border;
+  border-top: 3px solid $purple-mid;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+
+  &.red   { border-top-color: $red; }
+  &.green { border-top-color: $green; }
+  &.blue  { border-top-color: $amber; }
+}
+
+.stat-info span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-info h2 {
+  margin: 8px 0 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: $text-primary;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-sm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.stat-card.purple .stat-icon {
+  background: $purple-pale;
+  color: $purple-deep;
+}
+
+.stat-card.red .stat-icon {
+  background: $red-pale;
+  color: $red;
+}
+
+.stat-card.green .stat-icon {
+  background: $green-pale;
+  color: $green;
+}
+
+.stat-card.blue .stat-icon {
+  background: $amber-pale;
+  color: $amber;
+}
+
+// =============================================
+// TOOLBAR
+// =============================================
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+}
+
+.search-box i {
+  position: absolute;
+  left: 12px;
+  color: $text-dim;
+  pointer-events: none;
+  font-size: 0.85rem;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  color: $text-primary;
+  background: $bg-card;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &::placeholder { color: $text-dim; }
+
+  &:focus {
+    outline: none;
+    border-color: $purple-deep;
+    box-shadow: 0 0 0 3px rgba($purple-deep, 0.12);
+  }
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 5px 12px;
+  border: 1.5px solid $border;
+  border-radius: 100px;
+  background: $bg-card;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $bg-card-hover;
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $purple-pale;
+    border-color: $purple-deep;
+    color: $purple-deep;
+    font-weight: 600;
+  }
+}
+
+// =============================================
+// TABLE
+// =============================================
+.table-card {
+  background: $bg-card;
+  border: 1.5px solid $border;
+  border-top: 3px solid $purple-mid;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  thead tr th {
+    text-align: left;
+    padding: 11px 10px;
+    color: $text-dim;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid $border;
+    background: $bg-base;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba($border, 0.7);
+    transition: background 0.15s;
+
+    &:hover { background: $bg-card-hover; }
+    &:last-child { border-bottom: none; }
+
+    td {
+      padding: 11px 10px;
+      color: $text-muted;
+      vertical-align: middle;
+    }
+  }
+}
+
+// =============================================
+// BADGES
+// =============================================
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.badge-red {
+  background: $red-pale;
+  color: $red;
+}
+
+.badge-green {
+  background: $green-pale;
+  color: $green;
+}
+
+.badge-yellow {
+  background: $yellow-pale;
+  color: $yellow;
+}
+
+.badge-orange {
+  background: $orange-pale;
+  color: $orange;
+}
+
+// =============================================
+// STATUS
+// =============================================
+.status {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  &.active {
+    background: $green-pale;
+    color: $green;
+  }
+
+  &.review {
+    background: $amber-pale;
+    color: $amber;
+  }
+
+  &.inactive {
+    background: $red-pale;
+    color: $red;
+  }
+}
+
+// =============================================
+// ZONE NAME
+// =============================================
+.zone-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.zone-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: $radius-sm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+
+  &.red    { background: $red; }
+  &.green  { background: $green; }
+  &.yellow { background: $yellow; color: #422006; }
+  &.orange { background: $orange; }
+}
+
+// =============================================
+// ACTIONS
+// =============================================
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: $text-muted;
+
+  i { font-size: 0.8rem; }
+
+  &:hover {
+    border-color: $purple-mid;
+    color: $purple-deep;
+    background: $purple-pale;
+  }
+
+  &:nth-child(2):hover {
+    border-color: #3b82f6;
+    color: #1d4ed8;
+    background: $blue-pale;
+  }
+
+  &:nth-child(3):hover {
+    border-color: $red;
+    color: $red;
+    background: $red-pale;
+  }
+}
+
+// =============================================
+// TABLE FOOTER & PAGINATION
+// =============================================
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid $border;
+  background: $bg-base;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.table-info {
+  font-size: 0.78rem;
+  color: $text-muted;
+
+  strong {
+    color: $text-primary;
+    font-weight: 700;
+  }
+}
+
+.pagination {
+  display: flex;
+  gap: 4px;
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $bg-card-hover;
+    color: $purple-deep;
+    border-color: $purple-mid;
+  }
+
+  &.active {
+    background: $purple-deep;
+    border-color: $purple-deep;
+    color: #fff;
+    font-weight: 700;
+  }
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .risk-zones { padding: 16px; }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .toolbar-actions {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  table {
+    min-width: 800px;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+}

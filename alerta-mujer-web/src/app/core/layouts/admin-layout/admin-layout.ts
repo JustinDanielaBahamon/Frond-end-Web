@@ -17,6 +17,7 @@ export class AdminLayoutComponent {
     { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
     { label: 'Usuarios',     route: '/admin/usuarios' },
     { label: 'Alertas',      route: '/admin/alertas' },
+    { label: 'Gestion de Zonas', route: '/admin/zone-management'},
   
   ];
 

@@ -1,0 +1,274 @@
+<div class="risk-zones">
+
+    <!--==========================
+        HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Zonas</h1>
+        <p>Administra las zonas seguras y zonas de riesgo de la aplicación.</p>
+      </div>
+      <button class="btn-primary">
+        <i class="fa-solid fa-plus"></i>
+        Nueva Zona
+      </button>
+    </header>
+  
+    <!--==========================
+        ESTADÍSTICAS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Total Zonas</span>
+          <h2>48</h2>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card red">
+        <div class="stat-info">
+          <span>Zonas Riesgo Alto</span>
+          <h2>12</h2>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Zonas Seguras</span>
+          <h2>25</h2>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-shield-heart"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>En Revisión</span>
+          <h2>11</h2>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        FILTROS Y ACCIONES
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar zona..." aria-label="Buscar zona" />
+      </div>
+  
+      <div class="toolbar-actions">
+        <button class="chip active">Todas</button>
+        <button class="chip">Riesgo Alto</button>
+        <button class="chip">Riesgo Medio</button>
+        <button class="chip">Riesgo Bajo</button>
+        <button class="chip">Seguras</button>
+      </div>
+    </div>
+  
+    <!--==========================
+        TABLA DE ZONAS
+    ==========================-->
+  
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Zona</th>
+            <th>Ciudad</th>
+            <th>Tipo</th>
+            <th>Alertas</th>
+            <th>Estado</th>
+            <th>Última actualización</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+            <!-- Fila 1: Parque Santander (Riesgo Alto -> RED) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar red"> <!-- 🌟 Añadido 'red' -->
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Parque Santander
+                </div>
+              </td>
+              <td>Neiva</td>
+              <td><span class="badge badge-red">Riesgo Alto</span></td>
+              <td>37</td>
+              <td><span class="status active">Activa</span></td>
+              <td>Hace 2 horas</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          
+            <!-- Fila 2: Universidad Surcolombiana (Segura -> GREEN) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar green"> <!-- 🌟 Cambiado 'purple' por 'green' -->
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Universidad Surcolombiana
+                </div>
+              </td>
+              <td>Neiva</td>
+              <td><span class="badge badge-green">Segura</span></td>
+              <td>3</td>
+              <td><span class="status active">Activa</span></td>
+              <td>Hace 5 minutos</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          
+            <!-- Fila 3: Parque Leesburg (Riesgo Alto -> RED) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar red">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Parque Leesburg
+                </div>
+              </td>
+              <td>Bogotá</td>
+              <td><span class="badge badge-red">Riesgo Alto</span></td>
+              <td>28</td>
+              <td><span class="status active">Activa</span></td>
+              <td>Hace 1 día</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          
+            <!-- Fila 4: Centro Comercial San Pedro (Riesgo Medio -> YELLOW) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar yellow">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Centro Comercial San Pedro
+                </div>
+              </td>
+              <td>Cali</td>
+              <td><span class="badge badge-yellow">Riesgo Medio</span></td>
+              <td>14</td>
+              <td><span class="status review">Revisión</span></td>
+              <td>Hace 4 horas</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          
+            <!-- Fila 5: Parque de la Música (Segura -> GREEN) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar green">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Parque de la Música
+                </div>
+              </td>
+              <td>Medellín</td>
+              <td><span class="badge badge-green">Segura</span></td>
+              <td>2</td>
+              <td><span class="status active">Activa</span></td>
+              <td>Hace 30 minutos</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          
+            <!-- Fila 6: Terminal de Transportes (Riesgo Bajo -> ORANGE) -->
+            <tr>
+              <td>
+                <div class="zone-name">
+                  <div class="zone-avatar orange">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  Terminal de Transportes
+                </div>
+              </td>
+              <td>Barranquilla</td>
+              <td><span class="badge badge-orange">Riesgo Bajo</span></td>
+              <td>8</td>
+              <td><span class="status active">Activa</span></td>
+              <td>Hace 8 horas</td>
+              <td>
+                <div class="actions">
+                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
+                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+      </table>
+  
+      <!--==========================
+          PAGINACIÓN
+      ==========================-->
+  
+      <div class="table-footer">
+        <div class="table-info">
+          Mostrando
+          <strong>1 - 6</strong>
+          de
+          <strong>48</strong>
+          zonas registradas
+        </div>
+        <div class="pagination">
+          <button class="page-btn" aria-label="Página anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button class="page-btn active" aria-label="Página 1">1</button>
+          <button class="page-btn" aria-label="Página 2">2</button>
+          <button class="page-btn" aria-label="Página 3">3</button>
+          <button class="page-btn" aria-label="Página 4">4</button>
+          <button class="page-btn" aria-label="Página siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

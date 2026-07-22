@@ -1,0 +1,350 @@
+<div class="reports-management">
+
+    <!--==========================
+        HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Reportes</h1>
+        <p>Visualiza, filtra y genera reportes del sistema.</p>
+      </div>
+      <button class="btn-new-report">
+        <i class="fa-solid fa-plus"></i>
+        Nuevo Reporte
+      </button>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Total Reportes</span>
+          <h2>542</h2>
+          <p>Generados en total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-file-lines"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Total Alertas</span>
+          <h2>1,284</h2>
+          <p>Alertas registradas</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>Zonas Activas</span>
+          <h2>48</h2>
+          <p>Zonas monitoreadas</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Exportaciones</span>
+          <h2>91</h2>
+          <p>Reportes exportados</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS & ACTIONS)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar reporte..." aria-label="Buscar reporte" />
+      </div>
+  
+      <div class="action-buttons">
+        <button class="btn-action pdf">
+          <i class="fa-solid fa-file-pdf"></i>
+          Descargar PDF
+        </button>
+        <button class="btn-action excel">
+          <i class="fa-solid fa-file-excel"></i>
+          Descargar Excel
+        </button>
+        <button class="btn-action print">
+          <i class="fa-solid fa-print"></i>
+          Imprimir
+        </button>
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <input type="date" class="select-date" aria-label="Fecha inicial">
+        </div>
+        <div class="filter-item">
+          <input type="date" class="select-date" aria-label="Fecha final">
+        </div>
+        <div class="filter-item">
+          <select aria-label="Filtrar por Ciudad">
+            <option value="">Ciudad</option>
+            <option value="all">Todas</option>
+            <option value="neiva">Neiva</option>
+            <option value="bogota">Bogotá</option>
+            <option value="cali">Cali</option>
+            <option value="medellin">Medellín</option>
+            <option value="barranquilla">Barranquilla</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select aria-label="Filtrar por Tipo">
+            <option value="">Tipo</option>
+            <option value="all">Todos</option>
+            <option value="sos">SOS</option>
+            <option value="robo">Robo</option>
+            <option value="acoso">Acoso</option>
+            <option value="medico">Médico</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select aria-label="Filtrar por Estado">
+            <option value="">Estado</option>
+            <option value="all">Todas</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cerrada">Cerrada</option>
+            <option value="atendida">Atendida</option>
+          </select>
+        </div>
+        <button class="btn-clear-filters">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        TABLE
+    ==========================-->
+  
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+            <thead>
+              <tr>
+                <th>Nombre del Reporte</th>
+                <th>Fecha</th>
+                <th>Ciudad</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Generado por</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="report-name">
+                    <div class="report-icon">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    Reporte de Alertas - Julio 2024
+                  </div>
+                </td>
+                <td>23/07/2024 10:30 AM</td>
+                <td>Neiva</td>
+                <td>
+                  <span class="badge red">SOS</span>
+                </td>
+                <td>
+                  <span class="status pending">Pendiente</span>
+                </td>
+                <td>Administrador</td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="edit" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-name">
+                    <div class="report-icon">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    Reporte de Robos - Julio 2024
+                  </div>
+                </td>
+                <td>21/07/2024 04:15 PM</td>
+                <td>Bogotá</td>
+                <td>
+                  <span class="badge orange">Robo</span>
+                </td>
+                <td>
+                  <span class="status closed">Cerrada</span>
+                </td>
+                <td>Administrador</td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="edit" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-name">
+                    <div class="report-icon">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    Reporte de Acoso - Julio 2024
+                  </div>
+                </td>
+                <td>20/07/2024 11:45 AM</td>
+                <td>Cali</td>
+                <td>
+                  <span class="badge blue">Acoso</span>
+                </td>
+                <td>
+                  <span class="status attended">Atendida</span>
+                </td>
+                <td>Administrador</td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="edit" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-name">
+                    <div class="report-icon">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    Reporte Médico - Julio 2024
+                  </div>
+                </td>
+                <td>19/07/2024 09:20 AM</td>
+                <td>Neiva</td>
+                <td>
+                  <span class="badge green">Médico</span>
+                </td>
+                <td>
+                  <span class="status pending">Pendiente</span>
+                </td>
+                <td>Administrador</td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="edit" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-name">
+                    <div class="report-icon">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    Reporte de SOS - Julio 2024
+                  </div>
+                </td>
+                <td>18/07/2024 08:10 PM</td>
+                <td>Medellín</td>
+                <td>
+                  <span class="badge red">SOS</span>
+                </td>
+                <td>
+                  <span class="status attended">Atendida</span>
+                </td>
+                <td>Administrador</td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="edit" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      
+          <!--==========================
+              PAGINATION
+          ==========================-->
+      
+          <div class="table-footer">
+            <div class="table-info">
+              Mostrando
+              <strong>1 - 5</strong>
+              de
+              <strong>542</strong>
+              reportes
+            </div>
+            <div class="pagination">
+              <button class="page-btn" aria-label="Página anterior">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="page-btn active" aria-label="Página 1">1</button>
+              <button class="page-btn" aria-label="Página 2">2</button>
+              <button class="page-btn" aria-label="Página 3">3</button>
+              <button class="page-btn" aria-label="Página 4">4</button>
+              <span class="page-ellipsis">...</span>
+              <button class="page-btn" aria-label="Última página, 109">109</button>
+              <button class="page-btn" aria-label="Página siguiente">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        
+        </div>
+        </div>
+  </div>
+  

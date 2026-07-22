@@ -17,6 +17,7 @@ import {
   adminGuard,
   userGuard,
 } from './core/guards/role.guard';
+import { Path } from 'leaflet';
 
 export const routes: Routes = [
 
@@ -163,7 +164,13 @@ export const routes: Routes = [
         path: 'zone-management',
         loadComponent: () =>
           import('./features/admin/zone-management/zone-management')
-            .then(m => m.ZoneManagement),
+            .then(m => m.ZoneManagementComponent),
+      },
+      {
+        path: 'report-management',
+        loadComponent: () =>
+          import('./features/admin/report-management/report-management')
+            .then(m => m.ReportManagementComponent),
       },
 
     ],

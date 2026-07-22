@@ -6,4 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './zone-management.html',
   styleUrl: './zone-management.scss',
 })
-export class ZoneManagement {}
+export class ZoneManagementComponent {}

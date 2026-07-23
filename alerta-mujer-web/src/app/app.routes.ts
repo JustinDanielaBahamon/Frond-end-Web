@@ -12,6 +12,7 @@ import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone'
 import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 
+
 import {
   authGuard,
   adminGuard,
@@ -71,7 +72,8 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/auth/reset-password/reset-password')
             .then(m => m.ResetPasswordComponent)
-      }
+      },
+
     ]
   },
 
@@ -179,6 +181,12 @@ export const routes: Routes = [
            import('./features/admin/emergency-management/emergency-management')
            .then(m =>m.EmergencyManagementComponent),
       },
+      {
+         path: 'evidence-management',
+        loadComponent: () =>
+          import('./features/admin/evidence-management/evidence-management')
+            .then(m => m.EvidencesManagementComponent)
+      }
 
     ],
   },

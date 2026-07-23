@@ -1,0 +1,259 @@
+<div class="evidences-management">
+
+    <!--==========================
+        PAGE HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Evidencias</h1>
+        <p>Visualiza, administra y gestiona las evidencias enviadas en las alertas.</p>
+      </div>
+      <button class="btn-upload-evidence">
+        <i class="fa-solid fa-plus"></i>
+        Subir Evidencia
+      </button>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Total Evidencias</span>
+          <h2>{{ totalEvidences }}</h2>
+          <p>En total registradas</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-image"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Evidencias Verificadas</span>
+          <h2>{{ verifiedEvidences }}</h2>
+          <p>{{ (verifiedEvidences / totalEvidences * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>Pendientes de Revisión</span>
+          <h2>{{ pendingEvidences }}</h2>
+          <p>{{ (pendingEvidences / totalEvidences * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card red">
+        <div class="stat-info">
+          <span>Rechazadas</span>
+          <h2>{{ rejectedEvidences }}</h2>
+          <p>{{ (rejectedEvidences / totalEvidences * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-shield-xmark"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Descargas</span>
+          <h2>{{ totalDownloads }}</h2>
+          <p>Total realizadas</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-download"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Buscar por nombre, descripción o ID..."
+          [(ngModel)]="searchTermEvidence"
+          (input)="applyFilters()"
+          aria-label="Buscar evidencia"
+        />
+      </div>
+  
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o correo..."
+          [(ngModel)]="searchTermUser"
+          (input)="applyFilters()"
+          aria-label="Buscar usuario"
+        />
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterEvidenceType"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Tipo de evidencia"
+          >
+            <option value="all">Todos los tipos</option>
+            <option value="Imagen">Imagen</option>
+            <option value="Video">Video</option>
+            <option value="Audio">Audio</option>
+            <option value="Documento">Documento</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterStatus"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Estado"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="Verificada">Verificada</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Rechazada">Rechazada</option>
+          </select>
+        </div>
+        <button class="date-range-picker" aria-label="Seleccionar rango de fechas">
+          <i class="fa-solid fa-calendar-days"></i>
+          Seleccione un rango
+        </button>
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        EVIDENCE TABLE
+    ==========================-->
+  
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Vista previa</th>
+            <th>Nombre de la evidencia</th>
+            <th>Usuario</th>
+            <th>Alerta relacionada</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let evidence of paginatedEvidences; trackBy: trackByIndex">
+            <td>
+              <div class="evidence-preview">
+                <div class="preview-thumbnail"
+                  [ngClass]="{
+                    'video-icon': evidence.type === 'Video',
+                    'audio-icon': evidence.type === 'Audio',
+                    'document-icon': evidence.type === 'Documento'
+                  }"
+                >
+                  <img *ngIf="evidence.type === 'Imagen'" [src]="evidence.preview" alt="Preview" />
+                  <i *ngIf="evidence.type === 'Video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="evidence.type === 'Audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="evidence.type === 'Documento'" class="fa-solid fa-file-pdf"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="evidence-details">
+                <span class="evidence-name">{{ evidence.name }}</span>
+                <span class="evidence-id-size">ID: {{ evidence.evidenceId }} - {{ evidence.size }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ evidence.user.name }}</span>
+                <span class="user-email">{{ evidence.user.email }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="alert-related">
+                <span class="alert-id">{{ evidence.alertRelated.id }}</span>
+                <span class="alert-type-city">{{ evidence.alertRelated.type }} - {{ evidence.alertRelated.city }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.type)">
+                {{ evidence.type }}
+              </span>
+            </td>
+            <td>{{ evidence.date }}<br>{{ evidence.time }}</td>
+            <td>
+              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.status)">
+                {{ evidence.status }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="view" aria-label="Ver evidencia">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button class="download" aria-label="Descargar evidencia">
+                <i class="fa-solid fa-download"></i>
+              </button>
+              <button class="delete" aria-label="Eliminar evidencia">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!--==========================
+          PAGINATION
+      ==========================-->
+  
+      <div class="table-footer">
+        <div class="table-info">
+          Mostrando
+          <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ (currentPage - 1) * itemsPerPage + paginatedEvidences.length }}</strong>
+          de
+          <strong>{{ filteredEvidences.length }}</strong>
+          evidencias
+        </div>
+        <div class="pagination">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Página anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <ng-container *ngFor="let page of getPagesArray(); trackBy: trackByIndex">
+            <button
+              class="page-btn"
+              [class.active]="currentPage === page"
+              (click)="goToPage(page)"
+              aria-label="Página {{page}}"
+            >
+              {{ page }}
+            </button>
+          </ng-container>
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

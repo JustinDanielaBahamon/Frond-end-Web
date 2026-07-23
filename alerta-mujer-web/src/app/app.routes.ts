@@ -186,7 +186,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/evidence-management/evidence-management')
             .then(m => m.EvidencesManagementComponent)
-      }
+      },
+      {
+        path: 'moderator-management',
+        loadComponent: () =>
+          import('./features/admin/moderator-management/moderator-management')
+            .then(m => m.ModeratorManagementComponent)
+      },
 
     ],
   },

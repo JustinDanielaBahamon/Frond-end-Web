@@ -21,6 +21,7 @@ export class AdminLayoutComponent {
     { label: 'Gestion de Reportes', route: '/admin/report-management' },
     { label: 'Gestion  Contactos de Emergencia', route: '/admin/emergency-management'},
     { label: 'Gestion de evidencias' , route:'/admin/evidence-management'},
+    { label: 'Gestion de Moderadores' , route:'/admin/moderator-management'},
   ];
 
   toggleTheme() {

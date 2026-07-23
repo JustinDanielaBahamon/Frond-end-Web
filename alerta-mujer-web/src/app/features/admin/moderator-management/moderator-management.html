@@ -1,0 +1,493 @@
+<div class="moderator-management">
+
+    <!--==========================
+        HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Moderación</h1>
+        <p>Visualiza, gestiona y resuelve reportes de contenido inapropiado.</p>
+      </div>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Reportes Pendientes</span>
+          <h2>32</h2>
+          <p class="stat-change positive">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>+12%</span>
+            <span class="vs-ayer">vs ayer</span>
+          </p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-flag"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Casos Resueltos</span>
+          <h2>128</h2>
+          <p class="stat-change positive">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>+8%</span>
+            <span class="vs-ayer">vs ayer</span>
+          </p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-check-circle"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>Usuarios Sancionados</span>
+          <h2>15</h2>
+          <p class="stat-change negative">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span>-3%</span>
+            <span class="vs-ayer">vs ayer</span>
+          </p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-user-slash"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Contenido Eliminado</span>
+          <h2>46</h2>
+          <p class="stat-change positive">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>+5%</span>
+            <span class="vs-ayer">vs ayer</span>
+          </p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-trash"></i>
+        </div>
+      </div>
+
+      <div class="stat-card pink">
+        <div class="stat-info">
+          <span>Tiempo de Respuesta</span>
+          <h2>2h 15m</h2>
+          <p class="stat-change positive">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span>-15%</span>
+            <span class="vs-ayer">vs ayer</span>
+          </p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS & SEARCH)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar reporte..." aria-label="Buscar reporte" />
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" placeholder="Usuario reportado..." aria-label="Usuario reportado" />
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <select aria-label="Filtrar por Motivo de reporte">
+            <option value="">Motivo de reporte</option>
+            <option value="all">Todos</option>
+            <option value="spam">Spam</option>
+            <option value="acoso">Acoso</option>
+            <option value="contenido-inapropiado">Contenido inapropiado</option>
+            <option value="discurso-odio">Discurso de odio</option>
+            <option value="falsificacion">Falsificación</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select aria-label="Filtrar por Gravedad">
+            <option value="">Gravedad</option>
+            <option value="all">Todas</option>
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+            <option value="critica">Crítica</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select aria-label="Filtrar por Estado">
+            <option value="">Estado</option>
+            <option value="all">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en-revision">En revisión</option>
+            <option value="resuelto">Resuelto</option>
+            <option value="rechazado">Rechazado</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <input type="date" class="select-date" aria-label="Fecha inicial">
+        </div>
+        <div class="filter-item">
+          <input type="date" class="select-date" aria-label="Fecha final">
+        </div>
+        <button class="btn-clear-filters">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        TABLE
+    ==========================-->
+  
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+            <thead>
+              <tr>
+                <th>Reporte</th>
+                <th>Usuario Reportado</th>
+                <th>Motivo</th>
+                <th>Gravedad</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-001</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Maria+G&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">María García</span>
+                      <span class="user-email">maria.g@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge red">Acoso</span>
+                </td>
+                <td>
+                  <span class="severity high">Alta</span>
+                </td>
+                <td>23/07/2024 10:30 AM</td>
+                <td>
+                  <span class="status pending">Pendiente</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-002</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Carlos+R&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Carlos Rodríguez</span>
+                      <span class="user-email">carlos.r@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge orange">Spam</span>
+                </td>
+                <td>
+                  <span class="severity medium">Media</span>
+                </td>
+                <td>22/07/2024 04:15 PM</td>
+                <td>
+                  <span class="status in-review">En revisión</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-003</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Ana+M&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Ana Martínez</span>
+                      <span class="user-email">ana.m@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge blue">Contenido inapropiado</span>
+                </td>
+                <td>
+                  <span class="severity low">Baja</span>
+                </td>
+                <td>21/07/2024 11:45 AM</td>
+                <td>
+                  <span class="status resolved">Resuelto</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-004</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Pedro+S&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Pedro Sánchez</span>
+                      <span class="user-email">pedro.s@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge purple">Discurso de odio</span>
+                </td>
+                <td>
+                  <span class="severity critical">Crítica</span>
+                </td>
+                <td>20/07/2024 09:20 AM</td>
+                <td>
+                  <span class="status pending">Pendiente</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-005</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Laura+L&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Laura López</span>
+                      <span class="user-email">laura.l@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge green">Falsificación</span>
+                </td>
+                <td>
+                  <span class="severity high">Alta</span>
+                </td>
+                <td>19/07/2024 08:10 PM</td>
+                <td>
+                  <span class="status rejected">Rechazado</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-006</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Diego+T&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Diego Torres</span>
+                      <span class="user-email">diego.t@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge red">Acoso</span>
+                </td>
+                <td>
+                  <span class="severity medium">Media</span>
+                </td>
+                <td>18/07/2024 03:30 PM</td>
+                <td>
+                  <span class="status in-review">En revisión</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="report-id">
+                    <span class="id-badge">#REP-007</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Sofia+R&background=random" alt="Avatar" />
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">Sofía Ramírez</span>
+                      <span class="user-email">sofia.r@email.com</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge orange">Spam</span>
+                </td>
+                <td>
+                  <span class="severity low">Baja</span>
+                </td>
+                <td>17/07/2024 11:00 AM</td>
+                <td>
+                  <span class="status resolved">Resuelto</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="view" aria-label="Ver reporte">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="approve" aria-label="Aprobar reporte">
+                      <i class="fa-solid fa-check"></i>
+                    </button>
+                    <button class="reject" aria-label="Rechazar reporte">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      
+          <!--==========================
+              PAGINATION
+          ==========================-->
+      
+          <div class="table-footer">
+            <div class="table-info">
+              Mostrando
+              <strong>1 - 7</strong>
+              de
+              <strong>32</strong>
+              reportes
+            </div>
+            <div class="pagination">
+              <button class="page-btn" aria-label="Página anterior">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="page-btn active" aria-label="Página 1">1</button>
+              <button class="page-btn" aria-label="Página 2">2</button>
+              <button class="page-btn" aria-label="Página 3">3</button>
+              <button class="page-btn" aria-label="Página 4">4</button>
+              <button class="page-btn" aria-label="Página 5">5</button>
+              <button class="page-btn" aria-label="Página siguiente">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        
+        </div>
+        </div>
+  </div>

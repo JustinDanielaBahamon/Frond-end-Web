@@ -157,61 +157,103 @@
             "id": 1,
             "usuarioId": 1,
             "tipo": "video",
-            "nombre": "Video_alerta_001.mp4",
+            "tipoAlerta": "SOS",
+            "nombre": "SOS_2026-06-13_09-14.mp4",
             "tamanio": "15.3 MB",
             "fecha": "13 jun 2026",
             "alerta": "#001",
-            "estado": "En la nube"
+            "estado": "En la nube",
+            "ubicacion": {
+                "lat": 4.7110,
+                "lng": -74.0721,
+                "direccion": "Centro"
+            },
+            "enVivo": false
         },
         {
             "id": 2,
             "usuarioId": 1,
             "tipo": "foto",
-            "nombre": "Foto_alerta_001.jpg",
+            "tipoAlerta": "SOS",
+            "nombre": "SOS_2026-06-13_09-14.jpg",
             "tamanio": "5.9 MB",
             "fecha": "13 jun 2026",
             "alerta": "#001",
-            "estado": "En la nube"
+            "estado": "En la nube",
+            "ubicacion": {
+                "lat": 4.7110,
+                "lng": -74.0721,
+                "direccion": "Centro"
+            },
+            "enVivo": false
         },
         {
             "id": 3,
             "usuarioId": 1,
             "tipo": "audio",
-            "nombre": "Audio_alerta_002.mp3",
+            "tipoAlerta": "Medical",
+            "nombre": "Medical_2026-06-13_09-20.mp3",
             "tamanio": "1.9 MB",
             "fecha": "13 jun 2026",
             "alerta": "#002",
-            "estado": "En la nube"
+            "estado": "En la nube",
+            "ubicacion": {
+                "lat": 4.7118,
+                "lng": -74.0715,
+                "direccion": "Centro"
+            },
+            "enVivo": false
         },
         {
             "id": 4,
             "usuarioId": 2,
             "tipo": "video",
-            "nombre": "Video_alerta_003.mp4",
+            "tipoAlerta": "SOS",
+            "nombre": "SOS_2026-06-12_14-32.mp4",
             "tamanio": "9.2 MB",
             "fecha": "12 jun 2026",
             "alerta": "#003",
-            "estado": "En la nube"
+            "estado": "En la nube",
+            "ubicacion": {
+                "lat": 4.7105,
+                "lng": -74.0728,
+                "direccion": "Centro"
+            },
+            "enVivo": false
         },
         {
             "id": 5,
             "usuarioId": 3,
             "tipo": "foto",
-            "nombre": "Foto_alerta_006.jpg",
+            "tipoAlerta": "Robo",
+            "nombre": "Robo_2026-06-12_08-05.jpg",
             "tamanio": "5.7 MB",
             "fecha": "12 jun 2026",
             "alerta": "#006",
-            "estado": "Pendiente"
+            "estado": "Pendiente",
+            "ubicacion": {
+                "lat": 4.7160,
+                "lng": -74.0680,
+                "direccion": "Calle 80"
+            },
+            "enVivo": false
         },
         {
             "id": 6,
             "usuarioId": 4,
             "tipo": "audio",
-            "nombre": "Audio_alerta_007.mp3",
+            "tipoAlerta": "Acoso",
+            "nombre": "Acoso_2026-06-10_17-45.mp3",
             "tamanio": "2.7 MB",
             "fecha": "10 jun 2026",
             "alerta": "#007",
-            "estado": "En la nube"
+            "estado": "En la nube",
+            "ubicacion": {
+                "lat": 4.7055,
+                "lng": -74.0760,
+                "direccion": "Av. Caracas"
+            },
+            "enVivo": false
         }
     ],
     "ubicaciones": [

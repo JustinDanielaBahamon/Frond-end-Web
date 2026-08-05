@@ -1,0 +1,238 @@
+<div class="device-management">
+
+    <!--==========================
+        PAGE HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Dispositivos</h1>
+        <p>Visualiza y administra los dispositivos registrados en la aplicación.</p>
+      </div>
+      <button class="btn-register-device">
+        <i class="fa-solid fa-plus"></i>
+        Registrar Dispositivo
+      </button>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Total Dispositivos</span>
+          <h2>{{ totalDevices }}</h2>
+          <p>Dispositivos registrados</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>Activos</span>
+          <h2>{{ activeDevices }}</h2>
+          <p>{{ (activeDevices / totalDevices * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>Inactivos</span>
+          <h2>{{ inactiveDevices }}</h2>
+          <p>{{ (inactiveDevices / totalDevices * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card red">
+        <div class="stat-info">
+          <span>Bloqueados</span>
+          <h2>{{ blockedDevices }}</h2>
+          <p>{{ (blockedDevices / totalDevices * 100) | number:
+            '1.1-1' }}% del total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-circle-pause"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Sincronizados hoy</span>
+          <h2>{{ syncedToday }}</h2>
+          <p>Últimas 24 horas</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="ID, nombre, IMEI o número de teléfono..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          aria-label="Buscar dispositivo"
+        />
+      </div>
+  
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o correo..."
+          [(ngModel)]="filterUser"
+          (input)="applyFilters()"
+          aria-label="Buscar usuario"
+        />
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterStatus"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Estado"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Bloqueado">Bloqueado</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <select
+            [(ngModel)]="filterDeviceType"
+            (change)="applyFilters()"
+            aria-label="Filtrar por Tipo de dispositivo"
+          >
+            <option value="all">Todos los tipos</option>
+            <option value="Android">Android</option>
+            <option value="iOS">iOS</option>
+          </select>
+        </div>
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        DEVICE TABLE
+    ==========================-->
+  
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Dispositivo</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th>IMEI / ID</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Última sincronización</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let device of paginatedDevices; trackBy: trackByIndex">
+            <td>
+              <div class="device-info">
+                <div class="device-icon">
+                  <i [class]="device.icon"></i>
+                </div>
+                <div class="device-details">
+                  <span>{{ device.name }}</span>
+                  <span class="os-version">{{ device.osVersion }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="user-info">
+                <span>{{ device.user.name }}</span>
+                <span class="user-email">{{ device.user.email }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="type-badge" [class]="getDeviceTypeBadgeClass(device.type)">
+                {{ device.type }}
+              </span>
+            </td>
+            <td>{{ device.imei }}</td>
+            <td>{{ device.phone }}</td>
+            <td>
+              <span class="status-badge" [class]="getDeviceStatusBadgeClass(device.status)">
+                {{ device.status }}
+              </span>
+            </td>
+            <td>{{ device.lastSync }}</td>
+            <td class="actions-cell">
+              <button class="view" aria-label="Ver detalles del dispositivo">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button class="edit" aria-label="Editar dispositivo">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="delete" aria-label="Eliminar dispositivo">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!--==========================
+          PAGINATION
+      ==========================-->
+  
+      <div class="table-footer">
+        <div class="table-info">
+          Mostrando
+          <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ (currentPage - 1) * itemsPerPage + paginatedDevices.length }}</strong>
+          de
+          <strong>{{ filteredDevices.length }}</strong>
+          dispositivos
+        </div>
+        <div class="pagination">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Página anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <ng-container *ngFor="let page of getPagesArray(); trackBy: trackByIndex">
+            <button
+              class="page-btn"
+              [class.active]="currentPage === page"
+              (click)="goToPage(page)"
+              aria-label="Página {{page}}"
+            >
+              {{ page }}
+            </button>
+          </ng-container>
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

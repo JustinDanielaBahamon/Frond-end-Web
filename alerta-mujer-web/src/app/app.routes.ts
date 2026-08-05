@@ -179,6 +179,12 @@ export const routes: Routes = [
            import('./features/admin/emergency-management/emergency-management')
            .then(m =>m.EmergencyManagementComponent),
       },
+      {
+        path: 'devices-management',
+        loadComponent: () =>
+          import('./features/admin/devices-management/devices-management')
+            .then(m => m.DeviceManagementComponent),
+      }
 
     ],
   },

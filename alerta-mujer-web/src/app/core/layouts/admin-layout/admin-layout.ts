@@ -20,6 +20,7 @@ export class AdminLayoutComponent {
     { label: 'Gestion de Zonas', route: '/admin/zone-management' },
     { label: 'Gestion de Reportes', route: '/admin/report-management' },
     { label: 'Gestion  Contactos de Emergencia', route: '/admin/emergency-management'},
+    { label: 'Gestion de Dispositivos', route: '/admin/devices-management'},
   ];
 
   toggleTheme() {

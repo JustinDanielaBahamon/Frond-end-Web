@@ -8,8 +8,11 @@
         <line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
-    <img src="/logo.png" alt="AlertaMujer" class="topbar__logo w-10 h-10" />
-    <span class="topbar__brand">{{ brand }}</span>
+
+    <div class="topbar__greeting">
+      <span class="topbar__greeting-hi">Hola, {{ userName }} 👋</span>
+      <span class="topbar__greeting-page">{{ pageTitle }}</span>
+    </div>
   </div>
 
   <div class="topbar__actions">
@@ -40,38 +43,64 @@
         <div class="profile-menu__overlay" (click)="closeMenu()"></div>
       }
 
-      <div class="topbar__avatar" (click)="toggleMenu()">{{ avatarLetter }}</div>
-      <span class="topbar__username" (click)="toggleMenu()">Ver Perfil</span>
+      <div class="topbar__avatar" (click)="toggleMenu()" title="Ajustes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </div>
+      <span class="topbar__username" (click)="toggleMenu()">Ajustes</span>
 
       @if (menuOpen) {
         <div class="profile-menu">
-          <a routerLink="/auth/login" class="profile-menu__item" (click)="closeMenu()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
-            </svg>
-            Iniciar Sesión
-          </a>
-          <div class="profile-menu__divider"></div>
-          <a routerLink="/auth/register" class="profile-menu__item" (click)="closeMenu()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <line x1="19" y1="8" x2="19" y2="14"/>
-              <line x1="22" y1="11" x2="16" y2="11"/>
-            </svg>
-            Registrarse
-          </a>
-          <div class="profile-menu__divider"></div>
-          <a routerLink="/dashboard/profile" class="profile-menu__item" (click)="closeMenu()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            Perfil
-          </a>
+
+          <!-- IDIOMA -->
+          <div class="settings-section">
+            <p class="settings-section__title">Idioma</p>
+            <div class="settings-pills">
+              <button
+                class="settings-pill"
+                [class.settings-pill--active]="settings.language() === 'es'"
+                (click)="setLanguage('es')">
+                Español
+              </button>
+              <button
+                class="settings-pill"
+                [class.settings-pill--active]="settings.language() === 'en'"
+                (click)="setLanguage('en')">
+                English
+              </button>
+            </div>
+          </div>
+
+          <!-- ACCESIBILIDAD: TAMAÑO DE LETRA -->
+          <div class="settings-section">
+            <p class="settings-section__title">Tamaño de letra</p>
+            <div class="settings-pills">
+              <button
+                class="settings-pill settings-pill--font"
+                title="Pequeño"
+                [class.settings-pill--active]="settings.fontSize() === 'sm'"
+                (click)="setFontSize('sm')">
+                A-
+              </button>
+              <button
+                class="settings-pill settings-pill--font"
+                title="Normal"
+                [class.settings-pill--active]="settings.fontSize() === 'md'"
+                (click)="setFontSize('md')">
+                A
+              </button>
+              <button
+                class="settings-pill settings-pill--font"
+                title="Grande"
+                [class.settings-pill--active]="settings.fontSize() === 'lg'"
+                (click)="setFontSize('lg')">
+                A+
+              </button>
+            </div>
+          </div>
           <div class="profile-menu__divider"></div>
           <button class="profile-menu__item profile-menu__item--danger" (click)="logout()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"

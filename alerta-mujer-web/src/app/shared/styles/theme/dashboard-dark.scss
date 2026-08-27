@@ -5,7 +5,15 @@
 [data-theme="dark"] {
 
   .sidebar {
-    background: var(--bg-card) !important; // pisa el [style.background] inline
+    background: var(--bg-card) !important; // pisa el fondo blanco por defecto
+
+    &__brand-name {
+      color: var(--text-primary) !important;
+    }
+
+    &__brand-tagline {
+      color: var(--text-muted) !important;
+    }
 
     &__section {
       color: var(--text-muted) !important;
@@ -27,7 +35,15 @@
       &--active {
         background: var(--purple-pale-hover) !important;
         color: var(--text-primary) !important;
+
+        .sidebar__link-icon {
+          color: var(--text-primary) !important;
+        }
       }
+    }
+
+    &__link-icon {
+      color: var(--text-dim) !important;
     }
   }
 }
@@ -43,8 +59,24 @@
     border-color: var(--border) !important;
 
     &__brand { color: var(--text-primary) !important; }
+    &__greeting-hi { color: var(--text-primary) !important; }
+    &__greeting-page { color: var(--purple-mid) !important; }
     &__btn { background: var(--purple-pale) !important; }
     &__username { color: var(--text-primary) !important; }
+  }
+
+  .settings-section__title { color: var(--purple-mid) !important; }
+
+  .settings-pill {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &--active {
+      background: var(--purple-deep) !important;
+      border-color: var(--purple-deep) !important;
+      color: #fff !important;
+    }
   }
 
   .topbar__hamburger:hover {
@@ -208,6 +240,15 @@
 ==================================================*/
 
 [data-theme="dark"] {
+
+  /* ── Saludo ──────────────────────────────────── */
+  .db-greeting-title {
+    color: var(--text-primary) !important;
+  }
+
+  .db-greeting-sub {
+    color: var(--purple-mid) !important;
+  }
 
   /* ── Stat cards ────────────────────────────── */
   .db-card {

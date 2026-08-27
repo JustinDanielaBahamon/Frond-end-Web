@@ -1,395 +1,459 @@
 {
-    "alertas": [
-        {
-            "id": 1,
-            "usuarioId": 1,
-            "nombre": "María Pérez",
-            "descripcion": "Pánico activado",
-            "tipo": "SOS",
-            "tiempo": "Hace 2 min",
-            "ubicacion": "Centro",
-            "lat": 4.7110,
-            "lng": -74.0721,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 2,
-            "usuarioId": 1,
-            "nombre": "María Pérez",
-            "descripcion": "Emergencia médica",
-            "tipo": "Medical",
-            "tiempo": "Hace 2 min",
-            "ubicacion": "Centro",
-            "lat": 4.7118,
-            "lng": -74.0715,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 3,
-            "usuarioId": 2,
-            "nombre": "Ana Gómez",
-            "descripcion": "Pánico activado",
-            "tipo": "SOS",
-            "tiempo": "Hace 3 min",
-            "ubicacion": "Centro",
-            "lat": 4.7105,
-            "lng": -74.0728,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 4,
-            "usuarioId": 1,
-            "nombre": "María Pérez",
-            "descripcion": "Emergencia médica",
-            "tipo": "Medical",
-            "tiempo": "Hace 5 min",
-            "ubicacion": "Chapinero",
-            "lat": 4.7200,
-            "lng": -74.0650,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 5,
-            "usuarioId": 1,
-            "nombre": "María Pérez",
-            "descripcion": "Pánico activado",
-            "tipo": "SOS",
-            "tiempo": "Hace 6 min",
-            "ubicacion": "Centro",
-            "lat": 4.7112,
-            "lng": -74.0719,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 6,
-            "usuarioId": 3,
-            "nombre": "Laura Torres",
-            "descripcion": "Robo a mano armada",
-            "tipo": "Robo",
-            "tiempo": "Hace 8 min",
-            "ubicacion": "Calle 80",
-            "lat": 4.7160,
-            "lng": -74.0680,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 7,
-            "usuarioId": 4,
-            "nombre": "Sofía Ruiz",
-            "descripcion": "Acoso en transporte",
-            "tipo": "Acoso",
-            "tiempo": "Hace 10 min",
-            "ubicacion": "Av. Caracas",
-            "lat": 4.7055,
-            "lng": -74.0760,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 8,
-            "usuarioId": 5,
-            "nombre": "Camila Ortiz",
-            "descripcion": "Emergencia médica",
-            "tipo": "Medical",
-            "tiempo": "Hace 12 min",
-            "ubicacion": "Chapinero",
-            "lat": 4.7210,
-            "lng": -74.0640,
-            "estado": "Atendida"
-        },
-        {
-            "id": 9,
-            "usuarioId": 6,
-            "nombre": "Diana Morales",
-            "descripcion": "Pánico activado",
-            "tipo": "SOS",
-            "tiempo": "Hace 15 min",
-            "ubicacion": "Centro",
-            "lat": 4.7108,
-            "lng": -74.0724,
-            "estado": "Pendiente"
-        },
-        {
-            "id": 10,
-            "usuarioId": 7,
-            "nombre": "Paola Vargas",
-            "descripcion": "Acoso en calle",
-            "tipo": "Acoso",
-            "tiempo": "Hace 18 min",
-            "ubicacion": "Av. Caracas",
-            "lat": 4.7060,
-            "lng": -74.0758,
-            "estado": "Pendiente"
-        }
-    ],
-    "zonasManuales": [],
-    "puntosMapa": [
-        {
-            "id": 1,
-            "tipo": "CAI",
-            "nombre": "CAI Centro",
-            "lat": 4.7115,
-            "lng": -74.0700
-        },
-        {
-            "id": 2,
-            "tipo": "CAI",
-            "nombre": "CAI Norte",
-            "lat": 4.7185,
-            "lng": -74.0660
-        },
-        {
-            "id": 3,
-            "tipo": "Hospital",
-            "nombre": "Hospital La Victoria",
-            "lat": 4.7060,
-            "lng": -74.0755
-        },
-        {
-            "id": 4,
-            "tipo": "Hospital",
-            "nombre": "Hospital Simón Bolívar",
-            "lat": 4.7210,
-            "lng": -74.0640
-        }
-    ],
-    "evidencias": [
-        {
-            "id": 1,
-            "usuarioId": 1,
-            "tipo": "video",
-            "nombre": "Video_alerta_001.mp4",
-            "tamanio": "15.3 MB",
-            "fecha": "13 jun 2026",
-            "alerta": "#001",
-            "estado": "En la nube"
-        },
-        {
-            "id": 2,
-            "usuarioId": 1,
-            "tipo": "foto",
-            "nombre": "Foto_alerta_001.jpg",
-            "tamanio": "5.9 MB",
-            "fecha": "13 jun 2026",
-            "alerta": "#001",
-            "estado": "En la nube"
-        },
-        {
-            "id": 3,
-            "usuarioId": 1,
-            "tipo": "audio",
-            "nombre": "Audio_alerta_002.mp3",
-            "tamanio": "1.9 MB",
-            "fecha": "13 jun 2026",
-            "alerta": "#002",
-            "estado": "En la nube"
-        },
-        {
-            "id": 4,
-            "usuarioId": 2,
-            "tipo": "video",
-            "nombre": "Video_alerta_003.mp4",
-            "tamanio": "9.2 MB",
-            "fecha": "12 jun 2026",
-            "alerta": "#003",
-            "estado": "En la nube"
-        },
-        {
-            "id": 5,
-            "usuarioId": 3,
-            "tipo": "foto",
-            "nombre": "Foto_alerta_006.jpg",
-            "tamanio": "5.7 MB",
-            "fecha": "12 jun 2026",
-            "alerta": "#006",
-            "estado": "Pendiente"
-        },
-        {
-            "id": 6,
-            "usuarioId": 4,
-            "tipo": "audio",
-            "nombre": "Audio_alerta_007.mp3",
-            "tamanio": "2.7 MB",
-            "fecha": "10 jun 2026",
-            "alerta": "#007",
-            "estado": "En la nube"
-        }
-    ],
-    "ubicaciones": [
-        {
-            "id": 1,
-            "usuarioId": 1,
-            "time": "11:30 AM",
-            "address": "Calle Principal 123, Ciudad",
-            "gpsSignal": "Fuerte",
-            "battery": 85,
-            "lat": 4.7110,
-            "lng": -74.0721
-        },
-        {
-            "id": 2,
-            "usuarioId": 1,
-            "time": "11:15 AM",
-            "address": "Parque Central",
-            "gpsSignal": "Fuerte",
-            "battery": 82,
-            "lat": 4.7095,
-            "lng": -74.0698
-        },
-        {
-            "id": 3,
-            "usuarioId": 1,
-            "time": "10:45 AM",
-            "address": "Centro Comercial",
-            "gpsSignal": "Moderada",
-            "battery": 79,
-            "lat": 4.7080,
-            "lng": -74.0750
-        },
-        {
-            "id": 4,
-            "usuarioId": 1,
-            "time": "10:30 AM",
-            "address": "Av. Libertad 456",
-            "gpsSignal": "Fuerte",
-            "battery": 76,
-            "lat": 4.7060,
-            "lng": -74.0730
-        },
-        {
-            "id": 5,
-            "usuarioId": 1,
-            "time": "9:30 AM",
-            "address": "Zona Norte, Barrio El Prado",
-            "gpsSignal": "Débil",
-            "battery": 70,
-            "lat": 4.7040,
-            "lng": -74.0710
-        },
-        {
-            "id": 6,
-            "usuarioId": 2,
-            "time": "12:00 PM",
-            "address": "Av. Caracas, Centro",
-            "gpsSignal": "Fuerte",
-            "battery": 90,
-            "lat": 4.7055,
-            "lng": -74.0760
-        },
-        {
-            "id": 7,
-            "usuarioId": 2,
-            "time": "11:40 AM",
-            "address": "Estación Norte",
-            "gpsSignal": "Moderada",
-            "battery": 88,
-            "lat": 4.7100,
-            "lng": -74.0700
-        }
-    ],
-    "usuarios": [
-        {
-            "id": 1,
-            "nombre": "María Pérez",
-            "email": "maria.perez@test.com",
-            "telefono": "+57 311 000 0001",
-            "fechaRegistro": "29/05/2023",
-            "alertas": 7,
-            "ultimaActividad": "hace 2 horas",
-            "estado": "Activa",
-            "rol": "Usuaria",
-            "contactoEmergencia": "Ana Gómez (+57 311 111 0001)",
-            "avatarColor": "#7c3aed"
-        },
-        {
-            "id": 2,
-            "nombre": "Ana Gómez",
-            "email": "ana.gomez@test.com",
-            "telefono": "+57 312 000 0002",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 2,
-            "ultimaActividad": "hace 3 días",
-            "estado": "Inactiva",
-            "rol": "Usuaria",
-            "contactoEmergencia": "Luis Díaz (+57 312 111 0002)",
-            "avatarColor": "#a78bfa"
-        },
-        {
-            "id": 3,
-            "nombre": "Laura Torres",
-            "email": "laura.torres@test.com",
-            "telefono": "+57 313 000 0003",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 12,
-            "ultimaActividad": "hace 1 semana",
-            "estado": "Bloqueada por Fraude",
-            "rol": "Usuaria",
-            "contactoEmergencia": "Pedro Flores (+57 313 111 0003)",
-            "avatarColor": "#ec4899"
-        },
-        {
-            "id": 4,
-            "nombre": "Sofía Ruiz",
-            "email": "sofia.ruiz@test.com",
-            "telefono": "+57 314 000 0004",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 9,
-            "ultimaActividad": "hace 5 días",
-            "estado": "Bloqueada por Fraude",
-            "rol": "Usuaria",
-            "contactoEmergencia": "Rosa Gomez (+57 314 111 0004)",
-            "avatarColor": "#6d28d9"
-        },
-        {
-            "id": 5,
-            "nombre": "Camila Ortiz",
-            "email": "camila.ortiz@test.com",
-            "telefono": "+57 315 000 0005",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 3,
-            "ultimaActividad": "hace 1 hora",
-            "estado": "Activa",
-            "rol": "Usuaria",
-            "contactoEmergencia": "José Tian (+57 315 111 0005)",
-            "avatarColor": "#7c3aed"
-        },
-        {
-            "id": 6,
-            "nombre": "Diana Morales",
-            "email": "diana.morales@test.com",
-            "telefono": "+57 316 000 0006",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 15,
-            "ultimaActividad": "hace 2 semanas",
-            "estado": "Bloqueada por Fraude",
-            "rol": "Usuaria",
-            "contactoEmergencia": "N/A",
-            "avatarColor": "#c4b5fd"
-        },
-        {
-            "id": 7,
-            "nombre": "Paola Vargas",
-            "email": "paola.vargas@test.com",
-            "telefono": "+57 317 000 0007",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 6,
-            "ultimaActividad": "hace 4 días",
-            "estado": "Bloqueada por Fraude",
-            "rol": "Usuaria",
-            "contactoEmergencia": "María Flores (+57 317 111 0007)",
-            "avatarColor": "#ec4899"
-        },
-        {
-            "id": 8,
-            "nombre": "Admin Principal",
-            "email": "admin@test.com",
-            "telefono": "+57 318 000 0008",
-            "fechaRegistro": "27/05/2023",
-            "alertas": 0,
-            "ultimaActividad": "hace 30 min",
-            "estado": "Activa",
-            "rol": "Admin",
-            "contactoEmergencia": "N/A",
-            "avatarColor": "#16a34a"
-        }
-    ]
+  "alertas": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "nombre": "María Pérez",
+      "descripcion": "Pánico activado",
+      "tipo": "SOS",
+      "tiempo": "Hace 2 min",
+      "ubicacion": "Centro",
+      "lat": 4.711,
+      "lng": -74.0721,
+      "estado": "Atendida"
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "nombre": "María Pérez",
+      "descripcion": "Emergencia médica",
+      "tipo": "Medical",
+      "tiempo": "Hace 2 min",
+      "ubicacion": "Centro",
+      "lat": 4.7118,
+      "lng": -74.0715,
+      "estado": "Atendida"
+    },
+    {
+      "id": "3",
+      "usuarioId": 2,
+      "nombre": "Ana Gómez",
+      "descripcion": "Pánico activado",
+      "tipo": "SOS",
+      "tiempo": "Hace 3 min",
+      "ubicacion": "Centro",
+      "lat": 4.7105,
+      "lng": -74.0728,
+      "estado": "Atendida"
+    },
+    {
+      "id": "4",
+      "usuarioId": 1,
+      "nombre": "María Pérez",
+      "descripcion": "Emergencia médica",
+      "tipo": "Medical",
+      "tiempo": "Hace 5 min",
+      "ubicacion": "Chapinero",
+      "lat": 4.72,
+      "lng": -74.065,
+      "estado": "Atendida"
+    },
+    {
+      "id": "5",
+      "usuarioId": 1,
+      "nombre": "María Pérez",
+      "descripcion": "Pánico activado",
+      "tipo": "SOS",
+      "tiempo": "Hace 6 min",
+      "ubicacion": "Centro",
+      "lat": 4.7112,
+      "lng": -74.0719,
+      "estado": "Atendida"
+    },
+    {
+      "id": "6",
+      "usuarioId": 3,
+      "nombre": "Laura Torres",
+      "descripcion": "Robo a mano armada",
+      "tipo": "Robo",
+      "tiempo": "Hace 8 min",
+      "ubicacion": "Calle 80",
+      "lat": 4.716,
+      "lng": -74.068,
+      "estado": "Atendida"
+    },
+    {
+      "id": "7",
+      "usuarioId": 4,
+      "nombre": "Sofía Ruiz",
+      "descripcion": "Acoso en transporte",
+      "tipo": "Acoso",
+      "tiempo": "Hace 10 min",
+      "ubicacion": "Av. Caracas",
+      "lat": 4.7055,
+      "lng": -74.076,
+      "estado": "Atendida"
+    },
+    {
+      "id": "8",
+      "usuarioId": 5,
+      "nombre": "Camila Ortiz",
+      "descripcion": "Emergencia médica",
+      "tipo": "Medical",
+      "tiempo": "Hace 12 min",
+      "ubicacion": "Chapinero",
+      "lat": 4.721,
+      "lng": -74.064,
+      "estado": "Atendida"
+    },
+    {
+      "id": "9",
+      "usuarioId": 6,
+      "nombre": "Diana Morales",
+      "descripcion": "Pánico activado",
+      "tipo": "SOS",
+      "tiempo": "Hace 15 min",
+      "ubicacion": "Centro",
+      "lat": 4.7108,
+      "lng": -74.0724,
+      "estado": "Atendida"
+    },
+    {
+      "id": "10",
+      "usuarioId": 7,
+      "nombre": "Paola Vargas",
+      "descripcion": "Acoso en calle",
+      "tipo": "Acoso",
+      "tiempo": "Hace 18 min",
+      "ubicacion": "Av. Caracas",
+      "lat": 4.706,
+      "lng": -74.0758,
+      "estado": "Pendiente"
+    }
+  ],
+  "zonasManuales": [
+    {
+      "nombre": "Zona Chapinero",
+      "nivel": "Medio",
+      "metodo": "area",
+      "radio": 280,
+      "centroLat": 4.719,
+      "centroLng": -74.06566666666666,
+      "alertasEnZona": 3,
+      "id": "Ehu1gtmV3Jc"
+    },
+    {
+      "nombre": "Zona Av. Caracas",
+      "nivel": "Bajo",
+      "metodo": "area",
+      "radio": 180,
+      "centroLat": 4.70575,
+      "centroLng": -74.07589999999999,
+      "alertasEnZona": 2,
+      "id": "OKWcJZGZhtI"
+    }
+  ],
+  "puntosMapa": [
+    {
+      "id": "1",
+      "tipo": "CAI",
+      "nombre": "CAI Centro",
+      "lat": 4.7115,
+      "lng": -74.07
+    },
+    {
+      "id": "2",
+      "tipo": "CAI",
+      "nombre": "CAI Norte",
+      "lat": 4.7185,
+      "lng": -74.066
+    },
+    {
+      "id": "3",
+      "tipo": "Hospital",
+      "nombre": "Hospital La Victoria",
+      "lat": 4.706,
+      "lng": -74.0755
+    },
+    {
+      "id": "4",
+      "tipo": "Hospital",
+      "nombre": "Hospital Simón Bolívar",
+      "lat": 4.721,
+      "lng": -74.064
+    }
+  ],
+  "evidencias": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "tipo": "video",
+      "tipoAlerta": "SOS",
+      "nombre": "SOS_2026-06-13_09-14.mp4",
+      "tamanio": "15.3 MB",
+      "fecha": "13 jun 2026",
+      "alerta": "#001",
+      "estado": "En la nube",
+      "ubicacion": {
+        "lat": 4.711,
+        "lng": -74.0721,
+        "direccion": "Centro"
+      },
+      "enVivo": false
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "tipo": "foto",
+      "tipoAlerta": "SOS",
+      "nombre": "SOS_2026-06-13_09-14.jpg",
+      "tamanio": "5.9 MB",
+      "fecha": "13 jun 2026",
+      "alerta": "#001",
+      "estado": "En la nube",
+      "ubicacion": {
+        "lat": 4.711,
+        "lng": -74.0721,
+        "direccion": "Centro"
+      },
+      "enVivo": false
+    },
+    {
+      "id": "3",
+      "usuarioId": 1,
+      "tipo": "audio",
+      "tipoAlerta": "Medical",
+      "nombre": "Medical_2026-06-13_09-20.mp3",
+      "tamanio": "1.9 MB",
+      "fecha": "13 jun 2026",
+      "alerta": "#002",
+      "estado": "En la nube",
+      "ubicacion": {
+        "lat": 4.7118,
+        "lng": -74.0715,
+        "direccion": "Centro"
+      },
+      "enVivo": false
+    },
+    {
+      "id": "4",
+      "usuarioId": 2,
+      "tipo": "video",
+      "tipoAlerta": "SOS",
+      "nombre": "SOS_2026-06-12_14-32.mp4",
+      "tamanio": "9.2 MB",
+      "fecha": "12 jun 2026",
+      "alerta": "#003",
+      "estado": "En la nube",
+      "ubicacion": {
+        "lat": 4.7105,
+        "lng": -74.0728,
+        "direccion": "Centro"
+      },
+      "enVivo": false
+    },
+    {
+      "id": "5",
+      "usuarioId": 3,
+      "tipo": "foto",
+      "tipoAlerta": "Robo",
+      "nombre": "Robo_2026-06-12_08-05.jpg",
+      "tamanio": "5.7 MB",
+      "fecha": "12 jun 2026",
+      "alerta": "#006",
+      "estado": "Pendiente",
+      "ubicacion": {
+        "lat": 4.716,
+        "lng": -74.068,
+        "direccion": "Calle 80"
+      },
+      "enVivo": false
+    },
+    {
+      "id": "6",
+      "usuarioId": 4,
+      "tipo": "audio",
+      "tipoAlerta": "Acoso",
+      "nombre": "Acoso_2026-06-10_17-45.mp3",
+      "tamanio": "2.7 MB",
+      "fecha": "10 jun 2026",
+      "alerta": "#007",
+      "estado": "En la nube",
+      "ubicacion": {
+        "lat": 4.7055,
+        "lng": -74.076,
+        "direccion": "Av. Caracas"
+      },
+      "enVivo": false
+    }
+  ],
+  "ubicaciones": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "time": "11:30 AM",
+      "address": "Calle Principal 123, Ciudad",
+      "gpsSignal": "Fuerte",
+      "battery": 85,
+      "lat": 4.711,
+      "lng": -74.0721
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "time": "11:15 AM",
+      "address": "Parque Central",
+      "gpsSignal": "Fuerte",
+      "battery": 82,
+      "lat": 4.7095,
+      "lng": -74.0698
+    },
+    {
+      "id": "3",
+      "usuarioId": 1,
+      "time": "10:45 AM",
+      "address": "Centro Comercial",
+      "gpsSignal": "Moderada",
+      "battery": 79,
+      "lat": 4.708,
+      "lng": -74.075
+    },
+    {
+      "id": "4",
+      "usuarioId": 1,
+      "time": "10:30 AM",
+      "address": "Av. Libertad 456",
+      "gpsSignal": "Fuerte",
+      "battery": 76,
+      "lat": 4.706,
+      "lng": -74.073
+    },
+    {
+      "id": "5",
+      "usuarioId": 1,
+      "time": "9:30 AM",
+      "address": "Zona Norte, Barrio El Prado",
+      "gpsSignal": "Débil",
+      "battery": 70,
+      "lat": 4.704,
+      "lng": -74.071
+    },
+    {
+      "id": "6",
+      "usuarioId": 2,
+      "time": "12:00 PM",
+      "address": "Av. Caracas, Centro",
+      "gpsSignal": "Fuerte",
+      "battery": 90,
+      "lat": 4.7055,
+      "lng": -74.076
+    },
+    {
+      "id": "7",
+      "usuarioId": 2,
+      "time": "11:40 AM",
+      "address": "Estación Norte",
+      "gpsSignal": "Moderada",
+      "battery": 88,
+      "lat": 4.71,
+      "lng": -74.07
+    }
+  ],
+  "usuarios": [
+    {
+      "id": "1",
+      "nombre": "María Pérez",
+      "email": "maria.perez@test.com",
+      "telefono": "+57 311 000 0001",
+      "fechaRegistro": "29/05/2023",
+      "alertas": 7,
+      "ultimaActividad": "hace 2 horas",
+      "estado": "Activa",
+      "rol": "Usuaria",
+      "contactoEmergencia": "Ana Gómez (+57 311 111 0001)",
+      "avatarColor": "#7c3aed"
+    },
+    {
+      "id": "2",
+      "nombre": "Ana Gómez",
+      "email": "ana.gomez@test.com",
+      "telefono": "+57 312 000 0002",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 2,
+      "ultimaActividad": "hace 3 días",
+      "estado": "Inactiva",
+      "rol": "Usuaria",
+      "contactoEmergencia": "Luis Díaz (+57 312 111 0002)",
+      "avatarColor": "#a78bfa"
+    },
+    {
+      "id": "3",
+      "nombre": "Laura Torres",
+      "email": "laura.torres@test.com",
+      "telefono": "+57 313 000 0003",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 12,
+      "ultimaActividad": "hace 1 semana",
+      "estado": "Bloqueada por Fraude",
+      "rol": "Usuaria",
+      "contactoEmergencia": "Pedro Flores (+57 313 111 0003)",
+      "avatarColor": "#ec4899"
+    },
+    {
+      "id": "4",
+      "nombre": "Sofía Ruiz",
+      "email": "sofia.ruiz@test.com",
+      "telefono": "+57 314 000 0004",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 9,
+      "ultimaActividad": "hace 5 días",
+      "estado": "Bloqueada por Fraude",
+      "rol": "Usuaria",
+      "contactoEmergencia": "Rosa Gomez (+57 314 111 0004)",
+      "avatarColor": "#6d28d9"
+    },
+    {
+      "id": "5",
+      "nombre": "Camila Ortiz",
+      "email": "camila.ortiz@test.com",
+      "telefono": "+57 315 000 0005",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 3,
+      "ultimaActividad": "hace 1 hora",
+      "estado": "Activa",
+      "rol": "Usuaria",
+      "contactoEmergencia": "José Tian (+57 315 111 0005)",
+      "avatarColor": "#7c3aed"
+    },
+    {
+      "id": "6",
+      "nombre": "Diana Morales",
+      "email": "diana.morales@test.com",
+      "telefono": "+57 316 000 0006",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 15,
+      "ultimaActividad": "hace 2 semanas",
+      "estado": "Bloqueada por Fraude",
+      "rol": "Usuaria",
+      "contactoEmergencia": "N/A",
+      "avatarColor": "#c4b5fd"
+    },
+    {
+      "id": "7",
+      "nombre": "Paola Vargas",
+      "email": "paola.vargas@test.com",
+      "telefono": "+57 317 000 0007",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 6,
+      "ultimaActividad": "hace 4 días",
+      "estado": "Bloqueada por Fraude",
+      "rol": "Usuaria",
+      "contactoEmergencia": "María Flores (+57 317 111 0007)",
+      "avatarColor": "#ec4899"
+    },
+    {
+      "id": "8",
+      "nombre": "Admin Principal",
+      "email": "admin@test.com",
+      "telefono": "+57 318 000 0008",
+      "fechaRegistro": "27/05/2023",
+      "alertas": 0,
+      "ultimaActividad": "hace 30 min",
+      "estado": "Activa",
+      "rol": "Admin",
+      "contactoEmergencia": "N/A",
+      "avatarColor": "#16a34a"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

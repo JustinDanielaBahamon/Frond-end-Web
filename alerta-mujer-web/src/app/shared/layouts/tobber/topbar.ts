@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { SettingsService, AppLanguage, AppFontSize } from '../../../core/settings/settings.service';
 
 @Component({
   selector: 'app-topbar',
@@ -12,10 +13,15 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class TopbarComponent {
   @Input() brand: string = 'Alerta Mujer';
   @Input() avatarLetter: string = 'U';
+  // TODO: pásalo desde el layout (dashboard-layout.ts) con el nombre real del usuario logueado
+  @Input() userName: string = 'Usuario';
+  // TODO: pásalo desde cada página, o autogénéralo con router.data['title'] en NavigationEnd
+  @Input() pageTitle: string = '';
   @Output() sidebarToggle = new EventEmitter<void>();
   @Output() themeToggle = new EventEmitter<void>();
 
   private authService = inject(AuthService);
+  settings = inject(SettingsService);
 
   isDark = false;
   menuOpen = false;
@@ -35,6 +41,14 @@ export class TopbarComponent {
 
   closeMenu() {
     this.menuOpen = false;
+  }
+
+  setLanguage(lang: AppLanguage) {
+    this.settings.setLanguage(lang);
+  }
+
+  setFontSize(size: AppFontSize) {
+    this.settings.setFontSize(size);
   }
 
   logout() {

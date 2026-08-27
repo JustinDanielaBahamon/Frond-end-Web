@@ -12,11 +12,29 @@
     gap: 10px;
   }
 
-  &__brand {
-    font-size: 1.1rem;
+  &__greeting {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    min-width: 0;
+  }
+
+  &__greeting-hi {
+    font-size: 1rem;
     font-weight: 800;
     color: #2d1457;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__greeting-page {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a78bfa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__actions {
@@ -85,7 +103,7 @@
 .profile-menu__overlay {
   position: fixed;
   inset: 0;
-  z-index: 199;
+  z-index: 4999;
 }
 
 .profile-menu {
@@ -97,7 +115,7 @@
   box-shadow: 0 8px 32px rgba(44, 20, 87, 0.18);
   padding: 8px 0;
   min-width: 210px;
-  z-index: 200;
+  z-index: 5000;
   animation: menuFadeIn 0.15s ease;
 
   &__item {
@@ -147,39 +165,70 @@
   }
 }
 
+// ── AJUSTES: IDIOMA / TAMAÑO DE LETRA ───────────
+.settings-section {
+  padding: 8px 20px 12px;
+
+  &__title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #a78bfa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 8px;
+  }
+}
+
+.settings-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.settings-pill {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  background: #f8f6ff;
+  color: #2d1457;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    border-color: #7c3aed;
+  }
+
+  &--active {
+    background: #7c3aed;
+    border-color: #7c3aed;
+    color: #fff;
+  }
+
+  &--font {
+    flex: none;
+    width: 38px;
+    text-align: center;
+  }
+}
+
 @keyframes menuFadeIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-// Modo oscuro
-:host-context(body.dark-mode) {
-  .topbar {
-    background: #2d1457;
-    border-color: rgba(255,255,255,0.05);
-    &__brand { color: #fff; }
-    &__btn { background: #3d1f6e; }
-    &__username { color: #fff; }
-  }
-
-  .profile-menu {
-    background: #2d1457;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-    &__item {
-      color: #e9d5ff;
-      svg { stroke: #e9d5ff; }
-      &:hover { background: #3d1f6e; color: #fff; }
-    }
-
-    &__divider { background: rgba(255,255,255,0.08); }
-  }
-}
+// El modo oscuro real de este componente vive en
+// src/app/shared/styles/theme/dashboard-dark.scss bajo [data-theme="dark"] { .topbar { ... } }
+// (tu app pone el atributo data-theme, no una clase body.dark-mode, así que
+// un bloque :host-context(body.dark-mode) aquí nunca se activaría).
 
 // Móvil
 @media (max-width: 768px) {
   .topbar {
     padding: 0.75rem 1rem;
     &__username { display: none; }
+    &__greeting-page { display: none; }
   }
 }

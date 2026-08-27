@@ -3,7 +3,11 @@
   <app-sidebar
     [links]="links"
     sectionTitle="Módulo"
-    [collapsed]="sidebarCollapsed">
+    [collapsed]="sidebarCollapsed"
+    [showMobileAppButton]="true"
+    mobileAppUrl="https://tu-link-de-descarga"
+    [user]="user"
+    (logout)="onLogout()">
   </app-sidebar>
 
   <div class="layout__body">

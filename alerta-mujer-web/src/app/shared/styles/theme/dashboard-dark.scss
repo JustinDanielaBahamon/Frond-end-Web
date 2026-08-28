@@ -241,21 +241,12 @@
 
 [data-theme="dark"] {
 
-  /* ── Saludo ──────────────────────────────────── */
-  .db-greeting-title {
-    color: var(--text-primary) !important;
-  }
-
-  .db-greeting-sub {
-    color: var(--purple-mid) !important;
-  }
-
-  /* ── Stat cards ────────────────────────────── */
-  .db-card {
+  /* ── 5 tarjetas de estadísticas ──────────────── */
+  .db-stat {
     &--purple { background: linear-gradient(135deg, var(--purple-deep), #2d1457) !important; }
-    &--pink   { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; }
-    &--green  { background: linear-gradient(135deg, #065f46, #064e3b) !important; }
+    &--red    { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; }
     &--teal   { background: linear-gradient(135deg, #0e7490, #164e63) !important; }
+    &--amber  { background: linear-gradient(135deg, #92400e, #451a03) !important; }
   }
 
   /* ── Título de sección (reutilizable) ───────── */
@@ -267,33 +258,28 @@
     color: var(--purple-mid) !important;
   }
 
-  /* ── Cards base (chart, mapa, actividad, accesos) ─ */
-  .db-chart-box,
-  .db-map-box,
-  .db-activity-box,
+  /* ── Paneles base (mapa, gráfica, actividad, gauge, dona, consejo, accesos) ─ */
+  .db-panel,
   .db-accesos {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
   }
 
-  /* ── Gráfica ─────────────────────────────────── */
+  /* ── Gráfica de tendencia (línea) ─────────────── */
   .db-chart-sub {
     color: var(--purple-mid) !important;
   }
 
-  .db-bar {
-    background: linear-gradient(180deg, var(--purple-mid), var(--purple-deep)) !important;
-
-    &:hover {
-      background: linear-gradient(180deg, var(--purple-deep), var(--purple-mid)) !important;
-    }
+  .db-trend-line {
+    stroke: var(--purple-mid) !important;
   }
 
-  .db-bar-label {
-    color: var(--purple-mid) !important;
+  .db-trend-dot {
+    fill: var(--bg-card) !important;
+    stroke: var(--purple-mid) !important;
   }
 
-  .db-chart-yaxis {
+  .db-trend-labels span {
     color: var(--text-dim) !important;
   }
 
@@ -367,34 +353,53 @@
     border-color: var(--purple-deep) !important;
   }
 
-  /* ── Tabla de actividad ──────────────────────── */
-  .db-activity-table {
-    th {
-      color: var(--purple-mid) !important;
-      border-bottom-color: var(--border) !important;
+  /* ── Actividad reciente (lista compacta) ─────── */
+  .db-activity-item {
+    &__titulo { color: var(--text-primary) !important; }
+    &__fecha { color: var(--text-muted) !important; }
+    &__estado {
+      background: var(--purple-pale) !important;
+      color: var(--purple-deep) !important;
     }
-
-    td {
-      color: var(--text-primary) !important;
-      border-bottom-color: var(--border) !important;
-    }
-  }
-
-  .db-ubicacion {
-    color: var(--purple-mid) !important;
-  }
-
-  .db-fecha {
-    color: var(--text-muted) !important;
-  }
-
-  .db-estado {
-    &--validada { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
-    &--ok       { background: var(--green-pale) !important; color: var(--green) !important; }
   }
 
   .db-ver-mas {
     color: var(--pink) !important;
+  }
+
+  /* ── Resumen de seguridad (medidor) ──────────── */
+  .db-gauge__hole {
+    background: var(--bg-card) !important;
+  }
+
+  .db-gauge__percent {
+    color: var(--text-primary) !important;
+  }
+
+  .db-gauge__label {
+    color: var(--text-dim) !important;
+  }
+
+  .db-gauge__mensaje {
+    color: var(--text-muted) !important;
+  }
+
+  /* ── Distribución de alertas (dona) ──────────── */
+  .db-donut__hole {
+    background: var(--bg-card) !important;
+  }
+
+  .db-donut-legend__label {
+    color: var(--text-primary) !important;
+  }
+
+  .db-donut-legend__value {
+    color: var(--text-dim) !important;
+  }
+
+  /* ── Consejo de seguridad ─────────────────────── */
+  .db-consejo__texto {
+    color: var(--text-primary) !important;
   }
 
   /* ── Accesos rápidos ─────────────────────────── */

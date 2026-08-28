@@ -1,7 +1,32 @@
-import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
+import { AuthService } from '../../../core/auth/auth.service';
+
+interface StatCard {
+  label: string;
+  value: string;
+  sub: string;
+  icon: string;
+  color: 'purple' | 'red' | 'teal' | 'amber';
+  trend?: { dir: 'up' | 'down'; percent: number };
+  statusDot?: boolean;
+}
+
+interface ActividadItem {
+  icon: string;
+  color: 'purple' | 'red' | 'green';
+  titulo: string;
+  fecha: string;
+  estado?: string;
+}
+
+interface DistribucionItem {
+  tipo: string;
+  count: number;
+  color: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -14,8 +39,20 @@ export class Home implements AfterViewInit, OnDestroy {
   @ViewChild('mapWrapper') mapWrapper!: ElementRef<HTMLDivElement>;
 
   private map: L.Map | null = null;
+  private authService = inject(AuthService);
+
   panelAbierto = false;
 
+  // ── TARJETAS DE ESTADÍSTICAS ─────────────────────
+  statCards: StatCard[] = [
+    { label: 'Total Alertas', value: '24', sub: 'Este mes', icon: 'ti-users', color: 'purple', trend: { dir: 'up', percent: 12 } },
+    { label: 'SOS Enviados', value: '12', sub: 'Este mes', icon: 'ti-alert-octagon', color: 'red', trend: { dir: 'down', percent: 8 } },
+    { label: 'Evidencias Guardadas', value: '37', sub: 'Este mes', icon: 'ti-shield-check', color: 'teal', trend: { dir: 'up', percent: 18 } },
+    { label: 'Tiempo Protegido', value: '86h 24m', sub: 'Este mes', icon: 'ti-clock', color: 'amber' },
+    { label: 'Sincronización', value: 'En línea', sub: 'Última: Hace 1 min', icon: 'ti-wifi', color: 'purple', statusDot: true },
+  ];
+
+  // ── ZONAS DE RIESGO (mapa) ───────────────────────
   zonas = [
     { lat: 2.2964, lng: -75.0199, nombre: 'Campoalegre Centro',     alertas: 24, porcentaje: 42, nivel: 'alto',  color: '#ef4444' },
     { lat: 2.9273, lng: -75.2819, nombre: 'Av. Santander, Neiva',   alertas: 15, porcentaje: 26, nivel: 'medio', color: '#f59e0b' },
@@ -24,26 +61,107 @@ export class Home implements AfterViewInit, OnDestroy {
     { lat: 2.2971, lng: -75.0210, nombre: 'Calle 15, Campoalegre',  alertas: 3,  porcentaje: 5,  nivel: 'bajo',  color: '#10b981' },
   ];
 
+  // ── GRÁFICA DE TENDENCIA (línea) ─────────────────
   chartData = [
     { mes: 'J', valor: 15 }, { mes: 'F', valor: 18 }, { mes: 'M', valor: 22 },
     { mes: 'A', valor: 25 }, { mes: 'M', valor: 20 }, { mes: 'J', valor: 10 },
     { mes: 'J', valor: 12 }, { mes: 'A', valor: 20 }, { mes: 'S', valor: 18 },
     { mes: 'O', valor: 22 }, { mes: 'N', valor: 14 }, { mes: 'D', valor: 9  },
   ];
+  private readonly chartMax = 30;
+  private readonly chartW = 300;
+  private readonly chartH = 120;
 
-  yAxis = [30, 25, 20, 15, 10, 5, 0];
+  get lineChartPoints(): string {
+    const stepX = this.chartW / (this.chartData.length - 1);
+    return this.chartData
+      .map((d, i) => `${i * stepX},${this.chartH - (d.valor / this.chartMax) * this.chartH}`)
+      .join(' ');
+  }
 
-  actividad = [
-    { n: 1, tipo: 'SOS',               ubicacion: 'Cra 7 #34-12',    fecha: 'Hoy 10:32 AM',   estado: 'VALIDADA' },
-    { n: 2, tipo: 'Perímetro check',   ubicacion: 'Calle 12 #45-67', fecha: 'Hoy 09:15 AM',   estado: 'OK' },
-    { n: 3, tipo: 'Ubicación manual',  ubicacion: 'Parque Central',   fecha: 'Ayer 14:27 PM',  estado: 'OK' },
-    { n: 4, tipo: 'Contacto agregado', ubicacion: 'N/A',              fecha: 'Ayer 11:03 AM',  estado: 'OK' },
-    { n: 5, tipo: 'Check-in diario',   ubicacion: 'N/A',              fecha: 'Lunes 18:45 PM', estado: 'OK' },
+  get lineChartAreaPath(): string {
+    const stepX = this.chartW / (this.chartData.length - 1);
+    const pts = this.chartData.map(
+      (d, i) => `${i * stepX},${this.chartH - (d.valor / this.chartMax) * this.chartH}`
+    );
+    return `M0,${this.chartH} L${pts.join(' L')} L${this.chartW},${this.chartH} Z`;
+  }
+
+  dotX(i: number): number {
+    return i * (this.chartW / (this.chartData.length - 1));
+  }
+
+  dotY(valor: number): number {
+    return this.chartH - (valor / this.chartMax) * this.chartH;
+  }
+
+  // ── ACTIVIDAD RECIENTE (lista compacta) ──────────
+  actividadReciente: ActividadItem[] = [
+    { icon: 'ti-alert-octagon', color: 'red',    titulo: 'Alerta SOS enviada',    fecha: 'Hoy, 12:30 PM',   estado: 'Atendida' },
+    { icon: 'ti-map-pin',       color: 'purple', titulo: 'Ubicación registrada',  fecha: 'Hoy, 11:45 AM' },
+    { icon: 'ti-camera',        color: 'green',  titulo: 'Evidencia guardada',    fecha: 'Hoy, 10:20 AM' },
+    { icon: 'ti-shield',        color: 'purple', titulo: 'Alerta de seguimiento', fecha: 'Ayer, 07:40 PM',  estado: 'En curso' },
   ];
+
+  // ── RESUMEN DE SEGURIDAD (medidor) ───────────────
+  resumenSeguridad = {
+    percent: 80,
+    calificacion: 'Muy bueno',
+    mensaje: '¡Sigue así! Tu nivel de protección ha mejorado un 15% este mes.',
+  };
+
+  get resumenGradient(): string {
+    const p = this.resumenSeguridad.percent;
+    return `conic-gradient(#7c3aed 0%, #10b981 ${p}%, rgba(255,255,255,0.08) ${p}% 100%)`;
+  }
+
+  // ── DISTRIBUCIÓN DE ALERTAS POR TIPO (dona) ──────
+  distribucionAlertas: DistribucionItem[] = [
+    { tipo: 'SOS',         count: 12, color: '#ef4444' },
+    { tipo: 'Seguimiento', count: 6,  color: '#7c3aed' },
+    { tipo: 'Evidencia',   count: 6,  color: '#f59e0b' },
+    { tipo: 'Otro',        count: 2,  color: '#06b6d4' },
+  ];
+
+  get distribucionTotal(): number {
+    return this.distribucionAlertas.reduce((sum, d) => sum + d.count, 0);
+  }
+
+  distribucionPercent(count: number): number {
+    return Math.round((count / this.distribucionTotal) * 100);
+  }
+
+  get distribucionGradient(): string {
+    let acc = 0;
+    const stops = this.distribucionAlertas.map(d => {
+      const start = acc;
+      acc += (d.count / this.distribucionTotal) * 100;
+      return `${d.color} ${start}% ${acc}%`;
+    });
+    return `conic-gradient(${stops.join(', ')})`;
+  }
+
+  // ── CONSEJO DE SEGURIDAD ──────────────────────────
+  consejo = {
+    icono: 'ti-shield-lock',
+    texto: 'Activa el acceso rápido a SOS desde tu pantalla de bloqueo',
+  };
 
   togglePanel(): void {
     this.panelAbierto = !this.panelAbierto;
     setTimeout(() => this.map?.invalidateSize(), 300);
+  }
+
+  /** Botón "Ampliar" del mapa compacto: entra a pantalla completa y abre
+   * de una vez el panel con la lista de zonas, ya que ahí sí hay espacio. */
+  verZonasDetalle(): void {
+    if (!document.fullscreenElement) {
+      this.toggleFullscreen();
+    }
+    setTimeout(() => {
+      this.panelAbierto = true;
+      this.map?.invalidateSize();
+    }, 250);
   }
 
   toggleFullscreen(): void {

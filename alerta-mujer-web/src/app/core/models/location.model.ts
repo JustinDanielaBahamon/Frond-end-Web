@@ -1,5 +1,5 @@
 export interface UbicacionEntry {
-  id: number;
+  id: string;
   usuarioId: number;
   time: string;
   address: string;
@@ -7,4 +7,7 @@ export interface UbicacionEntry {
   battery: number;
   lat: number;
   lng: number;
+  date?: string;           // 'YYYY-MM-DD' — agrégalo en el backend para que el calendario filtre de verdad
+  connectionType?: string; // opcional
+  deviceName?: string;     // opcional
 }

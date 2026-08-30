@@ -7,6 +7,6 @@ export interface Alerta {
   ubicacion: string;
   lat: number;
   lng: number;
-  estado: 'Pendiente' | 'Atendida';
+  estado: 'Pendiente' | 'Atendida' | 'Falsa alarma';
   usuarioId?: number; // 👈 opcional: admin no lo usa, usuaria sí lo necesita para filtrar
 }

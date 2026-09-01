@@ -1,72 +1,239 @@
 <div class="ev-wrap">
 
-  <h1 class="ev-title">Evidencias</h1>
-  <p class="ev-sub">Archivos capturados automáticamente durante las alertas</p>
-
-  <!-- STATS -->
-  <div class="ev-stats">
-    <div class="ev-stat">
-      <p class="ev-stat-label">Total archivos</p>
-      <p class="ev-stat-val pink">9</p>
+  <!-- CABECERA -->
+  <div class="ev-header">
+    <div>
+      <h1 class="ev-title">Evidencias</h1>
+      <p class="ev-sub">Archivos capturados automáticamente durante las alertas</p>
     </div>
-    <div class="ev-stat">
-      <p class="ev-stat-label">Videos</p>
-      <p class="ev-stat-val purple">3</p>
-    </div>
-    <div class="ev-stat">
-      <p class="ev-stat-label">Fotos</p>
-      <p class="ev-stat-val pink">3</p>
-    </div>
-    <div class="ev-stat">
-      <p class="ev-stat-label">Audios</p>
-      <p class="ev-stat-val green">3</p>
-    </div>
-  </div>
 
-  <!-- BANNER NUBE -->
-  <div class="ev-banner">
-    <i class="ti ti-cloud" aria-hidden="true"></i>
-    <p>
-      <strong>Nube Activa — Sincronización Automática:</strong>
-      Todas las evidencias se suben automáticamente al activar una alerta.
-      Se conservan incluso si el móvil se pierde o formatea.
-    </p>
-  </div>
-
-  <!-- FILTROS -->
-  <div class="ev-filtros">
-    @for (f of filtros; track f.key) {
-      <button class="ev-pill" [ngClass]="{'ev-pill--active': filtroActivo === f.key}"
-              (click)="setFiltro(f.key)">
-        {{ f.label }}
-      </button>
-    }
-  </div>
-
-  <!-- GALERÍA -->
-  <div class="ev-grid">
-    @for (e of evidenciasFiltradas; track e.id) {
-      <div class="ev-card" (click)="abrirModal(e)">
-        <div class="ev-card__preview" [ngClass]="getColor(e.tipo)">
-          <i class="ti" [ngClass]="getIcono(e.tipo)" aria-hidden="true"></i>
-        </div>
-        <div class="ev-card__body">
-            
-          <p class="ev-card__nombre">{{ e.nombre }}</p>
-          <p class="ev-card__meta">{{ e.tamanio }} · {{ e.fecha }}</p>
-          <p class="ev-card__alerta">Alerta {{ e.alerta }}</p>
-          <span class="ev-card__estado" [ngClass]="e.estado === 'En la nube' ? 'estado-nube' : 'estado-pendiente'">
-            <i class="ti" [ngClass]="e.estado === 'En la nube' ? 'ti-cloud-check' : 'ti-clock'" aria-hidden="true"></i>
-            {{ e.estado }}
-          </span>
-        </div>
+    <div class="ev-header-actions">
+      <div class="ev-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Buscar evidencia..." [value]="terminoBusqueda" (input)="onBuscar($event)" />
       </div>
-    }
+
+      <button type="button" class="ev-btn ev-btn--ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filtros
+      </button>
+
+      <button type="button" class="ev-btn ev-btn--primary" (click)="sincronizarAhora()" [disabled]="sincronizando">
+        <svg [class.ev-spin]="sincronizando" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        {{ sincronizando ? 'Sincronizando...' : 'Sincronizar ahora' }}
+      </button>
+    </div>
   </div>
 
-  <p class="ev-footer">
-    * Las evidencias sincronizadas se conservan incluso si el móvil se formatea o se pierde.
-  </p>
+  <!-- ERROR -->
+  @if (error) {
+    <p class="ev-error">No se pudieron cargar las evidencias. Intenta de nuevo.</p>
+  }
+
+  @if (!error) {
+
+    <!-- STATS -->
+    <div class="ev-stats">
+      <div class="ev-stat ev-stat--total">
+        <div class="ev-stat-head">
+          <div class="ev-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+            </svg>
+          </div>
+          <p class="ev-stat-label">Total archivos</p>
+        </div>
+        <p class="ev-stat-val">{{ evidencias.length }}</p>
+        <p class="ev-stat-sub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+          </svg>
+          +{{ totalEsteMes }} este mes
+        </p>
+      </div>
+
+      <div class="ev-stat ev-stat--videos">
+        <div class="ev-stat-head">
+          <div class="ev-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <p class="ev-stat-label">Videos</p>
+        </div>
+        <p class="ev-stat-val">{{ contarPorTipo('video') }}</p>
+        <p class="ev-stat-sub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+          </svg>
+          +{{ videosEsteMes }} este mes
+        </p>
+      </div>
+
+      <div class="ev-stat ev-stat--fotos">
+        <div class="ev-stat-head">
+          <div class="ev-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <p class="ev-stat-label">Fotos</p>
+        </div>
+        <p class="ev-stat-val">{{ contarPorTipo('foto') }}</p>
+        <p class="ev-stat-sub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+          </svg>
+          +{{ fotosEsteMes }} este mes
+        </p>
+      </div>
+
+      <div class="ev-stat ev-stat--audios">
+        <div class="ev-stat-head">
+          <div class="ev-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </div>
+          <p class="ev-stat-label">Audios</p>
+        </div>
+        <p class="ev-stat-val">{{ contarPorTipo('audio') }}</p>
+        <p class="ev-stat-sub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+          </svg>
+          +{{ audiosEsteMes }} este mes
+        </p>
+      </div>
+    </div>
+
+    <!-- BANNER NUBE -->
+    <div class="ev-banner">
+      <svg class="ev-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+      </svg>
+      <p class="ev-banner-text">
+        <strong>Nube Activa — Sincronización Automática:</strong>
+        Todas las evidencias se suben automáticamente al activar una alerta.
+        Se conservan incluso si el móvil se pierde o formatea.
+      </p>
+
+      <div class="ev-banner-status">
+        @if (todoSincronizado) {
+          <span class="ev-sync-badge ev-sync-badge--ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            Todo sincronizado
+          </span>
+        } @else {
+          <span class="ev-sync-badge ev-sync-badge--pending">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {{ pendientesCount }} pendiente{{ pendientesCount === 1 ? '' : 's' }}
+          </span>
+        }
+        <span class="ev-sync-time">Última sincronización: {{ formatearUltimaSync() }}</span>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="ev-filtros">
+      @for (f of filtros; track f.key) {
+        <button type="button" class="ev-pill" [ngClass]="{'ev-pill--active': filtroActivo === f.key}"
+                (click)="setFiltro(f.key)">
+          {{ f.label }}
+          <span class="ev-pill-count">{{ contarPorTipo(f.key) }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- GALERÍA -->
+    <div class="ev-grid">
+      @for (e of evidenciasFiltradas; track e.id) {
+        <div class="ev-card" (click)="abrirModal(e)">
+          <div class="ev-card__preview" [ngClass]="getColor(e.tipo)">
+            <span class="ev-card__tipo-badge" [ngClass]="getColor(e.tipo)">{{ e.tipo | uppercase }}</span>
+
+            @switch (e.tipo) {
+              @case ('video') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="23 7 16 12 23 17 23 7"/>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+              }
+              @case ('foto') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              }
+              @case ('audio') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              }
+              @default {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              }
+            }
+          </div>
+
+          <div class="ev-card__body">
+            <p class="ev-card__nombre">{{ e.nombre }}</p>
+            <p class="ev-card__meta">{{ e.tamanio }} · {{ e.fecha }}</p>
+            <p class="ev-card__alerta">Alerta {{ e.alerta }}</p>
+            <span class="ev-card__estado" [ngClass]="e.estado === 'En la nube' ? 'estado-nube' : 'estado-pendiente'">
+              @if (e.estado === 'En la nube') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              }
+              {{ e.estado }}
+            </span>
+          </div>
+        </div>
+      } @empty {
+        <p class="ev-empty">
+          {{ terminoBusqueda ? 'No hay evidencias que coincidan con tu búsqueda.' : 'Aún no tienes evidencias registradas.' }}
+        </p>
+      }
+    </div>
+
+    <p class="ev-footer">
+      * Las evidencias sincronizadas se conservan incluso si el móvil se formatea o se pierde.
+    </p>
+
+  }
 
 </div>
 
@@ -82,7 +249,28 @@
 
       <div class="ev-modal-body">
         <div class="ev-modal-preview" [ngClass]="getColor(evidenciaSeleccionada.tipo)">
-          <i class="ti" [ngClass]="getIcono(evidenciaSeleccionada.tipo)" aria-hidden="true"></i>
+          @switch (evidenciaSeleccionada.tipo) {
+            @case ('video') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            }
+            @case ('foto') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            }
+            @case ('audio') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            }
+          }
         </div>
         <div class="ev-detail-row">
           <span class="ev-detail-label">Tipo</span>
@@ -107,7 +295,11 @@
           </span>
         </div>
         <button class="ev-download-btn">
-          <i class="ti ti-download" aria-hidden="true"></i>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
           Descargar evidencia
         </button>
       </div>

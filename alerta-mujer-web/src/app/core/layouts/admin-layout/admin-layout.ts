@@ -22,6 +22,7 @@ export class AdminLayoutComponent {
     { label: 'Gestion  Contactos de Emergencia', route: '/admin/emergency-management'},
     { label: 'Gestion de evidencias' , route:'/admin/evidence-management'},
     { label: 'Gestion de Moderadores' , route:'/admin/moderator-management'},
+    { label: 'Gestion de Dispositivos', route: '/admin/devices-management'},
   ];
 
   toggleTheme() {

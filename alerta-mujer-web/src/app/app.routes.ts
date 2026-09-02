@@ -20,7 +20,7 @@ import {
 } from './core/guards/role.guard';
 import { Path } from 'leaflet';
 import { EmergencyManagementComponent } from './features/admin/emergency-management/emergency-management';
-
+import { DeviceManagementComponent } from './features/admin/devices-management/devices-management';
 export const routes: Routes = [
 
   // ─────────────────────────────────────────────────────────────
@@ -89,39 +89,67 @@ export const routes: Routes = [
     children: [
 
       {
-        path: '',
+        path: 'dashboard',
         loadComponent: () =>
-          import('./features/dashboard/home/home')
-            .then(m => m.Home),
+          import('./features/admin/dashboard/dashboard')
+            .then(m => m.AdminDashboardComponent),
       },
-
+      
       {
-        path: 'phone-location',
+        path: 'usuarios',
         loadComponent: () =>
-          import('./features/dashboard/phone-location/phone-location')
-            .then(m => m.PhoneLocationComponent),
+          import('./features/admin/user/user')
+            .then(m => m.UserComponent),
       },
-
+      
       {
-        path: 'device-status',
+        path: 'alertas',
         loadComponent: () =>
-          import('./features/dashboard/device-status/device-status')
-            .then(m => m.DeviceStatusComponent),
+          import('./features/admin/alert-admin/alert-admin')
+            .then(m => m.AlertAdminComponent),
       },
-
+      
       {
-        path: 'alert-history',
+        path: 'zone-management',
         loadComponent: () =>
-          import('./features/dashboard/alert-history/alert-history')
-            .then(m => m.AlertHistory),
+          import('./features/admin/zone-management/zone-management')
+            .then(m => m.ZoneManagementComponent),
       },
-
+      
       {
-        path: 'evidence',
+        path: 'report-management',
         loadComponent: () =>
-          import('./features/dashboard/evidence/evidence')
-            .then(m => m.Evidence),
-      }
+          import('./features/admin/report-management/report-management')
+            .then(m => m.ReportManagementComponent),
+      },
+      
+      {
+        path: 'emergency-management',
+        loadComponent: () =>
+          import('./features/admin/emergency-management/emergency-management')
+            .then(m => m.EmergencyManagementComponent),
+      },
+      
+      {
+        path: 'evidence-management',
+        loadComponent: () =>
+          import('./features/admin/evidence-management/evidence-management')
+            .then(m => m.EvidencesManagementComponent),
+      },
+      
+      {
+        path: 'moderator-management',
+        loadComponent: () =>
+          import('./features/admin/moderator-management/moderator-management')
+            .then(m => m.ModeratorManagementComponent),
+      },
+      
+      {
+        path: 'devices-management',
+        loadComponent: () =>
+          import('./features/admin/devices-management/devices-management')
+            .then(m => m.DeviceManagementComponent),
+      },
 
     ],
   },
@@ -193,6 +221,12 @@ export const routes: Routes = [
           import('./features/admin/moderator-management/moderator-management')
             .then(m => m.ModeratorManagementComponent)
       },
+      {
+        path: 'devices-management',
+        loadComponent: () =>
+          import('./features/admin/devices-management/devices-management')
+            .then(m => m.DeviceManagementComponent)
+      }
 
     ],
   },

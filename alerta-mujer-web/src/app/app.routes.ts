@@ -88,6 +88,36 @@ export const routes: Routes = [
 
     children: [
 
+      // ⬇️ ESTA ES LA RUTA QUE FALTABA. Sin ella, al entrar a "/dashboard"
+      // el router-outlet del layout no tiene qué mostrar y queda en blanco.
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/dashboard/home/home')
+            .then(m => m.Home),
+      },
+
+      {
+        path: 'phone-location',
+        loadComponent: () =>
+          import('./features/dashboard/phone-location/phone-location')
+            .then(m => m.PhoneLocationComponent),
+      },
+
+      {
+        path: 'alert-history',
+        loadComponent: () =>
+          import('./features/dashboard/alert-history/alert-history')
+            .then(m => m.AlertHistory),
+      },
+
+      {
+        path: 'evidence',
+        loadComponent: () =>
+          import('./features/dashboard/evidence/evidence')
+            .then(m => m.Evidence),
+      },
+
       {
         path: 'dashboard',
         loadComponent: () =>

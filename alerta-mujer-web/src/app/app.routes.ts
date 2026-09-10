@@ -118,6 +118,35 @@ export const routes: Routes = [
             .then(m => m.Evidence),
       },
 
+      // ── Módulos nuevos del panel de usuaria ─────────────────
+      {
+        path: 'emergency-contacts',
+        loadComponent: () =>
+          import('./features/dashboard/emergency-contacts/emergency-contacts')
+            .then(m => m.EmergencyContacts),
+      },
+
+      {
+        path: 'assistance',
+        loadComponent: () =>
+          import('./features/dashboard/assistance/assistance')
+            .then(m => m.Assistance),
+      },
+
+      {
+        path: 'device',
+        loadComponent: () =>
+          import('./features/dashboard/device/device')
+            .then(m => m.Device),
+      },
+
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/dashboard/settings/settings')
+            .then(m => m.Settings),
+      },
+
       {
         path: 'dashboard',
         loadComponent: () =>

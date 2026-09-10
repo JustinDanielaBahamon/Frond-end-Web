@@ -25,7 +25,6 @@ export class SidebarComponent {
   @Input() links: SidebarLink[] = [];
   @Input() sectionTitle: string = 'Módulo';
   @Input() collapsed: boolean = false;
-  @Input() accentColor: string = '#2d1457';
 
   @Input() brandName: string = 'Alerta Mujer';
   @Input() brandTagline: string = 'Tu seguridad, siempre';

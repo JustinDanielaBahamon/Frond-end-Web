@@ -19,10 +19,14 @@ export class DashboardLayoutComponent {
   sidebarCollapsed = false;
 
   links: SidebarLink[] = [
-    { label: 'Dashboard',              route: '/dashboard',               icon: 'fa-solid fa-house',       exact: true },
-    { label: 'Ubicación del teléfono', route: '/dashboard/phone-location', icon: 'fa-solid fa-location-dot' },
-    { label: 'Historial de Alerta',    route: '/dashboard/alert-history',  icon: 'fa-solid fa-bell' },
-    { label: 'Evidencias',             route: '/dashboard/evidence',       icon: 'fa-solid fa-folder-open' },
+    { label: 'Inicio',                 route: '/dashboard',                    icon: 'fa-solid fa-house',       exact: true },
+    { label: 'Mis emergencias',        route: '/dashboard/alert-history',      icon: 'fa-solid fa-triangle-exclamation' },
+    { label: 'Ubicación',              route: '/dashboard/phone-location',     icon: 'fa-solid fa-location-dot' },
+    { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
+    { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
+    { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },
+    { label: 'Mi dispositivo',         route: '/dashboard/device',             icon: 'fa-solid fa-mobile-screen' },
+    { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];
 
   // ⚠️ reemplaza por el usuario real cuando AuthService lo exponga

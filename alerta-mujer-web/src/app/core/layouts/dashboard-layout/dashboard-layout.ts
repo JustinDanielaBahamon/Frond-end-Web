@@ -21,7 +21,7 @@ export class DashboardLayoutComponent {
   links: SidebarLink[] = [
     { label: 'Inicio',                 route: '/dashboard',                    icon: 'fa-solid fa-house',       exact: true },
     { label: 'Mis emergencias',        route: '/dashboard/alert-history',      icon: 'fa-solid fa-triangle-exclamation' },
-    { label: 'Ubicación',              route: '/dashboard/phone-location',     icon: 'fa-solid fa-location-dot' },
+    { label: 'Ubicación',              route: '/dashboard/ubicacion',          icon: 'fa-solid fa-location-dot' },
     { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
     { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
     { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },

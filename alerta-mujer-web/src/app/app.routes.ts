@@ -18,7 +18,6 @@ import {
   adminGuard,
   userGuard,
 } from './core/guards/role.guard';
-import { Path } from 'leaflet';
 import { EmergencyManagementComponent } from './features/admin/emergency-management/emergency-management';
 import { DeviceManagementComponent } from './features/admin/devices-management/devices-management';
 export const routes: Routes = [
@@ -102,6 +101,40 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/phone-location/phone-location')
             .then(m => m.PhoneLocationComponent),
+      },
+
+      {
+        path: 'ubicacion',
+        loadComponent: () =>
+          import('./features/dashboard/ubicacion/location-shell')
+            .then(m => m.LocationShellComponent),
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'my-location' },
+          {
+            path: 'my-location',
+            loadComponent: () =>
+              import('./features/dashboard/mi-ubicacion/my-location')
+                .then(m => m.MyLocationComponent),
+          },
+          {
+            path: 'history',
+            loadComponent: () =>
+              import('./features/dashboard/location-history/location-history')
+                .then(m => m.LocationHistoryComponent),
+          },
+          {
+            path: 'frequent-places',
+            loadComponent: () =>
+              import('./features/dashboard/lugares-frecuentes/frequent-places')
+                .then(m => m.FrequentPlacesComponent),
+          },
+          {
+            path: 'nearby-zones',
+            loadComponent: () =>
+              import('./features/dashboard/zonas-cercanas/nearby-zones')
+                .then(m => m.NearbyZonesComponent),
+          },
+        ],
       },
 
       {

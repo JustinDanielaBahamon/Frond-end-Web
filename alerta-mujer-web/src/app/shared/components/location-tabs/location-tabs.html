@@ -1,0 +1,26 @@
+<div class="lt-header">
+  <h1 class="lt-title">{{ title }}</h1>
+  <p class="lt-subtitle">{{ subtitle }}</p>
+</div>
+
+<nav class="lt-tabs">
+  @for (tab of tabs; track tab.path) {
+    <a class="lt-tab" [routerLink]="tab.path" routerLinkActive="lt-tab--active">
+      @switch (tab.icon) {
+        @case ('location') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        }
+        @case ('clock') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        }
+        @case ('star') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        }
+        @case ('shield') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        }
+      }
+      {{ tab.label }}
+    </a>
+  }
+</nav>

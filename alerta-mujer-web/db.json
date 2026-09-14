@@ -455,5 +455,18 @@
       "avatarColor": "#16a34a"
     }
   ],
+
+  "frequentPlaces": [
+      { "id": 1, "userId": 1, "name": "Casa", "type": "home", "address": "Carrera 5 #21-45", "city": "Neiva, Huila", "lat": 4.711, "lng": -74.0721, "isMain": true },
+      { "id": 2, "userId": 1, "name": "Trabajo", "type": "work", "address": "Calle 10 #8-20", "city": "Neiva, Huila", "lat": 4.7095, "lng": -74.0698 },
+      { "id": 3, "userId": 1, "name": "SENA", "type": "study", "address": "Neiva, Huila", "city": "Neiva, Huila", "lat": 4.708, "lng": -74.075 }
+  ],
+
+ "nearbyZones": [
+      { "id": 1, "name": "Zona segura", "type": "safe", "description": "Parque Santander", "distanceKm": 0.8, "lat": 4.7112, "lng": -74.0715, "radiusMeters": 200 },
+      { "id": 2, "name": "Zona de riesgo", "type": "risk", "description": "Sector X", "distanceKm": 1.2, "lat": 4.706, "lng": -74.073, "radiusMeters": 150 },
+      { "id": 3, "name": "Centro de ayuda", "type": "help", "description": "Casa de la Mujer", "distanceKm": 1.5, "lat": 4.704, "lng": -74.071, "radiusMeters": 100 }
+  ],
+
   "$schema": "./node_modules/json-server/schema.json"
 }

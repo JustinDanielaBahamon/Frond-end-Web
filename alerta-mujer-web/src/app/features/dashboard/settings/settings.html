@@ -1,1 +1,291 @@
-<p>settings works!</p>
+<section class="settings">
+  <header class="settings__header">
+    <h1>Ajustes</h1>
+    <p>Personaliza la aplicación según tus necesidades.</p>
+  </header>
+
+  <div class="settings__grid">
+
+    <!-- CUENTA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-user-circle"></i> Cuenta</h2>
+        <button type="button" class="link-btn" (click)="onEditProfile()">Editar perfil</button>
+      </div>
+
+      <div class="account-profile">
+        <div class="avatar">
+          @if (user().avatarUrl) {
+            <img [src]="user().avatarUrl" [alt]="user().name" />
+          } @else {
+            <i class="ti ti-user"></i>
+          }
+        </div>
+        <div>
+          <strong>{{ user().name }}</strong>
+          <span>{{ user().email }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link">
+        <i class="ti ti-lock"></i>
+        <span>Cambiar contraseña</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <button type="button" class="setting-row setting-row--link">
+        <i class="ti ti-mail"></i>
+        <span>Correo electrónico</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <button type="button" class="setting-row setting-row--link">
+        <i class="ti ti-phone"></i>
+        <span>Número de teléfono</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+
+      <button type="button" class="setting-row setting-row--danger" (click)="onDeleteAccount()">
+        <i class="ti ti-trash"></i>
+        <span>Eliminar cuenta</span>
+      </button>
+    </article>
+
+    <!-- APARIENCIA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-palette"></i> Apariencia</h2>
+      </div>
+
+      <p class="settings-card__label">Tema</p>
+      <div class="theme-options">
+        <button type="button" class="theme-option" [class.active]="theme() === 'light'" (click)="toggleTheme('light')">
+          <span class="theme-preview theme-preview--light"></span>
+          <span>Claro</span>
+        </button>
+        <button type="button" class="theme-option" [class.active]="theme() === 'dark'" (click)="toggleTheme('dark')">
+          <span class="theme-preview theme-preview--dark"></span>
+          <span>Oscuro</span>
+        </button>
+      </div>
+
+      <p class="settings-card__label">Color principal</p>
+      <div class="color-swatches">
+        @for (color of accentColors; track color.value) {
+          <button
+            type="button"
+            class="swatch"
+            [class.active]="selectedColor() === color.value"
+            [style.background]="color.value"
+            [attr.aria-label]="color.name"
+            (click)="selectColor(color.value)">
+          </button>
+        }
+      </div>
+
+      <p class="settings-card__label">Tamaño de letra</p>
+      <div class="font-size-options">
+        @for (size of fontSizes; track size) {
+          <button
+            type="button"
+            class="font-size-option"
+            [class.active]="selectedFontSize() === size"
+            (click)="selectFontSize(size)">
+            <span [class]="'font-size-option__sample font-size-option__sample--' + size">Aa</span>
+            <span class="font-size-option__label">{{ size }}</span>
+          </button>
+        }
+      </div>
+    </article>
+
+    <!-- NOTIFICACIONES -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-bell"></i> Notificaciones</h2>
+      </div>
+
+      @for (item of notifications(); track item.key) {
+        <div class="setting-row setting-row--toggle">
+          <div>
+            <strong>{{ item.label }}</strong>
+            <span>{{ item.description }}</span>
+          </div>
+          <button
+            type="button"
+            class="switch"
+            [class.on]="item.enabled"
+            role="switch"
+            [attr.aria-checked]="item.enabled"
+            (click)="toggleNotification(item.key)">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+      }
+    </article>
+
+    <!-- PRIVACIDAD -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-shield-lock"></i> Privacidad</h2>
+      </div>
+
+      <div class="setting-row setting-row--toggle">
+        <div>
+          <strong>Permitir ubicación en segundo plano</strong>
+          <span>Mejora la precisión de tu ubicación.</span>
+        </div>
+        <button
+          type="button"
+          class="switch"
+          [class.on]="backgroundLocation()"
+          role="switch"
+          [attr.aria-checked]="backgroundLocation()"
+          (click)="toggleBackgroundLocation()">
+          <span class="switch__thumb"></span>
+        </button>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link">
+        <div>
+          <strong>Uso de datos</strong>
+          <span>Wi-Fi y datos móviles</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+
+      <button type="button" class="setting-row setting-row--link">
+        <div>
+          <strong>Personalización de datos</strong>
+          <span>Controla qué información compartes.</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+
+      <div class="settings-card__banner">
+        <i class="ti ti-shield-check"></i>
+        <div>
+          <strong>Tu privacidad es importante</strong>
+          <span>Puedes ajustar qué información compartes y cómo se usa.</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- SEGURIDAD -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-shield"></i> Seguridad</h2>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link">
+        <div>
+          <strong>Bloqueo de la aplicación</strong>
+          <span>Usa un PIN o huella para acceder.</span>
+        </div>
+        <span class="status-pill" [class.status-pill--active]="appLockActive()">
+          {{ appLockActive() ? 'Activado' : 'Desactivado' }}
+        </span>
+      </button>
+
+      <div class="setting-row setting-row--toggle">
+        <div>
+          <strong>Autenticación biométrica</strong>
+          <span>Huella dactilar o reconocimiento facial.</span>
+        </div>
+        <button
+          type="button"
+          class="switch"
+          [class.on]="biometricAuth()"
+          role="switch"
+          [attr.aria-checked]="biometricAuth()"
+          (click)="toggleBiometricAuth()">
+          <span class="switch__thumb"></span>
+        </button>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link">
+        <div>
+          <strong>Tiempo de bloqueo automático</strong>
+          <span>Después de inactividad.</span>
+        </div>
+        <span class="setting-row__value">{{ autoLockTime() }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+
+      <div class="settings-card__banner">
+        <i class="ti ti-shield-check"></i>
+        <div>
+          <strong>Tu seguridad es nuestra prioridad</strong>
+          <span>Mantén tu cuenta protegida en todo momento.</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- SOPORTE Y AYUDA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-headset"></i> Soporte y ayuda</h2>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link">
+        <span>Centro de ayuda</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <button type="button" class="setting-row setting-row--link">
+        <span>Términos y condiciones</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <button type="button" class="setting-row setting-row--link">
+        <span>Política de privacidad</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <button type="button" class="setting-row setting-row--link">
+        <span>Información de la aplicación</span>
+        <span class="setting-row__value">Versión 1.0.0</span>
+      </button>
+
+      <div class="settings-card__banner settings-card__banner--support">
+        <i class="ti ti-headset"></i>
+        <div>
+          <strong>¿Necesitas ayuda?</strong>
+          <span>Estamos aquí para apoyarte.</span>
+        </div>
+        <button type="button" class="btn-primary" (click)="onContactSupport()">Contactar soporte</button>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- BANNER INFERIOR -->
+  <footer class="settings__footer">
+    <div class="footer-item footer-item--highlight">
+      <i class="ti ti-shield-check"></i>
+      <span>Tu seguridad, en tus manos</span>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-moon"></i>
+      <div>
+        <strong>Modo claro / oscuro</strong>
+        <span>Elige el tema que prefieras.</span>
+      </div>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-palette"></i>
+      <div>
+        <strong>Personaliza colores</strong>
+        <span>Hazla única con tu color favorito.</span>
+      </div>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-text-size"></i>
+      <div>
+        <strong>Tamaño de letra</strong>
+        <span>Mejora la legibilidad.</span>
+      </div>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-bell"></i>
+      <div>
+        <strong>Notificaciones</strong>
+        <span>Mantente siempre informada.</span>
+      </div>
+    </div>
+  </footer>
+</section>

@@ -1,1 +1,269 @@
-<p>emergency-contacts works!</p>
+@if (error) {
+  <p class="ec-error">No se pudieron cargar tus contactos de emergencia.</p>
+}
+
+@if (!error) {
+<div class="ec-wrap" (click)="cerrarMenu()">
+
+  <div class="ec-header">
+    <div>
+      <h2 class="ec-title">Contactos de emergencia</h2>
+      <p class="ec-sub">Gestiona las personas que recibirán tus alertas.</p>
+    </div>
+    <button type="button" class="ec-add-btn" (click)="$event.stopPropagation(); abrirModalAgregar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Agregar contacto
+    </button>
+  </div>
+
+  <div class="ec-info-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    En caso de emergencia, los contactos recibirán una notificación en el orden de prioridad que configures.
+  </div>
+
+  @if (loading) {
+    <p class="ec-muted">Cargando contactos...</p>
+  } @else {
+    <div class="ec-table-wrap">
+      <table class="ec-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Relación</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of contactos; track c.id) {
+            <tr>
+              <td>
+                <span class="ec-avatar">{{ iniciales(c.nombre) }}</span>
+              </td>
+              <td class="ec-nombre">{{ c.nombre }}</td>
+              <td>{{ c.telefono }}</td>
+              <td>{{ c.relacion }}</td>
+              <td><span class="ec-prioridad">{{ c.prioridad }}</span></td>
+              <td>
+                <span class="ec-badge" [ngClass]="c.activo ? 'ec-badge--activo' : 'ec-badge--inactivo'">
+                  {{ c.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="ec-actions">
+                  <button type="button" class="ec-icon-btn" title="Editar" (click)="$event.stopPropagation(); abrirModalEditar(c)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <div class="ec-menu-wrap">
+                    <button type="button" class="ec-icon-btn" title="Más acciones" (click)="$event.stopPropagation(); toggleMenu(c.id)">⋮</button>
+                    @if (menuAbierto === c.id) {
+                      <div class="ec-menu" (click)="$event.stopPropagation()">
+                        <button type="button" (click)="abrirModalEditar(c)">Editar</button>
+                        <button type="button" (click)="toggleActivo(c)">{{ c.activo ? 'Desactivar' : 'Activar' }}</button>
+                        <button type="button" class="ec-menu-danger" (click)="eliminarDesdeMenu(c)">Eliminar</button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="ec-empty">Aún no tienes contactos de emergencia registrados.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ec-footer-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <p>
+        Puedes reordenar la prioridad de tus contactos en cualquier momento.
+        Los contactos inactivos no recibirán notificaciones.
+      </p>
+    </div>
+  }
+</div>
+}
+
+<!-- MODAL AGREGAR -->
+@if (modalAgregarAbierto) {
+  <div class="ec-modal-bg" (click)="cerrarModalAgregar()">
+    <div class="ec-modal" (click)="$event.stopPropagation()">
+      <div class="ec-modal-header">
+        <div>
+          <h3>Agregar contacto</h3>
+          <p>Completa la información del contacto que recibirá tus alertas de emergencia.</p>
+        </div>
+        <button type="button" class="ec-modal-close" (click)="cerrarModalAgregar()">✕</button>
+      </div>
+
+      <div class="ec-modal-body">
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Nombre completo *
+          </span>
+          <input type="text" placeholder="Ej. Ana González" [(ngModel)]="formAgregar.nombre" name="nombre" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Teléfono *
+          </span>
+          <input type="tel" placeholder="Ej. 300 123 4567" [(ngModel)]="formAgregar.telefono" name="telefono" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Relación *
+          </span>
+          <select [(ngModel)]="formAgregar.relacion" name="relacion">
+            <option value="" disabled selected>Selecciona una relación</option>
+            @for (r of relaciones; track r) { <option [value]="r">{{ r }}</option> }
+          </select>
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Prioridad *
+          </span>
+          <select [(ngModel)]="formAgregar.prioridad" name="prioridad">
+            @for (p of prioridades; track p.value) { <option [value]="p.value">{{ p.label }}</option> }
+          </select>
+        </label>
+
+        <div class="ec-toggle-row">
+          <div>
+            <span class="ec-toggle-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Contacto activo
+            </span>
+            <p class="ec-toggle-sub">Recibirá notificaciones en caso de emergencia.</p>
+          </div>
+          <button type="button" class="ec-switch" [class.ec-switch--on]="formAgregar.activo" (click)="formAgregar.activo = !formAgregar.activo">
+            <span class="ec-switch-knob"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ec-modal-actions">
+        <button type="button" class="ec-btn ec-btn--ghost" (click)="cerrarModalAgregar()">Cancelar</button>
+        <button type="button" class="ec-btn ec-btn--primary" [disabled]="!formAgregarValido || guardandoAgregar" (click)="guardarNuevoContacto()">
+          {{ guardandoAgregar ? 'Guardando...' : 'Guardar contacto' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL EDITAR -->
+@if (modalEditarAbierto && contactoEditando) {
+  <div class="ec-modal-bg" (click)="cerrarModalEditar()">
+    <div class="ec-modal" (click)="$event.stopPropagation()">
+      <div class="ec-modal-header">
+        <div>
+          <h3>Editar contacto</h3>
+          <p>Modifica la información del contacto.</p>
+        </div>
+        <button type="button" class="ec-modal-close" (click)="cerrarModalEditar()">✕</button>
+      </div>
+
+      <div class="ec-modal-body">
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Nombre completo *
+          </span>
+          <input type="text" [(ngModel)]="formEditar.nombre" name="nombreEditar" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Teléfono *
+          </span>
+          <input type="tel" [(ngModel)]="formEditar.telefono" name="telefonoEditar" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Relación *
+          </span>
+          <select [(ngModel)]="formEditar.relacion" name="relacionEditar">
+            @for (r of relaciones; track r) { <option [value]="r">{{ r }}</option> }
+          </select>
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Prioridad *
+          </span>
+          <select [(ngModel)]="formEditar.prioridad" name="prioridadEditar">
+            @for (p of prioridades; track p.value) { <option [value]="p.value">{{ p.label }}</option> }
+          </select>
+        </label>
+
+        <div class="ec-toggle-row">
+          <div>
+            <span class="ec-toggle-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Contacto activo
+            </span>
+            <p class="ec-toggle-sub">Recibirá notificaciones en caso de emergencia.</p>
+          </div>
+          <button type="button" class="ec-switch" [class.ec-switch--on]="formEditar.activo" (click)="formEditar.activo = !formEditar.activo">
+            <span class="ec-switch-knob"></span>
+          </button>
+        </div>
+
+        <div class="ec-danger-zone">
+          <div class="ec-danger-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <div>
+              <strong>Eliminar contacto</strong>
+              <p>Esta acción no se puede deshacer.</p>
+            </div>
+          </div>
+
+          @if (!confirmandoEliminar) {
+            <button type="button" class="ec-danger-btn" (click)="pedirConfirmacionEliminar()">Eliminar contacto</button>
+          } @else {
+            <div class="ec-danger-confirm">
+              <p>¿Seguro que quieres eliminar a <strong>{{ contactoEditando.nombre }}</strong>?</p>
+              <div class="ec-danger-confirm-actions">
+                <button type="button" class="ec-btn ec-btn--ghost" (click)="cancelarEliminar()">Cancelar</button>
+                <button type="button" class="ec-danger-btn ec-danger-btn--confirm" [disabled]="eliminando" (click)="confirmarEliminar()">
+                  {{ eliminando ? 'Eliminando...' : 'Sí, eliminar' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="ec-modal-actions">
+        <button type="button" class="ec-btn ec-btn--ghost" (click)="cerrarModalEditar()">Cancelar</button>
+        <button type="button" class="ec-btn ec-btn--primary" [disabled]="!formEditarValido || guardandoEditar" (click)="guardarCambios()">
+          {{ guardandoEditar ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

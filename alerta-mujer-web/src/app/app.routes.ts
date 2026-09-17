@@ -96,12 +96,7 @@ export const routes: Routes = [
             .then(m => m.Home),
       },
 
-      {
-        path: 'phone-location',
-        loadComponent: () =>
-          import('./features/dashboard/phone-location/phone-location')
-            .then(m => m.PhoneLocationComponent),
-      },
+      
 
       {
         path: 'ubicacion',

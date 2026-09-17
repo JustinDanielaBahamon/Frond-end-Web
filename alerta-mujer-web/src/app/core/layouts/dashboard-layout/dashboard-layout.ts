@@ -25,7 +25,6 @@ export class DashboardLayoutComponent {
     { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
     { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
     { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },
-    { label: 'Mi dispositivo',         route: '/dashboard/device',             icon: 'fa-solid fa-mobile-screen' },
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];
 

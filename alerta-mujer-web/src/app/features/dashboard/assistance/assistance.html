@@ -1,1 +1,271 @@
-<p>assistance works!</p>
+@if (error) {
+  <p class="as-error">No se pudieron cargar los recursos de asistencia.</p>
+}
+
+@if (!error) {
+<div class="as-wrap">
+
+  <div class="as-header">
+    <div class="as-header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="as-title">Asistencia</h1>
+      <p class="as-sub">Recursos de ayuda disponibles para ti. Encuentra líneas, entidades y centros cercanos que pueden apoyarte.</p>
+    </div>
+    <div class="as-header-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      Tu seguridad también está en tus manos
+    </div>
+  </div>
+
+  <div class="as-body">
+    <div class="as-content">
+
+      <div class="as-tabs">
+        <button type="button" class="as-tab" [class.as-tab--active]="tabActivo === 'lineas'" (click)="setTab('lineas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Líneas de ayuda
+        </button>
+        <button type="button" class="as-tab" [class.as-tab--active]="tabActivo === 'centros'" (click)="setTab('centros')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Centros cercanos
+        </button>
+        <button type="button" class="as-tab" [class.as-tab--active]="tabActivo === 'recursos'" (click)="setTab('recursos')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Mis recursos
+        </button>
+      </div>
+
+      <div class="as-panels" [class.as-panels--solo-centros]="tabActivo === 'centros'">
+
+        <!-- LÍNEAS DE AYUDA -->
+        @if (tabActivo === 'lineas') {
+          <div class="as-panel as-panel--lineas">
+            <h2 class="as-panel-title">Líneas de ayuda</h2>
+            <p class="as-panel-sub">Comunícate directamente con entidades que pueden ayudarte en caso de emergencia o situaciones de riesgo.</p>
+
+            @if (loading) {
+              <p class="as-muted">Cargando líneas...</p>
+            } @else {
+              <div class="as-lineas-list">
+                @for (l of lineas; track l.id) {
+                  <div class="as-linea-card">
+                    <div class="as-linea-icon" [ngClass]="colorLinea(l.tipo)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path [attr.d]="iconoLinea(l.tipo)"/>
+                      </svg>
+                    </div>
+                    <div class="as-linea-body">
+                      <p class="as-linea-nombre">{{ l.nombre }}</p>
+                      <p class="as-linea-numero">{{ l.numero }}</p>
+                      <p class="as-linea-desc">{{ l.descripcion }}</p>
+                      <span class="as-linea-disp"><i></i>{{ l.disponibilidad }}</span>
+                    </div>
+                    <div class="as-linea-actions">
+                      <button type="button" class="as-btn as-btn--primary" (click)="llamar(l.numero)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Llamar
+                      </button>
+                      <button type="button" class="as-btn as-btn--ghost" (click)="toggleGuardarLinea(l)">
+                        <svg viewBox="0 0 24 24" [attr.fill]="esGuardado('linea', l.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        Ver información
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- CENTROS CERCANOS (visible en tab lineas junto a la lista, y solo en tab centros) -->
+        @if (tabActivo === 'lineas' || tabActivo === 'centros') {
+          <div class="as-panel as-panel--centros">
+            <div class="as-panel-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="as-panel-head-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <div>
+                <h2 class="as-panel-title">Centros de ayuda cercanos</h2>
+                <p class="as-panel-sub">Encuentra los centros más cercanos a tu ubicación y accede a la información de cada uno.</p>
+              </div>
+            </div>
+
+            <div class="as-centros-toolbar">
+              <div class="as-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Buscar centro o servicio..." [(ngModel)]="terminoBusquedaCentros" name="buscarCentros" />
+              </div>
+              <button type="button" class="as-filter-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filtrar
+              </button>
+            </div>
+
+            <div class="as-chips">
+              @for (c of categorias; track c.key) {
+                <button type="button" class="as-chip" [class.as-chip--active]="categoriaActiva === c.key" (click)="setCategoria(c.key)">
+                  {{ c.label }}
+                </button>
+              }
+            </div>
+
+            <div class="as-map" #mapContainer></div>
+
+            @if (loading) {
+              <p class="as-muted">Cargando centros...</p>
+            } @else {
+              <div class="as-centros-list">
+                @for (c of centrosFiltrados.slice(0, 4); track c.id) {
+                  <div class="as-centro-item">
+                    <div class="as-centro-icon" [ngClass]="'as-cat--' + c.categoria">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5Z"/></svg>
+                    </div>
+                    <div class="as-centro-body">
+                      <p class="as-centro-nombre">{{ c.nombre }}</p>
+                      <p class="as-centro-desc">{{ c.descripcion }}</p>
+                      <div class="as-centro-meta">
+                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ c.distanciaKm }} km</span>
+                        <span class="as-centro-estado" [class.as-centro-estado--cerrado]="!c.abierto"><i></i>{{ c.abierto ? 'Abierto' : 'Cerrado' }} · {{ c.estado }}</span>
+                      </div>
+                    </div>
+                    <div class="as-centro-actions">
+                      <button type="button" class="as-icon-btn" [class.as-icon-btn--activo]="esGuardado('centro', c.id)" (click)="toggleGuardarCentro(c)" title="Guardar">
+                        <svg viewBox="0 0 24 24" [attr.fill]="esGuardado('centro', c.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                      </button>
+                      <button type="button" class="as-pill-btn" (click)="centrarEnMapa(c)">Ver detalles</button>
+                      <button type="button" class="as-pill-btn as-pill-btn--ghost" (click)="comoLlegar(c)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        Cómo llegar
+                      </button>
+                    </div>
+                  </div>
+                } @empty {
+                  <p class="as-empty">No hay centros para este filtro.</p>
+                }
+              </div>
+
+              @if (centrosFiltrados.length > 4) {
+                <button type="button" class="as-ver-todos" (click)="setTab('centros')">
+                  Ver todos los centros cercanos
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+              }
+            }
+          </div>
+        }
+
+        <!-- MIS RECURSOS -->
+        @if (tabActivo === 'recursos') {
+          <div class="as-panel as-panel--recursos">
+            <h2 class="as-panel-title">Mis recursos</h2>
+            <p class="as-panel-sub">Los lugares y líneas que has guardado para acceder rápido cuando los necesites.</p>
+
+            <div class="as-recursos-grid">
+              @for (r of recursosGuardados; track r.id) {
+                <div class="as-recurso-card">
+                  <div class="as-recurso-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      @if (r.refTipo === 'linea') {
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      } @else {
+                        <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5Z"/>
+                      }
+                    </svg>
+                  </div>
+                  <div class="as-recurso-body">
+                    <p class="as-recurso-nombre">{{ r.nombre }}</p>
+                    <p class="as-recurso-sub">{{ r.subtitulo }}</p>
+                  </div>
+                  <button type="button" class="as-icon-btn" (click)="quitarRecursoGuardado(r)" title="Quitar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+              } @empty {
+                <p class="as-empty">Aún no has guardado recursos. Guarda una línea o un centro desde las otras pestañas.</p>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="as-sidebar">
+      <div class="as-info-card">
+        <div class="as-info-illustration">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <h3>¿Qué es la asistencia?</h3>
+        <p>En esta sección encuentras líneas telefónicas y entidades que pueden ayudarte en caso de emergencia, situaciones de riesgo o cuando necesites orientación.</p>
+      </div>
+
+      <div class="as-tip-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>Recuerda que la app móvil te permite llamar rápidamente a estas líneas. En la web puedes conocer más información, guardar tus recursos y encontrar centros cercanos.</p>
+      </div>
+
+      <div class="as-guardados-card">
+        <div class="as-guardados-head">
+          <h3>Tus recursos guardados</h3>
+          <button type="button" (click)="setTab('recursos')">Ver todos</button>
+        </div>
+        @for (r of recursosGuardados.slice(0, 4); track r.id) {
+          <button type="button" class="as-guardado-item" (click)="setTab('recursos')">
+            <span class="as-guardado-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                @if (r.refTipo === 'linea') {
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                } @else {
+                  <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5Z"/>
+                }
+              </svg>
+            </span>
+            <span class="as-guardado-body">
+              <span class="as-guardado-nombre">{{ r.nombre }}</span>
+              <span class="as-guardado-sub">{{ r.subtitulo }}</span>
+            </span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        } @empty {
+          <p class="as-guardados-empty">Aún no tienes recursos guardados.</p>
+        }
+      </div>
+
+      <div class="as-app-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <div>
+          <strong>Conecta tu experiencia</strong>
+          <p>Los recursos que guardes aquí también estarán disponibles en tu aplicación móvil.</p>
+          <button type="button" class="as-app-link">Ver cómo funciona</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="as-footer-strip">
+    <div class="as-footer-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span><strong>Tu seguridad es importante</strong><br>No estás sola. Siempre hay alguien dispuesto a ayudarte.</span>
+    </div>
+    <div class="as-footer-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>Si estás en peligro inmediato,<br><strong>llama al 123.</strong></span>
+    </div>
+    <div class="as-footer-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Si necesitas orientación,<br><strong>usa nuestras líneas de ayuda.</strong></span>
+    </div>
+    <div class="as-footer-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Si buscas un lugar seguro cerca,<br><strong>consulta los centros de ayuda.</strong></span>
+    </div>
+    <p class="as-footer-signature">Aquí siempre hay apoyo 💜</p>
+  </div>
+</div>
+}

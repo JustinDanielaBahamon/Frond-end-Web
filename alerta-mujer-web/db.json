@@ -455,18 +455,180 @@
       "avatarColor": "#16a34a"
     }
   ],
-
   "frequentPlaces": [
-      { "id": 1, "userId": 1, "name": "Casa", "type": "home", "address": "Carrera 5 #21-45", "city": "Neiva, Huila", "lat": 4.711, "lng": -74.0721, "isMain": true },
-      { "id": 2, "userId": 1, "name": "Trabajo", "type": "work", "address": "Calle 10 #8-20", "city": "Neiva, Huila", "lat": 4.7095, "lng": -74.0698 },
-      { "id": 3, "userId": 1, "name": "SENA", "type": "study", "address": "Neiva, Huila", "city": "Neiva, Huila", "lat": 4.708, "lng": -74.075 }
+    {
+      "id": "1",
+      "userId": 1,
+      "name": "Casa",
+      "type": "home",
+      "address": "Carrera 5 #21-45",
+      "city": "Neiva, Huila",
+      "lat": 4.711,
+      "lng": -74.0721,
+      "isMain": true
+    },
+    {
+      "id": "2",
+      "userId": 1,
+      "name": "Trabajo",
+      "type": "work",
+      "address": "Calle 10 #8-20",
+      "city": "Neiva, Huila",
+      "lat": 4.7095,
+      "lng": -74.0698
+    },
+    {
+      "id": "3",
+      "userId": 1,
+      "name": "SENA",
+      "type": "study",
+      "address": "Neiva, Huila",
+      "city": "Neiva, Huila",
+      "lat": 4.708,
+      "lng": -74.075
+    }
   ],
-
- "nearbyZones": [
-      { "id": 1, "name": "Zona segura", "type": "safe", "description": "Parque Santander", "distanceKm": 0.8, "lat": 4.7112, "lng": -74.0715, "radiusMeters": 200 },
-      { "id": 2, "name": "Zona de riesgo", "type": "risk", "description": "Sector X", "distanceKm": 1.2, "lat": 4.706, "lng": -74.073, "radiusMeters": 150 },
-      { "id": 3, "name": "Centro de ayuda", "type": "help", "description": "Casa de la Mujer", "distanceKm": 1.5, "lat": 4.704, "lng": -74.071, "radiusMeters": 100 }
+  "nearbyZones": [
+    {
+      "id": "1",
+      "name": "Zona segura",
+      "type": "safe",
+      "description": "Parque Santander",
+      "distanceKm": 0.8,
+      "lat": 4.7112,
+      "lng": -74.0715,
+      "radiusMeters": 200
+    },
+    {
+      "id": "2",
+      "name": "Zona de riesgo",
+      "type": "risk",
+      "description": "Sector X",
+      "distanceKm": 1.2,
+      "lat": 4.706,
+      "lng": -74.073,
+      "radiusMeters": 150
+    },
+    {
+      "id": "3",
+      "name": "Centro de ayuda",
+      "type": "help",
+      "description": "Casa de la Mujer",
+      "distanceKm": 1.5,
+      "lat": 4.704,
+      "lng": -74.071,
+      "radiusMeters": 100
+    }
   ],
-
+  "contactos": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "nombre": "Ana Gómez",
+      "telefono": "300 111 0001",
+      "relacion": "Hermano/a",
+      "prioridad": 1,
+      "activo": true
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "nombre": "Luis Díaz",
+      "telefono": "300 222 0002",
+      "relacion": "Pareja",
+      "prioridad": 2,
+      "activo": true
+    },
+    {
+      "usuarioId": 2,
+      "nombre": "justin",
+      "telefono": "3226662738",
+      "relacion": "Padre",
+      "prioridad": "2",
+      "activo": true,
+      "id": "XDvB0e7Yth0"
+    }
+  ],
+  "lineas-ayuda": [
+    {
+      "id": "1",
+      "tipo": "emergencia",
+      "nombre": "Línea de Emergencias 123",
+      "numero": "123",
+      "descripcion": "Atención inmediata para cualquier emergencia.",
+      "disponibilidad": "Disponible 24/7"
+    },
+    {
+      "id": "2",
+      "tipo": "mujeres",
+      "nombre": "Línea Púrpura",
+      "numero": "018000112137",
+      "descripcion": "Orientación y apoyo para mujeres en situación de violencia.",
+      "disponibilidad": "Disponible 24/7"
+    },
+    {
+      "id": "3",
+      "tipo": "policia",
+      "nombre": "Policía Nacional",
+      "numero": "123",
+      "descripcion": "Reporta situaciones de riesgo o delitos en curso.",
+      "disponibilidad": "Disponible 24/7"
+    },
+    {
+      "id": "4",
+      "tipo": "saludMental",
+      "nombre": "Línea de Salud Mental",
+      "numero": "106",
+      "descripcion": "Apoyo psicológico y contención emocional.",
+      "disponibilidad": "Disponible 24/7"
+    }
+  ],
+  "centros-ayuda": [
+    {
+      "id": "1",
+      "nombre": "Casa de la Mujer",
+      "descripcion": "Atención integral y acompañamiento para mujeres.",
+      "categoria": "mujeres",
+      "distanciaKm": 1.5,
+      "lat": 4.704,
+      "lng": -74.071,
+      "abierto": true,
+      "estado": "Atención al público"
+    },
+    {
+      "id": "2",
+      "nombre": "CAI Centro",
+      "descripcion": "Comando de Atención Inmediata de la Policía.",
+      "categoria": "seguridad",
+      "distanciaKm": 0.8,
+      "lat": 4.7115,
+      "lng": -74.07,
+      "abierto": true,
+      "estado": "Servicio permanente"
+    },
+    {
+      "id": "3",
+      "nombre": "Hospital La Victoria",
+      "descripcion": "Urgencias médicas y atención primaria.",
+      "categoria": "salud",
+      "distanciaKm": 1.2,
+      "lat": 4.706,
+      "lng": -74.0755,
+      "abierto": true,
+      "estado": "Urgencias 24 horas"
+    },
+    {
+      "id": "4",
+      "nombre": "Defensoría del Pueblo",
+      "descripcion": "Orientación legal y defensa de derechos.",
+      "categoria": "legal",
+      "distanciaKm": 2.1,
+      "lat": 4.72,
+      "lng": -74.065,
+      "abierto": false,
+      "estado": "Cierra a las 5:00 pm"
+    }
+  ],
+  "recursos-guardados": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

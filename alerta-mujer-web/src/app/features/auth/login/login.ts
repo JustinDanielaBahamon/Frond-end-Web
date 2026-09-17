@@ -110,7 +110,7 @@ export class LoginComponent {
       next: (user) => {
         this.loading = false;
   
-        if (user.rol === 'admin') {
+        if (user.rol === 'Admin' || user.rol === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

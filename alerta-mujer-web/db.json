@@ -10,7 +10,17 @@
       "ubicacion": "Centro",
       "lat": 4.711,
       "lng": -74.0721,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 1,
+      "device_id": 1,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Pánico activado",
+      "started_at": "2026-09-16T14:32:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-16T14:32:00.000Z"
     },
     {
       "id": "2",
@@ -22,7 +32,17 @@
       "ubicacion": "Centro",
       "lat": 4.7118,
       "lng": -74.0715,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 1,
+      "device_id": 1,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Emergencia médica",
+      "started_at": "2026-09-16T09:20:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-16T09:20:00.000Z"
     },
     {
       "id": "3",
@@ -34,7 +54,17 @@
       "ubicacion": "Centro",
       "lat": 4.7105,
       "lng": -74.0728,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 2,
+      "device_id": 2,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Pánico activado",
+      "started_at": "2026-09-15T20:10:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-15T20:10:00.000Z"
     },
     {
       "id": "4",
@@ -46,7 +76,17 @@
       "ubicacion": "Chapinero",
       "lat": 4.72,
       "lng": -74.065,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 1,
+      "device_id": 1,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Emergencia médica",
+      "started_at": "2026-09-15T22:05:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-15T22:05:00.000Z"
     },
     {
       "id": "5",
@@ -58,7 +98,17 @@
       "ubicacion": "Centro",
       "lat": 4.7112,
       "lng": -74.0719,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 1,
+      "device_id": 1,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Pánico activado",
+      "started_at": "2026-09-14T18:40:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-14T18:40:00.000Z"
     },
     {
       "id": "6",
@@ -70,7 +120,17 @@
       "ubicacion": "Calle 80",
       "lat": 4.716,
       "lng": -74.068,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 3,
+      "device_id": 3,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Robo a mano armada",
+      "started_at": "2026-09-14T11:05:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-14T11:05:00.000Z"
     },
     {
       "id": "7",
@@ -82,7 +142,17 @@
       "ubicacion": "Av. Caracas",
       "lat": 4.7055,
       "lng": -74.076,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 4,
+      "device_id": 4,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Acoso en transporte",
+      "started_at": "2026-09-13T08:15:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-13T08:15:00.000Z"
     },
     {
       "id": "8",
@@ -94,7 +164,17 @@
       "ubicacion": "Chapinero",
       "lat": 4.721,
       "lng": -74.064,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 5,
+      "device_id": 5,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Emergencia médica",
+      "started_at": "2026-09-12T16:55:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-12T16:55:00.000Z"
     },
     {
       "id": "9",
@@ -106,7 +186,17 @@
       "ubicacion": "Centro",
       "lat": 4.7108,
       "lng": -74.0724,
-      "estado": "Atendida"
+      "estado": "Atendida",
+      "user_profile_id": 6,
+      "device_id": 6,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "resolved",
+      "message": "Pánico activado",
+      "started_at": "2026-09-11T19:30:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-11T19:30:00.000Z"
     },
     {
       "id": "10",
@@ -118,7 +208,17 @@
       "ubicacion": "Av. Caracas",
       "lat": 4.706,
       "lng": -74.0758,
-      "estado": "Pendiente"
+      "estado": "Pendiente",
+      "user_profile_id": 7,
+      "device_id": 7,
+      "alert_type": "main",
+      "activation_method": "panic_button",
+      "status": "active",
+      "message": "Acoso en calle",
+      "started_at": "2026-09-10T07:45:00.000Z",
+      "ended_at": null,
+      "cancelled_at": null,
+      "created_at": "2026-09-10T07:45:00.000Z"
     }
   ],
   "zonasManuales": [
@@ -354,6 +454,7 @@
       "id": "1",
       "nombre": "María Pérez",
       "email": "maria.perez@test.com",
+      "correo": "maria.perez@test.com",
       "telefono": "+57 311 000 0001",
       "fechaRegistro": "29/05/2023",
       "alertas": 7,
@@ -361,12 +462,21 @@
       "estado": "Activa",
       "rol": "Usuaria",
       "contactoEmergencia": "Ana Gómez (+57 311 111 0001)",
-      "avatarColor": "#7c3aed"
+      "avatarColor": "#7c3aed",
+      "role_id": 1,
+      "first_name": "María",
+      "last_name": "Pérez",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-29T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "2",
       "nombre": "Ana Gómez",
       "email": "ana.gomez@test.com",
+      "correo": "ana.gomez@test.com",
       "telefono": "+57 312 000 0002",
       "fechaRegistro": "27/05/2023",
       "alertas": 2,
@@ -374,12 +484,21 @@
       "estado": "Inactiva",
       "rol": "Usuaria",
       "contactoEmergencia": "Luis Díaz (+57 312 111 0002)",
-      "avatarColor": "#a78bfa"
+      "avatarColor": "#a78bfa",
+      "role_id": 1,
+      "first_name": "Ana",
+      "last_name": "Gómez",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "3",
       "nombre": "Laura Torres",
       "email": "laura.torres@test.com",
+      "correo": "laura.torres@test.com",
       "telefono": "+57 313 000 0003",
       "fechaRegistro": "27/05/2023",
       "alertas": 12,
@@ -387,12 +506,21 @@
       "estado": "Bloqueada por Fraude",
       "rol": "Usuaria",
       "contactoEmergencia": "Pedro Flores (+57 313 111 0003)",
-      "avatarColor": "#ec4899"
+      "avatarColor": "#ec4899",
+      "role_id": 1,
+      "first_name": "Laura",
+      "last_name": "Torres",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "4",
       "nombre": "Sofía Ruiz",
       "email": "sofia.ruiz@test.com",
+      "correo": "sofia.ruiz@test.com",
       "telefono": "+57 314 000 0004",
       "fechaRegistro": "27/05/2023",
       "alertas": 9,
@@ -400,12 +528,21 @@
       "estado": "Bloqueada por Fraude",
       "rol": "Usuaria",
       "contactoEmergencia": "Rosa Gomez (+57 314 111 0004)",
-      "avatarColor": "#6d28d9"
+      "avatarColor": "#6d28d9",
+      "role_id": 1,
+      "first_name": "Sofía",
+      "last_name": "Ruiz",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "5",
       "nombre": "Camila Ortiz",
       "email": "camila.ortiz@test.com",
+      "correo": "camila.ortiz@test.com",
       "telefono": "+57 315 000 0005",
       "fechaRegistro": "27/05/2023",
       "alertas": 3,
@@ -413,12 +550,21 @@
       "estado": "Activa",
       "rol": "Usuaria",
       "contactoEmergencia": "José Tian (+57 315 111 0005)",
-      "avatarColor": "#7c3aed"
+      "avatarColor": "#7c3aed",
+      "role_id": 1,
+      "first_name": "Camila",
+      "last_name": "Ortiz",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "6",
       "nombre": "Diana Morales",
       "email": "diana.morales@test.com",
+      "correo": "diana.morales@test.com",
       "telefono": "+57 316 000 0006",
       "fechaRegistro": "27/05/2023",
       "alertas": 15,
@@ -426,12 +572,21 @@
       "estado": "Bloqueada por Fraude",
       "rol": "Usuaria",
       "contactoEmergencia": "N/A",
-      "avatarColor": "#c4b5fd"
+      "avatarColor": "#c4b5fd",
+      "role_id": 1,
+      "first_name": "Diana",
+      "last_name": "Morales",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "7",
       "nombre": "Paola Vargas",
       "email": "paola.vargas@test.com",
+      "correo": "paola.vargas@test.com",
       "telefono": "+57 317 000 0007",
       "fechaRegistro": "27/05/2023",
       "alertas": 6,
@@ -439,12 +594,21 @@
       "estado": "Bloqueada por Fraude",
       "rol": "Usuaria",
       "contactoEmergencia": "María Flores (+57 317 111 0007)",
-      "avatarColor": "#ec4899"
+      "avatarColor": "#ec4899",
+      "role_id": 1,
+      "first_name": "Paola",
+      "last_name": "Vargas",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Alerta@123"
     },
     {
       "id": "8",
       "nombre": "Admin Principal",
       "email": "admin@test.com",
+      "correo": "admin@test.com",
       "telefono": "+57 318 000 0008",
       "fechaRegistro": "27/05/2023",
       "alertas": 0,
@@ -452,8 +616,287 @@
       "estado": "Activa",
       "rol": "Admin",
       "contactoEmergencia": "N/A",
-      "avatarColor": "#16a34a"
+      "avatarColor": "#16a34a",
+      "role_id": 2,
+      "first_name": "Admin",
+      "last_name": "Principal",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "password": "Admin@2026"
+    },
+    {
+      "id": "9",
+      "nombre": "Raquel",
+      "email": "Raquel@gmail.com",
+      "correo": "Raquel@gmail.com",
+      "telefono": "+57 320 000 0009",
+      "fechaRegistro": "17/09/2026",
+      "alertas": 0,
+      "ultimaActividad": "recién registrado",
+      "estado": "Activa",
+      "rol": "Usuaria",
+      "contactoEmergencia": "N/A",
+      "avatarColor": "#7c3aed",
+      "role_id": 1,
+      "first_name": "Raquel",
+      "last_name": "",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2026-09-17T00:00:00.000Z",
+      "password": "Noruega@123"
     }
   ],
+  "role": [
+    {
+      "id": "1",
+      "name": "user",
+      "description": "Usuario estándar de la aplicación"
+    },
+    {
+      "id": "2",
+      "name": "administrator",
+      "description": "Administrador del sistema"
+    }
+  ],
+  "account": [
+    {
+      "id": "1",
+      "user_id": 1,
+      "password_hash": "Alerta@123",
+      "status": "active",
+      "last_access": null
+    },
+    {
+      "id": "2",
+      "user_id": 2,
+      "password_hash": "Alerta@123",
+      "status": "inactive",
+      "last_access": null
+    },
+    {
+      "id": "3",
+      "user_id": 3,
+      "password_hash": "Alerta@123",
+      "status": "blocked",
+      "last_access": null
+    },
+    {
+      "id": "4",
+      "user_id": 4,
+      "password_hash": "Alerta@123",
+      "status": "blocked",
+      "last_access": null
+    },
+    {
+      "id": "5",
+      "user_id": 5,
+      "password_hash": "Alerta@123",
+      "status": "active",
+      "last_access": null
+    },
+    {
+      "id": "6",
+      "user_id": 6,
+      "password_hash": "Alerta@123",
+      "status": "blocked",
+      "last_access": null
+    },
+    {
+      "id": "7",
+      "user_id": 7,
+      "password_hash": "Alerta@123",
+      "status": "blocked",
+      "last_access": null
+    },
+    {
+      "id": "8",
+      "user_id": 8,
+      "password_hash": "Admin@2026",
+      "status": "active",
+      "last_access": null
+    },
+    {
+      "id": "9",
+      "user_id": 9,
+      "password_hash": "Noruega@123",
+      "status": "active",
+      "last_access": null
+    }
+  ],
+  "user_profile": [
+    {
+      "id": "1",
+      "user_id": 1,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-29T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "2",
+      "user_id": 2,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "3",
+      "user_id": 3,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "4",
+      "user_id": 4,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "5",
+      "user_id": 5,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "6",
+      "user_id": 6,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "7",
+      "user_id": 7,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "8",
+      "user_id": 8,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    },
+    {
+      "id": "9",
+      "user_id": 9,
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2026-09-17T00:00:00.000Z",
+      "updated_at": null
+    }
+  ],
+  "emergency_contact": [
+    {
+      "id": "1",
+      "user_profile_id": 1,
+      "contact_name": "Juan Pérez",
+      "telephone": "3111234567",
+      "relationship": "Amigo",
+      "created_at": "2026-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "user_profile_id": 9,
+      "contact_name": "Daniela de mrd",
+      "telephone": "123457543757",
+      "relationship": "Pendeja",
+      "created_at": "2026-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "user_profile_id": 9,
+      "contact_name": "DavidE",
+      "telephone": "573112082620",
+      "relationship": "Amigo",
+      "created_at": "2026-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "user_profile_id": 9,
+      "contact_name": "Antisecuestro, antiterrorismo y antiextorsion (F.F.M.M)",
+      "telephone": "14706868668",
+      "relationship": "Servicio",
+      "created_at": "2026-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "user_profile_id": 9,
+      "contact_name": "Andrea",
+      "telephone": "573102307889",
+      "relationship": "Amiga",
+      "created_at": "2026-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "user_profile_id": 9,
+      "contact_name": "Orueba",
+      "telephone": "12345678994976",
+      "relationship": "Familia",
+      "created_at": "2026-09-17T21:35:10.073Z"
+    },
+    {
+      "user_profile_id": "9",
+      "contact_name": "Daniela y miguel",
+      "telephone": "31248424954345",
+      "relationship": "Esclava",
+      "id": "R4m79jRvb24",
+      "created_at": "2026-09-17T22:16:01.228Z"
+    }
+  ],
+  "alert_contact": [],
+  "notification": [],
+  "device": [],
+  "device_permission": [],
+  "frequent_location": [],
+  "alert_reminder": [],
+  "alert_activation_setting": [],
+  "zone_report": [],
+  "user_preference": [],
+  "system_configuration": [
+    {
+      "id": "1",
+      "singleton_key": "SYSTEM",
+      "sos_max_duration_minutes": 30,
+      "emergency_phone_number": "123",
+      "admin_email": "admin@test.com",
+      "notifications_enabled": true,
+      "default_notification_priority": "normal",
+      "default_theme": "light",
+      "updated_by_admin_perfil_id": null,
+      "created_at": "2023-05-27T00:00:00.000Z",
+      "updated_at": null
+    }
+  ],
+  "audit_log": [],
+  "user_report": [],
+  "moderation_action": [],
+  "device_session": [],
+  "admin_perfil": [],
+  "recovery_request": [],
+  "resource_call": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

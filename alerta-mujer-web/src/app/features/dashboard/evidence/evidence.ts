@@ -4,80 +4,72 @@ import { EvidenceService } from '../../../core/services/evidence.service';
 import { Evidencia } from '../../../core/models/evidence.model';
 import { AuthService } from '../../../core/auth/auth.service';
 
+type FiltroTipo = 'todos' | 'foto' | 'video' | 'audio';
+type Orden = 'recientes' | 'antiguas';
+
 @Component({
   selector: 'app-evidence',
+  standalone: true,
   imports: [CommonModule, NgClass],
   templateUrl: './evidence.html',
   styleUrl: './evidence.scss',
 })
 export class Evidence implements OnInit {
-
   private evidenceService = inject(EvidenceService);
   private authService = inject(AuthService);
 
-  filtroActivo = 'todos';
-
-  filtros = [
-    { key: 'todos',  label: 'Todos' },
-    { key: 'video',  label: 'Video' },
-    { key: 'foto',   label: 'Foto' },
-    { key: 'audio',  label: 'Audio' },
-  ];
-
-  evidencias: Evidencia[] = [];
+  loading = true;
   error = false;
 
+  tabs: { key: FiltroTipo; label: string }[] = [
+    { key: 'todos', label: 'Todas' },
+    { key: 'foto',  label: 'Fotos' },
+    { key: 'video', label: 'Videos' },
+    { key: 'audio', label: 'Audios' },
+  ];
+  filtroActivo: FiltroTipo = 'todos';
+
   terminoBusqueda = '';
+  orden: Orden = 'recientes';
 
-  // "+N este mes" de cada tarjeta.
-  totalEsteMes = 0;
-  videosEsteMes = 0;
-  fotosEsteMes = 0;
-  audiosEsteMes = 0;
-
-  // Estado del botón "Sincronizar ahora" / banner.
-  sincronizando = false;
-  ultimaSincronizacion: Date | null = null;
-
+  evidencias: Evidencia[] = [];
   evidenciaSeleccionada: Evidencia | null = null;
-  modalAbierto = false;
+
+  lightboxAbierto = false;
 
   ngOnInit() {
     this.authService.currentUser$.subscribe((usuario) => {
-      if (!usuario) {
-        this.error = true;
-        return;
-      }
+      if (!usuario) { this.error = true; this.loading = false; return; }
 
+      this.loading = true;
       this.evidenceService.getByUsuario(usuario.id).subscribe({
         next: (data) => {
           this.evidencias = data;
-          this.calcularStats(data);
+          this.loading = false;
+          // Selecciona la más reciente por defecto, para que el panel de
+          // detalle no arranque vacío (como en el diseño de referencia).
+          if (data.length > 0 && !this.evidenciaSeleccionada) {
+            this.evidenciaSeleccionada = this.ordenarPorFecha(data, 'recientes')[0];
+          }
         },
-        error: () => {
-          this.error = true;
-        },
+        error: () => { this.error = true; this.loading = false; },
       });
     });
   }
 
-  private calcularStats(evidencias: Evidencia[]) {
-    // 👇 asume que 'fecha' es parseable como fecha (ej. "2026-06-12T14:32:00").
-    // Si tu formato real es distinto (ej. "27/05/2025 - 12:32 PM"), dime el formato
-    // exacto y ajusto el parseo — mientras tanto, si no parsea, simplemente no cuenta
-    // ese archivo como "de este mes" (no rompe la pantalla).
-    const hoy = new Date();
-    const esEsteMes = (fechaTexto: string) => {
-      const fecha = new Date(fechaTexto);
-      return !isNaN(fecha.getTime()) &&
-        fecha.getMonth() === hoy.getMonth() &&
-        fecha.getFullYear() === hoy.getFullYear();
-    };
+  setFiltro(key: FiltroTipo) { this.filtroActivo = key; }
 
-    this.totalEsteMes = evidencias.filter(e => esEsteMes(e.fecha)).length;
-    this.videosEsteMes = evidencias.filter(e => e.tipo === 'video' && esEsteMes(e.fecha)).length;
-    this.fotosEsteMes = evidencias.filter(e => e.tipo === 'foto' && esEsteMes(e.fecha)).length;
-    this.audiosEsteMes = evidencias.filter(e => e.tipo === 'audio' && esEsteMes(e.fecha)).length;
+  onBuscar(event: Event) {
+    this.terminoBusqueda = (event.target as HTMLInputElement).value;
+  }
+
+  onOrdenChange(event: Event) {
+    this.orden = (event.target as HTMLSelectElement).value as Orden;
+  }
+
+  contarPorTipo(key: FiltroTipo): number {
+    if (key === 'todos') return this.evidencias.length;
+    return this.evidencias.filter(e => e.tipo === key).length;
   }
 
   get evidenciasFiltradas(): Evidencia[] {
@@ -89,36 +81,40 @@ export class Evidence implements OnInit {
     if (termino) {
       lista = lista.filter(e =>
         e.nombre.toLowerCase().includes(termino) ||
-        e.alerta.toLowerCase().includes(termino)
+        e.alerta.toLowerCase().includes(termino) ||
+        (e.ubicacion ?? '').toLowerCase().includes(termino)
       );
     }
 
-    return lista;
+    return this.ordenarPorFecha(lista, this.orden);
   }
 
-  /** Cuenta cuántas evidencias hay de un tipo (o el total si key === 'todos'), para el numerito de cada pastilla. */
-  contarPorTipo(key: string): number {
-    if (key === 'todos') return this.evidencias.length;
-    return this.evidencias.filter(e => e.tipo === key).length;
+  private ordenarPorFecha(lista: Evidencia[], orden: Orden): Evidencia[] {
+    return [...lista].sort((a, b) => {
+      const fa = new Date(a.fecha).getTime();
+      const fb = new Date(b.fecha).getTime();
+      const va = isNaN(fa) ? 0 : fa;
+      const vb = isNaN(fb) ? 0 : fb;
+      return orden === 'recientes' ? vb - va : va - vb;
+    });
   }
 
-  onBuscar(event: Event) {
-    this.terminoBusqueda = (event.target as HTMLInputElement).value;
+  /** Otras evidencias de la misma emergencia, para el carrusel del panel de detalle. */
+  get relacionadas(): Evidencia[] {
+    if (!this.evidenciaSeleccionada) return [];
+    return this.evidencias.filter(e => e.alerta === this.evidenciaSeleccionada!.alerta);
   }
 
-  setFiltro(key: string) {
-    this.filtroActivo = key;
+  seleccionar(e: Evidencia) {
+    this.evidenciaSeleccionada = e;
   }
 
-  abrirModal(evidencia: Evidencia) {
-    this.evidenciaSeleccionada = evidencia;
-    this.modalAbierto = true;
-  }
-
-  cerrarModal() {
-    this.modalAbierto = false;
+  cerrarDetalle() {
     this.evidenciaSeleccionada = null;
   }
+
+  abrirLightbox() { this.lightboxAbierto = true; }
+  cerrarLightbox() { this.lightboxAbierto = false; }
 
   getColor(tipo: string): string {
     const colores: Record<string, string> = {
@@ -129,38 +125,40 @@ export class Evidence implements OnInit {
     return colores[tipo] || '';
   }
 
-  get todoSincronizado(): boolean {
-    return this.evidencias.length > 0 && this.evidencias.every(e => e.estado === 'En la nube');
+  tipoLabel(tipo: string): string {
+    const labels: Record<string, string> = {
+      video: 'Video',
+      foto: 'Fotografía',
+      audio: 'Audio',
+    };
+    return labels[tipo] || tipo;
   }
 
-  get pendientesCount(): number {
-    return this.evidencias.filter(e => e.estado === 'Pendiente').length;
+  /** '2026-08-28T20:45:00' -> '28 ago. 2026'. Si no parsea, muestra el texto tal cual llegó. */
+  formatFecha(fecha: string): string {
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return fecha;
+    return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  /**
-   * TODO: reemplazar por la llamada real a tu backend, ej.:
-   *   this.evidenceService.sincronizar().subscribe(() => { ... })
-   * Por ahora simula la sincronización: marca todo como "En la nube" después de 1.2s,
-   * para que el botón y el banner respondan visualmente mientras conectas el endpoint real.
-   */
-  sincronizarAhora() {
-    if (this.sincronizando) return;
-    this.sincronizando = true;
-
-    setTimeout(() => {
-      this.evidencias = this.evidencias.map(e => ({ ...e, estado: 'En la nube' as const }));
-      this.ultimaSincronizacion = new Date();
-      this.sincronizando = false;
-    }, 1200);
+  /** '2026-08-28T20:45:00' -> '8:45 PM'. Vacío si no parsea. */
+  formatHora(fecha: string): string {
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true });
   }
 
-  /** Texto tipo "hace 2 min" para el banner. */
-  formatearUltimaSync(): string {
-    if (!this.ultimaSincronizacion) return 'aún no sincronizado';
+  /** '2026-08-28T20:45:00' -> '28 de agosto de 2026' (para el panel de detalle). */
+  formatFechaLarga(fecha: string): string {
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return fecha;
+    return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
 
-    const minutos = Math.round((Date.now() - this.ultimaSincronizacion.getTime()) / 60000);
-    if (minutos < 1) return 'hace un momento';
-    if (minutos === 1) return 'hace 1 min';
-    return `hace ${minutos} min`;
+  // TODO: conectar con el endpoint real de descarga cuando exista, ej.:
+  //   this.evidenceService.descargar(evidencia.id).subscribe(...)
+  descargar() {
+    if (!this.evidenciaSeleccionada?.archivoUrl) return;
+    window.open(this.evidenciaSeleccionada.archivoUrl, '_blank');
   }
 }

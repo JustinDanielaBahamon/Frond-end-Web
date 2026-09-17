@@ -1,228 +1,199 @@
-<div class="db-wrap">
+<div class="home-wrap">
 
-  <!-- STATS: 5 TARJETAS COMPACTAS -->
-  <div class="db-stats">
-    @for (stat of statCards; track stat.label) {
-      <div class="db-stat" [ngClass]="'db-stat--' + stat.color">
-        <div class="db-stat__icon"><i class="ti {{ stat.icon }}"></i></div>
-        <div class="db-stat__body">
-          <p class="db-stat__label">{{ stat.label }}</p>
-          <div class="db-stat__value-row">
-            <p class="db-stat__value">
-              @if (stat.statusDot) {
-                <span class="db-stat__dot"></span>
-              }
-              {{ stat.value }}
-            </p>
-            @if (stat.trend) {
-              <span class="db-stat__trend" [ngClass]="'db-stat__trend--' + stat.trend.dir">
-                <i class="ti" [ngClass]="stat.trend.dir === 'up' ? 'ti-arrow-up' : 'ti-arrow-down'"></i>
-                {{ stat.trend.percent }}%
-              </span>
-            }
-          </div>
-          <p class="db-stat__sub">{{ stat.sub }}</p>
+  <!-- ESTADO DE SEGURIDAD + MI DISPOSITIVO -->
+  <div class="home-row home-row--top">
+
+    <!-- ESTADO DE TU SEGURIDAD -->
+    <div class="home-panel home-panel--estado">
+      <div class="home-panel__header">
+        <div>
+          <h2 class="home-panel__title">Estado de tu seguridad</h2>
+          <p class="home-panel__subtitle">Tu cuenta está protegida</p>
         </div>
-      </div>
-    }
-  </div>
-
-  <!-- FILA DE 4 PANELES -->
-  <div class="db-row4">
-
-    <!-- ZONAS DE RIESGO -->
-    <div class="db-panel db-panel--wide db-panel--map">
-      <div class="db-section-header">
-        <i class="ti ti-map-pin"></i>
-        <h2 class="db-section-title">Zonas de Riesgo</h2>
-        <div class="db-map-header-actions">
-          <button class="db-map-btn-secundario" (click)="togglePanel()" title="Ver más zonas">
-            <i class="ti ti-list"></i>
-            <span>Ver más</span>
-          </button>
-          <button class="db-map-btn-secundario" (click)="toggleFullscreen()" title="Ampliar mapa">
-            <i class="ti ti-arrows-maximize"></i>
-            <span>Ampliar mapa</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="db-map-wrapper" #mapWrapper>
-        <div class="db-map-container">
-          <div id="dashboard-map" class="db-map"></div>
-
-          <div class="db-zonas-panel" [class.db-zonas-panel--open]="panelAbierto">
-            <div class="db-zonas-panel-header">
-              <span>Zonas de Peligro</span>
-              <button class="db-zonas-close" (click)="togglePanel()">
-                <i class="ti ti-x"></i>
-              </button>
-            </div>
-            <div class="db-zonas-list">
-              @for (zona of zonas; track zona.nombre) {
-                <div class="db-zona-item" (click)="irAZona(zona)">
-                  <div class="db-zona-dot" [style.background]="zona.color"></div>
-                  <div class="db-zona-info">
-                    <p class="db-zona-nombre">{{ zona.nombre }}</p>
-                    <p class="db-zona-meta">🔔 {{ zona.alertas }} alertas · {{ zona.porcentaje }}%</p>
-                  </div>
-                  <span class="db-zona-nivel" [style.background]="zona.color + '22'" [style.color]="zona.color">
-                    {{ zona.nivel | uppercase }}
-                  </span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <button
-          class="db-map-btn-zonas-fs"
-          [class.db-map-btn-zonas-fs--open]="panelAbierto"
-          (click)="togglePanel()">
-          <i class="ti ti-list"></i> Ver zonas
-        </button>
-
-        <button class="db-map-btn-exit-fs" (click)="toggleFullscreen()">
-          <i class="ti ti-arrows-minimize"></i>
+        <button class="home-btn home-btn--outline" routerLink="/dashboard/configuracion">
+          Ver configuración
         </button>
       </div>
 
-      <div class="db-map-legend">
-        <span class="db-legend-item db-legend--alto">● Alto</span>
-        <span class="db-legend-item db-legend--medio">● Medio</span>
-        <span class="db-legend-item db-legend--bajo">● Bajo</span>
-      </div>
-    </div>
-
-    <!-- ACTIVIDAD RECIENTE (lista compacta) -->
-    <div class="db-panel">
-      <div class="db-section-header">
-        <i class="ti ti-clock"></i>
-        <h2 class="db-section-title">Actividad Reciente</h2>
-      </div>
-      <div class="db-activity-list">
-        @for (item of actividadReciente; track item.titulo) {
-          <div class="db-activity-item">
-            <div class="db-activity-item__icon" [ngClass]="'db-activity-item__icon--' + item.color">
+      <div class="home-seguridad-grid">
+        @for (item of estadoSeguridad; track item.descripcion) {
+          <div class="home-seguridad-item">
+            <div class="home-seguridad-item__icon">
               <i class="ti {{ item.icon }}"></i>
             </div>
-            <div class="db-activity-item__body">
-              <p class="db-activity-item__titulo">{{ item.titulo }}</p>
-              <p class="db-activity-item__fecha">{{ item.fecha }}</p>
-            </div>
-            @if (item.estado) {
-              <span class="db-activity-item__estado">{{ item.estado }}</span>
+            <p class="home-seguridad-item__valor">{{ item.valor }}</p>
+            <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
+            @if (item.configurado) {
+              <span class="home-seguridad-item__check"><i class="ti ti-check"></i></span>
             }
           </div>
         }
       </div>
-      <a class="db-ver-mas" routerLink="/dashboard/alert-history">Ver toda la actividad →</a>
     </div>
 
-    <!-- RESUMEN DE SEGURIDAD (medidor) -->
-    <div class="db-panel db-panel--center">
-      <div class="db-section-header">
-        <i class="ti ti-shield-check"></i>
-        <h2 class="db-section-title">Resumen de Seguridad</h2>
+    <!-- MI DISPOSITIVO -->
+    <div class="home-panel home-panel--dispositivo">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-device-mobile"></i> Mi dispositivo
+        </h2>
+        <button class="home-icon-btn" title="Más opciones">
+          <i class="ti ti-dots-vertical"></i>
+        </button>
       </div>
-      <div class="db-gauge" [style.background]="resumenGradient">
-        <div class="db-gauge__hole">
-          <p class="db-gauge__percent">{{ resumenSeguridad.percent }}%</p>
-          <p class="db-gauge__label">Nivel de protección</p>
+
+      <div class="home-dispositivo-body">
+        <div class="home-dispositivo-info">
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Estado:</span>
+            <span class="home-badge home-badge--exito">{{ miDispositivo.estado }}</span>
+          </p>
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Última comunicación:</span>
+            <span class="home-dispositivo-value">{{ miDispositivo.ultimaComunicacion }}</span>
+          </p>
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Última ubicación:</span>
+            <span class="home-dispositivo-value">{{ miDispositivo.ultimaUbicacion }}</span>
+          </p>
+        </div>
+        <div class="home-dispositivo-icon">
+          <i class="ti ti-device-mobile"></i>
         </div>
       </div>
-      <p class="db-gauge__calificacion">{{ resumenSeguridad.calificacion }}</p>
-      <p class="db-gauge__mensaje">{{ resumenSeguridad.mensaje }}</p>
+
+      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/mi-dispositivo">
+        Ver detalles del dispositivo <i class="ti ti-arrow-right"></i>
+      </a>
     </div>
 
   </div>
 
-  <!-- FILA 2 DE 4 COLUMNAS: Distribución + Consejos (izquierda) + Tendencia (ancho, derecha) -->
-  <div class="db-row4">
+  <!-- ACTIVIDAD RECIENTE + ÚLTIMA EMERGENCIA + ÚLTIMA UBICACIÓN -->
+  <div class="home-row home-row--mid">
 
-    <!-- DISTRIBUCIÓN DE ALERTAS POR TIPO (dona) -->
-    <div class="db-panel db-panel--donut">
-      <div class="db-section-header">
-        <i class="ti ti-chart-pie"></i>
-        <h2 class="db-section-title">Distribución de Alertas</h2>
+    <!-- ACTIVIDAD RECIENTE -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Actividad reciente</h2>
+        <a class="home-link" routerLink="/dashboard/alert-history">Ver todo</a>
       </div>
-      <div class="db-donut-row">
-        <div class="db-donut" [style.background]="distribucionGradient">
-          <div class="db-donut__hole"></div>
-        </div>
-        <div class="db-donut-legend">
-          @for (item of distribucionAlertas; track item.tipo) {
-            <div class="db-donut-legend__item">
-              <span class="db-donut-legend__dot" [style.background]="item.color"></span>
-              <span class="db-donut-legend__label">{{ item.tipo }}</span>
-              <span class="db-donut-legend__value">
-                {{ item.count }} ({{ distribucionPercent(item.count) }}%)
-              </span>
+      <div class="home-activity-list">
+        @for (item of actividadReciente; track item.titulo) {
+          <a class="home-activity-item" routerLink="/dashboard/alert-history">
+            <div class="home-activity-item__icon" [ngClass]="'home-activity-item__icon--' + item.color">
+              <i class="ti {{ item.icon }}"></i>
             </div>
-          }
+            <div class="home-activity-item__body">
+              <p class="home-activity-item__titulo">{{ item.titulo }}</p>
+              <p class="home-activity-item__fecha">{{ item.fecha }}</p>
+            </div>
+            <i class="ti ti-chevron-right home-activity-item__chevron"></i>
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- ÚLTIMA EMERGENCIA -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Última emergencia</h2>
+        <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
+      </div>
+
+      <div class="home-emergencia">
+        <div class="home-emergencia__fecha-row">
+          <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
+          <div>
+            <p class="home-emergencia__fecha">{{ ultimaEmergencia.fecha }}</p>
+            <p class="home-emergencia__hora">{{ ultimaEmergencia.hora }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-map-pin"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Ubicación</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.ubicacion }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-activity"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Activada mediante</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.activadaMediante }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-users"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Contactos notificados</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.contactosNotificados }} contactos</p>
+          </div>
         </div>
       </div>
+
+      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/alert-history">
+        Ver detalles
+      </a>
     </div>
 
-    <!-- CONSEJOS DE SEGURIDAD -->
-    <div class="db-panel db-panel--consejo">
-      <div class="db-section-header">
-        <i class="ti ti-bulb"></i>
-        <h2 class="db-section-title">Consejos de Seguridad</h2>
+    <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
+        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
       </div>
-      <div class="db-consejo">
-        <div class="db-consejo__icon"><i class="ti {{ consejo.icono }}"></i></div>
-        <p class="db-consejo__texto">{{ consejo.texto }}</p>
-      </div>
-      <a class="db-ver-mas" href="#">Ver cómo hacerlo →</a>
-    </div>
 
-    <!-- TENDENCIA DE ALERTAS (línea) -->
-    <div class="db-panel db-panel--wide">
-      <div class="db-section-header">
-        <i class="ti ti-chart-line"></i>
-        <h2 class="db-section-title">Tendencia de Alertas</h2>
-      </div>
-      <p class="db-chart-sub">Alertas por Mes</p>
+      <div id="home-mini-map" class="home-mini-map"></div>
 
-      <svg viewBox="0 0 300 120" class="db-trend-svg" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.35"></stop>
-            <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"></stop>
-          </linearGradient>
-        </defs>
-        <path [attr.d]="lineChartAreaPath" class="db-trend-area"></path>
-        <polyline [attr.points]="lineChartPoints" class="db-trend-line"></polyline>
-        @for (d of chartData; track d.mes; let i = $index) {
-          <circle [attr.cx]="dotX(i)" [attr.cy]="dotY(d.valor)" r="3" class="db-trend-dot"></circle>
-        }
-      </svg>
-      <div class="db-trend-labels">
-        @for (d of chartData; track d.mes) {
-          <span>{{ d.mes }}</span>
-        }
-      </div>
+      <p class="home-mini-map__direccion">
+        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
+      </p>
+      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
     </div>
 
   </div>
 
-  <!-- ACCESOS RÁPIDOS -->
-  <div class="db-accesos">
-    <div class="db-section-header">
-      <i class="ti ti-bolt"></i>
-      <h2 class="db-section-title">Accesos Rápidos</h2>
+  <!-- ACCESOS RÁPIDOS + ACCIONES RÁPIDAS -->
+  <div class="home-row home-row--bottom">
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Accesos rápidos</h2>
+      </div>
+      <div class="home-accesos-grid">
+        @for (acceso of accesosRapidos; track acceso.label) {
+          <a class="home-acceso" [routerLink]="acceso.route">
+            <div class="home-acceso__icon" [ngClass]="'home-acceso__icon--' + acceso.color">
+              <i class="ti {{ acceso.icon }}"></i>
+            </div>
+            <p class="home-acceso__label">{{ acceso.label }}</p>
+            <p class="home-acceso__sub">{{ acceso.sub }}</p>
+          </a>
+        }
+      </div>
     </div>
-    <div class="db-accesos-grid">
-      <a class="db-acceso-card" routerLink="/dashboard/alert-history">
-        <i class="ti ti-map-2 db-acceso-icon"></i>
-        <span class="db-acceso-label">Ver Historial</span>
-      </a>
-      <a class="db-acceso-card" routerLink="/dashboard/evidencias">
-        <i class="ti ti-camera db-acceso-icon"></i>
-        <span class="db-acceso-label">Nube de Evidencias</span>
-      </a>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Acciones rápidas</h2>
+      </div>
+      <div class="home-acciones-list">
+        @for (accion of accionesRapidas; track accion.label) {
+          <a class="home-accion-item" [routerLink]="accion.route">
+            <i class="ti {{ accion.icon }}"></i>
+            <span>{{ accion.label }}</span>
+            <i class="ti ti-chevron-right home-accion-item__chevron"></i>
+          </a>
+        }
+      </div>
     </div>
+
   </div>
 
 </div>

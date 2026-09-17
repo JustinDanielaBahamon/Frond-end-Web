@@ -1,0 +1,117 @@
+.lf-error { color: var(--red, #dc2626); margin-bottom: 1rem; }
+
+.lf-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.lf-card {
+  background: var(--bg-card, #fff);
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem;
+}
+
+.lf-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+.lf-title { font-size: 1rem; font-weight: 700; color: var(--text-primary, #1a1a1a); margin: 0; }
+.lf-subtitle { font-size: 0.78rem; color: var(--text-muted, #4b4b55); margin: 2px 0 0; max-width: 220px; }
+
+.lf-add-btn {
+  display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;
+  padding: 0.45rem 0.8rem; border-radius: 0.5rem;
+  border: 1px solid var(--purple-pale, #e9d5ff);
+  background: var(--purple-pale, #faf5ff);
+  color: var(--purple-mid, #7c3aed);
+  font-size: 0.78rem; font-weight: 700; cursor: pointer;
+
+  svg { width: 14px; height: 14px; }
+  &:hover { background: var(--purple-pale-hover, #ede9fe); }
+}
+
+.lf-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.9rem; }
+
+.lf-item {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border, #ede9fe);
+  position: relative;
+
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+}
+
+.lf-icon {
+  width: 40px; height: 40px; border-radius: 0.65rem; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  svg { width: 18px; height: 18px; }
+
+  &--casa { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+  &--trabajo { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+  &--estudio { background: linear-gradient(135deg, #d97706, #fbbf24); }
+  &--otro { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+}
+
+.lf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.lf-name-row { display: flex; align-items: center; gap: 0.5rem; }
+.lf-name { font-size: 0.88rem; font-weight: 700; color: var(--text-primary, #1a1a1a); }
+
+.lf-tag {
+  font-size: 0.65rem; font-weight: 700; color: var(--purple-deep, #5b21b6);
+  background: var(--purple-pale, #ede9fe); padding: 0.05rem 0.5rem; border-radius: 999px;
+}
+
+.lf-address { font-size: 0.8rem; color: var(--text-primary, #1a1a1a); font-weight: 600; }
+.lf-city { font-size: 0.75rem; color: var(--text-muted, #4b4b55); }
+
+.lf-link {
+  display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.3rem;
+  border: none; background: none; padding: 0;
+  font-size: 0.75rem; font-weight: 700; color: var(--purple-mid, #7c3aed); cursor: pointer;
+  svg { width: 12px; height: 12px; }
+  &:hover { text-decoration: underline; }
+}
+
+.lf-menu-wrap { position: relative; flex-shrink: 0; }
+
+.lf-menu-btn {
+  border: none; background: none; color: var(--text-muted, #4b4b55); font-size: 1.1rem;
+  cursor: pointer; padding: 0.2rem 0.4rem; border-radius: 0.4rem;
+  &:hover { background: var(--purple-pale, #f5f3ff); }
+}
+
+.lf-menu {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 20;
+  min-width: 160px; background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #e9d5ff); border-radius: 0.6rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); padding: 6px;
+  display: flex; flex-direction: column;
+
+  button {
+    text-align: left; padding: 0.5rem 0.6rem; border: none; background: none;
+    border-radius: 0.4rem; font-size: 0.78rem; font-weight: 600;
+    color: var(--text-primary, #1a1a1a); cursor: pointer;
+    &:hover { background: var(--purple-pale, #f5f3ff); }
+  }
+}
+
+.lf-menu-danger { color: var(--red, #dc2626) !important; }
+
+.lf-muted { color: var(--text-muted, #4b4b55); font-size: 0.85rem; }
+
+.lf-map-wrap { position: relative; border-radius: 1rem; }
+.lf-map { height: 480px; border-radius: 1rem; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+
+.lf-legend {
+  position: absolute; bottom: 12px; left: 12px; z-index: 1000;
+  display: flex; flex-wrap: wrap; gap: 0.7rem;
+  background: rgba(255, 255, 255, 0.92); padding: 0.35rem 0.8rem; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 600; color: #1a1a1a; backdrop-filter: blur(4px);
+}
+
+.lf-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.lf-dot--casa { background: #7c3aed; }
+.lf-dot--trabajo { background: #2563eb; }
+.lf-dot--estudio { background: #d97706; }
+.lf-dot--otro { background: #6b7280; }

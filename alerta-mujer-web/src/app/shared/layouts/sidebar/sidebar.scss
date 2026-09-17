@@ -10,6 +10,9 @@
   overflow: hidden;
   transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
 
+  // 🎨 Color principal del sidebar (paleta de la landing)
+  background: #380759;
+
   &--collapsed {
     width: 0;
     min-width: 0;
@@ -53,7 +56,7 @@
 
   &__brand-tagline {
     margin: 0;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.678);
     font-size: 0.7rem;
   }
 
@@ -65,14 +68,14 @@
 
   &__divider {
     height: 2px;
-    background: linear-gradient(90deg, #7c3aed, #e607ae, transparent);
+    background: linear-gradient(90deg, #C2A0F2, #b108b1, transparent);
     border-radius: 2px;
   }
 
   &__section {
     font-size: 0.7rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.658);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin: 0 0 0.75rem;
@@ -108,22 +111,24 @@
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
     }
 
     &--active {
-      background: rgba(139, 92, 246, 0.28);
+      // 🎨 Indicador de módulo activo — degradado con los colores del landing/login
+      background: linear-gradient(135deg, #7630D9, #D948B2);
       color: #fff;
+      box-shadow: 0 4px 14px rgba(217, 72, 178, 0.35);
 
-      .sidebar__link-icon { color: #e879f9; }
+      .sidebar__link-icon { color: #F2F2F2; }
     }
   }
 
   &__link-icon {
     width: 16px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
     transition: color 0.15s ease;
   }
@@ -142,7 +147,7 @@
     margin-bottom: 1rem;
     padding: 11px 14px;
     border-radius: 10px;
-    background: linear-gradient(90deg, #7c3aed, #e607ae);
+    background: linear-gradient(90deg, #D948B2, #7630D9);
     color: #fff;
     font-size: 0.8rem;
     font-weight: 700;

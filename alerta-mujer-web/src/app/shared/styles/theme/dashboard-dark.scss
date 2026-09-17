@@ -5,7 +5,7 @@
 [data-theme="dark"] {
 
   .sidebar {
-    background: var(--bg-card) !important; // pisa el fondo blanco por defecto
+    background: #842CBF !important; // 🎨 color principal de la paleta
 
     &__brand-name {
       color: var(--text-primary) !important;
@@ -20,7 +20,7 @@
     }
 
     &__divider {
-      background: linear-gradient(90deg, var(--purple-mid), var(--pink), transparent) !important;
+      background: linear-gradient(90deg, #C2A0F2, var(--pink), transparent) !important;
     }
 
     &__link {
@@ -28,16 +28,18 @@
       border-bottom-color: var(--border) !important;
 
       &:hover {
-        background: var(--purple-pale) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
         color: var(--text-primary) !important;
       }
 
       &--active {
-        background: var(--purple-pale-hover) !important;
-        color: var(--text-primary) !important;
+        // 🎨 Indicador de módulo activo — degradado con los colores del landing/login
+        background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 14px rgba(217, 72, 178, 0.35) !important;
 
         .sidebar__link-icon {
-          color: var(--text-primary) !important;
+          color: #F2F2F2 !important;
         }
       }
     }

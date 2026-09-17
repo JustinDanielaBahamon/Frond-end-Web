@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import * as L from 'leaflet';
@@ -38,29 +38,41 @@ export class AlertHistory implements OnInit, OnDestroy {
   // Fecha elegida en el selector (formato 'YYYY-MM-DD' del <input type="date">), o null si no hay filtro.
   fechaFiltro: string | null = null;
 
+  // Filtro por medio de activación ('Todas' = sin filtro).
+  tipoFiltro = 'Todas';
+  searchTerm = '';
+
+  // NOTA: estos 4 valores deben coincidir exactamente con los que envía el backend
+  // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
+  mediosDisponibles = ['Botón de pánico', 'Widget', 'Movimiento sospechoso', 'Manual'];
+
   @ViewChild('fechaInput') private fechaInputRef?: ElementRef<HTMLInputElement>;
 
   totalAlertas = 0;
   alertasEsteMes = 0;
-  alertasPendientes = 0;
   alertasAtendidas = 0;
-  alertasFalsas = 0;
+  alertasCanceladas = 0;
 
-  tipoBadge: Record<string, string> = {
-    'SOS': 'badge-sos',
-    'Medical': 'badge-medical',
-    'Robo': 'badge-robo',
-    'Acoso': 'badge-acoso',
+  medioBadge: Record<string, string> = {
+    'Botón de pánico': 'badge-boton',
+    'Widget': 'badge-widget',
+    'Movimiento sospechoso': 'badge-movimiento',
+    'Manual': 'badge-manual',
   };
 
   estadoBadge: Record<string, string> = {
     'Atendida': 'badge-ok',
     'Pendiente': 'badge-pendiente',
-    'Falsa alarma': 'badge-falsa',
+    'Cancelada': 'badge-falsa',
   };
 
   // Fila expandida in-line (reemplaza al modal). Solo una a la vez.
   expandedAlertaId: number | null = null;
+  menuAbiertoId: number | null = null;
+
+  // Paginación
+  currentPage = 1;
+  pageSize = 7;
 
   private map: L.Map | null = null;
   private tileLayer: L.TileLayer | null = null;
@@ -80,7 +92,7 @@ export class AlertHistory implements OnInit, OnDestroy {
         next: (data) => {
           this.alertas = data;
           this.calcularStats(data);
-          this.aplicarFiltroFecha();
+          this.aplicarFiltros();
         },
         error: () => {
           this.error = true;
@@ -91,9 +103,8 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   private calcularStats(alertas: Alerta[]) {
     this.totalAlertas = alertas.length;
-    this.alertasPendientes = alertas.filter(a => a.estado === 'Pendiente').length;
     this.alertasAtendidas = alertas.filter(a => a.estado === 'Atendida').length;
-    this.alertasFalsas = alertas.filter(a => a.estado === 'Falsa alarma').length;
+    this.alertasCanceladas = alertas.filter(a => a.estado === 'Cancelada').length;
 
     // 👇 asume que 'tiempo' es parseable como fecha (ej. "2026-06-13T10:32:00").
     // Si tu formato es distinto (ej. "13 jun 2026, 10:32 AM"), dime el formato exacto
@@ -123,6 +134,20 @@ export class AlertHistory implements OnInit, OnDestroy {
       const el = document.getElementById(elId);
       if (el) this.inicializarMapa(alerta.lat, alerta.lng, elId);
     }, 50);
+  }
+
+  toggleMenu(id: number, event: Event) {
+    event.stopPropagation();
+    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
+  }
+
+  @HostListener('document:click')
+cerrarMenu() {
+  this.menuAbiertoId = null;
+}
+
+  mapsUrl(alerta: Alerta): string {
+    return `https://www.google.com/maps?q=${alerta.lat},${alerta.lng}`;
   }
 
   /**
@@ -236,27 +261,53 @@ export class AlertHistory implements OnInit, OnDestroy {
   onFechaChange(event: Event) {
     const valor = (event.target as HTMLInputElement).value;
     this.fechaFiltro = valor || null;
-    this.aplicarFiltroFecha();
+    this.aplicarFiltros();
   }
 
-  /** Quita el filtro y vuelve a mostrar todo el historial. */
+  /** Quita el filtro de fecha y vuelve a mostrar todo el historial. */
   limpiarFiltroFecha() {
     this.fechaFiltro = null;
-    this.aplicarFiltroFecha();
+    this.aplicarFiltros();
   }
 
-  /** Filtra this.alertas por el día elegido (comparando solo año-mes-día). */
-  private aplicarFiltroFecha() {
-    if (!this.fechaFiltro) {
-      this.alertasFiltradas = this.alertas;
-      return;
+  onTipoChange(event: Event) {
+    this.tipoFiltro = (event.target as HTMLSelectElement).value;
+    this.aplicarFiltros();
+  }
+
+  onBuscarChange(event: Event) {
+    this.searchTerm = (event.target as HTMLInputElement).value;
+    this.aplicarFiltros();
+  }
+
+  /** Aplica fecha + medio de activación + búsqueda de texto sobre this.alertas y reinicia la paginación. */
+  private aplicarFiltros() {
+    let resultado = this.alertas;
+
+    if (this.fechaFiltro) {
+      resultado = resultado.filter(a => {
+        const fecha = new Date(a.tiempo);
+        if (isNaN(fecha.getTime())) return false;
+        return this.aFechaLocalISO(fecha) === this.fechaFiltro;
+      });
     }
 
-    this.alertasFiltradas = this.alertas.filter(a => {
-      const fecha = new Date(a.tiempo);
-      if (isNaN(fecha.getTime())) return false;
-      return this.aFechaLocalISO(fecha) === this.fechaFiltro;
-    });
+    if (this.tipoFiltro && this.tipoFiltro !== 'Todas') {
+      resultado = resultado.filter(a => a.medioActivacion === this.tipoFiltro);
+    }
+
+    if (this.searchTerm.trim()) {
+      const q = this.searchTerm.trim().toLowerCase();
+      resultado = resultado.filter(a =>
+        a.estado.toLowerCase().includes(q) ||
+        a.ubicacion.toLowerCase().includes(q) ||
+        (a.medioActivacion ?? '').toLowerCase().includes(q) ||
+        a.tiempo.toLowerCase().includes(q)
+      );
+    }
+
+    this.alertasFiltradas = resultado;
+    this.currentPage = 1;
   }
 
   /** Convierte una fecha a 'YYYY-MM-DD' usando la hora local (evita el corrimiento de un día que da toISOString con UTC). */
@@ -274,6 +325,50 @@ export class AlertHistory implements OnInit, OnDestroy {
     return fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  /** Divide alerta.tiempo en fecha y hora legibles para las dos líneas de la tabla. */
+  formatearFechaHora(tiempo: string): { fecha: string; hora: string } {
+    const fecha = new Date(tiempo);
+    if (isNaN(fecha.getTime())) return { fecha: tiempo, hora: '' };
+    return {
+      fecha: fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }),
+      hora: fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+    };
+  }
+
+  // --- Paginación ---
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.alertasFiltradas.length / this.pageSize));
+  }
+
+  get alertasPagina(): Alerta[] {
+    const inicio = (this.currentPage - 1) * this.pageSize;
+    return this.alertasFiltradas.slice(inicio, inicio + this.pageSize);
+  }
+
+  get rangoInicio(): number {
+    return this.alertasFiltradas.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get rangoFin(): number {
+    return Math.min(this.currentPage * this.pageSize, this.alertasFiltradas.length);
+  }
+
+  get paginasVisibles(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  irAPagina(p: number) {
+    this.currentPage = p;
+  }
+
+  paginaAnterior() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
+  paginaSiguiente() {
+    if (this.currentPage < this.totalPages) this.currentPage++;
+  }
+
   /**
    * Lleva al módulo de Evidencias, pasando el id de la alerta por query param
    * para que esa pantalla pueda filtrar y mostrar solo las evidencias de esta alerta.
@@ -285,11 +380,11 @@ export class AlertHistory implements OnInit, OnDestroy {
   }
 
   /**
-   * TODO: reemplazar por la llamada real a tu backend (alertsService.marcarFalsaAlarma(alerta.id)).
+   * TODO: reemplazar por la llamada real a tu backend (alertsService.marcarCancelada(alerta.id)).
    * Por ahora actualiza el estado localmente para que la UI responda de inmediato.
    */
-  marcarFalsaAlarma(alerta: Alerta) {
-    alerta.estado = 'Falsa alarma';
+  marcarCancelada(alerta: Alerta) {
+    alerta.estado = 'Cancelada';
     this.calcularStats(this.alertas);
   }
 

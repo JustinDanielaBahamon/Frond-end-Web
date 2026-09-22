@@ -10,7 +10,7 @@
           <h2 class="home-panel__title">Estado de tu seguridad</h2>
           <p class="home-panel__subtitle">Tu cuenta está protegida</p>
         </div>
-        <button class="home-btn home-btn--outline" routerLink="/dashboard/configuracion">
+        <button class="home-btn home-btn--outline" routerLink="/dashboard/settings">
           Ver configuración
         </button>
       </div>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/mi-dispositivo">
+      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/device">
         Ver detalles del dispositivo <i class="ti ti-arrow-right"></i>
       </a>
     </div>
@@ -185,11 +185,19 @@
       </div>
       <div class="home-acciones-list">
         @for (accion of accionesRapidas; track accion.label) {
-          <a class="home-accion-item" [routerLink]="accion.route">
-            <i class="ti {{ accion.icon }}"></i>
-            <span>{{ accion.label }}</span>
-            <i class="ti ti-chevron-right home-accion-item__chevron"></i>
-          </a>
+          @if (!accion.disabled) {
+            <a class="home-accion-item" [routerLink]="accion.route">
+              <i class="ti {{ accion.icon }}"></i>
+              <span>{{ accion.label }}</span>
+              <i class="ti ti-chevron-right home-accion-item__chevron"></i>
+            </a>
+          } @else {
+            <div class="home-accion-item home-accion-item--disabled">
+              <i class="ti {{ accion.icon }}"></i>
+              <span>{{ accion.label }}</span>
+              <i class="ti ti-lock home-accion-item__chevron"></i>
+            </div>
+          }
         }
       </div>
     </div>

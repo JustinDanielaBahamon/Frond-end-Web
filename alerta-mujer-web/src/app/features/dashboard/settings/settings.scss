@@ -21,14 +21,14 @@
 
     h1 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: var(--font-size-2xl);
       font-weight: 700;
     }
 
     p {
       margin: 4px 0 0;
       color: var(--am-text-secondary);
-      font-size: 0.9rem;
+      font-size: var(--font-size-sm);
     }
   }
 
@@ -60,7 +60,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 0.85rem;
+      font-size: var(--font-size-sm);
       flex: 1 1 160px;
 
       i {
@@ -104,13 +104,13 @@
       align-items: center;
       gap: 8px;
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--font-size-base);
       font-weight: 600;
     }
   }
 
   &__label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     color: var(--am-text-secondary);
     margin: 12px 0 8px;
   }
@@ -123,7 +123,7 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
 
     i {
       color: var(--am-accent);
@@ -155,7 +155,7 @@
   background: none;
   border: none;
   color: var(--am-accent);
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
@@ -188,11 +188,11 @@
 
   strong {
     display: block;
-    font-size: 0.95rem;
+    font-size: var(--font-size-lg);
   }
 
   span {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     color: var(--am-text-secondary);
   }
 }
@@ -207,7 +207,7 @@
   border-bottom: 1px solid var(--am-border);
   padding: 12px 0;
   text-align: left;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   color: var(--am-text-primary);
   cursor: pointer;
 
@@ -254,7 +254,7 @@
 
   &__value {
     color: var(--am-text-secondary);
-    font-size: 0.78rem;
+    font-size: var(--font-size-xs);
     margin-left: auto;
   }
 }
@@ -308,7 +308,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   color: var(--am-text-secondary);
 
   &.active {
@@ -369,7 +369,7 @@
   gap: 4px;
   cursor: pointer;
   color: var(--am-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: capitalize;
 
   &.active {
@@ -380,9 +380,9 @@
   &__sample {
     font-weight: 700;
 
-    &--pequeña { font-size: 0.75rem; }
-    &--normal { font-size: 1rem; }
-    &--grande { font-size: 1.25rem; }
+    &--pequeña { font-size: var(--font-size-xs); }
+    &--normal { font-size: var(--font-size-base); }
+    &--grande { font-size: var(--font-size-xl); }
   }
 }
 
@@ -391,7 +391,7 @@
   margin-left: auto;
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: var(--font-size-xs);
   background: var(--am-border);
   color: var(--am-text-secondary);
 
@@ -407,7 +407,7 @@
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
 }

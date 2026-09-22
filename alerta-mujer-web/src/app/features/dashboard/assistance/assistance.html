@@ -42,7 +42,7 @@
         </button>
       </div>
 
-      <div class="as-panels" [class.as-panels--solo-centros]="tabActivo === 'centros'">
+      <div class="as-panels as-panels--solo">
 
         <!-- LÍNEAS DE AYUDA -->
         @if (tabActivo === 'lineas') {
@@ -84,8 +84,8 @@
           </div>
         }
 
-        <!-- CENTROS CERCANOS (visible en tab lineas junto a la lista, y solo en tab centros) -->
-        @if (tabActivo === 'lineas' || tabActivo === 'centros') {
+        <!-- CENTROS CERCANOS (solo en su propia pestaña) -->
+        @if (tabActivo === 'centros') {
           <div class="as-panel as-panel--centros">
             <div class="as-panel-head">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="as-panel-head-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>

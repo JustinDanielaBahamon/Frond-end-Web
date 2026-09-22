@@ -51,6 +51,7 @@ interface AccionRapida {
   icon: string;
   label: string;
   route: string;
+  disabled?: boolean;
 }
 
 @Component({
@@ -112,18 +113,18 @@ export class Home implements AfterViewInit, OnDestroy {
 
   // ── ACCESOS RÁPIDOS ───────────────────────────────
   accesosRapidos: AccesoRapido[] = [
-    { icon: 'ti-alert-triangle', color: 'peligro',     label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/mis-emergencias' },
-    { icon: 'ti-folder',         color: 'exito',       label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidencias' },
-    { icon: 'ti-users',          color: 'principal',   label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/contactos' },
+    { icon: 'ti-alert-triangle', color: 'peligro',     label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/alert-history' },
+    { icon: 'ti-folder',         color: 'exito',       label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidence' },
+    { icon: 'ti-users',          color: 'principal',   label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/emergency-contacts' },
     { icon: 'ti-map-pin',        color: 'acento',      label: 'Ubicación',       sub: 'Ver mapa',         route: '/dashboard/ubicacion' },
-    { icon: 'ti-phone',          color: 'advertencia', label: 'Asistencia',      sub: 'Recursos y ayuda', route: '/dashboard/asistencia' },
+    { icon: 'ti-phone',          color: 'advertencia', label: 'Asistencia',      sub: 'Recursos y ayuda', route: '/dashboard/assistance' },
   ];
 
   // ── ACCIONES RÁPIDAS ──────────────────────────────
   accionesRapidas: AccionRapida[] = [
-    { icon: 'ti-file-text', label: 'Generar informe de emergencia',   route: '/dashboard/informe' },
-    { icon: 'ti-book',      label: 'Ver tutorial nuevamente',          route: '/dashboard/tutorial' },
-    { icon: 'ti-user',      label: 'Actualizar información personal',  route: '/dashboard/perfil' },
+    { icon: 'ti-file-text', label: 'Generar informe de emergencia',   route: '/dashboard/informe', disabled: true },
+    { icon: 'ti-book',      label: 'Ver tutorial nuevamente',          route: '/dashboard/tutorial', disabled: true },
+    { icon: 'ti-user',      label: 'Actualizar información personal',  route: '/dashboard/settings' },
   ];
 
   ngAfterViewInit(): void {

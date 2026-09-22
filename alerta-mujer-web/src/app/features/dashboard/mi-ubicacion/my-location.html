@@ -1,0 +1,64 @@
+@if (error) {
+  <p class="mu-error">No se pudo cargar tu ubicación. Intenta de nuevo.</p>
+}
+
+<div class="mu-grid">
+  <div class="mu-card">
+    <div class="mu-card-header">
+      <h2 class="mu-card-title">Mi ubicación registrada</h2>
+      @if (currentZone(); as zona) {
+        <span class="mu-badge mu-badge--segura">
+          <span class="mu-badge-dot"></span> {{ zona.name }}
+        </span>
+      }
+    </div>
+
+    @if (loading) {
+      <p class="mu-muted">Cargando ubicación...</p>
+    } @else if (currentLocation(); as loc) {
+      <div class="mu-place">
+        <svg class="mu-place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="mu-place-name">{{ currentPlace()?.name || 'Ubicación actual' }}</span>
+        @if (currentPlace()) {
+          <span class="mu-tag">Lugar frecuente</span>
+        }
+      </div>
+
+      <div class="mu-info-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="mu-info-value">{{ loc.address }}</span>
+      </div>
+
+      <div class="mu-info-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div>
+          <span class="mu-info-label">Última actualización</span>
+          <span class="mu-info-value">{{ updatedLabel() }}</span>
+        </div>
+      </div>
+
+      @if (currentZone(); as zona) {
+        <div class="mu-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <p>Esta ubicación se encuentra dentro de una zona segura{{ currentPlace() ? ' y corresponde a uno de tus lugares frecuentes' : '' }}.</p>
+        </div>
+      }
+
+      <button class="mu-btn" (click)="viewOnMap()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ver en el mapa
+      </button>
+    } @else if (!error) {
+      <p class="mu-muted">Sin datos de ubicación registrados.</p>
+    }
+  </div>
+
+  <div class="mu-map-wrap">
+    <div class="mu-map" #mapContainer></div>
+    <div class="mu-legend">
+      <span><i class="mu-dot mu-dot--you"></i> Tu ubicación</span>
+      <span><i class="mu-dot mu-dot--segura"></i> Zona segura</span>
+      <span><i class="mu-dot mu-dot--frecuente"></i> Lugar frecuente</span>
+    </div>
+  </div>
+</div>

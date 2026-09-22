@@ -1,0 +1,66 @@
+
+
+@if (error) {
+  <p class="lf-error">No se pudieron cargar tus lugares frecuentes.</p>
+}
+
+<div class="lf-grid">
+  <div class="lf-card">
+    <div class="lf-card-header">
+      <div>
+        <h2 class="lf-title">Tus lugares frecuentes</h2>
+        <p class="lf-subtitle">Son los lugares que visitas habitualmente y que reconocemos en el sistema.</p>
+      </div>
+      <button class="lf-add-btn" (click)="addPlace()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar lugar
+      </button>
+    </div>
+
+    @if (loading) {
+      <p class="lf-muted">Cargando lugares...</p>
+    } @else {
+      <ul class="lf-list">
+        @for (place of places(); track place.id) {
+          <li class="lf-item">
+            <div class="lf-icon lf-icon--{{ place.type }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath(place.type)"/></svg>
+            </div>
+            <div class="lf-body">
+              <div class="lf-name-row">
+                <span class="lf-name">{{ place.name }}</span>
+                @if (place.isMain) { <span class="lf-tag">Principal</span> }
+              </div>
+              <span class="lf-address">{{ place.address }}</span>
+              <span class="lf-city">{{ place.city }}</span>
+              <button class="lf-link" (click)="viewOnMap(place)">
+                Ver en el mapa
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+            <div class="lf-menu-wrap">
+              <button class="lf-menu-btn" (click)="toggleMenu(place.id)">⋮</button>
+              @if (openMenu() === place.id) {
+                <div class="lf-menu">
+                  <button (click)="viewOnMap(place)">Ver en el mapa</button>
+                  <button class="lf-menu-danger" (click)="remove(place)">Eliminar</button>
+                </div>
+              }
+            </div>
+          </li>
+        } @empty {
+          <li class="lf-muted">Aún no tienes lugares frecuentes guardados.</li>
+        }
+      </ul>
+    }
+  </div>
+
+  <div class="lf-map-wrap">
+    <div class="lf-map" #mapContainer></div>
+    <div class="lf-legend">
+      @for (place of places(); track place.id) {
+        <span><i class="lf-dot lf-dot--{{ place.type }}"></i> {{ place.name }}</span>
+      }
+    </div>
+  </div>
+</div>

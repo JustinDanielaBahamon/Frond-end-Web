@@ -544,9 +544,18 @@
       "nombre": "justin",
       "telefono": "3226662738",
       "relacion": "Padre",
-      "prioridad": "2",
+      "prioridad": 1,
       "activo": true,
-      "id": "XDvB0e7Yth0"
+      "id": "kZzYVpDnLf8"
+    },
+    {
+      "usuarioId": 2,
+      "nombre": "justing",
+      "telefono": "3186866594",
+      "relacion": "Hermano/a",
+      "prioridad": 1,
+      "activo": true,
+      "id": "EzFO-WMmUsI"
     }
   ],
   "lineas-ayuda": [
@@ -629,6 +638,23 @@
       "estado": "Cierra a las 5:00 pm"
     }
   ],
-  "recursos-guardados": [],
+  "recursos-guardados": [
+    {
+      "usuarioId": 2,
+      "refTipo": "linea",
+      "refId": "1",
+      "nombre": "Línea de Emergencias 123",
+      "subtitulo": "Línea · 24/7",
+      "id": "zfOU2-TZlPU"
+    },
+    {
+      "usuarioId": 2,
+      "refTipo": "linea",
+      "refId": "2",
+      "nombre": "Línea Púrpura",
+      "subtitulo": "Línea · 24/7",
+      "id": "wDn7I02aRH4"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

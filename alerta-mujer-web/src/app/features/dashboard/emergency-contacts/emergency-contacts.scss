@@ -5,7 +5,7 @@
 .ec-error {
   text-align: center;
   color: var(--red, #dc2626);
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   padding: 1.5rem;
 }
 
@@ -19,8 +19,8 @@
   margin-bottom: 1rem;
 }
 
-.ec-title { font-size: 1.3rem; font-weight: 800; color: #111827; margin: 0 0 2px; }
-.ec-sub { font-size: 0.85rem; color: #4b5563; margin: 0; }
+.ec-title { font-size: var(--font-size-2xl); font-weight: 800; color: #111827; margin: 0 0 2px; }
+.ec-sub { font-size: var(--font-size-sm); color: #4b5563; margin: 0; }
 
 .ec-add-btn {
   display: inline-flex;
@@ -33,7 +33,7 @@
   background: linear-gradient(135deg, #8b5cf6, #7c3aed);
   color: #fff;
   font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
 
@@ -50,7 +50,7 @@
   border: 1px solid var(--border, rgba(124, 58, 237, 0.2));
   border-radius: 12px;
   padding: 12px 16px;
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   color: #374151;
   margin-bottom: 1.25rem;
 
@@ -72,15 +72,16 @@
   width: 100%;
   border-collapse: collapse;
 
+  // antes: var(--purple-pale, #f9f8ff) — casi blanco, sin contraste con la tarjeta
   thead {
-    background: var(--purple-pale, #f9f8ff);
+    background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
 
     th {
       text-align: left;
-      font-size: 0.72rem;
+      font-size: var(--font-size-xs);
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      color: #6b7280;
+      color: #ffffff;
       font-weight: 800;
       padding: 12px 14px;
     }
@@ -94,7 +95,7 @@
 
   td {
     padding: 12px 14px;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: #1f2937;
     vertical-align: middle;
   }
@@ -110,7 +111,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 .ec-nombre { font-weight: 700; color: #111827; }
@@ -125,14 +126,14 @@
   background: var(--purple-pale, #ede9fe);
   color: #5b21b6;
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
 }
 
 .ec-badge {
   display: inline-block;
   padding: 3px 12px;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
 
   &--activo   { background: rgba(16, 185, 129, 0.15); color: #059669; }
@@ -156,7 +157,7 @@
   border-radius: 8px;
   color: #6b7280;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xl);
 
   svg { width: 15px; height: 15px; }
   &:hover { background: var(--purple-pale, #f5f3ff); color: #7c3aed; }
@@ -184,7 +185,7 @@
     border: none;
     background: transparent;
     font-family: 'Nunito', sans-serif;
-    font-size: 0.82rem;
+    font-size: var(--font-size-sm);
     color: #1f2937;
     cursor: pointer;
 
@@ -197,7 +198,7 @@
 .ec-empty, .ec-muted {
   text-align: center;
   color: #6b7280;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   padding: 2rem;
 }
 
@@ -230,8 +231,8 @@
   gap: 10px;
   padding: 20px 22px 12px;
 
-  h3 { font-size: 1.05rem; font-weight: 800; color: #111827; margin: 0 0 4px; }
-  p { font-size: 0.8rem; color: #6b7280; margin: 0; }
+  h3 { font-size: var(--font-size-lg); font-weight: 800; color: #111827; margin: 0 0 4px; }
+  p { font-size: var(--font-size-sm); color: #6b7280; margin: 0; }
 }
 
 .ec-modal-close {
@@ -241,7 +242,7 @@
   border: none;
   background: transparent;
   color: #9ca3af;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   cursor: pointer;
   border-radius: 50%;
 
@@ -265,7 +266,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: #374151;
 
@@ -279,7 +280,7 @@
   border-radius: 10px;
   border: 1.5px solid #d8d0f5;
   font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   color: #111827;
   background: #fff;
 
@@ -300,14 +301,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: #111827;
 
   svg { width: 15px; height: 15px; color: #7c3aed; }
 }
 
-.ec-toggle-sub { font-size: 0.75rem; color: #6b7280; margin: 2px 0 0 21px; }
+.ec-toggle-sub { font-size: var(--font-size-xs); color: #6b7280; margin: 2px 0 0 21px; }
 
 .ec-switch {
   position: relative;
@@ -351,8 +352,8 @@
   margin-bottom: 10px;
 
   svg { width: 17px; height: 17px; color: #dc2626; flex-shrink: 0; margin-top: 1px; }
-  strong { display: block; font-size: 0.85rem; color: #dc2626; }
-  p { margin: 1px 0 0; font-size: 0.75rem; color: #9ca3af; }
+  strong { display: block; font-size: var(--font-size-sm); color: #dc2626; }
+  p { margin: 1px 0 0; font-size: var(--font-size-xs); color: #9ca3af; }
 }
 
 .ec-danger-btn {
@@ -363,7 +364,7 @@
   background: rgba(220, 38, 38, 0.08);
   color: #dc2626;
   font-family: 'Nunito', sans-serif;
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
 
@@ -380,7 +381,7 @@
 }
 
 .ec-danger-confirm {
-  p { font-size: 0.82rem; color: #374151; margin: 0 0 10px; }
+  p { font-size: var(--font-size-sm); color: #374151; margin: 0 0 10px; }
 }
 
 .ec-danger-confirm-actions {
@@ -402,7 +403,7 @@
   padding: 11px;
   border-radius: 12px;
   font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 800;
   cursor: pointer;
 

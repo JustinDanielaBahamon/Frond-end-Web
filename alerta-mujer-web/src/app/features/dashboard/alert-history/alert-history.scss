@@ -25,19 +25,19 @@
   }
 }
 
+// Mismo patrón tipográfico que el resto de las pantallas (ver assistance.scss: .as-title)
 .ah-title {
-  font-family: 'Poppins', 'Nunito', sans-serif;
-  font-size: 1.5rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-primary, #111827);
   margin: 0;
-  letter-spacing: -0.01em;
 }
 
 .ah-sub {
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  color: var(--text-muted, #333333);
+  color: var(--text-muted, #4b5563);
   margin: 2px 0 0;
 }
 
@@ -79,7 +79,7 @@
     border: none;
     background: transparent;
     padding: 10px 0;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     outline: none;
     flex: 1;
     font-family: 'Nunito', sans-serif;
@@ -104,7 +104,7 @@
   background: var(--bg-card, #fff);
   border: 1.5px solid var(--border, #c4b5fd);
   color: var(--text-primary, #1a1a1a);
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -222,24 +222,25 @@
     .ah-stat-body { min-width: 0; }
 
     .ah-stat-label {
-      font-size: 0.75rem;
+      font-size: var(--font-size-xs);
       font-weight: 600;
       color: #000000;
       margin: 0 0 2px;
     }
 
     .ah-stat-val {
-      font-family: 'Poppins', 'Nunito', sans-serif;
-      font-size: 1.4rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: var(--font-size-2xl);
       font-weight: 800;
       margin: 0;
       color: var(--text-primary, #1a1a1a);
     }
 
+    // antes 0.68rem / #4b4b55: demasiado pequeño y bajo contraste
     .ah-stat-sub {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--text-dim, #4b4b55);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      color: var(--text-dim, #374151);
       margin: 2px 0 0;
     }
 
@@ -262,17 +263,23 @@
 .ah-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 
-  thead tr { background: var(--purple-pale, #2d1457); }
+  // Antes usaba var(--purple-pale, #2d1457): esa variable se usa en toda la app
+  // como fondo CLARO (lavanda pálido), así que aquí el header salía lavado y
+  // el texto blanco casi no se leía. Ahora usa un morado intermedio propio,
+  // consistente con los acentos de la app (--purple-mid / --purple-deep).
+  thead tr {
+    background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
+  }
 
   th {
     padding: 12px 16px;
     text-align: left;
-    font-size: 0.72rem;
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    color: var(--text-primary, #fff);
-    border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -287,8 +294,9 @@
 
   .ah-id    { color: var(--pink,  #e60f4f); font-weight: 700; }
   .ah-fecha { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
-  .ah-hora  { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted, #000000); }
-  .ah-ubicacion { font-size: 0.82rem; font-weight: 600; color:  #000000; }
+  // antes 0.75rem con color casi negro sobre texto ya negro: subo contraste con gris intermedio legible
+  .ah-hora  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
+  .ah-ubicacion { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
 }
 
 
@@ -299,7 +307,7 @@
   align-items: center;
   padding: 3px 12px;
   border-radius: 50px;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
 
   &.badge-boton      { background: rgba(219, 39, 119, 0.18); color: #e60f4f; }
@@ -308,7 +316,7 @@
   &.badge-manual     { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
 
   // BADGES — estado
-  &.badge-ok        { background: rgba(6, 184, 65, 0.719); color: #ffffff; }
+  &.badge-ok        { background: rgb(5 141 50 / 98%); color: #ffffff; }
   &.badge-pendiente { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
   &.badge-falsa     { background: rgba(16, 185, 129, 0.18); color: #047857; }
 }
@@ -356,7 +364,7 @@
     border: none;
     background: transparent;
     border-radius: 6px;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     color: var(--text-primary, #1a1a1a);
     cursor: pointer;
@@ -388,17 +396,18 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     color: var(--purple-deep, #5b21b6);
 
     svg { width: 16px; height: 16px; }
   }
 
+  // antes 0.78rem / #4b4b55: ligero refuerzo de contraste
   &-modo {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-muted, #4b4b55);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--text-muted, #374151);
   }
 }
 
@@ -413,11 +422,11 @@
 
 .ah-expand-col-title {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted, #4b4b55);
+  color: var(--text-muted, #374151);
   margin-bottom: 0.6rem;
 }
 
@@ -460,8 +469,9 @@
   box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
 }
 
-.ah-mini-timeline-label { font-size: 0.82rem; font-weight: 700; color: var(--text-primary, #1a1a1a); }
-.ah-mini-timeline-time { font-size: 0.72rem; font-weight: 600; color: var(--text-muted, #4b4b55); }
+.ah-mini-timeline-label { font-size: var(--font-size-sm); font-weight: 700; color: var(--text-primary, #1a1a1a); }
+// antes 0.72rem / #4b4b55: subo un poco tamaño y contraste
+.ah-mini-timeline-time { font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted, #374151); }
 
 .ah-mini-map-wrap {
   position: relative;
@@ -496,7 +506,7 @@
 .ah-mini-map-link {
   display: inline-block;
   margin-top: 8px;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   color: var(--purple-mid, #7c3aed);
   text-decoration: none;
@@ -515,8 +525,9 @@
   &:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 }
 
-.ah-expand-item-label { font-size: 0.7rem; color: var(--text-muted, #4b4b55); font-weight: 700; }
-.ah-expand-item-value { font-size: 0.82rem; color: var(--text-primary, #1a1a1a); font-weight: 700; }
+// antes 0.7rem / #4b4b55: etiqueta demasiado pequeña
+.ah-expand-item-label { font-size: var(--font-size-xs); color: var(--text-muted, #374151); font-weight: 700; }
+.ah-expand-item-value { font-size: var(--font-size-sm); color: var(--text-primary, #1a1a1a); font-weight: 700; }
 
 .ah-expand-action {
   display: flex;
@@ -529,7 +540,7 @@
   border: 1px solid var(--border, #e9d5ff);
   background: var(--bg-card, #fff);
   color: var(--purple-deep, #5b21b6);
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
 
@@ -546,7 +557,7 @@
   padding: 0.9rem 1.25rem;
   border-top: 1px solid var(--border, #ede9fe);
 
-  &-info { font-size: 0.78rem; font-weight: 600; color: var(--text-muted, #4b4b55); }
+  &-info { font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted, #374151); }
 
   &-controls {
     display: flex;
@@ -561,7 +572,7 @@
       border-radius: 8px;
       background: var(--bg-card, #fff);
       color: var(--text-primary, #1a1a1a);
-      font-size: 0.8rem;
+      font-size: var(--font-size-sm);
       font-weight: 700;
       cursor: pointer;
 
@@ -580,10 +591,202 @@
 .ah-error,
 .ah-empty {
   text-align: center;
-  color: var(--text-muted, #4b4b55);
+  color: var(--text-muted, #374151);
   font-size: 0.9rem;
   font-weight: 600;
   padding: 1.5rem;
 }
 
 .ah-error { color: var(--red, #dc2626); }
+
+/* ==================================================
+   MODO OSCURO — MIS EMERGENCIAS (scope local al componente)
+   ================================================== */
+
+/* :host-context permite seleccionar basándose en el estado de ancestros
+   manteniendo el scope del componente de Angular */
+
+:host-context([data-theme="dark"]) {
+  /* Encabezado de tabla con degradado morado-fucsia */
+  .ah-table thead tr {
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  }
+
+  /* Icono del título */
+  .ah-titlebar-icon {
+    background: rgba(219, 39, 119, 0.18) !important;
+  }
+
+  /* Textos */
+  .ah-title { color: var(--text-primary) !important; }
+  .ah-sub { color: var(--text-muted) !important; }
+
+  /* Toolbar - búsqueda y filtros */
+  .ah-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &-icon { color: var(--text-muted) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+
+    &:focus-within {
+      border-color: var(--pink) !important;
+      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15) !important;
+    }
+  }
+
+  .ah-filtro-fecha,
+  .ah-filtro-tipo {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &-icon { color: var(--purple-mid) !important; }
+  }
+
+  .ah-filtro-fecha-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+
+  .ah-view-toggle {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* Stats - tarjetas con degradados */
+  .ah-stat {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &--total      { border-left-color: var(--purple-mid) !important; }
+    &--atendidas  { border-left-color: var(--green, #16a34a) !important; }
+    &--canceladas { border-left-color: var(--pink) !important; }
+
+    .ah-stat-label { color: var(--text-muted) !important; }
+    .ah-stat-val { color: var(--text-primary) !important; }
+    .ah-stat-sub { color: var(--text-dim) !important; }
+    .ah-stat-chevron { color: var(--text-dim) !important; }
+  }
+
+  /* Tabla */
+  .ah-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .ah-table {
+    th { color: #fff !important; border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
+
+    td {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    .ah-id { color: var(--pink) !important; }
+    .ah-fecha { color: var(--text-primary) !important; }
+    .ah-hora { color: var(--text-muted) !important; }
+    .ah-ubicacion { color: var(--text-primary) !important; }
+  }
+
+  /* Badges */
+  .ah-badge {
+    &.badge-boton      { background: rgba(219, 39, 119, 0.22) !important; color: var(--pink) !important; }
+    &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+
+    &.badge-ok        { background: var(--green, #16a34a) !important; color: #fff !important; }
+    &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #16a34a) !important; }
+  }
+
+  /* Iconos de acción */
+  .ah-icon-btn {
+    color: var(--text-muted) !important;
+    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .ah-menu {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+
+    button {
+      color: var(--text-primary) !important;
+      &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    }
+
+    &-danger, .ah-menu-danger { color: var(--red) !important; }
+  }
+
+  /* Fila expandida */
+  .ah-expand-row td {
+    background: var(--purple-pale) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  .ah-expand-head-title { color: var(--purple-mid) !important; }
+  .ah-expand-head-modo { color: var(--text-muted) !important; }
+  .ah-expand-col-title { color: var(--text-muted) !important; }
+
+  .ah-mini-timeline-item:not(:last-child)::after { background: var(--border) !important; }
+  .ah-mini-timeline-dot { background: var(--text-dim) !important; }
+  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #16a34a) !important; }
+  .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
+    background: var(--amber) !important;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2) !important;
+  }
+
+  .ah-mini-timeline-label { color: var(--text-primary) !important; }
+  .ah-mini-timeline-time { color: var(--text-muted) !important; }
+
+  .ah-mini-map-wrap { border-color: var(--border) !important; }
+
+  .ah-mini-map-fullscreen {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .ah-mini-map-link { color: var(--purple-mid) !important; }
+
+  .ah-expand-item { border-bottom-color: var(--border) !important; }
+  .ah-expand-item-label { color: var(--text-muted) !important; }
+  .ah-expand-item-value { color: var(--text-primary) !important; }
+
+  .ah-expand-action {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* Paginación */
+  .ah-pagination {
+    border-top-color: var(--border) !important;
+
+    &-info { color: var(--text-muted) !important; }
+
+    &-controls button {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+
+      &:hover:not(:disabled) { background: var(--purple-pale) !important; }
+
+      &.active {
+        background: var(--purple-mid) !important;
+        border-color: var(--purple-mid) !important;
+        color: #fff !important;
+      }
+    }
+  }
+
+  .ah-error,
+  .ah-empty { color: var(--text-muted) !important; }
+  .ah-error { color: var(--red) !important; }
+}

@@ -1,7 +1,7 @@
 .ev-error {
   text-align: center;
   color: var(--red, #dc2626);
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   padding: 1.5rem;
 }
 
@@ -31,7 +31,7 @@
 
 .ev-tabs {
   display: flex;
-  background: var(--purple-pale, #f5f3ff);
+  background: #fdeaf1; // tinte claro de #fa5b95 para el fondo del contenedor
   border-radius: 12px;
   padding: 4px;
   gap: 2px;
@@ -45,9 +45,9 @@
   border: none;
   border-radius: 9px;
   background: transparent;
-  color: var(--text-primary, #2d1457);
+  color: #d61f79; // rosa oscuro, buen contraste sobre el fondo claro (mayúsculas y minúsculas legibles)
   font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -55,8 +55,8 @@
   svg { width: 15px; height: 15px; }
 
   &--active {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: #fff;
+    background: linear-gradient(135deg, #6c0694,#380759);
+    color: #fff; // blanco sobre el rosa fuerte, legible
   }
 }
 
@@ -79,7 +79,7 @@
     background: transparent;
     outline: none;
     width: 100%;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     font-family: 'Nunito', sans-serif;
     color: var(--text-primary, #2d1457);
 
@@ -115,14 +115,14 @@
 }
 
 .ev-section-title {
-  font-size: 1.1rem;
+  font-size: var(--font-size-xl);
   font-weight: 800;
   color: #1f2937; // antes: var(--text-primary, #2d1457)
   margin: 0 0 2px;
 }
 
 .ev-section-sub {
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
   color: #4b5563; // antes: var(--text-muted, #9f69da)
   margin: 0;
 }
@@ -141,7 +141,7 @@
   background-size: 14px;
   color: #1f2937; // texto negro/oscuro, ya no morado clarito
   font-family: 'Nunito', sans-serif;
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
 }
@@ -185,7 +185,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 1.4rem;
+  font-size: var(--font-size-2xl);
   background: rgba(0, 0, 0, 0.15);
 }
 
@@ -195,7 +195,7 @@
   right: 8px;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 6px;
@@ -214,7 +214,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   color: #374151; // antes: var(--text-muted, #7c6a9c)
 
   svg { width: 13px; height: 13px; flex-shrink: 0; }
@@ -223,14 +223,14 @@
 .ev-card-tipo {
   font-weight: 800;
   color: #111827; // antes: var(--text-primary, #2d1457)
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
 }
 
 .ev-card-alerta {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   color: var(--pink, #be185d);
   margin-top: 2px;
@@ -250,7 +250,7 @@
   background: transparent;
   color: var(--purple-mid, #7c3aed);
   font-family: 'Nunito', sans-serif;
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
   width: fit-content;
@@ -274,8 +274,9 @@
 
   svg { width: 20px; height: 20px; color: var(--purple, #7c3aed); flex-shrink: 0; margin-top: 2px; }
 
-  strong { display: block; font-size: 0.85rem; color: var(--text-primary, #2d1457); }
-  p { margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted, #7c6a9c); }
+  strong { display: block; font-size: var(--font-size-sm); color: var(--text-primary, #2d1457); }
+  // antes: var(--text-muted, #7c6a9c) — morado apagado, poco contraste sobre el fondo lavanda
+  p { margin: 2px 0 0; font-size: var(--font-size-xs); color: #4b5563; }
 }
 
 .ev-privacy-link {
@@ -285,16 +286,17 @@
   border: none;
   color: var(--purple, #7c3aed);
   font-family: 'Nunito', sans-serif;
-  font-size: 0.78rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
 }
 
+// antes: var(--text-muted, #a78bfa) — lavanda claro, casi ilegible sobre blanco
 .ev-empty, .ev-muted {
   text-align: center;
-  color: var(--text-muted, #a78bfa);
-  font-size: 0.9rem;
+  color: #6b7280;
+  font-size: var(--font-size-sm);
   padding: 1.5rem;
   grid-column: 1 / -1;
 }
@@ -322,7 +324,7 @@
   background: transparent;
   color: var(--purple, #7c3aed);
   font-family: 'Nunito', sans-serif;
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
   padding: 0;
@@ -336,7 +338,7 @@
   gap: 8px;
   flex-wrap: wrap;
 
-  h3 { font-size: 0.95rem; font-weight: 800; color: var(--text-primary, #2d1457); margin: 0; flex: 1; }
+  h3 { font-size: var(--font-size-lg); font-weight: 800; color: var(--text-primary, #2d1457); margin: 0; flex: 1; }
 }
 
 .ev-detail-icon {
@@ -356,7 +358,7 @@
 .ev-detail-badge {
   background: var(--purple-pale, #f5f3ff);
   color: var(--purple-mid, #7c3aed);
-  font-size: 0.7rem;
+  font-size: var(--font-size-xs);
   font-weight: 800;
   padding: 3px 10px;
   border-radius: 50px;
@@ -427,7 +429,7 @@
   background: var(--purple-pale, #f5f3ff);
   color: var(--purple-mid, #7c3aed);
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
 }
 
 .ev-detail-rows { display: flex; flex-direction: column; }
@@ -438,7 +440,7 @@
   align-items: center;
   padding: 9px 0;
   border-bottom: 1px solid var(--border, rgba(124, 58, 237, 0.07));
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   color: #111827; // antes: var(--text-primary, #2d1457)
   &:last-child { border-bottom: none; }
 }
@@ -458,7 +460,7 @@
   padding: 11px;
   border-radius: 12px;
   font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 800;
   cursor: pointer;
   transition: opacity 0.15s;
@@ -494,7 +496,7 @@
   border: none;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xl);
   cursor: pointer;
 }
 

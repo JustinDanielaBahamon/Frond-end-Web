@@ -118,205 +118,6 @@
 }
 
 /*==================================================
-=            MODO OSCURO — MIS EMERGENCIAS (ah-*)    =
-==================================================*/
-
-[data-theme="dark"] {
-
-  .ah-titlebar-icon {
-    background: rgba(224, 8, 105, 0.842) !important;
-  }
-
-  .ah-title { color: var(--text-primary) !important; }
-  .ah-sub { color: var(--text-muted) !important; }
-
-  /* ── Toolbar ─────────────────────────────────── */
-  .ah-search {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-
-    &-icon { color: var(--text-muted) !important; }
-
-    input {
-      color: var(--text-primary) !important;
-      &::placeholder { color: var(--text-dim) !important; }
-    }
-
-    &:focus-within {
-      border-color: var(--pink) !important;
-      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15) !important;
-    }
-  }
-
-  .ah-filtro-fecha,
-  .ah-filtro-tipo {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--text-primary) !important;
-
-    &-icon { color: var(--purple-mid) !important; }
-  }
-
-  .ah-filtro-fecha-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
-
-  .ah-view-toggle {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--purple-mid) !important;
-    &:hover { background: var(--purple-pale) !important; }
-  }
-
-  /* ── Stats (Total / Atendidas / Canceladas) ──── */
-  .ah-stat {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-
-    &--total      { border-left-color: var(--purple-mid) !important; }
-    &--atendidas  { border-left-color: var(--green, #16a34a) !important; }
-    &--canceladas { border-left-color: var(--pink) !important; }
-
-    .ah-stat-label { color: var(--text-muted) !important; }
-    .ah-stat-val { color: var(--text-primary) !important; }
-    .ah-stat-sub { color: var(--text-dim) !important; }
-    .ah-stat-chevron { color: var(--text-dim) !important; }
-  }
-
-  /* ── Tabla ───────────────────────────────────── */
-  .ah-table-wrap {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-  }
-
-  
-  .ah-table {
-    thead[data-theme="dark"][data-theme="dark"] tr,
-    &[data-theme="dark"][data-theme="dark"] thead tr {
-      background: linear-gradient(135deg, #7630D9, #6304bd) !important;
-    }
-
-    thead tr {
-      background: linear-gradient(135deg, #7630D9, #8b06d8) !important;
-    }
-
-    th { color: #fff !important; border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
-
-    td {
-      color: var(--text-primary) !important;
-      border-bottom-color: var(--border) !important;
-    }
-
-    .ah-id { color: var(--pink) !important; }
-    .ah-fecha { color: var(--text-primary) !important; }
-    .ah-hora { color: var(--text-muted) !important; }
-    .ah-ubicacion { color: var(--text-primary) !important; }
-  }
-
-  /* ── Badges — medio de activación y estado ────── */
-  .ah-badge {
-    &.badge-boton      { background: rgba(245, 7, 173, 0.973) !important; color: var(--pink) !important; }
-    &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
-    &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
-    &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-
-    &.badge-ok        { background: var(--green, #16a34a) !important; color: #fff !important; }
-    &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #16a34a) !important; }
-  }
-
-  /* ── Acciones (ojo / menú) ───────────────────── */
-  .ah-icon-btn {
-    color: var(--text-muted) !important;
-    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-  }
-
-  .ah-menu {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
-
-    button {
-      color: var(--text-primary) !important;
-      &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    }
-
-    &-danger, .ah-menu-danger { color: var(--red) !important; }
-  }
-
-  /* ── Fila expandida ──────────────────────────── */
-  .ah-expand-row td {
-    background: var(--purple-pale) !important;
-    border-bottom-color: var(--border) !important;
-  }
-
-  .ah-expand-head-title {
-    color: var(--purple-mid) !important;
-  }
-
-  .ah-expand-head-modo { color: var(--text-muted) !important; }
-  .ah-expand-col-title { color: var(--text-muted) !important; }
-
-  .ah-mini-timeline-item:not(:last-child)::after {
-    background: var(--border) !important;
-  }
-
-  .ah-mini-timeline-dot { background: var(--text-dim) !important; }
-  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #16a34a) !important; }
-  .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
-    background: var(--amber) !important;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2) !important;
-  }
-
-  .ah-mini-timeline-label { color: var(--text-primary) !important; }
-  .ah-mini-timeline-time { color: var(--text-muted) !important; }
-
-  .ah-mini-map-wrap { border-color: var(--border) !important; }
-
-  .ah-mini-map-fullscreen {
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-    &:hover { background: var(--purple-pale) !important; }
-  }
-
-  .ah-mini-map-link { color: var(--purple-mid) !important; }
-
-  .ah-expand-item { border-bottom-color: var(--border) !important; }
-  .ah-expand-item-label { color: var(--text-muted) !important; }
-  .ah-expand-item-value { color: var(--text-primary) !important; }
-
-  .ah-expand-action {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--purple-mid) !important;
-    &:hover { background: var(--purple-pale) !important; }
-  }
-
-  /* ── Paginación ──────────────────────────────── */
-  .ah-pagination {
-    border-top-color: var(--border) !important;
-
-    &-info { color: var(--text-muted) !important; }
-
-    &-controls button {
-      background: var(--bg-card) !important;
-      border-color: var(--border) !important;
-      color: var(--text-primary) !important;
-
-      &:hover:not(:disabled) { background: var(--purple-pale) !important; }
-
-      &.active {
-        background: var(--purple-mid) !important;
-        border-color: var(--purple-mid) !important;
-        color: #fff !important;
-      }
-    }
-  }
-
-  .ah-error,
-  .ah-empty { color: var(--text-muted) !important; }
-  .ah-error { color: var(--red) !important; }
-}
-
-/*==================================================
 =            MODO OSCURO — LAYOUT / BOTTOM NAV      =
 ==================================================*/
 
@@ -663,131 +464,164 @@
 }
 
 /*==================================================
-=            MODO OSCURO — EVIDENCIAS               =
+=            MODO OSCURO — EVIDENCIAS (ev-*)        =
+   Reemplaza por completo el bloque anterior de
+   "MODO OSCURO — EVIDENCIAS": ese usaba selectores
+   de una versión anterior del componente (.ev-stats,
+   .ev-banner, .ev-pill, .ev-card__nombre, .ev-modal)
+   que ya no existen en el .scss actual (ev-toolbar,
+   ev-tabs, ev-search, ev-card-thumb, ev-detail, etc.).
 ==================================================*/
 
 [data-theme="dark"] {
 
-  .ev-title { color: var(--text-primary) !important; }
-  .ev-sub { color: var(--purple-mid) !important; }
-
-  /* ── Stats ───────────────────────────────────── */
-  .ev-stats .ev-stat {
-    &:nth-child(1) { background: linear-gradient(135deg, var(--purple-deep), #2d1457) !important; border-color: var(--border) !important; }
-    &:nth-child(2) { background: linear-gradient(135deg, var(--purple-mid), var(--purple-deep)) !important; border-color: var(--border) !important; }
-    &:nth-child(3) { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; border-color: var(--border) !important; }
-    &:nth-child(4) { background: linear-gradient(135deg, #0e7490, #164e63) !important; border-color: var(--border) !important; }
-
-    .ev-stat-label { color: rgba(255, 255, 255, 0.75) !important; }
-
-    .ev-stat-val {
-      &.pink, &.purple, &.green { color: #fff !important; }
-    }
+  .ev-error {
+    color: var(--red, #f87171) !important;
   }
 
-  /* ── Banner nube ─────────────────────────────── */
-  .ev-banner {
+  /* ── Toolbar: tabs + búsqueda + filtro ───────── */
+  .ev-tabs {
     background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--text-primary) !important;
-
-    i { color: var(--pink) !important; }
-    strong { color: var(--pink) !important; }
   }
 
-  /* ── Filtros (pills) ─────────────────────────── */
-  .ev-pill {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
+  .ev-tab {
     color: var(--text-muted) !important;
 
-    &:hover { background: var(--purple-pale) !important; }
-
     &--active {
-      background: var(--purple-deep) !important;
+      background: linear-gradient(135deg, #7630D9, #D948B2) !important;
       color: #fff !important;
     }
   }
 
-  /* ── Galería ─────────────────────────────────── */
+  .ev-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    svg { color: var(--purple-mid) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+  }
+
+  .ev-filter-btn {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Encabezado de sección ────────────────────── */
+  .ev-section-title { color: var(--text-primary) !important; }
+  .ev-section-sub { color: var(--text-muted) !important; }
+
+  .ev-sort {
+    background-color: var(--bg-card) !important;
+    border-color: var(--purple-mid) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Galería de tarjetas ──────────────────────── */
   .ev-card {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
 
     &:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
     }
 
-    &__nombre { color: var(--text-primary) !important; }
-    &__meta { color: var(--text-muted) !important; }
-    &__alerta { color: var(--pink) !important; }
+    &--active {
+      border-color: var(--purple-mid) !important;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35) !important;
+    }
   }
 
-  .tipo-video {
-    background: linear-gradient(135deg, var(--purple-pale), var(--purple-pale-hover)) !important;
-    i { color: var(--purple-mid) !important; }
+  .ev-card-tipo { color: var(--text-primary) !important; }
+  .ev-card-fecha,
+  .ev-card-ubicacion { color: var(--text-muted) !important; }
+
+  .ev-card-alerta { color: var(--pink) !important; }
+  .ev-card-detalle { color: var(--purple-mid) !important; }
+
+  .tipo-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
+  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #451a03), #92400e) !important; color: #fbbf24 !important; }
+  .tipo-audio { background: linear-gradient(135deg, #164e63, #0e7490) !important; color: #67e8f9 !important; }
+
+  .ev-empty,
+  .ev-muted { color: var(--text-dim) !important; }
+
+  /* ── Banner de privacidad ─────────────────────── */
+  .ev-privacy-banner {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+
+    svg { color: var(--purple-mid) !important; }
+
+    strong { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
   }
 
-  .tipo-foto {
-    background: linear-gradient(135deg, var(--red-pale), #4a0a2e) !important;
-    i { color: var(--pink) !important; }
+  .ev-privacy-link { color: var(--pink) !important; }
+
+  /* ── Panel de detalle ─────────────────────────── */
+  .ev-detail {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
   }
 
-  .tipo-audio {
-    background: linear-gradient(135deg, #164e63, #0e7490) !important;
-    i { color: #67e8f9 !important; }
-  }
+  .ev-detail-back { color: var(--purple-mid) !important; }
 
-  .estado-nube {
+  .ev-detail-titlebar h3 { color: var(--text-primary) !important; }
+
+  .ev-detail-icon {
     background: var(--purple-pale) !important;
     color: var(--purple-mid) !important;
   }
 
-  .estado-pendiente {
-    background: var(--red-pale) !important;
-    color: var(--pink) !important;
+  .ev-detail-badge {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
   }
 
-  .ev-footer {
-    color: var(--text-dim) !important;
+  .ev-detail-thumb-more {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
   }
 
-  /* ── Modal ───────────────────────────────────── */
-  .ev-modal {
-    background: var(--bg-card) !important;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
-
-    &-header {
-      background: var(--purple-deep) !important;
-      border-bottom-color: var(--border) !important;
-    }
-  }
+  .ev-detail-thumb--active { border-color: var(--purple-mid) !important; }
 
   .ev-detail-row {
     border-bottom-color: var(--border) !important;
     color: var(--text-primary) !important;
-
-    .ev-detail-label { color: var(--text-muted) !important; }
   }
+
+  .ev-detail-label { color: var(--text-muted) !important; }
 
   .ev-download-btn {
     background: var(--purple-deep) !important;
+    color: #fff !important;
   }
-}
 
+  .ev-fullscreen-btn {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Lightbox (ya es oscuro por diseño, sin cambios) ─ */
+}
 /*==================================================
 =            MODO OSCURO — MIS EMERGENCIAS (ah-*)    =
-   Reemplaza por completo el bloque anterior de
-   "MODO OSCURO — ALERT HISTORY": ese usaba selectores
-   de una versión anterior del componente (nth-child,
-   .ah-modal, .ah-detail-row, badge-wigert/sacudida)
-   que ya no existen en el .scss actual.
 ==================================================*/
 
 [data-theme="dark"] {
 
+  /* Icono del título */
   .ah-titlebar-icon {
-    background: rgba(219, 39, 119, 0.18) !important;
+    background: var(--purple-mid, #7c3aed) !important;
+    color: #ffffff !important;
   }
 
   .ah-title { color: var(--text-primary) !important; }
@@ -834,9 +668,9 @@
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
 
-    &--total      { border-left-color: var(--purple-mid) !important; }
-    &--atendidas  { border-left-color: var(--green, #16a34a) !important; }
-    &--canceladas { border-left-color: var(--pink) !important; }
+    &--total      { border-left-color: #560c79 !important; }
+    &--atendidas  { border-left-color: #055f1a !important; }
+    &--canceladas { border-left-color: #e60f4f !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -971,4 +805,122 @@
   .ah-error,
   .ah-empty { color: var(--text-muted) !important; }
   .ah-error { color: var(--red) !important; }
+}
+
+/*==================================================
+=      MODO OSCURO — CONTACTOS DE EMERGENCIA (ec-*)  =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .ec-title { color: var(--text-primary) !important; }
+  .ec-sub { color: var(--text-muted) !important; }
+
+  /* ── Banners (info arriba / nota abajo) ───────── */
+  .ec-info-banner,
+  .ec-footer-banner {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    svg { color: var(--purple-mid) !important; }
+  }
+
+  /* ── Tabla ─────────────────────────────────────── */
+  .ec-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--purple-mid) !important;
+  }
+
+  .ec-table {
+    tbody tr {
+      border-top-color: var(--border) !important;
+      &:hover { background: var(--purple-pale) !important; }
+    }
+
+    td { color: var(--text-primary) !important; }
+  }
+
+  .ec-nombre { color: var(--text-primary) !important; }
+
+  .ec-prioridad {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .ec-badge {
+    &--activo   { background: rgba(22, 163, 74, 0.22) !important; color: #4ade80 !important; }
+    &--inactivo { background: rgba(220, 38, 38, 0.22) !important; color: #f87171 !important; }
+  }
+
+  .ec-icon-btn {
+    color: var(--text-muted) !important;
+    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .ec-menu {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+
+    button {
+      color: var(--text-primary) !important;
+      &:hover { background: var(--purple-pale) !important; }
+    }
+  }
+
+  .ec-menu-danger { color: var(--red) !important; }
+
+  .ec-empty,
+  .ec-muted { color: var(--text-dim) !important; }
+
+  /* ── Modal (agregar / editar) ──────────────────── */
+  .ec-modal {
+    background: var(--bg-card) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .ec-modal-header {
+    h3 { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .ec-modal-close {
+    color: var(--text-dim) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .ec-field-label { color: var(--text-muted) !important; }
+
+  .ec-field input,
+  .ec-field select {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &:focus { border-color: var(--purple-mid) !important; }
+  }
+
+  .ec-toggle-row { background: var(--bg-base) !important; }
+
+  .ec-toggle-label { color: var(--text-primary) !important; }
+  .ec-toggle-sub { color: var(--text-muted) !important; }
+
+  .ec-switch { background: var(--border) !important; &--on { background: var(--purple-mid) !important; } }
+
+  .ec-danger-zone {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: rgba(220, 38, 38, 0.35) !important;
+  }
+
+  .ec-danger-head p { color: var(--text-dim) !important; }
+
+  .ec-danger-confirm p { color: var(--text-primary) !important; }
+
+  .ec-btn--ghost {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
 }

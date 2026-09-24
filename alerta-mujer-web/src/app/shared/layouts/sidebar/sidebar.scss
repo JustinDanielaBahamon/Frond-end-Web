@@ -246,4 +246,35 @@
   @media (max-width: 768px) {
     display: none;
   }
+
+  /*==================================================
+  =        VARIANTE ADMIN — paleta cálida             =
+     Se activa agregando la clase "sidebar--admin"
+     junto a "sidebar" en el <aside>, sin tocar nada
+     de la paleta de usuaria de arriba.
+  ==================================================*/
+
+  &--admin {
+    background: #4a1d0f; // marrón cálido oscuro, en vez del morado de usuaria
+
+    .sidebar__divider {
+      background: linear-gradient(90deg, #fbbf24, #ea580c, transparent);
+    }
+
+    .sidebar__link--active {
+      background: linear-gradient(135deg, #d97706, #ea580c); // ámbar → naranja
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+
+      .sidebar__link-icon { color: #fff7ed; }
+    }
+
+    .sidebar__mobile-btn {
+      background: linear-gradient(90deg, #ea580c, #d97706);
+    }
+
+    .sidebar__logout-btn:hover {
+      background: rgba(234, 88, 12, 0.25);
+      color: #fdba74;
+    }
+  }
 }

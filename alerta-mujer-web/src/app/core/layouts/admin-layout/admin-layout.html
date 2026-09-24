@@ -1,10 +1,13 @@
 <div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
 
   <app-sidebar
+    class="sidebar--admin"
     [links]="links"
     sectionTitle="Administración"
     [collapsed]="sidebarCollapsed"
-    accentColor="#4a0a2e">
+    [user]="usuarioActual"
+    [showMobileAppButton]="false"
+    (logout)="cerrarSesion()">
   </app-sidebar>
 
   <div class="layout__body">

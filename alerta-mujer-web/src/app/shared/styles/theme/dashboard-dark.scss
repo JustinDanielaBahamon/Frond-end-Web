@@ -145,176 +145,113 @@
 
 [data-theme="dark"] {
 
-  /* ── 5 tarjetas de estadísticas ──────────────── */
-  .db-stat {
-    &--purple { background: linear-gradient(135deg, var(--purple-deep), #2d1457) !important; }
-    &--red    { background: linear-gradient(135deg, #9d174d, #4a0a2e) !important; }
-    &--teal   { background: linear-gradient(135deg, #0e7490, #164e63) !important; }
-    &--amber  { background: linear-gradient(135deg, #92400e, #451a03) !important; }
+  /* ── 1. Variables del componente ───────────────── */
+  app-dashboard {
+    --color-principal: var(--purple-mid, #a78bfa);      // textos e iconos morados (legibles en oscuro)
+    --color-principal-claro: var(--purple-mid, #a78bfa);
+    --color-fondo: rgba(124, 58, 237, 0.08);            // fichas internas, hover, círculo del dispositivo
+    --color-superficie: var(--bg-card, #15112b);        // fondo de las tarjetas
+    --color-borde: var(--border, #2e2657);
+    --color-texto-principal: var(--text-primary, #f3efff);
+    --color-texto-secundario: var(--text-muted, #a79cc8);
   }
 
-  /* ── Título de sección (reutilizable) ───────── */
-  .db-section-title {
-    color: var(--text-primary) !important;
+  /* ── 2. Botones ────────────────────────────────── */
+  .home-btn--primario {
+    // mismo degradado del login / sidebar activo
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(217, 72, 178, 0.3) !important;
   }
 
-  .db-section-header i {
-    color: var(--purple-mid) !important;
+  .home-btn--outline {
+    background: transparent !important;
+    border-color: #7c3aed !important;
+    color: var(--purple-mid, #a78bfa) !important;
+
+    i { color: var(--purple-mid, #a78bfa) !important; }
+
+    &:hover { background: rgba(124, 58, 237, 0.15) !important; }
   }
 
-  /* ── Paneles base (mapa, gráfica, actividad, gauge, dona, consejo, accesos) ─ */
-  .db-panel,
-  .db-accesos {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
+  .home-icon-btn:hover {
+    color: var(--purple-mid, #a78bfa) !important;
   }
 
-  /* ── Gráfica de tendencia (línea) ─────────────── */
-  .db-chart-sub {
-    color: var(--purple-mid) !important;
+  /* ── 3. Badge "Conectado" / "Atendida" ─────────── */
+  .home-badge--exito {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
   }
 
-  .db-trend-line {
-    stroke: var(--purple-mid) !important;
-  }
+  /* ── 4. Estado de seguridad (5 fichas) ─────────── */
+  .home-seguridad-item {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--border, #2e2657) !important;
 
-  .db-trend-dot {
-    fill: var(--bg-card) !important;
-    stroke: var(--purple-mid) !important;
-  }
-
-  .db-trend-labels span {
-    color: var(--text-dim) !important;
-  }
-
-  /* ── Mapa ────────────────────────────────────── */
-  .db-map {
-    border-color: var(--border) !important;
-  }
-
-  /* ── Botones pill (Ver zonas / Ver mapa completo) ─ */
-  .db-map-btn-zonas,
-  .db-map-btn-fullscreen {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--purple-mid) !important;
-
-    &:hover {
-      background: var(--purple-pale) !important;
-      border-color: var(--purple-deep) !important;
+    &__icon {
+      background: rgba(124, 58, 237, 0.25) !important;
+      color: #c4b5fd !important;
     }
+
+    &__valor { color: var(--text-primary, #f3efff) !important; }
+    &__descripcion { color: var(--text-muted, #a79cc8) !important; }
   }
 
-  /* ── Panel lateral de zonas ──────────────────── */
-  .db-zonas-panel {
-    background: var(--bg-card) !important;
-    border-left-color: var(--border) !important;
+  /* ── 5. Mi dispositivo ─────────────────────────── */
+  .home-dispositivo-icon {
+    background: rgba(124, 58, 237, 0.18) !important;
+    color: #a78bfa !important;
   }
 
-  .db-zonas-panel-header {
-    border-bottom-color: var(--border) !important;
-    color: var(--text-primary) !important;
+  /* ── 6. Iconos sólidos (actividad, emergencia, accesos) ─
+        Mismo estilo de la imagen: cuadro de color sólido
+        con el icono claro encima.                       */
+  .home-activity-item__icon,
+  .home-acceso__icon {
+
+    &--peligro     { background: #a11d48 !important; color: #ffe4ec !important; }
+    &--principal   { background: #7c3aed !important; color: #ede9fe !important; }
+    &--exito       { background: #10b981 !important; color: #ecfdf5 !important; }
+    &--acento      { background: #0891b2 !important; color: #ecfeff !important; }
+    &--advertencia { background: #d97706 !important; color: #fffbeb !important; }
   }
 
-  .db-zonas-close {
-    color: var(--text-dim) !important;
-
-    &:hover { color: var(--purple-mid) !important; }
+  .home-emergencia__icon {
+    background: #a11d48 !important;
+    color: #ffe4ec !important;
   }
 
-  .db-zona-item:hover {
-    background: var(--purple-pale) !important;
+  /* ── 7. Actividad reciente ─────────────────────── */
+  .home-activity-item {
+    &:hover { background: rgba(124, 58, 237, 0.12) !important; }
+    &__chevron { color: var(--text-dim, #7d739e) !important; }
   }
 
-  .db-zona-nombre {
-    color: var(--text-primary) !important;
+  /* ── 8. Última emergencia ──────────────────────── */
+  .home-emergencia__detalle {
+    border-top-color: var(--border, #2e2657) !important;
+
+    i { color: var(--purple-mid, #a78bfa) !important; }
   }
 
-  .db-zona-meta {
-    color: var(--text-muted) !important;
+  /* ── 9. Mini-mapa ──────────────────────────────── */
+  .home-mini-map {
+    border-color: var(--border, #2e2657) !important;
   }
 
-  /* ── Botones flotantes en fullscreen ─────────── */
-  .db-map-wrapper:fullscreen {
-    background: var(--bg-card) !important;
+  .home-mini-map__pin {
+    color: #a78bfa !important;
   }
 
-  .db-map-btn-zonas-fs,
-  .db-map-btn-exit-fs {
-    background: var(--bg-card) !important;
-    border-color: var(--border) !important;
-    color: var(--purple-mid) !important;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4) !important;
-
-    &:hover {
-      background: var(--purple-pale) !important;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-    }
+  /* ── 10. Accesos y acciones rápidas ────────────── */
+  .home-acceso:hover,
+  .home-accion-item:hover {
+    background: rgba(124, 58, 237, 0.12) !important;
   }
 
-  .db-map-btn-zonas-fs--open {
-    background: var(--purple-pale) !important;
-    border-color: var(--purple-deep) !important;
-  }
-
-  /* ── Actividad reciente (lista compacta) ─────── */
-  .db-activity-item {
-    &__titulo { color: var(--text-primary) !important; }
-    &__fecha { color: var(--text-muted) !important; }
-    &__estado {
-      background: var(--purple-pale) !important;
-      color: var(--purple-deep) !important;
-    }
-  }
-
-  .db-ver-mas {
-    color: var(--pink) !important;
-  }
-
-  /* ── Resumen de seguridad (medidor) ──────────── */
-  .db-gauge__hole {
-    background: var(--bg-card) !important;
-  }
-
-  .db-gauge__percent {
-    color: var(--text-primary) !important;
-  }
-
-  .db-gauge__label {
-    color: var(--text-dim) !important;
-  }
-
-  .db-gauge__mensaje {
-    color: var(--text-muted) !important;
-  }
-
-  /* ── Distribución de alertas (dona) ──────────── */
-  .db-donut__hole {
-    background: var(--bg-card) !important;
-  }
-
-  .db-donut-legend__label {
-    color: var(--text-primary) !important;
-  }
-
-  .db-donut-legend__value {
-    color: var(--text-dim) !important;
-  }
-
-  /* ── Consejo de seguridad ─────────────────────── */
-  .db-consejo__texto {
-    color: var(--text-primary) !important;
-  }
-
-  /* ── Accesos rápidos ─────────────────────────── */
-  .db-acceso-card {
-    border-color: var(--border) !important;
-    color: var(--text-primary) !important;
-
-    &:hover {
-      background: var(--purple-pale) !important;
-      border-color: var(--purple-mid) !important;
-    }
+  .home-accion-item__chevron {
+    color: var(--text-dim, #7d739e) !important;
   }
 }
 
@@ -813,6 +750,10 @@
 
 [data-theme="dark"] {
 
+  .ec-table thead {
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  }
+
   .ec-title { color: var(--text-primary) !important; }
   .ec-sub { color: var(--text-muted) !important; }
 
@@ -923,4 +864,205 @@
     color: var(--text-primary) !important;
     &:hover { background: var(--purple-pale) !important; }
   }
+}
+
+/*==================================================
+=            MODO OSCURO — ASISTENCIA (as-*)        =
+==================================================*/
+
+[data-theme="dark"] {
+
+  /* ── Header ────────────────────────────────────── */
+  .as-header-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-title { color: var(--text-primary) !important; }
+  .as-sub { color: var(--text-muted) !important; }
+
+  .as-header-banner {
+  background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  color: #fff !important;
+
+  svg { color: #fff !important; }
+}
+
+  /* ── Tabs ──────────────────────────────────────── */
+  .as-tabs {
+    background: var(--bg-card) !important;
+  }
+
+  .as-tab {
+    color: var(--text-muted) !important;
+
+    &--active {
+      background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+      color: #fff !important;
+    }
+  }
+
+  /* ── Panels (contenedor de cada pestaña) ─────────── */
+  .as-panel {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .as-panel-head-icon { color: var(--purple-mid) !important; }
+  .as-panel-title { color: var(--text-primary) !important; }
+  .as-panel-sub { color: var(--text-muted) !important; }
+
+  .as-muted,
+  .as-empty { color: var(--text-dim) !important; }
+
+  /* ── Líneas de ayuda ──────────────────────────────── */
+  .as-linea-card {
+    border-color: var(--border) !important;
+  }
+
+  .as-linea-nombre { color: var(--text-muted) !important; }
+  .as-linea-numero { color: var(--text-primary) !important; }
+  .as-linea-desc { color: var(--text-dim) !important; }
+
+  .as-btn--ghost {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Centros cercanos ─────────────────────────────── */
+  .as-search {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+  }
+
+  .as-filter-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .as-chip {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-muted) !important;
+
+    &--active {
+      background: var(--purple-mid) !important;
+      border-color: var(--purple-mid) !important;
+      color: #fff !important;
+    }
+  }
+
+  .as-map {
+    background: var(--bg-base) !important;
+  }
+
+  .as-centro-item {
+    border-bottom-color: var(--border) !important;
+  }
+
+  .as-centro-nombre { color: var(--text-primary) !important; }
+  .as-centro-desc { color: var(--text-dim) !important; }
+  .as-centro-meta { color: var(--text-muted) !important; }
+
+  .as-icon-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-dim) !important;
+    &:hover { background: var(--purple-pale) !important; }
+    &--activo { color: var(--purple-mid) !important; border-color: var(--purple-mid) !important; }
+  }
+
+  .as-pill-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &--ghost { background: var(--bg-card) !important; }
+  }
+
+  /* ── Mis recursos ─────────────────────────────────── */
+  .as-recurso-card {
+    border-color: var(--border) !important;
+  }
+
+  .as-recurso-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-recurso-nombre { color: var(--text-primary) !important; }
+  .as-recurso-sub { color: var(--text-dim) !important; }
+
+  /* ── Sidebar derecho (tarjetas) ───────────────────── */
+  .as-info-card,
+  .as-tip-card,
+  .as-guardados-card,
+  .as-app-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .as-info-illustration {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-info-card h3 { color: var(--text-primary) !important; }
+  .as-info-card p { color: var(--text-muted) !important; }
+
+  .as-tip-card {
+    background: var(--purple-pale) !important;
+    svg { color: var(--purple-mid) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .as-guardados-head h3 { color: var(--text-primary) !important; }
+
+  .as-guardado-item {
+    border-bottom-color: var(--border) !important;
+  }
+
+  .as-guardado-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-guardado-nombre { color: var(--text-primary) !important; }
+  .as-guardado-sub { color: var(--text-dim) !important; }
+  .as-guardados-empty { color: var(--text-dim) !important; }
+
+  .as-app-card {
+    background: linear-gradient(135deg, var(--purple-pale), var(--bg-card)) !important;
+
+    strong { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .as-app-link {
+    background: var(--bg-base) !important;
+    border-color: var(--purple-mid) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  /* ── Footer strip ─────────────────────────────────── */
+  .as-footer-strip {
+    background: linear-gradient(135deg, var(--purple-pale), var(--bg-card)) !important;
+  }
+
+  .as-footer-item {
+    color: var(--text-muted) !important;
+    svg { color: var(--purple-mid) !important; }
+    strong { color: var(--text-primary) !important; }
+  }
+
+  .as-footer-signature { color: var(--purple-mid) !important; }
 }

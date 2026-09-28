@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { UsersService } from '../../../core/services/users.services';
 import { Usuario } from '../../../core/models/user.model';
@@ -10,13 +11,41 @@ import { Modal } from '../../../shared/components/modal/modal';
 // Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
 type UsuariaUI = Usuario & { selected?: boolean };
 
-// Renombrado a ChipData para no chocar con el componente Chip importado arriba
 interface ChipData {
   label: string;
   value: string;
   color: string;
   count: number;
 }
+
+// Datos que vienen de otras tablas del db.json
+export interface ContactoEmergencia {
+  id: string;
+  user_profile_id: number | string;
+  contact_name: string;
+  telephone: string;
+  relationship: string;
+}
+
+export interface AlertaResumen {
+  id: string;
+  usuarioId: number;
+  descripcion: string;
+  ubicacion: string;
+  status: string;
+  created_at: string;
+}
+
+// Modelo del formulario (crear / editar)
+interface FormUsuaria {
+  first_name: string;
+  last_name: string;
+  email: string;
+  telefono: string;
+  password: string;
+}
+
+const COLORES_AVATAR = ['#7c3aed', '#a78bfa', '#ec4899', '#6d28d9', '#c4b5fd'];
 
 @Component({
   selector: 'app-user',
@@ -31,7 +60,6 @@ export class UserComponent implements OnInit {
 
   cargando = true;
 
-  // ── Datos reales (ya no mock) ──────────────────────────────
   private todasLasUsuarias: UsuariaUI[] = [];
 
   // ── Estado UI ────────────────────────────────────────────────
@@ -51,8 +79,20 @@ export class UserComponent implements OnInit {
   // ── Modales ──────────────────────────────────────────────────
   modalDetalle = false;
   modalBloqueo = false;
+  modalForm = false;
   usuariaSeleccionada: UsuariaUI | null = null;
   accionBloqueo: 'bloquear' | 'desbloquear' = 'bloquear';
+
+  // ── Detalle (datos reales de otras tablas) ───────────────────
+  contactosDetalle: ContactoEmergencia[] = [];
+  alertasDetalle: AlertaResumen[] = [];
+  cargandoDetalle = false;
+
+  // ── Formulario ───────────────────────────────────────────────
+  modoForm: 'crear' | 'editar' = 'crear';
+  guardando = false;
+  errorForm = '';
+  form: FormUsuaria = this.formVacio();
 
   Math = Math;
 
@@ -60,17 +100,21 @@ export class UserComponent implements OnInit {
   get chips(): ChipData[] {
     return [
       { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.todasLasUsuarias.length },
-      { label: 'Activas',               value: 'Activa',               color: '#16a34a', count: this.todasLasUsuarias.filter(u => u.estado === 'Activa').length },
-      { label: 'Inactivas',             value: 'Inactiva',             color: '#d97706', count: this.todasLasUsuarias.filter(u => u.estado === 'Inactiva').length },
-      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#dc2626', count: this.todasLasUsuarias.filter(u => u.estado === 'Bloqueada por Fraude').length },
+      { label: 'Activas',               value: 'Activa',               color: '#16a34a', count: this.contar('Activa') },
+      { label: 'Inactivas',             value: 'Inactiva',             color: '#d97706', count: this.contar('Inactiva') },
+      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#dc2626', count: this.contar('Bloqueada por Fraude') },
     ];
+  }
+
+  private contar(estado: string): number {
+    return this.todasLasUsuarias.filter(u => u.estado === estado).length;
   }
 
   // ── Stat cards ───────────────────────────────────────────────
   get totalUsuarias()      { return this.todasLasUsuarias.length; }
-  get usuariasActivas()    { return this.todasLasUsuarias.filter(u => u.estado === 'Activa').length; }
-  get usuariasBloqueadas() { return this.todasLasUsuarias.filter(u => u.estado === 'Bloqueada por Fraude').length; }
-  get usuariasInactivas()  { return this.todasLasUsuarias.filter(u => u.estado === 'Inactiva').length; }
+  get usuariasActivas()    { return this.contar('Activa'); }
+  get usuariasBloqueadas() { return this.contar('Bloqueada por Fraude'); }
+  get usuariasInactivas()  { return this.contar('Inactiva'); }
 
   // ── Lifecycle ────────────────────────────────────────────────
   ngOnInit(): void {
@@ -79,9 +123,17 @@ export class UserComponent implements OnInit {
 
   private cargarUsuarias(): void {
     this.cargando = true;
-    this.usersService.getAll().subscribe({
-      next: (usuarios) => {
-        this.todasLasUsuarias = usuarios;
+
+    // Traemos usuarias y alertas juntas para calcular el contador real
+    forkJoin({
+      usuarios: this.usersService.getAll(),
+      alertas: this.usersService.getAlertas(),
+    }).subscribe({
+      next: ({ usuarios, alertas }) => {
+        this.todasLasUsuarias = usuarios.map(u => ({
+          ...u,
+          alertas: alertas.filter(a => String(a.usuarioId) === String(u.id)).length,
+        }));
         this.applyFilters();
         this.cargando = false;
       },
@@ -177,13 +229,35 @@ export class UserComponent implements OnInit {
     this.deselectAll();
   }
 
-  // ── Acciones de fila ─────────────────────────────────────────
+  // ── Ver detalle: carga contactos y alertas reales ────────────
   verDetalle(u: UsuariaUI): void {
     this.usuariaSeleccionada = u;
+    this.contactosDetalle = [];
+    this.alertasDetalle = [];
+    this.cargandoDetalle = true;
     this.modalDetalle = true;
+
+    forkJoin({
+      contactos: this.usersService.getContactos(u.id),
+      alertas: this.usersService.getAlertasByUsuaria(u.id),
+    }).subscribe({
+      next: ({ contactos, alertas }) => {
+        this.contactosDetalle = contactos;
+        // Las más recientes primero, máximo 5
+        this.alertasDetalle = [...alertas]
+          .sort((a, b) => b.created_at.localeCompare(a.created_at))
+          .slice(0, 5);
+        this.cargandoDetalle = false;
+      },
+      error: (err) => {
+        console.error('Error cargando detalle:', err);
+        this.cargandoDetalle = false;
+      }
+    });
   }
 
   restablecerPassword(u: UsuariaUI): void {
+    // TODO: cuando exista el backend, llamar al endpoint de recuperación
     alert(`Se envió un correo de restablecimiento a ${u.email}`);
     this.cerrarModales();
   }
@@ -194,7 +268,6 @@ export class UserComponent implements OnInit {
     this.modalBloqueo = true;
   }
 
-  // ── Confirmar bloqueo/desbloqueo vía API ─────────────────────
   confirmarBloqueo(): void {
     if (!this.usuariaSeleccionada) return;
 
@@ -212,14 +285,126 @@ export class UserComponent implements OnInit {
     });
   }
 
+  // ── Formulario crear / editar ────────────────────────────────
+  private formVacio(): FormUsuaria {
+    return { first_name: '', last_name: '', email: '', telefono: '', password: '' };
+  }
+
   abrirModalNueva(): void {
-    alert('Formulario de nueva usuaria (próximamente)');
+    this.modoForm = 'crear';
+    this.form = this.formVacio();
+    this.errorForm = '';
+    this.usuariaSeleccionada = null;
+    this.modalForm = true;
+  }
+
+  abrirModalEditar(u: UsuariaUI): void {
+    this.modoForm = 'editar';
+    this.usuariaSeleccionada = u;
+    this.form = {
+      first_name: u.first_name ?? u.nombre.split(' ')[0],
+      last_name: u.last_name ?? '',
+      email: u.email,
+      telefono: u.telefono,
+      password: '', // vacío = no cambiar
+    };
+    this.errorForm = '';
+    this.modalDetalle = false;
+    this.modalForm = true;
+  }
+
+  guardarUsuaria(): void {
+    this.errorForm = '';
+
+    const email = this.form.email.trim().toLowerCase();
+    const duplicado = this.todasLasUsuarias.some(u =>
+      u.email.toLowerCase() === email &&
+      (this.modoForm === 'crear' || u.id !== this.usuariaSeleccionada?.id)
+    );
+    if (duplicado) {
+      this.errorForm = 'Ya existe una usuaria con ese correo.';
+      return;
+    }
+
+    this.guardando = true;
+
+    if (this.modoForm === 'crear') {
+      const nombreCompleto = `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim();
+      const ahora = new Date();
+      const dd = String(ahora.getDate()).padStart(2, '0');
+      const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+
+      const nueva = {
+        nombre: nombreCompleto,
+        first_name: this.form.first_name.trim(),
+        last_name: this.form.last_name.trim(),
+        email,
+        correo: email,
+        telefono: this.form.telefono.trim(),
+        fechaRegistro: `${dd}/${mm}/${ahora.getFullYear()}`,
+        alertas: 0,
+        ultimaActividad: 'recién registrada',
+        estado: 'Activa',
+        rol: 'Usuaria',
+        role_id: 1,
+        contactoEmergencia: 'N/A',
+        avatarColor: COLORES_AVATAR[Math.floor(Math.random() * COLORES_AVATAR.length)],
+        document_number: '',
+        document_type: '',
+        birthdate: null,
+        created_at: ahora.toISOString(),
+        password: this.form.password, // solo mock: en el backend real va con BCrypt
+      };
+
+      this.usersService.crearUsuaria(nueva).subscribe({
+        next: (creada) => {
+          this.todasLasUsuarias = [...this.todasLasUsuarias, creada];
+          this.finalizarGuardado();
+        },
+        error: (err) => this.manejarErrorGuardado(err),
+      });
+    } else {
+      const u = this.usuariaSeleccionada!;
+      const cambios: Partial<Usuario> & Record<string, unknown> = {
+        nombre: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
+        first_name: this.form.first_name.trim(),
+        last_name: this.form.last_name.trim(),
+        email,
+        correo: email,
+        telefono: this.form.telefono.trim(),
+      };
+      if (this.form.password) cambios['password'] = this.form.password;
+
+      this.usersService.actualizarUsuaria(u.id, cambios).subscribe({
+        next: (actualizada) => {
+          this.todasLasUsuarias = this.todasLasUsuarias.map(x =>
+            x.id === actualizada.id ? { ...x, ...actualizada, alertas: x.alertas } : x
+          );
+          this.finalizarGuardado();
+        },
+        error: (err) => this.manejarErrorGuardado(err),
+      });
+    }
+  }
+
+  private finalizarGuardado(): void {
+    this.guardando = false;
+    this.cerrarModales();
+    this.applyFilters();
+  }
+
+  private manejarErrorGuardado(err: unknown): void {
+    console.error('Error guardando usuaria:', err);
+    this.guardando = false;
+    this.errorForm = 'No se pudo guardar. Intenta de nuevo.';
   }
 
   cerrarModales(): void {
     this.modalDetalle = false;
     this.modalBloqueo = false;
+    this.modalForm = false;
     this.usuariaSeleccionada = null;
+    this.errorForm = '';
   }
 
   // ── Helpers de estilo ────────────────────────────────────────

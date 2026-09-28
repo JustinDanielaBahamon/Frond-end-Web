@@ -5,7 +5,7 @@
 [data-theme="dark"] {
 
   .sidebar {
-    background: #280142 !important; // 🎨 color principal de la paleta
+    background: var(--sidebar-bg, #280142) !important;
 
     &__brand-name {
       color: var(--text-primary) !important;
@@ -20,7 +20,7 @@
     }
 
     &__divider {
-      background: linear-gradient(90deg, #C2A0F2, var(--pink), transparent) !important;
+      background: linear-gradient(90deg, var(--purple-mid), var(--accent-grad-to), transparent) !important;
     }
 
     &__link {
@@ -33,10 +33,9 @@
       }
 
       &--active {
-        // 🎨 Indicador de módulo activo — degradado con los colores del landing/login
-        background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+        background: linear-gradient(135deg, var(--accent-grad-from), var(--accent-grad-to)) !important;
         color: #fff !important;
-        box-shadow: 0 4px 14px rgba(217, 72, 178, 0.35) !important;
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to) 35%, transparent) !important;
 
         .sidebar__link-icon {
           color: #F2F2F2 !important;
@@ -204,13 +203,13 @@
     color: #a78bfa !important;
   }
 
-  /* ── 6. Iconos sólidos (actividad, emergencia, accesos) ─
+    /* ── 6. Iconos sólidos (actividad, emergencia, accesos) ─
         Mismo estilo de la imagen: cuadro de color sólido
         con el icono claro encima.                       */
   .home-activity-item__icon,
   .home-acceso__icon {
 
-    &--peligro     { background: #a11d48 !important; color: #ffe4ec !important; }
+    &--peligro     { background: var(--pink) !important; color: #fff !important; }
     &--principal   { background: #7c3aed !important; color: #ede9fe !important; }
     &--exito       { background: #10b981 !important; color: #ecfdf5 !important; }
     &--acento      { background: #0891b2 !important; color: #ecfeff !important; }
@@ -218,8 +217,8 @@
   }
 
   .home-emergencia__icon {
-    background: #a11d48 !important;
-    color: #ffe4ec !important;
+    background: var(--pink) !important;
+    color: #fff !important;
   }
 
   /* ── 7. Actividad reciente ─────────────────────── */

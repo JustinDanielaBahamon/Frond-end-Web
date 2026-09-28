@@ -237,6 +237,7 @@
         </span>
       </div>
     </div>
+
     <div class="detail-grid">
       <div class="detail-item">
         <span class="detail-label">Teléfono</span>
@@ -251,25 +252,91 @@
         <span class="detail-value">{{ usuariaSeleccionada.alertas }}</span>
       </div>
       <div class="detail-item">
-        <span class="detail-label">Última actividad</span>
-        <span class="detail-value">{{ usuariaSeleccionada.ultimaActividad }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Contacto de emergencia</span>
-        <span class="detail-value">{{ usuariaSeleccionada.contactoEmergencia }}</span>
-      </div>
-      <div class="detail-item">
         <span class="detail-label">Rol</span>
         <span class="detail-value">{{ usuariaSeleccionada.rol }}</span>
       </div>
     </div>
+
+    <!-- Contactos de emergencia (tabla emergency_contact) -->
+    <h4 class="detail-section">Contactos de emergencia</h4>
+    <p class="detail-empty" *ngIf="cargandoDetalle">Cargando...</p>
+    <p class="detail-empty" *ngIf="!cargandoDetalle && contactosDetalle.length === 0">
+      Sin contactos registrados.
+    </p>
+    <ul class="detail-list" *ngIf="!cargandoDetalle && contactosDetalle.length > 0">
+      <li *ngFor="let c of contactosDetalle">
+        <strong>{{ c.contact_name }}</strong>
+        <span>{{ c.relationship }} · {{ c.telephone }}</span>
+      </li>
+    </ul>
+
+    <!-- Últimas alertas (tabla alertas) -->
+    <h4 class="detail-section">Últimas alertas</h4>
+    <p class="detail-empty" *ngIf="!cargandoDetalle && alertasDetalle.length === 0">
+      Sin alertas registradas.
+    </p>
+    <ul class="detail-list" *ngIf="!cargandoDetalle && alertasDetalle.length > 0">
+      <li *ngFor="let a of alertasDetalle">
+        <strong>{{ a.descripcion }}</strong>
+        <span>{{ a.ubicacion }} · {{ a.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+      </li>
+    </ul>
   </div>
 
   <div modal-footer>
     <button class="btn-secondary" (click)="cerrarModales()">Cerrar</button>
+    <button class="btn-secondary" (click)="abrirModalEditar(usuariaSeleccionada!)">Editar</button>
     <button class="btn-primary" (click)="restablecerPassword(usuariaSeleccionada!)">Restablecer contraseña</button>
   </div>
+</app-modal>
 
+<!-- ===================== MODAL: CREAR / EDITAR ===================== -->
+<app-modal
+  *ngIf="modalForm"
+  [titulo]="modoForm === 'crear' ? 'Añadir Usuaria' : 'Editar Usuaria'"
+  (cerrar)="cerrarModales()">
+
+  <div modal-body>
+    <form #f="ngForm" class="user-form" id="user-form" novalidate
+          (ngSubmit)="f.valid && guardarUsuaria()">
+      <div class="form-row">
+        <label class="form-field">
+          <span>Nombre</span>
+          <input name="first_name" [(ngModel)]="form.first_name" required minlength="2" />
+        </label>
+        <label class="form-field">
+          <span>Apellido</span>
+          <input name="last_name" [(ngModel)]="form.last_name" required minlength="2" />
+        </label>
+      </div>
+
+      <label class="form-field">
+        <span>Correo</span>
+        <input type="email" name="email" [(ngModel)]="form.email" required email />
+      </label>
+
+      <label class="form-field">
+        <span>Teléfono</span>
+        <input name="telefono" [(ngModel)]="form.telefono" required pattern="^[+0-9 ]{7,20}$" />
+      </label>
+
+      <label class="form-field">
+        <span>{{ modoForm === 'crear' ? 'Contraseña temporal' : 'Nueva contraseña (opcional)' }}</span>
+        <input type="password" name="password" [(ngModel)]="form.password"
+               [required]="modoForm === 'crear'" minlength="8" />
+      </label>
+
+      <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      <p class="form-error" *ngIf="f.submitted && f.invalid">Revisa los campos marcados.</p>
+    </form>
+  </div>
+
+  <div modal-footer>
+    <button class="btn-secondary" type="button" (click)="cerrarModales()">Cancelar</button>
+    <button class="btn-primary" type="submit" form="user-form" [disabled]="guardando">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
 </app-modal>
 
 <!-- ===================== MODAL: CONFIRMAR BLOQUEO ===================== -->

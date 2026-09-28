@@ -197,10 +197,10 @@ $yellow: #eab308;
   font-size: 0.65rem; font-weight: 800;
   flex-shrink: 0; color: #fff;
 
-  &--sos     { background: $red; }
-  &--medical { background: $blue; }
-  &--robo    { background: $amber; }
-  &--acoso   { background: $purple-deep; }
+  &--boton      { background: $red; }
+  &--widget     { background: $blue; }
+  &--movimiento { background: $purple-deep; }
+  &--manual     { background: $amber; }
 }
 
 .alerta-info {
@@ -666,10 +666,10 @@ $yellow: #eab308;
     font-size: 0.68rem; font-weight: 700;
     margin-bottom: 5px;
 
-    &.popup-tipo--sos     { background: $red-pale;   color: $red; }
-    &.popup-tipo--medical { background: #dbeafe;      color: $blue; }
-    &.popup-tipo--robo    { background: #fef3c7;      color: $amber; }
-    &.popup-tipo--acoso   { background: $purple-pale; color: $purple-deep; }
+    &.popup-tipo--boton      { background: $red-pale;    color: $red; }
+    &.popup-tipo--widget     { background: #dbeafe;      color: $blue; }
+    &.popup-tipo--movimiento { background: $purple-pale; color: $purple-deep; }
+    &.popup-tipo--manual     { background: #fef3c7;      color: $amber; }
   }
 
   &__nombre {

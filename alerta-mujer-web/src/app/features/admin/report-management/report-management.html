@@ -9,7 +9,7 @@
         <h1>Gestión de Reportes</h1>
         <p>Visualiza, filtra y genera reportes del sistema.</p>
       </div>
-      <button class="btn-new-report">
+      <button class="btn-new-report" (click)="abrirModalNuevo()">
         <i class="fa-solid fa-plus"></i>
         Nuevo Reporte
       </button>
@@ -23,7 +23,7 @@
       <div class="stat-card purple">
         <div class="stat-info">
           <span>Total Reportes</span>
-          <h2>542</h2>
+          <h2>{{ stats.totalReportes }}</h2>
           <p>Generados en total</p>
         </div>
         <div class="stat-icon">
@@ -34,7 +34,7 @@
       <div class="stat-card green">
         <div class="stat-info">
           <span>Total Alertas</span>
-          <h2>1,284</h2>
+          <h2>{{ stats.totalAlertas }}</h2>
           <p>Alertas registradas</p>
         </div>
         <div class="stat-icon">
@@ -45,7 +45,7 @@
       <div class="stat-card orange">
         <div class="stat-info">
           <span>Zonas Activas</span>
-          <h2>48</h2>
+          <h2>{{ stats.zonasActivas }}</h2>
           <p>Zonas monitoreadas</p>
         </div>
         <div class="stat-icon">
@@ -56,7 +56,7 @@
       <div class="stat-card blue">
         <div class="stat-info">
           <span>Exportaciones</span>
-          <h2>91</h2>
+          <h2>{{ stats.exportaciones }}</h2>
           <p>Reportes exportados</p>
         </div>
         <div class="stat-icon">
@@ -72,34 +72,46 @@
     <div class="toolbar">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Buscar reporte..." aria-label="Buscar reporte" />
+        <input 
+          type="text" 
+          placeholder="Buscar reporte..." 
+          aria-label="Buscar reporte"
+          [(ngModel)]="filtros.busqueda"
+          (input)="onBusquedaChange()"
+        />
       </div>
   
-      <div class="action-buttons">
-        <button class="btn-action pdf">
-          <i class="fa-solid fa-file-pdf"></i>
-          Descargar PDF
-        </button>
-        <button class="btn-action excel">
-          <i class="fa-solid fa-file-excel"></i>
-          Descargar Excel
-        </button>
-        <button class="btn-action print">
-          <i class="fa-solid fa-print"></i>
-          Imprimir
-        </button>
-      </div>
+
   
       <div class="filter-group">
         <div class="filter-item">
-          <input type="date" class="select-date" aria-label="Fecha inicial">
+          <label>Fecha Inicial</label>
+          <input 
+            type="date" 
+            class="select-date" 
+            aria-label="Fecha inicial"
+            [(ngModel)]="filtros.fechaInicio"
+            (change)="aplicarFiltros()"
+          >
         </div>
         <div class="filter-item">
-          <input type="date" class="select-date" aria-label="Fecha final">
+          <label>Fecha Final</label>
+          <input 
+            type="date" 
+            class="select-date" 
+            aria-label="Fecha final"
+            [(ngModel)]="filtros.fechaFin"
+            (change)="aplicarFiltros()"
+          >
         </div>
         <div class="filter-item">
-          <select aria-label="Filtrar por Ciudad">
-            <option value="">Ciudad</option>
+          <label>Lugar de Alerta</label>
+          <select 
+            aria-label="Filtrar por Ciudad"
+            [(ngModel)]="filtros.ciudad"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todas</option>
             <option value="all">Todas</option>
             <option value="neiva">Neiva</option>
             <option value="bogota">Bogotá</option>
@@ -109,25 +121,20 @@
           </select>
         </div>
         <div class="filter-item">
-          <select aria-label="Filtrar por Tipo">
-            <option value="">Tipo</option>
+          <label>Estado</label>
+          <select 
+            aria-label="Filtrar por Estado"
+            [(ngModel)]="filtros.estado"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todos</option>
             <option value="all">Todos</option>
-            <option value="sos">SOS</option>
-            <option value="robo">Robo</option>
-            <option value="acoso">Acoso</option>
-            <option value="medico">Médico</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Cerrada">Cerrada</option>
+            <option value="Atendida">Atendida</option>
           </select>
         </div>
-        <div class="filter-item">
-          <select aria-label="Filtrar por Estado">
-            <option value="">Estado</option>
-            <option value="all">Todas</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="cerrada">Cerrada</option>
-            <option value="atendida">Atendida</option>
-          </select>
-        </div>
-        <button class="btn-clear-filters">
+        <button class="btn-clear-filters" (click)="limpiarFiltros()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
           Limpiar filtros
         </button>
@@ -146,173 +153,82 @@
                 <th>Nombre del Reporte</th>
                 <th>Fecha</th>
                 <th>Ciudad</th>
-                <th>Tipo</th>
+                <th>Usuaria</th>
+                <th>Acontecimiento</th>
                 <th>Estado</th>
                 <th>Generado por</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div class="report-name">
-                    <div class="report-icon">
-                      <i class="fa-solid fa-file-lines"></i>
+              @if (cargando) {
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Cargando reportes...</p>
                     </div>
-                    Reporte de Alertas - Julio 2024
-                  </div>
-                </td>
-                <td>23/07/2024 10:30 AM</td>
-                <td>Neiva</td>
-                <td>
-                  <span class="badge red">SOS</span>
-                </td>
-                <td>
-                  <span class="status pending">Pendiente</span>
-                </td>
-                <td>Administrador</td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="edit" aria-label="Editar reporte">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button class="delete" aria-label="Eliminar reporte">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-name">
-                    <div class="report-icon">
-                      <i class="fa-solid fa-file-lines"></i>
+                  </td>
+                </tr>
+              } @else if (reportesPaginados.length === 0) {
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px;">
+                    <div class="no-data">
+                      <i class="fa-solid fa-folder-open"></i>
+                      <p>No se encontraron reportes</p>
+                      <button class="btn-clear-filters" (click)="limpiarFiltros()">
+                        Limpiar filtros
+                      </button>
                     </div>
-                    Reporte de Robos - Julio 2024
-                  </div>
-                </td>
-                <td>21/07/2024 04:15 PM</td>
-                <td>Bogotá</td>
-                <td>
-                  <span class="badge orange">Robo</span>
-                </td>
-                <td>
-                  <span class="status closed">Cerrada</span>
-                </td>
-                <td>Administrador</td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="edit" aria-label="Editar reporte">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button class="delete" aria-label="Eliminar reporte">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-name">
-                    <div class="report-icon">
-                      <i class="fa-solid fa-file-lines"></i>
-                    </div>
-                    Reporte de Acoso - Julio 2024
-                  </div>
-                </td>
-                <td>20/07/2024 11:45 AM</td>
-                <td>Cali</td>
-                <td>
-                  <span class="badge blue">Acoso</span>
-                </td>
-                <td>
-                  <span class="status attended">Atendida</span>
-                </td>
-                <td>Administrador</td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="edit" aria-label="Editar reporte">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button class="delete" aria-label="Eliminar reporte">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-name">
-                    <div class="report-icon">
-                      <i class="fa-solid fa-file-lines"></i>
-                    </div>
-                    Reporte Médico - Julio 2024
-                  </div>
-                </td>
-                <td>19/07/2024 09:20 AM</td>
-                <td>Neiva</td>
-                <td>
-                  <span class="badge green">Médico</span>
-                </td>
-                <td>
-                  <span class="status pending">Pendiente</span>
-                </td>
-                <td>Administrador</td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="edit" aria-label="Editar reporte">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button class="delete" aria-label="Eliminar reporte">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-name">
-                    <div class="report-icon">
-                      <i class="fa-solid fa-file-lines"></i>
-                    </div>
-                    Reporte de SOS - Julio 2024
-                  </div>
-                </td>
-                <td>18/07/2024 08:10 PM</td>
-                <td>Medellín</td>
-                <td>
-                  <span class="badge red">SOS</span>
-                </td>
-                <td>
-                  <span class="status attended">Atendida</span>
-                </td>
-                <td>Administrador</td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="edit" aria-label="Editar reporte">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button class="delete" aria-label="Eliminar reporte">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              } @else {
+                @for (reporte of reportesPaginados; track reporte.id) {
+                  <tr>
+                    <td>
+                      <div class="report-name">
+                        <div class="report-icon">
+                          <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        {{ reporte.nombre }}
+                      </div>
+                    </td>
+                    <td>{{ formatearFecha(reporte.fecha) }}</td>
+                    <td>{{ reporte.ciudad }}</td>
+                    <td>{{ reporte.usuaria || '-' }}</td>
+                    <td>{{ reporte.acontecimiento || '-' }}</td>
+                    <td>
+                      <span class="status {{ getStatusClass(reporte.estado) }}">{{ reporte.estado }}</span>
+                    </td>
+                    <td>{{ reporte.generadoPor }}</td>
+                    <td>
+                      <div class="actions">
+                        <button 
+                          class="view" 
+                          aria-label="Ver reporte"
+                          (click)="verReporte(reporte)"
+                        >
+                          <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <button 
+                          class="edit" 
+                          aria-label="Editar reporte"
+                          (click)="editarReporte(reporte)"
+                        >
+                          <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button 
+                          class="delete" 
+                          aria-label="Eliminar reporte"
+                          (click)="eliminarReporte(reporte.id)"
+                        >
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
             </tbody>
           </table>
       
@@ -323,22 +239,50 @@
           <div class="table-footer">
             <div class="table-info">
               Mostrando
-              <strong>1 - 5</strong>
+              <strong>{{ elementoInicio }} - {{ elementoFin }}</strong>
               de
-              <strong>542</strong>
+              <strong>{{ paginacion.totalElementos }}</strong>
               reportes
             </div>
             <div class="pagination">
-              <button class="page-btn" aria-label="Página anterior">
+              <button 
+                class="page-btn" 
+                aria-label="Página anterior"
+                (click)="paginaAnterior()"
+                [disabled]="paginacion.paginaActual === 1"
+              >
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              <button class="page-btn active" aria-label="Página 1">1</button>
-              <button class="page-btn" aria-label="Página 2">2</button>
-              <button class="page-btn" aria-label="Página 3">3</button>
-              <button class="page-btn" aria-label="Página 4">4</button>
-              <span class="page-ellipsis">...</span>
-              <button class="page-btn" aria-label="Última página, 109">109</button>
-              <button class="page-btn" aria-label="Página siguiente">
+              
+              @for (pagina of paginasVisibles; track pagina) {
+                <button 
+                  class="page-btn" 
+                  [class.active]="pagina === paginacion.paginaActual"
+                  (click)="cambiarPagina(pagina)"
+                >
+                  {{ pagina }}
+                </button>
+              }
+              
+              @if (paginacion.totalPaginas > 5) {
+                <span class="page-ellipsis">...</span>
+              }
+              
+              @if (paginacion.totalPaginas > 5 && !paginasVisibles.includes(paginacion.totalPaginas)) {
+                <button 
+                  class="page-btn" 
+                  (click)="irAUltimaPagina()"
+                >
+                  {{ paginacion.totalPaginas }}
+                </button>
+              }
+              
+              <button 
+                class="page-btn" 
+                aria-label="Página siguiente"
+                (click)="paginaSiguiente()"
+                [disabled]="paginacion.paginaActual === paginacion.totalPaginas"
+              >
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
             </div>
@@ -347,4 +291,245 @@
         </div>
         </div>
   </div>
+
+  <!-- MODAL NUEVO/EDITAR REPORTE -->
+  @if (mostrarModalNuevo) {
+    <div class="modal-overlay" (click)="cerrarModalNuevo()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ reporteEditando ? 'Editar Reporte' : 'Nuevo Reporte' }}</h2>
+          <button class="modal-close" (click)="cerrarModalNuevo()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          @if (error) {
+            <div class="error-message">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ error }}
+            </div>
+          }
+          
+          <form class="report-form">
+            <div class="form-group">
+              <label>Nombre del Reporte</label>
+              <input 
+                type="text" 
+                [(ngModel)]="modeloNombre"
+                (ngModelChange)="modeloNombre = $event"
+                placeholder="Ej: Reporte de Alertas - Enero 2024"
+              >
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ciudad</label>
+                <select 
+                  [(ngModel)]="modeloCiudad"
+                  (ngModelChange)="modeloCiudad = $event"
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="Neiva">Neiva</option>
+                  <option value="Bogotá">Bogotá</option>
+                  <option value="Cali">Cali</option>
+                  <option value="Medellín">Medellín</option>
+                  <option value="Barranquilla">Barranquilla</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Estado</label>
+                <select 
+                  [(ngModel)]="modeloEstado"
+                  (ngModelChange)="modeloEstado = $event"
+                >
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Cerrada">Cerrada</option>
+                  <option value="Atendida">Atendida</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Usuaria</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="modeloUsuaria"
+                  (ngModelChange)="modeloUsuaria = $event"
+                  placeholder="Nombre de la usuaria"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label>Acontecimiento</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="modeloAcontecimiento"
+                  (ngModelChange)="modeloAcontecimiento = $event"
+                  placeholder="Descripción breve del acontecimiento"
+                >
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Formato</label>
+                <select 
+                  [(ngModel)]="modeloFormato"
+                  (ngModelChange)="modeloFormato = $event"
+                >
+                  <option value="PDF">PDF</option>
+                  <option value="Excel">Excel</option>
+                  <option value="CSV">CSV</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Descripción</label>
+              <textarea 
+                [(ngModel)]="modeloDescripcion"
+                (ngModelChange)="modeloDescripcion = $event"
+                placeholder="Descripción detallada del reporte..."
+                rows="3"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
+          <button 
+            class="btn-primary" 
+            (click)="reporteEditando ? actualizarReporte() : crearReporte()"
+            [disabled]="cargando"
+          >
+            @if (cargando) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            }
+            {{ reporteEditando ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL VER REPORTE -->
+  @if (mostrarModalVer && reporteSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModalVer()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Detalle del Reporte</h2>
+          <button class="modal-close" (click)="cerrarModalVer()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="report-detail">
+            <div class="detail-header">
+              <div class="report-icon-large">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div class="detail-info">
+                <h3>{{ reporteSeleccionado.nombre }}</h3>
+                <span class="status {{ getStatusClass(reporteSeleccionado.estado) }}">{{ reporteSeleccionado.estado }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>ID</label>
+                <p>{{ reporteSeleccionado.id }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Fecha</label>
+                <p>{{ formatearFecha(reporteSeleccionado.fecha) }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Ciudad</label>
+                <p>{{ reporteSeleccionado.ciudad }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Usuaria</label>
+                <p>{{ reporteSeleccionado.usuaria || '-' }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Acontecimiento</label>
+                <p>{{ reporteSeleccionado.acontecimiento || '-' }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Generado por</label>
+                <p>{{ reporteSeleccionado.generadoPor }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Formato</label>
+                <p>{{ reporteSeleccionado.formato }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Tamaño</label>
+                <p>{{ reporteSeleccionado.tamano }}</p>
+              </div>
+            </div>
+            
+            @if (reporteSeleccionado.descripcion) {
+              <div class="detail-description">
+                <label>Descripción</label>
+                <p>{{ reporteSeleccionado.descripcion }}</p>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            class="btn-action pdf" 
+            (click)="descargarPDF(reporteSeleccionado.id)"
+          >
+            <i class="fa-solid fa-file-pdf"></i>
+            Descargar PDF
+          </button>
+          <button 
+            class="btn-action excel" 
+            (click)="descargarExcel(reporteSeleccionado.id)"
+          >
+            <i class="fa-solid fa-file-excel"></i>
+            Descargar Excel
+          </button>
+          <button 
+            class="btn-action print" 
+            (click)="imprimir()"
+          >
+            <i class="fa-solid fa-print"></i>
+            Imprimir
+          </button>
+          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL ALERTA IMPRESORA -->
+  @if (mostrarModalImpresora) {
+    <div class="modal-overlay modal-impresora" (click)="cerrarModalImpresora()">
+      <div class="modal-content modal-impresora-content" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-impresora-header">
+          <div class="impresora-icon">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <h2>¡No se ha encontrado impresora!</h2>
+          <button class="modal-close" (click)="cerrarModalImpresora()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body modal-impresora-body">
+          <p>No se ha encontrado dispositivos para imprimir. Conecta tu impresora e inténtalo de nuevo.</p>
+          <p class="mensaje-final">¡Ten lindo día!!</p>
+        </div>
+        <div class="modal-footer modal-impresora-footer">
+          <button class="btn-primary" (click)="cerrarModalImpresora()">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  }
   

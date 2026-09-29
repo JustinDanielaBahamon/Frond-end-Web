@@ -44,11 +44,8 @@ export class Settings {
   // --- Apariencia: color de acento (global, vía AccentColorService) ---
   readonly accentColors: AccentColor[] = [
     { name: 'purpura', value: '#7c3aed' }, // color por defecto de la app
-    { name: 'rosa', value: '#ec4899' },
-    { name: 'magenta', value: '#db2777' },
-    { name: 'indigo', value: '#6366f1' },
-    { name: 'teal', value: '#0d9488' },
-    { name: 'azul', value: '#2563eb' }
+    { name: 'rosa', value: '#130253' },
+    { name: 'magenta', value: '#710592' },
   ];
   readonly selectedColor = this.accentColorService.currentAccent;
 

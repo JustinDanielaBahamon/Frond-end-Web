@@ -1,3 +1,4 @@
+
 <div class="alertas-page">
 
   <!-- TÍTULO -->
@@ -6,7 +7,7 @@
     <div class="alertas-header__right">
       <span class="live-dot"></span>
       <span class="live-label">En vivo</span>
-      <span class="alertas-count">{{ alertas.length }} alertas activas</span>
+      <span class="alertas-count">{{ alertasPendientes }} alertas activas</span>
     </div>
   </div>
 
@@ -31,12 +32,12 @@
       <!-- ── TAB ALERTAS ── -->
       <ng-container *ngIf="tabActivo === 'alertas'">
         <div class="panel-filters">
-          <select class="panel-select" [(ngModel)]="filtroTipo" (change)="filtrarAlertas()">
-            <option value="Todos">Todos los tipos</option>
-            <option value="SOS">SOS / Pánico</option>
-            <option value="Medical">Emergencia Médica</option>
-            <option value="Robo">Robo</option>
-            <option value="Acoso">Acoso</option>
+          <select class="panel-select" [(ngModel)]="filtroMedio" (change)="filtrarAlertas()">
+            <option value="Todos">Todos los modos</option>
+            <option value="Botón de pánico">Botón de pánico</option>
+            <option value="Widget">Widget</option>
+            <option value="Movimiento sospechoso">Movimiento sospechoso</option>
+            <option value="Manual">Manual</option>
           </select>
           <select class="panel-select" [(ngModel)]="filtroEstado" (change)="filtrarAlertas()">
             <option value="Todos">Todos</option>
@@ -49,20 +50,31 @@
           <div *ngFor="let alerta of alertasFiltradas" class="alerta-card"
             [class.alerta-card--active]="alertaActiva?.id === alerta.id"
             [class.alerta-card--atendida]="alerta.estado === 'Atendida'" (click)="seleccionarAlerta(alerta)">
-            <div class="alerta-icon" [ngClass]="'alerta-icon--' + alerta.tipo.toLowerCase()">
-              <span *ngIf="alerta.tipo === 'SOS'">SOS</span>
-              <svg *ngIf="alerta.tipo === 'Medical'" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            <div class="alerta-icon" [ngClass]="'alerta-icon--' + claseMedio(alerta.medioActivacion)">
+              <!-- Botón de pánico -->
+              <svg *ngIf="alerta.medioActivacion === 'Botón de pánico'" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="9" />
+                <circle cx="12" cy="12" r="3" fill="currentColor" />
+              </svg>
+              <!-- Widget -->
+              <svg *ngIf="alerta.medioActivacion === 'Widget'" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5">
-                <path d="M12 5v14M5 12h14" />
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
               </svg>
-              <svg *ngIf="alerta.tipo === 'Robo'" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <!-- Movimiento sospechoso -->
+              <svg *ngIf="alerta.medioActivacion === 'Movimiento sospechoso'" width="16" height="16"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
               </svg>
-              <svg *ngIf="alerta.tipo === 'Acoso'" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4M12 16h.01" />
+              <!-- Manual -->
+              <svg *ngIf="alerta.medioActivacion === 'Manual'" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
               </svg>
             </div>
 
@@ -289,8 +301,9 @@
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
-        <div class="mapa-popup__tipo" [ngClass]="'popup-tipo--' + alertaActiva.tipo.toLowerCase()">{{ alertaActiva.tipo
-          }}</div>
+        <div class="mapa-popup__tipo" [ngClass]="'popup-tipo--' + claseMedio(alertaActiva.medioActivacion)">
+          {{ alertaActiva.medioActivacion }}
+        </div>
         <div class="mapa-popup__nombre">{{ alertaActiva.nombre }}</div>
         <div class="mapa-popup__desc">{{ alertaActiva.descripcion }}</div>
         <div class="mapa-popup__row">

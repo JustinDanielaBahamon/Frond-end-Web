@@ -36,26 +36,36 @@ export class AccentColorService {
     const { h, s } = this.hexToHsl(hex);
     const root = document.documentElement.style;
     const sat = this.clamp(s, 45, 75);
+    const palePaleSat = this.clamp(sat - 55, 10, 25);
+    const vivid = this.clamp(sat + 10, 55, 85);
 
     if (theme === 'light') {
       root.setProperty('--purple-deep', this.hslToHex(h, sat, 48));
       root.setProperty('--purple-mid', this.hslToHex(h, sat - 5, 68));
       root.setProperty('--purple-light', this.hslToHex(h, sat - 10, 80));
-      root.setProperty('--purple-pale', this.hslToHex(h, sat - 15, 93));
-      root.setProperty('--purple-pale-hover', this.hslToHex(h, sat - 15, 89));
-      root.setProperty('--pink', this.hslToHex((h + 320) % 360, this.clamp(sat + 5, 60, 85), 59));
+      root.setProperty('--purple-pale', this.hslToHex(h, palePaleSat, 93));
+      root.setProperty('--purple-pale-hover', this.hslToHex(h, palePaleSat, 89));
+      root.setProperty('--pink', this.hslToHex(h, vivid, 58));
       root.setProperty('--hero-accent', this.hslToHex(h, sat, 58));
       root.setProperty('--navbar-purple', this.hslToHex(h, sat, 44));
     } else {
       root.setProperty('--purple-deep', this.hslToHex(h, sat, 65));
       root.setProperty('--purple-mid', this.hslToHex(h, sat - 5, 72));
       root.setProperty('--purple-light', this.hslToHex(h, sat - 10, 45));
-      root.setProperty('--purple-pale', this.hslToHex(h, sat - 15, 16));
-      root.setProperty('--purple-pale-hover', this.hslToHex(h, sat - 15, 20));
-      root.setProperty('--pink', this.hslToHex((h + 320) % 360, this.clamp(sat + 5, 60, 85), 68));
+      root.setProperty('--purple-pale', this.hslToHex(h, palePaleSat, 20));
+      root.setProperty('--purple-pale-hover', this.hslToHex(h, palePaleSat, 24));
+      root.setProperty('--pink', this.hslToHex(h, vivid, 68));
       root.setProperty('--hero-accent', this.hslToHex(h, sat, 72));
       root.setProperty('--navbar-purple', this.hslToHex(h, sat, 72));
     }
+
+    // ── Sidebar y degradados ──
+    root.setProperty('--accent-grad-from', this.hslToHex(h, sat, 42));
+    root.setProperty('--accent-grad-to', this.hslToHex(h, vivid, 58));
+    root.setProperty(
+      '--sidebar-bg',
+      this.hslToHex(h, this.clamp(sat - 10, 35, 65), theme === 'light' ? 17 : 12)
+    );
   }
 
   private clamp(v: number, min: number, max: number): number {

@@ -10,7 +10,7 @@ import { PublicLayoutComponent } from './core/layouts/public-layout/public-layou
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
 import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone';
 import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
-import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+
 
 
 import {
@@ -66,13 +66,6 @@ export const routes: Routes = [
           import('./features/auth/verify-code/verify-code')
             .then(m => m.VerifyCodeComponent)
       },
-      {
-        path: 'reset-password',
-        loadComponent: () =>
-          import('./features/auth/reset-password/reset-password')
-            .then(m => m.ResetPasswordComponent)
-      },
-
     ]
   },
 

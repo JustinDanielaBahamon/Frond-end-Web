@@ -1,11 +1,11 @@
-import { Component, OnDestroy, AfterViewInit, inject } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 import { AlertsService } from '../../../core/services/alerts.services';
 import { RiskZonesService } from '../../../core/services/risk-zones.services';
-import { Alerta } from '../../../core/models/alert.model';
+import { Alerta, MedioActivacion } from '../../../core/models/alert.model';
 import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
 import { Modal } from '../../../shared/components/modal/modal';
 import { Chip } from '../../../shared/components/chip/chip';
@@ -23,6 +23,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   private alertsService = inject(AlertsService);
   private riskZonesService = inject(RiskZonesService);
+  private cdr = inject(ChangeDetectorRef);
 
   // ── Mapa ─────────────────────────────────────────────────────
   private mapa: any;
@@ -34,6 +35,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private circuloPreview: any = null;
   private marcadorCentro: any = null;
 
+  private readonly centroInicial: [number, number] = [4.7110, -74.0721];
+
   // ── UI state ─────────────────────────────────────────────────
   tabActivo: 'alertas' | 'zonas' = 'alertas';
   fabOpen = false;
@@ -43,7 +46,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   cargando = true;
 
   alertaActiva: Alerta | null = null;
-  filtroTipo   = 'Todos';
+  filtroMedio  = 'Todos';
   filtroEstado = 'Todos';
   filtroNivel  = 'Todos';
   alertasFiltradas: Alerta[] = [];
@@ -83,6 +86,15 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   alertas: Alerta[] = [];
   zonasManuales: ZonaManual[] = [];
   puntosMapa: PuntoMapa[] = [];
+
+  // ── Filtros ──────────────────────────────────────────────────
+  filtrarAlertas(): void {
+    this.alertasFiltradas = this.alertas.filter(a => {
+      const m = this.filtroMedio  === 'Todos' || a.medioActivacion === this.filtroMedio;
+      const e = this.filtroEstado === 'Todos' || a.estado          === this.filtroEstado;
+      return m && e;
+    });
+  }
 
   // ── Getters ──────────────────────────────────────────────────
   get alertasPendientes(): number {
@@ -127,6 +139,23 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void { if (this.mapa) this.mapa.remove(); }
 
+  /** Fuerza refresco de la vista (útil para callbacks de Leaflet y HTTP) */
+  private refrescar(): void {
+    this.cdr.detectChanges();
+  }
+
+  // ── Medio de activación ──────────────────────────────────────
+  /** Clase CSS segura (sin tildes ni espacios) */
+  claseMedio(medio: MedioActivacion): string {
+    const map: Record<MedioActivacion, string> = {
+      'Botón de pánico':       'boton',
+      'Widget':                'widget',
+      'Movimiento sospechoso': 'movimiento',
+      'Manual':                'manual',
+    };
+    return map[medio] ?? 'boton';
+  }
+
   // ── Init mapa + carga de datos reales ──────────────────────────
   private initMapaYData(): void {
     if (typeof L === 'undefined') {
@@ -134,7 +163,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.mapa = L.map('mapa-leaflet', { center: [4.7110, -74.0721], zoom: 14 });
+    this.mapa = L.map('mapa-leaflet', { center: this.centroInicial, zoom: 14 });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap', maxZoom: 19,
@@ -149,6 +178,9 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       puntos: this.riskZonesService.getPuntos(),
     }).subscribe({
       next: ({ alertas, zonas, puntos }) => {
+        // DEBUG: quítalo cuando ya veas bien los datos
+        console.log('Primera alerta normalizada:', alertas[0]);
+
         this.alertas = alertas;
         this.zonasManuales = zonas;
         this.puntosMapa = puntos;
@@ -160,12 +192,86 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.repintarZonasGuardadas();
 
         this.cargando = false;
+        this.refrescar();
         setTimeout(() => this.mapa?.invalidateSize(), 200);
       },
       error: (err) => {
         console.error('Error cargando datos del mapa:', err);
         this.cargando = false;
+        this.refrescar();
       }
+    });
+  }
+
+  // ── Pintar capas ──────────────────────────────────────────────
+  private coordsValidas(lat: number, lng: number): boolean {
+    return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+  }
+
+  private pintarAlertas(): void {
+    this.marcadoresAlertas.forEach(m => this.mapa?.removeLayer(m));
+    this.marcadoresAlertas.clear();
+
+    this.alertas.forEach(a => {
+      if (!this.coordsValidas(a.lat, a.lng)) return;
+
+      const marker = L.marker([a.lat, a.lng], {
+        icon: this.crearIconoPin(a.medioActivacion, a.estado === 'Atendida'),
+      }).bindTooltip(`${a.nombre}`);
+
+      marker.on('click', () => {
+        this.seleccionarAlerta(a);
+        this.refrescar();
+      });
+
+      this.marcadoresAlertas.set(a.id, marker);
+      if (this.capas.alertas) marker.addTo(this.mapa);
+    });
+  }
+
+  private pintarPuntos(): void {
+    this.puntosMapa.forEach(p => this.pintarUnPunto(p));
+  }
+
+  private pintarUnPunto(p: PuntoMapa): void {
+    if (!this.coordsValidas(p.lat, p.lng)) return;
+
+    const esCAI = p.tipo === 'CAI';
+    const emoji = esCAI ? '🚔' : '🏥';
+    const fondo = esCAI ? '#dbeafe' : '#fce7f3';
+
+    const icon = L.divIcon({
+      html: `<div style="width:30px;height:30px;border-radius:50%;background:${fondo};
+                         border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);
+                         display:flex;align-items:center;justify-content:center;font-size:15px;">${emoji}</div>`,
+      className: '',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+    });
+
+    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.nombre}`);
+    this.marcadoresPuntos.push({ marker, tipo: p.tipo });
+
+    const visible = esCAI ? this.capas.cais : this.capas.hospitales;
+    if (visible) marker.addTo(this.mapa);
+  }
+
+  private pintarCalor(): void {
+    this.circulosCalor.forEach(c => this.mapa?.removeLayer(c));
+    this.circulosCalor = [];
+
+    this.zonasCalientes.forEach(z => {
+      const color = this.colorPorNivel(z.nivel);
+      const circulo = L.circle([z.lat, z.lng], {
+        radius: 150 + z.alertas * 60,
+        color,
+        fillColor: color,
+        fillOpacity: 0.15,
+        weight: 0,
+        interactive: false,
+      });
+      this.circulosCalor.push(circulo);
+      if (this.capas.calor) circulo.addTo(this.mapa);
     });
   }
 
@@ -173,7 +279,70 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.zonasManuales.forEach(z => {
       const capa = this.pintarZonaEnMapa(z);
       this.capasZonas.set(z.id, capa);
+      if (!this.capas.zonas) this.mapa?.removeLayer(capa);
     });
+  }
+
+  // ── Capas (toggle) ────────────────────────────────────────────
+  toggleCapa(capa: 'alertas' | 'zonas' | 'cais' | 'hospitales' | 'calor'): void {
+    if (!this.mapa) return;
+    const visible = this.capas[capa];
+    const alternar = (layer: any) => visible ? layer.addTo(this.mapa) : this.mapa.removeLayer(layer);
+
+    switch (capa) {
+      case 'alertas':
+        this.marcadoresAlertas.forEach(alternar);
+        break;
+      case 'zonas':
+        this.capasZonas.forEach(alternar);
+        break;
+      case 'cais':
+        this.marcadoresPuntos.filter(p => p.tipo === 'CAI').forEach(p => alternar(p.marker));
+        break;
+      case 'hospitales':
+        this.marcadoresPuntos.filter(p => p.tipo === 'Hospital').forEach(p => alternar(p.marker));
+        break;
+      case 'calor':
+        this.circulosCalor.forEach(alternar);
+        break;
+    }
+  }
+
+  // ── Selección / atención de alertas ───────────────────────────
+  seleccionarAlerta(alerta: Alerta): void {
+    this.alertaActiva = alerta;
+    if (this.coordsValidas(alerta.lat, alerta.lng)) {
+      this.mapa?.flyTo([alerta.lat, alerta.lng], 16, { duration: 0.6 });
+    }
+  }
+
+  cerrarPopup(): void {
+    this.alertaActiva = null;
+  }
+
+  atenderAlerta(alerta: Alerta): void {
+    if (alerta.estado === 'Atendida') return;
+
+    this.alertsService.updateEstado(alerta.id, 'Atendida').subscribe({
+      next: () => {
+        alerta.estado = 'Atendida';
+        this.marcadoresAlertas.get(alerta.id)
+          ?.setIcon(this.crearIconoPin(alerta.medioActivacion, true));
+        this.filtrarAlertas();
+        this.refrescar();
+      },
+      error: (err) => console.error('Error atendiendo alerta:', err),
+    });
+  }
+
+  irAZona(lat: number, lng: number): void {
+    this.mapa?.flyTo([lat, lng], 15, { duration: 0.6 });
+  }
+
+  limpiarVista(): void {
+    this.fabOpen = false;
+    this.alertaActiva = null;
+    this.mapa?.flyTo(this.centroInicial, 14, { duration: 0.6 });
   }
 
   // ── Click en mapa ────────────────────────────────────────────
@@ -185,12 +354,14 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       this.nuevaZona.lng = parseFloat(lng.toFixed(6));
       this.esperandoClickZona = false;
       this.actualizarPreviewZona();
+      this.refrescar();
       return;
     }
 
     if (this.modalPunto && this.esperandoClickPunto) {
       this.nuevoPunto.lat = parseFloat(lat.toFixed(6));
       this.nuevoPunto.lng = parseFloat(lng.toFixed(6));
+      this.refrescar();
     }
   }
 
@@ -283,6 +454,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.limpiarPreview();
         this.modalZona = false;
         this.nuevaZona = { nombre: '', nivel: 'Alto', lat: 0, lng: 0, radio: 300 };
+        this.refrescar();
       },
       error: (err) => console.error('Error guardando zona:', err)
     });
@@ -309,6 +481,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.zonasManuales.push(zonaCreada);
         this.zonasManuales.sort((a, b) => b.alertasEnZona - a.alertasEnZona);
         this.mapa?.flyTo([zonaCreada.centroLat, zonaCreada.centroLng], 15, { duration: 0.6 });
+        this.refrescar();
       },
       error: (err) => console.error('Error marcando zona caliente:', err)
     });
@@ -322,6 +495,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         if (capa) this.mapa?.removeLayer(capa);
         this.capasZonas.delete(id);
         this.zonasManuales = this.zonasManuales.filter(z => z.id !== id);
+        this.refrescar();
       },
       error: (err) => console.error('Error eliminando zona:', err)
     });
@@ -342,8 +516,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const payload: Omit<PuntoMapa, 'id'> = {
       tipo: this.nuevoPunto.tipo as 'CAI' | 'Hospital',
       nombre: this.nuevoPunto.nombre,
-      lat: this.nuevoPunto.lat || 4.7110,
-      lng: this.nuevoPunto.lng || -74.0721,
+      lat: this.nuevoPunto.lat || this.centroInicial[0],
+      lng: this.nuevoPunto.lng || this.centroInicial[1],
     };
 
     this.riskZonesService.createPunto(payload).subscribe({
@@ -352,6 +526,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.pintarUnPunto(puntoCreado);
         this.modalPunto = false;
         this.esperandoClickPunto = false;
+        this.refrescar();
       },
       error: (err) => console.error('Error guardando punto:', err)
     });
@@ -392,125 +567,22 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     </svg>`;
   }
 
-  private crearIconoPin(tipo: string): any {
-    const colores: Record<string, string> = {
-      SOS: '#ef4444', Medical: '#3b82f6', Robo: '#f59e0b', Acoso: '#8b5cf6',
+  // Color del pin según el medio de activación (gris si ya fue atendida)
+  private crearIconoPin(medio: MedioActivacion, atendida = false): any {
+    const colores: Record<MedioActivacion, string> = {
+      'Botón de pánico':       '#ef4444',
+      'Widget':                '#3b82f6',
+      'Movimiento sospechoso': '#8b5cf6',
+      'Manual':                '#f59e0b',
     };
-    const color = colores[tipo] ?? '#ef4444';
+
+    const color = atendida ? '#9ca3af' : (colores[medio] ?? '#ef4444');
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
       <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z"
             fill="${color}" stroke="white" stroke-width="1.5"/>
-      <circle cx="14" cy="14" r="6" fill="white" fill-opacity="0.9"/>
+      <circle cx="14" cy="14" r="5" fill="white"/>
     </svg>`;
-    return L.divIcon({ html: svg, className: '', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36] });
-  }
 
-  // ── Pintar capas ─────────────────────────────────────────────
-  private pintarAlertas(): void {
-    this.alertas.forEach(a => {
-      const marker = L.marker([a.lat, a.lng], { icon: this.crearIconoPin(a.tipo) }).addTo(this.mapa);
-      marker.on('click', () => this.seleccionarAlerta(a));
-      this.marcadoresAlertas.set(a.id, marker);
-    });
-  }
-
-  private pintarPuntos(): void {
-    this.puntosMapa.forEach(p => this.pintarUnPunto(p));
-  }
-
-  private pintarUnPunto(p: PuntoMapa): void {
-    const emoji = p.tipo === 'CAI' ? '🚔' : '🏥';
-    const bg    = p.tipo === 'CAI' ? '#dbeafe' : '#dcfce7';
-    const icon  = L.divIcon({
-      html: `<div style="width:32px;height:32px;border-radius:50%;background:${bg};
-                         border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.2);
-                         display:flex;align-items:center;justify-content:center;font-size:1rem;">${emoji}</div>`,
-      className: '', iconSize: [32, 32], iconAnchor: [16, 16],
-    });
-    const m = L.marker([p.lat, p.lng], { icon })
-      .bindTooltip(p.nombre, { permanent: false, direction: 'top' })
-      .addTo(this.mapa);
-    this.marcadoresPuntos.push({ marker: m, tipo: p.tipo });
-  }
-
-  private pintarCalor(): void {
-    this.zonasCalientes.forEach(z => {
-      const radio = z.alertas >= 5 ? 350 : z.alertas >= 3 ? 250 : 180;
-      const color = this.colorPorNivel(z.nivel);
-      const c = L.circle([z.lat, z.lng], { radius: radio, color, fillColor: color, fillOpacity: 0.15, weight: 1 })
-        .addTo(this.mapa);
-      this.circulosCalor.push(c);
-    });
-  }
-
-  // ── Seleccionar / deseleccionar alerta ────────────────────────
-  seleccionarAlerta(alerta: Alerta): void {
-    this.alertaActiva = alerta;
-    this.mapa?.flyTo([alerta.lat, alerta.lng], 17, { duration: 0.7 });
-    this.marcadoresAlertas.forEach((m, id) => m.setOpacity(id === alerta.id ? 1 : 0.45));
-  }
-
-  cerrarPopup(): void {
-    this.alertaActiva = null;
-    this.marcadoresAlertas.forEach(m => m.setOpacity(1));
-  }
-
-  irAZona(lat: number, lng: number): void {
-    this.mapa?.flyTo([lat, lng], 15, { duration: 0.7 });
-  }
-
-  /** Solo resetea el zoom — nunca borra alertas ni datos */
-  limpiarVista(): void {
-    this.fabOpen = false;
-    this.cerrarPopup();
-    this.mapa?.flyTo([4.7110, -74.0721], 14);
-  }
-
-  // ── Filtros ──────────────────────────────────────────────────
-  filtrarAlertas(): void {
-    this.alertasFiltradas = this.alertas.filter(a => {
-      const t = this.filtroTipo   === 'Todos' || a.tipo   === this.filtroTipo;
-      const e = this.filtroEstado === 'Todos' || a.estado === this.filtroEstado;
-      return t && e;
-    });
-  }
-
-  // ── Atender alerta vía API ────────────────────────────────────
-  atenderAlerta(alerta: Alerta): void {
-    const nuevoEstado: 'Pendiente' | 'Atendida' =
-      alerta.estado === 'Atendida' ? 'Pendiente' : 'Atendida';
-    const alertaActualizada = { ...alerta, estado: nuevoEstado };
-
-    this.alertsService.update(alertaActualizada).subscribe({
-      next: () => {
-        alerta.estado = nuevoEstado;
-        const m = this.marcadoresAlertas.get(alerta.id);
-        if (m) m.setOpacity(alerta.estado === 'Atendida' ? 0.4 : 1);
-        this.filtrarAlertas();
-      },
-      error: (err) => console.error('Error actualizando alerta:', err)
-    });
-  }
-
-  // ── Toggle capas ─────────────────────────────────────────────
-  toggleCapa(capa: keyof typeof this.capas): void {
-    if (!this.mapa) return;
-    if (capa === 'alertas') {
-      this.marcadoresAlertas.forEach(m =>
-        this.capas.alertas ? m.addTo(this.mapa) : this.mapa.removeLayer(m));
-    }
-    if (capa === 'zonas') {
-      this.capasZonas.forEach(p =>
-        this.capas.zonas ? p.addTo(this.mapa) : this.mapa.removeLayer(p));
-    }
-    if (capa === 'cais' || capa === 'hospitales') {
-      const tipo = capa === 'cais' ? 'CAI' : 'Hospital';
-      this.marcadoresPuntos.filter(mp => mp.tipo === tipo).forEach(mp =>
-        this.capas[capa] ? mp.marker.addTo(this.mapa) : this.mapa.removeLayer(mp.marker));
-    }
-    if (capa === 'calor') {
-      this.circulosCalor.forEach(c =>
-        this.capas.calor ? c.addTo(this.mapa) : this.mapa.removeLayer(c));
-    }
+    return L.divIcon({ html: svg, className: '', iconSize: [28, 36], iconAnchor: [14, 36] });
   }
 }

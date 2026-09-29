@@ -3,283 +3,333 @@
   <!-- ===== HEADER ===== -->
   <div class="dash-header">
     <h1 class="dash-title">Dashboard de un vistazo</h1>
-    <app-period-badge [periodo]="periodoGlobal" [opciones]="periodos" [conDropdown]="true"
-      (periodoChange)="periodoGlobal = $event"></app-period-badge>
+    <p class="dash-sub">Información general del sistema y estado actual de la plataforma.</p>
   </div>
 
-  <!-- ===== STAT CARDS ROW ===== -->
-  <div class="stats-row">
+  @if (error) {
+    <p class="dash-error">No se pudieron cargar los datos del dashboard.</p>
+  }
 
-    <!-- Card: Total Usuarias -->
-    <div class="stat-card">
-      <div class="stat-card__top">
-        <span class="stat-card__label">Total Usuarias</span>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
+  @if (cargando) {
+    <p class="dash-loading">Cargando datos...</p>
+  }
+
+  @if (!cargando && !error) {
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-row">
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Usuarias registradas</span>
+          <span class="stat-card__value">{{ totalUsuarias | number }}</span>
+          <span class="stat-card__sub">Cuentas en la plataforma</span>
+        </div>
       </div>
-      <div class="stat-card__value">
-        {{ totalUsuarias | number }}
-        <svg class="stat-card__trend up" width="18" height="18" viewBox="0 0 18 18">
-          <path d="M9 14V4M4 9l5-5 5 5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" fill="none" />
-        </svg>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Usuarias activas</span>
+          <span class="stat-card__value">{{ usuariasActivas | number }}</span>
+          <span class="stat-card__sub">{{ porcentajeActivas }}% del total</span>
+        </div>
       </div>
-      <svg class="stat-card__chart" viewBox="0 0 180 60" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="grad-usuarias" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.3" />
-            <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <polygon [attr.points]="'0,60 ' + miniLinePoints(miniUsuariasData) + ' 180,60'" fill="url(#grad-usuarias)" />
-        <polyline [attr.points]="miniLinePoints(miniUsuariasData)" fill="none" stroke="#a78bfa" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <div class="stat-card__axis">
-        <span *ngFor="let d of ['Días','Lun','Mar','Mié','May','Jun','Días']">{{ d }}</span>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Alertas registradas</span>
+          <span class="stat-card__value">{{ totalAlertas | number }}</span>
+          <span class="stat-card__sub">{{ alertasActivas }} pendientes</span>
+        </div>
       </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Zonas de riesgo</span>
+          <span class="stat-card__value">{{ zonasCriticas | number }}</span>
+          <span class="stat-card__sub">{{ alertasEnZonas }} alertas dentro de zonas</span>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Card: Alertas Activas -->
-    <div class="stat-card">
-      <div class="stat-card__top">
-        <span class="stat-card__label">Alertas Activas</span>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
-      </div>
-      <div class="stat-card__value alert-value">{{ alertasActivas }}</div>
-      <div class="alert-breakdown">
-        <div class="alert-item alta">
-          <svg width="14" height="14" viewBox="0 0 14 14">
-            <path d="M7 1L13 13H1L7 1Z" stroke="#ef4444" stroke-width="1.5" fill="none" />
-          </svg>
-          {{ alertasAltas }} Altas (SOS)
-        </div>
-        <div class="alert-item media">
-          <svg width="14" height="14" viewBox="0 0 14 14">
-            <path d="M7 1L13 13H1L7 1Z" stroke="#f59e0b" stroke-width="1.5" fill="none" />
-          </svg>
-          {{ alertasMedias }} Medias (Robo/Acoso)
-        </div>
-        <div class="alert-item emergencia">
-          <svg width="14" height="14" viewBox="0 0 14 14">
-            <circle cx="7" cy="7" r="6" stroke="#ec4899" stroke-width="1.5" fill="none" />
-            <path d="M7 4v4M7 10v.5" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-          {{ alertasEmergencia }} Emergencia Médica
-        </div>
-      </div>
-    </div>
+    <!-- ===== TENDENCIA + MODOS DE ACTIVACIÓN ===== -->
+    <div class="charts-row">
 
-    <!-- Card: Zonas Críticas -->
-    <div class="stat-card zonas-card">
-      <div class="stat-card__top">
-        <span class="stat-card__label">Zonas Críticas</span>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
-      </div>
-      <div class="zonas-content">
-        <div class="zonas-left">
-          <div class="stat-card__value">{{ zonasCriticas }}</div>
-          <!-- Mini mapa estático placeholder -->
-          <div class="mini-mapa">
-            <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
-              <rect width="120" height="70" rx="6" fill="#f0eeff" />
-              <line x1="0" y1="20" x2="120" y2="20" stroke="#d4cef5" stroke-width="0.5" />
-              <line x1="0" y1="40" x2="120" y2="40" stroke="#d4cef5" stroke-width="0.5" />
-              <line x1="0" y1="60" x2="120" y2="60" stroke="#d4cef5" stroke-width="0.5" />
-              <line x1="30" y1="0" x2="30" y2="70" stroke="#d4cef5" stroke-width="0.5" />
-              <line x1="60" y1="0" x2="60" y2="70" stroke="#d4cef5" stroke-width="0.5" />
-              <line x1="90" y1="0" x2="90" y2="70" stroke="#d4cef5" stroke-width="0.5" />
-              <circle cx="55" cy="32" r="16" fill="#ef4444" opacity="0.35" />
-              <circle cx="55" cy="32" r="8" fill="#ef4444" opacity="0.5" />
-              <circle cx="55" cy="32" r="3" fill="#ef4444" opacity="0.9" />
-              <circle cx="80" cy="20" r="10" fill="#f59e0b" opacity="0.3" />
-              <circle cx="80" cy="20" r="4" fill="#f59e0b" opacity="0.6" />
-              <circle cx="35" cy="50" r="8" fill="#a78bfa" opacity="0.35" />
-              <circle cx="35" cy="50" r="3" fill="#a78bfa" opacity="0.7" />
-              <text x="2" y="68" font-size="5" fill="#9ca3af">Map data</text>
+      <div class="dash-card">
+        <div class="dash-card__header">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
             </svg>
+          </span>
+          <div>
+            <h3>Tendencia de alertas</h3>
+            <p>Alertas registradas por día de la semana</p>
           </div>
         </div>
-        <div class="zonas-right">
-          <p class="zonas-title">Top 3 Zonas de Mayor Incidencia</p>
-          <ul class="zonas-list">
-            <li *ngFor="let z of topZonas">
-              <span class="zona-nombre">{{ z.nombre }}</span>
-              <span class="zona-alertas">- {{ z.alertas }} Alertas</span>
+
+        @if (tendenciaTotal > 0) {
+          <svg class="trend-svg" viewBox="0 0 640 230">
+            @for (t of tendenciaTicks; track t.label) {
+              <line class="grid-line" x1="40" [attr.y1]="t.y" x2="620" [attr.y2]="t.y" />
+              <text class="axis-text" x="30" [attr.y]="t.y + 3" text-anchor="end">{{ t.label }}</text>
+            }
+            <polygon class="trend-area" [attr.points]="tendenciaArea" />
+            <polyline class="trend-line" [attr.points]="tendenciaLinea" />
+            @for (d of tendenciaDots; track d.x) {
+              <circle class="trend-dot" [attr.cx]="d.x" [attr.cy]="d.y" r="4" />
+            }
+            @for (l of tendenciaLabels; track l.x) {
+              <text class="axis-text" [attr.x]="l.x" y="212" text-anchor="middle">{{ l.texto }}</text>
+            }
+          </svg>
+        } @else {
+          <p class="empty">Aún no hay alertas con fecha para graficar.</p>
+        }
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card__header">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Modos de activación</h3>
+            <p>¿Cómo se activan las alertas?</p>
+          </div>
+        </div>
+
+        <ul class="modos-list">
+          @for (m of modosActivacion; track m.nombre) {
+            <li class="modo">
+              <span class="modo__icon" [style.background]="m.color">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  @switch (m.icono) {
+                    @case ('campana') {
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    }
+                    @case ('movimiento') {
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    }
+                    @case ('voz') {
+                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+                    }
+                    @default {
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    }
+                  }
+                </svg>
+              </span>
+              <div class="modo__body">
+                <div class="modo__top">
+                  <span class="modo__nombre">{{ m.nombre }}</span>
+                  <span class="modo__pct">{{ m.porcentaje }}%</span>
+                  <span class="modo__cant">{{ m.cantidad }}</span>
+                </div>
+                <div class="modo__bar">
+                  <span class="modo__fill" [style.width.%]="m.porcentaje" [style.background]="m.color"></span>
+                </div>
+              </div>
             </li>
+          } @empty {
+            <li class="empty">Sin datos de activación.</li>
+          }
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ===== ALERTAS POR ZONA + EMERGENCIAS POR TIPO ===== -->
+    <div class="charts-row">
+
+      <div class="dash-card">
+        <div class="dash-card__header">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Alertas por zona</h3>
+            <p>Distribución de alertas en el territorio</p>
+          </div>
+        </div>
+
+        <div class="zonas-body">
+          <div class="zona-mapa">
+            <svg viewBox="0 0 300 190">
+              <rect class="map-bg" width="300" height="190" rx="10" />
+              <line class="map-grid" x1="0" y1="47" x2="300" y2="47" />
+              <line class="map-grid" x1="0" y1="95" x2="300" y2="95" />
+              <line class="map-grid" x1="0" y1="142" x2="300" y2="142" />
+              <line class="map-grid" x1="75" y1="0" x2="75" y2="190" />
+              <line class="map-grid" x1="150" y1="0" x2="150" y2="190" />
+              <line class="map-grid" x1="225" y1="0" x2="225" y2="190" />
+
+              @for (b of burbujasZona; track b.nombre; let i = $index) {
+                <circle [attr.class]="'bubble bubble--' + (i < 3 ? i + 1 : 4)" [attr.cx]="b.x" [attr.cy]="b.y" [attr.r]="b.r" />
+                <text class="bubble-label" [attr.x]="b.x" [attr.y]="b.y + b.r + 12" text-anchor="middle">{{ b.nombre }} · {{ b.cantidad }}</text>
+              }
+            </svg>
+          </div>
+
+          <div class="zona-ranking">
+            <p class="zona-ranking__title">Zonas con mayor número de alertas</p>
+            <ol>
+              @for (z of rankingZonas; track z.nombre; let i = $index) {
+                <li>
+                  <span class="rank" [ngClass]="'rank--' + (i + 1)">{{ i + 1 }}</span>
+                  <span class="zona-ranking__nombre">{{ z.nombre }}</span>
+                  <span class="zona-ranking__cant">{{ z.cantidad }}</span>
+                </li>
+              } @empty {
+                <li class="empty">Sin datos de zonas.</li>
+              }
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card__header">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Emergencias por tipo</h3>
+            <p>Clasificación de alertas registradas</p>
+          </div>
+        </div>
+
+        <div class="tipos-body">
+          <svg class="donut-svg" viewBox="0 0 160 160">
+            @for (seg of donutSegs; track seg.tipo) {
+              <path [attr.d]="seg.d" [attr.fill]="seg.color" />
+            }
+            <circle class="donut-hole" cx="80" cy="80" r="42" />
+            <text class="donut-total" x="80" y="86" text-anchor="middle">{{ totalAlertas }}</text>
+            <text class="donut-caption" x="80" y="104" text-anchor="middle">Total</text>
+          </svg>
+
+          <ul class="tipos-legend">
+            @for (t of alertasPorTipo; track t.tipo) {
+              <li>
+                <span class="legend-dot" [style.background]="t.color"></span>
+                <span class="tipos-legend__nombre">{{ t.etiqueta }}</span>
+                <span class="tipos-legend__pct">{{ t.porcentaje }}%</span>
+                <span class="tipos-legend__cant">{{ t.cantidad }}</span>
+              </li>
+            } @empty {
+              <li class="empty">Sin alertas.</li>
+            }
           </ul>
         </div>
       </div>
+
     </div>
 
-  </div>
+    <!-- ===== ALERTAS RECIENTES + ACCESOS RÁPIDOS ===== -->
+    <div class="bottom-row">
 
-  <!-- ===== CHARTS ROW ===== -->
-  <div class="charts-row">
-
-    <!-- Estadísticas de Comportamiento -->
-    <div class="chart-card behavior-card">
-      <div class="chart-card__header">
-        <h3>Estadísticas de Comportamiento</h3>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
-      </div>
-      <p class="chart-subtitle">Alertas registradas por zona/ubicación</p>
-
-      <div class="chart-wrap">
-        <svg class="behavior-svg" viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg">
-          <text x="2" y="15" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() }}</text>
-          <text x="2" y="95" font-size="9" fill="#9ca3af">{{ barMaxValueZonas() / 2 | number:'1.0-0' }}</text>
-          <text x="2" y="175" font-size="9" fill="#9ca3af">0</text>
-
-          <line x1="25" y1="10" x2="500" y2="10" stroke="#e5e0f8" stroke-width="0.5" />
-          <line x1="25" y1="50" x2="500" y2="50" stroke="#e5e0f8" stroke-width="0.5" />
-          <line x1="25" y1="90" x2="500" y2="90" stroke="#e5e0f8" stroke-width="0.5" />
-          <line x1="25" y1="130" x2="500" y2="130" stroke="#e5e0f8" stroke-width="0.5" />
-          <line x1="25" y1="170" x2="500" y2="170" stroke="#e5e0f8" stroke-width="0.5" />
-
-          <defs>
-            <linearGradient id="grad-reg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25" />
-              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <polygon [attr.points]="registroPolygonPoints" fill="url(#grad-reg)" />
-          <polyline [attr.points]="polylinePoints(alertasPorZonaSerie, 475, 180)" fill="none" stroke="#7c3aed"
-            stroke-width="2" stroke-linejoin="round" transform="translate(25,5)" />
-
-          <g transform="translate(25,190)">
-            <text *ngFor="let z of zonasLabels; let i = index" [attr.x]="(i/(zonasLabels.length-1 || 1))*475" y="0"
-              font-size="8" fill="#9ca3af" text-anchor="middle">{{ z }}</text>
-          </g>
-        </svg>
-      </div>
-    </div>
-
-    <!-- Resumen de Categorización -->
-    <div class="chart-card category-card">
-      <div class="chart-card__header">
-        <h3>Resumen de Categorización</h3>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
-      </div>
-
-      <div class="category-charts">
-
-        <div class="donut-wrap">
-          <p class="category-subtitle">Alertas por tipo</p>
-          <div class="donut-container">
-            <svg viewBox="0 0 160 160" class="donut-svg">
-              <g *ngFor="let seg of donutSegments()">
-                <path [attr.d]="seg.d" [attr.fill]="seg.color" />
-              </g>
-              <circle cx="80" cy="80" r="30" fill="#ffffff" />
+      <div class="dash-card table-card">
+        <div class="dash-card__header">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            <div class="donut-legend">
-              <div *ngFor="let item of alertasPorTipo" class="donut-legend-item">
-                <span class="legend-dot" [style.background]="item.color"></span>
-                <span>{{ item.tipo }}</span>
-              </div>
-            </div>
+          </span>
+          <div>
+            <h3>Alertas recientes</h3>
+            <p>Últimas alertas registradas en la plataforma</p>
           </div>
         </div>
 
-        <div class="bars-wrap">
-          <p class="category-subtitle">Alertas por Horario</p>
-          <svg viewBox="0 0 280 180" class="bars-svg" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="12" font-size="9" fill="#9ca3af">300</text>
-            <text x="0" y="52" font-size="9" fill="#9ca3af">200</text>
-            <text x="0" y="92" font-size="9" fill="#9ca3af">100</text>
-            <text x="0" y="132" font-size="9" fill="#9ca3af">50</text>
-
-            <line x1="25" y1="10" x2="275" y2="10" stroke="#e5e0f8" stroke-width="0.5" />
-            <line x1="25" y1="50" x2="275" y2="50" stroke="#e5e0f8" stroke-width="0.5" />
-            <line x1="25" y1="90" x2="275" y2="90" stroke="#e5e0f8" stroke-width="0.5" />
-            <line x1="25" y1="130" x2="275" y2="130" stroke="#e5e0f8" stroke-width="0.5" />
-
-            <g *ngFor="let val of horariosData; let i = index">
-              <rect [attr.x]="25 + i * 36 + 5" [attr.y]="145 - barHeight(val, 130)" [attr.height]="barHeight(val, 130)"
-                width="22" [attr.fill]="i === 6 ? '#7c3aed' : (i === 5 ? '#a78bfa' : '#c4b5fd')" rx="3" />
-            </g>
-
-            <g>
-              <text *ngFor="let h of horariosLabels; let i = index" [attr.x]="25 + i * 36 + 16" y="165" font-size="8"
-                fill="#9ca3af" text-anchor="middle">{{ h }}</text>
-            </g>
-          </svg>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Usuaria</th>
+                <th>Tipo de alerta</th>
+                <th>Zona</th>
+                <th>Modo de activación</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of alertasRecientes; track $index) {
+                <tr>
+                  <td><span class="dot" [style.background]="colorTipo(a.tipo)"></span>{{ a.tiempo }}</td>
+                  <td>{{ a.nombre }}</td>
+                  <td><span class="tipo-badge" [ngClass]="getTipoBadgeClass(a.tipo)">{{ etiquetaTipo(a.tipo) }}</span></td>
+                  <td>{{ a.ubicacion }}</td>
+                  <td>{{ a.medioActivacion }}</td>
+                  <td><span class="estado-badge" [class.active]="a.estado === 'Atendida'">{{ a.estado }}</span></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="6" class="empty">No hay alertas recientes.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-
       </div>
+
+      <div class="dash-card accesos-card">
+        <h3>Accesos Rápidos Administrativos</h3>
+        <div class="accesos-list">
+
+          <button class="acceso-btn acceso-primary">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="2" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" />
+              <path d="M6 6V4a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            Bloquear Cuenta Sospechosa
+          </button>
+
+          <button class="acceso-btn acceso-secondary">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 15l3-1 8-8a1.41 1.41 0 10-2-2L4 12l-1 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+            </svg>
+            Editar Mapa de Riesgo
+          </button>
+
+          <button class="acceso-btn acceso-secondary">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 13v2h12v-2M9 3v8M5 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Descargar Reporte Mensual
+          </button>
+
+        </div>
+      </div>
+
     </div>
-
-  </div>
-
-  <!-- ===== BOTTOM ROW ===== -->
-  <div class="bottom-row">
-
-    <!-- Tabla de alertas recientes -->
-    <div class="table-card">
-      <div class="chart-card__header">
-        <h3>Monitoreo de Alertas Recientes (Top 5)</h3>
-        <app-period-badge [periodo]="periodoGlobal"></app-period-badge>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Hora</th>
-              <th>Ubicación</th>
-              <th>Tipo de Alerta</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let a of alertasRecientes">
-              <td>{{ a.tiempo }}</td>
-              <td>
-                {{ a.ubicacion }}
-                <span class="coords">({{ a.lat }}, {{ a.lng }})</span>
-              </td>
-              <td>
-                <span class="tipo-badge" [ngClass]="getTipoBadgeClass(a.tipo)">{{ a.tipo }}</span>
-              </td>
-              <td>
-                <span class="estado-badge" [class.active]="a.estado === 'Atendida'">{{ a.estado }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Accesos Rápidos -->
-    <div class="accesos-card">
-      <h3>Accesos Rápidos Administrativos</h3>
-      <div class="accesos-list">
-
-        <button class="acceso-btn acceso-primary">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="2" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" />
-            <path d="M6 6V4a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-          Bloquear Cuenta Sospechosa
-        </button>
-
-        <button class="acceso-btn acceso-secondary">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 15l3-1 8-8a1.41 1.41 0 10-2-2L4 12l-1 3z" stroke="currentColor" stroke-width="1.5"
-              stroke-linejoin="round" />
-          </svg>
-          Editar Mapa de Riesgo
-        </button>
-
-        <button class="acceso-btn acceso-secondary">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 13v2h12v-2M9 3v8M5 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-          Descargar Reporte Mensual
-        </button>
-
-      </div>
-    </div>
-
-  </div>
+  }
 
 </div>

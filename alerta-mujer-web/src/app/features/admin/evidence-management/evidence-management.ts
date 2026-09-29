@@ -1,30 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-/**
- * Interfaces para definir la estructura de datos
- */
-interface Evidence {
-  id: number;
-  preview: string; // URL de la imagen de previsualización o icono
-  name: string;
-  evidenceId: string;
-  size: string;
-  user: {
-    name: string;
-    email: string;
-  };
-  alertRelated: {
-    id: string;
-    type: string;
-    city: string;
-  };
-  type: 'Imagen' | 'Video' | 'Audio' | 'Documento';
-  date: string;
-  time: string;
-  status: 'Verificada' | 'Pendiente' | 'Rechazada';
-}
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { Evidencia, EvidenciaFilters, EvidenciaStats } from '../../../core/models/evidence.model';
+import { EvidenceService } from '../../../core/services/evidence.service';
 
 @Component({
   selector: 'app-evidences-management',
@@ -34,195 +13,158 @@ interface Evidence {
   styleUrls: ['./evidence-management.scss']
 })
 export class EvidencesManagementComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+  private evidenceService = inject(EvidenceService);
 
-  // Propiedades para la visualización de datos
-  evidences: Evidence[] = [];
-  filteredEvidences: Evidence[] = [];
+  // Datos
+  evidencias$: Observable<Evidencia[]> = this.evidenceService.evidencias$;
+  stats$: Observable<EvidenciaStats> = this.evidenceService.getStats();
+  
+  evidenciasFiltradas: Evidencia[] = [];
+  filteredEvidences: Evidencia[] = []; // Para compatibilidad con HTML
+  stats: EvidenciaStats = {
+    totalEvidencias: 0,
+    verificadas: 0,
+    pendientes: 0,
+    rechazadas: 0,
+    descargas: 0
+  };
 
-  // Propiedades para filtros y paginación
-  searchTermEvidence: string = '';
-  searchTermUser: string = '';
-  filterEvidenceType: string = 'all';
-  filterStatus: string = 'all';
-  filterDateRange: string = ''; // Podría ser un objeto de rango de fechas en una implementación real
+  // Filtros
+  filtros: EvidenciaFilters = {
+    busqueda: '',
+    tipo: '',
+    estado: '',
+    fechaInicio: null,
+    fechaFin: null
+  };
+
+  // Paginación
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
 
-  // Estadísticas
-  totalEvidences: number = 0;
-  verifiedEvidences: number = 0;
-  pendingEvidences: number = 0;
-  rejectedEvidences: number = 0;
-  totalDownloads: number = 0;
+  // Estados UI
+  cargando = false;
+  error = '';
+  evidenciaSeleccionada: Evidencia | null = null;
+  mostrarModalVer = false;
+  
+  // Estados de dropdowns personalizados
+  isEvidenceTypeDropdownOpen = false;
+  isStatusDropdownOpen = false;
+  
+  // Handler para cerrar dropdowns al hacer clic fuera
+  private clickHandler: (() => void) | null = null;
 
-  constructor() { }
+  // Para búsqueda
+  searchTermEvidence: string = '';
+  filterEvidenceType: string = 'all';
+  filterStatus: string = 'all';
+
+  constructor() {
+    // Cerrar dropdowns al hacer clic fuera de ellos
+    this.clickHandler = () => {
+      this.isEvidenceTypeDropdownOpen = false;
+      this.isStatusDropdownOpen = false;
+    };
+    document.addEventListener('click', this.clickHandler);
+  }
 
   ngOnInit(): void {
-    this.loadMockData();
-    this.applyFilters();
-    this.calculateStats();
+    this.cargarDatos();
   }
 
-  /**
-   * Carga de datos simulados para la visualización inicial
-   */
-  loadMockData(): void {
-    this.evidences = [
-      {
-        id: 1,
-        preview: 'assets/evidence-img-1.png',
-        name: 'IMG_20240512_092301.jpg',
-        evidenceId: 'EV-2024-0001',
-        size: '2.4 MB',
-        user: { name: 'María Fernanda López', email: 'maria.lopez@gmail.com' },
-        alertRelated: { id: 'AL-2024-0456', type: 'SOS', city: 'Neiva' },
-        type: 'Imagen',
-        date: '12/05/2024',
-        time: '09:23 a.m.',
-        status: 'Verificada',
-      },
-      {
-        id: 2,
-        preview: 'assets/evidence-vid-1.png',
-        name: 'VID_20240511_214522.mp4',
-        evidenceId: 'EV-2024-0002',
-        size: '15.6 MB',
-        user: { name: 'Ana Sofía Ramírez', email: 'ana.ramirez@gmail.com' },
-        alertRelated: { id: 'AL-2024-0451', type: 'Acoso', city: 'Bogotá' },
-        type: 'Video',
-        date: '11/05/2024',
-        time: '09:45 p.m.',
-        status: 'Pendiente',
-      },
-      {
-        id: 3,
-        preview: 'assets/evidence-aud-1.png',
-        name: 'AUD_20240510_185500.m4a',
-        evidenceId: 'EV-2024-0003',
-        size: '3.2 MB',
-        user: { name: 'Valentina Castro', email: 'valentina.castro@gmail.com' },
-        alertRelated: { id: 'AL-2024-0448', type: 'Robo', city: 'Cali' },
-        type: 'Audio',
-        date: '10/05/2024',
-        time: '06:55 p.m.',
-        status: 'Verificada',
-      },
-      {
-        id: 4,
-        preview: 'assets/evidence-doc-1.png',
-        name: 'DOC_20240510_163012.pdf',
-        evidenceId: 'EV-2024-0004',
-        size: '1.1 MB',
-        user: { name: 'Isabella Martínez', email: 'isabella.martinez@gmail.com' },
-        alertRelated: { id: 'AL-2024-0443', type: 'SOS', city: 'Medellín' },
-        type: 'Documento',
-        date: '10/05/2024',
-        time: '04:30 p.m.',
-        status: 'Rechazada',
-      },
-      {
-        id: 5,
-        preview: 'assets/evidence-img-2.png',
-        name: 'IMG_20240509_221045.jpg',
-        evidenceId: 'EV-2024-0005',
-        size: '1.8 MB',
-        user: { name: 'Daniela Paredes', email: 'daniela.paredes@gmail.com' },
-        alertRelated: { id: 'AL-2024-0439', type: 'Acoso', city: 'Barranquilla' },
-        type: 'Imagen',
-        date: '09/05/2024',
-        time: '10:10 p.m.',
-        status: 'Pendiente',
-      },
-      {
-        id: 6,
-        preview: 'assets/evidence-vid-2.png',
-        name: 'VID_20240509_192233.mp4',
-        evidenceId: 'EV-2024-0006',
-        size: '8.7 MB',
-        user: { name: 'Sofía Herrera', email: 'sofia.herrera@gmail.com' },
-        alertRelated: { id: 'AL-2024-0435', type: 'Robo', city: 'Neiva' },
-        type: 'Video',
-        date: '09/05/2024',
-        time: '07:22 p.m.',
-        status: 'Verificada',
-      },
-    ];
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    // Remover listener de clic para evitar memory leaks
+    if (this.clickHandler) {
+      document.removeEventListener('click', this.clickHandler);
+    }
   }
 
-  /**
-   * Calcula las estadísticas globales basadas en las evidencias cargadas
-   */
-  calculateStats(): void {
-    this.totalEvidences = this.evidences.length;
-    this.verifiedEvidences = this.evidences.filter(e => e.status === 'Verificada').length;
-    this.pendingEvidences = this.evidences.filter(e => e.status === 'Pendiente').length;
-    this.rejectedEvidences = this.evidences.filter(e => e.status === 'Rechazada').length;
-    // Simulación de descargas
-    this.totalDownloads = 1253; // Valor fijo por ahora, se podría calcular dinámicamente
+  // ========================================
+  // CARGA DE DATOS
+  // ========================================
+
+  private cargarDatos(): void {
+    this.cargando = true;
+    
+    this.evidenceService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (evidencias) => {
+        this.evidenciasFiltradas = evidencias;
+        this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
+        this.actualizarPaginacion();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cargar las evidencias';
+        this.cargando = false;
+        console.error('Error cargando evidencias:', err);
+      }
+    });
+
+    this.stats$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (stats) => {
+        console.log('Estadísticas actualizadas:', stats);
+        this.stats = stats;
+      }
+    });
   }
 
-  /**
-   * Aplica los filtros de búsqueda, usuario, tipo y estado de evidencia
-   */
+  // ========================================
+  // FILTRADO
+  // ========================================
+
   applyFilters(): void {
-    let tempEvidences = [...this.evidences];
+    this.cargando = true;
+    this.currentPage = 1; // Resetear a primera página
 
-    // Filtrar por término de búsqueda (nombre, descripción o ID de evidencia)
-    if (this.searchTermEvidence) {
-      const lowerCaseSearchTerm = this.searchTermEvidence.toLowerCase();
-      tempEvidences = tempEvidences.filter(evidence =>
-        evidence.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        evidence.evidenceId.toLowerCase().includes(lowerCaseSearchTerm)
-      );
-    }
+    const filtros: EvidenciaFilters = {
+      busqueda: this.searchTermEvidence,
+      tipo: this.filterEvidenceType,
+      estado: this.filterStatus,
+      fechaInicio: null,
+      fechaFin: null
+    };
 
-    // Filtrar por usuario (nombre o email)
-    if (this.searchTermUser) {
-      const lowerCaseSearchTerm = this.searchTermUser.toLowerCase();
-      tempEvidences = tempEvidences.filter(evidence =>
-        evidence.user.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        evidence.user.email.toLowerCase().includes(lowerCaseSearchTerm)
-      );
-    }
+    console.log('Aplicando filtros:', filtros);
 
-    // Filtrar por tipo de evidencia
-    if (this.filterEvidenceType !== 'all') {
-      tempEvidences = tempEvidences.filter(evidence => evidence.type === this.filterEvidenceType);
-    }
-
-    // Filtrar por estado
-    if (this.filterStatus !== 'all') {
-      tempEvidences = tempEvidences.filter(evidence => evidence.status === this.filterStatus);
-    }
-
-    // TODO: Implementar filtro por rango de fechas
-
-    this.filteredEvidences = tempEvidences;
-    this.currentPage = 1; // Reset pagination on filter change
-    this.updatePagination();
+    this.evidenceService.filtrarEvidencias(filtros).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (evidencias) => {
+        console.log('Evidencias filtradas:', evidencias.length, 'resultados');
+        this.evidenciasFiltradas = evidencias;
+        this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
+        this.actualizarPaginacion();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al filtrar evidencias';
+        this.cargando = false;
+        console.error('Error filtrando:', err);
+      }
+    });
   }
 
-  /**
-   * Limpia todos los filtros aplicados
-   */
   clearFilters(): void {
     this.searchTermEvidence = '';
-    this.searchTermUser = '';
     this.filterEvidenceType = 'all';
     this.filterStatus = 'all';
-    this.filterDateRange = '';
-    this.applyFilters();
+    this.cargarDatos();
   }
 
-  // Lógica de paginación
-  get paginatedEvidences(): Evidence[] {
+  // ========================================
+  // PAGINACIÓN
+  // ========================================
+
+  private actualizarPaginacion(): void {
+    this.totalPages = Math.ceil(this.evidenciasFiltradas.length / this.itemsPerPage);
+  }
+
+  get paginatedEvidences(): Evidencia[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredEvidences.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredEvidences.length / this.itemsPerPage);
+    return this.evidenciasFiltradas.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   goToPage(page: number): void {
@@ -251,29 +193,237 @@ export class EvidencesManagementComponent implements OnInit {
     return pages;
   }
 
-  /**
-   * Helper para asignar la clase CSS correcta al badge de tipo de evidencia
-   */
-  getEvidenceTypeBadgeClass(type: 'Imagen' | 'Video' | 'Audio' | 'Documento'): string {
-    switch (type) {
-      case 'Imagen':
+  // ========================================
+  // ACCIONES CRUD
+  // ========================================
+
+  verEvidencia(evidencia: Evidencia): void {
+    this.evidenciaSeleccionada = evidencia;
+    this.mostrarModalVer = true;
+  }
+
+  descargarEvidencia(id: number): void {
+    this.cargando = true;
+    this.evidenceService.descargar(id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (blob) => {
+        console.log('Blob recibido:', blob);
+        const evidencia = this.evidenciaSeleccionada || this.evidenciasFiltradas.find(e => e.id === id);
+        const nombreArchivo = evidencia?.nombre || `evidencia_${id}`;
+        this.descargarArchivo(blob, nombreArchivo, evidencia?.tipo);
+        // Las estadísticas se actualizan automáticamente en el servicio
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al descargar evidencia';
+        this.cargando = false;
+        console.error('Error descargando:', err);
+      }
+    });
+  }
+
+  eliminarEvidencia(id: number): void {
+    if (confirm('¿Estás seguro de eliminar esta evidencia?')) {
+      this.cargando = true;
+      this.evidenceService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          // Recargar datos para actualizar la tabla y estadísticas
+          this.cargarDatos();
+          this.cargando = false;
+        },
+        error: (err) => {
+          this.error = 'Error al eliminar evidencia';
+          this.cargando = false;
+          console.error('Error eliminando:', err);
+        }
+      });
+    }
+  }
+
+  cambiarEstadoEvidencia(id: number, nuevoEstado: 'Verificada' | 'Pendiente' | 'Rechazada'): void {
+    this.cargando = true;
+    this.evidenceService.cambiarEstado(id, nuevoEstado).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (evidenciaActualizada) => {
+        // Actualizar la evidencia seleccionada en el modal
+        if (this.evidenciaSeleccionada && this.evidenciaSeleccionada.id === id) {
+          this.evidenciaSeleccionada = evidenciaActualizada;
+        }
+        // Recargar datos para actualizar la tabla y estadísticas
+        this.cargarDatos();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cambiar estado';
+        this.cargando = false;
+        console.error('Error cambiando estado:', err);
+      }
+    });
+  }
+
+  private descargarArchivo(blob: Blob, nombre: string, tipo?: string): void {
+    console.log('Iniciando descarga:', nombre, 'Tipo:', tipo, 'Tamaño blob:', blob.size);
+    
+    if (blob.size === 0) {
+      // Generar contenido simulado según el tipo de archivo
+      const contenido = this.generarContenidoSimulado(nombre, tipo);
+      const mimeType = this.obtenerMimeType(tipo);
+      const extension = this.obtenerExtension(tipo);
+      
+      const blobReal = new Blob([contenido], { type: mimeType });
+      const url = window.URL.createObjectURL(blobReal);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre.endsWith(extension) ? nombre : nombre + extension;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      return;
+    }
+    
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  private generarContenidoSimulado(nombre: string, tipo?: string): string {
+    const fecha = new Date().toLocaleString('es-ES');
+    let contenido = `Evidencia: ${nombre}\n`;
+    contenido += `Fecha de descarga: ${fecha}\n`;
+    contenido += `Sistema: AlertaMujer\n\n`;
+    contenido += `Esta es una evidencia de ejemplo generada por el sistema.\n`;
+    contenido += `En producción, este archivo contendría el contenido real de la evidencia.\n`;
+    
+    if (tipo === 'video') {
+      contenido += `\n[Contenido de video simulado]`;
+    } else if (tipo === 'audio') {
+      contenido += `\n[Contenido de audio simulado]`;
+    } else if (tipo === 'documento') {
+      contenido += `\n[Contenido de documento PDF simulado]`;
+    } else if (tipo === 'foto') {
+      contenido += `\n[Contenido de imagen simulado]`;
+    }
+    
+    return contenido;
+  }
+
+  private obtenerMimeType(tipo?: string): string {
+    switch (tipo) {
+      case 'video':
+        return 'video/mp4';
+      case 'audio':
+        return 'audio/mpeg';
+      case 'documento':
+        return 'application/pdf';
+      case 'foto':
+        return 'image/jpeg';
+      default:
+        return 'text/plain';
+    }
+  }
+
+  private obtenerExtension(tipo?: string): string {
+    switch (tipo) {
+      case 'video':
+        return '.mp4';
+      case 'audio':
+        return '.mp3';
+      case 'documento':
+        return '.pdf';
+      case 'foto':
+        return '.jpg';
+      default:
+        return '.txt';
+    }
+  }
+
+  // ========================================
+  // MODALES
+  // ========================================
+
+  cerrarModalVer(): void {
+    this.mostrarModalVer = false;
+    this.evidenciaSeleccionada = null;
+  }
+
+  // ========================================
+  // DROPDOWNS PERSONALIZADOS
+  // ========================================
+
+  toggleEvidenceTypeDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isEvidenceTypeDropdownOpen = !this.isEvidenceTypeDropdownOpen;
+    this.isStatusDropdownOpen = false; // Cerrar el otro dropdown
+  }
+
+  toggleStatusDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
+    this.isEvidenceTypeDropdownOpen = false; // Cerrar el otro dropdown
+  }
+
+  selectEvidenceType(tipo: string, event: Event): void {
+    event.stopPropagation();
+    this.filterEvidenceType = tipo;
+    this.isEvidenceTypeDropdownOpen = false;
+    console.log('Seleccionado tipo:', tipo);
+    // No aplicar filtros automáticamente, esperar al botón Buscar
+  }
+
+  selectStatus(estado: string, event: Event): void {
+    event.stopPropagation();
+    this.filterStatus = estado;
+    this.isStatusDropdownOpen = false;
+    console.log('Seleccionado estado:', estado);
+    // No aplicar filtros automáticamente, esperar al botón Buscar
+  }
+
+  getEvidenceTypeLabel(tipo: string): string {
+    switch (tipo) {
+      case 'all': return 'Todos los tipos';
+      case 'foto': return 'Imagen';
+      case 'video': return 'Video';
+      case 'audio': return 'Audio';
+      case 'documento': return 'Documento';
+      default: return tipo;
+    }
+  }
+
+  getStatusLabel(estado: string): string {
+    switch (estado) {
+      case 'all': return 'Todos los estados';
+      case 'Verificada': return 'Verificada';
+      case 'Pendiente': return 'Pendiente';
+      case 'Rechazada': return 'Rechazada';
+      default: return estado;
+    }
+  }
+
+  // ========================================
+  // UTILIDADES
+  // ========================================
+
+  getEvidenceTypeBadgeClass(tipo: string): string {
+    switch (tipo) {
+      case 'foto':
         return 'badge-image';
-      case 'Video':
+      case 'video':
         return 'badge-video';
-      case 'Audio':
+      case 'audio':
         return 'badge-audio';
-      case 'Documento':
+      case 'documento':
         return 'badge-document';
       default:
         return '';
     }
   }
 
-  /**
-   * Helper para asignar la clase CSS correcta al badge de estado de evidencia
-   */
-  getEvidenceStatusBadgeClass(status: 'Verificada' | 'Pendiente' | 'Rechazada'): string {
-    switch (status) {
+  getEvidenceStatusBadgeClass(estado: string): string {
+    switch (estado) {
       case 'Verificada':
         return 'status-verified';
       case 'Pendiente':
@@ -285,6 +435,21 @@ export class EvidencesManagementComponent implements OnInit {
     }
   }
 
+  getEvidenceTypeDisplay(tipo: string): string {
+    switch (tipo) {
+      case 'foto':
+        return 'Imagen';
+      case 'video':
+        return 'Video';
+      case 'audio':
+        return 'Audio';
+      case 'documento':
+        return 'Documento';
+      default:
+        return tipo;
+    }
+  }
+
   /**
    * Función trackBy para optimizar el rendimiento de las listas de Angular
    */
@@ -292,4 +457,24 @@ export class EvidencesManagementComponent implements OnInit {
     return index;
   }
 
+  // Getters para compatibilidad con template
+  get totalEvidences(): number {
+    return this.stats.totalEvidencias;
+  }
+
+  get verifiedEvidences(): number {
+    return this.stats.verificadas;
+  }
+
+  get pendingEvidences(): number {
+    return this.stats.pendientes;
+  }
+
+  get rejectedEvidences(): number {
+    return this.stats.rechazadas;
+  }
+
+  get totalDownloads(): number {
+    return this.stats.descargas;
+  }
 }

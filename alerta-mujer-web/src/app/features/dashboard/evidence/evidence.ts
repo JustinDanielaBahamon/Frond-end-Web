@@ -81,7 +81,7 @@ export class Evidence implements OnInit {
     if (termino) {
       lista = lista.filter(e =>
         e.nombre.toLowerCase().includes(termino) ||
-        e.alerta.toLowerCase().includes(termino) ||
+        e.alertaId.toLowerCase().includes(termino) ||
         (e.ubicacion ?? '').toLowerCase().includes(termino)
       );
     }
@@ -102,7 +102,7 @@ export class Evidence implements OnInit {
   /** Otras evidencias de la misma emergencia, para el carrusel del panel de detalle. */
   get relacionadas(): Evidencia[] {
     if (!this.evidenciaSeleccionada) return [];
-    return this.evidencias.filter(e => e.alerta === this.evidenciaSeleccionada!.alerta);
+    return this.evidencias.filter(e => e.alertaId === this.evidenciaSeleccionada!.alertaId);
   }
 
   seleccionar(e: Evidencia) {

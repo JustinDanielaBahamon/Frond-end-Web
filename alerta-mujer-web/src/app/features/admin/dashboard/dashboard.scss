@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '../../../shared/styles/variables.scss' as *;
 
 // =============================================
@@ -16,291 +15,425 @@
   gap: 18px;
 }
 
-// =============================================
-// HEADER
-// =============================================
-.dash-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+.dash-header { display: flex; flex-direction: column; gap: 4px; }
 
 .dash-title {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: $text-primary;
   margin: 0;
 }
 
+.dash-sub {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+.dash-loading,
+.dash-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.9rem;
+  color: $text-muted;
+}
+
+.dash-error { color: $red; }
+
+.empty {
+  text-align: center;
+  color: $text-dim;
+  font-size: 0.82rem;
+  padding: 1rem;
+  list-style: none;
+}
+
 // =============================================
-// STAT CARDS ROW
+// STATS
 // =============================================
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
 .stat-card {
   background: $bg-card;
   border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
   border-radius: $radius-card;
   box-shadow: $shadow-card;
   padding: 16px 18px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   min-width: 0;
 
-  &__top {
+  &__icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
+    justify-content: center;
+
+    svg { width: 22px; height: 22px; }
+
+    &--purple { background: color-mix(in srgb, #{$purple-mid} 20%, transparent); color: $purple-deep; }
+    &--green  { background: $green-pale; color: $green; }
+    &--red    { background: $red-pale;   color: $red; }
+    &--amber  { background: $amber-pale; color: $amber; }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
 
   &__label {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: $text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
   }
 
   &__value {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.8rem;
+    font-size: 1.9rem;
     font-weight: 800;
     color: $text-primary;
-    margin-bottom: 8px;
-
-    &.alert-value { color: $red; }
+    line-height: 1.15;
   }
 
-  &__trend {
-    &.up { color: $green; }
-  }
-
-  &__chart {
-    width: 100%;
-    height: 55px;
-    display: block;
-  }
-
-  &__axis {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 4px;
-    font-size: 0.62rem;
+  &__sub {
+    font-size: 0.74rem;
     color: $text-dim;
   }
 }
 
-// ── Alertas Activas breakdown ─────────────────
-.alert-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.alert-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.8rem;
-  color: $text-muted;
-  font-weight: 500;
-
-  svg { flex-shrink: 0; }
-
-  &.alta       { color: $red; }
-  &.media      { color: $amber; }
-  &.emergencia { color: $pink; }
-}
-
-// ── Zonas Críticas card ────────────────────────
-.zonas-card {
-  .stat-card__value { margin-bottom: 10px; }
-}
-
-.zonas-content {
-  display: flex;
-  gap: 14px;
-}
-
-.zonas-left {
-  flex-shrink: 0;
-  width: 120px;
-}
-
-.mini-mapa {
-  border-radius: $radius-sm;
-  overflow: hidden;
-  border: 1px solid $border;
-
-  svg { display: block; width: 100%; height: auto; }
-}
-
-.zonas-right {
-  flex: 1;
+// =============================================
+// CARD GENÉRICA
+// =============================================
+.dash-card {
+  background: $bg-card;
+  border: 1.5px solid $border;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  padding: 18px 20px;
   min-width: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: $text-primary;
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 0.75rem;
+      color: $text-dim;
+    }
+  }
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: $purple-pale;
+    color: $purple-deep;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg { width: 18px; height: 18px; }
+  }
 }
 
-.zonas-title {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: $text-dim;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0 0 8px;
+.charts-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
 }
 
-.zonas-list {
+// =============================================
+// TENDENCIA
+// =============================================
+.trend-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.grid-line {
+  stroke: $border;
+  stroke-width: 0.6;
+  opacity: 0.7;
+}
+
+.axis-text {
+  fill: $text-dim;
+  font-size: 11px;
+}
+
+.trend-area { fill: color-mix(in srgb, #{$purple-mid} 22%, transparent); }
+
+.trend-line {
+  fill: none;
+  stroke: $purple-deep;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.trend-dot {
+  fill: $bg-card;
+  stroke: $purple-deep;
+  stroke-width: 2;
+}
+
+// =============================================
+// MODOS DE ACTIVACIÓN
+// =============================================
+.modos-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
+}
+
+.modo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg { width: 16px; height: 16px; }
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  &__nombre {
+    flex: 1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__pct { font-size: 0.78rem; color: $text-muted; }
+
+  &__cant {
+    width: 28px;
+    text-align: right;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $purple-deep;
+  }
+
+  &__bar {
+    height: 8px;
+    border-radius: 99px;
+    background: $purple-pale;
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    min-width: 4px;
+    border-radius: 99px;
+  }
+}
+
+// =============================================
+// ALERTAS POR ZONA
+// =============================================
+.zonas-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.zona-mapa svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.map-bg { fill: $purple-pale; }
+
+.map-grid {
+  stroke: $border;
+  stroke-width: 0.6;
+  opacity: 0.6;
+}
+
+.bubble {
+  stroke-width: 1.5;
+
+  &--1 { fill: color-mix(in srgb, #{$red} 40%, transparent);          stroke: $red; }
+  &--2 { fill: color-mix(in srgb, #{$amber} 40%, transparent);        stroke: $amber; }
+  &--3 { fill: color-mix(in srgb, #{$purple-deep} 35%, transparent);  stroke: $purple-deep; }
+  &--4 { fill: color-mix(in srgb, #{$purple-mid} 35%, transparent);   stroke: $purple-mid; }
+}
+
+.bubble-label {
+  fill: $text-primary;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: $bg-card;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.zona-ranking {
+  &__title {
+    margin: 0 0 8px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: $text-muted;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
   li {
     display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-  }
-}
-
-.zona-nombre {
-  color: $text-primary;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.zona-alertas {
-  color: $purple-deep;
-  font-weight: 600;
-  flex-shrink: 0;
-  margin-left: 6px;
-}
-
-// =============================================
-// CHARTS ROW
-// =============================================
-.charts-row {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 16px;
-}
-
-.chart-card {
-  background: $bg-card;
-  border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
-  border-radius: $radius-card;
-  box-shadow: $shadow-card;
-  padding: 16px 18px;
-
-  &__header {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2px;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid $border;
+    font-size: 0.82rem;
 
-    h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: $text-primary;
-      margin: 0;
-    }
+    &:last-child { border-bottom: none; }
+  }
+
+  &__nombre {
+    flex: 1;
+    color: $text-primary;
+    font-weight: 600;
+  }
+
+  &__cant {
+    font-weight: 800;
+    color: $purple-deep;
   }
 }
 
-.chart-subtitle {
-  font-size: 0.75rem;
-  color: $text-dim;
-  margin: 0 0 10px;
-}
-
-.chart-wrap {
-  width: 100%;
-}
-
-.behavior-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-// ── Resumen de categorización ─────────────────
-.category-subtitle {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: $text-muted;
-  margin: 0 0 10px;
-  text-align: center;
-}
-
-.category-charts {
+.rank {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.donut-wrap {
-  flex: 1;
-  min-width: 0;
-}
-
-.donut-container {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+
+  &--1 { background: #e11d48; }
+  &--2 { background: #f59e0b; }
+  &--3 { background: #7c3aed; }
+  &--4 { background: #2563eb; }
+  &--5 { background: #0d9488; }
+}
+
+// =============================================
+// EMERGENCIAS POR TIPO
+// =============================================
+.tipos-body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
 .donut-svg {
-  width: 140px;
-  height: 140px;
+  width: 170px;
+  height: 170px;
+  flex-shrink: 0;
+
+  path {
+    stroke: $bg-card;
+    stroke-width: 2;
+  }
 }
 
-.donut-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 100%;
+.donut-hole { fill: $bg-card; }
+
+.donut-total {
+  fill: $text-primary;
+  font-size: 26px;
+  font-weight: 800;
 }
 
-.donut-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: $text-muted;
+.donut-caption {
+  fill: $text-muted;
+  font-size: 11px;
+}
+
+.tipos-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+
+  li {
+    display: grid;
+    grid-template-columns: 12px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 0.82rem;
+  }
+
+  &__nombre { color: $text-primary; }
+  &__pct { color: $text-muted; }
+
+  &__cant {
+    min-width: 28px;
+    text-align: right;
+    font-weight: 700;
+    color: $purple-deep;
+  }
 }
 
 .legend-dot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.bars-wrap {
-  flex: 1;
-  min-width: 0;
-}
-
-.bars-svg {
-  width: 100%;
-  height: auto;
-  display: block;
 }
 
 // =============================================
@@ -308,26 +441,12 @@
 // =============================================
 .bottom-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.8fr 1fr;
   gap: 16px;
   align-items: start;
 }
 
-// ── Tabla de alertas recientes ────────────────
-.table-card {
-  background: $bg-card;
-  border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
-  border-radius: $radius-card;
-  box-shadow: $shadow-card;
-  padding: 16px 18px;
-  overflow: hidden;
-}
-
-.table-wrap {
-  overflow-x: auto;
-  margin-top: 10px;
-}
+.table-wrap { overflow-x: auto; }
 
 table {
   width: 100%;
@@ -348,7 +467,7 @@ table {
   }
 
   tbody tr {
-    border-bottom: 1px solid rgba($border, 0.6);
+    border-bottom: 1px solid $border;
     transition: background 0.15s;
 
     &:hover { background: $bg-card-hover; }
@@ -363,14 +482,14 @@ table {
   }
 }
 
-.coords {
-  font-size: 0.7rem;
-  color: $text-dim;
-  font-family: monospace;
-  margin-left: 4px;
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
 }
 
-// ── Badges tipo de alerta ─────────────────────
 .tipo-badge {
   display: inline-block;
   padding: 3px 9px;
@@ -378,13 +497,13 @@ table {
   font-size: 0.7rem;
   font-weight: 700;
 
-  &.badge-robo              { background: $red-pale;   color: $red; }
-  &.badge-emergencia-medica { background: #dbeafe;      color: #1d4ed8; }
-  &.badge-acoso             { background: $purple-pale; color: $purple-deep; }
-  &.badge-otros             { background: $amber-pale;  color: $amber; }
+  &.badge-sos    { background: $red-pale; color: $red; }
+  &.badge-acoso  { background: $purple-pale; color: $purple-deep; }
+  &.badge-robo   { background: color-mix(in srgb, #2563eb 16%, transparent); color: #3b82f6; }
+  &.badge-medica { background: color-mix(in srgb, #0d9488 16%, transparent); color: #14b8a6; }
+  &.badge-otros  { background: $amber-pale; color: $amber; }
 }
 
-// ── Badge estado ──────────────────────────────
 .estado-badge {
   display: inline-block;
   padding: 3px 9px;
@@ -401,20 +520,11 @@ table {
 }
 
 // ── Accesos Rápidos ───────────────────────────
-.accesos-card {
-  background: $bg-card;
-  border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
-  border-radius: $radius-card;
-  box-shadow: $shadow-card;
-  padding: 16px 18px;
-
-  h3 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: $text-primary;
-    margin: 0 0 14px;
-  }
+.accesos-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 14px;
 }
 
 .accesos-list {
@@ -441,9 +551,9 @@ table {
 }
 
 .acceso-primary {
-  background: linear-gradient(135deg, $purple-deep, #6d28d9);
+  background: linear-gradient(135deg, var(--accent-grad-from, #{$purple-deep}), var(--accent-grad-to, #{$purple-mid}));
   color: #fff;
-  box-shadow: 0 4px 14px rgba($purple-deep, 0.3);
+  box-shadow: 0 4px 14px color-mix(in srgb, #{$purple-deep} 30%, transparent);
 
   &:hover { filter: brightness(1.08); }
 }
@@ -453,13 +563,17 @@ table {
   border-color: $border;
   color: $text-muted;
 
-  &:hover { background: $bg-card-hover; border-color: $purple-mid; color: $purple-deep; }
+  &:hover {
+    background: $bg-card-hover;
+    border-color: $purple-mid;
+    color: $purple-deep;
+  }
 }
 
 // =============================================
 // RESPONSIVE
 // =============================================
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .stats-row { grid-template-columns: 1fr 1fr; }
   .charts-row { grid-template-columns: 1fr; }
   .bottom-row { grid-template-columns: 1fr; }
@@ -468,7 +582,6 @@ table {
 @media (max-width: 700px) {
   .dashboard { padding: 16px; }
   .stats-row { grid-template-columns: 1fr; }
-  .category-charts { flex-direction: column; }
-  .zonas-content { flex-direction: column; }
-  .zonas-left { width: 100%; }
+  .zonas-body { grid-template-columns: 1fr; }
+  .tipos-body { flex-direction: column; }
 }

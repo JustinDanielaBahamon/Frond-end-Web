@@ -503,4 +503,20 @@ table {
   .table-card {
     overflow-x: auto;
   }
+  // =============================================
+// ESTADOS VACÍO / DESHABILITADO
+// =============================================
+.empty-state {
+  text-align: center;
+  padding: 40px 20px !important;
+  color: $text-dim;
+
+  p { margin: 0 0 12px; font-size: 0.88rem; }
 }
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+}
+

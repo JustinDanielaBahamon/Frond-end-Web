@@ -10,8 +10,8 @@
   overflow: hidden;
   transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
 
-  // 🎨 Color principal del sidebar (paleta de la landing)
-  background: #380759;
+  // 🎨 Color principal del sidebar (sigue el color de acento elegido)
+  background: var(--sidebar-bg, #380759);
 
   &--collapsed {
     width: 0;
@@ -68,7 +68,7 @@
 
   &__divider {
     height: 2px;
-    background: linear-gradient(90deg, #C2A0F2, #b108b1, transparent);
+    background: linear-gradient(90deg, var(--purple-mid, #C2A0F2), var(--accent-grad-to, #b108b1), transparent);
     border-radius: 2px;
   }
 
@@ -116,10 +116,10 @@
     }
 
     &--active {
-      // 🎨 Indicador de módulo activo — degradado con los colores del landing/login
-      background: linear-gradient(135deg, #7630D9, #D948B2);
+      // 🎨 Indicador de módulo activo — degradado con el color de acento
+      background: linear-gradient(135deg, var(--accent-grad-from, #7630D9), var(--accent-grad-to, #D948B2));
       color: #fff;
-      box-shadow: 0 4px 14px rgba(217, 72, 178, 0.35);
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #D948B2) 35%, transparent);
 
       .sidebar__link-icon { color: #F2F2F2; }
     }
@@ -147,7 +147,7 @@
     margin-bottom: 1rem;
     padding: 11px 14px;
     border-radius: 10px;
-    background: linear-gradient(90deg, #D948B2, #7630D9);
+    background: linear-gradient(90deg, var(--accent-grad-to, #D948B2), var(--accent-grad-from, #7630D9));
     color: #fff;
     font-size: 0.8rem;
     font-weight: 700;
@@ -214,8 +214,8 @@
     transition: background 0.15s, color 0.15s;
 
     &:hover {
-      background: rgba(190, 24, 93, 0.25);
-      color: #f472b6;
+      background: color-mix(in srgb, var(--accent-grad-to, #be185d) 25%, transparent);
+      color: var(--purple-mid, #f472b6);
     }
   }
 

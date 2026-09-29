@@ -23,3 +23,18 @@
   overflow-y: auto;
   background: var(--bg-base, #f9fafb);
 }
+
+// Fondo oscuro del drawer: oculto en escritorio
+.layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999; // debajo del drawer (1000)
+  }
+}

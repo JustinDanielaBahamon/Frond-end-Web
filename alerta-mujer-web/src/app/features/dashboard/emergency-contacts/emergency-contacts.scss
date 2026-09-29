@@ -61,16 +61,26 @@
 .ec-footer-banner { margin-top: 1.25rem; margin-bottom: 0; }
 
 // TABLA
+
 .ec-table-wrap {
   background: var(--bg-card, #fff);
   border: 1.5px solid #7c3aed;
   border-radius: 14px;
-  overflow: hidden;
 }
 
 .ec-table {
   width: 100%;
   border-collapse: collapse;
+
+  thead tr:first-child {
+    th:first-child { border-top-left-radius: 12px; }
+    th:last-child  { border-top-right-radius: 12px; }
+  }
+
+  tbody tr:last-child {
+    td:first-child { border-bottom-left-radius: 12px; }
+    td:last-child  { border-bottom-right-radius: 12px; }
+  }
 
   // antes: var(--purple-pale, #f9f8ff) — casi blanco, sin contraste con la tarjeta
   thead {

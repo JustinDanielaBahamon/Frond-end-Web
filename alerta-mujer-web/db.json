@@ -10,7 +10,7 @@
       "ubicacion": "Centro",
       "lat": 4.711,
       "lng": -74.0721,
-      "estado": "Atendida",
+      "estado": "Pendiente",
       "user_profile_id": 1,
       "device_id": 1,
       "alert_type": "main",
@@ -607,8 +607,8 @@
     {
       "id": "8",
       "nombre": "Admin Principal",
-      "email": "admin@test.com",
-      "correo": "admin@test.com",
+      "email": "admin@gmail.com",
+      "correo": "admin@gmail.com",
       "telefono": "+57 318 000 0008",
       "fechaRegistro": "27/05/2023",
       "alertas": 0,
@@ -624,7 +624,7 @@
       "document_type": "",
       "birthdate": null,
       "created_at": "2023-05-27T00:00:00.000Z",
-      "password": "Admin@2026"
+      "password": "Alerta@123"
     },
     {
       "id": "9",
@@ -1007,6 +1007,42 @@
       "prioridad": 1,
       "activo": true,
       "id": "EzFO-WMmUsI"
+    },
+    {
+      "usuarioId": "9",
+      "nombre": "justin",
+      "telefono": "3226662738",
+      "relacion": "Padre",
+      "prioridad": "4",
+      "activo": true,
+      "id": "G9d4RRMrSwE"
+    },
+    {
+      "usuarioId": "9",
+      "nombre": "justin",
+      "telefono": "3226662738",
+      "relacion": "Padre",
+      "prioridad": 1,
+      "activo": true,
+      "id": "WUWWtFnbNo0"
+    },
+    {
+      "usuarioId": "9",
+      "nombre": "justin",
+      "telefono": "3226662738",
+      "relacion": "Hermano/a",
+      "prioridad": 1,
+      "activo": true,
+      "id": "TfZBg3Gq_xE"
+    },
+    {
+      "usuarioId": "9",
+      "nombre": "justin",
+      "telefono": "3226662738",
+      "relacion": "Hermano/a",
+      "prioridad": 1,
+      "activo": true,
+      "id": "zQD89TneKfo"
     }
   ],
   "lineas-ayuda": [

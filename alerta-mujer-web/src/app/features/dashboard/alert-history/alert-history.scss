@@ -614,7 +614,8 @@
 
   /* Icono del título */
   .ah-titlebar-icon {
-    background: rgba(219, 39, 119, 0.18) !important;
+    background: var(--purple-mid, #7c3aed) !important;
+    color: #ffffff !important;
   }
 
   /* Textos */
@@ -657,14 +658,14 @@
     &:hover { background: var(--purple-pale) !important; }
   }
 
-  /* Stats - tarjetas con degradados */
+  /* Stats - tarjetas con acentos fijos, iguales al modo claro */
   .ah-stat {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
 
-    &--total      { border-left-color: var(--purple-mid) !important; }
-    &--atendidas  { border-left-color: var(--green, #16a34a) !important; }
-    &--canceladas { border-left-color: var(--pink) !important; }
+    &--total      { border-left-color: #560c79 !important; }
+    &--atendidas  { border-left-color: #055f1a !important; }
+    &--canceladas { border-left-color: #e60f4f !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }

@@ -278,3 +278,87 @@
     }
   }
 }
+
+/*==================================================
+=   ADMIN: sidebar como drawer (off-canvas)         =
+=   ≤ 1024px. Solo aplica con class="sidebar--admin" =
+=   en <app-sidebar>, el de usuaria no cambia.      =
+==================================================*/
+@media (max-width: 1024px) {
+  :host(.sidebar--admin) .sidebar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 280px;
+    min-width: 0; // antes 280px: le ganaba al max-width y el drawer se salía de la pantalla
+    max-width: 85vw;
+    padding: 1.5rem 1rem;
+    z-index: 1000;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s ease, visibility 0s linear 0s;
+
+    // Cerrado: se desliza fuera de la pantalla
+    &.sidebar--collapsed {
+      width: 280px;
+      min-width: 0;
+      padding: 1.5rem 1rem;
+      transform: translateX(-100%);
+      box-shadow: none;
+      visibility: hidden;
+      transition: transform 0.3s ease, visibility 0s linear 0.3s;
+    }
+  }
+
+  // Deshace las reglas de "barra angosta" de tablet para que se vea completo
+  :host(.sidebar--admin) .sidebar__brand-text {
+    display: block;
+    min-width: 0;
+  }
+
+  :host(.sidebar--admin) .sidebar__user-info {
+    display: block;
+  }
+
+  // Los textos de marca saltan de línea en vez de cortarse
+  :host(.sidebar--admin) .sidebar__brand-name,
+  :host(.sidebar--admin) .sidebar__brand-tagline {
+    overflow-wrap: anywhere;
+  }
+
+  :host(.sidebar--admin) .sidebar__section {
+    font-size: 0.7rem;
+  }
+
+  // Sin scroll horizontal en la lista de módulos
+  :host(.sidebar--admin) .sidebar__nav {
+    overflow-x: hidden;
+  }
+
+  // Los nombres de módulo se acomodan en varias líneas si no caben
+  :host(.sidebar--admin) .sidebar__link {
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    padding: 11px 14px;
+
+    span {
+      display: inline;
+      flex: 1;
+      min-width: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  :host(.sidebar--admin) .sidebar__user {
+    flex-direction: row;
+    gap: 10px;
+  }
+}

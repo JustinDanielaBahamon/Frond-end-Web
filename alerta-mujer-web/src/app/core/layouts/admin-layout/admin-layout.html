@@ -10,6 +10,11 @@
     (logout)="cerrarSesion()">
   </app-sidebar>
 
+  <!-- Fondo oscuro detrás del drawer (solo visible en pantallas ≤ 1024px) -->
+  @if (!sidebarCollapsed) {
+    <div class="layout__backdrop" (click)="sidebarCollapsed = true"></div>
+  }
+
   <div class="layout__body">
 
     <app-topbar

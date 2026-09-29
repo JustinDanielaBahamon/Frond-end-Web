@@ -215,6 +215,12 @@ export class ReportsService {
       }
     };
     
+    // Si el reporte tiene alertasIds, agregar esa información
+    if (reporte.alertasIds && reporte.alertasIds.length > 0) {
+      nuevoReporte.alertasIds = reporte.alertasIds;
+      console.log('Reporte creado con alertas:', reporte.alertasIds);
+    }
+    
     this.reportesMock = [...this.reportesMock, nuevoReporte];
     this.reportesSubject.next(this.reportesMock);
     console.log('Reporte creado exitosamente en servicio:', nuevoReporte);

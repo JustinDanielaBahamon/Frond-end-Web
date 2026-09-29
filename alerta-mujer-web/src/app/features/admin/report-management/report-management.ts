@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Reporte, ReporteFilters, ReporteStats, Paginacion } from '../../../core/models/report.model';
 import { ReportsService } from '../../../core/services/reports.service';
+import { AlertsService } from '../../../core/services/alerts.services';
+import { Alerta } from '../../../core/models/alert.model';
 
 @Component({
   selector: 'app-report-management',
@@ -14,6 +16,7 @@ import { ReportsService } from '../../../core/services/reports.service';
 export class ReportManagementComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private reportsService = inject(ReportsService);
+  private alertsService = inject(AlertsService);
 
   // Datos
   reportes$: Observable<Reporte[]> = this.reportsService.reportes$;
@@ -53,6 +56,11 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   reporteSeleccionado: Reporte | null = null;
   reporteEditando: Reporte | null = null;
 
+  // Alertas disponibles para selección
+  alertasDisponibles: Alerta[] = [];
+  alertasSeleccionadas: number[] = []; // IDs de alertas seleccionadas
+  cargandoAlertas = false;
+
   // Para formulario de nuevo reporte
   nuevoReporte: Partial<Reporte> = {
     nombre: '',
@@ -60,12 +68,12 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     estado: 'Pendiente',
     usuaria: '',
     acontecimiento: '',
-    formato: 'PDF',
     descripcion: ''
   };
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.cargarAlertas();
   }
 
   ngOnDestroy(): void {
@@ -76,6 +84,20 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // ========================================
   // CARGA DE DATOS
   // ========================================
+
+  private cargarAlertas(): void {
+    this.cargandoAlertas = true;
+    this.alertsService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (alertas) => {
+        this.alertasDisponibles = alertas;
+        this.cargandoAlertas = false;
+      },
+      error: (err) => {
+        console.error('Error cargando alertas:', err);
+        this.cargandoAlertas = false;
+      }
+    });
+  }
 
   private cargarDatos(): void {
     this.cargando = true;
@@ -345,7 +367,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       usuaria: this.modeloUsuaria,
       acontecimiento: this.modeloAcontecimiento,
       generadoPor: this.reporteEditando.generadoPor,
-      formato: this.modeloFormato as any,
+      formato: this.reporteEditando.formato, // Mantener el formato original
       tamano: this.reporteEditando.tamano,
       descripcion: this.modeloDescripcion
     };
@@ -386,17 +408,55 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   crearReporte(): void {
     this.cargando = true;
+    
+    // Si hay alertas seleccionadas, generar datos basados en ellas
+    let nombre = this.modeloNombre;
+    let usuaria = this.modeloUsuaria;
+    let acontecimiento = this.modeloAcontecimiento;
+    let ciudad = this.modeloCiudad || 'No especificada';
+    let descripcion = this.modeloDescripcion;
+
+    if (this.alertasSeleccionadas.length > 0) {
+      const alertasSeleccionadasObj = this.alertasDisponibles.filter(a => 
+        this.alertasSeleccionadas.includes(a.id)
+      );
+      
+      if (alertasSeleccionadasObj.length > 0) {
+        // Generar nombre automático basado en alertas si no hay nombre personalizado
+        if (!nombre) {
+          const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const tiposAlertas = [...new Set(alertasSeleccionadasObj.map(a => a.tipo))].join(', ');
+          nombre = `Reporte ${tiposAlertas} - ${fecha}`;
+        }
+        
+        // Usar datos de la primera alerta seleccionada como base
+        if (!usuaria && alertasSeleccionadasObj[0].usuarioId) {
+          usuaria = `Usuario ${alertasSeleccionadasObj[0].usuarioId}`;
+        }
+        if (!acontecimiento) {
+          acontecimiento = alertasSeleccionadasObj[0].tipo;
+        }
+        if (!ciudad || ciudad === 'No especificada') {
+          ciudad = alertasSeleccionadasObj[0].ubicacion || 'No especificada';
+        }
+        if (!descripcion) {
+          descripcion = `Reporte basado en ${this.alertasSeleccionadas.length} alerta(s): ${alertasSeleccionadasObj.map(a => a.tipo).join(', ')}`;
+        }
+      }
+    }
+
     const reporteACrear: Omit<Reporte, 'id'> = {
-      nombre: this.modeloNombre || 'Reporte Sin Nombre',
+      nombre: nombre || 'Reporte Sin Nombre',
       fecha: new Date(),
-      ciudad: this.modeloCiudad || 'No especificada',
+      ciudad: ciudad,
       estado: (this.modeloEstado || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
-      usuaria: this.modeloUsuaria,
-      acontecimiento: this.modeloAcontecimiento,
+      usuaria: usuaria,
+      acontecimiento: acontecimiento,
       generadoPor: 'Administrador',
-      formato: (this.modeloFormato || 'PDF') as 'PDF' | 'Excel' | 'CSV',
+      formato: 'PDF' as 'PDF' | 'Excel' | 'CSV', // Formato por defecto
       tamano: 'Calculando...',
-      descripcion: this.modeloDescripcion
+      descripcion: descripcion,
+      alertasIds: this.alertasSeleccionadas.length > 0 ? this.alertasSeleccionadas : undefined
     };
 
     console.log('Creando reporte:', reporteACrear);
@@ -405,7 +465,8 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       ciudad: this.modeloCiudad,
       estado: this.modeloEstado,
       usuaria: this.modeloUsuaria,
-      acontecimiento: this.modeloAcontecimiento
+      acontecimiento: this.modeloAcontecimiento,
+      alertasSeleccionadas: this.alertasSeleccionadas
     });
     
     this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
@@ -435,9 +496,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       estado: 'Pendiente',
       usuaria: '',
       acontecimiento: '',
-      formato: 'PDF',
       descripcion: ''
     };
+    this.alertasSeleccionadas = []; // Resetear selección de alertas
     this.mostrarModalNuevo = true;
   }
 
@@ -450,9 +511,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       estado: 'Pendiente',
       usuaria: '',
       acontecimiento: '',
-      formato: 'PDF',
       descripcion: ''
     };
+    this.alertasSeleccionadas = [];
     this.error = '';
   }
 
@@ -549,18 +610,6 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  get modeloFormato(): string {
-    return this.reporteEditando ? this.reporteEditando.formato : this.nuevoReporte.formato || 'PDF';
-  }
-
-  set modeloFormato(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.formato = valor as any;
-    } else {
-      this.nuevoReporte.formato = valor as any;
-    }
-  }
-
   get modeloUsuaria(): string {
     return this.reporteEditando ? (this.reporteEditando.usuaria || '') : (this.nuevoReporte.usuaria || '');
   }
@@ -595,5 +644,34 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     } else {
       this.nuevoReporte.descripcion = valor;
     }
+  }
+
+  // ========================================
+  // GESTIÓN DE ALERTAS
+  // ========================================
+
+  toggleAlertaSeleccionada(alertaId: number): void {
+    const index = this.alertasSeleccionadas.indexOf(alertaId);
+    if (index === -1) {
+      this.alertasSeleccionadas.push(alertaId);
+    } else {
+      this.alertasSeleccionadas.splice(index, 1);
+    }
+  }
+
+  isAlertaSeleccionada(alertaId: number): boolean {
+    return this.alertasSeleccionadas.includes(alertaId);
+  }
+
+  seleccionarTodasAlertas(): void {
+    this.alertasSeleccionadas = this.alertasDisponibles.map(a => a.id);
+  }
+
+  deseleccionarTodasAlertas(): void {
+    this.alertasSeleccionadas = [];
+  }
+
+  get alertasSeleccionadasCount(): number {
+    return this.alertasSeleccionadas.length;
   }
 }

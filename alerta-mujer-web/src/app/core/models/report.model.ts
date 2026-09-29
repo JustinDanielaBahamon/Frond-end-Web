@@ -122,6 +122,9 @@ export interface Reporte {
   tamano: string;
   descripcion?: string;
   
+  // Referencia a alertas del sistema
+  alertasIds?: number[]; // IDs de las alertas incluidas en este reporte
+  
   // Datos detallados de la alerta
   alertaData?: AlertaData;
   activador?: AlertActivator;

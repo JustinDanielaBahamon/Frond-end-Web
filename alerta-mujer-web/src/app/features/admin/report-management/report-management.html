@@ -31,28 +31,6 @@
         </div>
       </div>
   
-      <div class="stat-card green">
-        <div class="stat-info">
-          <span>Total Alertas</span>
-          <h2>{{ stats.totalAlertas }}</h2>
-          <p>Alertas registradas</p>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-bell"></i>
-        </div>
-      </div>
-  
-      <div class="stat-card orange">
-        <div class="stat-info">
-          <span>Zonas Activas</span>
-          <h2>{{ stats.zonasActivas }}</h2>
-          <p>Zonas monitoreadas</p>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-location-dot"></i>
-        </div>
-      </div>
-  
       <div class="stat-card blue">
         <div class="stat-info">
           <span>Exportaciones</span>
@@ -320,6 +298,57 @@
                 placeholder="Ej: Reporte de Alertas - Enero 2024"
               >
             </div>
+
+            <!-- Selector de Alertas -->
+            <div class="form-group alertas-selector">
+              <label>
+                Seleccionar Alertas 
+                <span class="alertas-count">({{ alertasSeleccionadasCount }} seleccionadas)</span>
+              </label>
+              <div class="alertas-actions">
+                <button type="button" class="btn-small" (click)="seleccionarTodasAlertas()">
+                  Seleccionar todas
+                </button>
+                <button type="button" class="btn-small" (click)="deseleccionarTodasAlertas()">
+                  Deseleccionar todas
+                </button>
+              </div>
+              
+              @if (cargandoAlertas) {
+                <div class="loading-alertas">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  Cargando alertas...
+                </div>
+              } @else if (alertasDisponibles.length === 0) {
+                <div class="no-alertas">
+                  <i class="fa-solid fa-folder-open"></i>
+                  <p>No hay alertas disponibles</p>
+                </div>
+              } @else {
+                <div class="alertas-list">
+                  @for (alerta of alertasDisponibles; track alerta.id) {
+                    <div class="alerta-item" [class.selected]="isAlertaSeleccionada(alerta.id)">
+                      <input 
+                        type="checkbox" 
+                        [id]="'alerta-' + alerta.id"
+                        [checked]="isAlertaSeleccionada(alerta.id)"
+                        (change)="toggleAlertaSeleccionada(alerta.id)"
+                      >
+                      <label [for]="'alerta-' + alerta.id" class="alerta-label">
+                        <div class="alerta-info">
+                          <span class="alerta-tipo">{{ alerta.tipo }}</span>
+                          <span class="alerta-ubicacion">{{ alerta.ubicacion }}</span>
+                          <span class="alerta-fecha">{{ alerta.tiempo }}</span>
+                        </div>
+                        <span class="alerta-estado status {{ getStatusClass(alerta.estado) }}">
+                          {{ alerta.estado }}
+                        </span>
+                      </label>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
             
             <div class="form-row">
               <div class="form-group">
@@ -369,20 +398,6 @@
                   (ngModelChange)="modeloAcontecimiento = $event"
                   placeholder="Descripción breve del acontecimiento"
                 >
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label>Formato</label>
-                <select 
-                  [(ngModel)]="modeloFormato"
-                  (ngModelChange)="modeloFormato = $event"
-                >
-                  <option value="PDF">PDF</option>
-                  <option value="Excel">Excel</option>
-                  <option value="CSV">CSV</option>
-                </select>
               </div>
             </div>
             

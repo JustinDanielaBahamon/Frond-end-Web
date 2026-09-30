@@ -1,506 +1,531 @@
-@use 'sass:color';
 @use '../../../shared/styles/variables.scss' as *;
 
-$orange:      #f97316;
-$orange-pale: #ffedd5;
-$yellow:      #eab308;
-$yellow-pale: #fef9c3;
-$blue:        #3b82f6;
-$blue-pale:   #dbeafe;
+$blue:   #3b82f6;
+$orange: #f97316;
+$yellow: #eab308;
+
+// Fondo suave del color dado, válido en claro y oscuro
+@function tint($color, $pct: 16%) {
+  @return color-mix(in srgb, #{$color} #{$pct}, transparent);
+}
 
 // =============================================
-// PAGE WRAPPER
+// PÁGINA
 // =============================================
 .risk-zones {
-  padding: 24px 24px 40px;
-  background: $bg-base;
+  padding: 30px;
   min-height: 100vh;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  color: $text-primary;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  background: $bg-base;
+  color: $text-primary;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
-// =============================================
-// HEADER
-// =============================================
 .page-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
 
-.page-header h1 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: $text-primary;
-  margin: 0;
-}
-
-.page-header p {
-  margin: 4px 0 0;
-  color: $text-muted;
-  font-size: 0.85rem;
+  h1 { margin: 0; font-size: 2rem; font-weight: 700; color: $text-primary; }
+  p  { margin: 5px 0 0; font-size: 0.92rem; color: $text-muted; }
 }
 
 .btn-primary {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 12px 20px;
   border: none;
-  border-radius: $radius-sm;
-  background: linear-gradient(135deg, $purple-deep, #6d28d9);
+  border-radius: 8px;
+  background: linear-gradient(90deg, $purple-deep 0%, $pink 100%);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  cursor: pointer;
   font-family: inherit;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba($purple-deep, 0.3);
-  transition: filter 0.2s, transform 0.15s;
+  cursor: pointer;
+  box-shadow: 0 8px 18px tint($purple-deep, 35%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  &:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px tint($purple-deep, 45%);
   }
-
-  i { font-size: 0.9rem; }
 }
 
 // =============================================
-// STAT CARDS
+// ESTADÍSTICAS
 // =============================================
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 18px;
+  margin-bottom: 26px;
 }
 
 .stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
   background: $bg-card;
-  border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
   border-radius: $radius-card;
   box-shadow: $shadow-card;
-  padding: 16px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 0;
 
-  &.red   { border-top-color: $red; }
-  &.green { border-top-color: $green; }
-  &.blue  { border-top-color: $amber; }
-}
+  .stat-info {
+    span { font-size: 0.85rem; color: $text-muted; }
+    h2   { margin: 8px 0 0; font-size: 2rem; font-weight: 700; color: $text-primary; }
+  }
 
-.stat-info span {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
+  .stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    color: #fff;
+  }
 
-.stat-info h2 {
-  margin: 8px 0 0;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: $text-primary;
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: $radius-sm;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.stat-card.purple .stat-icon {
-  background: $purple-pale;
-  color: $purple-deep;
-}
-
-.stat-card.red .stat-icon {
-  background: $red-pale;
-  color: $red;
-}
-
-.stat-card.green .stat-icon {
-  background: $green-pale;
-  color: $green;
-}
-
-.stat-card.blue .stat-icon {
-  background: $amber-pale;
-  color: $amber;
+  &.purple .stat-icon { background: $purple-deep; }
+  &.red    .stat-icon { background: $red; }
+  &.green  .stat-icon { background: $green; }
+  &.blue   .stat-icon { background: $blue; }
 }
 
 // =============================================
-// TOOLBAR
+// FILTROS
 // =============================================
 .toolbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  padding: 16px 20px;
+  background: $bg-card;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
 }
 
 .search-box {
-  position: relative;
-  flex: 1;
-  min-width: 220px;
-  max-width: 360px;
   display: flex;
   align-items: center;
-}
-
-.search-box i {
-  position: absolute;
-  left: 12px;
-  color: $text-dim;
-  pointer-events: none;
-  font-size: 0.85rem;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 14px 10px 38px;
+  flex: 1;
+  min-width: 200px;
+  height: 44px;
+  padding: 0 14px;
   border: 1.5px solid $border;
-  border-radius: $radius-sm;
-  font-size: 0.85rem;
-  color: $text-primary;
-  background: $bg-card;
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border-radius: 8px;
+  background: $bg-base;
 
-  &::placeholder { color: $text-dim; }
+  i { margin-right: 10px; color: $text-muted; }
 
-  &:focus {
+  input {
+    flex: 1;
+    border: none;
     outline: none;
-    border-color: $purple-deep;
-    box-shadow: 0 0 0 3px rgba($purple-deep, 0.12);
+    background: transparent;
+    color: $text-primary;
+    font-size: 0.9rem;
+    font-family: inherit;
+
+    &::placeholder { color: $text-dim; }
   }
+
+  &:focus-within { border-color: $purple-deep; }
 }
 
-.toolbar-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .chip {
-  padding: 5px 12px;
+  padding: 8px 14px;
   border: 1.5px solid $border;
-  border-radius: 100px;
+  border-radius: 999px;
   background: $bg-card;
-  font-size: 0.78rem;
-  font-weight: 500;
   color: $text-muted;
-  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
   font-family: inherit;
+  cursor: pointer;
   transition: all 0.15s;
 
-  &:hover {
-    background: $bg-card-hover;
-    color: $text-primary;
-  }
-
-  &.active {
-    background: $purple-pale;
-    border-color: $purple-deep;
-    color: $purple-deep;
-    font-weight: 600;
-  }
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+  &.active { border-color: transparent; background: $purple-deep; color: #fff; }
 }
 
 // =============================================
-// TABLE
+// TABLA
 // =============================================
 .table-card {
+  overflow-x: auto;
   background: $bg-card;
-  border: 1.5px solid $border;
-  border-top: 3px solid $purple-mid;
   border-radius: $radius-card;
   box-shadow: $shadow-card;
-  overflow: hidden;
-}
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: $purple-pale; }
 
-  thead tr th {
+  th {
+    padding: 14px 20px;
     text-align: left;
-    padding: 11px 10px;
-    color: $text-dim;
-    font-weight: 600;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid $border;
-    background: $bg-base;
+    letter-spacing: 0.03em;
+    color: $text-muted;
     white-space: nowrap;
   }
 
-  tbody tr {
-    border-bottom: 1px solid rgba($border, 0.7);
-    transition: background 0.15s;
-
-    &:hover { background: $bg-card-hover; }
-    &:last-child { border-bottom: none; }
-
-    td {
-      padding: 11px 10px;
-      color: $text-muted;
-      vertical-align: middle;
-    }
-  }
-}
-
-// =============================================
-// BADGES
-// =============================================
-.badge {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.badge-red {
-  background: $red-pale;
-  color: $red;
-}
-
-.badge-green {
-  background: $green-pale;
-  color: $green;
-}
-
-.badge-yellow {
-  background: $yellow-pale;
-  color: $yellow;
-}
-
-.badge-orange {
-  background: $orange-pale;
-  color: $orange;
-}
-
-// =============================================
-// STATUS
-// =============================================
-.status {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 600;
-
-  &.active {
-    background: $green-pale;
-    color: $green;
+  td {
+    padding: 16px 20px;
+    border-top: 1px solid $border;
+    font-size: 0.88rem;
+    color: $text-muted;
   }
 
-  &.review {
-    background: $amber-pale;
-    color: $amber;
-  }
-
-  &.inactive {
-    background: $red-pale;
-    color: $red;
-  }
+  tbody tr { transition: background-color 0.15s; }
+  tbody tr:hover { background: $bg-card-hover; }
 }
 
-// =============================================
-// ZONE NAME
-// =============================================
 .zone-name {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-weight: 600;
   color: $text-primary;
 }
 
 .zone-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: $radius-sm;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  font-size: 0.85rem;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: $purple-pale;
+  color: $purple-deep;
 
-  &.red    { background: $red; }
-  &.green  { background: $green; }
-  &.yellow { background: $yellow; color: #422006; }
-  &.orange { background: $orange; }
+  &.red    { background: tint($red);    color: $red; }
+  &.yellow { background: tint($yellow); color: $yellow; }
+  &.orange { background: tint($orange); color: $orange; }
+  &.green  { background: tint($green);  color: $green; }
 }
 
-// =============================================
-// ACTIONS
-// =============================================
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.badge-red    { background: tint($red);    color: $red; }
+  &.badge-yellow { background: tint($yellow); color: $yellow; }
+  &.badge-orange { background: tint($orange); color: $orange; }
+  &.badge-green  { background: tint($green);  color: $green; }
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  &.active   { color: $green; }
+  &.review   { color: $blue; }
+  &.inactive { color: $text-dim; }
+}
+
 .actions {
   display: flex;
   gap: 6px;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid $border;
+    border-radius: 8px;
+    background: $bg-card;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover { background: $purple-pale; color: $purple-deep; border-color: $purple-deep; }
+    &:last-child:hover { background: $red-pale; color: $red; border-color: $red; }
+  }
 }
 
-.actions button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1.5px solid $border;
-  border-radius: $radius-sm;
-  background: $bg-card;
-  cursor: pointer;
-  transition: all 0.15s;
+.empty-state {
+  padding: 32px 20px !important;
+  text-align: center;
   color: $text-muted;
 
-  i { font-size: 0.8rem; }
-
-  &:hover {
-    border-color: $purple-mid;
-    color: $purple-deep;
-    background: $purple-pale;
-  }
-
-  &:nth-child(2):hover {
-    border-color: #3b82f6;
-    color: #1d4ed8;
-    background: $blue-pale;
-  }
-
-  &:nth-child(3):hover {
-    border-color: $red;
-    color: $red;
-    background: $red-pale;
-  }
+  p { margin: 0 0 12px; }
 }
 
-// =============================================
-// TABLE FOOTER & PAGINATION
-// =============================================
 .table-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-top: 1px solid $border;
-  background: $bg-base;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.table-info {
-  font-size: 0.78rem;
+  padding: 14px 20px;
+  border-top: 1px solid $border;
+  font-size: 0.85rem;
   color: $text-muted;
 
-  strong {
-    color: $text-primary;
-    font-weight: 700;
-  }
+  strong { color: $text-primary; }
 }
 
-.pagination {
-  display: flex;
-  gap: 4px;
-}
+.pagination { display: flex; gap: 6px; }
 
 .page-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) { background: $bg-card-hover; color: $text-primary; }
+  &.active { border-color: transparent; background: $purple-deep; color: #fff; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+// =============================================
+// MODALES DE ZONA (nueva / editar / ver)
+// =============================================
+.btn-secondary {
+  padding: 10px 18px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+// En móvil .btn-primary ocupa todo el ancho; dentro del modal no
+.btn-primary.btn-modal { width: auto; }
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.form-opcional {
+  font-weight: 500;
+  color: $text-dim;
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-base;
+  color: $text-primary;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: $purple-deep; }
+}
+
+.form-hint {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  color: $text-muted;
+}
+
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  background: $red-pale;
+  color: $red;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+// Botones de opción (tipo / estado / radios rápidos)
+.opciones {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 30px;
-  height: 30px;
-  padding: 0 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  &--chicas { margin-top: 8px; }
+}
+
+.opcion {
+  padding: 8px 12px;
   border: 1.5px solid $border;
   border-radius: $radius-sm;
   background: $bg-card;
   color: $text-muted;
   font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
+  font-weight: 600;
   font-family: inherit;
+  cursor: pointer;
   transition: all 0.15s;
 
-  &:hover {
-    background: $bg-card-hover;
-    color: $purple-deep;
-    border-color: $purple-mid;
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+
+  &--activa {
+    border-color: transparent;
+    color: #fff;
+
+    &:hover { color: #fff; }
   }
 
-  &.active {
-    background: $purple-deep;
-    border-color: $purple-deep;
-    color: #fff;
+  &--activa.opcion--red     { background: $red; }
+  &--activa.opcion--orange  { background: $orange; }
+  &--activa.opcion--yellow  { background: $yellow; color: #422006; }
+  &--activa.opcion--green   { background: $green; }
+  &--activa.opcion--neutral { background: $purple-deep; }
+}
+
+// Mapa dentro del modal
+.zona-mapa {
+  height: 260px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.zona-mapa-info {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: $text-muted;
+}
+
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.radio-slider {
+  flex: 1;
+  accent-color: $purple-deep;
+}
+
+.radio-value {
+  min-width: 64px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+// Detalle (ojo)
+.zona-detalle__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h3 { margin: 0; font-size: 1.05rem; color: $text-primary; }
+  p  { margin: 2px 0 0; font-size: 0.82rem; color: $text-muted; }
+}
+
+.zona-detalle__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 0 0 18px;
+
+  dt {
+    margin-bottom: 4px;
+    font-size: 0.72rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $text-dim;
   }
+
+  dd {
+    margin: 0;
+    font-size: 0.88rem;
+    color: $text-primary;
+  }
+}
+
+.zona-detalle__fecha {
+  display: block;
+  margin-top: 2px;
+  color: $text-dim;
+}
+
+.zona-sin-ubicacion {
+  margin: 0;
+  padding: 14px;
+  border: 1.5px dashed $border;
+  border-radius: $radius-sm;
+  font-size: 0.82rem;
+  color: $text-muted;
+}
+
+// Mapa en modo oscuro: oscurece los tiles de OpenStreetMap
+:host-context([data-theme='dark']) .zona-mapa ::ng-deep {
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+  .leaflet-control-attribution { background: rgba(36, 29, 61, 0.8); color: #a8a0c4; a { color: #b79bf5; } }
+  .leaflet-control-zoom a { background: #241d3d; color: #ede9fe; border-color: #4c3a80; }
 }
 
 // =============================================
 // RESPONSIVE
 // =============================================
 @media (max-width: 1100px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 640px) {
   .risk-zones { padding: 16px; }
+  .page-header { flex-direction: column; align-items: stretch; }
+  .btn-primary { width: 100%; }
+  .stats-grid { grid-template-columns: 1fr; }
+}
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .btn-primary {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-box {
-    max-width: none;
-  }
-
-  .toolbar-actions {
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  table {
-    min-width: 800px;
-  }
-
-  .table-card {
-    overflow-x: auto;
-  }
+@media (max-width: 480px) {
+  .zona-detalle__grid { grid-template-columns: 1fr; }
+  .zona-mapa { height: 220px; }
 }

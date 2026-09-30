@@ -584,8 +584,7 @@ table {
 }
 
 // =============================================
-// FORMULARIOS DE MODALES
-// (los estilos del modal en sí ahora viven en
+// MODALES (el modal en sí vive en
 // shared/components/modal/modal.scss)
 // =============================================
 
@@ -638,6 +637,98 @@ table {
   font-weight: 500;
 }
 
+// ── Secciones del detalle ────────────────────
+.detail-section {
+  margin: 20px 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $purple-deep;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: $text-dim;
+}
+
+.detail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    background: $bg-base;
+
+    strong { font-size: 0.83rem; color: $text-primary; }
+    span   { font-size: 0.76rem; color: $text-muted; }
+  }
+}
+
+// ── Formulario ───────────────────────────────
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: $text-dim;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input {
+    padding: 10px 12px;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: $text-primary;
+    background: $bg-card;
+
+    &:focus {
+      outline: none;
+      border-color: $purple-deep;
+      box-shadow: 0 0 0 3px rgba($purple-deep, 0.12);
+    }
+
+    &.ng-invalid.ng-touched { border-color: $red; }
+  }
+}
+
+.form-error {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: $red;
+  background: $red-pale;
+  border-radius: $radius-sm;
+}
+
 // ── Confirm modal ────────────────────────────
 .confirm-text {
   font-size: 0.9rem;
@@ -671,4 +762,6 @@ table {
   .mini-stat { min-width: 52px; padding: 6px 10px; }
 
   .detail-grid { grid-template-columns: 1fr; }
+
+  .form-row { grid-template-columns: 1fr; }
 }

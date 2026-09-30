@@ -1,274 +1,318 @@
 <div class="risk-zones">
 
-    <!--==========================
-        HEADER
-    ==========================-->
-  
-    <header class="page-header">
-      <div>
-        <h1>Gestión de Zonas</h1>
-        <p>Administra las zonas seguras y zonas de riesgo de la aplicación.</p>
+  <!--==========================
+      HEADER
+  ==========================-->
+  <header class="page-header">
+    <div>
+      <h1>Gestión de Zonas</h1>
+      <p>Administra las zonas seguras y zonas de riesgo de la aplicación.</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="abrirCrear()">
+      <i class="fa-solid fa-plus"></i>
+      Nueva Zona
+    </button>
+  </header>
+
+  <!--==========================
+      ESTADÍSTICAS
+  ==========================-->
+  <section class="stats-grid">
+    <div class="stat-card purple">
+      <div class="stat-info">
+        <span>Total Zonas</span>
+        <h2>{{ totalZonas }}</h2>
       </div>
-      <button class="btn-primary">
-        <i class="fa-solid fa-plus"></i>
-        Nueva Zona
-      </button>
-    </header>
-  
-    <!--==========================
-        ESTADÍSTICAS
-    ==========================-->
-  
-    <section class="stats-grid">
-      <div class="stat-card purple">
-        <div class="stat-info">
-          <span>Total Zonas</span>
-          <h2>48</h2>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-location-dot"></i>
-        </div>
-      </div>
-  
-      <div class="stat-card red">
-        <div class="stat-info">
-          <span>Zonas Riesgo Alto</span>
-          <h2>12</h2>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-      </div>
-  
-      <div class="stat-card green">
-        <div class="stat-info">
-          <span>Zonas Seguras</span>
-          <h2>25</h2>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-shield-heart"></i>
-        </div>
-      </div>
-  
-      <div class="stat-card blue">
-        <div class="stat-info">
-          <span>En Revisión</span>
-          <h2>11</h2>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-clock"></i>
-        </div>
-      </div>
-    </section>
-  
-    <!--==========================
-        FILTROS Y ACCIONES
-    ==========================-->
-  
-    <div class="toolbar">
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Buscar zona..." aria-label="Buscar zona" />
-      </div>
-  
-      <div class="toolbar-actions">
-        <button class="chip active">Todas</button>
-        <button class="chip">Riesgo Alto</button>
-        <button class="chip">Riesgo Medio</button>
-        <button class="chip">Riesgo Bajo</button>
-        <button class="chip">Seguras</button>
+      <div class="stat-icon">
+        <i class="fa-solid fa-location-dot"></i>
       </div>
     </div>
-  
+
+    <div class="stat-card red">
+      <div class="stat-info">
+        <span>Zonas Riesgo Alto</span>
+        <h2>{{ zonasRiesgoAlto }}</h2>
+      </div>
+      <div class="stat-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+    </div>
+
+    <div class="stat-card green">
+      <div class="stat-info">
+        <span>Zonas Seguras</span>
+        <h2>{{ zonasSeguras }}</h2>
+      </div>
+      <div class="stat-icon">
+        <i class="fa-solid fa-shield-heart"></i>
+      </div>
+    </div>
+
+    <div class="stat-card blue">
+      <div class="stat-info">
+        <span>En Revisión</span>
+        <h2>{{ zonasEnRevision }}</h2>
+      </div>
+      <div class="stat-icon">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+    </div>
+  </section>
+
+  <!--==========================
+      FILTROS Y ACCIONES
+  ==========================-->
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Buscar zona..." aria-label="Buscar zona"
+        [(ngModel)]="searchTerm" (input)="applyFilters()" />
+    </div>
+
+    <div class="toolbar-actions">
+      <button *ngFor="let chip of chips" class="chip"
+        [class.active]="filtroTipo === chip.value"
+        (click)="setChip(chip.value)">
+        {{ chip.label }}
+      </button>
+    </div>
+  </div>
+
+  <!--==========================
+      TABLA DE ZONAS
+  ==========================-->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Zona</th>
+          <th>Ciudad</th>
+          <th>Tipo</th>
+          <th>Alertas</th>
+          <th>Estado</th>
+          <th>Última actualización</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let z of zonasFiltradas">
+          <td>
+            <div class="zone-name">
+              <div class="zone-avatar" [ngClass]="getAvatarClass(z.tipo)">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              {{ z.nombre }}
+            </div>
+          </td>
+          <td>{{ z.ciudad }}</td>
+          <td><span class="badge" [ngClass]="getBadgeClass(z.tipo)">{{ z.tipo }}</span></td>
+          <td>{{ z.alertas }}</td>
+          <td><span class="status" [ngClass]="getStatusClass(z.estado)">{{ z.estado }}</span></td>
+          <td>{{ tiempoRelativo(z.updated_at) }}</td>
+          <td>
+            <div class="actions">
+              <button aria-label="Ver detalles" title="Ver detalles" (click)="verZona(z)"><i class="fa-solid fa-eye"></i></button>
+              <button aria-label="Editar" title="Editar" (click)="editarZona(z)"><i class="fa-solid fa-pen"></i></button>
+              <button aria-label="Eliminar" (click)="eliminarZona(z)"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Cargando -->
+        <tr *ngIf="cargando">
+          <td colspan="7" class="empty-state">Cargando zonas...</td>
+        </tr>
+
+        <!-- Sin resultados -->
+        <tr *ngIf="!cargando && zonasFiltradas.length === 0">
+          <td colspan="7" class="empty-state">
+            <p>No se encontraron zonas con ese criterio.</p>
+            <button class="chip" (click)="clearAll()">Limpiar filtros</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
     <!--==========================
-        TABLA DE ZONAS
+        PAGINACIÓN
     ==========================-->
-  
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>Zona</th>
-            <th>Ciudad</th>
-            <th>Tipo</th>
-            <th>Alertas</th>
-            <th>Estado</th>
-            <th>Última actualización</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-            <!-- Fila 1: Parque Santander (Riesgo Alto -> RED) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar red"> <!-- 🌟 Añadido 'red' -->
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Parque Santander
-                </div>
-              </td>
-              <td>Neiva</td>
-              <td><span class="badge badge-red">Riesgo Alto</span></td>
-              <td>37</td>
-              <td><span class="status active">Activa</span></td>
-              <td>Hace 2 horas</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          
-            <!-- Fila 2: Universidad Surcolombiana (Segura -> GREEN) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar green"> <!-- 🌟 Cambiado 'purple' por 'green' -->
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Universidad Surcolombiana
-                </div>
-              </td>
-              <td>Neiva</td>
-              <td><span class="badge badge-green">Segura</span></td>
-              <td>3</td>
-              <td><span class="status active">Activa</span></td>
-              <td>Hace 5 minutos</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          
-            <!-- Fila 3: Parque Leesburg (Riesgo Alto -> RED) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar red">
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Parque Leesburg
-                </div>
-              </td>
-              <td>Bogotá</td>
-              <td><span class="badge badge-red">Riesgo Alto</span></td>
-              <td>28</td>
-              <td><span class="status active">Activa</span></td>
-              <td>Hace 1 día</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          
-            <!-- Fila 4: Centro Comercial San Pedro (Riesgo Medio -> YELLOW) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar yellow">
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Centro Comercial San Pedro
-                </div>
-              </td>
-              <td>Cali</td>
-              <td><span class="badge badge-yellow">Riesgo Medio</span></td>
-              <td>14</td>
-              <td><span class="status review">Revisión</span></td>
-              <td>Hace 4 horas</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          
-            <!-- Fila 5: Parque de la Música (Segura -> GREEN) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar green">
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Parque de la Música
-                </div>
-              </td>
-              <td>Medellín</td>
-              <td><span class="badge badge-green">Segura</span></td>
-              <td>2</td>
-              <td><span class="status active">Activa</span></td>
-              <td>Hace 30 minutos</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          
-            <!-- Fila 6: Terminal de Transportes (Riesgo Bajo -> ORANGE) -->
-            <tr>
-              <td>
-                <div class="zone-name">
-                  <div class="zone-avatar orange">
-                    <i class="fa-solid fa-location-dot"></i>
-                  </div>
-                  Terminal de Transportes
-                </div>
-              </td>
-              <td>Barranquilla</td>
-              <td><span class="badge badge-orange">Riesgo Bajo</span></td>
-              <td>8</td>
-              <td><span class="status active">Activa</span></td>
-              <td>Hace 8 horas</td>
-              <td>
-                <div class="actions">
-                  <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-                  <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
-                  <button aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-      </table>
-  
-      <!--==========================
-          PAGINACIÓN
-      ==========================-->
-  
-      <div class="table-footer">
-        <div class="table-info">
-          Mostrando
-          <strong>1 - 6</strong>
-          de
-          <strong>48</strong>
-          zonas registradas
-        </div>
-        <div class="pagination">
-          <button class="page-btn" aria-label="Página anterior">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <button class="page-btn active" aria-label="Página 1">1</button>
-          <button class="page-btn" aria-label="Página 2">2</button>
-          <button class="page-btn" aria-label="Página 3">3</button>
-          <button class="page-btn" aria-label="Página 4">4</button>
-          <button class="page-btn" aria-label="Página siguiente">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
+    <div class="table-footer">
+      <div class="table-info">
+        Mostrando
+        <strong>{{ desde }} - {{ hasta }}</strong>
+        de
+        <strong>{{ totalFiltradas }}</strong>
+        zonas registradas
+      </div>
+      <div class="pagination">
+        <button class="page-btn" aria-label="Página anterior"
+          [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button *ngFor="let p of paginas" class="page-btn"
+          [class.active]="p === paginaActual"
+          [attr.aria-label]="'Página ' + p"
+          (click)="cambiarPagina(p)">{{ p }}</button>
+        <button class="page-btn" aria-label="Página siguiente"
+          [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
-  
+
+  <!--==========================
+      MODAL: NUEVA / EDITAR ZONA
+  ==========================-->
+  <app-modal
+    *ngIf="modal === 'crear' || modal === 'editar'"
+    tamano="lg"
+    [titulo]="modal === 'crear' ? '📍 Nueva zona' : '✏️ Editar zona'"
+    [cerrarAlClickFuera]="false"
+    (cerrar)="cerrarModal()">
+
+    <div modal-body>
+
+      <div class="form-group">
+        <label class="form-label" for="zona-nombre">Nombre</label>
+        <input id="zona-nombre" class="form-input" type="text" maxlength="80"
+          placeholder="Ej: Parque Santander" [(ngModel)]="form.nombre" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="zona-ciudad">Ciudad</label>
+        <input id="zona-ciudad" class="form-input" type="text" maxlength="60" list="ciudades-zona"
+          placeholder="Ej: Neiva" [(ngModel)]="form.ciudad" (input)="onCiudadChange()" />
+        <datalist id="ciudades-zona">
+          <option *ngFor="let c of ciudadesSugeridas" [value]="c"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Tipo de zona</span>
+        <div class="opciones">
+          <button type="button" *ngFor="let t of tipos" class="opcion"
+            [ngClass]="'opcion--' + getAvatarClass(t)"
+            [class.opcion--activa]="form.tipo === t"
+            (click)="setTipo(t)">{{ t }}</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Estado</span>
+        <div class="opciones">
+          <button type="button" *ngFor="let e of estados" class="opcion opcion--neutral"
+            [class.opcion--activa]="form.estado === e"
+            (click)="setEstado(e)">{{ e }}</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">
+          Ubicación en el mapa
+          <small class="form-opcional" *ngIf="modal === 'editar'">(opcional)</small>
+        </span>
+        <p class="form-hint">Haz clic en el mapa para marcar el centro de la zona.</p>
+        <div #mapaModal class="zona-mapa"></div>
+        <p class="zona-mapa-info">
+          <ng-container *ngIf="formTieneUbicacion">
+            ✓ {{ form.lat | number:'1.5-5' }}, {{ form.lng | number:'1.5-5' }}
+          </ng-container>
+          <ng-container *ngIf="!formTieneUbicacion">Sin ubicación seleccionada</ng-container>
+        </p>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Radio del área</span>
+        <div class="radio-row">
+          <input type="range" min="100" max="1500" step="50" class="radio-slider"
+            aria-label="Radio del área en metros"
+            [ngModel]="form.radio" (ngModelChange)="setRadio($event)" />
+          <span class="radio-value">{{ form.radio }} m</span>
+        </div>
+        <div class="opciones opciones--chicas">
+          <button type="button" *ngFor="let r of radiosRapidos" class="opcion opcion--neutral"
+            [class.opcion--activa]="form.radio === r"
+            (click)="setRadio(r)">{{ r }} m</button>
+        </div>
+      </div>
+
+      <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+    </div>
+
+    <div modal-footer>
+      <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn-primary btn-modal" [disabled]="!formValido || guardando" (click)="guardar()">
+        {{ guardando ? 'Guardando...' : (modal === 'crear' ? 'Guardar zona' : 'Guardar cambios') }}
+      </button>
+    </div>
+  </app-modal>
+
+  <!--==========================
+      MODAL: VER DETALLE
+  ==========================-->
+  <app-modal
+    *ngIf="modal === 'ver' && zonaSeleccionada"
+    tamano="lg"
+    titulo="Detalle de la zona"
+    (cerrar)="cerrarModal()">
+
+    <div modal-body>
+      <div class="zona-detalle__head">
+        <div class="zone-avatar" [ngClass]="getAvatarClass(zonaSeleccionada.tipo)">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div>
+          <h3>{{ zonaSeleccionada.nombre }}</h3>
+          <p>{{ zonaSeleccionada.ciudad }}</p>
+        </div>
+      </div>
+
+      <dl class="zona-detalle__grid">
+        <div>
+          <dt>Tipo</dt>
+          <dd><span class="badge" [ngClass]="getBadgeClass(zonaSeleccionada.tipo)">{{ zonaSeleccionada.tipo }}</span></dd>
+        </div>
+        <div>
+          <dt>Estado</dt>
+          <dd><span class="status" [ngClass]="getStatusClass(zonaSeleccionada.estado)">{{ zonaSeleccionada.estado }}</span></dd>
+        </div>
+        <div>
+          <dt>Alertas</dt>
+          <dd>{{ zonaSeleccionada.alertas }}</dd>
+        </div>
+        <div>
+          <dt>Última actualización</dt>
+          <dd>{{ tiempoRelativo(zonaSeleccionada.updated_at) }}
+            <small class="zona-detalle__fecha">{{ zonaSeleccionada.updated_at | date:'dd/MM/yyyy HH:mm' }}</small>
+          </dd>
+        </div>
+      </dl>
+
+      <div *ngIf="tieneUbicacion(zonaSeleccionada); else sinUbicacion">
+        <span class="form-label">Ubicación</span>
+        <div #mapaModal class="zona-mapa"></div>
+        <p class="zona-mapa-info">
+          {{ zonaSeleccionada.lat | number:'1.5-5' }}, {{ zonaSeleccionada.lng | number:'1.5-5' }}
+          · radio {{ zonaSeleccionada.radio ?? 300 }} m
+        </p>
+      </div>
+
+      <ng-template #sinUbicacion>
+        <p class="zona-sin-ubicacion">
+          Esta zona todavía no tiene una ubicación en el mapa. Puedes agregarla desde
+          <strong>Editar</strong>.
+        </p>
+      </ng-template>
+    </div>
+
+    <div modal-footer>
+      <button type="button" class="btn-secondary" (click)="cerrarModal()">Cerrar</button>
+      <button type="button" class="btn-primary btn-modal" (click)="editarDesdeVer()">
+        <i class="fa-solid fa-pen"></i>
+        Editar
+      </button>
+    </div>
+  </app-modal>
+
+</div>

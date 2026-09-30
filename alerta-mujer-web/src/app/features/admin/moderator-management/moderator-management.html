@@ -7,8 +7,12 @@
     <header class="page-header">
       <div>
         <h1>Gestión de Moderación</h1>
-        <p>Visualiza, gestiona y resuelve reportes de contenido inapropiado.</p>
+        <p>Administra los reportes de usuarios y aplica las medidas correspondientes.</p>
       </div>
+      <button class="btn-add-report" (click)="abrirModalAgregarReporte(); $event.stopPropagation()">
+        <i class="fa-solid fa-plus"></i>
+        Agregar Reporte
+      </button>
     </header>
   
     <!--==========================
@@ -30,8 +34,8 @@
           <i class="fa-solid fa-flag"></i>
         </div>
       </div>
-  
-      <div class="stat-card green">
+
+      <div class="stat-card purple">
         <div class="stat-info">
           <span>Casos Resueltos</span>
           <h2>128</h2>
@@ -45,8 +49,8 @@
           <i class="fa-solid fa-check-circle"></i>
         </div>
       </div>
-  
-      <div class="stat-card orange">
+
+      <div class="stat-card purple">
         <div class="stat-info">
           <span>Usuarios Sancionados</span>
           <h2>15</h2>
@@ -60,36 +64,6 @@
           <i class="fa-solid fa-user-slash"></i>
         </div>
       </div>
-  
-      <div class="stat-card blue">
-        <div class="stat-info">
-          <span>Contenido Eliminado</span>
-          <h2>46</h2>
-          <p class="stat-change positive">
-            <i class="fa-solid fa-arrow-up"></i>
-            <span>+5%</span>
-            <span class="vs-ayer">vs ayer</span>
-          </p>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-trash"></i>
-        </div>
-      </div>
-
-      <div class="stat-card pink">
-        <div class="stat-info">
-          <span>Tiempo de Respuesta</span>
-          <h2>2h 15m</h2>
-          <p class="stat-change positive">
-            <i class="fa-solid fa-arrow-down"></i>
-            <span>-15%</span>
-            <span class="vs-ayer">vs ayer</span>
-          </p>
-        </div>
-        <div class="stat-icon">
-          <i class="fa-solid fa-clock"></i>
-        </div>
-      </div>
     </section>
   
     <!--==========================
@@ -99,53 +73,68 @@
     <div class="toolbar">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Buscar reporte..." aria-label="Buscar reporte" />
+        <input
+          type="text"
+          placeholder="ID reporte, usuario reportado, motivo, gravedad o estado..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          (keyup.enter)="applyFilters()"
+          aria-label="Buscar reporte"
+        />
       </div>
+      <button class="btn-search" (click)="applyFilters(); $event.stopPropagation()">
+        <i class="fa-solid fa-search"></i>
+        Buscar
+      </button>
 
-      <div class="search-box">
-        <i class="fa-solid fa-user"></i>
-        <input type="text" placeholder="Usuario reportado..." aria-label="Usuario reportado" />
-      </div>
-  
       <div class="filter-group">
         <div class="filter-item">
-          <select aria-label="Filtrar por Motivo de reporte">
-            <option value="">Motivo de reporte</option>
-            <option value="all">Todos</option>
-            <option value="spam">Spam</option>
-            <option value="acoso">Acoso</option>
-            <option value="contenido-inapropiado">Contenido inapropiado</option>
-            <option value="discurso-odio">Discurso de odio</option>
-            <option value="falsificacion">Falsificación</option>
-          </select>
+          <div class="custom-select" [class.open]="isReasonDropdownOpen">
+            <div class="select-selected" (click)="toggleReasonDropdown($event)">
+              {{ getReasonLabel(filterReason) }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isReasonDropdownOpen">
+              <div (click)="selectReason('all', $event)">Todos</div>
+              <div (click)="selectReason('spam', $event)">Spam</div>
+              <div (click)="selectReason('acoso', $event)">Acoso</div>
+              <div (click)="selectReason('contenido-inapropiado', $event)">Contenido inapropiado</div>
+              <div (click)="selectReason('discurso-odio', $event)">Discurso de odio</div>
+              <div (click)="selectReason('falsificacion', $event)">Falsificación</div>
+            </div>
+          </div>
         </div>
         <div class="filter-item">
-          <select aria-label="Filtrar por Gravedad">
-            <option value="">Gravedad</option>
-            <option value="all">Todas</option>
-            <option value="baja">Baja</option>
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-            <option value="critica">Crítica</option>
-          </select>
+          <div class="custom-select" [class.open]="isSeverityDropdownOpen">
+            <div class="select-selected" (click)="toggleSeverityDropdown($event)">
+              {{ getSeverityLabel(filterSeverity) }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isSeverityDropdownOpen">
+              <div (click)="selectSeverity('all', $event)">Todas</div>
+              <div (click)="selectSeverity('baja', $event)">Baja</div>
+              <div (click)="selectSeverity('media', $event)">Media</div>
+              <div (click)="selectSeverity('alta', $event)">Alta</div>
+              <div (click)="selectSeverity('critica', $event)">Crítica</div>
+            </div>
+          </div>
         </div>
         <div class="filter-item">
-          <select aria-label="Filtrar por Estado">
-            <option value="">Estado</option>
-            <option value="all">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en-revision">En revisión</option>
-            <option value="resuelto">Resuelto</option>
-            <option value="rechazado">Rechazado</option>
-          </select>
+          <div class="custom-select" [class.open]="isStatusDropdownOpen">
+            <div class="select-selected" (click)="toggleStatusDropdown($event)">
+              {{ getStatusLabel(filterStatus) }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isStatusDropdownOpen">
+              <div (click)="selectStatus('all', $event)">Todos</div>
+              <div (click)="selectStatus('pendiente', $event)">Pendiente</div>
+              <div (click)="selectStatus('en-revision', $event)">En revisión</div>
+              <div (click)="selectStatus('resuelto', $event)">Resuelto</div>
+              <div (click)="selectStatus('rechazado', $event)">Rechazado</div>
+            </div>
+          </div>
         </div>
-        <div class="filter-item">
-          <input type="date" class="select-date" aria-label="Fecha inicial">
-        </div>
-        <div class="filter-item">
-          <input type="date" class="select-date" aria-label="Fecha final">
-        </div>
-        <button class="btn-clear-filters">
+        <button class="btn-clear-filters" (click)="clearFilters(); $event.stopPropagation()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
           Limpiar filtros
         </button>
@@ -171,289 +160,43 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr *ngFor="let report of reports">
                 <td>
                   <div class="report-id">
-                    <span class="id-badge">#REP-001</span>
+                    <span class="id-badge">{{ report.id }}</span>
                   </div>
                 </td>
                 <td>
                   <div class="user-info">
                     <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Maria+G&background=random" alt="Avatar" />
+                      <i class="fa-solid fa-user"></i>
                     </div>
                     <div class="user-details">
-                      <span class="user-name">María García</span>
-                      <span class="user-email">maria.g@email.com</span>
+                      <span class="user-name">{{ report.userName }}</span>
+                      <span class="user-email">{{ report.userEmail }}</span>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span class="badge red">Acoso</span>
+                  <span class="badge {{ getReasonClass(report.reason) }}">{{ report.reason }}</span>
                 </td>
                 <td>
-                  <span class="severity high">Alta</span>
+                  <span class="severity {{ getSeverityClass(report.severity) }}">{{ report.severity }}</span>
                 </td>
-                <td>23/07/2024 10:30 AM</td>
+                <td>{{ report.date }}</td>
                 <td>
-                  <span class="status pending">Pendiente</span>
+                  <span class="status {{ getStatusClass(report.status) }}">{{ report.status }}</span>
                 </td>
                 <td>
                   <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
+                    <button class="view" (click)="viewReport(report.id); $event.stopPropagation()" aria-label="Ver reporte">
                       <i class="fa-solid fa-eye"></i>
                     </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
+                    <button class="edit" (click)="abrirModalEditar(report.id); $event.stopPropagation()" aria-label="Editar reporte">
+                      <i class="fa-solid fa-pencil"></i>
                     </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-002</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Carlos+R&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Carlos Rodríguez</span>
-                      <span class="user-email">carlos.r@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge orange">Spam</span>
-                </td>
-                <td>
-                  <span class="severity medium">Media</span>
-                </td>
-                <td>22/07/2024 04:15 PM</td>
-                <td>
-                  <span class="status in-review">En revisión</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-003</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Ana+M&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Ana Martínez</span>
-                      <span class="user-email">ana.m@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge blue">Contenido inapropiado</span>
-                </td>
-                <td>
-                  <span class="severity low">Baja</span>
-                </td>
-                <td>21/07/2024 11:45 AM</td>
-                <td>
-                  <span class="status resolved">Resuelto</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-004</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Pedro+S&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Pedro Sánchez</span>
-                      <span class="user-email">pedro.s@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge purple">Discurso de odio</span>
-                </td>
-                <td>
-                  <span class="severity critical">Crítica</span>
-                </td>
-                <td>20/07/2024 09:20 AM</td>
-                <td>
-                  <span class="status pending">Pendiente</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-005</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Laura+L&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Laura López</span>
-                      <span class="user-email">laura.l@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge green">Falsificación</span>
-                </td>
-                <td>
-                  <span class="severity high">Alta</span>
-                </td>
-                <td>19/07/2024 08:10 PM</td>
-                <td>
-                  <span class="status rejected">Rechazado</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-006</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Diego+T&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Diego Torres</span>
-                      <span class="user-email">diego.t@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge red">Acoso</span>
-                </td>
-                <td>
-                  <span class="severity medium">Media</span>
-                </td>
-                <td>18/07/2024 03:30 PM</td>
-                <td>
-                  <span class="status in-review">En revisión</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="report-id">
-                    <span class="id-badge">#REP-007</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">
-                      <img src="https://ui-avatars.com/api/?name=Sofia+R&background=random" alt="Avatar" />
-                    </div>
-                    <div class="user-details">
-                      <span class="user-name">Sofía Ramírez</span>
-                      <span class="user-email">sofia.r@email.com</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge orange">Spam</span>
-                </td>
-                <td>
-                  <span class="severity low">Baja</span>
-                </td>
-                <td>17/07/2024 11:00 AM</td>
-                <td>
-                  <span class="status resolved">Resuelto</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="view" aria-label="Ver reporte">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="approve" aria-label="Aprobar reporte">
-                      <i class="fa-solid fa-check"></i>
-                    </button>
-                    <button class="reject" aria-label="Rechazar reporte">
-                      <i class="fa-solid fa-xmark"></i>
+                    <button class="reject" (click)="deleteReport(report.id); $event.stopPropagation()" aria-label="Eliminar reporte">
+                      <i class="fa-solid fa-trash"></i>
                     </button>
                   </div>
                 </td>
@@ -468,21 +211,21 @@
           <div class="table-footer">
             <div class="table-info">
               Mostrando
-              <strong>1 - 7</strong>
+              <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ getMinValue(currentPage * itemsPerPage, totalItems) }}</strong>
               de
-              <strong>32</strong>
+              <strong>{{ totalItems }}</strong>
               reportes
             </div>
             <div class="pagination">
-              <button class="page-btn" aria-label="Página anterior">
+              <button class="page-btn" (click)="prevPage(); $event.stopPropagation()" [disabled]="currentPage === 1" aria-label="Página anterior">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              <button class="page-btn active" aria-label="Página 1">1</button>
-              <button class="page-btn" aria-label="Página 2">2</button>
-              <button class="page-btn" aria-label="Página 3">3</button>
-              <button class="page-btn" aria-label="Página 4">4</button>
-              <button class="page-btn" aria-label="Página 5">5</button>
-              <button class="page-btn" aria-label="Página siguiente">
+              <button class="page-btn" (click)="changePage(1); $event.stopPropagation()" [class.active]="currentPage === 1" aria-label="Página 1">1</button>
+              <button class="page-btn" (click)="changePage(2); $event.stopPropagation()" [class.active]="currentPage === 2" aria-label="Página 2">2</button>
+              <button class="page-btn" (click)="changePage(3); $event.stopPropagation()" [class.active]="currentPage === 3" aria-label="Página 3">3</button>
+              <button class="page-btn" (click)="changePage(4); $event.stopPropagation()" [class.active]="currentPage === 4" aria-label="Página 4">4</button>
+              <button class="page-btn" (click)="changePage(5); $event.stopPropagation()" [class.active]="currentPage === 5" aria-label="Página 5">5</button>
+              <button class="page-btn" (click)="nextPage(); $event.stopPropagation()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
             </div>
@@ -491,3 +234,265 @@
         </div>
         </div>
   </div>
+
+<!-- MODAL VER REPORTE -->
+<div class="modal-overlay" *ngIf="mostrarModalVer && reporteSeleccionado" (click)="cerrarModalVer()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Ver Detalles del Reporte</h2>
+      <button class="modal-close" (click)="cerrarModalVer(); $event.stopPropagation()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="report-detail">
+        <!-- Header del reporte con icono -->
+        <div class="report-header">
+          <div class="report-icon-large">
+            <i class="fa-solid fa-flag"></i>
+          </div>
+          <div class="report-header-info">
+            <h3>{{ reporteSeleccionado!.id }}</h3>
+            <span class="date-badge">{{ reporteSeleccionado!.date }}</span>
+            <span class="status-badge-large {{ getStatusClass(reporteSeleccionado!.status) }}">
+              {{ reporteSeleccionado!.status }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Sección de información del reporte -->
+        <div class="detail-section">
+          <h4>
+            <i class="fa-solid fa-circle-info"></i>
+            Información del Reporte
+          </h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Motivo</label>
+              <span class="badge-large {{ getReasonClass(reporteSeleccionado!.reason) }}">
+                {{ reporteSeleccionado!.reason }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Gravedad</label>
+              <span class="severity-badge-large {{ getSeverityClass(reporteSeleccionado!.severity) }}">
+                {{ reporteSeleccionado!.severity }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de descripción -->
+        <div class="detail-section">
+          <h4>
+            <i class="fa-solid fa-file-lines"></i>
+            Descripción del Reporte
+          </h4>
+          <div class="description-box">
+            <p>{{ reporteSeleccionado!.description }}</p>
+          </div>
+        </div>
+
+        <!-- Sección de información del usuario -->
+        <div class="detail-section">
+          <h4>
+            <i class="fa-solid fa-user"></i>
+            Usuario Reportado
+          </h4>
+          <div class="user-card">
+            <div class="user-avatar">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="user-details">
+              <p class="user-name">{{ reporteSeleccionado!.userName }}</p>
+              <p class="user-email">{{ reporteSeleccionado!.userEmail }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="cerrarModalVer(); $event.stopPropagation()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR REPORTE -->
+<div class="modal-overlay" *ngIf="mostrarModalAgregar && nuevoReporte" (click)="cerrarModalAgregar()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-icon">
+        <i class="fa-solid fa-flag"></i>
+      </div>
+      <div class="modal-header-text">
+        <h2>Agregar Nuevo Reporte</h2>
+        <p>Registra un reporte manual de una usuaria</p>
+      </div>
+      <button class="modal-close" (click)="cerrarModalAgregar(); $event.stopPropagation()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="guardarNuevoReporte()">
+        <div class="form-section">
+          <h4>
+            <i class="fa-solid fa-user"></i>
+            Información del Usuario
+          </h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre del Usuario *</label>
+              <input type="text" [(ngModel)]="nuevoReporte!.userName" name="userName" required placeholder="Nombre completo del usuario" />
+            </div>
+            <div class="form-group">
+              <label>Email del Usuario *</label>
+              <input type="email" [(ngModel)]="nuevoReporte!.userEmail" name="userEmail" required placeholder="email@ejemplo.com" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>
+            <i class="fa-solid fa-circle-exclamation"></i>
+            Detalles del Reporte
+          </h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Motivo del Reporte *</label>
+              <div class="custom-select" [class.open]="isReasonDropdownOpen">
+                <div class="select-selected" (click)="toggleReasonDropdown($event)">
+                  {{ nuevoReporte!.reason || 'Seleccionar motivo' }}
+                  <i class="fa-solid fa-chevron-down select-arrow"></i>
+                </div>
+                <div class="select-items" *ngIf="isReasonDropdownOpen">
+                  <div (click)="nuevoReporte!.reason = 'Spam'; isReasonDropdownOpen = false">Spam</div>
+                  <div (click)="nuevoReporte!.reason = 'Acoso'; isReasonDropdownOpen = false">Acoso</div>
+                  <div (click)="nuevoReporte!.reason = 'Contenido inapropiado'; isReasonDropdownOpen = false">Contenido inapropiado</div>
+                  <div (click)="nuevoReporte!.reason = 'Discurso de odio'; isReasonDropdownOpen = false">Discurso de odio</div>
+                  <div (click)="nuevoReporte!.reason = 'Falsificación'; isReasonDropdownOpen = false">Falsificación</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Gravedad *</label>
+              <div class="custom-select" [class.open]="isSeverityDropdownOpen">
+                <div class="select-selected" (click)="toggleSeverityDropdown($event)">
+                  {{ nuevoReporte!.severity || 'Seleccionar gravedad' }}
+                  <i class="fa-solid fa-chevron-down select-arrow"></i>
+                </div>
+                <div class="select-items" *ngIf="isSeverityDropdownOpen">
+                  <div (click)="nuevoReporte!.severity = 'Baja'; isSeverityDropdownOpen = false">Baja</div>
+                  <div (click)="nuevoReporte!.severity = 'Media'; isSeverityDropdownOpen = false">Media</div>
+                  <div (click)="nuevoReporte!.severity = 'Alta'; isSeverityDropdownOpen = false">Alta</div>
+                  <div (click)="nuevoReporte!.severity = 'Crítica'; isSeverityDropdownOpen = false">Crítica</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>
+            <i class="fa-solid fa-file-lines"></i>
+            Descripción del Reporte
+          </h4>
+          <div class="form-group">
+            <label>Describe detalladamente el motivo de este reporte *</label>
+            <textarea
+              [(ngModel)]="nuevoReporte!.description"
+              name="description"
+              required
+              rows="5"
+              placeholder="Describe detalladamente el motivo de este reporte, la evidencia disponible y cualquier información relevante para la moderación..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModalAgregar(); $event.stopPropagation()">
+            <i class="fa-solid fa-xmark"></i>
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">
+            <i class="fa-solid fa-plus"></i>
+            Agregar Reporte
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalEditar && reporteSeleccionado" (click)="cerrarModalEditar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Reporte</h2>
+      <button class="modal-close" (click)="cerrarModalEditar(); $event.stopPropagation()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="actualizarReporte()">
+        <div class="form-group">
+          <label>Motivo</label>
+          <div class="custom-select" [class.open]="isEditReasonDropdownOpen">
+            <div class="select-selected" (click)="toggleEditReasonDropdown($event)">
+              {{ reporteSeleccionado!.reason }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isEditReasonDropdownOpen">
+              <div (click)="updateReportReason('Spam', $event)">Spam</div>
+              <div (click)="updateReportReason('Acoso', $event)">Acoso</div>
+              <div (click)="updateReportReason('Contenido inapropiado', $event)">Contenido inapropiado</div>
+              <div (click)="updateReportReason('Discurso de odio', $event)">Discurso de odio</div>
+              <div (click)="updateReportReason('Falsificación', $event)">Falsificación</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Gravedad</label>
+          <div class="custom-select" [class.open]="isEditSeverityDropdownOpen">
+            <div class="select-selected" (click)="toggleEditSeverityDropdown($event)">
+              {{ reporteSeleccionado!.severity }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isEditSeverityDropdownOpen">
+              <div (click)="updateReportSeverity('Baja', $event)">Baja</div>
+              <div (click)="updateReportSeverity('Media', $event)">Media</div>
+              <div (click)="updateReportSeverity('Alta', $event)">Alta</div>
+              <div (click)="updateReportSeverity('Crítica', $event)">Crítica</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <div class="custom-select" [class.open]="isEditStatusDropdownOpen">
+            <div class="select-selected" (click)="toggleEditStatusDropdown($event)">
+              {{ reporteSeleccionado!.status }}
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="select-items" *ngIf="isEditStatusDropdownOpen">
+              <div (click)="updateReportStatus('Pendiente', $event)">Pendiente</div>
+              <div (click)="updateReportStatus('En revisión', $event)">En revisión</div>
+              <div (click)="updateReportStatus('Resuelto', $event)">Resuelto</div>
+              <div (click)="updateReportStatus('Rechazado', $event)">Rechazado</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción del Reporte</label>
+          <textarea
+            [(ngModel)]="reporteSeleccionado!.description"
+            name="description"
+            rows="4"
+            placeholder="Describe detalladamente el motivo de este reporte y la evidencia disponible..."
+          ></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModalEditar(); $event.stopPropagation()">Cancelar</button>
+          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

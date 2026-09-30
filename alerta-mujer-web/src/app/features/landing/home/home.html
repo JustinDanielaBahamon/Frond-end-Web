@@ -1,1 +1,190 @@
-<h1>LANDING PAGE FUNCIONANDO</h1>
+<div class="home-wrap">
+
+  <!-- ESTADO DE SEGURIDAD + MI DISPOSITIVO -->
+  <div class="home-row home-row--top">
+
+    <!-- ESTADO DE TU SEGURIDAD -->
+    <div class="home-panel home-panel--estado">
+      <div class="home-panel__header">
+        <div>
+          <h2 class="home-panel__title">Estado de tu seguridad</h2>
+          <p class="home-panel__subtitle">Tu cuenta está protegida</p>
+        </div>
+        <button class="home-btn home-btn--outline">
+          Ver configuración
+        </button>
+      </div>
+
+      <div class="home-seguridad-grid">
+        <div class="home-seguridad-item" *ngFor="let item of estadoSeguridad">
+          <div class="home-seguridad-item__icon">
+            <i class="ti {{ item.icon }}"></i>
+          </div>
+          <p class="home-seguridad-item__valor">{{ item.valor }}</p>
+          <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
+          <span class="home-seguridad-item__check" *ngIf="item.configurado"><i class="ti ti-check"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MI DISPOSITIVO -->
+    <div class="home-panel home-panel--dispositivo">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-device-mobile"></i> Mi dispositivo
+        </h2>
+        <button class="home-icon-btn" title="Más opciones">
+          <i class="ti ti-dots-vertical"></i>
+        </button>
+      </div>
+
+      <div class="home-dispositivo-body">
+        <div class="home-dispositivo-info">
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Estado:</span>
+            <span class="home-badge home-badge--exito">{{ miDispositivo.estado }}</span>
+          </p>
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Última comunicación:</span>
+            <span class="home-dispositivo-value">{{ miDispositivo.ultimaComunicacion }}</span>
+          </p>
+          <p class="home-dispositivo-row">
+            <span class="home-dispositivo-label">Última ubicación:</span>
+            <span class="home-dispositivo-value">{{ miDispositivo.ultimaUbicacion }}</span>
+          </p>
+        </div>
+        <div class="home-dispositivo-icon">
+          <i class="ti ti-device-mobile"></i>
+        </div>
+      </div>
+
+      <a class="home-btn home-btn--primario home-btn--block">
+        Ver detalles del dispositivo <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ACTIVIDAD RECIENTE + ÚLTIMA EMERGENCIA + ÚLTIMA UBICACIÓN -->
+  <div class="home-row home-row--mid">
+
+    <!-- ACTIVIDAD RECIENTE -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Actividad reciente</h2>
+        <a class="home-link">Ver todo</a>
+      </div>
+      <div class="home-activity-list">
+        <a class="home-activity-item" *ngFor="let item of actividadReciente">
+          <div class="home-activity-item__icon" [ngClass]="'home-activity-item__icon--' + item.color">
+            <i class="ti {{ item.icon }}"></i>
+          </div>
+          <div class="home-activity-item__body">
+            <p class="home-activity-item__titulo">{{ item.titulo }}</p>
+            <p class="home-activity-item__fecha">{{ item.fecha }}</p>
+          </div>
+          <i class="ti ti-chevron-right home-activity-item__chevron"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- ÚLTIMA EMERGENCIA -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Última emergencia</h2>
+        <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
+      </div>
+
+      <div class="home-emergencia">
+        <div class="home-emergencia__fecha-row">
+          <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
+          <div>
+            <p class="home-emergencia__fecha">{{ ultimaEmergencia.fecha }}</p>
+            <p class="home-emergencia__hora">{{ ultimaEmergencia.hora }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-map-pin"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Ubicación</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.ubicacion }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-activity"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Activada mediante</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.activadaMediante }}</p>
+          </div>
+        </div>
+
+        <div class="home-emergencia__detalle">
+          <i class="ti ti-users"></i>
+          <div>
+            <p class="home-emergencia__detalle-label">Contactos notificados</p>
+            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.contactosNotificados }} contactos</p>
+          </div>
+        </div>
+      </div>
+
+      <a class="home-btn home-btn--primario home-btn--block">
+        Ver detalles
+      </a>
+    </div>
+
+    <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
+        <a class="home-link">Ver mapa</a>
+      </div>
+
+      <div id="home-mini-map" class="home-mini-map"></div>
+
+      <p class="home-mini-map__direccion">
+        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
+      </p>
+      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
+    </div>
+
+  </div>
+
+  <!-- ACCESOS RÁPIDOS + ACCIONES RÁPIDAS -->
+  <div class="home-row home-row--bottom">
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Accesos rápidos</h2>
+      </div>
+      <div class="home-accesos-grid">
+        <a class="home-acceso" *ngFor="let acceso of accesosRapidos">
+          <div class="home-acceso__icon" [ngClass]="'home-acceso__icon--' + acceso.color">
+            <i class="ti {{ acceso.icon }}"></i>
+          </div>
+          <p class="home-acceso__label">{{ acceso.label }}</p>
+          <p class="home-acceso__sub">{{ acceso.sub }}</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">Acciones rápidas</h2>
+      </div>
+      <div class="home-acciones-list">
+        <a class="home-accion-item" *ngFor="let accion of accionesRapidas" [class.home-accion-item--disabled]="accion.disabled">
+          <i class="ti {{ accion.icon }}"></i>
+          <span>{{ accion.label }}</span>
+          <i class="ti ti-chevron-right home-accion-item__chevron" *ngIf="!accion.disabled"></i>
+          <i class="ti ti-lock home-accion-item__chevron" *ngIf="accion.disabled"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>

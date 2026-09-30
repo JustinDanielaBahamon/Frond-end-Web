@@ -1,4 +1,81 @@
 {
+  "alertasActivas": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "estado": "inactive",
+      "tipo": "emergency",
+      "mensaje": "Alerta de emergencia activada",
+      "ubicacion": {
+        "lat": 2.9273,
+        "lng": -75.2819,
+        "direccion": "Neiva, Barrio Centro"
+      },
+      "dispositivoOrigen": "web",
+      "sincronizado": true,
+      "contactosNotificados": [],
+      "started_at": null,
+      "ended_at": null
+    }
+  ],
+  "dispositivos": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "tipo": "web",
+      "nombre": "Chrome - Windows",
+      "activo": true,
+      "ultimaConexion": "2026-09-29T10:30:00.000Z",
+      "ubicacion": {
+        "lat": 2.9273,
+        "lng": -75.2819
+      }
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "tipo": "android",
+      "nombre": "Samsung Galaxy S21",
+      "activo": false,
+      "ultimaConexion": "2026-09-28T15:45:00.000Z",
+      "ubicacion": {
+        "lat": 2.9280,
+        "lng": -75.2800
+      }
+    }
+  ],
+  "contactosEmergencia": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "nombre": "Ana Gómez",
+      "telefono": "+57 311 111 0001",
+      "email": "ana.gomez@test.com",
+      "relacion": "Hermana",
+      "notificado": false,
+      "ultimaNotificacion": null
+    },
+    {
+      "id": "2",
+      "usuarioId": 1,
+      "nombre": "Luis Díaz",
+      "telefono": "+57 312 111 0002",
+      "email": "luis.diaz@test.com",
+      "relacion": "Esposo",
+      "notificado": false,
+      "ultimaNotificacion": null
+    },
+    {
+      "id": "3",
+      "usuarioId": 1,
+      "nombre": "Pedro Flores",
+      "telefono": "+57 313 111 0003",
+      "email": "pedro.flores@test.com",
+      "relacion": "Padre",
+      "notificado": false,
+      "ultimaNotificacion": null
+    }
+  ],
   "alertas": [
     {
       "id": "1",
@@ -1138,7 +1215,6 @@
       "subtitulo": "Línea · 24/7",
       "id": "wDn7I02aRH4"
     }
-    
   ],
   "$schema": "./node_modules/json-server/schema.json"
 }

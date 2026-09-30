@@ -1,207 +1,169 @@
 <div class="home-wrap">
 
-  <!-- ESTADO DE SEGURIDAD + MI DISPOSITIVO -->
-  <div class="home-row home-row--top">
-
-    <!-- ESTADO DE TU SEGURIDAD -->
-    <div class="home-panel home-panel--estado">
-      <div class="home-panel__header">
-        <div>
-          <h2 class="home-panel__title">Estado de tu seguridad</h2>
-          <p class="home-panel__subtitle">Tu cuenta está protegida</p>
-        </div>
-        <button class="home-btn home-btn--outline" routerLink="/dashboard/settings">
-          Ver configuración
-        </button>
+  <!-- BANNER DE ESTADO -->
+  <div class="home-status-banner" [ngClass]="{ 'home-status-banner--warning': !estadoApp.ubicacionCompartida || !estadoApp.appActiva }">
+    <div class="home-status-banner__content">
+      <div class="home-status-banner__icon" [ngClass]="{ 'home-status-banner__icon--warning': !estadoApp.ubicacionCompartida || !estadoApp.appActiva }">
+        <i class="ti" [ngClass]="estadoApp.ubicacionCompartida && estadoApp.appActiva ? 'ti-shield-check' : 'ti-alert-triangle-filled'"></i>
       </div>
-
-      <div class="home-seguridad-grid">
-        @for (item of estadoSeguridad; track item.descripcion) {
-          <div class="home-seguridad-item">
-            <div class="home-seguridad-item__icon">
-              <i class="ti {{ item.icon }}"></i>
-            </div>
-            <p class="home-seguridad-item__valor">{{ item.valor }}</p>
-            <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
-            @if (item.configurado) {
-              <span class="home-seguridad-item__check"><i class="ti ti-check"></i></span>
-            }
-          </div>
-        }
+      <div class="home-status-banner__text">
+        <h3 class="home-status-banner__title">{{ estadoApp.ubicacionCompartida && estadoApp.appActiva ? 'Todo en orden' : 'Advertencia!!' }}</h3>
+        <p class="home-status-banner__subtitle">{{ estadoApp.ubicacionCompartida && estadoApp.appActiva ? 'Tu ubicación se está compartiendo y la app está activa' : 'Tu ubicación no está siendo compartida y la app está inactiva' }}</p>
       </div>
     </div>
-
-    <!-- MI DISPOSITIVO -->
-    <div class="home-panel home-panel--dispositivo">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">
-          <i class="ti ti-device-mobile"></i> Mi dispositivo
-        </h2>
-        <button class="home-icon-btn" title="Más opciones">
-          <i class="ti ti-dots-vertical"></i>
-        </button>
-      </div>
-
-      <div class="home-dispositivo-body">
-        <div class="home-dispositivo-info">
-          <p class="home-dispositivo-row">
-            <span class="home-dispositivo-label">Estado:</span>
-            <span class="home-badge home-badge--exito">{{ miDispositivo.estado }}</span>
-          </p>
-          <p class="home-dispositivo-row">
-            <span class="home-dispositivo-label">Última comunicación:</span>
-            <span class="home-dispositivo-value">{{ miDispositivo.ultimaComunicacion }}</span>
-          </p>
-          <p class="home-dispositivo-row">
-            <span class="home-dispositivo-label">Última ubicación:</span>
-            <span class="home-dispositivo-value">{{ miDispositivo.ultimaUbicacion }}</span>
-          </p>
-        </div>
-        <div class="home-dispositivo-icon">
-          <i class="ti ti-device-mobile"></i>
-        </div>
-      </div>
-
-      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/device">
-        Ver detalles del dispositivo <i class="ti ti-arrow-right"></i>
-      </a>
-    </div>
-
+   
   </div>
 
-  <!-- ACTIVIDAD RECIENTE + ÚLTIMA EMERGENCIA + ÚLTIMA UBICACIÓN -->
-  <div class="home-row home-row--mid">
-
-    <!-- ACTIVIDAD RECIENTE -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Actividad reciente</h2>
-        <a class="home-link" routerLink="/dashboard/alert-history">Ver todo</a>
-      </div>
-      <div class="home-activity-list">
-        @for (item of actividadReciente; track item.titulo) {
-          <a class="home-activity-item" routerLink="/dashboard/alert-history">
-            <div class="home-activity-item__icon" [ngClass]="'home-activity-item__icon--' + item.color">
-              <i class="ti {{ item.icon }}"></i>
-            </div>
-            <div class="home-activity-item__body">
-              <p class="home-activity-item__titulo">{{ item.titulo }}</p>
-              <p class="home-activity-item__fecha">{{ item.fecha }}</p>
-            </div>
-            <i class="ti ti-chevron-right home-activity-item__chevron"></i>
-          </a>
-        }
-      </div>
+  <!-- CARD PRINCIPAL DE ALERTA -->
+  <div class="home-alert-card" [ngClass]="{ 'home-alert-card--active': hayAlertaActiva() }">
+    <div class="home-alert-card__icon" [ngClass]="{ 'home-alert-card__icon--active': hayAlertaActiva() }">
+      <i class="ti" [ngClass]="hayAlertaActiva() ? 'ti-bell-ringing-filled' : 'ti-alert-triangle-filled'"></i>
     </div>
-
-    <!-- ÚLTIMA EMERGENCIA -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Última emergencia</h2>
-        <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
-      </div>
-
-      <div class="home-emergencia">
-        <div class="home-emergencia__fecha-row">
-          <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
-          <div>
-            <p class="home-emergencia__fecha">{{ ultimaEmergencia.fecha }}</p>
-            <p class="home-emergencia__hora">{{ ultimaEmergencia.hora }}</p>
-          </div>
-        </div>
-
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-map-pin"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Ubicación</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.ubicacion }}</p>
-          </div>
-        </div>
-
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-activity"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Activada mediante</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.activadaMediante }}</p>
-          </div>
-        </div>
-
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-users"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Contactos notificados</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.contactosNotificados }} contactos</p>
-          </div>
-        </div>
-      </div>
-
-      <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/alert-history">
-        Ver detalles
-      </a>
-    </div>
-
-    <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
-        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
-      </div>
-
-      <div id="home-mini-map" class="home-mini-map"></div>
-
-      <p class="home-mini-map__direccion">
-        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
+    <div class="home-alert-card__content">
+      <h3 class="home-alert-card__title">{{ hayAlertaActiva() ? 'Alerta Activa' : 'Activar alerta' }}</h3>
+      <p class="home-alert-card__subtitle">
+        {{ hayAlertaActiva() ? 'Tu ubicación se está compartiendo con tus contactos' : 'Envía una señal de emergencia a tus contactos' }}
       </p>
-      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
     </div>
-
+    <button
+      class="home-btn"
+      [ngClass]="hayAlertaActiva() ? 'home-btn--alert-active' : 'home-btn--alert'"
+      (click)="hayAlertaActiva() ? desactivarAlerta() : activarAlerta()"
+      [disabled]="activandoAlerta">
+      <i class="ti" [ngClass]="hayAlertaActiva() ? 'ti-bell-off' : 'ti-alarm-filled'"></i>
+      <span>{{ activandoAlerta ? 'Activando...' : (hayAlertaActiva() ? 'Desactivar' : 'Activar') }}</span>
+    </button>
   </div>
 
-  <!-- ACCESOS RÁPIDOS + ACCIONES RÁPIDAS -->
-  <div class="home-row home-row--bottom">
-
-    <!-- ACCESOS RÁPIDOS -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Accesos rápidos</h2>
+  <!-- ESTADO DE SINCRONIZACIÓN -->
+  <div class="home-sync-status" *ngIf="hayAlertaActiva()">
+    <div class="home-sync-status__content">
+      <div class="home-sync-status__icon">
+        <i class="ti ti-device-mobile" [ngClass]="{ 'ti-loader': !(sincronizacion$ | async) }"></i>
       </div>
-      <div class="home-accesos-grid">
-        @for (acceso of accesosRapidos; track acceso.label) {
-          <a class="home-acceso" [routerLink]="acceso.route">
-            <div class="home-acceso__icon" [ngClass]="'home-acceso__icon--' + acceso.color">
-              <i class="ti {{ acceso.icon }}"></i>
-            </div>
-            <p class="home-acceso__label">{{ acceso.label }}</p>
-            <p class="home-acceso__sub">{{ acceso.sub }}</p>
-          </a>
-        }
+      <div class="home-sync-status__text">
+        <p class="home-sync-status__title">Sincronizando dispositivos</p>
+        <p class="home-sync-status__subtitle">Alerta activa en web y celular</p>
       </div>
     </div>
-
-    <!-- ACCIONES RÁPIDAS -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Acciones rápidas</h2>
+    <div class="home-sync-status__indicators">
+      <div class="home-sync-status__indicator home-sync-status__indicator--active">
+        <i class="ti ti-browser"></i>
+        <span>Web</span>
       </div>
-      <div class="home-acciones-list">
-        @for (accion of accionesRapidas; track accion.label) {
-          @if (!accion.disabled) {
-            <a class="home-accion-item" [routerLink]="accion.route">
-              <i class="ti {{ accion.icon }}"></i>
-              <span>{{ accion.label }}</span>
-              <i class="ti ti-chevron-right home-accion-item__chevron"></i>
-            </a>
-          } @else {
-            <div class="home-accion-item home-accion-item--disabled">
-              <i class="ti {{ accion.icon }}"></i>
-              <span>{{ accion.label }}</span>
-              <i class="ti ti-lock home-accion-item__chevron"></i>
-            </div>
-          }
-        }
+      <div class="home-sync-status__indicator home-sync-status__indicator--active">
+        <i class="ti ti-brand-android"></i>
+        <span>Android</span>
       </div>
     </div>
+  </div>
 
+ 
+
+  <!-- MAPA DE UBICACIÓN ACTUAL -->
+  <div class="home-location-section">
+    <div class="home-location-section__header">
+      <h3 class="home-location-section__title">Tu ubicación actual</h3>
+      <span class="home-badge" [ngClass]="estadoApp.ubicacionCompartida && estadoApp.appActiva ? 'home-badge--live' : 'home-badge--offline'">
+        {{ estadoApp.ubicacionCompartida && estadoApp.appActiva ? 'En tiempo real' : 'Sin conexión' }}
+      </span>
+    </div>
+    <div class="home-location-map-wrapper">
+      <div *ngIf="estadoApp.ubicacionCompartida && estadoApp.appActiva" id="home-location-map" class="home-location-map"></div>
+      <div *ngIf="!estadoApp.ubicacionCompartida || !estadoApp.appActiva" class="home-location-map--no-data">
+        <div class="home-location-map__no-data-content">
+          <i class="ti ti-map-pin-off"></i>
+          <p>Ubicación no disponible</p>
+          <span>Activa la ubicación para ver el mapa</span>
+        </div>
+      </div>
+      <button class="home-btn home-btn--map-more" routerLink="/dashboard/ubicacion">
+        Ver más <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+    <div class="home-location-section__info" *ngIf="estadoApp.ubicacionCompartida && estadoApp.appActiva">
+      <p class="home-location-section__address">
+        <i class="ti ti-map-pin"></i> {{ ubicacionActual.direccion }}
+      </p>
+      <div class="home-location-section__details">
+        <div class="home-location-section__detail">
+          <i class="ti ti-clock"></i>
+          <span>Actualizada: {{ ubicacionActual.ultimaActualizacion }}</span>
+        </div>
+        <div class="home-location-section__detail">
+          <i class="ti ti-crosshair"></i>
+          <span>Precisión: {{ ubicacionActual.precision }}m</span>
+        </div>
+        <div class="home-location-section__detail">
+          <i class="ti ti-compass"></i>
+          <span>Coord: {{ ubicacionActual.lat.toFixed(4) }}, {{ ubicacionActual.lng.toFixed(4) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- SECCIÓN DE SEGURIDAD -->
+  <div class="home-security-section">
+    <div class="home-security-section__content">
+      <div class="home-security-section__icon">
+        <i class="ti ti-shield"></i>
+      </div>
+      <div class="home-security-section__text">
+        <h3 class="home-security-section__title">Tu seguridad importa</h3>
+        <p class="home-security-section__subtitle">Mantén tu configuración actualizada para estar siempre protegida</p>
+      </div>
+    </div>
+    <button class="home-btn home-btn--outline-small" routerLink="/dashboard/settings">
+      Revisar configuración
+    </button>
+  </div>
+
+  <!-- RESUMEN DE CUENTA -->
+  <div class="home-account-summary">
+    <h3 class="home-account-summary__title">Resumen de tu cuenta</h3>
+    <div class="home-account-summary__grid">
+      <div class="home-account-summary-item">
+        <p class="home-account-summary-item__value">{{ resumenCuenta.contactos }}</p>
+        <p class="home-account-summary-item__label">Contactos de emergencia</p>
+      </div>
+      <div class="home-account-summary-item">
+        <p class="home-account-summary-item__value">{{ resumenCuenta.dispositivos }}</p>
+        <p class="home-account-summary-item__label">Dispositivos registrados</p>
+      </div>
+      <div class="home-account-summary-item">
+        <p class="home-account-summary-item__value">{{ resumenCuenta.recorridos }}</p>
+        <p class="home-account-summary-item__label">Recorridos guardados</p>
+      </div>
+      <div class="home-account-summary-item">
+        <p class="home-account-summary-item__value">{{ resumenCuenta.evidencias }}</p>
+        <p class="home-account-summary-item__label">Evidencias</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCESOS RÁPIDOS -->
+  <div class="home-quick-access">
+    <h3 class="home-quick-access__title">Accesos rápidos</h3>
+    <div class="home-quick-access__grid">
+      @for (acceso of accesosRapidos; track acceso.label) {
+        <a class="home-quick-access-item" [routerLink]="acceso.route">
+          <div class="home-quick-access-item__icon" [ngClass]="'home-quick-access-item__icon--' + acceso.color">
+            <i class="ti {{ acceso.icon }}"></i>
+          </div>
+          <p class="home-quick-access-item__label">{{ acceso.label }}</p>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- ELEMENTO DECORATIVO -->
+  <div class="home-decorative">
+    <div class="home-decorative__silhouette">
+      <i class="ti ti-woman"></i>
+    </div>
+    <p class="home-decorative__text">Siempre segura</p>
   </div>
 
 </div>

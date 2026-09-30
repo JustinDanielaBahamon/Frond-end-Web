@@ -1,10 +1,165 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { CommonModule, NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import * as L from 'leaflet';
+
+interface SeguridadItem {
+  icon: string;
+  valor: string;
+  descripcion: string;
+  configurado: boolean;
+}
+
+interface MiDispositivo {
+  estado: string;
+  ultimaComunicacion: string;
+  ultimaUbicacion: string;
+}
+
+interface ActividadItem {
+  icon: string;
+  color: 'peligro' | 'exito' | 'principal';
+  titulo: string;
+  fecha: string;
+}
+
+interface UltimaEmergencia {
+  fecha: string;
+  hora: string;
+  ubicacion: string;
+  activadaMediante: string;
+  contactosNotificados: number;
+  estado: string;
+}
+
+interface UltimaUbicacion {
+  lat: number;
+  lng: number;
+  direccion: string;
+  fecha: string;
+}
+
+interface AccesoRapido {
+  icon: string;
+  color: 'peligro' | 'exito' | 'principal' | 'acento' | 'advertencia';
+  label: string;
+  sub: string;
+  route: string;
+}
+
+interface AccionRapida {
+  icon: string;
+  label: string;
+  route: string;
+  disabled?: boolean;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, NgClass, RouterLink],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
-export class LandingHomeComponent {}
+export class LandingHomeComponent implements AfterViewInit, OnDestroy {
+
+  private map: L.Map | null = null;
+
+  // ── ESTADO DE SEGURIDAD ───────────────────────────
+  estadoSeguridad: SeguridadItem[] = [
+    { icon: 'ti-users',        valor: '3',            descripcion: 'Contactos de emergencia', configurado: true },
+    { icon: 'ti-shield-check', valor: 'Movimiento',   descripcion: 'Método de activación',     configurado: true },
+    { icon: 'ti-map-pin',      valor: 'Ubicación',    descripcion: 'activa',                   configurado: true },
+    { icon: 'ti-bell',         valor: 'Notificaciones', descripcion: 'activas',                configurado: true },
+    { icon: 'ti-folder',       valor: '8',            descripcion: 'Evidencias almacenadas',   configurado: true },
+  ];
+
+  // ── MI DISPOSITIVO ────────────────────────────────
+  miDispositivo: MiDispositivo = {
+    estado: 'Conectado',
+    ultimaComunicacion: 'Hoy, 3:42 PM',
+    ultimaUbicacion: 'Neiva, Huila',
+  };
+
+  // ── ACTIVIDAD RECIENTE ────────────────────────────
+  actividadReciente: ActividadItem[] = [
+    { icon: 'ti-alert-octagon', color: 'peligro',   titulo: 'Alerta de emergencia',              fecha: '28 ago. 2026 · 8:42 PM · Neiva, Huila' },
+    { icon: 'ti-camera',        color: 'principal', titulo: 'Evidencia agregada',                 fecha: '28 ago. 2026 · 8:45 PM' },
+    { icon: 'ti-map-pin',       color: 'exito',      titulo: 'Ubicación registrada',               fecha: '28 ago. 2026 · 8:42 PM' },
+    { icon: 'ti-users',         color: 'principal', titulo: 'Contacto de emergencia notificado',   fecha: '28 ago. 2026 · 8:42 PM' },
+  ];
+
+  // ── ÚLTIMA EMERGENCIA ─────────────────────────────
+  ultimaEmergencia: UltimaEmergencia = {
+    fecha: '28 agosto 2026',
+    hora: '8:42 PM',
+    ubicacion: 'Neiva, Huila',
+    activadaMediante: 'Movimiento brusco',
+    contactosNotificados: 3,
+    estado: 'Atendida',
+  };
+
+  // ── ÚLTIMA UBICACIÓN REGISTRADA ───────────────────
+  ultimaUbicacion: UltimaUbicacion = {
+    lat: 2.9273,
+    lng: -75.2819,
+    direccion: 'Neiva, Huila',
+    fecha: 'Hoy, 3:42 PM',
+  };
+
+  // ── ACCESOS RÁPIDOS ───────────────────────────────
+  accesosRapidos: AccesoRapido[] = [
+    { icon: 'ti-alert-triangle', color: 'peligro',     label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/alert-history' },
+    { icon: 'ti-folder',         color: 'exito',       label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidence' },
+    { icon: 'ti-users',          color: 'principal',   label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/emergency-contacts' },
+    { icon: 'ti-map-pin',        color: 'acento',      label: 'Ubicación',       sub: 'Ver mapa',         route: '/dashboard/ubicacion' },
+    { icon: 'ti-phone',          color: 'advertencia', label: 'Asistencia',      sub: 'Recursos y ayuda', route: '/dashboard/assistance' },
+  ];
+
+  // ── ACCIONES RÁPIDAS ──────────────────────────────
+  accionesRapidas: AccionRapida[] = [
+    { icon: 'ti-file-text', label: 'Generar informe de emergencia',   route: '/dashboard/informe', disabled: true },
+    { icon: 'ti-book',      label: 'Ver tutorial nuevamente',          route: '/dashboard/tutorial', disabled: true },
+    { icon: 'ti-user',      label: 'Actualizar información personal',  route: '/dashboard/settings' },
+  ];
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.inicializarMiniMapa(), 100);
+  }
+
+  private inicializarMiniMapa(): void {
+    this.map = L.map('home-mini-map', {
+      center: [this.ultimaUbicacion.lat, this.ultimaUbicacion.lng],
+      zoom: 14,
+      zoomControl: false,
+      scrollWheelZoom: false,
+      dragging: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      touchZoom: false,
+      attributionControl: false,
+    });
+
+    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+    }).addTo(this.map);
+
+    const icono = L.divIcon({
+      className: '',
+      html: `<div class="home-mini-map__pin"><i class="ti ti-map-pin-filled"></i></div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    });
+
+    L.marker([this.ultimaUbicacion.lat, this.ultimaUbicacion.lng], { icon: icono }).addTo(this.map);
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  }
+}

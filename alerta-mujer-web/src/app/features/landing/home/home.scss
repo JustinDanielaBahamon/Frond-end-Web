@@ -1,4 +1,525 @@
-h1 {
-  color: red;
-  font-size: 50px;
+// ── PALETA REDUCIDA DEL PANEL DE USUARIA ────────────
+// Rojo (peligro) queda reservado solo para lo relacionado
+// con emergencias/SOS; el resto de la interfaz se apoya en
+// principal/acento/éxito. Si ya tienes variables globales de
+// tema, estas se pueden sustituir por var(--global, fallback).
+:host {
+  --color-principal: #6d28d9;
+  --color-principal-claro: #7c3aed;
+  --color-acento: #0891b2;
+  --color-exito: #10b981;
+  --color-advertencia: #d97706;
+  --color-peligro: #ef4444;
+  --color-fondo: #f5f3ff;
+  --color-superficie: #ffffff;
+  --color-borde: #c4b5fd;
+  --color-texto-principal: #2d1457;
+  --color-texto-secundario: #8b7bac;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+
+  display: block;
+}
+
+.home-wrap {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Nunito', sans-serif;
+}
+
+// ── PANEL BASE (reutilizable) ──────────────────────
+%home-box {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.home-panel {
+  @extend %home-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 1.1rem;
+}
+
+.home-panel__title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0 0 2px;
+}
+
+.home-panel__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+.home-panel__title-sm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0;
+
+  i { color: var(--color-principal); }
+}
+
+.home-link {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-principal);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+}
+
+.home-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-texto-secundario);
+  font-size: 1rem;
+
+  &:hover { color: var(--color-principal); }
+}
+
+// ── BOTONES ──────────────────────────────────────────
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.92; }
+
+  &--outline {
+    background: var(--color-superficie);
+    border: 1.5px solid var(--color-borde);
+    color: var(--color-principal);
+  }
+
+  &--primario {
+    background: #380759;
+    color: #fff;
+  }
+
+  &--block {
+    width: 100%;
+    margin-top: 1.25rem;
+  }
+}
+
+// ── BADGES ───────────────────────────────────────────
+.home-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  white-space: nowrap;
+
+  &--exito { background: rgba(16, 185, 129, 0.15); color: #059669; }
+}
+
+// ── FILAS ────────────────────────────────────────────
+.home-row {
+  display: grid;
+  gap: 1rem;
+
+  &--top {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  &--mid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &--bottom {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  @media (max-width: 1200px) {
+    &--mid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 1000px) {
+    &--top, &--bottom { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    &--mid { grid-template-columns: 1fr; }
+  }
+}
+
+// ── ESTADO DE SEGURIDAD (grid de 5 items) ───────────
+.home-seguridad-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 560px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.home-seguridad-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 0.9rem 0.5rem;
+  border-radius: 12px;
+  background: var(--color-fondo);
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(109, 40, 217, 0.12);
+    color: var(--color-principal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+  }
+
+  &__valor {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-texto-principal);
+    margin: 0;
+  }
+
+  &__descripcion {
+    font-size: var(--font-size-xs);
+    color: var(--color-texto-secundario);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  &__check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-exito);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    margin-top: 2px;
+  }
+}
+
+// ── MI DISPOSITIVO ───────────────────────────────────
+.home-dispositivo-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.home-dispositivo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-dispositivo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.home-dispositivo-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+}
+
+.home-dispositivo-value {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.home-dispositivo-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-principal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+// ── ACTIVIDAD RECIENTE ───────────────────────────────
+.home-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.home-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 0.12s;
+
+  &:hover { background: var(--color-fondo); }
+
+  &__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+
+    &--peligro   { background: rgba(239, 68, 68, 0.12);  color: var(--color-peligro); }
+    &--exito     { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    &--principal { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__titulo {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-texto-principal);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__fecha {
+    font-size: var(--font-size-xs);
+    color: var(--color-texto-secundario);
+    margin: 2px 0 0;
+  }
+
+  &__chevron {
+    color: var(--color-texto-secundario);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+}
+
+// ── ÚLTIMA EMERGENCIA ─────────────────────────────────
+.home-emergencia {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.home-emergencia__fecha-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-emergencia__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-peligro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.home-emergencia__fecha {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0;
+}
+
+.home-emergencia__hora {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  margin: 1px 0 0;
+}
+
+.home-emergencia__detalle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ede9fe;
+
+  i { color: var(--color-principal); font-size: 0.95rem; margin-top: 2px; }
+}
+
+.home-emergencia__detalle-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+.home-emergencia__detalle-valor {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  margin: 1px 0 0;
+}
+
+// ── ÚLTIMA UBICACIÓN (mini-mapa) ─────────────────────
+.home-mini-map {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  border: 1px solid #ede9fe;
+  margin-bottom: 10px;
+}
+
+.home-mini-map__pin {
+  color: var(--color-principal);
+  font-size: 1.8rem;
+  display: flex;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.home-mini-map__direccion {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  margin: 0;
+
+  i { color: var(--color-principal); }
+}
+
+.home-mini-map__fecha {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  margin: 2px 0 0;
+}
+
+// ── ACCESOS RÁPIDOS ───────────────────────────────────
+.home-accesos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.home-acceso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 1rem 0.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.12s;
+
+  &:hover { background: var(--color-fondo); }
+
+  &__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+
+    &--peligro     { background: rgba(239, 68, 68, 0.12);  color: var(--color-peligro); }
+    &--exito       { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    &--principal   { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
+    &--acento      { background: rgba(8, 145, 178, 0.12);  color: var(--color-acento); }
+    &--advertencia { background: rgba(217, 119, 6, 0.12);  color: var(--color-advertencia); }
+  }
+
+  &__label {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-texto-principal);
+    margin: 0;
+  }
+
+  &__sub {
+    font-size: var(--font-size-xs);
+    color: var(--color-texto-secundario);
+    margin: 0;
+  }
+}
+
+// ── ACCIONES RÁPIDAS ──────────────────────────────────
+.home-acciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-accion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--color-texto-principal);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: background 0.12s;
+
+  i:first-child { color: var(--color-principal); font-size: 1rem; }
+
+  span { flex: 1; }
+
+  &__chevron {
+    color: var(--color-texto-secundario);
+    font-size: var(--font-size-xs);
+  }
+
+  &:hover { background: var(--color-fondo); }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 }

@@ -10,7 +10,7 @@ import { FrequentPlace } from '../models/frequent-place.model';
 @Injectable({ providedIn: 'root' })
 export class FrequentPlaceService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/frequentPlaces`;
+  private baseUrl = `${environment.apiUrl}/api/frequent-locations`;
 
   getByUser(userId: number): Observable<FrequentPlace[]> {
     return this.http.get<FrequentPlace[]>(`${this.baseUrl}?userId=${userId}`);

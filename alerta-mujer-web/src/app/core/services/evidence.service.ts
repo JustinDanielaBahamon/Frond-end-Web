@@ -7,158 +7,42 @@ import { Evidencia, EvidenciaFilters, EvidenciaStats } from '../models/evidence.
 @Injectable({ providedIn: 'root' })
 export class EvidenceService {
   private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/evidencias`;
+  private url = `${environment.apiUrl}/api/evidences`;
 
-  // Datos mock locales (para funcionalidad sin backend)
-  private evidenciasMock: Evidencia[] = [
-    {
-      id: 1,
-      usuarioId: 1,
-      usuarioNombre: 'María Fernanda López',
-      usuarioEmail: 'maria.lopez@gmail.com',
-      tipo: 'foto',
-      nombre: 'IMG_20240512_092301.jpg',
-      tamanio: '2.4 MB',
-      fecha: '2024-05-12',
-      hora: '09:23 a.m.',
-      alertaId: 'AL-2024-0456',
-      alertaTipo: 'SOS',
-      alertaCiudad: 'Neiva',
-      estado: 'Verificada',
-      ubicacion: 'Neiva, Huila',
-      metodoActivacion: 'boton_fisico',
-      archivoUrl: 'assets/evidence-img-1.png'
-    },
-    {
-      id: 2,
-      usuarioId: 2,
-      usuarioNombre: 'Ana Sofía Ramírez',
-      usuarioEmail: 'ana.ramirez@gmail.com',
-      tipo: 'video',
-      nombre: 'VID_20240511_214522.mp4',
-      tamanio: '15.6 MB',
-      fecha: '2024-05-11',
-      hora: '09:45 p.m.',
-      alertaId: 'AL-2024-0451',
-      alertaTipo: 'Acoso',
-      alertaCiudad: 'Bogotá',
-      estado: 'Pendiente',
-      ubicacion: 'Bogotá, Cundinamarca',
-      metodoActivacion: 'movimiento_brusco',
-      archivoUrl: 'assets/evidence-vid-1.png',
-      duracion: '02:15'
-    },
-    {
-      id: 3,
-      usuarioId: 3,
-      usuarioNombre: 'Valentina Castro',
-      usuarioEmail: 'valentina.castro@gmail.com',
-      tipo: 'audio',
-      nombre: 'AUD_20240510_185500.m4a',
-      tamanio: '3.2 MB',
-      fecha: '2024-05-10',
-      hora: '06:55 p.m.',
-      alertaId: 'AL-2024-0448',
-      alertaTipo: 'Robo',
-      alertaCiudad: 'Cali',
-      estado: 'Verificada',
-      ubicacion: 'Cali, Valle del Cauca',
-      metodoActivacion: 'voz',
-      archivoUrl: 'assets/evidence-aud-1.png',
-      duracion: '01:30'
-    },
-    {
-      id: 4,
-      usuarioId: 4,
-      usuarioNombre: 'Isabella Martínez',
-      usuarioEmail: 'isabella.martinez@gmail.com',
-      tipo: 'documento',
-      nombre: 'DOC_20240510_163012.pdf',
-      tamanio: '1.1 MB',
-      fecha: '2024-05-10',
-      hora: '04:30 p.m.',
-      alertaId: 'AL-2024-0443',
-      alertaTipo: 'SOS',
-      alertaCiudad: 'Medellín',
-      estado: 'Rechazada',
-      ubicacion: 'Medellín, Antioquia',
-      metodoActivacion: 'widget',
-      archivoUrl: 'assets/evidence-doc-1.png'
-    },
-    {
-      id: 5,
-      usuarioId: 5,
-      usuarioNombre: 'Daniela Paredes',
-      usuarioEmail: 'daniela.paredes@gmail.com',
-      tipo: 'foto',
-      nombre: 'IMG_20240509_221045.jpg',
-      tamanio: '1.8 MB',
-      fecha: '2024-05-09',
-      hora: '10:10 p.m.',
-      alertaId: 'AL-2024-0439',
-      alertaTipo: 'Acoso',
-      alertaCiudad: 'Barranquilla',
-      estado: 'Pendiente',
-      ubicacion: 'Barranquilla, Atlántico',
-      metodoActivacion: 'automatico',
-      archivoUrl: 'assets/evidence-img-2.png'
-    },
-    {
-      id: 6,
-      usuarioId: 6,
-      usuarioNombre: 'Sofía Herrera',
-      usuarioEmail: 'sofia.herrera@gmail.com',
-      tipo: 'video',
-      nombre: 'VID_20240509_192233.mp4',
-      tamanio: '8.7 MB',
-      fecha: '2024-05-09',
-      hora: '07:22 p.m.',
-      alertaId: 'AL-2024-0435',
-      alertaTipo: 'Robo',
-      alertaCiudad: 'Neiva',
-      estado: 'Verificada',
-      ubicacion: 'Neiva, Huila',
-      metodoActivacion: 'boton_fisico',
-      archivoUrl: 'assets/evidence-vid-2.png',
-      duracion: '03:45'
-    }
-  ];
-
-  private evidenciasSubject = new BehaviorSubject<Evidencia[]>(this.evidenciasMock);
+  // Sin datos mock - se cargarán desde el backend
+  private evidenciasSubject = new BehaviorSubject<Evidencia[]>([]);
   evidencias$ = this.evidenciasSubject.asObservable();
 
-  private statsMock: EvidenciaStats = {
-    totalEvidencias: 6,
-    verificadas: 3,
-    pendientes: 2,
-    rechazadas: 1,
-    descargas: 1253
-  };
-
-  // Variable separada para el contador de descargas que no se sobrescribe
-  private contadorDescargas: number = 1253;
-
-  private statsSubject = new BehaviorSubject<EvidenciaStats>(this.statsMock);
+  private statsSubject = new BehaviorSubject<EvidenciaStats>({
+    totalEvidencias: 0,
+    verificadas: 0,
+    pendientes: 0,
+    rechazadas: 0,
+    descargas: 0
+  });
   stats$ = this.statsSubject.asObservable();
 
+  // Variable para el contador de descargas
+  private contadorDescargas: number = 0;
+
   // ========================================
-  // MÉTODOS API (Futuros - preparados)
+  // MÉTODOS API (Conectar al backend)
   // ========================================
 
   /**
-   * Obtener todas las evidencias (API futura)
+   * Obtener todas las evidencias
    */
   getAll(): Observable<Evidencia[]> {
-    // En el futuro: return this.http.get<Evidencia[]>(this.url);
-    return this.evidencias$;
+    return this.http.get<Evidencia[]>(this.url);
   }
 
   /**
-   * Obtener evidencia por ID (API futura)
+   * Obtener evidencia por ID
    */
   getById(id: number): Observable<Evidencia> {
-    // En el futuro: return this.http.get<Evidencia>(`${this.url}/${id}`);
-    const evidencia = this.evidenciasMock.find(e => e.id === id);
+    // TODO: Conectar al backend
+    // return this.http.get<Evidencia>(`${this.url}/${id}`);
+    const evidencia = this.evidenciasSubject.value.find(e => e.id === id);
     return of(evidencia as Evidencia).pipe(delay(300));
   }
 
@@ -166,66 +50,36 @@ export class EvidenceService {
    * Usado por USUARIA: solo sus propias evidencias
    */
   getByUsuario(usuarioId: number): Observable<Evidencia[]> {
-    // En el futuro: return this.http.get<Evidencia[]>(`${this.url}?usuarioId=${usuarioId}`);
-    const evidenciasUsuario = this.evidenciasMock.filter(e => e.usuarioId === usuarioId);
-    return of(evidenciasUsuario).pipe(delay(300));
+    return this.http.get<Evidencia[]>(`${this.url}?usuarioId=${usuarioId}`);
   }
 
   /**
-   * Crear nueva evidencia (API futura)
+   * Crear nueva evidencia
    */
   create(evidencia: Omit<Evidencia, 'id'>): Observable<Evidencia> {
-    // En el futuro: return this.http.post<Evidencia>(this.url, evidencia);
-    console.log('EvidenceService.create llamado con:', evidencia);
-    
-    const nuevaEvidencia: Evidencia = {
-      ...evidencia,
-      id: Date.now()
-    };
-    
-    this.evidenciasMock = [...this.evidenciasMock, nuevaEvidencia];
-    this.evidenciasSubject.next(this.evidenciasMock);
-    this.actualizarEstadisticas(); // Actualizar estadísticas
-    console.log('Evidencia creada exitosamente en servicio:', nuevaEvidencia);
-    return of(nuevaEvidencia).pipe(delay(500));
+    return this.http.post<Evidencia>(this.url, evidencia);
   }
 
   /**
-   * Actualizar evidencia (API futura)
+   * Actualizar evidencia
    */
   update(id: number, evidencia: Evidencia): Observable<Evidencia> {
-    // En el futuro: return this.http.put<Evidencia>(`${this.url}/${id}`, evidencia);
-    console.log('EvidenceService.update llamado con id:', id, 'evidencia:', evidencia);
-    const index = this.evidenciasMock.findIndex(e => e.id === id);
-    console.log('Índice encontrado:', index);
-    if (index !== -1) {
-      this.evidenciasMock[index] = evidencia;
-      this.evidenciasSubject.next(this.evidenciasMock);
-      this.actualizarEstadisticas(); // Actualizar estadísticas
-      console.log('Evidencia actualizada en índice:', index);
-    } else {
-      console.error('No se encontró evidencia con id:', id);
-    }
-    return of(evidencia).pipe(delay(500));
+    return this.http.put<Evidencia>(`${this.url}/${id}`, evidencia);
   }
 
   /**
-   * Eliminar evidencia (API futura)
+   * Eliminar evidencia
    */
   delete(id: number): Observable<void> {
-    // En el futuro: return this.http.delete<void>(`${this.url}/${id}`);
-    this.evidenciasMock = this.evidenciasMock.filter(e => e.id !== id);
-    this.evidenciasSubject.next(this.evidenciasMock);
-    this.actualizarEstadisticas(); // Actualizar estadísticas
-    return of(void 0).pipe(delay(300));
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 
   /**
-   * Obtener estadísticas (API futura)
+   * Obtener estadísticas
    */
   getStats(): Observable<EvidenciaStats> {
-    // En el futuro: return this.http.get<EvidenciaStats>(`${this.url}/stats`);
-    // Calcular estadísticas dinámicamente basándose en las evidencias actuales
+    // TODO: Conectar al backend
+    // return this.http.get<EvidenciaStats>(`${this.url}/stats`);
     const stats = this.calcularEstadisticas();
     return of(stats).pipe(delay(200));
   }
@@ -234,17 +88,18 @@ export class EvidenceService {
    * Calcular estadísticas dinámicamente desde las evidencias
    */
   private calcularEstadisticas(): EvidenciaStats {
-    const total = this.evidenciasMock.length;
-    const verificadas = this.evidenciasMock.filter(e => e.estado === 'Verificada').length;
-    const pendientes = this.evidenciasMock.filter(e => e.estado === 'Pendiente').length;
-    const rechazadas = this.evidenciasMock.filter(e => e.estado === 'Rechazada').length;
+    const evidencias = this.evidenciasSubject.value;
+    const total = evidencias.length;
+    const verificadas = evidencias.filter(e => e.estado === 'Verificada').length;
+    const pendientes = evidencias.filter(e => e.estado === 'Pendiente').length;
+    const rechazadas = evidencias.filter(e => e.estado === 'Rechazada').length;
     
     return {
       totalEvidencias: total,
       verificadas: verificadas,
       pendientes: pendientes,
       rechazadas: rechazadas,
-      descargas: this.contadorDescargas // Usar la variable separada
+      descargas: this.contadorDescargas
     };
   }
 
@@ -253,47 +108,46 @@ export class EvidenceService {
    */
   private actualizarEstadisticas(): void {
     const stats = this.calcularEstadisticas();
-    this.statsMock = stats;
-    console.log('Estadísticas calculadas y actualizadas:', stats);
     this.statsSubject.next(stats);
   }
 
   /**
-   * Descargar evidencia (API futura)
+   * Descargar evidencia
    */
   descargar(id: number): Observable<Blob> {
-    // En el futuro: return this.http.get(`${this.url}/${id}/descargar`, { responseType: 'blob' });
+    // TODO: Conectar al backend
+    // return this.http.get(`${this.url}/${id}/descargar`, { responseType: 'blob' });
     console.log(`Descargando evidencia ${id}. Contador antes: ${this.contadorDescargas}`);
-    this.contadorDescargas++; // Incrementar el contador separado de descargas
+    this.contadorDescargas++;
     console.log(`Contador después: ${this.contadorDescargas}`);
-    this.actualizarEstadisticas(); // Notificar a los suscriptores del cambio
+    this.actualizarEstadisticas();
     return of(new Blob()).pipe(delay(1000));
   }
 
   /**
-   * Ver evidencia (API futura - retorna URL para visualización)
+   * Ver evidencia (retorna URL para visualización)
    */
   getVerUrl(id: number): Observable<string> {
-    // En el futuro: return this.http.get(`${this.url}/${id}/ver`, { responseType: 'text' });
-    const evidencia = this.evidenciasMock.find(e => e.id === id);
+    // TODO: Conectar al backend
+    // return this.http.get(`${this.url}/${id}/ver`, { responseType: 'text' });
+    const evidencia = this.evidenciasSubject.value.find(e => e.id === id);
     return of(evidencia?.archivoUrl || '').pipe(delay(300));
   }
 
   // ========================================
-  // MÉTODOS DE FILTRADO (Locales)
+  // MÉTODOS DE FILTRADO
   // ========================================
 
   /**
    * Filtrar evidencias según criterios
    */
   filtrarEvidencias(filtros: EvidenciaFilters): Observable<Evidencia[]> {
-    let evidenciasFiltradas = [...this.evidenciasMock];
+    let evidenciasFiltradas = [...this.evidenciasSubject.value];
 
-    // Filtro de búsqueda general mejorado
+    // Filtro de búsqueda
     if (filtros.busqueda && filtros.busqueda.trim() !== '') {
       const busquedaLower = filtros.busqueda.toLowerCase().trim();
       evidenciasFiltradas = evidenciasFiltradas.filter(evidencia => {
-        // Buscar en múltiples campos para mejor coincidencia
         return (
           evidencia.nombre.toLowerCase().includes(busquedaLower) ||
           evidencia.alertaId.toLowerCase().includes(busquedaLower) ||
@@ -340,14 +194,15 @@ export class EvidenceService {
   }
 
   /**
-   * Cambiar estado de evidencia (API futura)
+   * Cambiar estado de evidencia
    */
   cambiarEstado(id: number, nuevoEstado: 'Verificada' | 'Pendiente' | 'Rechazada'): Observable<Evidencia> {
-    const evidencia = this.evidenciasMock.find(e => e.id === id);
+    const currentEvidencias = this.evidenciasSubject.value;
+    const evidencia = currentEvidencias.find(e => e.id === id);
     if (evidencia) {
       evidencia.estado = nuevoEstado;
-      this.evidenciasSubject.next(this.evidenciasMock);
-      this.actualizarEstadisticas(); // Actualizar estadísticas
+      this.evidenciasSubject.next(currentEvidencias);
+      this.actualizarEstadisticas();
       return of(evidencia).pipe(delay(300));
     }
     return of({} as Evidencia).pipe(delay(300));

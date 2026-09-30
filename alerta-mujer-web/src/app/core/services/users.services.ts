@@ -39,7 +39,7 @@ export class UsersService {
           }),
           this.http.post(`${this.apiUrl}/account`, {
             user_id: creada.id,
-            password_hash: data['password'], // solo mock
+            password_hash: data['password'],
             status: 'active',
             last_access: null,
           }),

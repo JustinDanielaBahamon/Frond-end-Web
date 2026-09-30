@@ -347,7 +347,7 @@ export class UserComponent implements OnInit {
         document_type: '',
         birthdate: null,
         created_at: ahora.toISOString(),
-        password: this.form.password, // solo mock: en el backend real va con BCrypt
+        password: this.form.password,
       };
 
       this.usersService.crearUsuaria(nueva).subscribe({

@@ -9,122 +9,16 @@ import { environment } from '../../../environments/environment';
 export class ReportsService {
   private apiUrl = `${environment.apiUrl}/reportes`;
   
-  // Datos mock locales (para funcionalidad sin backend)
-  private reportesMock: Reporte[] = [
-    {
-      id: 1,
-      nombre: 'Reporte de Alertas - Julio 2024',
-      fecha: new Date('2024-07-23T10:30:00'),
-      ciudad: 'Neiva',
-      estado: 'Pendiente',
-      usuaria: 'María Pérez',
-      acontecimiento: 'SOS en sector centro',
-      generadoPor: 'Administrador',
-      formato: 'PDF',
-      tamano: '2.3 MB',
-      descripcion: 'Reporte consolidado de alertas del mes de julio'
-    },
-    {
-      id: 2,
-      nombre: 'Reporte de Alertas - Julio 2024',
-      fecha: new Date('2024-07-21T16:15:00'),
-      ciudad: 'Bogotá',
-      estado: 'Cerrada',
-      usuaria: 'Ana García',
-      acontecimiento: 'Robo en zona norte',
-      generadoPor: 'Administrador',
-      formato: 'Excel',
-      tamano: '1.8 MB',
-      descripcion: 'Análisis de incidentes en Bogotá'
-    },
-    {
-      id: 3,
-      nombre: 'Reporte de Alertas - Julio 2024',
-      fecha: new Date('2024-07-20T11:45:00'),
-      ciudad: 'Cali',
-      estado: 'Atendida',
-      usuaria: 'Laura Martínez',
-      acontecimiento: 'Acoso en parque central',
-      generadoPor: 'Administrador',
-      formato: 'PDF',
-      tamano: '1.5 MB',
-      descripcion: 'Reporte de casos en la ciudad de Cali'
-    },
-    {
-      id: 4,
-      nombre: 'Reporte de Alertas - Julio 2024',
-      fecha: new Date('2024-07-19T09:20:00'),
-      ciudad: 'Neiva',
-      estado: 'Pendiente',
-      usuaria: 'Carolina López',
-      acontecimiento: 'Emergencia médica',
-      generadoPor: 'Administrador',
-      formato: 'CSV',
-      tamano: '950 KB',
-      descripcion: 'Registro de emergencias atendidas'
-    },
-    {
-      id: 5,
-      nombre: 'Reporte de Alertas - Julio 2024',
-      fecha: new Date('2024-07-18T20:10:00'),
-      ciudad: 'Medellín',
-      estado: 'Atendida',
-      usuaria: 'Daniela Torres',
-      acontecimiento: 'SOS en apartamento',
-      generadoPor: 'Administrador',
-      formato: 'PDF',
-      tamano: '2.1 MB',
-      descripcion: 'Alertas generadas en Medellín'
-    },
-    {
-      id: 6,
-      nombre: 'Reporte de Zonas - Agosto 2024',
-      fecha: new Date('2024-08-15T14:30:00'),
-      ciudad: 'Barranquilla',
-      estado: 'Cerrada',
-      usuaria: 'Sofía Ramírez',
-      acontecimiento: 'Múltiples alertas en zona',
-      generadoPor: 'Administrador',
-      formato: 'Excel',
-      tamano: '1.2 MB',
-      descripcion: 'Análisis de zonas de riesgo en Barranquilla'
-    },
-    {
-      id: 7,
-      nombre: 'Reporte Mensual - Agosto 2024',
-      fecha: new Date('2024-08-10T08:00:00'),
-      ciudad: 'Neiva',
-      estado: 'Atendida',
-      usuaria: 'Valentina Castro',
-      acontecimiento: 'Consolidado mensual',
-      generadoPor: 'Administrador',
-      formato: 'PDF',
-      tamano: '3.5 MB',
-      descripcion: 'Reporte mensual consolidado de todas las alertas'
-    },
-    {
-      id: 8,
-      nombre: 'Reporte de Alertas - Agosto 2024',
-      fecha: new Date('2024-08-05T17:45:00'),
-      ciudad: 'Bogotá',
-      estado: 'Pendiente',
-      usuaria: 'Isabella Rodríguez',
-      acontecimiento: 'Casos reportados en sector',
-      generadoPor: 'Administrador',
-      formato: 'CSV',
-      tamano: '800 KB',
-      descripcion: 'Casos reportados en Bogotá'
-    }
-  ];
+  private reportes: Reporte[] = [];
 
-  private reportesSubject = new BehaviorSubject<Reporte[]>(this.reportesMock);
+  private reportesSubject = new BehaviorSubject<Reporte[]>(this.reportes);
   reportes$ = this.reportesSubject.asObservable();
 
-  private statsMock: ReporteStats = {
-    totalReportes: 542,
-    totalAlertas: 1284,
-    zonasActivas: 48,
-    exportaciones: 91
+  private stats: ReporteStats = {
+    totalReportes: 0,
+    totalAlertas: 0,
+    zonasActivas: 0,
+    exportaciones: 0
   };
 
   // ========================================
@@ -144,7 +38,7 @@ export class ReportsService {
    */
   getById(id: number): Observable<Reporte> {
     // En el futuro: return this.http.get<Reporte>(`${this.apiUrl}/${id}`);
-    const reporte = this.reportesMock.find(r => r.id === id);
+    const reporte = this.reportes.find(r => r.id === id);
     return of(reporte as Reporte).pipe(delay(300));
   }
 
@@ -221,8 +115,8 @@ export class ReportsService {
       console.log('Reporte creado con alertas:', reporte.alertasIds);
     }
     
-    this.reportesMock = [...this.reportesMock, nuevoReporte];
-    this.reportesSubject.next(this.reportesMock);
+    this.reportes = [...this.reportes, nuevoReporte];
+    this.reportesSubject.next(this.reportes);
     console.log('Reporte creado exitosamente en servicio:', nuevoReporte);
     return of(nuevoReporte).pipe(delay(500));
   }
@@ -233,11 +127,11 @@ export class ReportsService {
   update(id: number, reporte: Reporte): Observable<Reporte> {
     // En el futuro: return this.http.put<Reporte>(`${this.apiUrl}/${id}`, reporte);
     console.log('ReportsService.update llamado con id:', id, 'reporte:', reporte);
-    const index = this.reportesMock.findIndex(r => r.id === id);
+    const index = this.reportes.findIndex(r => r.id === id);
     console.log('Índice encontrado:', index);
     if (index !== -1) {
-      this.reportesMock[index] = reporte;
-      this.reportesSubject.next(this.reportesMock);
+      this.reportes[index] = reporte;
+      this.reportesSubject.next(this.reportes);
       console.log('Reporte actualizado en índice:', index);
     } else {
       console.error('No se encontró reporte con id:', id);
@@ -250,8 +144,8 @@ export class ReportsService {
    */
   delete(id: number): Observable<void> {
     // En el futuro: return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    this.reportesMock = this.reportesMock.filter(r => r.id !== id);
-    this.reportesSubject.next(this.reportesMock);
+    this.reportes = this.reportes.filter(r => r.id !== id);
+    this.reportesSubject.next(this.reportes);
     return of(void 0).pipe(delay(300));
   }
 
@@ -260,7 +154,7 @@ export class ReportsService {
    */
   getStats(): Observable<ReporteStats> {
     // En el futuro: return this.http.get<ReporteStats>(`${this.apiUrl}/stats`);
-    return of(this.statsMock).pipe(delay(200));
+    return of(this.stats).pipe(delay(200));
   }
 
   // ========================================
@@ -271,7 +165,7 @@ export class ReportsService {
    * Filtrar reportes según criterios
    */
   filtrarReportes(filtros: ReporteFilters): Observable<Reporte[]> {
-    let reportesFiltrados = [...this.reportesMock];
+    let reportesFiltrados = [...this.reportes];
 
     // Filtro de búsqueda
     if (filtros.busqueda) {
@@ -367,7 +261,7 @@ export class ReportsService {
    * Imprimir reporte (funcionalidad local)
    */
   imprimirReporte(id: number): void {
-    const reporte = this.reportesMock.find(r => r.id === id);
+    const reporte = this.reportes.find(r => r.id === id);
     if (reporte) {
       console.log('Imprimiendo reporte:', reporte.nombre);
       // Aquí se implementaría la lógica de impresión

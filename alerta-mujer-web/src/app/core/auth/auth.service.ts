@@ -47,7 +47,7 @@ export class AuthService {
         return user;
       }),
       tap((user) => {
-        const token = `mock-jwt-${user.id}-${Date.now()}`;
+        const token = `jwt-${user.id}-${Date.now()}`;
         this.saveSession(user, token);
         this._currentUser$.next(user);
       }),
@@ -87,7 +87,7 @@ export class AuthService {
     this.http.post<any>(`${environment.apiUrl}/usuarios`, nuevoUsuario).subscribe({
       next: (response) => {
         const { password: _pwd, ...user } = response;
-        const token = `mock-jwt-${user.id}-${Date.now()}`;
+        const token = `jwt-${user.id}-${Date.now()}`;
         this.saveSession(user, token);
         this._currentUser$.next(user);
       },

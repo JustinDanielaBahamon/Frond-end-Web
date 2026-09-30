@@ -48,58 +48,20 @@ export interface DeviceFilters {
 export class DeviceService {
   private url = '/api/dispositivos'; // URL base para la API (se cambiará cuando se conecte al backend)
 
-  // Datos mock iniciales (se eliminarán cuando se conecte al backend)
-  private devicesMock: Device[] = [
-    {
-      id: 1,
-      name: 'Samsung Galaxy A54',
-      osVersion: 'Android 13',
-      user: { name: 'María Fernanda López', email: 'maria.lopez@gmail.com' },
-      type: 'Android',
-      imei: '354684123456789',
-      phone: '311 245 6789',
-      status: 'Activo',
-      lastSync: 'Hoy, 10:24 a.m.',
-      icon: 'fa-brands fa-android'
-    },
-    {
-      id: 2,
-      name: 'Xiaomi Redmi Note 12',
-      osVersion: 'Android 12',
-      user: { name: 'Valentina Castro', email: 'valentina.castro@gmail.com' },
-      type: 'Android',
-      imei: '862341567890123',
-      phone: '315 987 6543',
-      status: 'Inactivo',
-      lastSync: 'Ayer, 08:45 p.m.',
-      icon: 'fa-brands fa-android'
-    },
-    {
-      id: 6,
-      name: 'Samsung Galaxy S22',
-      osVersion: 'Android 13',
-      user: { name: 'Sofía Herrera', email: 'sofia.herrera@gmail.com' },
-      type: 'Android',
-      imei: '352147896325987',
-      phone: '311 753 9514',
-      status: 'Activo',
-      lastSync: 'Hoy, 11:05 a.m.',
-      icon: 'fa-brands fa-android'
-    }
-  ];
+  private devices: Device[] = [];
 
-  private devicesSubject = new BehaviorSubject<Device[]>(this.devicesMock);
+  private devicesSubject = new BehaviorSubject<Device[]>(this.devices);
   devices$ = this.devicesSubject.asObservable();
 
-  private statsMock: DeviceStats = {
-    totalDevices: 6,
-    activeDevices: 4,
-    inactiveDevices: 1,
-    blockedDevices: 1,
-    syncedToday: 4
+  private stats: DeviceStats = {
+    totalDevices: 0,
+    activeDevices: 0,
+    inactiveDevices: 0,
+    blockedDevices: 0,
+    syncedToday: 0
   };
 
-  private statsSubject = new BehaviorSubject<DeviceStats>(this.statsMock);
+  private statsSubject = new BehaviorSubject<DeviceStats>(this.stats);
   stats$ = this.statsSubject.asObservable();
 
   // ========================================
@@ -119,7 +81,7 @@ export class DeviceService {
    */
   getById(id: number): Observable<Device> {
     // En el futuro: return this.http.get<Device>(`${this.url}/${id}`);
-    const device = this.devicesMock.find(d => d.id === id);
+    const device = this.devices.find(d => d.id === id);
     return of(device as Device).pipe(delay(300));
   }
 
@@ -135,8 +97,8 @@ export class DeviceService {
       id: Date.now()
     };
     
-    this.devicesMock = [...this.devicesMock, nuevoDevice];
-    this.devicesSubject.next(this.devicesMock);
+    this.devices = [...this.devices, nuevoDevice];
+    this.devicesSubject.next(this.devices);
     this.actualizarEstadisticas(); // Actualizar estadísticas
     console.log('Dispositivo creado exitosamente en servicio:', nuevoDevice);
     return of(nuevoDevice).pipe(delay(500));
@@ -148,11 +110,11 @@ export class DeviceService {
   update(id: number, device: Device): Observable<Device> {
     // En el futuro: return this.http.put<Device>(`${this.url}/${id}`, device);
     console.log('DeviceService.update llamado con id:', id, 'device:', device);
-    const index = this.devicesMock.findIndex(d => d.id === id);
+    const index = this.devices.findIndex(d => d.id === id);
     console.log('Índice encontrado:', index);
     if (index !== -1) {
-      this.devicesMock[index] = device;
-      this.devicesSubject.next(this.devicesMock);
+      this.devices[index] = device;
+      this.devicesSubject.next(this.devices);
       this.actualizarEstadisticas(); // Actualizar estadísticas
       console.log('Dispositivo actualizado en índice:', index);
     } else {
@@ -166,8 +128,8 @@ export class DeviceService {
    */
   delete(id: number): Observable<void> {
     // En el futuro: return this.http.delete<void>(`${this.url}/${id}`);
-    this.devicesMock = this.devicesMock.filter(d => d.id !== id);
-    this.devicesSubject.next(this.devicesMock);
+    this.devices = this.devices.filter(d => d.id !== id);
+    this.devicesSubject.next(this.devices);
     this.actualizarEstadisticas(); // Actualizar estadísticas
     return of(void 0).pipe(delay(300));
   }
@@ -186,11 +148,11 @@ export class DeviceService {
    * Calcular estadísticas dinámicamente desde los dispositivos
    */
   private calcularEstadisticas(): DeviceStats {
-    const total = this.devicesMock.length;
-    const activos = this.devicesMock.filter(d => d.status === 'Activo').length;
-    const inactivos = this.devicesMock.filter(d => d.status === 'Inactivo').length;
-    const bloqueados = this.devicesMock.filter(d => d.status === 'Bloqueado').length;
-    const sincronizadosHoy = this.devicesMock.filter(d => d.lastSync.includes('Hoy')).length;
+    const total = this.devices.length;
+    const activos = this.devices.filter(d => d.status === 'Activo').length;
+    const inactivos = this.devices.filter(d => d.status === 'Inactivo').length;
+    const bloqueados = this.devices.filter(d => d.status === 'Bloqueado').length;
+    const sincronizadosHoy = this.devices.filter(d => d.lastSync.includes('Hoy')).length;
     
     return {
       totalDevices: total,
@@ -206,7 +168,7 @@ export class DeviceService {
    */
   private actualizarEstadisticas(): void {
     const stats = this.calcularEstadisticas();
-    this.statsMock = stats;
+    this.stats = stats;
     this.statsSubject.next(stats);
   }
 
@@ -214,10 +176,10 @@ export class DeviceService {
    * Cambiar estado de dispositivo (API futura)
    */
   cambiarEstado(id: number, nuevoEstado: 'Activo' | 'Inactivo' | 'Bloqueado'): Observable<Device> {
-    const device = this.devicesMock.find(d => d.id === id);
+    const device = this.devices.find(d => d.id === id);
     if (device) {
       device.status = nuevoEstado;
-      this.devicesSubject.next(this.devicesMock);
+      this.devicesSubject.next(this.devices);
       this.actualizarEstadisticas(); // Actualizar estadísticas
       return of(device).pipe(delay(300));
     }
@@ -228,7 +190,7 @@ export class DeviceService {
    * Filtrar dispositivos (API futura)
    */
   filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {
-    let dispositivosFiltrados = [...this.devicesMock];
+    let dispositivosFiltrados = [...this.devices];
 
     // Filtro por búsqueda
     if (filtros.busqueda) {

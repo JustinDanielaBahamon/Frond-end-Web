@@ -8,7 +8,7 @@
       <h1>Gestión de Zonas</h1>
       <p>Administra las zonas seguras y zonas de riesgo de la aplicación.</p>
     </div>
-    <button class="btn-primary">
+    <button type="button" class="btn-primary" (click)="abrirCrear()">
       <i class="fa-solid fa-plus"></i>
       Nueva Zona
     </button>
@@ -111,8 +111,8 @@
           <td>{{ tiempoRelativo(z.updated_at) }}</td>
           <td>
             <div class="actions">
-              <button aria-label="Ver detalles"><i class="fa-solid fa-eye"></i></button>
-              <button aria-label="Editar"><i class="fa-solid fa-pen"></i></button>
+              <button aria-label="Ver detalles" title="Ver detalles" (click)="verZona(z)"><i class="fa-solid fa-eye"></i></button>
+              <button aria-label="Editar" title="Editar" (click)="editarZona(z)"><i class="fa-solid fa-pen"></i></button>
               <button aria-label="Eliminar" (click)="eliminarZona(z)"><i class="fa-solid fa-trash"></i></button>
             </div>
           </td>
@@ -160,4 +160,159 @@
       </div>
     </div>
   </div>
+
+  <!--==========================
+      MODAL: NUEVA / EDITAR ZONA
+  ==========================-->
+  <app-modal
+    *ngIf="modal === 'crear' || modal === 'editar'"
+    tamano="lg"
+    [titulo]="modal === 'crear' ? '📍 Nueva zona' : '✏️ Editar zona'"
+    [cerrarAlClickFuera]="false"
+    (cerrar)="cerrarModal()">
+
+    <div modal-body>
+
+      <div class="form-group">
+        <label class="form-label" for="zona-nombre">Nombre</label>
+        <input id="zona-nombre" class="form-input" type="text" maxlength="80"
+          placeholder="Ej: Parque Santander" [(ngModel)]="form.nombre" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="zona-ciudad">Ciudad</label>
+        <input id="zona-ciudad" class="form-input" type="text" maxlength="60" list="ciudades-zona"
+          placeholder="Ej: Neiva" [(ngModel)]="form.ciudad" (input)="onCiudadChange()" />
+        <datalist id="ciudades-zona">
+          <option *ngFor="let c of ciudadesSugeridas" [value]="c"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Tipo de zona</span>
+        <div class="opciones">
+          <button type="button" *ngFor="let t of tipos" class="opcion"
+            [ngClass]="'opcion--' + getAvatarClass(t)"
+            [class.opcion--activa]="form.tipo === t"
+            (click)="setTipo(t)">{{ t }}</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Estado</span>
+        <div class="opciones">
+          <button type="button" *ngFor="let e of estados" class="opcion opcion--neutral"
+            [class.opcion--activa]="form.estado === e"
+            (click)="setEstado(e)">{{ e }}</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">
+          Ubicación en el mapa
+          <small class="form-opcional" *ngIf="modal === 'editar'">(opcional)</small>
+        </span>
+        <p class="form-hint">Haz clic en el mapa para marcar el centro de la zona.</p>
+        <div #mapaModal class="zona-mapa"></div>
+        <p class="zona-mapa-info">
+          <ng-container *ngIf="formTieneUbicacion">
+            ✓ {{ form.lat | number:'1.5-5' }}, {{ form.lng | number:'1.5-5' }}
+          </ng-container>
+          <ng-container *ngIf="!formTieneUbicacion">Sin ubicación seleccionada</ng-container>
+        </p>
+      </div>
+
+      <div class="form-group">
+        <span class="form-label">Radio del área</span>
+        <div class="radio-row">
+          <input type="range" min="100" max="1500" step="50" class="radio-slider"
+            aria-label="Radio del área en metros"
+            [ngModel]="form.radio" (ngModelChange)="setRadio($event)" />
+          <span class="radio-value">{{ form.radio }} m</span>
+        </div>
+        <div class="opciones opciones--chicas">
+          <button type="button" *ngFor="let r of radiosRapidos" class="opcion opcion--neutral"
+            [class.opcion--activa]="form.radio === r"
+            (click)="setRadio(r)">{{ r }} m</button>
+        </div>
+      </div>
+
+      <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+    </div>
+
+    <div modal-footer>
+      <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn-primary btn-modal" [disabled]="!formValido || guardando" (click)="guardar()">
+        {{ guardando ? 'Guardando...' : (modal === 'crear' ? 'Guardar zona' : 'Guardar cambios') }}
+      </button>
+    </div>
+  </app-modal>
+
+  <!--==========================
+      MODAL: VER DETALLE
+  ==========================-->
+  <app-modal
+    *ngIf="modal === 'ver' && zonaSeleccionada"
+    tamano="lg"
+    titulo="Detalle de la zona"
+    (cerrar)="cerrarModal()">
+
+    <div modal-body>
+      <div class="zona-detalle__head">
+        <div class="zone-avatar" [ngClass]="getAvatarClass(zonaSeleccionada.tipo)">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div>
+          <h3>{{ zonaSeleccionada.nombre }}</h3>
+          <p>{{ zonaSeleccionada.ciudad }}</p>
+        </div>
+      </div>
+
+      <dl class="zona-detalle__grid">
+        <div>
+          <dt>Tipo</dt>
+          <dd><span class="badge" [ngClass]="getBadgeClass(zonaSeleccionada.tipo)">{{ zonaSeleccionada.tipo }}</span></dd>
+        </div>
+        <div>
+          <dt>Estado</dt>
+          <dd><span class="status" [ngClass]="getStatusClass(zonaSeleccionada.estado)">{{ zonaSeleccionada.estado }}</span></dd>
+        </div>
+        <div>
+          <dt>Alertas</dt>
+          <dd>{{ zonaSeleccionada.alertas }}</dd>
+        </div>
+        <div>
+          <dt>Última actualización</dt>
+          <dd>{{ tiempoRelativo(zonaSeleccionada.updated_at) }}
+            <small class="zona-detalle__fecha">{{ zonaSeleccionada.updated_at | date:'dd/MM/yyyy HH:mm' }}</small>
+          </dd>
+        </div>
+      </dl>
+
+      <div *ngIf="tieneUbicacion(zonaSeleccionada); else sinUbicacion">
+        <span class="form-label">Ubicación</span>
+        <div #mapaModal class="zona-mapa"></div>
+        <p class="zona-mapa-info">
+          {{ zonaSeleccionada.lat | number:'1.5-5' }}, {{ zonaSeleccionada.lng | number:'1.5-5' }}
+          · radio {{ zonaSeleccionada.radio ?? 300 }} m
+        </p>
+      </div>
+
+      <ng-template #sinUbicacion>
+        <p class="zona-sin-ubicacion">
+          Esta zona todavía no tiene una ubicación en el mapa. Puedes agregarla desde
+          <strong>Editar</strong>.
+        </p>
+      </ng-template>
+    </div>
+
+    <div modal-footer>
+      <button type="button" class="btn-secondary" (click)="cerrarModal()">Cerrar</button>
+      <button type="button" class="btn-primary btn-modal" (click)="editarDesdeVer()">
+        <i class="fa-solid fa-pen"></i>
+        Editar
+      </button>
+    </div>
+  </app-modal>
+
 </div>

@@ -1,3 +1,5 @@
+@use '../../../shared/styles/admin-responsive' as responsive;
+
 /*==================================================
 =            GLOBAL STYLES & UTILITIES
 ==================================================*/
@@ -543,5 +545,35 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
     flex-direction: column;
     gap: 20px;
     text-align: center;
+  }
+}
+
+/*==================================================
+=            RESPONSIVE (bloque final)
+==================================================*/
+
+@include responsive.admin-responsive('moderator-management', $table-min: 820px, $clear-full-row: true);
+
+@media (max-width: 768px) {
+  .table-card table tbody tr td .user-info {
+    justify-content: flex-end;
+  }
+
+  .table-card table tbody tr td .user-info .user-details {
+    text-align: left;
+  }
+}
+
+/* Tablet/móvil: las cajas de búsqueda respetan su alto de 50px */
+@media (max-width: 1024px) {
+  .toolbar .search-box {
+    flex: 0 0 auto;
+  }
+}
+
+/* Móvil pequeño: se oculta el avatar para que el correo no se parta */
+@media (max-width: 480px) {
+  .table-card table tbody tr td .user-info .user-avatar {
+    display: none;
   }
 }

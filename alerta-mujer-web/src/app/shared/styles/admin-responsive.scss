@@ -1,0 +1,429 @@
+/*==================================================
+=   RESPONSIVE COMPARTIDO — PANEL ADMIN
+=   Reportes · Evidencias · Moderadores · Dispositivos
+
+   Se incluye AL FINAL del .scss de cada módulo:
+
+     @use '../../../shared/styles/admin-responsive' as responsive;
+     @include responsive.admin-responsive('nombre-clase-raiz');
+
+   - Tablet (≤1024px): la tabla hace scroll horizontal y
+     el pie de paginación se queda fijo a la izquierda.
+   - Móvil (≤768px): cada fila de la tabla pasa a ser una
+     tarjeta (usa el atributo data-label de cada <td>).
+   - ≤600px: los modales se abren como "hoja" desde abajo.
+
+   Los colores usan los tokens (--border, --text-muted) con
+   valor de respaldo, así funcionan en modo claro y oscuro.
+==================================================*/
+
+@mixin admin-responsive(
+  $root,
+  $table-min: 1000px,        // ancho mínimo de la tabla en tablet
+  $clear-full-row: false,    // botón "Limpiar filtros" ocupa toda la fila
+  $footer-direction: column  // orden de botones del modal en móvil
+) {
+
+  /* ── El botón X de los modales se posiciona dentro del modal ── */
+  .modal-content {
+    position: relative;
+  }
+
+  /*==================================================
+  =   ≤ 1100px — tarjetas de estadísticas en 2 columnas
+  ==================================================*/
+  @media (max-width: 1100px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /*==================================================
+  =   ≤ 1024px — TABLET
+  ==================================================*/
+  @media (max-width: 1024px) {
+    .#{$root} {
+      padding: 24px;
+    }
+
+    .page-header {
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .stats-grid .stat-card {
+      min-width: 0;
+    }
+
+    /* Filtros en cuadrícula de 2 columnas */
+    .toolbar {
+      .search-box {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .filter-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+
+        .filter-item {
+          flex: none;
+          min-width: 0;
+          width: 100%;
+        }
+
+        .btn-clear-filters,
+        .btn-search {
+          width: 100%;
+        }
+
+        @if $clear-full-row {
+          .btn-clear-filters {
+            grid-column: 1 / -1;
+          }
+        }
+      }
+
+      .btn-clear-filters,
+      .btn-search {
+        width: 100%;
+      }
+    }
+
+    /* Tabla con scroll horizontal + pie de página siempre visible */
+    .table-card {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        min-width: $table-min;
+      }
+
+      .table-footer {
+        position: sticky;
+        left: 0;
+      }
+
+      .pagination {
+        flex-wrap: wrap;
+      }
+    }
+  }
+
+  /*==================================================
+  =   ≤ 768px — MÓVIL / TABLET VERTICAL
+  ==================================================*/
+  @media (max-width: 768px) {
+    .#{$root} {
+      padding: 16px;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: stretch;
+      margin-bottom: 20px;
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+
+      > button {
+        width: 100%;
+      }
+    }
+
+    /* Estadísticas: 2 por fila */
+    .stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+
+      .stat-card {
+        padding: 14px;
+        gap: 10px;
+
+        .stat-info {
+          min-width: 0;
+
+          span,
+          p {
+            overflow-wrap: anywhere;
+          }
+
+          h2 {
+            font-size: 1.5rem;
+          }
+        }
+
+        .stat-icon {
+          width: 42px;
+          height: 42px;
+          flex-shrink: 0;
+          border-radius: 10px;
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .toolbar {
+      padding: 14px;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* ── TABLA → TARJETAS ───────────────────────────── */
+    .table-card {
+      overflow-x: hidden;
+
+      .table-responsive {
+        overflow-x: hidden;
+      }
+
+      table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+      }
+
+      /* Encabezado oculto visualmente (sigue disponible para lectores de pantalla) */
+      table thead {
+        display: block;
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      table tbody {
+        display: block;
+        padding: 12px;
+      }
+
+      table tbody tr,
+      table tbody tr:last-child {
+        display: block;
+        margin: 0 0 12px;
+        padding: 4px 14px;
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 14px;
+      }
+
+      table tbody tr:last-child {
+        margin-bottom: 0;
+      }
+
+      table tbody tr td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-width: 0;
+        padding: 10px 0;
+        border: 0;
+        text-align: right;
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+      }
+
+      table tbody tr td + td {
+        border-top: 1px dashed var(--border, #e2e8f0);
+      }
+
+      /* Etiqueta de cada dato (sale del atributo data-label) */
+      table tbody tr td[data-label]::before {
+        content: attr(data-label);
+        flex: 0 0 38%;
+        max-width: 38%;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted, #6b7280);
+      }
+
+      /* Celdas sin etiqueta (mensajes de "cargando" / "sin datos") */
+      table tbody tr td:not([data-label]) {
+        display: block;
+        text-align: center;
+      }
+
+      /* Contenido de cada celda: ocupa el espacio restante y va a la derecha */
+      table tbody tr td > div,
+      table tbody tr td > span {
+        min-width: 0;
+        text-align: right;
+      }
+
+      /* Celda de botones de acción */
+      table tbody tr td.actions-cell {
+        justify-content: flex-end;
+      }
+
+      table tbody tr td.actions-cell::before {
+        margin-right: auto;
+      }
+
+      .actions {
+        justify-content: flex-end;
+      }
+
+      /* Pie de tabla + paginación */
+      .table-footer {
+        position: static;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 12px;
+        text-align: center;
+      }
+
+      .table-footer .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+
+        .page-btn {
+          width: 38px;
+          height: 38px;
+        }
+      }
+    }
+
+    /* ── MODALES ────────────────────────────────────── */
+    .modal-overlay {
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 600px;
+      margin: 0;
+      max-height: calc(100vh - 24px);
+      max-height: calc(100dvh - 24px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header:not(.modal-impresora-header) {
+      flex-shrink: 0;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      text-align: left;
+
+      h2 {
+        min-width: 0;
+        font-size: 1.1rem;
+        overflow-wrap: anywhere;
+      }
+
+      .modal-close {
+        position: static;
+        flex-shrink: 0;
+      }
+    }
+
+    .modal-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+    }
+
+    .modal-footer {
+      flex-shrink: 0;
+      gap: 10px;
+      padding: 12px 16px;
+    }
+
+    .form-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .detail-item p,
+    .detail-item label {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  /*==================================================
+  =   ≤ 600px — MÓVIL
+  ==================================================*/
+  @media (max-width: 600px) {
+    .stats-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .toolbar .filter-group {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Modal como "hoja" que sube desde abajo */
+    .modal-overlay {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    .modal-content {
+      max-width: 100%;
+      border-radius: 20px 20px 0 0;
+      max-height: 94vh;
+      max-height: 94dvh;
+    }
+
+    .modal-footer {
+      flex-direction: $footer-direction;
+
+      > * {
+        width: 100%;
+        min-height: 44px;
+      }
+    }
+  }
+
+  /*==================================================
+  =   ≤ 480px — MÓVIL PEQUEÑO
+  ==================================================*/
+  @media (max-width: 480px) {
+    .#{$root} {
+      padding: 12px;
+    }
+
+    .page-header h1 {
+      font-size: 1.4rem;
+    }
+
+    .detail-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .table-card table tbody {
+      padding: 10px;
+    }
+
+    .table-card table tbody tr td[data-label]::before {
+      flex-basis: 42%;
+      max-width: 42%;
+    }
+  }
+}

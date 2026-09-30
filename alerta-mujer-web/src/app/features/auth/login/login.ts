@@ -95,21 +95,25 @@ export class LoginComponent {
 
     this.validarCorreo();
     this.validarPassword();
-  
+
     if (!this.emailValido || !this.passwordValida) {
+      this.error = 'Por favor verifica que el correo y la contraseña sean válidos';
       return;
     }
-  
+
     this.error = '';
     this.loading = true;
-  
+
+    console.log('Intentando login con:', this.email);
+
     this.auth.login({
       email: this.email,
       password: this.password
     }).subscribe({
       next: (user) => {
         this.loading = false;
-  
+        console.log('Login exitoso, usuario:', user);
+
         if (user.rol === 'Admin' || user.rol === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else {
@@ -117,11 +121,12 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.error = err.message;
+        console.error('Error en login:', err);
+        this.error = err.message || 'Error al iniciar sesión';
         this.loading = false;
       }
     });
-  
+
   }
 
 }

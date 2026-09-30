@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 import { Zona } from '../models/zone-management-model';
 
@@ -8,21 +9,21 @@ import { Zona } from '../models/zone-management-model';
 export class ZonesService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000'; // usa aquí la misma URL base que en users.services.ts
+  private apiUrl = environment.apiUrl;
 
   getAll(): Observable<Zona[]> {
-    return this.http.get<Zona[]>(`${this.apiUrl}/zonas`);
+    return this.http.get<Zona[]>(`${this.apiUrl}/api/zones`);
   }
 
   crear(zona: Omit<Zona, 'id'>): Observable<Zona> {
-    return this.http.post<Zona>(`${this.apiUrl}/zonas`, zona);
+    return this.http.post<Zona>(`${this.apiUrl}/api/zones`, zona);
   }
 
   actualizar(id: string, cambios: Partial<Omit<Zona, 'id'>>): Observable<Zona> {
-    return this.http.patch<Zona>(`${this.apiUrl}/zonas/${id}`, cambios);
+    return this.http.put<Zona>(`${this.apiUrl}/api/zones/${id}`, cambios);
   }
 
   eliminar(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/zonas/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/api/zones/${id}`);
   }
 }

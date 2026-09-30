@@ -10,22 +10,22 @@ export class AssistanceService {
   private base = environment.apiUrl;
 
   getLineas(): Observable<LineaAyuda[]> {
-    return this.http.get<LineaAyuda[]>(`${this.base}/lineas-ayuda`);
+    return this.http.get<LineaAyuda[]>(`${this.base}/api/resources`);
   }
 
   getCentros(): Observable<CentroAyuda[]> {
-    return this.http.get<CentroAyuda[]>(`${this.base}/centros-ayuda`);
+    return this.http.get<CentroAyuda[]>(`${this.base}/api/resources`);
   }
 
   getRecursosGuardados(usuarioId: number): Observable<RecursoGuardado[]> {
-    return this.http.get<RecursoGuardado[]>(`${this.base}/recursos-guardados?usuarioId=${usuarioId}`);
+    return this.http.get<RecursoGuardado[]>(`${this.base}/api/resource-calls/user/${usuarioId}`);
   }
 
   guardarRecurso(recurso: Omit<RecursoGuardado, 'id'>): Observable<RecursoGuardado> {
-    return this.http.post<RecursoGuardado>(`${this.base}/recursos-guardados`, recurso);
+    return this.http.post<RecursoGuardado>(`${this.base}/api/resource-calls`, recurso);
   }
 
   quitarRecurso(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.base}/recursos-guardados/${id}`);
+    return this.http.delete<void>(`${this.base}/api/resource-calls/${id}`);
   }
 }

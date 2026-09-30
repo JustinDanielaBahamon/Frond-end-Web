@@ -96,7 +96,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let z of zonasFiltradas">
-          <td>
+          <td class="cell-zona">
             <div class="zone-name">
               <div class="zone-avatar" [ngClass]="getAvatarClass(z.tipo)">
                 <i class="fa-solid fa-location-dot"></i>
@@ -104,12 +104,12 @@
               {{ z.nombre }}
             </div>
           </td>
-          <td>{{ z.ciudad }}</td>
-          <td><span class="badge" [ngClass]="getBadgeClass(z.tipo)">{{ z.tipo }}</span></td>
-          <td>{{ z.alertas }}</td>
-          <td><span class="status" [ngClass]="getStatusClass(z.estado)">{{ z.estado }}</span></td>
-          <td>{{ tiempoRelativo(z.updated_at) }}</td>
-          <td>
+          <td data-label="Ciudad">{{ z.ciudad }}</td>
+          <td data-label="Tipo"><span class="badge" [ngClass]="getBadgeClass(z.tipo)">{{ z.tipo }}</span></td>
+          <td data-label="Alertas">{{ z.alertas }}</td>
+          <td data-label="Estado"><span class="status" [ngClass]="getStatusClass(z.estado)">{{ z.estado }}</span></td>
+          <td data-label="Actualizada">{{ tiempoRelativo(z.updated_at) }}</td>
+          <td class="cell-acc">
             <div class="actions">
               <button aria-label="Ver detalles" title="Ver detalles" (click)="verZona(z)"><i class="fa-solid fa-eye"></i></button>
               <button aria-label="Editar" title="Editar" (click)="editarZona(z)"><i class="fa-solid fa-pen"></i></button>

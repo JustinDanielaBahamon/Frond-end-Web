@@ -221,37 +221,86 @@
       "created_at": "2026-09-10T07:45:00.000Z"
     }
   ],
-  
   "zonasManuales": [
-  {
-    "nombre": "Zona Chapinero",
-    "nivel": "Medio",
-    "metodo": "area",
-    "radio": 280,
-    "centroLat": 4.719,
-    "centroLng": -74.06566666666666,
-    "alertasEnZona": 3,
-    "id": "Ehu1gtmV3Jc"
-  },
-  {
-    "nombre": "Zona Av. Caracas",
-    "nivel": "Bajo",
-    "metodo": "area",
-    "radio": 180,
-    "centroLat": 4.70575,
-    "centroLng": -74.07589999999999,
-    "alertasEnZona": 2,
-    "id": "OKWcJZGZhtI"
-  }
-],
-"zonas": [
-  { "id": "1", "nombre": "Parque Santander", "ciudad": "Neiva", "tipo": "Riesgo Alto", "alertas": 37, "estado": "Activa", "updated_at": "2026-09-27T15:30:00.000Z" },
-  { "id": "2", "nombre": "Universidad Surcolombiana", "ciudad": "Neiva", "tipo": "Segura", "alertas": 3, "estado": "Activa", "updated_at": "2026-09-27T17:45:00.000Z" },
-  { "id": "3", "nombre": "Parque Leesburg", "ciudad": "Bogotá", "tipo": "Riesgo Alto", "alertas": 28, "estado": "Activa", "updated_at": "2026-09-26T12:00:00.000Z" },
-  { "id": "4", "nombre": "Centro Comercial San Pedro", "ciudad": "Cali", "tipo": "Riesgo Medio", "alertas": 14, "estado": "Revisión", "updated_at": "2026-09-27T13:30:00.000Z" },
-  { "id": "5", "nombre": "Parque de la Música", "ciudad": "Medellín", "tipo": "Segura", "alertas": 2, "estado": "Activa", "updated_at": "2026-09-27T17:15:00.000Z" },
-  { "id": "6", "nombre": "Terminal de Transportes", "ciudad": "Barranquilla", "tipo": "Riesgo Bajo", "alertas": 8, "estado": "Activa", "updated_at": "2026-09-27T09:30:00.000Z" }
-
+    {
+      "nombre": "Zona Chapinero",
+      "nivel": "Medio",
+      "metodo": "area",
+      "radio": 280,
+      "centroLat": 4.719,
+      "centroLng": -74.06566666666666,
+      "alertasEnZona": 3,
+      "id": "Ehu1gtmV3Jc"
+    },
+    {
+      "nombre": "Zona Av. Caracas",
+      "nivel": "Bajo",
+      "metodo": "area",
+      "radio": 180,
+      "centroLat": 4.70575,
+      "centroLng": -74.07589999999999,
+      "alertasEnZona": 2,
+      "id": "OKWcJZGZhtI"
+    }
+  ],
+  "zonas": [
+    {
+      "id": "1",
+      "nombre": "Parque Santander",
+      "ciudad": "Neiva",
+      "tipo": "Riesgo Alto",
+      "alertas": 37,
+      "estado": "Activa",
+      "updated_at": "2026-09-30T01:30:51.551Z",
+      "lat": 2.929514,
+      "lng": -75.287418,
+      "radio": 300
+    },
+    {
+      "id": "2",
+      "nombre": "Universidad Surcolombiana",
+      "ciudad": "Neiva",
+      "tipo": "Segura",
+      "alertas": 3,
+      "estado": "Activa",
+      "updated_at": "2026-09-27T17:45:00.000Z"
+    },
+    {
+      "id": "3",
+      "nombre": "Parque Leesburg",
+      "ciudad": "Bogotá",
+      "tipo": "Riesgo Alto",
+      "alertas": 28,
+      "estado": "Activa",
+      "updated_at": "2026-09-26T12:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "nombre": "Centro Comercial San Pedro",
+      "ciudad": "Cali",
+      "tipo": "Riesgo Medio",
+      "alertas": 14,
+      "estado": "Revisión",
+      "updated_at": "2026-09-27T13:30:00.000Z"
+    },
+    {
+      "id": "5",
+      "nombre": "Parque de la Música",
+      "ciudad": "Medellín",
+      "tipo": "Segura",
+      "alertas": 2,
+      "estado": "Activa",
+      "updated_at": "2026-09-27T17:15:00.000Z"
+    },
+    {
+      "id": "6",
+      "nombre": "Terminal de Transportes",
+      "ciudad": "Barranquilla",
+      "tipo": "Riesgo Bajo",
+      "alertas": 8,
+      "estado": "Activa",
+      "updated_at": "2026-09-27T09:30:00.000Z"
+    }
   ],
   "puntosMapa": [
     {
@@ -284,27 +333,207 @@
     }
   ],
   "reportes": [
-  { "id": "1",  "nombre": "Reporte de SOS - Septiembre 2026",     "fecha": "2026-09-26T10:30:00.000Z", "ciudad": "Neiva",        "tipo": "SOS",    "estado": "Pendiente", "generadoPor": "Administrador", "exportaciones": 0 },
-  { "id": "2",  "nombre": "Reporte de Robos - Septiembre 2026",   "fecha": "2026-09-25T16:15:00.000Z", "ciudad": "Bogotá",       "tipo": "Robo",   "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 3 },
-  { "id": "3",  "nombre": "Reporte de Acoso - Septiembre 2026",   "fecha": "2026-09-24T11:45:00.000Z", "ciudad": "Cali",         "tipo": "Acoso",  "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 2 },
-  { "id": "4",  "nombre": "Reporte Médico - Septiembre 2026",     "fecha": "2026-09-23T09:20:00.000Z", "ciudad": "Neiva",        "tipo": "Médico", "estado": "Pendiente", "generadoPor": "Administrador", "exportaciones": 0 },
-  { "id": "5",  "nombre": "Reporte de SOS - Septiembre 2026",     "fecha": "2026-09-22T20:10:00.000Z", "ciudad": "Medellín",     "tipo": "SOS",    "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 4 },
-  { "id": "6",  "nombre": "Reporte de Alertas - Septiembre 2026", "fecha": "2026-09-21T14:00:00.000Z", "ciudad": "Barranquilla", "tipo": "SOS",    "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 5 },
-  { "id": "7",  "nombre": "Reporte de Robos - Septiembre 2026",   "fecha": "2026-09-19T18:40:00.000Z", "ciudad": "Bogotá",       "tipo": "Robo",   "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 1 },
-  { "id": "8",  "nombre": "Reporte de Acoso - Septiembre 2026",   "fecha": "2026-09-18T08:15:00.000Z", "ciudad": "Cali",         "tipo": "Acoso",  "estado": "Pendiente", "generadoPor": "Administrador", "exportaciones": 0 },
-  { "id": "9",  "nombre": "Reporte Médico - Septiembre 2026",     "fecha": "2026-09-16T22:05:00.000Z", "ciudad": "Medellín",     "tipo": "Médico", "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 2 },
-  { "id": "10", "nombre": "Reporte de SOS - Septiembre 2026",     "fecha": "2026-09-15T13:30:00.000Z", "ciudad": "Neiva",        "tipo": "SOS",    "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 6 },
-  { "id": "11", "nombre": "Reporte de Robos - Septiembre 2026",   "fecha": "2026-09-12T17:25:00.000Z", "ciudad": "Barranquilla", "tipo": "Robo",   "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 1 },
-  { "id": "12", "nombre": "Reporte de Acoso - Septiembre 2026",   "fecha": "2026-09-10T07:45:00.000Z", "ciudad": "Bogotá",       "tipo": "Acoso",  "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 3 },
-  { "id": "13", "nombre": "Reporte Médico - Septiembre 2026",     "fecha": "2026-09-08T19:50:00.000Z", "ciudad": "Cali",         "tipo": "Médico", "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 2 },
-  { "id": "14", "nombre": "Reporte de SOS - Septiembre 2026",     "fecha": "2026-09-05T12:10:00.000Z", "ciudad": "Medellín",     "tipo": "SOS",    "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 4 },
-  { "id": "15", "nombre": "Reporte de Alertas - Agosto 2026",     "fecha": "2026-08-28T10:00:00.000Z", "ciudad": "Neiva",        "tipo": "SOS",    "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 7 },
-  { "id": "16", "nombre": "Reporte de Robos - Agosto 2026",       "fecha": "2026-08-22T15:35:00.000Z", "ciudad": "Bogotá",       "tipo": "Robo",   "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 2 },
-  { "id": "17", "nombre": "Reporte de Acoso - Agosto 2026",       "fecha": "2026-08-17T09:05:00.000Z", "ciudad": "Cali",         "tipo": "Acoso",  "estado": "Atendida",  "generadoPor": "Administrador", "exportaciones": 1 },
-  { "id": "18", "nombre": "Reporte Médico - Agosto 2026",         "fecha": "2026-08-11T21:20:00.000Z", "ciudad": "Barranquilla", "tipo": "Médico", "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 0 },
-  { "id": "19", "nombre": "Reporte de SOS - Agosto 2026",         "fecha": "2026-08-04T06:55:00.000Z", "ciudad": "Medellín",     "tipo": "SOS",    "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 5 },
-  { "id": "20", "nombre": "Reporte de Alertas - Julio 2026",      "fecha": "2026-07-23T10:30:00.000Z", "ciudad": "Neiva",        "tipo": "SOS",    "estado": "Cerrada",   "generadoPor": "Administrador", "exportaciones": 8 }
-],
+    {
+      "id": "1",
+      "nombre": "Reporte de SOS - Septiembre 2026",
+      "fecha": "2026-09-26T10:30:00.000Z",
+      "ciudad": "Neiva",
+      "tipo": "SOS",
+      "estado": "Pendiente",
+      "generadoPor": "Administrador",
+      "exportaciones": 0
+    },
+    {
+      "id": "2",
+      "nombre": "Reporte de Robos - Septiembre 2026",
+      "fecha": "2026-09-25T16:15:00.000Z",
+      "ciudad": "Bogotá",
+      "tipo": "Robo",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 3
+    },
+    {
+      "id": "3",
+      "nombre": "Reporte de Acoso - Septiembre 2026",
+      "fecha": "2026-09-24T11:45:00.000Z",
+      "ciudad": "Cali",
+      "tipo": "Acoso",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 2
+    },
+    {
+      "id": "4",
+      "nombre": "Reporte Médico - Septiembre 2026",
+      "fecha": "2026-09-23T09:20:00.000Z",
+      "ciudad": "Neiva",
+      "tipo": "Médico",
+      "estado": "Pendiente",
+      "generadoPor": "Administrador",
+      "exportaciones": 0
+    },
+    {
+      "id": "5",
+      "nombre": "Reporte de SOS - Septiembre 2026",
+      "fecha": "2026-09-22T20:10:00.000Z",
+      "ciudad": "Medellín",
+      "tipo": "SOS",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 4
+    },
+    {
+      "id": "6",
+      "nombre": "Reporte de Alertas - Septiembre 2026",
+      "fecha": "2026-09-21T14:00:00.000Z",
+      "ciudad": "Barranquilla",
+      "tipo": "SOS",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 5
+    },
+    {
+      "id": "7",
+      "nombre": "Reporte de Robos - Septiembre 2026",
+      "fecha": "2026-09-19T18:40:00.000Z",
+      "ciudad": "Bogotá",
+      "tipo": "Robo",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 1
+    },
+    {
+      "id": "8",
+      "nombre": "Reporte de Acoso - Septiembre 2026",
+      "fecha": "2026-09-18T08:15:00.000Z",
+      "ciudad": "Cali",
+      "tipo": "Acoso",
+      "estado": "Pendiente",
+      "generadoPor": "Administrador",
+      "exportaciones": 0
+    },
+    {
+      "id": "9",
+      "nombre": "Reporte Médico - Septiembre 2026",
+      "fecha": "2026-09-16T22:05:00.000Z",
+      "ciudad": "Medellín",
+      "tipo": "Médico",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 2
+    },
+    {
+      "id": "10",
+      "nombre": "Reporte de SOS - Septiembre 2026",
+      "fecha": "2026-09-15T13:30:00.000Z",
+      "ciudad": "Neiva",
+      "tipo": "SOS",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 6
+    },
+    {
+      "id": "11",
+      "nombre": "Reporte de Robos - Septiembre 2026",
+      "fecha": "2026-09-12T17:25:00.000Z",
+      "ciudad": "Barranquilla",
+      "tipo": "Robo",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 1
+    },
+    {
+      "id": "12",
+      "nombre": "Reporte de Acoso - Septiembre 2026",
+      "fecha": "2026-09-10T07:45:00.000Z",
+      "ciudad": "Bogotá",
+      "tipo": "Acoso",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 3
+    },
+    {
+      "id": "13",
+      "nombre": "Reporte Médico - Septiembre 2026",
+      "fecha": "2026-09-08T19:50:00.000Z",
+      "ciudad": "Cali",
+      "tipo": "Médico",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 2
+    },
+    {
+      "id": "14",
+      "nombre": "Reporte de SOS - Septiembre 2026",
+      "fecha": "2026-09-05T12:10:00.000Z",
+      "ciudad": "Medellín",
+      "tipo": "SOS",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 4
+    },
+    {
+      "id": "15",
+      "nombre": "Reporte de Alertas - Agosto 2026",
+      "fecha": "2026-08-28T10:00:00.000Z",
+      "ciudad": "Neiva",
+      "tipo": "SOS",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 7
+    },
+    {
+      "id": "16",
+      "nombre": "Reporte de Robos - Agosto 2026",
+      "fecha": "2026-08-22T15:35:00.000Z",
+      "ciudad": "Bogotá",
+      "tipo": "Robo",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 2
+    },
+    {
+      "id": "17",
+      "nombre": "Reporte de Acoso - Agosto 2026",
+      "fecha": "2026-08-17T09:05:00.000Z",
+      "ciudad": "Cali",
+      "tipo": "Acoso",
+      "estado": "Atendida",
+      "generadoPor": "Administrador",
+      "exportaciones": 1
+    },
+    {
+      "id": "18",
+      "nombre": "Reporte Médico - Agosto 2026",
+      "fecha": "2026-08-11T21:20:00.000Z",
+      "ciudad": "Barranquilla",
+      "tipo": "Médico",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 0
+    },
+    {
+      "id": "19",
+      "nombre": "Reporte de SOS - Agosto 2026",
+      "fecha": "2026-08-04T06:55:00.000Z",
+      "ciudad": "Medellín",
+      "tipo": "SOS",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 5
+    },
+    {
+      "id": "20",
+      "nombre": "Reporte de Alertas - Julio 2026",
+      "fecha": "2026-07-23T10:30:00.000Z",
+      "ciudad": "Neiva",
+      "tipo": "SOS",
+      "estado": "Cerrada",
+      "generadoPor": "Administrador",
+      "exportaciones": 8
+    }
+  ],
   "evidencias": [
     {
       "id": "1",
@@ -679,6 +908,28 @@
       "birthdate": null,
       "created_at": "2026-09-17T00:00:00.000Z",
       "password": "Noruega@123"
+    },
+    {
+      "nombre": "dfwdfwd efdgsfgsf",
+      "first_name": "dfwdfwd",
+      "last_name": "efdgsfgsf",
+      "email": "yo@test.com",
+      "correo": "yo@test.com",
+      "telefono": "123345556",
+      "fechaRegistro": "29/09/2026",
+      "alertas": 0,
+      "ultimaActividad": "recién registrada",
+      "estado": "Activa",
+      "rol": "Usuaria",
+      "role_id": 1,
+      "contactoEmergencia": "N/A",
+      "avatarColor": "#6d28d9",
+      "document_number": "",
+      "document_type": "",
+      "birthdate": null,
+      "created_at": "2026-09-30T01:33:17.712Z",
+      "password": "Admin@2026",
+      "id": "TbVANjPJWQU"
     }
   ],
   "role": [
@@ -756,6 +1007,13 @@
       "password_hash": "Noruega@123",
       "status": "active",
       "last_access": null
+    },
+    {
+      "user_id": "TbVANjPJWQU",
+      "password_hash": "Admin@2026",
+      "status": "active",
+      "last_access": null,
+      "id": "cow4RAeM0sI"
     }
   ],
   "user_profile": [
@@ -839,6 +1097,15 @@
       "tutorial_seen_at": null,
       "created_at": "2026-09-17T00:00:00.000Z",
       "updated_at": null
+    },
+    {
+      "user_id": "TbVANjPJWQU",
+      "profile_photo_url": null,
+      "tutorial_completed": false,
+      "tutorial_seen_at": null,
+      "created_at": "2026-09-30T01:33:17.712Z",
+      "updated_at": null,
+      "id": "iwSsGffbo5Y"
     }
   ],
   "emergency_contact": [
@@ -1138,7 +1405,6 @@
       "subtitulo": "Línea · 24/7",
       "id": "wDn7I02aRH4"
     }
-    
   ],
   "$schema": "./node_modules/json-server/schema.json"
 }

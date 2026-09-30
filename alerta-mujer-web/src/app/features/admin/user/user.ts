@@ -84,7 +84,6 @@ export class UserComponent implements OnInit {
   accionBloqueo: 'bloquear' | 'desbloquear' = 'bloquear';
 
   // ── Detalle (datos reales de otras tablas) ───────────────────
-  contactosDetalle: ContactoEmergencia[] = [];
   alertasDetalle: AlertaResumen[] = [];
   cargandoDetalle = false;
 
@@ -229,20 +228,15 @@ export class UserComponent implements OnInit {
     this.deselectAll();
   }
 
-  // ── Ver detalle: carga contactos y alertas reales ────────────
+  // ── Ver detalle: carga las últimas alertas reales ────────────
   verDetalle(u: UsuariaUI): void {
     this.usuariaSeleccionada = u;
-    this.contactosDetalle = [];
     this.alertasDetalle = [];
     this.cargandoDetalle = true;
     this.modalDetalle = true;
 
-    forkJoin({
-      contactos: this.usersService.getContactos(u.id),
-      alertas: this.usersService.getAlertasByUsuaria(u.id),
-    }).subscribe({
-      next: ({ contactos, alertas }) => {
-        this.contactosDetalle = contactos;
+    this.usersService.getAlertasByUsuaria(u.id).subscribe({
+      next: (alertas) => {
         // Las más recientes primero, máximo 5
         this.alertasDetalle = [...alertas]
           .sort((a, b) => b.created_at.localeCompare(a.created_at))

@@ -11,6 +11,8 @@
   font-family: 'Inter', 'Segoe UI', sans-serif;
   color: $text-primary;
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 // =============================================
@@ -185,6 +187,8 @@
   gap: 8px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+
+  app-chip { flex-shrink: 0; }
 }
 
 .chip {
@@ -241,10 +245,20 @@
   overflow: hidden;
 }
 
-.table-wrap { overflow-x: hidden; }
+// Scroll horizontal cuando el espacio es justo (tablets / laptops con sidebar)
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// "Seleccionar todas": solo se muestra en móvil (ver media query)
+.select-all-mobile {
+  display: none;
+}
 
 table {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
   font-size: 0.82rem;
   table-layout: fixed;
@@ -334,6 +348,7 @@ table {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .user-name {
@@ -485,6 +500,7 @@ table {
   align-items: center;
   gap: 10px;
   flex: 1;
+  flex-wrap: wrap;
 }
 
 .bulk-label {
@@ -524,6 +540,7 @@ table {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .pagination__info {
@@ -535,6 +552,7 @@ table {
 .pagination__controls {
   display: flex;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .page-btn {
@@ -609,6 +627,7 @@ table {
   font-size: 0.82rem;
   color: $purple-deep;
   margin: 0 0 8px;
+  word-break: break-all;
 }
 
 .detail-grid {
@@ -702,6 +721,8 @@ table {
   }
 
   input {
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px 12px;
     border: 1.5px solid $border;
     border-radius: $radius-sm;
@@ -748,20 +769,289 @@ table {
 }
 
 // =============================================
+// BOTONES DEL PIE DE LOS MODALES
+// (Cerrar / Editar / Cancelar / Guardar / Restablecer / Bloquear)
+// Usan tokens, así que cambian solos entre modo claro y oscuro.
+// =============================================
+.btn-secondary,
+.btn-primary,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// Secundario: borde + texto de alto contraste (casi blanco en oscuro, oscuro en claro)
+.btn-secondary {
+  border: 1.5px solid $border;
+  background: $bg-card;
+  color: $text-primary;
+
+  &:hover:not(:disabled) { background: $bg-card-hover; border-color: $purple-deep; }
+}
+
+// Principal: degradado morado-rosa con texto blanco en ambos modos
+.btn-primary {
+  border: none;
+  background: linear-gradient(90deg, $purple-deep 0%, $pink 100%);
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(1.1); }
+}
+
+// Peligro: rojo sólido con texto blanco en ambos modos
+.btn-danger {
+  border: none;
+  background: #dc2626;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: #b91c1c; }
+}
+
+// =============================================
 // RESPONSIVE
 // =============================================
+
+// ── Tablet ≤ 1024px ──────────────────────────
+@media (max-width: 1024px) {
+  .users-page { padding: 20px 20px 32px; }
+}
+
+// ── Móvil ≤ 768px: tabla → tarjetas ──────────
 @media (max-width: 768px) {
-  .users-page { padding: 16px; }
+  .users-page { padding: 16px 14px 28px; }
 
-  .users-header { flex-direction: column; align-items: flex-start; }
+  // Header: título arriba, estadísticas en una fila de 4
+  .users-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
 
-  .users-toolbar { flex-direction: column; align-items: stretch; }
+  .users-title { font-size: 1.25rem; }
 
-  .search-wrap { min-width: unset; }
+  .users-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
 
-  .mini-stat { min-width: 52px; padding: 6px 10px; }
+  .mini-stat {
+    min-width: 0;
+    padding: 8px 6px;
 
+    &__value { font-size: 1.1rem; }
+    &__label { font-size: 0.62rem; }
+  }
+
+  // Toolbar apilada, ancho completo
+  .users-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .search-wrap { min-width: 0; flex: none; width: 100%; }
+  .filter-wrap { width: 100%; }
+  .filter-select { width: 100%; box-sizing: border-box; }
+  .btn-add { width: 100%; justify-content: center; }
+
+  // 16px evita el zoom automático de iOS al enfocar inputs
+  .search-input,
+  .filter-select,
+  .form-field input { font-size: 16px; }
+
+  .search-input,
+  .filter-select { padding-top: 12px; padding-bottom: 12px; }
+
+  // Chips: una sola línea con scroll horizontal
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  // Seleccionar todas (reemplaza el checkbox del thead)
+  .select-all-mobile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: $bg-base;
+    border-bottom: 1px solid $border;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-muted;
+    cursor: pointer;
+
+    input {
+      accent-color: $purple-deep;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+  }
+
+  .table-wrap { overflow-x: visible; }
+
+  // Cada fila pasa a ser una tarjeta
+  table {
+    display: block;
+    min-width: 0;
+    table-layout: auto;
+
+    colgroup { display: none; }
+
+    // El encabezado se oculta visualmente pero queda para lectores de pantalla
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody { display: block; }
+
+    tbody tr {
+      display: block;
+      position: relative;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid $border;
+
+      td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-align: right;
+
+        // Etiqueta de cada dato (viene de data-label en el HTML)
+        &[data-label]::before {
+          content: attr(data-label);
+          flex-shrink: 0;
+          text-align: left;
+          font-size: 0.68rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: $text-dim;
+        }
+      }
+
+      // Checkbox arriba a la derecha de la tarjeta
+      td.cell-check {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        padding: 0;
+      }
+
+      // Nombre + avatar como encabezado de la tarjeta
+      td.cell-nombre {
+        justify-content: flex-start;
+        text-align: left;
+        padding: 0 34px 10px 0;
+        margin-bottom: 4px;
+        border-bottom: 1px dashed $border;
+      }
+
+      td.email-cell { word-break: break-all; }
+
+      // Acciones al pie de la tarjeta
+      td.cell-acc {
+        justify-content: flex-end;
+        margin-top: 6px;
+        padding-top: 12px;
+        border-top: 1px solid $border;
+      }
+
+      td.empty-state {
+        display: block;
+        text-align: center;
+      }
+    }
+
+    input[type="checkbox"] { width: 18px; height: 18px; }
+  }
+
+  // Botones de acción más grandes para el dedo
+  .actions-cell { gap: 8px; }
+  .action-btn { width: 40px; height: 40px; }
+
+  // Pie de tabla centrado y apilado
+  .table-footer {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    padding: 12px 14px;
+  }
+
+  .bulk-actions {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .bulk-btn { justify-content: center; padding: 10px 14px; }
+
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pagination__info { margin-right: 0; text-align: center; }
+  .pagination__controls { justify-content: center; }
+  .page-btn { min-width: 36px; height: 36px; }
+
+  .per-page-select {
+    font-size: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  // Modales
   .detail-grid { grid-template-columns: 1fr; }
-
   .form-row { grid-template-columns: 1fr; }
+
+  .btn-secondary,
+  .btn-primary,
+  .btn-danger {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}
+
+// ── Móvil pequeño ≤ 480px ────────────────────
+@media (max-width: 480px) {
+  .users-stats { grid-template-columns: repeat(2, 1fr); }
+
+  .detail-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }

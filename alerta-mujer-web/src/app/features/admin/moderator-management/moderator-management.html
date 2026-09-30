@@ -161,12 +161,12 @@
             </thead>
             <tbody>
               <tr *ngFor="let report of reports">
-                <td>
+                <td data-label="Reporte">
                   <div class="report-id">
                     <span class="id-badge">{{ report.id }}</span>
                   </div>
                 </td>
-                <td>
+                <td data-label="Usuario reportado">
                   <div class="user-info">
                     <div class="user-avatar">
                       <i class="fa-solid fa-user"></i>
@@ -177,17 +177,17 @@
                     </div>
                   </div>
                 </td>
-                <td>
+                <td data-label="Motivo">
                   <span class="badge {{ getReasonClass(report.reason) }}">{{ report.reason }}</span>
                 </td>
-                <td>
+                <td data-label="Gravedad">
                   <span class="severity {{ getSeverityClass(report.severity) }}">{{ report.severity }}</span>
                 </td>
-                <td>{{ report.date }}</td>
-                <td>
+                <td data-label="Fecha">{{ report.date }}</td>
+                <td data-label="Estado">
                   <span class="status {{ getStatusClass(report.status) }}">{{ report.status }}</span>
                 </td>
-                <td>
+                <td data-label="Acciones">
                   <div class="actions">
                     <button class="view" (click)="viewReport(report.id); $event.stopPropagation()" aria-label="Ver reporte">
                       <i class="fa-solid fa-eye"></i>
@@ -423,6 +423,7 @@
   </div>
 </div>
 
+<!-- MODAL EDITAR REPORTE -->
 <div class="modal-overlay" *ngIf="mostrarModalEditar && reporteSeleccionado" (click)="cerrarModalEditar()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">

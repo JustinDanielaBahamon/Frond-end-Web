@@ -1,233 +1,550 @@
 <div class="reports-management">
 
-  <!--==========================
-      HEADER
-  ==========================-->
-  <header class="page-header">
-    <div>
-      <h1>Gestión de Reportes</h1>
-      <p>Visualiza, filtra y genera reportes del sistema.</p>
-    </div>
-    <button class="btn-new-report">
-      <i class="fa-solid fa-plus"></i>
-      Nuevo Reporte
-    </button>
-  </header>
-
-  <!--==========================
-      STAT CARDS
-  ==========================-->
-  <section class="stats-grid">
-    <div class="stat-card purple">
-      <div class="stat-info">
-        <span>Total Reportes</span>
-        <h2>{{ totalReportes | number }}</h2>
-        <p>Generados en total</p>
+    <!--==========================
+        HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>Gestión de Reportes</h1>
+        <p>Visualiza, filtra y genera reportes del sistema.</p>
       </div>
-      <div class="stat-icon">
-        <i class="fa-solid fa-file-lines"></i>
+      <button class="btn-new-report" (click)="abrirModalNuevo()">
+        <i class="fa-solid fa-plus"></i>
+        Nuevo Reporte
+      </button>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>Total Reportes</span>
+          <h2>{{ stats.totalReportes }}</h2>
+          <p>Generados en total</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-file-lines"></i>
+        </div>
       </div>
-    </div>
-
-    <div class="stat-card green">
-      <div class="stat-info">
-        <span>Total Alertas</span>
-        <h2>{{ totalAlertas | number }}</h2>
-        <p>Alertas registradas</p>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>Exportaciones</span>
+          <h2>{{ stats.exportaciones }}</h2>
+          <p>Reportes exportados</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+        </div>
       </div>
-      <div class="stat-icon">
-        <i class="fa-solid fa-bell"></i>
-      </div>
-    </div>
-
-    <div class="stat-card orange">
-      <div class="stat-info">
-        <span>Zonas Activas</span>
-        <h2>{{ zonasActivas | number }}</h2>
-        <p>Zonas monitoreadas</p>
-      </div>
-      <div class="stat-icon">
-        <i class="fa-solid fa-location-dot"></i>
-      </div>
-    </div>
-
-    <div class="stat-card blue">
-      <div class="stat-info">
-        <span>Exportaciones</span>
-        <h2>{{ totalExportaciones | number }}</h2>
-        <p>Reportes exportados</p>
-      </div>
-      <div class="stat-icon">
-        <i class="fa-solid fa-cloud-arrow-down"></i>
-      </div>
-    </div>
-  </section>
-
-  <!--==========================
-      TOOLBAR (FILTERS & ACTIONS)
-  ==========================-->
-  <div class="toolbar">
-
-    <div class="toolbar-upper">
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS & ACTIONS)
+    ==========================-->
+  
+    <div class="toolbar">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Buscar reporte..." aria-label="Buscar reporte"
-          [ngModel]="searchTerm"
-          (ngModelChange)="searchTerm = $event; onFiltroChange()" />
+        <input 
+          type="text" 
+          placeholder="Buscar reporte..." 
+          aria-label="Buscar reporte"
+          [(ngModel)]="filtros.busqueda"
+          (input)="onBusquedaChange()"
+        />
       </div>
+  
 
-      <div class="action-buttons">
-        <button class="btn-action pdf" (click)="imprimir()"
-          title="Se abrirá el diálogo de impresión: elige «Guardar como PDF»">
-          <i class="fa-solid fa-file-pdf"></i>
-          Descargar PDF
-        </button>
-        <button class="btn-action excel" (click)="exportarExcel()">
-          <i class="fa-solid fa-file-excel"></i>
-          Descargar Excel
-        </button>
-        <button class="btn-action print" (click)="imprimir()">
-          <i class="fa-solid fa-print"></i>
-          Imprimir
+  
+      <div class="filter-group">
+        <div class="filter-item">
+          <label>Fecha Inicial</label>
+          <input 
+            type="date" 
+            class="select-date" 
+            aria-label="Fecha inicial"
+            [(ngModel)]="filtros.fechaInicio"
+            (change)="aplicarFiltros()"
+          >
+        </div>
+        <div class="filter-item">
+          <label>Fecha Final</label>
+          <input 
+            type="date" 
+            class="select-date" 
+            aria-label="Fecha final"
+            [(ngModel)]="filtros.fechaFin"
+            (change)="aplicarFiltros()"
+          >
+        </div>
+        <div class="filter-item">
+          <label>Lugar de Alerta</label>
+          <select 
+            aria-label="Filtrar por Ciudad"
+            [(ngModel)]="filtros.ciudad"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todas</option>
+            <option value="all">Todas</option>
+            <option value="neiva">Neiva</option>
+            <option value="bogota">Bogotá</option>
+            <option value="cali">Cali</option>
+            <option value="medellin">Medellín</option>
+            <option value="barranquilla">Barranquilla</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>Estado</label>
+          <select 
+            aria-label="Filtrar por Estado"
+            [(ngModel)]="filtros.estado"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todos</option>
+            <option value="all">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Cerrada">Cerrada</option>
+            <option value="Atendida">Atendida</option>
+          </select>
+        </div>
+        <button class="btn-clear-filters" (click)="limpiarFiltros()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Limpiar filtros
         </button>
       </div>
     </div>
-
-    <div class="filter-group">
-      <div class="filter-item">
-        <label for="fecha-inicio">Fecha inicio</label>
-        <input id="fecha-inicio" type="date" aria-label="Fecha inicial"
-          [ngModel]="fechaInicio"
-          (ngModelChange)="fechaInicio = $event; onFiltroChange()">
-      </div>
-      <div class="filter-item">
-        <label for="fecha-fin">Fecha fin</label>
-        <input id="fecha-fin" type="date" aria-label="Fecha final"
-          [ngModel]="fechaFin"
-          (ngModelChange)="fechaFin = $event; onFiltroChange()">
-      </div>
-      <div class="filter-item">
-        <label for="filtro-ciudad">Ciudad</label>
-        <select id="filtro-ciudad" aria-label="Filtrar por Ciudad"
-          [ngModel]="filtroCiudad"
-          (ngModelChange)="filtroCiudad = $event; onFiltroChange()">
-          <option value="">Todas</option>
-          <option *ngFor="let c of ciudades" [value]="c">{{ c }}</option>
-        </select>
-      </div>
-      <div class="filter-item">
-        <label for="filtro-medio">Modo de activación</label>
-        <select id="filtro-medio" aria-label="Filtrar por modo de activación"
-          [ngModel]="filtroMedio"
-          (ngModelChange)="filtroMedio = $event; onFiltroChange()">
-          <option value="">Todos</option>
-          <option *ngFor="let m of medios" [value]="m">{{ m }}</option>
-        </select>
-      </div>
-      <div class="filter-item">
-        <label for="filtro-estado">Estado</label>
-        <select id="filtro-estado" aria-label="Filtrar por Estado"
-          [ngModel]="filtroEstado"
-          (ngModelChange)="filtroEstado = $event; onFiltroChange()">
-          <option value="">Todos</option>
-          <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
-        </select>
-      </div>
-      <button class="btn-clear-filters" (click)="limpiarFiltros()">
-        <i class="fa-solid fa-filter-circle-xmark"></i>
-        Limpiar filtros
-      </button>
-    </div>
-
+  
+    <!--==========================
+        TABLE
+    ==========================-->
+  
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+            <thead>
+              <tr>
+                <th>Nombre del Reporte</th>
+                <th>Fecha</th>
+                <th>Ciudad</th>
+                <th>Usuaria</th>
+                <th>Acontecimiento</th>
+                <th>Estado</th>
+                <th>Generado por</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (cargando) {
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Cargando reportes...</p>
+                    </div>
+                  </td>
+                </tr>
+              } @else if (reportesPaginados.length === 0) {
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px;">
+                    <div class="no-data">
+                      <i class="fa-solid fa-folder-open"></i>
+                      <p>No se encontraron reportes</p>
+                      <button class="btn-clear-filters" (click)="limpiarFiltros()">
+                        Limpiar filtros
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @else {
+                @for (reporte of reportesPaginados; track reporte.id) {
+                  <tr>
+                    <td>
+                      <div class="report-name">
+                        <div class="report-icon">
+                          <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        {{ reporte.nombre }}
+                      </div>
+                    </td>
+                    <td>{{ formatearFecha(reporte.fecha) }}</td>
+                    <td>{{ reporte.ciudad }}</td>
+                    <td>{{ reporte.usuaria || '-' }}</td>
+                    <td>{{ reporte.acontecimiento || '-' }}</td>
+                    <td>
+                      <span class="status {{ getStatusClass(reporte.estado) }}">{{ reporte.estado }}</span>
+                    </td>
+                    <td>{{ reporte.generadoPor }}</td>
+                    <td>
+                      <div class="actions">
+                        <button 
+                          class="view" 
+                          aria-label="Ver reporte"
+                          (click)="verReporte(reporte)"
+                        >
+                          <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <button 
+                          class="edit" 
+                          aria-label="Editar reporte"
+                          (click)="editarReporte(reporte)"
+                        >
+                          <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button 
+                          class="delete" 
+                          aria-label="Eliminar reporte"
+                          (click)="eliminarReporte(reporte.id)"
+                        >
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+      
+          <!--==========================
+              PAGINATION
+          ==========================-->
+      
+          <div class="table-footer">
+            <div class="table-info">
+              Mostrando
+              <strong>{{ elementoInicio }} - {{ elementoFin }}</strong>
+              de
+              <strong>{{ paginacion.totalElementos }}</strong>
+              reportes
+            </div>
+            <div class="pagination">
+              <button 
+                class="page-btn" 
+                aria-label="Página anterior"
+                (click)="paginaAnterior()"
+                [disabled]="paginacion.paginaActual === 1"
+              >
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              
+              @for (pagina of paginasVisibles; track pagina) {
+                <button 
+                  class="page-btn" 
+                  [class.active]="pagina === paginacion.paginaActual"
+                  (click)="cambiarPagina(pagina)"
+                >
+                  {{ pagina }}
+                </button>
+              }
+              
+              @if (paginacion.totalPaginas > 5) {
+                <span class="page-ellipsis">...</span>
+              }
+              
+              @if (paginacion.totalPaginas > 5 && !paginasVisibles.includes(paginacion.totalPaginas)) {
+                <button 
+                  class="page-btn" 
+                  (click)="irAUltimaPagina()"
+                >
+                  {{ paginacion.totalPaginas }}
+                </button>
+              }
+              
+              <button 
+                class="page-btn" 
+                aria-label="Página siguiente"
+                (click)="paginaSiguiente()"
+                [disabled]="paginacion.paginaActual === paginacion.totalPaginas"
+              >
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        
+        </div>
+        </div>
   </div>
 
-  <!--==========================
-      TABLE
-  ==========================-->
-  <div class="table-card">
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre del Reporte</th>
-            <th>Fecha</th>
-            <th>Ciudad</th>
-            <th>Modo de activación</th>
-            <th>Estado</th>
-            <th>Generado por</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of reportesPagina">
-            <td>
-              <div class="report-name">
-                <div class="report-icon">
-                  <i class="fa-solid fa-file-lines"></i>
+  <!-- MODAL NUEVO/EDITAR REPORTE -->
+  @if (mostrarModalNuevo) {
+    <div class="modal-overlay" (click)="cerrarModalNuevo()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ reporteEditando ? 'Editar Reporte' : 'Nuevo Reporte' }}</h2>
+          <button class="modal-close" (click)="cerrarModalNuevo()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          @if (error) {
+            <div class="error-message">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ error }}
+            </div>
+          }
+          
+          <form class="report-form">
+            <div class="form-group">
+              <label>Nombre del Reporte</label>
+              <input 
+                type="text" 
+                [(ngModel)]="modeloNombre"
+                (ngModelChange)="modeloNombre = $event"
+                placeholder="Ej: Reporte de Alertas - Enero 2024"
+              >
+            </div>
+
+            <!-- Selector de Alertas -->
+            <div class="form-group alertas-selector">
+              <label>
+                Seleccionar Alertas 
+                <span class="alertas-count">({{ alertasSeleccionadasCount }} seleccionadas)</span>
+              </label>
+              <div class="alertas-actions">
+                <button type="button" class="btn-small" (click)="seleccionarTodasAlertas()">
+                  Seleccionar todas
+                </button>
+                <button type="button" class="btn-small" (click)="deseleccionarTodasAlertas()">
+                  Deseleccionar todas
+                </button>
+              </div>
+              
+              @if (cargandoAlertas) {
+                <div class="loading-alertas">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  Cargando alertas...
                 </div>
-                {{ r.nombre }}
+              } @else if (alertasDisponibles.length === 0) {
+                <div class="no-alertas">
+                  <i class="fa-solid fa-folder-open"></i>
+                  <p>No hay alertas disponibles</p>
+                </div>
+              } @else {
+                <div class="alertas-list">
+                  @for (alerta of alertasDisponibles; track alerta.id) {
+                    <div class="alerta-item" [class.selected]="isAlertaSeleccionada(alerta.id)">
+                      <input 
+                        type="checkbox" 
+                        [id]="'alerta-' + alerta.id"
+                        [checked]="isAlertaSeleccionada(alerta.id)"
+                        (change)="toggleAlertaSeleccionada(alerta.id)"
+                      >
+                      <label [for]="'alerta-' + alerta.id" class="alerta-label">
+                        <div class="alerta-info">
+                          <span class="alerta-tipo">{{ alerta.tipo }}</span>
+                          <span class="alerta-ubicacion">{{ alerta.ubicacion }}</span>
+                          <span class="alerta-fecha">{{ alerta.tiempo }}</span>
+                        </div>
+                        <span class="alerta-estado status {{ getStatusClass(alerta.estado) }}">
+                          {{ alerta.estado }}
+                        </span>
+                      </label>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ciudad</label>
+                <select 
+                  [(ngModel)]="modeloCiudad"
+                  (ngModelChange)="modeloCiudad = $event"
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="Neiva">Neiva</option>
+                  <option value="Bogotá">Bogotá</option>
+                  <option value="Cali">Cali</option>
+                  <option value="Medellín">Medellín</option>
+                  <option value="Barranquilla">Barranquilla</option>
+                </select>
               </div>
-            </td>
-            <td>{{ r.fecha | date:'dd/MM/yyyy hh:mm a' }}</td>
-            <td>{{ r.ciudad }}</td>
-            <td><span class="badge" [ngClass]="getBadgeClass(r.medioActivacion)">{{ r.medioActivacion }}</span></td>
-            <td><span class="status" [ngClass]="getStatusClass(r.estado)">{{ r.estado }}</span></td>
-            <td>{{ r.generadoPor }}</td>
-            <td>
-              <div class="actions">
-                <button class="view" aria-label="Ver reporte">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="edit" aria-label="Editar reporte">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <button class="delete" aria-label="Eliminar reporte" (click)="eliminarReporte(r)">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+              
+              <div class="form-group">
+                <label>Estado</label>
+                <select 
+                  [(ngModel)]="modeloEstado"
+                  (ngModelChange)="modeloEstado = $event"
+                >
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Cerrada">Cerrada</option>
+                  <option value="Atendida">Atendida</option>
+                </select>
               </div>
-            </td>
-          </tr>
-
-          <!-- Cargando -->
-          <tr *ngIf="cargando">
-            <td colspan="7" class="empty-state">Cargando reportes...</td>
-          </tr>
-
-          <!-- Sin resultados -->
-          <tr *ngIf="!cargando && reportesPagina.length === 0">
-            <td colspan="7" class="empty-state">No se encontraron reportes con ese criterio.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!--==========================
-          PAGINATION
-      ==========================-->
-      <div class="table-footer">
-        <div class="table-info">
-          Mostrando
-          <strong>{{ desde }} - {{ hasta }}</strong>
-          de
-          <strong>{{ totalFiltrados }}</strong>
-          reportes
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Usuaria</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="modeloUsuaria"
+                  (ngModelChange)="modeloUsuaria = $event"
+                  placeholder="Nombre de la usuaria"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label>Acontecimiento</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="modeloAcontecimiento"
+                  (ngModelChange)="modeloAcontecimiento = $event"
+                  placeholder="Descripción breve del acontecimiento"
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Descripción</label>
+              <textarea 
+                [(ngModel)]="modeloDescripcion"
+                (ngModelChange)="modeloDescripcion = $event"
+                placeholder="Descripción detallada del reporte..."
+                rows="3"
+              ></textarea>
+            </div>
+          </form>
         </div>
-        <div class="pagination">
-          <button class="page-btn" aria-label="Página anterior"
-            [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <button *ngFor="let p of paginas" class="page-btn"
-            [class.active]="p === paginaActual"
-            [attr.aria-label]="'Página ' + p"
-            (click)="cambiarPagina(p)">{{ p }}</button>
-          <button class="page-btn" aria-label="Página siguiente"
-            [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
-            <i class="fa-solid fa-chevron-right"></i>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
+          <button 
+            class="btn-primary" 
+            (click)="reporteEditando ? actualizarReporte() : crearReporte()"
+            [disabled]="cargando"
+          >
+            @if (cargando) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            }
+            {{ reporteEditando ? 'Actualizar' : 'Crear' }}
           </button>
         </div>
       </div>
-
     </div>
-  </div>
+  }
 
-</div>
+  <!-- MODAL VER REPORTE -->
+  @if (mostrarModalVer && reporteSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModalVer()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Detalle del Reporte</h2>
+          <button class="modal-close" (click)="cerrarModalVer()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="report-detail">
+            <div class="detail-header">
+              <div class="report-icon-large">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div class="detail-info">
+                <h3>{{ reporteSeleccionado.nombre }}</h3>
+                <span class="status {{ getStatusClass(reporteSeleccionado.estado) }}">{{ reporteSeleccionado.estado }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>ID</label>
+                <p>{{ reporteSeleccionado.id }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Fecha</label>
+                <p>{{ formatearFecha(reporteSeleccionado.fecha) }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Ciudad</label>
+                <p>{{ reporteSeleccionado.ciudad }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Usuaria</label>
+                <p>{{ reporteSeleccionado.usuaria || '-' }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Acontecimiento</label>
+                <p>{{ reporteSeleccionado.acontecimiento || '-' }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Generado por</label>
+                <p>{{ reporteSeleccionado.generadoPor }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Formato</label>
+                <p>{{ reporteSeleccionado.formato }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Tamaño</label>
+                <p>{{ reporteSeleccionado.tamano }}</p>
+              </div>
+            </div>
+            
+            @if (reporteSeleccionado.descripcion) {
+              <div class="detail-description">
+                <label>Descripción</label>
+                <p>{{ reporteSeleccionado.descripcion }}</p>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            class="btn-action pdf" 
+            (click)="descargarPDF(reporteSeleccionado.id)"
+          >
+            <i class="fa-solid fa-file-pdf"></i>
+            Descargar PDF
+          </button>
+          <button 
+            class="btn-action excel" 
+            (click)="descargarExcel(reporteSeleccionado.id)"
+          >
+            <i class="fa-solid fa-file-excel"></i>
+            Descargar Excel
+          </button>
+          <button 
+            class="btn-action print" 
+            (click)="imprimir()"
+          >
+            <i class="fa-solid fa-print"></i>
+            Imprimir
+          </button>
+          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL ALERTA IMPRESORA -->
+  @if (mostrarModalImpresora) {
+    <div class="modal-overlay modal-impresora" (click)="cerrarModalImpresora()">
+      <div class="modal-content modal-impresora-content" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-impresora-header">
+          <div class="impresora-icon">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <h2>¡No se ha encontrado impresora!</h2>
+          <button class="modal-close" (click)="cerrarModalImpresora()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body modal-impresora-body">
+          <p>No se ha encontrado dispositivos para imprimir. Conecta tu impresora e inténtalo de nuevo.</p>
+          <p class="mensaje-final">¡Ten lindo día!!</p>
+        </div>
+        <div class="modal-footer modal-impresora-footer">
+          <button class="btn-primary" (click)="cerrarModalImpresora()">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  

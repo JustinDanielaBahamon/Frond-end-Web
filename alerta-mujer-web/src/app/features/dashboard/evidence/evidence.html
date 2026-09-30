@@ -115,7 +115,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                 </svg>
-                Emergencia {{ e.alerta }}
+                Emergencia {{ e.alertaId }}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
@@ -166,7 +166,7 @@
           </svg>
         </span>
         <h3>{{ tipoLabel(evidenciaSeleccionada.tipo) }} de evidencia</h3>
-        <span class="ev-detail-badge">Emergencia {{ evidenciaSeleccionada.alerta }}</span>
+        <span class="ev-detail-badge">Emergencia {{ evidenciaSeleccionada.alertaId }}</span>
       </div>
 
       <div class="ev-detail-preview" [ngClass]="getColor(evidenciaSeleccionada.tipo)">
@@ -229,7 +229,7 @@
         </div>
         <div class="ev-detail-row">
           <span class="ev-detail-label">Emergencia asociada</span>
-          <span>{{ evidenciaSeleccionada.alerta }}</span>
+          <span>{{ evidenciaSeleccionada.alertaId }}</span>
         </div>
         <div class="ev-detail-row">
           <span class="ev-detail-label">Método de activación</span>

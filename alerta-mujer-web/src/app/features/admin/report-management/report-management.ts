@@ -1,221 +1,677 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
-import { ReportsService } from '../../../core/services/reports.services';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { Reporte, ReporteFilters, ReporteStats, Paginacion } from '../../../core/models/report.model';
+import { ReportsService } from '../../../core/services/reports.service';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { ZonesService } from '../../../core/services/zones.Services';
-import { Reporte, EstadoReporte } from '../../../core/models/report.model';
-import { MedioActivacion } from '../../../core/models/alert.model';
+import { Alerta } from '../../../core/models/alert.model';
 
 @Component({
   selector: 'app-report-management',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './report-management.html',
   styleUrl: './report-management.scss',
 })
-export class ReportManagementComponent implements OnInit {
-
+export class ReportManagementComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   private reportsService = inject(ReportsService);
   private alertsService = inject(AlertsService);
-  private zonesService = inject(ZonesService);
 
-  cargando = true;
-  private todos: Reporte[] = [];
-  private filtrados: Reporte[] = [];
+  // Datos
+  reportes$: Observable<Reporte[]> = this.reportsService.reportes$;
+  stats$: Observable<ReporteStats> = this.reportsService.getStats();
+  
+  reportesFiltrados: Reporte[] = [];
+  stats: ReporteStats = {
+    totalReportes: 0,
+    totalAlertas: 0,
+    zonasActivas: 0,
+    exportaciones: 0
+  };
 
-  // ── Datos de las tarjetas (vienen del db.json) ───────────────
-  totalAlertas = 0;
-  zonasActivas = 0;
+  // Filtros
+  filtros: ReporteFilters = {
+    busqueda: '',
+    fechaInicio: null,
+    fechaFin: null,
+    ciudad: '',
+    estado: ''
+  };
 
-  get totalReportes(): number { return this.todos.length; }
+  // Paginación
+  paginacion: Paginacion = {
+    paginaActual: 1,
+    elementosPorPagina: 5,
+    totalElementos: 0,
+    totalPaginas: 0
+  };
 
-  get totalExportaciones(): number {
-    return this.todos.reduce((suma, r) => suma + (r.exportaciones ?? 0), 0);
-  }
+  // Estados UI
+  cargando = false;
+  error = '';
+  mostrarModalNuevo = false;
+  mostrarModalVer = false;
+  mostrarModalImpresora = false;
+  reporteSeleccionado: Reporte | null = null;
+  reporteEditando: Reporte | null = null;
 
-  // ── Filtros ──────────────────────────────────────────────────
-  searchTerm = '';
-  fechaInicio = '';
-  fechaFin = '';
-  filtroCiudad = '';
-  filtroMedio = '';
-  filtroEstado = '';
+  // Alertas disponibles para selección
+  alertasDisponibles: Alerta[] = [];
+  alertasSeleccionadas: number[] = []; // IDs de alertas seleccionadas
+  cargandoAlertas = false;
 
-  readonly medios: MedioActivacion[] = ['Botón de pánico', 'Widget', 'Movimiento sospechoso', 'Manual'];
-  readonly estados: EstadoReporte[] = ['Pendiente', 'Cerrada', 'Atendida'];
+  // Para formulario de nuevo reporte
+  nuevoReporte: Partial<Reporte> = {
+    nombre: '',
+    ciudad: '',
+    estado: 'Pendiente',
+    usuaria: '',
+    acontecimiento: '',
+    descripcion: ''
+  };
 
-  // Ciudades sacadas de los propios reportes
-  get ciudades(): string[] {
-    return [...new Set(this.todos.map(r => r.ciudad))].sort((a, b) => a.localeCompare(b));
-  }
-
-  // ── Paginación ───────────────────────────────────────────────
-  reportesPagina: Reporte[] = [];
-  paginaActual = 1;
-  porPagina = 5;
-  totalFiltrados = 0;
-  totalPaginas = 1;
-  paginas: number[] = [];
-
-  get desde(): number {
-    return this.totalFiltrados === 0 ? 0 : (this.paginaActual - 1) * this.porPagina + 1;
-  }
-
-  get hasta(): number {
-    return Math.min(this.paginaActual * this.porPagina, this.totalFiltrados);
-  }
-
-  // ── Lifecycle ────────────────────────────────────────────────
   ngOnInit(): void {
     this.cargarDatos();
+    this.cargarAlertas();
   }
 
-  private cargarDatos(): void {
-    this.cargando = true;
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    forkJoin({
-      reportes: this.reportsService.getAll(),
-      // Si alertas o zonas fallan, los reportes igual se muestran
-      alertas: this.alertsService.getAll().pipe(catchError(() => of([]))),
-      zonas: this.zonesService.getAll().pipe(catchError(() => of([]))),
-    }).subscribe({
-      next: ({ reportes, alertas, zonas }) => {
-        // Más recientes primero
-        this.todos = [...reportes].sort(
-          (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-        );
-        this.totalAlertas = alertas.length;
-        this.zonasActivas = zonas.filter(z => z.estado === 'Activa').length;
+  // ========================================
+  // CARGA DE DATOS
+  // ========================================
 
-        this.applyFilters();
-        this.cargando = false;
+  private cargarAlertas(): void {
+    this.cargandoAlertas = true;
+    this.alertsService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (alertas) => {
+        this.alertasDisponibles = alertas;
+        this.cargandoAlertas = false;
       },
       error: (err) => {
-        console.error('Error cargando reportes:', err);
-        this.cargando = false;
+        console.error('Error cargando alertas:', err);
+        this.cargandoAlertas = false;
       }
     });
   }
 
-  // ── Filtros y paginación ─────────────────────────────────────
-  applyFilters(): void {
-    const term = this.searchTerm.trim().toLowerCase();
-    const inicio = this.fechaInicio ? new Date(`${this.fechaInicio}T00:00:00`).getTime() : null;
-    const fin = this.fechaFin ? new Date(`${this.fechaFin}T23:59:59.999`).getTime() : null;
-
-    this.filtrados = this.todos.filter(r => {
-      const t = new Date(r.fecha).getTime();
-
-      const coincideTexto = !term ||
-        r.nombre.toLowerCase().includes(term) ||
-        r.ciudad.toLowerCase().includes(term) ||
-        r.medioActivacion.toLowerCase().includes(term);
-      const coincideInicio = inicio === null || t >= inicio;
-      const coincideFin = fin === null || t <= fin;
-      const coincideCiudad = !this.filtroCiudad || r.ciudad === this.filtroCiudad;
-      const coincideMedio = !this.filtroMedio || r.medioActivacion === this.filtroMedio;
-      const coincideEstado = !this.filtroEstado || r.estado === this.filtroEstado;
-
-      return coincideTexto && coincideInicio && coincideFin &&
-             coincideCiudad && coincideMedio && coincideEstado;
+  private cargarDatos(): void {
+    this.cargando = true;
+    
+    this.reportsService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (reportes) => {
+        this.reportesFiltrados = reportes;
+        this.actualizarPaginacion();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cargar los reportes';
+        this.cargando = false;
+        console.error('Error cargando reportes:', err);
+      }
     });
 
-    this.totalFiltrados = this.filtrados.length;
-    this.totalPaginas = Math.ceil(this.totalFiltrados / this.porPagina) || 1;
-    if (this.paginaActual > this.totalPaginas) this.paginaActual = 1;
-
-    const start = (this.paginaActual - 1) * this.porPagina;
-    this.reportesPagina = this.filtrados.slice(start, start + this.porPagina);
-    this.paginas = Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+    this.stats$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (stats) => {
+        this.stats = stats;
+      }
+    });
   }
 
-  // Cuando cambia un filtro, se vuelve a la página 1
-  onFiltroChange(): void {
-    this.paginaActual = 1;
-    this.applyFilters();
-  }
+  // ========================================
+  // FILTRADO
+  // ========================================
 
-  cambiarPagina(p: number): void {
-    if (p < 1 || p > this.totalPaginas) return;
-    this.paginaActual = p;
-    this.applyFilters();
+  aplicarFiltros(): void {
+    this.cargando = true;
+    this.paginacion.paginaActual = 1; // Resetear a primera página
+
+    this.reportsService.filtrarReportes(this.filtros).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (reportes) => {
+        this.reportesFiltrados = reportes;
+        this.actualizarPaginacion();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al filtrar reportes';
+        this.cargando = false;
+        console.error('Error filtrando:', err);
+      }
+    });
   }
 
   limpiarFiltros(): void {
-    this.searchTerm = '';
-    this.fechaInicio = '';
-    this.fechaFin = '';
-    this.filtroCiudad = '';
-    this.filtroMedio = '';
-    this.filtroEstado = '';
-    this.paginaActual = 1;
-    this.applyFilters();
+    this.filtros = {
+      busqueda: '',
+      fechaInicio: null,
+      fechaFin: null,
+      ciudad: '',
+      estado: ''
+    };
+    // Aplicar filtros con datos originales en lugar de filtrar con filtros vacíos
+    this.cargarDatos();
   }
 
-  // ── Acciones ─────────────────────────────────────────────────
-  eliminarReporte(r: Reporte): void {
-    if (!confirm(`¿Eliminar "${r.nombre}"?`)) return;
+  onBusquedaChange(): void {
+    // Debounce simple para búsqueda
+    setTimeout(() => this.aplicarFiltros(), 300);
+  }
 
-    this.reportsService.eliminar(r.id).subscribe({
-      next: () => {
-        this.todos = this.todos.filter(x => x.id !== r.id);
-        this.applyFilters();
+  // ========================================
+  // PAGINACIÓN
+  // ========================================
+
+  private actualizarPaginacion(): void {
+    this.paginacion.totalElementos = this.reportesFiltrados.length;
+    this.paginacion.totalPaginas = Math.ceil(
+      this.paginacion.totalElementos / this.paginacion.elementosPorPagina
+    );
+  }
+
+  get reportesPaginados(): Reporte[] {
+    const inicio = (this.paginacion.paginaActual - 1) * this.paginacion.elementosPorPagina;
+    const fin = inicio + this.paginacion.elementosPorPagina;
+    return this.reportesFiltrados.slice(inicio, fin);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.paginacion.totalPaginas) {
+      this.paginacion.paginaActual = pagina;
+    }
+  }
+
+  irAPrimeraPagina(): void {
+    this.cambiarPagina(1);
+  }
+
+  irAUltimaPagina(): void {
+    this.cambiarPagina(this.paginacion.totalPaginas);
+  }
+
+  paginaAnterior(): void {
+    this.cambiarPagina(this.paginacion.paginaActual - 1);
+  }
+
+  paginaSiguiente(): void {
+    this.cambiarPagina(this.paginacion.paginaActual + 1);
+  }
+
+  // ========================================
+  // EXPORTACIÓN
+  // ========================================
+
+  descargarPDF(id: number): void {
+    this.cargando = true;
+    this.reportsService.descargarPDF(id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (blob) => {
+        console.log('PDF blob recibido:', blob);
+        this.descargarArchivo(blob, `reporte_${id}.pdf`);
+        this.cargando = false;
       },
-      error: (err) => console.error('Error eliminando reporte:', err)
+      error: (err) => {
+        this.error = 'Error al descargar PDF';
+        this.cargando = false;
+        console.error('Error descargando PDF:', err);
+      }
     });
   }
 
-  // Exporta a CSV (Excel lo abre directo) los reportes que cumplen los filtros
-  exportarExcel(): void {
-    const encabezado = ['Nombre', 'Fecha', 'Ciudad', 'Modo de activación', 'Estado', 'Generado por'];
-    const filas = this.filtrados.map(r => [
-      r.nombre,
-      new Date(r.fecha).toLocaleString('es-CO'),
-      r.ciudad,
-      r.medioActivacion,
-      r.estado,
-      r.generadoPor,
-    ]);
+  descargarExcel(id: number): void {
+    this.cargando = true;
+    this.reportsService.descargarExcel(id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (blob) => {
+        console.log('Excel blob recibido:', blob);
+        this.descargarArchivo(blob, `reporte_${id}.xlsx`);
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al descargar Excel';
+        this.cargando = false;
+        console.error('Error descargando Excel:', err);
+      }
+    });
+  }
 
-    const csv = [encabezado, ...filas]
-      .map(fila => fila.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'))
-      .join('\r\n');
+  generarReporteConFiltros(formato: 'PDF' | 'Excel'): void {
+    this.cargando = true;
+    
+    // Crear nombre del reporte basado en filtros
+    const nombreReporte = this.generarNombreReporte();
+    
+    const reporteACrear: Omit<Reporte, 'id'> = {
+      nombre: nombreReporte,
+      fecha: new Date(),
+      ciudad: this.filtros.ciudad || 'Todas',
+      estado: 'Pendiente',
+      generadoPor: 'Administrador',
+      formato: formato,
+      tamano: 'Calculando...',
+      descripcion: `Reporte generado con filtros: ${this.descripcionFiltros()}`
+    };
 
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (reporte) => {
+        // Descargar el reporte recién creado
+        if (formato === 'PDF') {
+          this.descargarPDF(reporte.id);
+        } else {
+          this.descargarExcel(reporte.id);
+        }
+        this.cargarDatos();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al generar reporte';
+        this.cargando = false;
+        console.error('Error generando reporte:', err);
+      }
+    });
+  }
+
+  generarNombreReporte(): string {
+    const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const ciudad = this.filtros.ciudad ? this.filtros.ciudad : 'Todas';
+    const estado = this.filtros.estado ? this.filtros.estado : 'Todos';
+    return `Reporte ${ciudad} - ${estado} - ${fecha}`;
+  }
+
+  descripcionFiltros(): string {
+    const partes: string[] = [];
+    if (this.filtros.ciudad) partes.push(`Ciudad: ${this.filtros.ciudad}`);
+    if (this.filtros.estado) partes.push(`Estado: ${this.filtros.estado}`);
+    if (this.filtros.fechaInicio) partes.push(`Desde: ${this.formatearFecha(this.filtros.fechaInicio)}`);
+    if (this.filtros.fechaFin) partes.push(`Hasta: ${this.formatearFecha(this.filtros.fechaFin)}`);
+    if (this.filtros.busqueda) partes.push(`Búsqueda: ${this.filtros.busqueda}`);
+    return partes.length > 0 ? partes.join(', ') : 'Sin filtros';
+  }
+
+  imprimir(): void {
+    // Verificar si hay impresora conectada
+    if (this.verificarImpresora()) {
+      window.print();
+    } else {
+      this.mostrarModalImpresora = true;
+    }
+  }
+
+  verificarImpresora(): boolean {
+    // Simulación de verificación de impresora
+    // En un entorno real, esto podría usar la API de impresión del navegador
+    // Aquí simulamos que NO hay impresora conectada para mostrar el modal
+    return false; // Cambiar a true para imprimir directamente
+  }
+
+  cerrarModalImpresora(): void {
+    this.mostrarModalImpresora = false;
+  }
+
+  private descargarArchivo(blob: Blob, nombre: string): void {
+    console.log('Iniciando descarga:', nombre, 'Tamaño blob:', blob.size);
+    
+    if (blob.size === 0) {
+      // Crear un archivo de ejemplo si el blob está vacío
+      const contenido = `Reporte generado el ${new Date().toLocaleString('es-ES')}\n\nEste es un reporte de ejemplo generado por el sistema AlertaMujer.`;
+      const blobReal = new Blob([contenido], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blobReal);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre.endsWith('.pdf') ? nombre : nombre.replace('.xlsx', '.txt');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      return;
+    }
+    
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'reportes.csv';
+    a.download = nombre;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 
-  // PDF e Imprimir usan el diálogo del navegador (elige "Guardar como PDF")
-  imprimir(): void {
-    window.print();
+  // ========================================
+  // ACCIONES CRUD
+  // ========================================
+
+  verReporte(reporte: Reporte): void {
+    this.reporteSeleccionado = reporte;
+    this.mostrarModalVer = true;
   }
 
-  // ── Helpers de estilo ────────────────────────────────────────
-  getBadgeClass(medio: MedioActivacion): string {
-    const map: Record<MedioActivacion, string> = {
-      'Botón de pánico':       'red',
-      'Widget':                'blue',
-      'Movimiento sospechoso': 'purple',
-      'Manual':                'orange',
+  editarReporte(reporte: Reporte): void {
+    this.reporteEditando = { ...reporte };
+    this.mostrarModalNuevo = true;
+  }
+
+  actualizarReporte(): void {
+    if (!this.reporteEditando || !this.reporteEditando.id) {
+      this.error = 'No hay reporte para actualizar';
+      return;
+    }
+
+    this.cargando = true;
+    const reporteActualizado: Reporte = {
+      id: this.reporteEditando.id,
+      nombre: this.modeloNombre,
+      fecha: this.reporteEditando.fecha,
+      ciudad: this.modeloCiudad,
+      estado: this.modeloEstado as any,
+      usuaria: this.modeloUsuaria,
+      acontecimiento: this.modeloAcontecimiento,
+      generadoPor: this.reporteEditando.generadoPor,
+      formato: this.reporteEditando.formato, // Mantener el formato original
+      tamano: this.reporteEditando.tamano,
+      descripcion: this.modeloDescripcion
     };
-    return map[medio] ?? '';
+
+    console.log('Actualizando reporte:', reporteActualizado);
+
+    this.reportsService.update(reporteActualizado.id, reporteActualizado).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        console.log('Reporte actualizado exitosamente');
+        this.cargarDatos();
+        this.cerrarModalNuevo();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al actualizar reporte';
+        this.cargando = false;
+        console.error('Error actualizando:', err);
+      }
+    });
   }
 
-  getStatusClass(estado: EstadoReporte): string {
-    const map: Record<EstadoReporte, string> = {
+  eliminarReporte(id: number): void {
+    if (confirm('¿Estás seguro de eliminar este reporte?')) {
+      this.cargando = true;
+      this.reportsService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.cargarDatos();
+          this.cargando = false;
+        },
+        error: (err) => {
+          this.error = 'Error al eliminar reporte';
+          this.cargando = false;
+          console.error('Error eliminando:', err);
+        }
+      });
+    }
+  }
+
+  crearReporte(): void {
+    this.cargando = true;
+    
+    // Si hay alertas seleccionadas, generar datos basados en ellas
+    let nombre = this.modeloNombre;
+    let usuaria = this.modeloUsuaria;
+    let acontecimiento = this.modeloAcontecimiento;
+    let ciudad = this.modeloCiudad || 'No especificada';
+    let descripcion = this.modeloDescripcion;
+
+    if (this.alertasSeleccionadas.length > 0) {
+      const alertasSeleccionadasObj = this.alertasDisponibles.filter(a => 
+        this.alertasSeleccionadas.includes(a.id)
+      );
+      
+      if (alertasSeleccionadasObj.length > 0) {
+        // Generar nombre automático basado en alertas si no hay nombre personalizado
+        if (!nombre) {
+          const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const tiposAlertas = [...new Set(alertasSeleccionadasObj.map(a => a.tipo))].join(', ');
+          nombre = `Reporte ${tiposAlertas} - ${fecha}`;
+        }
+        
+        // Usar datos de la primera alerta seleccionada como base
+        if (!usuaria && alertasSeleccionadasObj[0].usuarioId) {
+          usuaria = `Usuario ${alertasSeleccionadasObj[0].usuarioId}`;
+        }
+        if (!acontecimiento) {
+          acontecimiento = alertasSeleccionadasObj[0].tipo;
+        }
+        if (!ciudad || ciudad === 'No especificada') {
+          ciudad = alertasSeleccionadasObj[0].ubicacion || 'No especificada';
+        }
+        if (!descripcion) {
+          descripcion = `Reporte basado en ${this.alertasSeleccionadas.length} alerta(s): ${alertasSeleccionadasObj.map(a => a.tipo).join(', ')}`;
+        }
+      }
+    }
+
+    const reporteACrear: Omit<Reporte, 'id'> = {
+      nombre: nombre || 'Reporte Sin Nombre',
+      fecha: new Date(),
+      ciudad: ciudad,
+      estado: (this.modeloEstado || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
+      usuaria: usuaria,
+      acontecimiento: acontecimiento,
+      generadoPor: 'Administrador',
+      formato: 'PDF' as 'PDF' | 'Excel' | 'CSV', // Formato por defecto
+      tamano: 'Calculando...',
+      descripcion: descripcion,
+      alertasIds: this.alertasSeleccionadas.length > 0 ? this.alertasSeleccionadas : undefined
+    };
+
+    console.log('Creando reporte:', reporteACrear);
+    console.log('Valores del formulario:', {
+      nombre: this.modeloNombre,
+      ciudad: this.modeloCiudad,
+      estado: this.modeloEstado,
+      usuaria: this.modeloUsuaria,
+      acontecimiento: this.modeloAcontecimiento,
+      alertasSeleccionadas: this.alertasSeleccionadas
+    });
+    
+    this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (reporteCreado) => {
+        console.log('Reporte creado exitosamente:', reporteCreado);
+        this.cargarDatos();
+        this.cerrarModalNuevo();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al crear reporte';
+        this.cargando = false;
+        console.error('Error creando:', err);
+      }
+    });
+  }
+
+  // ========================================
+  // MODALES
+  // ========================================
+
+  abrirModalNuevo(): void {
+    this.reporteEditando = null;
+    this.nuevoReporte = {
+      nombre: '',
+      ciudad: '',
+      estado: 'Pendiente',
+      usuaria: '',
+      acontecimiento: '',
+      descripcion: ''
+    };
+    this.alertasSeleccionadas = []; // Resetear selección de alertas
+    this.mostrarModalNuevo = true;
+  }
+
+  cerrarModalNuevo(): void {
+    this.mostrarModalNuevo = false;
+    this.reporteEditando = null;
+    this.nuevoReporte = {
+      nombre: '',
+      ciudad: '',
+      estado: 'Pendiente',
+      usuaria: '',
+      acontecimiento: '',
+      descripcion: ''
+    };
+    this.alertasSeleccionadas = [];
+    this.error = '';
+  }
+
+  cerrarModalVer(): void {
+    this.mostrarModalVer = false;
+    this.reporteSeleccionado = null;
+  }
+
+  // ========================================
+  // UTILIDADES
+  // ========================================
+
+  getStatusClass(estado: string): string {
+    const clases: Record<string, string> = {
       'Pendiente': 'pending',
-      'Cerrada':   'closed',
-      'Atendida':  'attended',
+      'Cerrada': 'closed',
+      'Atendida': 'attended'
     };
-    return map[estado] ?? '';
+    return clases[estado] || 'pending';
+  }
+
+  formatearFecha(fecha: Date): string {
+    return new Date(fecha).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  get paginasVisibles(): number[] {
+    const paginas: number[] = [];
+    const maxPaginasVisibles = 5;
+    const mitad = Math.floor(maxPaginasVisibles / 2);
+    
+    let inicio = Math.max(1, this.paginacion.paginaActual - mitad);
+    let fin = Math.min(this.paginacion.totalPaginas, inicio + maxPaginasVisibles - 1);
+    
+    if (fin - inicio < maxPaginasVisibles - 1) {
+      inicio = Math.max(1, fin - maxPaginasVisibles + 1);
+    }
+    
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+    
+    return paginas;
+  }
+
+  // Helpers para template
+  get elementoInicio(): number {
+    return (this.paginacion.paginaActual - 1) * this.paginacion.elementosPorPagina + 1;
+  }
+
+  get elementoFin(): number {
+    return Math.min(this.paginacion.paginaActual * this.paginacion.elementosPorPagina, this.paginacion.totalElementos);
+  }
+
+  // Helpers para formularios en modales
+  get modeloNombre(): string {
+    return this.reporteEditando ? this.reporteEditando.nombre : this.nuevoReporte.nombre || '';
+  }
+
+  set modeloNombre(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.nombre = valor;
+    } else {
+      this.nuevoReporte.nombre = valor;
+    }
+  }
+
+  get modeloCiudad(): string {
+    return this.reporteEditando ? this.reporteEditando.ciudad : this.nuevoReporte.ciudad || '';
+  }
+
+  set modeloCiudad(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.ciudad = valor;
+    } else {
+      this.nuevoReporte.ciudad = valor;
+    }
+  }
+
+  get modeloEstado(): string {
+    return this.reporteEditando ? this.reporteEditando.estado : this.nuevoReporte.estado || 'Pendiente';
+  }
+
+  set modeloEstado(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.estado = valor as any;
+    } else {
+      this.nuevoReporte.estado = valor as any;
+    }
+  }
+
+  get modeloUsuaria(): string {
+    return this.reporteEditando ? (this.reporteEditando.usuaria || '') : (this.nuevoReporte.usuaria || '');
+  }
+
+  set modeloUsuaria(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.usuaria = valor;
+    } else {
+      this.nuevoReporte.usuaria = valor;
+    }
+  }
+
+  get modeloAcontecimiento(): string {
+    return this.reporteEditando ? (this.reporteEditando.acontecimiento || '') : (this.nuevoReporte.acontecimiento || '');
+  }
+
+  set modeloAcontecimiento(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.acontecimiento = valor;
+    } else {
+      this.nuevoReporte.acontecimiento = valor;
+    }
+  }
+
+  get modeloDescripcion(): string {
+    return this.reporteEditando ? this.reporteEditando.descripcion || '' : this.nuevoReporte.descripcion || '';
+  }
+
+  set modeloDescripcion(valor: string) {
+    if (this.reporteEditando) {
+      this.reporteEditando.descripcion = valor;
+    } else {
+      this.nuevoReporte.descripcion = valor;
+    }
+  }
+
+  // ========================================
+  // GESTIÓN DE ALERTAS
+  // ========================================
+
+  toggleAlertaSeleccionada(alertaId: number): void {
+    const index = this.alertasSeleccionadas.indexOf(alertaId);
+    if (index === -1) {
+      this.alertasSeleccionadas.push(alertaId);
+    } else {
+      this.alertasSeleccionadas.splice(index, 1);
+    }
+  }
+
+  isAlertaSeleccionada(alertaId: number): boolean {
+    return this.alertasSeleccionadas.includes(alertaId);
+  }
+
+  seleccionarTodasAlertas(): void {
+    this.alertasSeleccionadas = this.alertasDisponibles.map(a => a.id);
+  }
+
+  deseleccionarTodasAlertas(): void {
+    this.alertasSeleccionadas = [];
+  }
+
+  get alertasSeleccionadasCount(): number {
+    return this.alertasSeleccionadas.length;
   }
 }

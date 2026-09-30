@@ -9,10 +9,6 @@
         <h1>Gestión de Evidencias</h1>
         <p>Visualiza, administra y gestiona las evidencias enviadas en las alertas.</p>
       </div>
-      <button class="btn-upload-evidence">
-        <i class="fa-solid fa-plus"></i>
-        Subir Evidencia
-      </button>
     </header>
   
     <!--==========================
@@ -63,7 +59,7 @@
             '1.1-1' }}% del total</p>
         </div>
         <div class="stat-icon">
-          <i class="fa-solid fa-shield-xmark"></i>
+          <i class="fa-solid fa-xmark"></i>
         </div>
       </div>
   
@@ -88,57 +84,45 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input
           type="text"
-          placeholder="Buscar por nombre, descripción o ID..."
+          placeholder="Buscar por nombre, descripción, ID, usuario..."
           [(ngModel)]="searchTermEvidence"
-          (input)="applyFilters()"
           aria-label="Buscar evidencia"
         />
       </div>
   
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input
-          type="text"
-          placeholder="Buscar por nombre o correo..."
-          [(ngModel)]="searchTermUser"
-          (input)="applyFilters()"
-          aria-label="Buscar usuario"
-        />
-      </div>
-  
       <div class="filter-group">
-        <div class="filter-item">
-          <select
-            [(ngModel)]="filterEvidenceType"
-            (change)="applyFilters()"
-            aria-label="Filtrar por Tipo de evidencia"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="Imagen">Imagen</option>
-            <option value="Video">Video</option>
-            <option value="Audio">Audio</option>
-            <option value="Documento">Documento</option>
-          </select>
+        <div class="filter-item custom-select" [class.open]="isEvidenceTypeDropdownOpen">
+          <div class="select-selected" (click)="toggleEvidenceTypeDropdown($event)">
+            {{ getEvidenceTypeLabel(filterEvidenceType) }}
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+          <div class="select-items" *ngIf="isEvidenceTypeDropdownOpen">
+            <div (click)="selectEvidenceType('all', $event)">Todos los tipos</div>
+            <div (click)="selectEvidenceType('foto', $event)">Imagen</div>
+            <div (click)="selectEvidenceType('video', $event)">Video</div>
+            <div (click)="selectEvidenceType('audio', $event)">Audio</div>
+            <div (click)="selectEvidenceType('documento', $event)">Documento</div>
+          </div>
         </div>
-        <div class="filter-item">
-          <select
-            [(ngModel)]="filterStatus"
-            (change)="applyFilters()"
-            aria-label="Filtrar por Estado"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="Verificada">Verificada</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Rechazada">Rechazada</option>
-          </select>
+        <div class="filter-item custom-select" [class.open]="isStatusDropdownOpen">
+          <div class="select-selected" (click)="toggleStatusDropdown($event)">
+            {{ getStatusLabel(filterStatus) }}
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+          <div class="select-items" *ngIf="isStatusDropdownOpen">
+            <div (click)="selectStatus('all', $event)">Todos los estados</div>
+            <div (click)="selectStatus('Verificada', $event)">Verificada</div>
+            <div (click)="selectStatus('Pendiente', $event)">Pendiente</div>
+            <div (click)="selectStatus('Rechazada', $event)">Rechazada</div>
+          </div>
         </div>
-        <button class="date-range-picker" aria-label="Seleccionar rango de fechas">
-          <i class="fa-solid fa-calendar-days"></i>
-          Seleccione un rango
-        </button>
         <button class="btn-clear-filters" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
           Limpiar filtros
+        </button>
+        <button class="btn-search" (click)="applyFilters(); $event.stopPropagation()">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Buscar
         </button>
       </div>
     </div>
@@ -167,55 +151,56 @@
               <div class="evidence-preview">
                 <div class="preview-thumbnail"
                   [ngClass]="{
-                    'video-icon': evidence.type === 'Video',
-                    'audio-icon': evidence.type === 'Audio',
-                    'document-icon': evidence.type === 'Documento'
+                    'video-icon': evidence.tipo === 'video',
+                    'audio-icon': evidence.tipo === 'audio',
+                    'document-icon': evidence.tipo === 'documento'
                   }"
                 >
-                  <img *ngIf="evidence.type === 'Imagen'" [src]="evidence.preview" alt="Preview" />
-                  <i *ngIf="evidence.type === 'Video'" class="fa-solid fa-video"></i>
-                  <i *ngIf="evidence.type === 'Audio'" class="fa-solid fa-headphones"></i>
-                  <i *ngIf="evidence.type === 'Documento'" class="fa-solid fa-file-pdf"></i>
+                  <img *ngIf="evidence.tipo === 'foto' && evidence.archivoUrl" [src]="evidence.archivoUrl" alt="Preview" />
+                  <i *ngIf="evidence.tipo === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="evidence.tipo === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="evidence.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="evidence.tipo === 'foto' && !evidence.archivoUrl" class="fa-solid fa-image"></i>
                 </div>
               </div>
             </td>
             <td>
               <div class="evidence-details">
-                <span class="evidence-name">{{ evidence.name }}</span>
-                <span class="evidence-id-size">ID: {{ evidence.evidenceId }} - {{ evidence.size }}</span>
+                <span class="evidence-name">{{ evidence.nombre }}</span>
+                <span class="evidence-id-size">ID: {{ evidence.id }} - {{ evidence.tamanio }}</span>
               </div>
             </td>
             <td>
               <div class="user-info">
-                <span class="user-name">{{ evidence.user.name }}</span>
-                <span class="user-email">{{ evidence.user.email }}</span>
+                <span class="user-name">{{ evidence.usuarioNombre }}</span>
+                <span class="user-email">{{ evidence.usuarioEmail }}</span>
               </div>
             </td>
             <td>
               <div class="alert-related">
-                <span class="alert-id">{{ evidence.alertRelated.id }}</span>
-                <span class="alert-type-city">{{ evidence.alertRelated.type }} - {{ evidence.alertRelated.city }}</span>
+                <span class="alert-id">{{ evidence.alertaId }}</span>
+                <span class="alert-type-city">{{ evidence.alertaTipo }} - {{ evidence.alertaCiudad }}</span>
               </div>
             </td>
             <td>
-              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.type)">
-                {{ evidence.type }}
+              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.tipo)">
+                {{ getEvidenceTypeDisplay(evidence.tipo) }}
               </span>
             </td>
-            <td>{{ evidence.date }}<br>{{ evidence.time }}</td>
+            <td>{{ evidence.fecha }}<br>{{ evidence.hora }}</td>
             <td>
-              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.status)">
-                {{ evidence.status }}
+              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.estado)">
+                {{ evidence.estado }}
               </span>
             </td>
             <td class="actions-cell">
-              <button class="view" aria-label="Ver evidencia">
+              <button class="view" (click)="verEvidencia(evidence)" aria-label="Ver evidencia">
                 <i class="fa-solid fa-eye"></i>
               </button>
-              <button class="download" aria-label="Descargar evidencia">
+              <button class="download" (click)="descargarEvidencia(evidence.id)" aria-label="Descargar evidencia">
                 <i class="fa-solid fa-download"></i>
               </button>
-              <button class="delete" aria-label="Eliminar evidencia">
+              <button class="delete" (click)="eliminarEvidencia(evidence.id)" aria-label="Eliminar evidencia">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
@@ -256,4 +241,161 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL VER EVIDENCIA -->
+  @if (mostrarModalVer && evidenciaSeleccionada) {
+    <div class="modal-overlay" (click)="cerrarModalVer()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Detalle de Evidencia</h2>
+          <button class="modal-close" (click)="cerrarModalVer()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="evidence-detail">
+            <!-- Header con preview y estado -->
+            <div class="detail-header">
+              <div class="evidence-preview-large">
+                <div class="preview-thumbnail-large"
+                  [ngClass]="{
+                    'video-icon': evidenciaSeleccionada.tipo === 'video',
+                    'audio-icon': evidenciaSeleccionada.tipo === 'audio',
+                    'document-icon': evidenciaSeleccionada.tipo === 'documento'
+                  }"
+                >
+                  <img *ngIf="evidenciaSeleccionada.tipo === 'foto' && evidenciaSeleccionada.archivoUrl" [src]="evidenciaSeleccionada.archivoUrl" alt="Preview" />
+                  <i *ngIf="evidenciaSeleccionada.tipo === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="evidenciaSeleccionada.tipo === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="evidenciaSeleccionada.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="evidenciaSeleccionada.tipo === 'foto' && !evidenciaSeleccionada.archivoUrl" class="fa-solid fa-image"></i>
+                </div>
+              </div>
+              <div class="detail-info">
+                <h3>{{ evidenciaSeleccionada.nombre }}</h3>
+                <div class="detail-meta">
+                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidenciaSeleccionada.estado)">
+                    {{ evidenciaSeleccionada.estado }}
+                  </span>
+                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidenciaSeleccionada.tipo)">
+                    {{ getEvidenceTypeDisplay(evidenciaSeleccionada.tipo) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Información principal en grid -->
+            <div class="detail-section">
+              <h4>Información de la Evidencia</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>ID</label>
+                  <p>{{ evidenciaSeleccionada.id }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Fecha</label>
+                  <p>{{ evidenciaSeleccionada.fecha }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Hora</label>
+                  <p>{{ evidenciaSeleccionada.hora }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Tamaño</label>
+                  <p>{{ evidenciaSeleccionada.tamanio }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información del usuario -->
+            <div class="detail-section">
+              <h4>Información del Usuario</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>Nombre</label>
+                  <p>{{ evidenciaSeleccionada.usuarioNombre }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Email</label>
+                  <p>{{ evidenciaSeleccionada.usuarioEmail }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de la alerta -->
+            <div class="detail-section">
+              <h4>Alerta Relacionada</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>ID Alerta</label>
+                  <p>{{ evidenciaSeleccionada.alertaId }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Tipo</label>
+                  <p>{{ evidenciaSeleccionada.alertaTipo }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>Ciudad</label>
+                  <p>{{ evidenciaSeleccionada.alertaCiudad }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información adicional -->
+            @if (evidenciaSeleccionada.ubicacion || evidenciaSeleccionada.metodoActivacion || evidenciaSeleccionada.duracion) {
+              <div class="detail-section">
+                <h4>Información Adicional</h4>
+                <div class="detail-grid">
+                  @if (evidenciaSeleccionada.ubicacion) {
+                    <div class="detail-item">
+                      <label>Ubicación</label>
+                      <p>{{ evidenciaSeleccionada.ubicacion }}</p>
+                    </div>
+                  }
+                  @if (evidenciaSeleccionada.metodoActivacion) {
+                    <div class="detail-item">
+                      <label>Método de Activación</label>
+                      <p>{{ evidenciaSeleccionada.metodoActivacion }}</p>
+                    </div>
+                  }
+                  @if (evidenciaSeleccionada.duracion) {
+                    <div class="detail-item">
+                      <label>Duración</label>
+                      <p>{{ evidenciaSeleccionada.duracion }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            class="btn-action download" 
+            (click)="descargarEvidencia(evidenciaSeleccionada.id)"
+          >
+            <i class="fa-solid fa-download"></i>
+            Descargar
+          </button>
+          <button 
+            class="btn-action verify" 
+            (click)="cambiarEstadoEvidencia(evidenciaSeleccionada.id, 'Verificada')"
+            [disabled]="evidenciaSeleccionada.estado === 'Verificada'"
+          >
+            <i class="fa-solid fa-check"></i>
+            Verificar
+          </button>
+          <button 
+            class="btn-action reject" 
+            (click)="cambiarEstadoEvidencia(evidenciaSeleccionada.id, 'Rechazada')"
+            [disabled]="evidenciaSeleccionada.estado === 'Rechazada'"
+          >
+            <i class="fa-solid fa-xmark"></i>
+            Rechazar
+          </button>
+          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
   

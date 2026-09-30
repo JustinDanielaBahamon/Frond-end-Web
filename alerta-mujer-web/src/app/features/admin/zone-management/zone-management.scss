@@ -16,6 +16,8 @@ $yellow: #eab308;
   padding: 30px;
   min-height: 100vh;
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   background: $bg-base;
   color: $text-primary;
   font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -69,18 +71,22 @@ $yellow: #eab308;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 20px;
   background: $bg-card;
   border-radius: $radius-card;
   box-shadow: $shadow-card;
 
   .stat-info {
+    min-width: 0;
+
     span { font-size: 0.85rem; color: $text-muted; }
     h2   { margin: 8px 0 0; font-size: 2rem; font-weight: 700; color: $text-primary; }
   }
 
   .stat-icon {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 52px;
@@ -126,6 +132,7 @@ $yellow: #eab308;
 
   input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     background: transparent;
@@ -162,11 +169,12 @@ $yellow: #eab308;
 // =============================================
 .table-card {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: $bg-card;
   border-radius: $radius-card;
   box-shadow: $shadow-card;
 
-  table { width: 100%; border-collapse: collapse; }
+  table { width: 100%; min-width: 760px; border-collapse: collapse; }
   thead { background: $purple-pale; }
 
   th {
@@ -289,7 +297,7 @@ $yellow: #eab308;
   strong { color: $text-primary; }
 }
 
-.pagination { display: flex; gap: 6px; }
+.pagination { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .page-btn {
   min-width: 34px;
@@ -445,6 +453,7 @@ $yellow: #eab308;
 
 .radio-slider {
   flex: 1;
+  min-width: 0;
   accent-color: $purple-deep;
 }
 
@@ -514,18 +523,197 @@ $yellow: #eab308;
 // =============================================
 // RESPONSIVE
 // =============================================
+
+// ── Laptop / tablet grande ≤ 1100px ──────────
 @media (max-width: 1100px) {
+  .risk-zones { padding: 24px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .table-card {
+    th { padding: 12px 14px; }
+    td { padding: 14px; }
+  }
 }
 
+// ── Tablet ≤ 900px ───────────────────────────
+@media (max-width: 900px) {
+  .page-header h1 { font-size: 1.7rem; }
+}
+
+// ── Móvil ≤ 768px: tabla → tarjetas ──────────
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .search-box {
+    flex: 1 1 100%;
+    min-width: 0;
+
+    input { font-size: 16px; } // evita el zoom automático de iOS
+  }
+
+  // Chips: una sola línea con scroll horizontal
+  .toolbar-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .chip { flex-shrink: 0; white-space: nowrap; }
+
+  // Cada fila pasa a ser una tarjeta
+  .table-card {
+    overflow: hidden;
+
+    table {
+      display: block;
+      min-width: 0;
+    }
+
+    // El encabezado se oculta visualmente pero queda para lectores de pantalla
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody { display: block; }
+
+    tbody tr {
+      display: block;
+      padding: 14px 16px 12px;
+      border-top: 1px solid $border;
+
+      &:first-child { border-top: none; }
+    }
+
+    td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      border-top: none;
+      text-align: right;
+
+      // Etiqueta de cada dato (viene de data-label en el HTML)
+      &[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $text-dim;
+      }
+    }
+
+    // Nombre de la zona como encabezado de la tarjeta
+    td.cell-zona {
+      justify-content: flex-start;
+      text-align: left;
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px dashed $border;
+    }
+
+    // Acciones al pie de la tarjeta
+    td.cell-acc {
+      justify-content: flex-end;
+      margin-top: 6px;
+      padding-top: 12px;
+      border-top: 1px solid $border;
+    }
+
+    td.empty-state {
+      display: block;
+      text-align: center;
+    }
+  }
+
+  // Botones de acción más grandes para el dedo
+  .actions { gap: 8px; }
+  .actions button { width: 40px; height: 40px; }
+
+  // Pie de tabla centrado
+  .table-footer {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 14px;
+  }
+
+  .pagination { justify-content: center; }
+  .page-btn { min-width: 36px; height: 36px; }
+}
+
+// ── Móvil ≤ 640px ────────────────────────────
 @media (max-width: 640px) {
-  .risk-zones { padding: 16px; }
-  .page-header { flex-direction: column; align-items: stretch; }
-  .btn-primary { width: 100%; }
-  .stats-grid { grid-template-columns: 1fr; }
+  .risk-zones { padding: 16px 14px 28px; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 18px;
+
+    h1 { font-size: 1.4rem; }
+    p  { font-size: 0.85rem; }
+  }
+
+  .btn-primary { width: 100%; min-height: 44px; }
+
+  // Estadísticas compactas en 2 columnas
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 14px;
+
+    .stat-info {
+      span { font-size: 0.74rem; }
+      h2   { margin-top: 4px; font-size: 1.5rem; }
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+    }
+  }
+
+  // Modales
+  .form-input { font-size: 16px; }
+  .opcion { padding: 10px 14px; }
+
+  .btn-secondary,
+  .btn-primary.btn-modal {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
 }
 
+// ── Móvil pequeño ≤ 480px ────────────────────
 @media (max-width: 480px) {
   .zona-detalle__grid { grid-template-columns: 1fr; }
   .zona-mapa { height: 220px; }
+}
+
+// ── Móvil muy pequeño ≤ 380px ────────────────
+@media (max-width: 380px) {
+  .stats-grid { grid-template-columns: 1fr; }
 }

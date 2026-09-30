@@ -65,6 +65,13 @@
 
   <!-- TABLE -->
   <div class="table-card">
+
+    <!-- Seleccionar todas (solo visible en móvil, donde el thead se oculta) -->
+    <label class="select-all-mobile">
+      <input type="checkbox" (change)="toggleAll($event)" [checked]="allSelected" />
+      Seleccionar todas
+    </label>
+
     <div class="table-wrap">
       <table>
         <colgroup>
@@ -93,10 +100,10 @@
         </thead>
         <tbody>
           <tr *ngFor="let u of usuariasFiltradas" [class.row--blocked]="u.estado === 'Bloqueada por Fraude'">
-            <td>
+            <td class="cell-check">
               <input type="checkbox" [(ngModel)]="u.selected" (change)="updateSelection()" />
             </td>
-            <td>
+            <td class="cell-nombre">
               <div class="user-cell">
                 <div class="avatar" [style.background]="u.avatarColor">
                   {{ u.nombre.charAt(0) }}
@@ -107,15 +114,15 @@
                 </div>
               </div>
             </td>
-            <td class="email-cell">{{ u.email }}</td>
-            <td>{{ u.fechaRegistro }}</td>
-            <td>
+            <td class="email-cell" data-label="Email">{{ u.email }}</td>
+            <td data-label="Registro">{{ u.fechaRegistro }}</td>
+            <td data-label="Alertas">
               <span class="alerts-badge" [class.alerts-badge--high]="u.alertas > 5">
                 {{ u.alertas }}
               </span>
             </td>
-            <td class="muted">{{ u.ultimaActividad }}</td>
-            <td>
+            <td class="muted" data-label="Última actividad">{{ u.ultimaActividad }}</td>
+            <td data-label="Estado">
               <span class="estado-badge" [ngClass]="getEstadoClass(u.estado)">
                 <svg *ngIf="u.estado === 'Bloqueada por Fraude'" width="10" height="10" viewBox="0 0 24 24"
                   fill="currentColor">
@@ -124,7 +131,7 @@
                 {{ u.estado }}
               </span>
             </td>
-            <td>
+            <td class="cell-acc">
               <div class="actions-cell">
                 <!-- Ver detalle -->
                 <button class="action-btn action-btn--view" title="Ver detalle" (click)="verDetalle(u)">
@@ -256,19 +263,6 @@
         <span class="detail-value">{{ usuariaSeleccionada.rol }}</span>
       </div>
     </div>
-
-    <!-- Contactos de emergencia (tabla emergency_contact) -->
-    <h4 class="detail-section">Contactos de emergencia</h4>
-    <p class="detail-empty" *ngIf="cargandoDetalle">Cargando...</p>
-    <p class="detail-empty" *ngIf="!cargandoDetalle && contactosDetalle.length === 0">
-      Sin contactos registrados.
-    </p>
-    <ul class="detail-list" *ngIf="!cargandoDetalle && contactosDetalle.length > 0">
-      <li *ngFor="let c of contactosDetalle">
-        <strong>{{ c.contact_name }}</strong>
-        <span>{{ c.relationship }} · {{ c.telephone }}</span>
-      </li>
-    </ul>
 
     <!-- Últimas alertas (tabla alertas) -->
     <h4 class="detail-section">Últimas alertas</h4>

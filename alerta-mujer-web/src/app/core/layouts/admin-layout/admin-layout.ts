@@ -5,8 +5,8 @@ import { filter } from 'rxjs/operators';
 import { SidebarComponent, SidebarLink, SidebarUser } from '../../../shared/layouts/sidebar/sidebar';
 import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 
-const THEME_STORAGE_KEY = 'alerta_theme';
 // Debe coincidir con el breakpoint del drawer en sidebar.scss
 const DRAWER_BREAKPOINT = 1024;
 
@@ -21,6 +21,7 @@ export class AdminLayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private themeService = inject(ThemeService);
 
   // En pantallas angostas el sidebar es un drawer y empieza cerrado
   private isDrawerMode = window.innerWidth <= DRAWER_BREAKPOINT;
@@ -45,12 +46,6 @@ export class AdminLayoutComponent implements OnInit {
         ? { name: usuario.nombre, email: usuario.email }
         : null;
     });
-
-    // Restaura el tema guardado, igual que debería hacer el resto de la app
-    const temaGuardado = localStorage.getItem(THEME_STORAGE_KEY);
-    if (temaGuardado === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
 
     // En modo drawer, cierra el menú al navegar a otro módulo
     this.router.events
@@ -80,18 +75,9 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   toggleTheme() {
-    //  Antes esto hacía document.body.classList.toggle('dark-mode'),
-    // pero TODO el CSS de modo oscuro de la app (sidebar, topbar, ah-*, ec-*, ev-*, etc.)
-    // usa el selector [data-theme="dark"] en <html>. Esa clase nunca coincidía con nada,
-    // así que el modo oscuro del panel de admin probablemente no aplicaba ningún estilo.
-    const esOscuro = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (esOscuro) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem(THEME_STORAGE_KEY, 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem(THEME_STORAGE_KEY, 'dark');
-    }
+    // Único punto de verdad del tema: ThemeService. Así AccentColorService
+    // recalcula la paleta (--purple-pale, --purple-deep, etc.) al cambiar.
+    this.themeService.toggleTheme();
   }
 
   toggleSidebar() {

@@ -1,0 +1,314 @@
+/*==================================================
+=   MODO CLARO — PANEL ADMIN (más contraste)
+
+   Problemas que corrige:
+   1) Grises muy claros (#6b7280, #9ca3af) en textos,
+      iconos y placeholders.
+   2) Bordes/rayas casi invisibles (#e0e0e0, #e2e8f0,
+      #c4b5fd) y tarjetas blancas sobre fondo casi blanco.
+   3) Bordes inválidos: alert-admin y user usaban
+      rgba(var(--border), .6), que NO es CSS válido, por
+      eso esas líneas nunca se dibujaban.
+
+   Todo va acotado a app-admin-layout, así que no toca
+   el dashboard de usuario ni el modo oscuro.
+==================================================*/
+
+$adm: 'html:not([data-theme="dark"]) app-admin-layout .layout__main';
+
+/*──────────────────────────────────────────────────
+  A) Arreglo de bordes/sombras inválidos
+     (aplica en claro y oscuro)
+──────────────────────────────────────────────────*/
+app-admin-layout .layout__main {
+
+  .panel-filters   { border-bottom-color: var(--border) !important; }
+  .zonas-section,
+  .zona-add-row    { border-bottom-color: var(--border) !important; }
+  .filtros-body    { border-top-color: var(--border) !important; }
+
+  .zona-auto-card,
+  .zona-manual-card { border-color: var(--border) !important; }
+
+  app-user table tbody tr { border-bottom-color: var(--border) !important; }
+
+  app-user table tbody tr.row--blocked {
+    background: color-mix(in srgb, var(--red-pale) 35%, transparent) !important;
+
+    &:hover { background: color-mix(in srgb, var(--red-pale) 50%, transparent) !important; }
+  }
+
+  .form-input:focus,
+  .search-input:focus,
+  .form-field input:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--purple-deep) 20%, transparent) !important;
+  }
+
+  .fab-main,
+  .modo-dibujo-banner {
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--purple-deep) 40%, transparent) !important;
+  }
+
+  app-user .btn-add {
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--purple-deep) 30%, transparent) !important;
+  }
+}
+
+/*──────────────────────────────────────────────────
+  B) Tokens más oscuros para los módulos que ya
+     usan variables: alertas, usuarios, zonas y
+     dashboard admin
+──────────────────────────────────────────────────*/
+#{$adm} {
+  --text-muted : #374151;   // antes #6b7280
+  --text-dim   : #4b5563;   // antes #9ca3af (contraste 2.5:1)
+  --border     : #9d8fd6;   // antes #c4b5fd (casi invisible)
+  --green      : #15803d;
+  --amber      : #b45309;
+  --red        : #b91c1c;
+
+  app-dashboard {
+    .badge-robo   { color: #1d4ed8 !important; }
+    .badge-medica { color: #0f766e !important; }
+  }
+}
+
+/*──────────────────────────────────────────────────
+  C) Módulos con colores fijos: dispositivos,
+     moderadores, evidencias y reportes
+──────────────────────────────────────────────────*/
+@mixin admin-light($root) {
+
+  /* ── Fondo y tarjetas ───────────────────────── */
+  .#{$root} { background: #efebfa !important; }
+
+  .stat-card,
+  .toolbar,
+  .table-card,
+  .modal-content {
+    background: #ffffff !important;
+    border: 1px solid #cfc7ee !important;
+    box-shadow: 0 4px 14px rgba(45, 11, 94, 0.10) !important;
+  }
+
+  /* ── Textos grises → más oscuros ────────────── */
+  .page-header p,
+  .stat-info span,
+  .stat-info p,
+  .stat-change .vs-ayer,
+  .table-card table tbody tr td,
+  .user-email,
+  .os-version,
+  .evidence-id-size,
+  .alerta-ubicacion,
+  .alerta-fecha,
+  .table-footer .table-info,
+  .table-footer .page-ellipsis,
+  .detail-item label,
+  .detail-description p,
+  .loading-spinner,
+  .no-data,
+  .modal-close,
+  .modal-impresora-body p,
+  .loading-alertas,
+  .no-alertas { color: #374151 !important; }
+
+  .toolbar .search-box {
+    i { color: #4b5563 !important; }
+    input { color: #1e1a3c !important; }
+    input::placeholder { color: #4b5563 !important; }
+  }
+
+  .form-group input::placeholder,
+  .form-group select::placeholder,
+  .form-group textarea::placeholder { color: #4b5563 !important; }
+
+  .filter-item::after,
+  .select-arrow { color: #374151 !important; }
+
+  /* ── Bordes e inputs ────────────────────────── */
+  .toolbar .search-box,
+  .toolbar .filter-group .filter-item select,
+  .toolbar .filter-group .filter-item input[type='date'],
+  .toolbar .filter-group .custom-select .select-selected,
+  .toolbar .filter-group .date-range-picker,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-group .custom-select .select-selected,
+  .os-badge {
+    border-color: #a39bc9 !important;
+    background: #ffffff !important;
+  }
+
+  .toolbar .btn-clear-filters {
+    border: 1px solid #a39bc9 !important;
+    color: #4c1d95 !important;
+    background: #f3ecff !important;
+
+    &:hover { background: #7e22ce !important; color: #fff !important; }
+  }
+
+  .toolbar .filter-group { border-top-color: #cfc7ee !important; }
+
+  .select-items {
+    border-color: #a39bc9 !important;
+    box-shadow: 0 10px 30px rgba(45, 11, 94, 0.18) !important;
+  }
+
+  /* ── Tabla ──────────────────────────────────── */
+  .table-card table {
+    thead,
+    thead th { background: #ebe4fb !important; }
+
+    thead th { color: #3b1580 !important; }
+
+    tbody tr {
+      border-bottom: 1px solid #cfc7ee !important;
+
+      &:hover { background-color: #f4efff !important; }
+
+      td { border-top-color: #cfc7ee !important; }
+    }
+  }
+
+  .table-container table thead th { background: #ebe4fb !important; }
+
+  .table-footer { border-top-color: #cfc7ee !important; }
+
+  /* ── Iconos e insignias moradas ─────────────── */
+  .device-icon,
+  .report-icon,
+  .id-badge,
+  .alertas-count,
+  .report-icon-large,
+  .error-message {
+    background: #e9defb !important;
+    color: #5b21b6 !important;
+  }
+
+  /* ── Botones de acción de cada fila ─────────── */
+  .actions button,
+  .actions-cell button {
+    background: #e5e1f3 !important;
+    color: #2d0b5e !important;
+    border: 1px solid #cfc7ee !important;
+
+    &:hover {
+      background: #d9ccf7 !important;
+      color: #4c1d95 !important;
+    }
+  }
+
+  /* ── Paginación ─────────────────────────────── */
+  .table-footer .pagination .page-btn {
+    background: #e5e1f3 !important;
+    color: #3b1580 !important;
+    border: 1px solid #cfc7ee !important;
+
+    &:hover:not(:disabled) { background: #7e22ce !important; color: #fff !important; }
+
+    &.active { background: #7e22ce !important; color: #fff !important; border-color: #7e22ce !important; }
+  }
+
+  /* ── Modales ────────────────────────────────── */
+  .modal-header {
+    border-bottom-color: #cfc7ee !important;
+
+    .modal-close:hover { color: #5b21b6 !important; }
+  }
+
+  .modal-footer { border-top-color: #cfc7ee !important; }
+
+  .btn-secondary {
+    background: #e5e1f3 !important;
+    color: #2d0b5e !important;
+    border: 1px solid #cfc7ee !important;
+
+    &:hover { background: #d9ccf7 !important; }
+  }
+
+  /* ── Detalle ────────────────────────────────── */
+  .detail-section h4 { border-bottom-color: #cfc7ee !important; }
+
+  .alertas-selector {
+    .alertas-list,
+    .alerta-item,
+    .btn-small { border-color: #a39bc9 !important; }
+  }
+}
+
+/* ── Dispositivos ─────────────────────────────── */
+#{$adm} app-device-management {
+  @include admin-light('device-management');
+
+  .status-badge {
+    &.status-active,
+    &.status-inactive,
+    &.status-blocked { color: #5b21b6 !important; }
+  }
+}
+
+/* ── Moderadores ──────────────────────────────── */
+#{$adm} app-moderator-management {
+  @include admin-light('moderator-management');
+
+  .stat-change {
+    &.positive { color: #15803d !important; }
+    &.negative { color: #b91c1c !important; }
+  }
+
+  .badge,
+  .severity {
+    &.red,    &.critical { color: #b91c1c !important; }
+    &.orange, &.high     { color: #b45309 !important; }
+    &.yellow, &.medium   { color: #854d0e !important; }
+    &.green,  &.low      { color: #15803d !important; }
+    &.blue               { color: #1d4ed8 !important; }
+    &.purple             { color: #6b21a8 !important; }
+  }
+
+  .status {
+    &.pending   { color: #b91c1c !important; }
+    &.in-review { color: #b45309 !important; }
+    &.resolved  { color: #15803d !important; }
+    &.rejected  { color: #374151 !important; }
+  }
+}
+
+/* ── Evidencias ───────────────────────────────── */
+#{$adm} app-evidences-management {
+  @include admin-light('evidences-management');
+
+  .status-badge {
+    &.status-verified,
+    &.status-pending,
+    &.status-rejected { color: #7b1fa2 !important; }
+  }
+
+  .modal-header .modal-close {
+    background: #e5e1f3 !important;
+    border: 1px solid #cfc7ee !important;
+  }
+}
+
+/* ── Reportes ─────────────────────────────────── */
+#{$adm} app-report-management {
+  @include admin-light('reports-management');
+
+  .status {
+    &.pending  { color: #581c87 !important; }
+    &.closed   { color: #374151 !important; }
+    &.attended { color: #5b21b6 !important; }
+  }
+
+  .badge {
+    background: #e9defb !important;
+    color: #5b21b6 !important;
+  }
+
+  .modal-header .modal-close {
+    background: #e5e1f3 !important;
+    border: 1px solid #cfc7ee !important;
+  }
+}

@@ -1,0 +1,485 @@
+/*==================================================
+=   MODO OSCURO — PANEL ADMIN
+=   Dispositivos · Moderadores · Evidencias · Reportes
+
+   Estos 4 módulos tienen los colores escritos a mano
+   en su .scss (#fff, #f8f7fc, #2d0b5e...), por eso no
+   reaccionaban al tema. Aquí se sobreescriben usando
+   los tokens de tokens.scss, igual que dashboard-dark.
+==================================================*/
+
+// Estilos comunes a los 4 módulos (misma estructura HTML)
+@mixin admin-dark($root) {
+
+  /* ── Fondo de la página ─────────────────────── */
+  .#{$root} {
+    background: var(--bg-base) !important;
+    color: var(--text-primary);
+  }
+
+  /* ── Encabezado ─────────────────────────────── */
+  .page-header {
+    h1 { color: var(--text-primary) !important; }
+    p  { color: var(--text-muted) !important; }
+
+    .btn-register-device,
+    .btn-new-report,
+    .btn-upload-evidence {
+      background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+      color: #fff !important;
+      box-shadow: 0 6px 18px rgba(217, 72, 178, 0.28) !important;
+    }
+  }
+
+  /* ── Tarjetas (stats, toolbar, tabla, modal) ── */
+  .stat-card,
+  .toolbar,
+  .table-card,
+  .modal-content {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.65) !important;
+  }
+
+  .stat-card .stat-info {
+    span, p { color: var(--text-muted) !important; }
+    h2      { color: var(--text-primary) !important; }
+
+    .stat-change {
+      &.positive { color: var(--green) !important; }
+      &.negative { color: var(--red) !important; }
+      .vs-ayer   { color: var(--text-muted) !important; }
+    }
+  }
+
+  /* ── Toolbar: búsqueda y filtros ────────────── */
+  .toolbar {
+
+    .search-box {
+      background: var(--bg-base) !important;
+      border-color: var(--border) !important;
+
+      i { color: var(--text-muted) !important; }
+      input { color: var(--text-primary) !important; }
+      input::placeholder { color: var(--text-dim) !important; }
+
+      &:focus-within {
+        background: var(--bg-card) !important;
+        border-color: var(--purple-mid) !important;
+        box-shadow: 0 0 0 3px rgba(183, 155, 245, 0.18) !important;
+      }
+    }
+
+    .filter-group {
+      border-top-color: var(--border) !important;
+
+      .filter-item {
+        label { color: var(--purple-mid) !important; }
+
+        select,
+        input[type='date'] {
+          background: var(--bg-base) !important;
+          border-color: var(--border) !important;
+          color: var(--text-primary) !important;
+          color-scheme: dark;
+
+          &:hover,
+          &:focus {
+            background: var(--bg-base) !important;
+            border-color: var(--purple-mid) !important;
+          }
+        }
+
+        &::after { color: var(--text-muted) !important; }
+      }
+
+      .date-range-picker {
+        background: var(--bg-base) !important;
+        border-color: var(--border) !important;
+        color: var(--text-primary) !important;
+        color-scheme: dark;
+
+        &:hover { border-color: var(--purple-mid) !important; }
+      }
+    }
+  }
+
+  .btn-clear-filters {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+
+    &:hover {
+      background: var(--purple-pale-hover) !important;
+      color: var(--purple-mid) !important;
+    }
+  }
+
+  /* ── Selects personalizados (toolbar y formularios) ── */
+  .custom-select {
+    .select-selected {
+      background: var(--bg-base) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+
+      &:hover { border-color: var(--purple-mid) !important; }
+      .select-arrow { color: var(--text-muted) !important; }
+    }
+
+    .select-items {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+
+      div {
+        color: var(--text-primary) !important;
+
+        &:hover {
+          background: var(--purple-pale) !important;
+          color: var(--purple-mid) !important;
+        }
+      }
+    }
+  }
+
+  /* ── Tabla ──────────────────────────────────── */
+  .table-card table {
+    thead,
+    thead th { background: var(--purple-pale) !important; }
+
+    thead th { color: var(--purple-mid) !important; }
+
+    tbody tr {
+      border-bottom-color: var(--border) !important;
+
+      &:hover { background-color: var(--bg-card-hover) !important; }
+
+      td {
+        border-top-color: var(--border) !important;
+        color: var(--text-muted) !important;
+      }
+    }
+  }
+
+  .table-container table thead th {
+    background: var(--purple-pale) !important;
+  }
+
+  /* ── Contenido de las celdas ────────────────── */
+  .device-info,
+  .report-name { color: var(--text-primary) !important; }
+
+  .device-icon,
+  .report-icon,
+  .id-badge {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .user-name,
+  .evidence-name,
+  .alert-id { color: var(--text-primary) !important; }
+
+  .os-version,
+  .user-email,
+  .evidence-id-size,
+  .alert-type-city { color: var(--text-muted) !important; }
+
+  // el puntito de estado toma el color del texto del estado
+  .status::before,
+  .status-badge::before { background: currentColor !important; }
+
+  /* ── Botones de acción de cada fila ─────────── */
+  .actions button,
+  .actions-cell button {
+    background: var(--purple-pale) !important;
+    color: var(--text-muted) !important;
+
+    &:hover {
+      background: var(--purple-pale-hover) !important;
+      color: var(--purple-mid) !important;
+    }
+  }
+
+  /* ── Pie de tabla y paginación ──────────────── */
+  .table-footer {
+    border-top-color: var(--border) !important;
+
+    .table-info {
+      color: var(--text-muted) !important;
+      strong { color: var(--text-primary) !important; }
+    }
+
+    .pagination {
+      .page-btn {
+        background: var(--purple-pale) !important;
+        color: var(--text-primary) !important;
+
+        &:hover:not(:disabled) {
+          background: var(--purple-pale-hover) !important;
+          color: var(--purple-mid) !important;
+        }
+
+        &.active,
+        &.active:hover:not(:disabled) {
+          background: #7e22ce !important;
+          color: #fff !important;
+        }
+      }
+
+      .page-ellipsis { color: var(--text-muted) !important; }
+    }
+  }
+
+  /* ── Modales ────────────────────────────────── */
+  .modal-header {
+    border-bottom-color: var(--border) !important;
+
+    h2 { color: var(--text-primary) !important; }
+
+    .modal-close {
+      color: var(--text-muted) !important;
+      &:hover { color: var(--purple-mid) !important; }
+    }
+  }
+
+  .modal-footer { border-top-color: var(--border) !important; }
+
+  .btn-secondary {
+    background: var(--purple-pale) !important;
+    color: var(--text-primary) !important;
+
+    &:hover {
+      background: var(--purple-pale-hover) !important;
+      color: var(--purple-mid) !important;
+    }
+  }
+
+  /* ── Formularios ────────────────────────────── */
+  .form-group {
+    label { color: var(--purple-mid) !important; }
+
+    input,
+    select,
+    textarea {
+      background: var(--bg-base) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+      color-scheme: dark;
+
+      &::placeholder { color: var(--text-dim) !important; }
+
+      &:focus {
+        border-color: var(--purple-mid) !important;
+        box-shadow: 0 0 0 3px rgba(183, 155, 245, 0.18) !important;
+      }
+    }
+  }
+
+  .error-message {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .loading-spinner,
+  .no-data { color: var(--text-muted) !important; }
+
+  /* ── Detalle (modal "ver") ──────────────────── */
+  .detail-info h3,
+  .device-header-info h3 { color: var(--text-primary) !important; }
+
+  .device-header {
+    background: linear-gradient(135deg, var(--purple-pale) 0%, var(--bg-card) 100%) !important;
+
+    .os-badge {
+      background: var(--bg-base) !important;
+      border-color: var(--border) !important;
+      color: var(--purple-mid) !important;
+    }
+  }
+
+  .report-icon-large {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .detail-section h4 {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border) !important;
+
+    i { color: var(--purple-mid) !important; }
+  }
+
+  .detail-item {
+    label { color: var(--text-muted) !important; }
+    p     { color: var(--text-primary) !important; }
+  }
+
+  .detail-description {
+    label { color: var(--purple-mid) !important; }
+    p     { color: var(--text-muted) !important; }
+  }
+
+  .user-card { background: var(--purple-pale) !important; }
+}
+
+/*==================================================
+=   GESTIÓN DE DISPOSITIVOS
+==================================================*/
+
+[data-theme='dark'] app-device-management {
+  @include admin-dark('device-management');
+
+  .type-badge.badge-android {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .status-badge {
+    &.status-active,
+    &.status-inactive,
+    &.status-blocked { color: var(--purple-mid) !important; }
+  }
+}
+
+/*==================================================
+=   GESTIÓN DE MODERADORES
+==================================================*/
+
+[data-theme='dark'] app-moderator-management {
+  @include admin-dark('moderator-management');
+
+  .badge,
+  .severity {
+    &.red,    &.critical { background: var(--red-pale) !important;   color: var(--red) !important; }
+    &.orange, &.high     { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.yellow, &.medium   { background: rgba(234, 179, 8, 0.18) !important; color: #facc15 !important; }
+    &.green,  &.low      { background: var(--green-pale) !important; color: var(--green) !important; }
+    &.blue   { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.purple { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .status {
+    &.pending   { color: var(--red) !important; }
+    &.in-review { color: var(--amber) !important; }
+    &.resolved  { color: var(--green) !important; }
+    &.rejected  { color: var(--text-muted) !important; }
+  }
+
+  .actions button {
+    &.view:hover    { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.approve:hover { background: var(--green-pale) !important; color: var(--green) !important; }
+    &.reject:hover  { background: var(--red-pale) !important;   color: var(--red) !important; }
+  }
+}
+
+/*==================================================
+=   GESTIÓN DE EVIDENCIAS
+==================================================*/
+
+[data-theme='dark'] app-evidences-management {
+  @include admin-dark('evidences-management');
+
+  .status-badge {
+    &.status-verified,
+    &.status-pending,
+    &.status-rejected { color: var(--purple-mid) !important; }
+  }
+
+  .actions-cell button {
+    &.view:hover,
+    &.download:hover,
+    &.delete:hover {
+      background: #9C27B0 !important;
+      color: #fff !important;
+    }
+  }
+
+  .modal-header .modal-close {
+    background: var(--purple-pale) !important;
+
+    &:hover { background: var(--purple-pale-hover) !important; }
+  }
+}
+
+/*==================================================
+=   GESTIÓN DE REPORTES
+==================================================*/
+
+[data-theme='dark'] app-report-management {
+  @include admin-dark('reports-management');
+
+  .status {
+    &.pending  { color: var(--pink) !important; }
+    &.closed   { color: var(--text-muted) !important; }
+    &.attended { color: var(--purple-mid) !important; }
+  }
+
+  .badge {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .modal-header .modal-close {
+    background: var(--purple-pale) !important;
+
+    &:hover { background: var(--purple-pale-hover) !important; }
+  }
+
+  /* ── Selector de alertas del formulario ─────── */
+  .alertas-selector {
+    label { color: var(--purple-mid) !important; }
+
+    .alertas-count {
+      background: var(--purple-pale) !important;
+      color: var(--purple-mid) !important;
+    }
+
+    .alertas-actions .btn-small {
+      background: var(--bg-base) !important;
+      border-color: var(--border) !important;
+      color: var(--purple-mid) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        border-color: var(--purple-mid) !important;
+      }
+    }
+
+    .loading-alertas,
+    .no-alertas {
+      background: var(--bg-base) !important;
+      color: var(--text-muted) !important;
+    }
+
+    .alertas-list {
+      border-color: var(--border) !important;
+
+      .alerta-item {
+        background: var(--bg-base) !important;
+        border-color: var(--border) !important;
+
+        &:hover,
+        &.selected {
+          background: var(--purple-pale) !important;
+          border-color: var(--purple-mid) !important;
+        }
+
+        &.selected { box-shadow: 0 0 0 2px rgba(183, 155, 245, 0.18) !important; }
+
+        .alerta-tipo      { color: var(--text-primary) !important; }
+        .alerta-ubicacion,
+        .alerta-fecha     { color: var(--text-muted) !important; }
+      }
+    }
+  }
+
+  /* ── Modal "no se encontró impresora" ───────── */
+  .modal-impresora-header h2 { color: var(--text-primary) !important; }
+  .modal-impresora-body p    { color: var(--text-muted) !important; }
+  .modal-impresora-body .mensaje-final { color: var(--purple-mid) !important; }
+}

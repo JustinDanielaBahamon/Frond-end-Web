@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { SettingsService, AppLanguage, AppFontSize } from '../../../core/settings/settings.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 
 @Component({
   selector: 'app-topbar',
@@ -22,8 +23,12 @@ export class TopbarComponent {
 
   private authService = inject(AuthService);
   settings = inject(SettingsService);
+  private themeService = inject(ThemeService);
 
-  isDark = false;
+  // el icono de luna/sol sigue el tema real, no un booleano local
+  get isDark(): boolean {
+    return this.themeService.currentTheme() === 'dark';
+  }
   menuOpen = false;
 
   onToggleSidebar() {
@@ -31,7 +36,6 @@ export class TopbarComponent {
   }
 
   onToggleTheme() {
-    this.isDark = !this.isDark;
     this.themeToggle.emit();
   }
 

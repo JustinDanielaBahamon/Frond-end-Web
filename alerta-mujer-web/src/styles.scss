@@ -6,6 +6,8 @@
 @use 'app/shared/styles/theme/auth-dark';
 @use 'app/shared/styles/theme/landing-dark';
 @use 'app/shared/styles/theme/dashboard-dark';
+@use 'app/shared/styles/theme/admin-dark';
+@use 'app/shared/styles/theme/admin-light';
 
 @tailwind base;
 @tailwind components;

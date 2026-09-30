@@ -9,4 +9,9 @@ export interface Zona {
   alertas: number;
   estado: EstadoZona;
   updated_at: string;
+
+  // Ubicación en el mapa (opcional: las zonas antiguas no la tienen)
+  lat?: number;
+  lng?: number;
+  radio?: number; // metros
 }

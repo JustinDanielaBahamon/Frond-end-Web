@@ -18,7 +18,6 @@ import {
   adminGuard,
   userGuard,
 } from './core/guards/role.guard';
-import { EmergencyManagementComponent } from './features/admin/emergency-management/emergency-management';
 import { DeviceManagementComponent } from './features/admin/devices-management/devices-management';
 export const routes: Routes = [
 
@@ -204,13 +203,6 @@ export const routes: Routes = [
       },
       
       {
-        path: 'emergency-management',
-        loadComponent: () =>
-          import('./features/admin/emergency-management/emergency-management')
-            .then(m => m.EmergencyManagementComponent),
-      },
-      
-      {
         path: 'evidence-management',
         loadComponent: () =>
           import('./features/admin/evidence-management/evidence-management')
@@ -282,12 +274,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/report-management/report-management')
             .then(m => m.ReportManagementComponent),
-      },
-      {
-        path: 'emergency-management',
-        loadComponent: ()=> 
-           import('./features/admin/emergency-management/emergency-management')
-           .then(m =>m.EmergencyManagementComponent),
       },
       {
          path: 'evidence-management',

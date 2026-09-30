@@ -33,7 +33,6 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Alertas',      route: '/admin/alertas' },
     { label: 'Gestion de Zonas', route: '/admin/zone-management' },
     { label: 'Gestion de Reportes', route: '/admin/report-management' },
-    { label: 'Gestion  Contactos de Emergencia', route: '/admin/emergency-management'},
     { label: 'Gestion de evidencias' , route:'/admin/evidence-management'},
     { label: 'Gestion de Moderadores' , route:'/admin/moderator-management'},
     { label: 'Gestion de Dispositivos', route: '/admin/devices-management'},

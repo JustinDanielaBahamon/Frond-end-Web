@@ -71,36 +71,21 @@
                 (click)="setLanguage('en')">
                 English
               </button>
+              <button
+                class="settings-pill"
+                [class.settings-pill--active]="settings.language() === 'fr'"
+                (click)="setLanguage('fr')">
+                Français
+              </button>
+              <button
+                class="settings-pill"
+                [class.settings-pill--active]="settings.language() === 'pt'"
+                (click)="setLanguage('pt')">
+                Português
+              </button>
             </div>
           </div>
 
-          <!-- ACCESIBILIDAD: TAMAÑO DE LETRA -->
-          <div class="settings-section">
-            <p class="settings-section__title">Tamaño de letra</p>
-            <div class="settings-pills">
-              <button
-                class="settings-pill settings-pill--font"
-                title="Pequeño"
-                [class.settings-pill--active]="settings.fontSize() === 'sm'"
-                (click)="setFontSize('sm')">
-                A-
-              </button>
-              <button
-                class="settings-pill settings-pill--font"
-                title="Normal"
-                [class.settings-pill--active]="settings.fontSize() === 'md'"
-                (click)="setFontSize('md')">
-                A
-              </button>
-              <button
-                class="settings-pill settings-pill--font"
-                title="Grande"
-                [class.settings-pill--active]="settings.fontSize() === 'lg'"
-                (click)="setFontSize('lg')">
-                A+
-              </button>
-            </div>
-          </div>
           <div class="profile-menu__divider"></div>
           <button class="profile-menu__item profile-menu__item--danger" (click)="logout()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"

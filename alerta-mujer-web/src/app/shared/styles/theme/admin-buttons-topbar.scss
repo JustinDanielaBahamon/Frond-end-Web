@@ -1,0 +1,133 @@
+/* Barra superior */
+app-topbar:not(#_) {
+  .topbar {
+    gap: 16px;
+  }
+
+  .topbar__left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .topbar__actions {
+    flex-shrink: 0;
+    gap: 20px;
+  }
+
+  .topbar__profile {
+    gap: 12px;
+  }
+
+  .topbar__username {
+    white-space: nowrap;
+    padding-right: 4px;
+  }
+
+  .profile-menu {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+/* Barra superior: tablet */
+@media (max-width: 1024px) {
+  app-topbar:not(#_) .topbar__actions {
+    gap: 16px;
+  }
+}
+
+/* Barra superior: móvil */
+@media (max-width: 768px) {
+  app-topbar:not(#_) {
+    .topbar {
+      gap: 12px;
+    }
+
+    .topbar__actions {
+      gap: 14px;
+    }
+
+    .topbar__profile {
+      gap: 0;
+    }
+  }
+}
+
+/* Barra superior: móvil pequeño */
+@media (max-width: 480px) {
+  app-topbar:not(#_) {
+    .topbar {
+      padding: 0.6rem 0.75rem;
+    }
+
+    .topbar__actions {
+      gap: 10px;
+    }
+
+    .topbar__btn,
+    .topbar__avatar {
+      width: 34px;
+      height: 34px;
+    }
+
+    .topbar__greeting-hi {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Botones de los modales */
+app-modal:not(#_) [modal-footer] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.modal-footer:not(#_) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+app-modal:not(#_) [modal-footer] button,
+.modal-footer:not(#_) button {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+/* Botones de los modales: móvil */
+@media (max-width: 600px) {
+  app-modal:not(#_) [modal-footer],
+  .modal-footer:not(#_) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  app-modal:not(#_) [modal-footer] button,
+  .modal-footer:not(#_) button {
+    width: 100%;
+    min-height: 46px;
+  }
+}
+
+/* Botones de encabezado de página */
+@media (max-width: 600px) {
+  .btn-add:not(#_),
+  .btn-new-report:not(#_),
+  .btn-add-report:not(#_) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Botones de acción y filtros */
+.btn-add:not(#_),
+.btn-new-report:not(#_),
+.btn-add-report:not(#_),
+.btn-clear-filters:not(#_),
+.btn-clear-filter:not(#_) {
+  max-width: 100%;
+}

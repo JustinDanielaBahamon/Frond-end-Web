@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
-import { SettingsService, AppLanguage, AppFontSize } from '../../../core/settings/settings.service';
+import { SettingsService, AppLanguage } from '../../../core/settings/settings.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 
 @Component({
@@ -49,10 +49,6 @@ export class TopbarComponent {
 
   setLanguage(lang: AppLanguage) {
     this.settings.setLanguage(lang);
-  }
-
-  setFontSize(size: AppFontSize) {
-    this.settings.setFontSize(size);
   }
 
   logout() {

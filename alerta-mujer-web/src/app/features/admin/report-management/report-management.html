@@ -293,6 +293,7 @@
               <label>Nombre del Reporte</label>
               <input 
                 type="text" 
+                name="nombre"
                 [(ngModel)]="modeloNombre"
                 (ngModelChange)="modeloNombre = $event"
                 placeholder="Ej: Reporte de Alertas - Enero 2024"
@@ -354,6 +355,7 @@
               <div class="form-group">
                 <label>Ciudad</label>
                 <select 
+                  name="ciudad"
                   [(ngModel)]="modeloCiudad"
                   (ngModelChange)="modeloCiudad = $event"
                 >
@@ -369,6 +371,7 @@
               <div class="form-group">
                 <label>Estado</label>
                 <select 
+                  name="estado"
                   [(ngModel)]="modeloEstado"
                   (ngModelChange)="modeloEstado = $event"
                 >
@@ -384,6 +387,7 @@
                 <label>Usuaria</label>
                 <input 
                   type="text" 
+                  name="usuaria"
                   [(ngModel)]="modeloUsuaria"
                   (ngModelChange)="modeloUsuaria = $event"
                   placeholder="Nombre de la usuaria"
@@ -394,6 +398,7 @@
                 <label>Acontecimiento</label>
                 <input 
                   type="text" 
+                  name="acontecimiento"
                   [(ngModel)]="modeloAcontecimiento"
                   (ngModelChange)="modeloAcontecimiento = $event"
                   placeholder="Descripción breve del acontecimiento"
@@ -404,6 +409,7 @@
             <div class="form-group">
               <label>Descripción</label>
               <textarea 
+                name="descripcion"
                 [(ngModel)]="modeloDescripcion"
                 (ngModelChange)="modeloDescripcion = $event"
                 placeholder="Descripción detallada del reporte..."
@@ -413,8 +419,9 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
+          <button type="button" class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
           <button 
+            type="button"
             class="btn-primary" 
             (click)="reporteEditando ? actualizarReporte() : crearReporte()"
             [disabled]="cargando"
@@ -422,7 +429,7 @@
             @if (cargando) {
               <i class="fa-solid fa-spinner fa-spin"></i>
             }
-            {{ reporteEditando ? 'Actualizar' : 'Crear' }}
+            {{ reporteEditando ? 'Actualizar' : 'Agregar' }}
           </button>
         </div>
       </div>
@@ -547,4 +554,3 @@
       </div>
     </div>
   }
-  

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type AppLanguage = 'es' | 'en';
+export type AppLanguage = 'es' | 'en' | 'fr' | 'pt';
 export type AppFontSize = 'sm' | 'md' | 'lg';
 
 const LANG_KEY = 'am-language';

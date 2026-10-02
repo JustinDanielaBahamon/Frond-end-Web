@@ -37,6 +37,7 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Gestion de evidencias' , route:'/admin/evidence-management'},
     { label: 'Gestion de Moderadores' , route:'/admin/moderator-management'},
     { label: 'Gestion de Dispositivos', route: '/admin/devices-management'},
+    { label: 'Configuración', route: '/admin/settings' },
   ];
 
   ngOnInit() {

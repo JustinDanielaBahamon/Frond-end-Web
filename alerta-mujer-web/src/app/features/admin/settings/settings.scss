@@ -1,0 +1,495 @@
+/*==================================================
+=   CONFIGURACIÓN — PANEL ADMIN
+=   Usa los tokens de tokens.scss, así que cambia
+=   solo entre modo claro y oscuro.
+==================================================*/
+
+$btn-purple: #7c3aed;
+$btn-purple-hover: #6d28d9;
+
+.settings-page {
+  padding: 30px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100%;
+}
+
+/* ── Encabezado ─────────────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 26px;
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: $btn-purple;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba($btn-purple, 0.3);
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: $btn-purple-hover;
+    transform: translateY(-2px);
+  }
+}
+
+/* ── Mensaje flotante ───────────────────────── */
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Grilla de tarjetas ─────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  min-height: 340px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--dash-shadow-card);
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 6px;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+
+    i { color: var(--purple-deep); font-size: 1.1rem; }
+  }
+
+  &__note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: auto 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+
+    i { color: var(--purple-deep); }
+  }
+}
+
+.label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Mi cuenta ──────────────────────────────── */
+.account-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--purple-pale);
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    background: $btn-purple;
+    color: #fff;
+    font-size: 1.6rem;
+  }
+
+  &__name {
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__email {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+
+  &:hover { background: var(--red-pale); }
+}
+
+/* ── Apariencia ─────────────────────────────── */
+.theme-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.theme-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--purple-pale);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i { font-size: 1.4rem; }
+
+  &:hover { background: var(--purple-pale-hover); }
+
+  &--active {
+    border-color: var(--purple-mid);
+    color: var(--text-primary);
+    background: var(--purple-pale-hover);
+  }
+}
+
+/* ── Filas con flecha ───────────────────────── */
+.row-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 6px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: var(--bg-card-hover); }
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i { color: var(--purple-deep); font-size: 1.05rem; }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  &__desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  &__value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  &__chevron {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+}
+
+/* ── Filas con interruptor ──────────────────── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px;
+
+  &--box {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--purple-pale);
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  &__desc {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+}
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 54px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.25s ease;
+
+  &__knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.25s ease;
+  }
+
+  &--on {
+    background: $btn-purple;
+
+    .switch__knob { transform: translateX(24px); }
+  }
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &--off { background: var(--text-dim); }
+}
+
+/* ── Cajas informativas ─────────────────────── */
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: auto;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--purple-pale);
+
+  i {
+    margin-top: 2px;
+    color: var(--purple-deep);
+    font-size: 1.1rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  &__desc {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+}
+
+.version-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+
+  &__value {
+    font-family: monospace;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+}
+
+/* ── Ayuda y soporte ────────────────────────── */
+.help-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--purple-pale);
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    color: var(--purple-deep);
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  &__desc {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+}
+
+.btn-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: $btn-purple-hover; }
+}
+
+/* ── Barra de estado ────────────────────────── */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 16px 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i { color: var(--purple-deep); font-size: 1.1rem; }
+    strong { color: var(--text-primary); }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__dot { font-size: 0.7rem; }
+}
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-width: 1100px) {
+  .settings-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .settings-page { padding: 18px; }
+
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .page-header {
+    flex-direction: column;
+
+    h1 { font-size: 1.7rem; }
+  }
+}

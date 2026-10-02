@@ -292,6 +292,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/devices-management/devices-management')
             .then(m => m.DeviceManagementComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/admin/settings/settings')
+            .then(m => m.AdminSettingsComponent)
       }
 
     ],

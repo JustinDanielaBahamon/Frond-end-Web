@@ -28,13 +28,13 @@ export class Settings {
   private readonly themeService = inject(ThemeService);
   private readonly accentColorService = inject(AccentColorService);
 
-  // --- Cuenta (mock: reemplazar por el usuario autenticado real) ---
+  // --- Cuenta (conectar con el usuario autenticado real) ---
   readonly user = signal({
-    name: 'María González',
-    email: 'maria.gonzalez@gmail.com',
-    phone: '+57 300 123 4567',
+    name: '',
+    email: '',
+    phone: '',
     avatarUrl: '',
-    verified: true
+    verified: false
   });
 
   // --- Apariencia: tema (global, vía ThemeService) ---

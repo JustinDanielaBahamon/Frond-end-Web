@@ -1,25 +1,5 @@
-/*==================================================
-=   MODO CLARO — PANEL ADMIN (más contraste)
+$adm: 'html:not([data-theme=\"dark\"]) app-admin-layout .layout__main';
 
-   Problemas que corrige:
-   1) Grises muy claros (#6b7280, #9ca3af) en textos,
-      iconos y placeholders.
-   2) Bordes/rayas casi invisibles (#e0e0e0, #e2e8f0,
-      #c4b5fd) y tarjetas blancas sobre fondo casi blanco.
-   3) Bordes inválidos: alert-admin y user usaban
-      rgba(var(--border), .6), que NO es CSS válido, por
-      eso esas líneas nunca se dibujaban.
-
-   Todo va acotado a app-admin-layout, así que no toca
-   el dashboard de usuario ni el modo oscuro.
-==================================================*/
-
-$adm: 'html:not([data-theme="dark"]) app-admin-layout .layout__main';
-
-/*──────────────────────────────────────────────────
-  A) Arreglo de bordes/sombras inválidos
-     (aplica en claro y oscuro)
-──────────────────────────────────────────────────*/
 app-admin-layout .layout__main {
 
   .panel-filters   { border-bottom-color: var(--border) !important; }
@@ -54,11 +34,47 @@ app-admin-layout .layout__main {
   }
 }
 
-/*──────────────────────────────────────────────────
-  B) Tokens más oscuros para los módulos que ya
-     usan variables: alertas, usuarios, zonas y
-     dashboard admin
-──────────────────────────────────────────────────*/
+#{$adm} {
+
+  /* Alertas / zonas */
+  .panel-filters   { border-bottom: 1px solid #9d8fd6 !important; }
+  .zonas-section,
+  .zona-add-row    { border-bottom: 1px solid #9d8fd6 !important; }
+  .filtros-body    { border-top: 1px solid #9d8fd6 !important; }
+
+  .zona-auto-card,
+  .zona-manual-card { border: 1.5px solid #9d8fd6 !important; }
+
+  /* Usuarios */
+  app-user {
+
+    .table-card { border-color: #9d8fd6 !important; }
+
+    table thead tr th {
+      background: #ebe4fb !important;
+      color: #3b1580 !important;
+      border-bottom: 1.5px solid #9d8fd6 !important;
+    }
+
+    table tbody tr {
+      border-bottom: 1px solid #b8aee0 !important;
+
+      &:last-child { border-bottom: none !important; }
+    }
+
+    /* Fila bloqueada: fondo rosado fuerte + franja roja a la izquierda */
+    table tbody tr.row--blocked {
+      background: #fecaca !important;
+
+      &:hover { background: #fca5a5 !important; }
+
+      td:first-child { box-shadow: inset 4px 0 0 #dc2626; }
+
+      td { color: #1e1a3c !important; }
+    }
+  }
+}
+
 #{$adm} {
   --text-muted : #374151;   // antes #6b7280
   --text-dim   : #4b5563;   // antes #9ca3af (contraste 2.5:1)
@@ -73,10 +89,6 @@ app-admin-layout .layout__main {
   }
 }
 
-/*──────────────────────────────────────────────────
-  C) Módulos con colores fijos: dispositivos,
-     moderadores, evidencias y reportes
-──────────────────────────────────────────────────*/
 @mixin admin-light($root) {
 
   /* ── Fondo y tarjetas ───────────────────────── */

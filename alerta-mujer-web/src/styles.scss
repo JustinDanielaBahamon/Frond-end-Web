@@ -8,6 +8,9 @@
 @use 'app/shared/styles/theme/dashboard-dark';
 @use 'app/shared/styles/theme/admin-dark';
 @use 'app/shared/styles/theme/admin-light';
+@use 'app/shared/styles/theme/dashboard-light';
+@use 'app/shared/styles/theme/admin-lines-light';
+@use 'app/shared/styles/theme/admin-buttons-topbar';
 
 @tailwind base;
 @tailwind components;

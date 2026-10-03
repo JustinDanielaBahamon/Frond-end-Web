@@ -165,7 +165,7 @@
   }
 }
 
-// ── AJUSTES: IDIOMA / TAMAÑO DE LETRA ───────────
+// ── AJUSTES: IDIOMA ─────────────────────────────
 .settings-section {
   padding: 8px 20px 12px;
 
@@ -181,11 +181,12 @@
 
 .settings-pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
 .settings-pill {
-  flex: 1;
+  flex: 1 1 calc(50% - 3px);
   padding: 7px 10px;
   border-radius: 8px;
   border: 1px solid rgba(124, 58, 237, 0.15);
@@ -205,12 +206,6 @@
     background: #7c3aed;
     border-color: #7c3aed;
     color: #fff;
-  }
-
-  &--font {
-    flex: none;
-    width: 38px;
-    text-align: center;
   }
 }
 

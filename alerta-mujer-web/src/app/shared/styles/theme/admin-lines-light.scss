@@ -1,0 +1,103 @@
+$line:      #6d5bb8;   // bordes y líneas principales
+$line-soft: #8878c6;   // separadores entre filas
+
+$adm: 'html:not([data-theme=\"dark\"]):not(#_) app-admin-layout .layout__main';
+$mods: ':is(app-device-management, app-moderator-management, app-evidences-management, app-report-management)';
+
+/* ── Barra superior del admin ─────────────────── */
+html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
+  .topbar { border-bottom: 2px solid $line !important; }
+  .topbar__btn { border: 2px solid $line !important; }
+  .profile-menu { border: 2px solid $line !important; }
+  .profile-menu__divider { height: 2px !important; background: $line-soft !important; }
+  .settings-pill { border-width: 2px !important; border-color: $line !important; }
+}
+
+#{$adm} {
+
+  /* Color base que usan usuarios, alertas, zonas y dashboard */
+  --border: #{$line};
+  .mini-stat, .search-input, .filter-select, .chip, .action-btn,
+  .bulk-btn, .page-btn, .per-page-select, .btn-secondary,
+  .btn-clear-filter, .btn-clear-filters, .alertas-count,
+  .panel-select, .btn-atender, .zona-auto-card, .zona-manual-card,
+  .btn-add-zona, .btn-marcar-zona, .mapa-container, .fab-option,
+  .filtros-capas, .radio-preset-btn, .nivel-btn, .search-box,
+  .form-input, .form-control, .opcion, .zona-mapa, .stat-card,
+  .dash-card, .toolbar, .modal-content, .select-selected,
+  .select-items, .date-range-picker, .os-badge, .btn-action,
+  .btn-small, .alertas-list, .alerta-item, .description-box,
+  .user-card, .table-card {
+    border-width: 2px !important;
+  }
+
+  app-user input:not([type='checkbox']),
+  .form-group input:not([type='checkbox']),
+  .form-group select,
+  .form-group textarea,
+  .toolbar select,
+  .toolbar input[type='date'],
+  textarea { border-width: 2px !important; }
+
+  /* Tarjetas con franja superior gruesa: se conserva el 3px de arriba */
+  app-user .table-card,
+  app-alert-admin .alertas-panel { border-width: 2px !important; border-top-width: 3px !important; }
+
+  #{$mods} {
+    .stat-card, .toolbar, .table-card, .modal-content {
+      border-color: $line !important;
+    }
+
+    .search-box:not(:focus-within),
+    .select-selected, .select-items, .date-range-picker, .os-badge,
+    .btn-clear-filters, .btn-action, .btn-small,
+    .alertas-list, .alerta-item,
+    .toolbar select:not(:focus),
+    .toolbar input[type='date']:not(:focus),
+    .form-group input:not(:focus),
+    .form-group select:not(:focus),
+    .form-group textarea:not(:focus),
+    textarea:not(:focus) { border-color: $line !important; }
+  }
+
+  table thead th { border-bottom: 2px solid $line !important; }
+
+  .table-footer,
+  .modal-footer,
+  .filtros-body { border-top: 2px solid $line !important; }
+
+  /* Esta línea solo existía en Moderadores y Reportes (filtros en otra fila) */
+  :is(app-moderator-management, app-report-management) .filter-group {
+    border-top: 2px solid $line !important;
+  }
+
+  /* Tabla sin filas: no repetir la línea entre el encabezado y el pie */
+  .table-card:not(:has(tbody tr)) .table-footer { border-top: none !important; }
+
+  .modal-header,
+  .panel-tabs,
+  .panel-filters,
+  .zonas-section,
+  .zona-add-row,
+  .detail-hero { border-bottom: 2px solid $line !important; }
+
+  .detail-section h4 { border-bottom: 2px solid $line !important; }
+
+  /* Separadores entre filas: solo en escritorio
+     (en móvil la tabla se convierte en tarjetas) */
+  @media (min-width: 769px) {
+    table tbody tr {
+      border-bottom: 2px solid $line-soft !important;
+
+      &:last-child { border-bottom: none !important; }
+
+      td { border-top: 2px solid $line-soft !important; }
+    }
+
+    table tbody tr:first-child td { border-top-color: $line !important; }
+  }
+
+  /* Dashboard: listas (el último ítem de cada lista no lleva línea) */
+  app-dashboard li { border-bottom: 2px solid $line-soft !important; }
+  app-dashboard li:last-child { border-bottom: none !important; }
+}

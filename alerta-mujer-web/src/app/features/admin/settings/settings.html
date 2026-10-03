@@ -1,0 +1,263 @@
+<div class="settings-page">
+
+  <!-- ENCABEZADO -->
+  <header class="page-header">
+    <div>
+      <h1>Configuración</h1>
+      <p>Ajusta los detalles de tu cuenta y el funcionamiento general de la plataforma.</p>
+    </div>
+    <button class="btn-save" (click)="guardarCambios()">
+      <i class="fa-solid fa-check"></i>
+      Guardar cambios
+    </button>
+  </header>
+
+  <!-- MENSAJE FLOTANTE -->
+  @if (mensaje()) {
+    <div class="toast">{{ mensaje() }}</div>
+  }
+
+  <section class="settings-grid">
+
+    <!-- ═════════ MI CUENTA ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-regular fa-user"></i> Mi Cuenta</h2>
+
+      <div class="account-box">
+        <div class="account-box__avatar">
+          <i class="fa-regular fa-circle-user"></i>
+        </div>
+        <div class="account-box__info">
+          <p class="account-box__name">{{ user()?.nombre || 'Admin Principal' }}</p>
+          <p class="account-box__email">{{ user()?.email || 'contacto@alertamujer.org' }}</p>
+        </div>
+      </div>
+
+      <button class="row-link" (click)="abrirOpcion('Cambiar contraseña')">
+        <span class="row-link__left">
+          <i class="fa-solid fa-lock"></i>
+          <span class="row-link__title">Cambiar contraseña</span>
+        </span>
+        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+      </button>
+
+      <button class="row-link" (click)="abrirOpcion('Datos de contacto')">
+        <span class="row-link__left">
+          <i class="fa-regular fa-address-card"></i>
+          <span class="row-link__title">Datos de contacto</span>
+        </span>
+        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+      </button>
+
+      <button class="btn-logout" (click)="cerrarSesion()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Cerrar sesión
+      </button>
+    </article>
+
+    <!-- ═════════ APARIENCIA ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-solid fa-palette"></i> Apariencia</h2>
+
+      <p class="label">Tema</p>
+      <div class="theme-options">
+        <button
+          class="theme-btn"
+          [class.theme-btn--active]="!isDark()"
+          (click)="cambiarTema('light')">
+          <i class="fa-regular fa-sun"></i>
+          Modo Claro
+        </button>
+        <button
+          class="theme-btn"
+          [class.theme-btn--active]="isDark()"
+          (click)="cambiarTema('dark')">
+          <i class="fa-regular fa-moon"></i>
+          Modo Oscuro
+        </button>
+      </div>
+
+      <p class="card__note">
+        <i class="fa-regular fa-eye"></i>
+        Vista cómoda y adaptada para cualquier pantalla.
+      </p>
+    </article>
+
+    <!-- ═════════ NOTIFICACIONES Y ALERTAS ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-regular fa-bell"></i> Notificaciones y Alertas</h2>
+
+      <div class="toggle-row">
+        <div>
+          <p class="toggle-row__title">Resumen diario</p>
+          <p class="toggle-row__desc">Reporte sencillo al final del día</p>
+        </div>
+        <button
+          class="switch"
+          [class.switch--on]="config().dailySummary"
+          role="switch"
+          [attr.aria-checked]="config().dailySummary"
+          (click)="toggle('dailySummary')">
+          <span class="switch__knob"></span>
+        </button>
+      </div>
+
+      <p class="card__note">
+        <i class="fa-regular fa-circle-check"></i>
+        Las notificaciones llegan de manera instantánea.
+      </p>
+    </article>
+
+    <!-- ═════════ SEGURIDAD BÁSICA ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> Seguridad Básica</h2>
+
+      <div class="toggle-row toggle-row--box">
+        <div>
+          <p class="toggle-row__title">Verificación en dos pasos</p>
+          <p class="toggle-row__desc">Pedir un código al iniciar sesión</p>
+        </div>
+        <button
+          class="switch"
+          [class.switch--on]="config().twoFactor"
+          role="switch"
+          [attr.aria-checked]="config().twoFactor"
+          (click)="toggle('twoFactor')">
+          <span class="switch__knob"></span>
+        </button>
+      </div>
+
+      <button class="row-link row-link--stack" (click)="cambiarInactividad()">
+        <span class="row-link__text">
+          <span class="row-link__title">Cerrar sesión por inactividad</span>
+          <span class="row-link__desc">Si no se usa la pantalla</span>
+        </span>
+        <span class="row-link__value">
+          {{ config().inactivityMinutes }} minutos
+          <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+        </span>
+      </button>
+
+      <div class="toggle-row">
+        <div>
+          <p class="toggle-row__title">Contraseñas seguras para operadores</p>
+          <p class="toggle-row__desc">Requisito mínimo de seguridad</p>
+        </div>
+        <button
+          class="switch"
+          [class.switch--on]="config().strongPasswords"
+          role="switch"
+          [attr.aria-checked]="config().strongPasswords"
+          (click)="toggle('strongPasswords')">
+          <span class="switch__knob"></span>
+        </button>
+      </div>
+
+      <div class="info-box">
+        <i class="fa-solid fa-shield-halved"></i>
+        <div>
+          <p class="info-box__title">Tus datos están protegidos</p>
+          <p class="info-box__desc">La información de las usuarias está resguardada de forma confidencial.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ═════════ SISTEMA Y DATOS ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-solid fa-cloud"></i> Sistema y Datos</h2>
+
+      <div class="toggle-row toggle-row--box">
+        <div>
+          <p class="toggle-row__title">Copia de seguridad automática</p>
+          <p class="toggle-row__desc">Guardar una copia diaria de las alertas</p>
+        </div>
+        <button
+          class="badge"
+          [class.badge--off]="!config().autoBackup"
+          (click)="toggle('autoBackup')">
+          {{ config().autoBackup ? 'Activada' : 'Desactivada' }}
+        </button>
+      </div>
+
+      <button class="row-link row-link--stack" (click)="descargarUsuarios()">
+        <span class="row-link__text">
+          <span class="row-link__title">Descargar lista de usuarios</span>
+          <span class="row-link__desc">En formato Excel o PDF</span>
+        </span>
+        <i class="fa-solid fa-download row-link__chevron"></i>
+      </button>
+
+      <button class="row-link row-link--stack" (click)="descargarAlertas()">
+        <span class="row-link__text">
+          <span class="row-link__title">Descargar historial de alertas</span>
+          <span class="row-link__desc">Registro del último mes</span>
+        </span>
+        <i class="fa-solid fa-download row-link__chevron"></i>
+      </button>
+
+      <div class="version-row">
+        <span>Versión del sistema</span>
+        <span class="version-row__value">{{ versionSistema }}</span>
+      </div>
+
+      <div class="info-box">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+          <p class="info-box__title">Todo en orden</p>
+          <p class="info-box__desc">El sistema funciona con normalidad y sin errores registrados hoy.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ═════════ AYUDA Y SOPORTE ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-regular fa-circle-question"></i> Ayuda y Soporte</h2>
+
+      <button class="row-link row-link--stack" (click)="abrirOpcion('Preguntas frecuentes')">
+        <span class="row-link__text">
+          <span class="row-link__title">Preguntas frecuentes</span>
+          <span class="row-link__desc">Guía rápida para resolver dudas comunes</span>
+        </span>
+        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+      </button>
+
+      <button class="row-link row-link--stack" (click)="abrirOpcion('Manual de uso para operadores')">
+        <span class="row-link__text">
+          <span class="row-link__title">Manual de uso para operadores</span>
+          <span class="row-link__desc">Pasos sencillos para atender emergencias</span>
+        </span>
+        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+      </button>
+
+      <div class="help-box">
+        <div class="help-box__top">
+          <div class="help-box__icon"><i class="fa-solid fa-headset"></i></div>
+          <div>
+            <p class="help-box__title">¿Tienes algún problema?</p>
+            <p class="help-box__desc">Te ayudamos con cualquier duda.</p>
+          </div>
+        </div>
+        <button class="btn-help" (click)="abrirOpcion('Pedir ayuda')">
+          <i class="fa-regular fa-circle-question"></i>
+          Pedir ayuda
+        </button>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- BARRA DE ESTADO -->
+  <footer class="status-bar">
+    <div class="status-bar__left">
+      <i class="fa-regular fa-circle-check"></i>
+      <strong>Estado del sistema:</strong>
+      <span>Funcionando correctamente</span>
+    </div>
+    <div class="status-bar__right">
+      <span>Última copia: {{ ultimaCopia }}</span>
+      <span class="status-bar__dot">•</span>
+      <span>Soporte activo</span>
+    </div>
+  </footer>
+
+</div>

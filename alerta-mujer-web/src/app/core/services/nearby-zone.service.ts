@@ -7,7 +7,7 @@ import { NearbyZone } from '../models/nearby-zone.model';
 @Injectable({ providedIn: 'root' })
 export class NearbyZoneService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/nearbyZones`;
+  private baseUrl = `${environment.apiUrl}/api/zones`;
 
   // If zones aren't user-specific in your backend, userId is simply unused here.
   getByUser(userId: number): Observable<NearbyZone[]> {

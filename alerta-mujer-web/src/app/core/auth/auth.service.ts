@@ -10,6 +10,10 @@ export interface User {
   nombre: string;
   email: string;
   rol: string;
+  firstName?: string;
+  lastName?: string;
+  telephone?: string;
+  roleId?: number;
 }
 
 export interface LoginCredentials {
@@ -36,33 +40,40 @@ export class AuthService {
   private http = inject(HttpClient);
 
   private _currentUser$ = new BehaviorSubject<User | null>(this.loadSession());
+  private _token$ = new BehaviorSubject<string | null>(this.loadToken());
 
   currentUser$: Observable<User | null> = this._currentUser$.asObservable();
+  token$: Observable<string | null> = this._token$.asObservable();
 
   login(credentials: LoginCredentials): Observable<User> {
-    // Con JSON Server puro, obtenemos todos los usuarios y filtramos localmente
-    return this.http.get<any[]>(`${environment.apiUrl}/usuarios`).pipe(
-      map((usuarios) => {
-        const found = usuarios.find(
-          (u) =>
-            (u.correo?.toLowerCase() === credentials.email.toLowerCase() ||
-             u.email?.toLowerCase() === credentials.email.toLowerCase()) &&
-            u.password === credentials.password
-        );
-
-        if (!found) {
-          throw new Error('Credenciales incorrectas');
-        }
-
-        const { password: _pwd, ...user } = found;
+    // Conectar al backend Spring Boot
+    return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/login`, {
+      email: credentials.email,
+      password: credentials.password
+    }).pipe(
+      map((response) => {
+        const backendUser = response.user;
+        
+        // Adaptar el formato del backend al modelo User de Angular
+        const user: User = {
+          id: backendUser.id,
+          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
+          email: backendUser.email,
+          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+          firstName: backendUser.firstName,
+          lastName: backendUser.lastName,
+          telephone: backendUser.telephone,
+          roleId: backendUser.roleId
+        };
+        
+        this.saveSession(user, response.token);
+        this._currentUser$.next(user);
+        this._token$.next(response.token);
+        
         return user;
       }),
-      tap((user) => {
-        const token = `jwt-${user.id}-${Date.now()}`;
-        this.saveSession(user, token);
-        this._currentUser$.next(user);
-      }),
       catchError((error) => {
+        console.error('Error en login:', error);
         return throwError(() => new Error('Credenciales incorrectas'));
       })
     );
@@ -106,38 +117,31 @@ export class AuthService {
   }
 
   registrarUsuaria(data: { nombre: string; email: string; rol: string }): void {
-    // Con JSON Server puro, creamos el usuario directamente
-    const nuevoUsuario = {
+    // Conectar al backend Spring Boot
+    this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.nombre,
-      correo: data.email,
       email: data.email,
-      password: 'Default@123',
-      telefono: '',
-      fechaNacimiento: '',
-      municipio: 'Neiva',
-      departamento: 'Huila',
-      rol: data.rol,
-      estado: 'Activa',
-      fechaRegistro: new Date().toLocaleDateString('es-CO'),
-      ultimaActividad: 'recién registrado',
-      alertas: 0,
-      avatarColor: '#7c3aed',
-      contactoEmergencia: 'N/A',
-      role_id: 1,
-      first_name: data.nombre.split(' ')[0] || data.nombre,
-      last_name: data.nombre.split(' ').slice(1).join(' ') || '',
-      document_number: '',
-      document_type: '',
-      birthdate: null,
-      created_at: new Date().toISOString(),
-    };
-
-    this.http.post<any>(`${environment.apiUrl}/usuarios`, nuevoUsuario).subscribe({
+      password: 'Default@123', // Contraseña por defecto para pruebas
+      telefono: ''
+    }).subscribe({
       next: (response) => {
-        const { password: _pwd, ...user } = response;
-        const token = `jwt-${user.id}-${Date.now()}`;
-        this.saveSession(user, token);
+        const backendUser = response.user;
+        
+        // Adaptar el formato del backend al modelo User de Angular
+        const user: User = {
+          id: backendUser.id,
+          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
+          email: backendUser.email,
+          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+          firstName: backendUser.firstName,
+          lastName: backendUser.lastName,
+          telephone: backendUser.telephone,
+          roleId: backendUser.roleId
+        };
+        
+        this.saveSession(user, response.token);
         this._currentUser$.next(user);
+        this._token$.next(response.token);
       },
       error: (err) => {
         console.error('Error al registrar:', err);
@@ -148,19 +152,17 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(STORAGE_KEY);
     this._currentUser$.next(null);
+    this._token$.next(null);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw).token ?? null;
+    return this._token$.value;
   }
 
   getRol(): string {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return '';
-    return JSON.parse(raw).user?.rol ?? '';
+    const user = this._currentUser$.value;
+    return user?.rol ?? '';
   }
 
   isLoggedIn(): boolean {
@@ -175,5 +177,11 @@ export class AuthService {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw).user ?? null;
+  }
+
+  private loadToken(): string | null {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw).token ?? null;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 import { Usuario } from '../models/user.model';
 
@@ -9,19 +10,19 @@ import { Usuario } from '../models/user.model';
 export class UsersService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000'; // usa aquí tu URL base actual
+  private apiUrl = environment.apiUrl;
 
   // ── Usuarias ─────────────────────────────────────────────────
   getAll(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios`);
+    return this.http.get<Usuario[]>(`${this.apiUrl}/api/admin/users`);
   }
 
   updateEstado(id: string | number, estado: Usuario['estado']): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/usuarios/${id}`, { estado });
+    return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, { estado });
   }
 
   actualizarUsuaria(id: string | number, cambios: Partial<Usuario> & Record<string, unknown>): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/usuarios/${id}`, cambios);
+    return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, cambios);
   }
 
   // Crea la usuaria y también su perfil y cuenta, para no dejar tablas huérfanas
@@ -51,15 +52,15 @@ export class UsersService {
   // ── Datos relacionados ───────────────────────────────────────
   // Todas las alertas (para calcular el contador por usuaria)
   getAlertas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/alertas`);
+    return this.http.get<any[]>(`${this.apiUrl}/api/admin/alerts`);
   }
 
   getAlertasByUsuaria(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/alertas?usuarioId=${usuarioId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${usuarioId}`);
   }
 
   // user_profile_id coincide con el id de la usuaria
   getContactos(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/emergency_contact?user_profile_id=${usuarioId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/api/contacts/user/${usuarioId}`);
   }
 }

@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Report {
   id: string;
@@ -16,7 +18,8 @@ export interface Report {
   providedIn: 'root'
 })
 export class ModeratorService {
-  private apiUrl = '/api/reports'; // Placeholder para backend
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/api/admin/user-reports`;
 
   // BehaviorSubjects para datos reactivos
   private reportsSubject = new BehaviorSubject<Report[]>([]);
@@ -32,6 +35,10 @@ export class ModeratorService {
 
   private destroy$ = new Subject<void>();
 
+  constructor() {
+    // Sin datos mock - se cargarán desde el backend
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -42,59 +49,23 @@ export class ModeratorService {
   // ========================================
 
   getAll(): Observable<Report[]> {
-    // TODO: Conectar al backend
-    // return this.http.get<Report[]>(this.apiUrl);
-    return this.reports$;
+    return this.http.get<Report[]>(this.apiUrl);
   }
 
-  getById(id: string): Report | undefined {
-    // TODO: Conectar al backend
-    // return this.http.get<Report>(`${this.apiUrl}/${id}`);
-    return this.reportsSubject.value.find(r => r.id === id);
+  getById(id: string): Observable<Report> {
+    return this.http.get<Report>(`${this.apiUrl}/${id}`);
   }
 
   create(report: Omit<Report, 'id'>): Observable<Report> {
-    // TODO: Conectar al backend
-    // return this.http.post<Report>(this.apiUrl, report);
-    const currentReports = this.reportsSubject.value;
-    const newReport: Report = {
-      ...report,
-      id: `#REP-${String(currentReports.length + 1).padStart(3, '0')}`
-    };
-    this.reportsSubject.next([...currentReports, newReport]);
-    return new Observable(observer => {
-      observer.next(newReport);
-      observer.complete();
-    });
+    return this.http.post<Report>(this.apiUrl, report);
   }
 
   update(id: string, report: Partial<Report>): Observable<Report> {
-    // TODO: Conectar al backend
-    // return this.http.put<Report>(`${this.apiUrl}/${id}`, report);
-    const currentReports = this.reportsSubject.value;
-    const updatedReports = currentReports.map(r =>
-      r.id === id ? { ...r, ...report } : r
-    );
-    this.reportsSubject.next(updatedReports);
-    return new Observable(observer => {
-      const updated = updatedReports.find(r => r.id === id);
-      if (updated) {
-        observer.next(updated);
-        observer.complete();
-      }
-    });
+    return this.http.put<Report>(`${this.apiUrl}/${id}`, report);
   }
 
   delete(id: string): Observable<void> {
-    // TODO: Conectar al backend
-    // return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    const currentReports = this.reportsSubject.value;
-    const filteredReports = currentReports.filter(r => r.id !== id);
-    this.reportsSubject.next(filteredReports);
-    return new Observable(observer => {
-      observer.next();
-      observer.complete();
-    });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   // ========================================
@@ -112,14 +83,7 @@ export class ModeratorService {
     // const params = new HttpParams().setAll(filtros);
     // return this.http.get<Report[]>(this.apiUrl, { params });
     
-    return this.reports$.pipe(
-      // map(reports => {
-      //   return reports.filter(report => {
-      //     // Lógica de filtrado
-      //     return true;
-      //   });
-      // })
-    );
+    return this.reports$;
   }
 
   // ========================================
@@ -138,7 +102,7 @@ export class ModeratorService {
     const stats = {
       pendingReports: reports.filter(r => r.status === 'Pendiente').length,
       resolvedCases: reports.filter(r => r.status === 'Resuelto').length,
-      sanctionedUsers: 15 // TODO: Calcular basado en usuarios sancionados
+      sanctionedUsers: 0 // TODO: Calcular basado en usuarios sancionados
     };
     this.statsSubject.next(stats);
   }

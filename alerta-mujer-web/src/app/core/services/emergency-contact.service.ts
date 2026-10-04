@@ -7,7 +7,7 @@ import { ContactoEmergencia } from '../models/emergency-contact.model';
 @Injectable({ providedIn: 'root' })
 export class EmergencyContactService {
   private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/contactos`;
+  private url = `${environment.apiUrl}/api/contacts`;
 
   getByUsuario(usuarioId: number): Observable<ContactoEmergencia[]> {
     return this.http.get<ContactoEmergencia[]>(`${this.url}?usuarioId=${usuarioId}`);

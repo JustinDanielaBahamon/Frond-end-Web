@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 /**
  * Interfaz para definir la estructura de un dispositivo
@@ -46,100 +48,67 @@ export interface DeviceFilters {
   providedIn: 'root'
 })
 export class DeviceService {
-  private url = '/api/dispositivos'; // URL base para la API (se cambiará cuando se conecte al backend)
+  private http = inject(HttpClient);
+  private url = `${environment.apiUrl}/api/devices`;
 
-  private devices: Device[] = [];
-
-  private devicesSubject = new BehaviorSubject<Device[]>(this.devices);
+  // Sin datos mock - se cargarán desde el backend
+  private devicesSubject = new BehaviorSubject<Device[]>([]);
   devices$ = this.devicesSubject.asObservable();
 
-  private stats: DeviceStats = {
+  private statsSubject = new BehaviorSubject<DeviceStats>({
     totalDevices: 0,
     activeDevices: 0,
     inactiveDevices: 0,
     blockedDevices: 0,
     syncedToday: 0
-  };
-
-  private statsSubject = new BehaviorSubject<DeviceStats>(this.stats);
+  });
   stats$ = this.statsSubject.asObservable();
 
   // ========================================
-  // MÉTODOS API (Futuros - preparados)
+  // MÉTODOS API (Conectar al backend)
   // ========================================
 
   /**
-   * Obtener todos los dispositivos (API futura)
+   * Obtener todos los dispositivos
    */
   getAll(): Observable<Device[]> {
-    // En el futuro: return this.http.get<Device[]>(this.url);
-    return this.devices$;
+    return this.http.get<Device[]>(this.url);
   }
 
   /**
-   * Obtener dispositivo por ID (API futura)
+   * Obtener dispositivo por ID
    */
   getById(id: number): Observable<Device> {
-    // En el futuro: return this.http.get<Device>(`${this.url}/${id}`);
-    const device = this.devices.find(d => d.id === id);
-    return of(device as Device).pipe(delay(300));
+    return this.http.get<Device>(`${this.url}/${id}`);
   }
 
   /**
-   * Crear nuevo dispositivo (API futura)
+   * Crear nuevo dispositivo
    */
   create(device: Omit<Device, 'id'>): Observable<Device> {
-    // En el futuro: return this.http.post<Device>(this.url, device);
-    console.log('DeviceService.create llamado con:', device);
-    
-    const nuevoDevice: Device = {
-      ...device,
-      id: Date.now()
-    };
-    
-    this.devices = [...this.devices, nuevoDevice];
-    this.devicesSubject.next(this.devices);
-    this.actualizarEstadisticas(); // Actualizar estadísticas
-    console.log('Dispositivo creado exitosamente en servicio:', nuevoDevice);
-    return of(nuevoDevice).pipe(delay(500));
+    return this.http.post<Device>(this.url, device);
   }
 
   /**
-   * Actualizar dispositivo (API futura)
+   * Actualizar dispositivo
    */
   update(id: number, device: Device): Observable<Device> {
-    // En el futuro: return this.http.put<Device>(`${this.url}/${id}`, device);
-    console.log('DeviceService.update llamado con id:', id, 'device:', device);
-    const index = this.devices.findIndex(d => d.id === id);
-    console.log('Índice encontrado:', index);
-    if (index !== -1) {
-      this.devices[index] = device;
-      this.devicesSubject.next(this.devices);
-      this.actualizarEstadisticas(); // Actualizar estadísticas
-      console.log('Dispositivo actualizado en índice:', index);
-    } else {
-      console.error('No se encontró dispositivo con id:', id);
-    }
-    return of(device).pipe(delay(500));
+    return this.http.put<Device>(`${this.url}/${id}`, device);
   }
 
   /**
-   * Eliminar dispositivo (API futura)
+   * Eliminar dispositivo
    */
   delete(id: number): Observable<void> {
-    // En el futuro: return this.http.delete<void>(`${this.url}/${id}`);
-    this.devices = this.devices.filter(d => d.id !== id);
-    this.devicesSubject.next(this.devices);
-    this.actualizarEstadisticas(); // Actualizar estadísticas
-    return of(void 0).pipe(delay(300));
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 
   /**
-   * Obtener estadísticas (API futura)
+   * Obtener estadísticas
    */
   getStats(): Observable<DeviceStats> {
-    // En el futuro: return this.http.get<DeviceStats>(`${this.url}/stats`);
-    // Calcular estadísticas dinámicamente basándose en los dispositivos actuales
+    // TODO: Conectar al backend
+    // return this.http.get<DeviceStats>(`${this.url}/stats`);
     const stats = this.calcularEstadisticas();
     return of(stats).pipe(delay(200));
   }
@@ -148,11 +117,12 @@ export class DeviceService {
    * Calcular estadísticas dinámicamente desde los dispositivos
    */
   private calcularEstadisticas(): DeviceStats {
-    const total = this.devices.length;
-    const activos = this.devices.filter(d => d.status === 'Activo').length;
-    const inactivos = this.devices.filter(d => d.status === 'Inactivo').length;
-    const bloqueados = this.devices.filter(d => d.status === 'Bloqueado').length;
-    const sincronizadosHoy = this.devices.filter(d => d.lastSync.includes('Hoy')).length;
+    const devices = this.devicesSubject.value;
+    const total = devices.length;
+    const activos = devices.filter(d => d.status === 'Activo').length;
+    const inactivos = devices.filter(d => d.status === 'Inactivo').length;
+    const bloqueados = devices.filter(d => d.status === 'Bloqueado').length;
+    const sincronizadosHoy = devices.filter(d => d.lastSync.includes('Hoy')).length;
     
     return {
       totalDevices: total,
@@ -168,29 +138,29 @@ export class DeviceService {
    */
   private actualizarEstadisticas(): void {
     const stats = this.calcularEstadisticas();
-    this.stats = stats;
     this.statsSubject.next(stats);
   }
 
   /**
-   * Cambiar estado de dispositivo (API futura)
+   * Cambiar estado de dispositivo
    */
   cambiarEstado(id: number, nuevoEstado: 'Activo' | 'Inactivo' | 'Bloqueado'): Observable<Device> {
-    const device = this.devices.find(d => d.id === id);
+    const currentDevices = this.devicesSubject.value;
+    const device = currentDevices.find(d => d.id === id);
     if (device) {
       device.status = nuevoEstado;
-      this.devicesSubject.next(this.devices);
-      this.actualizarEstadisticas(); // Actualizar estadísticas
+      this.devicesSubject.next(currentDevices);
+      this.actualizarEstadisticas();
       return of(device).pipe(delay(300));
     }
     return of({} as Device).pipe(delay(300));
   }
 
   /**
-   * Filtrar dispositivos (API futura)
+   * Filtrar dispositivos
    */
   filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {
-    let dispositivosFiltrados = [...this.devices];
+    let dispositivosFiltrados = [...this.devicesSubject.value];
 
     // Filtro por búsqueda
     if (filtros.busqueda) {

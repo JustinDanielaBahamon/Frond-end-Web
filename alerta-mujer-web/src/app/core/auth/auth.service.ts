@@ -21,6 +21,17 @@ export interface LoginCredentials {
   password: string;
 }
 
+/* Datos que llegan desde el formulario de registro */
+export interface RegistroUsuaria {
+  nombre: string;
+  telefono: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  fechaNacimiento: string; // DD/MM/AAAA
+  correo: string;
+  password: string;
+}
+
 const STORAGE_KEY = 'alerta_session';
 
 @Injectable({ providedIn: 'root' })
@@ -65,6 +76,43 @@ export class AuthService {
         console.error('Error en login:', error);
         return throwError(() => new Error('Credenciales incorrectas'));
       })
+    );
+  }
+
+  /* Registro completo: guarda a la usuaria con todos sus datos.
+     No inicia sesión: después del registro se va al login. */
+  registrar(data: RegistroUsuaria): Observable<User> {
+    const [dia, mes, anio] = data.fechaNacimiento.split('/');
+    const iso = `${anio}-${mes}-${dia}`;
+    const partes = data.nombre.trim().split(/\s+/);
+
+    const nuevoUsuario = {
+      nombre: data.nombre.trim(),
+      correo: data.correo.trim(),
+      email: data.correo.trim(),
+      password: data.password,
+      telefono: data.telefono.trim(),
+      fechaNacimiento: data.fechaNacimiento,
+      municipio: 'Neiva',
+      departamento: 'Huila',
+      rol: 'Usuaria',
+      estado: 'Activa',
+      fechaRegistro: new Date().toLocaleDateString('es-CO'),
+      ultimaActividad: 'recién registrada',
+      alertas: 0,
+      avatarColor: '#7c3aed',
+      contactoEmergencia: 'N/A',
+      role_id: 1,
+      first_name: partes[0] || data.nombre,
+      last_name: partes.slice(1).join(' '),
+      document_type: data.tipoDocumento,
+      document_number: data.numeroDocumento.trim(),
+      birthdate: isNaN(Date.parse(iso)) ? null : iso,
+      created_at: new Date().toISOString(),
+    };
+
+    return this.http.post<any>(`${environment.apiUrl}/usuarios`, nuevoUsuario).pipe(
+      map(({ password: _pwd, ...user }) => user as User)
     );
   }
 

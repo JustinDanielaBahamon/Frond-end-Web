@@ -4,10 +4,7 @@
 
   <div class="register-page__wrapper">
 
-    
-
     <app-card class="card">
-
 
       <div class="brand">
         <div class="brand__icon">
@@ -21,64 +18,232 @@
         </div>
       </div>
 
-      <h1 class="card__title">Crear <span style="color:#ae10df">cuenta</span></h1>
-      <p class="card__subtitle">
-        Únete y empieza a proteger lo que más importa.
-      </p>
+      <h1 class="card__title">Únete a nosotros, <span style="color:#ae10df">crea tu cuenta</span></h1>
 
-      <form class="form" #registerForm="ngForm">
+      <form class="form" [formGroup]="form" (ngSubmit)="continuar()" novalidate>
 
+        <!-- Nombre completo -->
+        <div class="form__group">
+          <div class="field">
+            <span class="field__icon"><i class="fa-regular fa-user"></i></span>
+            <input
+              type="text"
+              formControlName="nombre"
+              class="field__input"
+              [class.is-invalid]="invalido('nombre')"
+              placeholder="Nombre completo"
+              autocomplete="name">
+          </div>
+          @if (invalido('nombre')) {
+            <p class="field__error">{{ mensaje('nombre') }}</p>
+          }
+        </div>
+
+        <!-- Teléfono + Fecha de nacimiento -->
         <div class="form__row">
-          <div class="field">
-            <span class="field__icon">
-              <i class="fa-regular fa-user"></i>
-            </span>
-            <input [(ngModel)]="nombre" name="nombre" type="text" class="field__input" placeholder="Nombre" required>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-solid fa-phone"></i></span>
+              <input
+                type="tel"
+                formControlName="telefono"
+                class="field__input"
+                [class.is-invalid]="invalido('telefono')"
+                placeholder="Teléfono"
+                autocomplete="tel">
+            </div>
+            @if (invalido('telefono')) {
+              <p class="field__error">{{ mensaje('telefono') }}</p>
+            }
           </div>
-          <div class="field">
-            <span class="field__icon">
-              <i class="fa-regular fa-user"></i>
-            </span>
-            <input [(ngModel)]="apellido" name="apellido" type="text" class="field__input" placeholder="Apellido" required>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-regular fa-calendar"></i></span>
+              <input
+                type="text"
+                formControlName="fechaNacimiento"
+                class="field__input"
+                [class.is-invalid]="invalido('fechaNacimiento')"
+                placeholder="DD/MM/AAAA"
+                maxlength="10"
+                inputmode="numeric"
+                autocomplete="bday"
+                (input)="alEscribirFecha($event)">
+            </div>
+            @if (invalido('fechaNacimiento')) {
+              <p class="field__error">{{ mensaje('fechaNacimiento') }}</p>
+            }
           </div>
+
         </div>
 
+        <!-- Tipo de documento + Número de documento -->
         <div class="form__row">
-          <div class="field">
-            <span class="field__icon">
-              <i class="fa-regular fa-calendar"></i>
-            </span>
-            <input [(ngModel)]="edad" name="edad" type="number" class="field__input" placeholder="Edad" min="13" max="120" required>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-regular fa-id-card"></i></span>
+              <select
+                formControlName="tipoDocumento"
+                class="field__input field__input--select"
+                [class.is-empty]="!form.controls.tipoDocumento.value"
+                [class.is-invalid]="invalido('tipoDocumento')">
+                <option value="" disabled>Tipo de documento</option>
+                @for (tipo of tiposDocumento; track tipo) {
+                  <option [value]="tipo">{{ tipo }}</option>
+                }
+              </select>
+              <span class="field__chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+            @if (invalido('tipoDocumento')) {
+              <p class="field__error">{{ mensaje('tipoDocumento') }}</p>
+            }
           </div>
-          <div class="field">
-            <span class="field__icon">
-              <i class="fa-solid fa-phone"></i>
-            </span>
-            <input [(ngModel)]="telefono" name="telefono" type="tel" class="field__input" placeholder="Teléfono" required>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-solid fa-hashtag"></i></span>
+              <input
+                type="text"
+                formControlName="numeroDocumento"
+                class="field__input"
+                [class.is-invalid]="invalido('numeroDocumento')"
+                placeholder="Número de documento">
+            </div>
+            @if (invalido('numeroDocumento')) {
+              <p class="field__error">{{ mensaje('numeroDocumento') }}</p>
+            }
           </div>
+
         </div>
 
-        <div class="field">
-          <span class="field__icon">
-            <i class="fa-regular fa-envelope"></i>
-          </span>
-          <input [(ngModel)]="correo" name="correo" type="email" class="field__input" placeholder="Correo electrónico" required>
+        <!-- Correo -->
+        <div class="form__group">
+          <div class="field">
+            <span class="field__icon"><i class="fa-regular fa-envelope"></i></span>
+            <input
+              type="email"
+              formControlName="correo"
+              class="field__input"
+              [class.is-invalid]="invalido('correo')"
+              placeholder="Correo electrónico"
+              autocomplete="email">
+          </div>
+          @if (invalido('correo')) {
+            <p class="field__error">{{ mensaje('correo') }}</p>
+          }
         </div>
 
-        <p *ngIf="error" class="form__error">{{ error }}</p>
+        <!-- Contraseña + Confirmar contraseña -->
+        <div class="form__row">
 
-        <label class="checkbox">
-          <input type="checkbox" [(ngModel)]="aceptaTerminos" name="terminos">
-          <span class="checkbox__mark"></span>
-          <span class="checkbox__label">
-            Acepto los <span class="form__link">Términos y Condiciones</span>
-            y la <span class="form__link">Política de Privacidad</span>
-          </span>
-        </label>
+          <div class="form__group">
+            <div class="field field--password">
+              <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
+              <input
+                [type]="verPassword() ? 'text' : 'password'"
+                formControlName="password"
+                class="field__input"
+                [class.is-invalid]="invalido('password')"
+                placeholder="Contraseña"
+                autocomplete="new-password">
+              <button
+                type="button"
+                class="field__eye"
+                aria-label="Mostrar u ocultar contraseña"
+                (click)="verPassword.set(!verPassword())">
+                <i [class]="verPassword() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              </button>
+            </div>
+            @if (invalido('password')) {
+              <p class="field__error">{{ mensaje('password') }}</p>
+            }
+          </div>
 
-        <button type="button" (click)="registrar()" [disabled]="!formularioValido()" class="btn-submit">
+          <div class="form__group">
+            <div class="field field--password">
+              <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
+              <input
+                [type]="verConfirmar() ? 'text' : 'password'"
+                formControlName="confirmarPassword"
+                class="field__input"
+                [class.is-invalid]="invalido('confirmarPassword')"
+                placeholder="Confirmar contraseña"
+                autocomplete="new-password">
+              <button
+                type="button"
+                class="field__eye"
+                aria-label="Mostrar u ocultar confirmación"
+                (click)="verConfirmar.set(!verConfirmar())">
+                <i [class]="verConfirmar() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              </button>
+            </div>
+            @if (invalido('confirmarPassword')) {
+              <p class="field__error">{{ mensaje('confirmarPassword') }}</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Casilla: Términos y condiciones -->
+        <div class="terms-row">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              [checked]="aceptaTerminos()"
+              (click)="alClickTerminos($event)"
+              (change)="alCambiarTerminos($event)">
+            <span class="checkbox__mark"></span>
+            <span class="checkbox__label">Acepto los Términos y condiciones</span>
+          </label>
+          <button type="button" class="form__link terms-row__link" (click)="abrirTerminos()">
+            Leer términos
+          </button>
+        </div>
+        @if (avisoTerminos()) {
+          <p class="field__error">Debes leer los términos primero</p>
+        }
+
+        <!-- Casilla: Política de privacidad -->
+        <div class="terms-row">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              [checked]="aceptaPrivacidad()"
+              (click)="alClickPrivacidad($event)"
+              (change)="alCambiarPrivacidad($event)">
+            <span class="checkbox__mark"></span>
+            <span class="checkbox__label">Acepto la Política de privacidad</span>
+          </label>
+          <button type="button" class="form__link terms-row__link" (click)="abrirPrivacidad()">
+            Leer política
+          </button>
+        </div>
+        @if (avisoPrivacidad()) {
+          <p class="field__error">Debes leer la política primero</p>
+        }
+
+        <!-- Mensajes generales -->
+        @if (errorAceptacion()) {
+          <p class="field__error">Debes aceptar términos y privacidad</p>
+        }
+
+        @if (errorServidor()) {
+          <p class="field__error">{{ errorServidor() }}</p>
+        }
+
+        @if (exito()) {
+          <div class="form__success">
+            <i class="fa-solid fa-circle-check"></i>
+            ¡Registro exitoso! Te llevamos al inicio de sesión…
+          </div>
+        }
+
+        <button type="submit" class="btn-submit" [disabled]="cargando() || exito()">
           <i class="fa-solid fa-shield-halved"></i>
-          CREAR CUENTA
+          Continuar
         </button>
 
       </form>
@@ -89,6 +254,7 @@
       </p>
 
     </app-card>
+
     <div class="register-page__visual">
       <img src="register.png" alt="Alerta Mujer">
     </div>

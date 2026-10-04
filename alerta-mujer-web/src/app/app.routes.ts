@@ -10,6 +10,8 @@ import { PublicLayoutComponent } from './core/layouts/public-layout/public-layou
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
 import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone';
 import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
+import { TermsComponent } from './features/auth/terms/terms'; // NUEVO
+import { PrivacyComponent } from './features/auth/privacy/privacy'; // NUEVO
 
 
 
@@ -47,6 +49,8 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
+      { path: 'terms', component: TermsComponent }, // NUEVO
+      { path: 'privacy', component: PrivacyComponent }, // NUEVO
       {
         path: 'forgot-password',
         loadComponent: () =>

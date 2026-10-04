@@ -1,0 +1,105 @@
+/* PÁGINAS LEGALES - Términos y Privacidad */
+/* Estilos compartidos por las dos páginas. Usan las variables del tema
+   para que se vean bien en modo claro y oscuro. */
+
+:host {
+  display: block;
+}
+
+/* Fondo de la página */
+.legal-page {
+  min-height     : 100vh;
+  padding        : 40px 20px;
+  box-sizing     : border-box;
+  display        : flex;
+  justify-content: center;
+  align-items    : flex-start;
+  background     : var(--gradient-bg);
+}
+
+/* Tarjeta con el texto, con borde morado visible */
+.legal-card {
+  width        : 100%;
+  max-width    : 820px;
+  padding      : 36px 40px;
+  border-radius: 28px;
+  border       : 2px solid #b48ee0;
+  background   : var(--bg-card);
+  color        : var(--text-primary);
+  box-shadow   : var(--shadow-card);
+}
+
+/* Botón de arriba: volver al registro */
+.legal-back {
+  background : none;
+  border     : none;
+  padding    : 0;
+  margin-bottom: 18px;
+  color      : var(--purple-mid);
+  font-weight: 700;
+  font-size  : 0.9rem;
+  cursor     : pointer;
+
+  &:hover { text-decoration: underline; }
+}
+
+.legal-title {
+  font-size  : 1.8rem;
+  font-weight: 900;
+  margin     : 0 0 6px;
+  color      : var(--text-primary);
+}
+
+.legal-date {
+  font-size  : 0.8rem;
+  color      : var(--text-muted);
+  margin     : 0 0 24px;
+}
+
+.legal-card h2 {
+  font-size  : 1.05rem;
+  font-weight: 800;
+  margin     : 22px 0 6px;
+  color      : var(--purple-mid);
+}
+
+.legal-card p {
+  font-size  : 0.92rem;
+  line-height: 1.65;
+  margin     : 0 0 8px;
+  color      : var(--text-muted);
+}
+
+/* Botón de abajo: "Entendido, volver al registro" */
+.legal-btn {
+  width        : 100%;
+  margin-top   : 28px;
+  padding      : 14px;
+  border       : none;
+  border-radius: 12px;
+  background   : linear-gradient(90deg, #6D28D9, #ec4899);
+  color        : #fff;
+  font-weight  : 800;
+  font-size    : 0.95rem;
+  cursor       : pointer;
+  box-shadow   : 0 10px 24px rgba(147, 51, 234, 0.35);
+  transition   : transform .15s, box-shadow .15s;
+
+  &:hover {
+    transform : translateY(-2px);
+    box-shadow: 0 14px 28px rgba(233, 30, 140, 0.4);
+  }
+}
+
+/* Modo oscuro */
+:host-context([data-theme="dark"]) {
+  .legal-page { background: var(--bg-base); }
+  .legal-card { border-color: var(--border); }
+}
+
+/* Pantallas pequeñas */
+@media (max-width: 576px) {
+  .legal-page { padding: 16px 12px; }
+  .legal-card { padding: 24px 20px; border-radius: 22px; }
+  .legal-title { font-size: 1.45rem; }
+}

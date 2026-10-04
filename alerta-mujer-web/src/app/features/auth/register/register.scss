@@ -6,7 +6,9 @@
 // respecto a la primera versión — solo se aplican colores/estilo.
 
 .register-page {
-  height     : 100vh;
+  /* CAMBIO: antes height: 100vh. Ahora la página crece si el formulario es
+     más alto que la pantalla, para que no se corte. */
+  min-height : 100vh;
   display        : flex;
   align-items    : center;
   justify-content: center;
@@ -85,7 +87,7 @@
     width          : 100%;
     max-width      : 1300px;
     margin         : 0 auto;
-    max-height     : 100%;
+    /* CAMBIO: se quitó max-height: 100% para que la card pueda ser más alta */
   }
 
   &__visual {
@@ -126,6 +128,13 @@
                                                                           // sin forzar brillo/saturación
     }
   }
+}
+
+/* NUEVO: la card de registro lleva menos relleno para que 8 campos
+   no la hagan demasiado alta. Se usa .register-page .card con !important
+   porque card.scss (componente compartido) también usa !important. */
+.register-page .card {
+  padding: 32px 40px 28px !important;
 }
 
 // ── Marca (logo + nombre) ────────────────────────────
@@ -186,7 +195,7 @@
   font-weight : 800;
   color       : #2d1457;
   line-height : 1.2;
-  margin-bottom: 4px;
+  margin-bottom: 14px;   /* CAMBIO: antes 4px; ya no hay subtítulo debajo */
   position    : relative;
 
   .highlight {
@@ -233,8 +242,8 @@
 // se note sin inflar la altura total de la card
 .form--framed {
   border        : 1.5px dashed rgba(196, 166, 224, 0.55);  // lila definido, más
-                                                             // visible que el morado
-                                                             // tenue anterior
+                                                           // visible que el morado
+                                                           // tenue anterior
   border-radius : 16px;
   padding       : 14px 14px;
   background    : rgba(238, 241, 251, 0.5);
@@ -245,6 +254,14 @@
   display              : grid;
   grid-template-columns: 1fr 1fr;
   gap                  : 12px;
+  align-items          : start;   /* CAMBIO: cada columna crece según su error */
+}
+
+/* NUEVO: grupo = campo + su mensaje de error debajo */
+.form__group {
+  margin-bottom: 10px;
+
+  .field { margin-bottom: 0; }
 }
 
 // ── Campos ────────────────────────────────────────────
@@ -288,6 +305,55 @@
   }
 }
 
+/* NUEVO: campo con error → borde rojo */
+.field__input.is-invalid {
+  border-color: #e11d48;
+
+  &:focus {
+    border-color: #e11d48;
+    box-shadow  : 0 0 0 3px rgba(225, 29, 72, 0.14);
+  }
+}
+
+/* NUEVO: mensaje de error en rojo, debajo de cada campo */
+.field__error {
+  color      : #e11d48;
+  font-size  : 0.78rem;
+  line-height: 1.3;
+  margin     : 4px 0 0 6px;
+}
+
+/* NUEVO: campos de contraseña (dejan espacio para el botón del ojo) */
+.field--password .field__input {
+  padding-right: 40px;
+}
+
+/* NUEVO: lista desplegable de tipo de documento */
+.field__input--select {
+  appearance        : none;
+  -webkit-appearance: none;
+  cursor            : pointer;
+  padding-right     : 34px;
+
+  /* Mientras no elija nada, se ve como un placeholder */
+  &.is-empty { color: #a99fd1; }
+
+  option {
+    color     : #2d1457;
+    background: #ffffff;
+  }
+}
+
+.field__chevron {
+  position      : absolute;
+  right         : 14px;
+  top           : 50%;
+  transform     : translateY(-50%);
+  color         : #6B3FA0;
+  font-size     : 0.7rem;
+  pointer-events: none;
+}
+
 // ── Error message ────────────────────────────────────
 .form__error {
   color      : #E91E8C;
@@ -296,17 +362,47 @@
   margin-bottom: 0.3rem;
 }
 
+/* NUEVO: mensaje de registro exitoso */
+.form__success {
+  display      : flex;
+  align-items  : center;
+  gap          : 8px;
+  margin       : 8px 0;
+  padding      : 10px 12px;
+  border-radius: 10px;
+  border       : 1.5px solid #22c55e;
+  background   : rgba(34, 197, 94, 0.12);
+  color        : #15803d;
+  font-size    : 0.85rem;
+  font-weight  : 700;
+}
+
 // ── Checkbox términos ─────────────────────────────────
+/* CAMBIO: ahora cada casilla va en una fila (.terms-row) junto a su enlace */
 .checkbox {
   display     : flex;
-  align-items : flex-start;
+  align-items : center;
   gap         : 8px;
-  margin      : 4px 0 12px;
+  margin      : 0;
   cursor      : pointer;
   font-size   : 0.8rem;
   color       : #6b5b8a;
 
   input { accent-color: var(--color-pink, #E91E8C); margin-top: 2px; }
+}
+
+/* NUEVO: borde de la casilla más visible */
+.checkbox__mark {
+  border-color: #C4A6E0;
+}
+
+/* NUEVO: fila con la casilla a la izquierda y el enlace "Leer ..." a la derecha */
+.terms-row {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  gap            : 10px;
+  margin         : 4px 0;
 }
 
 .form__link {
@@ -315,6 +411,15 @@
   cursor      : pointer;
 
   &:hover { text-decoration: underline; }
+}
+
+/* NUEVO: el enlace "Leer ..." es un <button>; se le quita el aspecto de botón */
+.terms-row__link {
+  background : none;
+  border     : none;
+  padding    : 0;
+  font-size  : 0.78rem;
+  white-space: nowrap;
 }
 
 // ── Botón principal ───────────────────────────────────
@@ -342,6 +447,7 @@
   cursor        : pointer;
   box-shadow    : 0 10px 24px rgba(147, 51, 234, 0.35);
   transition    : transform .15s, box-shadow .15s, opacity .15s;
+  margin-top    : 10px;   /* NUEVO: un poco de aire sobre el botón */
 
   &:hover:not(:disabled) {
     transform : translateY(-2px);
@@ -431,6 +537,13 @@
   }
 
   .card__footer-arrow { display: none; }
+
+  /* NUEVO: en móvil la card ocupa todo el ancho disponible */
+  .register-page .card {
+    width    : 100%;
+    max-width: 580px;
+    padding  : 24px 20px !important;
+  }
 }
 
 // Móviles muy pequeños: reduce un poco más el aire alrededor
@@ -449,6 +562,37 @@
     box-shadow:
       0 32px 80px rgba(0, 0, 0, .5),
       0 0 0 1px rgba(157, 111, 240, .15) inset !important;
+  }
+
+  /* NUEVO: errores, éxito y lista desplegable en modo oscuro */
+  .field__error {
+    color: #fb7185;
+  }
+
+  .field__input.is-invalid {
+    border-color: #fb7185 !important;
+  }
+
+  .form__success {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.12);
+  }
+
+  .field__input--select {
+    &.is-empty { color: var(--text-dim) !important; }
+
+    option {
+      color: var(--text-primary);
+      background: var(--bg-card);
+    }
+  }
+
+  .field__chevron {
+    color: var(--purple-mid);
+  }
+
+  .checkbox__mark {
+    border-color: var(--purple-mid) !important;
   }
 
   /* ... el resto de tu bloque que ya tienes ... */

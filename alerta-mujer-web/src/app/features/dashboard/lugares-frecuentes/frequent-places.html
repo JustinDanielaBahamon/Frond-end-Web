@@ -11,7 +11,7 @@
         <h2 class="lf-title">Tus lugares frecuentes</h2>
         <p class="lf-subtitle">Son los lugares que visitas habitualmente y que reconocemos en el sistema.</p>
       </div>
-      <button class="lf-add-btn" (click)="addPlace()">
+      <button class="lf-add-btn" (click)="abrirModalCrear()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Agregar lugar
       </button>
@@ -23,15 +23,14 @@
       <ul class="lf-list">
         @for (place of places(); track place.id) {
           <li class="lf-item">
-            <div class="lf-icon lf-icon--{{ place.type }}">
+            <div class="lf-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath(place.type)"/></svg>
             </div>
             <div class="lf-body">
               <div class="lf-name-row">
                 <span class="lf-name">{{ place.name }}</span>
-                @if (place.isMain) { <span class="lf-tag">Principal</span> }
               </div>
-              <span class="lf-address">{{ place.address }}</span>
+              <span class="lf-address">{{ place.address || (place.lat.toFixed(6) + ', ' + place.lng.toFixed(6)) }}</span>
               <span class="lf-city">{{ place.city }}</span>
               <button class="lf-link" (click)="viewOnMap(place)">
                 Ver en el mapa
@@ -43,24 +42,87 @@
               @if (openMenu() === place.id) {
                 <div class="lf-menu">
                   <button (click)="viewOnMap(place)">Ver en el mapa</button>
+                  <button (click)="abrirModalEditar(place)">Editar</button>
                   <button class="lf-menu-danger" (click)="remove(place)">Eliminar</button>
                 </div>
               }
             </div>
           </li>
         } @empty {
-          <li class="lf-muted">Aún no tienes lugares frecuentes guardados.</li>
+          <li class="lf-muted">
+        Aún no tienes lugares frecuentes guardados.
+        <span class="lf-muted-nota">Se guardan desde la app móvil.</span>
+      </li>
         }
       </ul>
     }
   </div>
 
   <div class="lf-map-wrap">
-    <div class="lf-map" #mapContainer></div>
+    @if (loading || places().length > 0) {
+      <div class="lf-map" #mapContainer></div>
+    } @else {
+      <div class="lf-map lf-map--vacio">
+        <p>Aún no tienes lugares frecuentes guardados.</p>
+      </div>
+    }
     <div class="lf-legend">
       @for (place of places(); track place.id) {
-        <span><i class="lf-dot lf-dot--{{ place.type }}"></i> {{ place.name }}</span>
+        <span><i class="lf-dot lf-dot--otro"></i> {{ place.name }}</span>
       }
     </div>
   </div>
 </div>
+
+<!-- MODAL CREAR/EDITAR LUGAR FRECUENTE -->
+@if (modalAbierto()) {
+  <div class="lf-modal-overlay" (click)="cerrarModal()">
+    <div class="lf-modal" (click)="$event.stopPropagation()">
+      <div class="lf-modal-head">
+        <h3>{{ editandoId() !== null ? 'Editar lugar' : 'Nuevo lugar frecuente' }}</h3>
+        <button type="button" class="lf-modal-close" (click)="cerrarModal()" [disabled]="enviando">✕</button>
+      </div>
+
+      <div class="lf-modal-body">
+        <label class="lf-field">
+          <span>Nombre</span>
+          <input type="text" [(ngModel)]="form.name" placeholder="Ej. Casa" />
+        </label>
+        <label class="lf-field">
+          <span>Dirección</span>
+          <input type="text" [(ngModel)]="form.address" placeholder="Calle, carrera…" />
+        </label>
+        <label class="lf-field">
+          <span>Ciudad</span>
+          <input type="text" [(ngModel)]="form.city" placeholder="Neiva" />
+        </label>
+        <div class="lf-field-row">
+          <label class="lf-field">
+            <span>Latitud</span>
+            <input type="text" inputmode="decimal" [(ngModel)]="form.lat" placeholder="4.711000" />
+          </label>
+          <label class="lf-field">
+            <span>Longitud</span>
+            <input type="text" inputmode="decimal" [(ngModel)]="form.lng" placeholder="-74.072100" />
+          </label>
+        </div>
+        <label class="lf-field">
+          <span>Notas (opcional)</span>
+          <input type="text" [(ngModel)]="form.notes" placeholder="Detalles del lugar" />
+        </label>
+        @if (formError()) {
+          <p class="lf-modal-error">{{ formError() }}</p>
+        }
+      </div>
+
+      <div class="lf-modal-foot">
+        <button type="button" class="lf-btn lf-btn--cancelar" (click)="cerrarModal()" [disabled]="enviando">
+          Cancelar
+        </button>
+        <button type="button" class="lf-btn lf-btn--guardar" (click)="guardar()" [disabled]="enviando">
+          {{ enviando ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

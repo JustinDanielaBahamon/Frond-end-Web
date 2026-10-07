@@ -5,8 +5,13 @@ export interface NearbyZone {
   name: string;
   type: ZoneType;
   description: string;
-  distanceKm: number;
+  address?: string;
+  city?: string;
+  riskLevel?: string;
   lat: number;
   lng: number;
   radiusMeters: number;
+  // No viene del backend: se calcula en el frontend con Haversine
+  // desde la última ubicación registrada de la usuaria.
+  distanceKm?: number;
 }

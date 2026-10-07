@@ -100,8 +100,109 @@
 
 .lf-muted { color: var(--text-muted, #4b4b55); font-size: 0.85rem; }
 
+.lf-muted-nota {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--purple-mid, #7c3aed);
+  margin-top: 4px;
+}
+
 .lf-map-wrap { position: relative; border-radius: 1rem; }
 .lf-map { height: 480px; border-radius: 1rem; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+
+.lf-map--vacio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--purple-pale, #f5f3ff);
+  color: var(--text-muted, #4b4b55);
+  font-size: 0.85rem;
+
+  p { margin: 0; }
+}
+
+// Marcador de colores en CSS puro (se inyecta dentro del mapa).
+:host ::ng-deep .am-marker {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--am-marker-color, #7c3aed);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+// ── Modal crear/editar ────────────────────────
+.lf-modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+
+.lf-modal {
+  width: 100%; max-width: 420px;
+  background: var(--bg-card, #fff);
+  border-radius: 1rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.lf-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border, #ede9fe);
+
+  h3 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #1a1a1a); }
+}
+
+.lf-modal-close {
+  border: none; background: none; font-size: 1rem; cursor: pointer;
+  color: var(--text-muted, #4b4b55); padding: 0.2rem 0.4rem; border-radius: 0.4rem;
+  &:hover { background: var(--purple-pale, #f5f3ff); }
+}
+
+.lf-modal-body { padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.7rem; }
+
+.lf-field { display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
+  span { font-size: 0.75rem; font-weight: 700; color: var(--text-muted, #4b4b55); }
+  input {
+    padding: 0.5rem 0.65rem; border-radius: 0.5rem;
+    border: 1px solid var(--border, #e9d5ff);
+    font-size: 0.85rem; color: var(--text-primary, #1a1a1a);
+    &:focus { outline: none; border-color: var(--purple-mid, #7c3aed); }
+  }
+}
+
+.lf-field-row { display: flex; gap: 0.7rem; }
+
+.lf-modal-error { color: var(--red, #dc2626); font-size: 0.78rem; font-weight: 600; margin: 0; }
+
+.lf-modal-foot {
+  display: flex; justify-content: flex-end; gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-top: 1px solid var(--border, #ede9fe);
+}
+
+.lf-btn {
+  padding: 0.5rem 1rem; border-radius: 0.5rem;
+  font-size: 0.8rem; font-weight: 700; cursor: pointer;
+
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+.lf-btn--cancelar {
+  border: 1px solid var(--border, #e9d5ff);
+  background: var(--bg-card, #fff);
+  color: var(--text-muted, #4b4b55);
+}
+
+.lf-btn--guardar {
+  border: none;
+  background: var(--purple-mid, #7c3aed);
+  color: #fff;
+
+  &:hover:not(:disabled) { background: var(--purple-deep, #5b21b6); }
+}
 
 .lf-legend {
   position: absolute; bottom: 12px; left: 12px; z-index: 1000;

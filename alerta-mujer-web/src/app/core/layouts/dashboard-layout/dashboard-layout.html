@@ -14,7 +14,8 @@
 
     <app-topbar
       brand="Alerta Mujer"
-      avatarLetter="S"
+      [avatarLetter]="avatarLetra"
+      [userName]="primerNombre"
       (sidebarToggle)="toggleSidebar()"
       (themeToggle)="toggleTheme()">
     </app-topbar>

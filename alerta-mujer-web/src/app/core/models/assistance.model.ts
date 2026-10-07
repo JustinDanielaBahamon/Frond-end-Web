@@ -21,6 +21,8 @@ export interface CentroAyuda {
   abierto: boolean;
   lat: number;
   lng: number;
+  address?: string;
+  city?: string;
 }
 
 export interface RecursoGuardado {

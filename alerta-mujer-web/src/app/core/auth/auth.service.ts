@@ -79,50 +79,38 @@ export class AuthService {
     );
   }
 
-  /* Registro completo: guarda a la usuaria con todos sus datos.
-     No inicia sesión: después del registro se va al login. */
+  /* Registro completo: usa el mismo endpoint del backend que la app móvil.
+     Después del registro se va al login. */
   registrar(data: RegistroUsuaria): Observable<User> {
-    const [dia, mes, anio] = data.fechaNacimiento.split('/');
-    const iso = `${anio}-${mes}-${dia}`;
-    const partes = data.nombre.trim().split(/\s+/);
-
-    const nuevoUsuario = {
+    return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.nombre.trim(),
-      correo: data.correo.trim(),
       email: data.correo.trim(),
       password: data.password,
       telefono: data.telefono.trim(),
-      fechaNacimiento: data.fechaNacimiento,
-      municipio: 'Neiva',
-      departamento: 'Huila',
-      rol: 'Usuaria',
-      estado: 'Activa',
-      fechaRegistro: new Date().toLocaleDateString('es-CO'),
-      ultimaActividad: 'recién registrada',
-      alertas: 0,
-      avatarColor: '#7c3aed',
-      contactoEmergencia: 'N/A',
-      role_id: 1,
-      first_name: partes[0] || data.nombre,
-      last_name: partes.slice(1).join(' '),
-      document_type: data.tipoDocumento,
-      document_number: data.numeroDocumento.trim(),
-      birthdate: isNaN(Date.parse(iso)) ? null : iso,
-      created_at: new Date().toISOString(),
-    };
-
-    return this.http.post<any>(`${environment.apiUrl}/usuarios`, nuevoUsuario).pipe(
-      map(({ password: _pwd, ...user }) => user as User)
+    }).pipe(
+      map((response) => {
+        const backendUser = response.user;
+        return {
+          id: backendUser.id,
+          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
+          email: backendUser.email,
+          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+          firstName: backendUser.firstName,
+          lastName: backendUser.lastName,
+          telephone: backendUser.telephone,
+          roleId: backendUser.roleId
+        } as User;
+      })
     );
   }
 
-  registrarUsuaria(data: { nombre: string; email: string; rol: string }): void {
+  registrarUsuaria(data: { nombre: string; email: string; rol: string; password?: string; telefono?: string }): void {
     // Conectar al backend Spring Boot
     this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.nombre,
       email: data.email,
-      password: 'Default@123', // Contraseña por defecto para pruebas
-      telefono: ''
+      password: data.password ?? 'Default@123', // Contraseña por defecto solo si no se envía
+      telefono: data.telefono ?? ''
     }).subscribe({
       next: (response) => {
         const backendUser = response.user;
@@ -183,5 +171,17 @@ export class AuthService {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw).token ?? null;
+  }
+
+  /** Actualiza la usuaria en sesión después de editar el perfil. */
+  actualizarUsuaria(cambios: Partial<User>): void {
+    const actual = this._currentUser$.value;
+    const token = this._token$.value;
+    if (!actual) return;
+    const usuario: User = { ...actual, ...cambios };
+    this._currentUser$.next(usuario);
+    if (token) {
+      this.saveSession(usuario, token);
+    }
   }
 }

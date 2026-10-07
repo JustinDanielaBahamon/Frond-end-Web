@@ -8,36 +8,35 @@ import { Alerta, EstadoAlerta, MedioActivacion } from '../models/alert.model';
 @Injectable({ providedIn: 'root' })
 export class AlertsService {
   private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/alertas`;
-
   // Usado por ADMIN: todas las alertas
   getAll(): Observable<Alerta[]> {
-    return this.http.get<any[]>(this.url).pipe(
+    return this.http.get<any[]>(`${environment.apiUrl}/api/admin/alerts`).pipe(
       map(lista => lista.map(a => this.normalizar(a)))
     );
   }
 
   // Usado por USUARIA: solo sus propias alertas
-  // json-server soporta filtros por query param: /alertas?usuarioId=1
   getByUsuario(usuarioId: number): Observable<Alerta[]> {
-    return this.http.get<any[]>(`${this.url}?usuarioId=${usuarioId}`).pipe(
+    return this.http.get<any[]>(`${environment.apiUrl}/api/alerts/user/${usuarioId}`).pipe(
       map(lista => lista.map(a => this.normalizar(a)))
     );
   }
 
   getById(id: number): Observable<Alerta> {
-    return this.http.get<any>(`${this.url}/${id}`).pipe(
+    return this.http.get<any>(`${environment.apiUrl}/api/alerts/${id}`).pipe(
       map(a => this.normalizar(a))
     );
   }
 
   update(alerta: Alerta): Observable<Alerta> {
-    return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alerta);
+    return this.http.put<any>(`${environment.apiUrl}/api/alerts/${alerta.id}`, alerta).pipe(
+      map(a => this.normalizar(a))
+    );
   }
 
-  // PATCH: cambia solo el estado sin pisar los demás campos del db.json
+  // Cambia solo el estado sin pisar los demás campos
   updateEstado(id: number, estado: EstadoAlerta): Observable<Alerta> {
-    return this.http.patch<any>(`${this.url}/${id}`, { estado }).pipe(
+    return this.http.put<any>(`${environment.apiUrl}/api/alerts/${id}`, { status: this.mapearEstadoBackend(estado) }).pipe(
       map(a => this.normalizar(a))
     );
   }
@@ -50,16 +49,16 @@ export class AlertsService {
       id: a.id,
       nombre: a.nombre ?? a.usuaria ?? a.user_name ?? 'Sin nombre',
       descripcion: a.descripcion ?? a.description ?? a.tipo ?? '',
-      medioActivacion: this.normalizarMedio(a.medioActivacion ?? a.medio),
-      tiempo: a.tiempo ?? this.haceCuanto(a.created_at ?? a.started_at),
-      ubicacion: a.ubicacion ?? a.location ?? '',
+      medioActivacion: this.normalizarMedio(a.medioActivacion ?? a.activationMethod ?? a.medio),
+      tiempo: a.tiempo ?? this.haceCuanto(a.createdAt ?? a.created_at ?? a.startedAt ?? a.started_at),
+      ubicacion: a.ubicacion ?? a.message ?? a.location ?? '',
       lat: Number(a.lat ?? a.latitude ?? 0) || 0,
       lng: Number(a.lng ?? a.longitude ?? 0) || 0,
       estado: this.normalizarEstado(a.estado ?? a.status),
-      usuarioId: a.usuarioId,
-      tipo: a.tipo,
-      created_at: a.created_at,
-      started_at: a.started_at,
+      usuarioId: a.usuarioId ?? a.userProfileId,
+      tipo: a.tipo ?? a.alertType,
+      created_at: a.created_at ?? a.createdAt,
+      started_at: a.started_at ?? a.startedAt,
     };
   }
 
@@ -71,6 +70,13 @@ export class AlertsService {
     return 'Botón de pánico';
   }
 
+  private mapearEstadoBackend(estado?: EstadoAlerta): string {
+    const v = String(estado ?? '').toLowerCase();
+    if (v.includes('atendida')) return 'resolved';
+    if (v.includes('cancelada')) return 'cancelled';
+    return 'active';
+  }
+
   private normalizarEstado(valor: unknown): EstadoAlerta {
     const v = String(valor ?? '').toLowerCase();
     if (v.startsWith('atend') || v === 'resolved' || v === 'attended') return 'Atendida';
@@ -80,7 +86,8 @@ export class AlertsService {
 
   private haceCuanto(fecha?: string): string {
     if (!fecha) return '';
-    const t = new Date(fecha).getTime();
+    const isoUtc = fecha + (fecha.endsWith('Z') || fecha.includes('+') ? '' : 'Z');
+    const t = new Date(isoUtc).getTime();
     if (isNaN(t)) return '';
     const min = Math.round((Date.now() - t) / 60000);
     if (min < 1) return 'Ahora';

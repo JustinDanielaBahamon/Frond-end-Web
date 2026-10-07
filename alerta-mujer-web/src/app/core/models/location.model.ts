@@ -8,6 +8,7 @@ export interface UbicacionEntry {
   lat: number;
   lng: number;
   date?: string;           // 'YYYY-MM-DD' — agrégalo en el backend para que el calendario filtre de verdad
+  recordedAt?: string;     // fecha/hora cruda del backend (ISO local)
   connectionType?: string; // opcional
   deviceName?: string;     // opcional
 }

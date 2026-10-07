@@ -8,7 +8,7 @@
       <div class="home-panel__header">
         <div>
           <h2 class="home-panel__title">Estado de tu seguridad</h2>
-          <p class="home-panel__subtitle">Tu cuenta está protegida</p>
+          <p class="home-panel__subtitle">{{ estadoGeneralSeguridad }}</p>
         </div>
         <button class="home-btn home-btn--outline" routerLink="/dashboard/settings">
           Ver configuración
@@ -25,6 +25,8 @@
             <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
             @if (item.configurado) {
               <span class="home-seguridad-item__check"><i class="ti ti-check"></i></span>
+            } @else {
+              <span class="home-seguridad-item__check home-seguridad-item__check--off" title="Falta por configurar"><i class="ti ti-x"></i></span>
             }
           </div>
         }
@@ -86,10 +88,15 @@
             </div>
             <div class="home-activity-item__body">
               <p class="home-activity-item__titulo">{{ item.titulo }}</p>
+              @if (item.detalle) {
+                <p class="home-activity-item__fecha">{{ item.detalle }}</p>
+              }
               <p class="home-activity-item__fecha">{{ item.fecha }}</p>
             </div>
             <i class="ti ti-chevron-right home-activity-item__chevron"></i>
           </a>
+        } @empty {
+          <p class="home-activity-empty">No hay actividad reciente.</p>
         }
       </div>
     </div>
@@ -98,42 +105,48 @@
     <div class="home-panel">
       <div class="home-panel__header">
         <h2 class="home-panel__title-sm">Última emergencia</h2>
-        <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
+        @if (tieneUltimaEmergencia) {
+          <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
+        }
       </div>
 
-      <div class="home-emergencia">
-        <div class="home-emergencia__fecha-row">
-          <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
-          <div>
-            <p class="home-emergencia__fecha">{{ ultimaEmergencia.fecha }}</p>
-            <p class="home-emergencia__hora">{{ ultimaEmergencia.hora }}</p>
+      @if (tieneUltimaEmergencia) {
+        <div class="home-emergencia">
+          <div class="home-emergencia__fecha-row">
+            <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
+            <div>
+              <p class="home-emergencia__fecha">{{ ultimaEmergencia.fecha }}</p>
+              <p class="home-emergencia__hora">{{ ultimaEmergencia.hora }}</p>
+            </div>
           </div>
-        </div>
 
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-map-pin"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Ubicación</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.ubicacion }}</p>
+          <div class="home-emergencia__detalle">
+            <i class="ti ti-map-pin"></i>
+            <div>
+              <p class="home-emergencia__detalle-label">Ubicación</p>
+              <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.ubicacion }}</p>
+            </div>
           </div>
-        </div>
 
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-activity"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Activada mediante</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.activadaMediante }}</p>
+          <div class="home-emergencia__detalle">
+            <i class="ti ti-activity"></i>
+            <div>
+              <p class="home-emergencia__detalle-label">Activada mediante</p>
+              <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.activadaMediante }}</p>
+            </div>
           </div>
-        </div>
 
-        <div class="home-emergencia__detalle">
-          <i class="ti ti-users"></i>
-          <div>
-            <p class="home-emergencia__detalle-label">Contactos notificados</p>
-            <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.contactosNotificados }} contactos</p>
+          <div class="home-emergencia__detalle">
+            <i class="ti ti-users"></i>
+            <div>
+              <p class="home-emergencia__detalle-label">Contactos notificados</p>
+              <p class="home-emergencia__detalle-valor">{{ ultimaEmergencia.contactosNotificados }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      } @else {
+        <p class="home-emergencia-vacia">No hay emergencias registradas.</p>
+      }
 
       <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/alert-history">
         Ver detalles
@@ -147,12 +160,21 @@
         <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
       </div>
 
-      <div id="home-mini-map" class="home-mini-map"></div>
+      @if (ultimaUbicacionDisponible) {
+        <div id="home-mini-map" class="home-mini-map"></div>
+      } @else {
+        <div class="home-mini-map home-mini-map--vacio">
+          <i class="ti ti-map-pin"></i>
+          <p>Abre la app móvil y activa la ubicación.</p>
+        </div>
+      }
 
-      <p class="home-mini-map__direccion">
-        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
-      </p>
-      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
+      @if (ultimaUbicacionDisponible) {
+        <p class="home-mini-map__direccion">
+          <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
+        </p>
+        <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
+      }
     </div>
 
   </div>

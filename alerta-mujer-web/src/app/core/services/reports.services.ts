@@ -7,7 +7,7 @@ import { Reporte } from '../models/report.model';
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
   private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/reportes`;
+  private url = `${environment.apiUrl}/api/zone-reports`;
 
   getAll(): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(this.url);

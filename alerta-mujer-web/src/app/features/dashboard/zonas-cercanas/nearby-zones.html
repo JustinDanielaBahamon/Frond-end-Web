@@ -8,6 +8,10 @@
     <h2 class="zc-title">Zonas cercanas</h2>
     <p class="zc-subtitle">Conoce las zonas de seguridad, riesgo y centros de ayuda alrededor de tu ubicación.</p>
 
+    @if (!loading && sinReferencia()) {
+      <p class="zc-nota">Sin ubicación de referencia: abre la app móvil y activa la ubicación para ver las distancias.</p>
+    }
+
     <div class="zc-chips">
       <button class="zc-chip" [class.active]="filter() === 'all'" (click)="setFilter('all')">Todas</button>
       <button class="zc-chip" [class.active]="filter() === 'safe'" (click)="setFilter('safe')">Seguras</button>
@@ -37,7 +41,7 @@
             <div class="zc-body">
               <span class="zc-name">{{ zone.name }}</span>
               <span class="zc-desc">{{ zone.description }}</span>
-              <span class="zc-dist">{{ zone.distanceKm }} km</span>
+              <span class="zc-dist">{{ distanciaTexto(zone) }}</span>
             </div>
             <button class="zc-link" (click)="viewOnMap(zone)">
               Ver en el mapa
@@ -52,11 +56,17 @@
   </div>
 
   <div class="zc-map-wrap">
-    <div class="zc-map" #mapContainer></div>
+    @if (loading || zones().length > 0) {
+      <div class="zc-map" #mapContainer></div>
+    } @else {
+      <div class="zc-map zc-map--vacio">
+        <p>No hay zonas registradas.</p>
+      </div>
+    }
     <div class="zc-legend">
-      <span><i class="zc-dot zc-dot--safe"></i> Zona segura</span>
-      <span><i class="zc-dot zc-dot--risk"></i> Zona de riesgo</span>
-      <span><i class="zc-dot zc-dot--help"></i> Centro de ayuda</span>
+      <span><i class="zc-dot zc-dot--segura"></i> Zona segura</span>
+      <span><i class="zc-dot zc-dot--riesgo"></i> Zona de riesgo</span>
+      <span><i class="zc-dot zc-dot--ayuda"></i> Centro de ayuda</span>
     </div>
   </div>
 </div>

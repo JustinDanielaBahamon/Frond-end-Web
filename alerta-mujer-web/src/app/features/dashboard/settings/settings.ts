@@ -1,7 +1,11 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { take } from 'rxjs/operators';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { UsersService } from '../../../core/services/users.services';
 
 type FontSize = 'pequeña' | 'normal' | 'grande';
 
@@ -20,15 +24,17 @@ interface ToggleSetting {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
 export class Settings {
   private readonly themeService = inject(ThemeService);
   private readonly accentColorService = inject(AccentColorService);
+  private readonly authService = inject(AuthService);
+  private readonly usersService = inject(UsersService);
 
-  // --- Cuenta (conectar con el usuario autenticado real) ---
+  // --- Cuenta: datos reales de la usuaria autenticada ---
   readonly user = signal({
     name: '',
     email: '',
@@ -36,6 +42,67 @@ export class Settings {
     avatarUrl: '',
     verified: false
   });
+
+  // --- Edición del perfil (PUT /api/users/me) ---
+  readonly editando = signal(false);
+  readonly guardando = signal(false);
+  readonly errorGuardado = signal('');
+  readonly perfil = signal({
+    firstName: '',
+    lastName: '',
+    telephone: '',
+    documentNumber: '',
+    documentType: 'CC',
+    birthdate: '',
+  });
+
+  constructor() {
+    this.cargarPerfil();
+  }
+
+  /** La información de la cuenta se carga al entrar a la pantalla. */
+  private cargarPerfil(): void {
+    // Nombre, correo y teléfono desde la sesión iniciada.
+    this.authService.currentUser$
+      .pipe(take(1))
+      .subscribe((usuario) => {
+        if (!usuario) return;
+        this.user.set({
+          name:
+            [usuario.firstName, usuario.lastName].filter(Boolean).join(' ').trim() ||
+            usuario.nombre,
+          email: usuario.email,
+          phone: usuario.telephone ?? '',
+          avatarUrl: '',
+          verified: false,
+        });
+        this.perfil.set({
+          firstName: usuario.firstName ?? '',
+          lastName: usuario.lastName ?? '',
+          telephone: usuario.telephone ?? '',
+          documentNumber: '',
+          documentType: 'CC',
+          birthdate: '',
+        });
+      });
+
+    // Perfil completo (documento, tipo y fecha de nacimiento) del backend.
+    this.usersService.getMe().subscribe({
+      next: (perfil: any) => {
+        this.perfil.update((p) => ({
+          ...p,
+          firstName: perfil.firstName ?? p.firstName,
+          lastName: perfil.lastName ?? p.lastName,
+          telephone: perfil.telephone ?? p.telephone,
+          documentNumber: perfil.documentNumber ?? '',
+          documentType: perfil.documentType ?? 'CC',
+          birthdate: perfil.birthdate ?? '',
+        }));
+      },
+      // Si falla, la sesión ya provee nombre, correo y teléfono.
+      error: () => undefined,
+    });
+  }
 
   // --- Apariencia: tema (global, vía ThemeService) ---
   readonly theme = this.themeService.currentTheme; // 'light' | 'dark'
@@ -99,7 +166,61 @@ export class Settings {
   }
 
   onEditProfile(): void {
-    // TODO: this.router.navigate(['/dashboard/perfil'])
+    this.errorGuardado.set('');
+    this.editando.set(true);
+  }
+
+  cancelarEdicion(): void {
+    this.editando.set(false);
+    this.errorGuardado.set('');
+  }
+
+  /** Guarda el perfil en el backend y actualiza la sesión. */
+  guardarPerfil(): void {
+    const p = this.perfil();
+    this.guardando.set(true);
+    this.errorGuardado.set('');
+
+    this.usersService
+      .updateMe({
+        firstName: p.firstName.trim(),
+        lastName: p.lastName.trim(),
+        telephone: p.telephone.trim(),
+        documentNumber: p.documentNumber.trim(),
+        documentType: p.documentType,
+        birthdate: p.birthdate ? p.birthdate : null,
+      })
+      .subscribe({
+        next: (actualizado: any) => {
+          this.guardando.set(false);
+          this.editando.set(false);
+
+          const nombre = [actualizado.firstName, actualizado.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+
+          this.user.set({
+            name: nombre || this.user().name,
+            email: actualizado.email ?? this.user().email,
+            phone: actualizado.telephone ?? '',
+            avatarUrl: '',
+            verified: false,
+          });
+
+          // La sesión debe reflejar los datos nuevos.
+          this.authService.actualizarUsuaria({
+            firstName: actualizado.firstName,
+            lastName: actualizado.lastName,
+            telephone: actualizado.telephone,
+            ...(nombre ? { nombre } : {}),
+          });
+        },
+        error: () => {
+          this.guardando.set(false);
+          this.errorGuardado.set('No se pudo guardar el perfil. Inténtalo de nuevo.');
+        },
+      });
   }
 
   onDeleteAccount(): void {

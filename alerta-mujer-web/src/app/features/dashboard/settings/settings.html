@@ -10,38 +10,88 @@
     <article class="settings-card">
       <div class="settings-card__header">
         <h2><i class="ti ti-user-circle"></i> Cuenta</h2>
-        <button type="button" class="link-btn" (click)="onEditProfile()">Editar perfil</button>
+        <button type="button" class="link-btn" (click)="editando() ? cancelarEdicion() : onEditProfile()">
+          {{ editando() ? 'Cancelar' : 'Editar perfil' }}
+        </button>
       </div>
 
-      <div class="account-profile">
-        <div class="avatar">
-          @if (user().avatarUrl) {
-            <img [src]="user().avatarUrl" [alt]="user().name" />
-          } @else {
-            <i class="ti ti-user"></i>
+      @if (!editando()) {
+        <div class="account-profile">
+          <div class="avatar">
+            @if (user().avatarUrl) {
+              <img [src]="user().avatarUrl" [alt]="user().name" />
+            } @else {
+              <i class="ti ti-user"></i>
+            }
+          </div>
+          <div>
+            <strong>{{ user().name }}</strong>
+            <span>{{ user().email }}</span>
+          </div>
+        </div>
+
+        <button type="button" class="setting-row setting-row--link" (click)="onEditProfile()">
+          <i class="ti ti-lock"></i>
+          <span>Cambiar contraseña</span>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+        <button type="button" class="setting-row setting-row--link" (click)="onEditProfile()">
+          <i class="ti ti-mail"></i>
+          <span>Correo electrónico</span>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+        <button type="button" class="setting-row setting-row--link" (click)="onEditProfile()">
+          <i class="ti ti-phone"></i>
+          <span>Número de teléfono</span>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      } @else {
+        <!-- Edición de los datos de la cuenta (nombre, teléfono, documento) -->
+        <div class="perfil-form">
+          <label class="perfil-field">
+            <span>Nombre</span>
+            <input type="text" class="perfil-input" name="perfilFirstName" [(ngModel)]="perfil().firstName" />
+          </label>
+          <label class="perfil-field">
+            <span>Apellido</span>
+            <input type="text" class="perfil-input" name="perfilLastName" [(ngModel)]="perfil().lastName" />
+          </label>
+          <label class="perfil-field">
+            <span>Teléfono</span>
+            <input type="tel" class="perfil-input" name="perfilTelephone" [(ngModel)]="perfil().telephone" />
+          </label>
+          <label class="perfil-field">
+            <span>Tipo de documento</span>
+            <select class="perfil-input" name="perfilDocumentType" [(ngModel)]="perfil().documentType">
+              <option value="CC">Cédula de ciudadanía</option>
+              <option value="CE">Cédula de extranjería</option>
+              <option value="TI">Tarjeta de identidad</option>
+              <option value="Pasaporte">Pasaporte</option>
+            </select>
+          </label>
+          <label class="perfil-field">
+            <span>Número de documento</span>
+            <input type="text" class="perfil-input" name="perfilDocumentNumber" [(ngModel)]="perfil().documentNumber" />
+          </label>
+          <label class="perfil-field">
+            <span>Fecha de nacimiento</span>
+            <input type="date" class="perfil-input" name="perfilBirthdate" [(ngModel)]="perfil().birthdate" />
+          </label>
+
+          @if (errorGuardado()) {
+            <p class="perfil-error">{{ errorGuardado() }}</p>
           }
-        </div>
-        <div>
-          <strong>{{ user().name }}</strong>
-          <span>{{ user().email }}</span>
-        </div>
-      </div>
 
-      <button type="button" class="setting-row setting-row--link">
-        <i class="ti ti-lock"></i>
-        <span>Cambiar contraseña</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
-        <i class="ti ti-mail"></i>
-        <span>Correo electrónico</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
-        <i class="ti ti-phone"></i>
-        <span>Número de teléfono</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
+          <div class="perfil-acciones">
+            <button type="button" class="perfil-btn perfil-btn--guardar" (click)="guardarPerfil()" [disabled]="guardando()">
+              {{ guardando() ? 'Guardando…' : 'Guardar' }}
+            </button>
+            <button type="button" class="perfil-btn" (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      }
 
       <button type="button" class="setting-row setting-row--danger" (click)="onDeleteAccount()">
         <i class="ti ti-trash"></i>

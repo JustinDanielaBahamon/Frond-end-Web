@@ -411,3 +411,74 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+// --- Edición de perfil (Cuenta) ---
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 0 4px;
+}
+
+.perfil-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span {
+    color: var(--am-text-secondary);
+    font-size: var(--font-size-xs);
+  }
+}
+
+.perfil-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--am-border);
+  border-radius: 8px;
+  background: var(--am-bg-page);
+  color: var(--am-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+
+  &:focus {
+    outline: 2px solid var(--am-accent);
+    outline-offset: 0;
+    border-color: var(--am-accent);
+  }
+}
+
+.perfil-error {
+  margin: 0;
+  color: var(--am-danger);
+  font-size: var(--font-size-xs);
+}
+
+.perfil-acciones {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.perfil-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--am-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--am-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+
+  &--guardar {
+    background: var(--am-accent);
+    border-color: var(--am-accent);
+    color: #fff;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}

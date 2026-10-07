@@ -7,8 +7,8 @@ import { ZonaManual, PuntoMapa } from '../models/zona.model';
 @Injectable({ providedIn: 'root' })
 export class RiskZonesService {
   private http = inject(HttpClient);
-  private zonasUrl = `${environment.apiUrl}/zonasManuales`;
-  private puntosUrl = `${environment.apiUrl}/puntosMapa`;
+  private zonasUrl = `${environment.apiUrl}/api/zones`;
+  private puntosUrl = `${environment.apiUrl}/api/zone-reports`;
 
   getZonas(): Observable<ZonaManual[]> {
     return this.http.get<ZonaManual[]>(this.zonasUrl);

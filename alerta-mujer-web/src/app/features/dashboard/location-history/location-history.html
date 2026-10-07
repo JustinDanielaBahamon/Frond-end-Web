@@ -68,7 +68,7 @@
                 <span class="lh-time">{{ entry.time }}</span>
                 @if (esFrecuente(entry)) { <span class="lh-tag">Lugar frecuente</span> }
               </div>
-              <span class="lh-address">{{ entry.address }}</span>
+              <span class="lh-address">{{ descripcion(entry) }}</span>
             </div>
           </li>
         } @empty {
@@ -83,7 +83,14 @@
   </div>
 
   <div class="lh-map-wrap">
-    <div class="lh-map" #mapContainer></div>
+    @if (cargando || history().length > 0) {
+      <div class="lh-map" #mapContainer></div>
+    } @else {
+      <div class="lh-map lh-map--vacio">
+        <p>Abre la app móvil y activa la ubicación.</p>
+        <p class="lh-map-vacio-nota">El historial lo genera la app móvil.</p>
+      </div>
+    }
     <div class="lh-legend">
       <span><i class="lh-dot-leg lh-dot-leg--tu"></i> Tu recorrido</span>
       <span><i class="lh-dot-leg lh-dot-leg--reg"></i> Ubicaciones registradas</span>

@@ -6,7 +6,7 @@
   <div class="mu-card">
     <div class="mu-card-header">
       <h2 class="mu-card-title">Mi ubicación registrada</h2>
-      @if (currentZone(); as zona) {
+      @if (zonaSegura(); as zona) {
         <span class="mu-badge mu-badge--segura">
           <span class="mu-badge-dot"></span> {{ zona.name }}
         </span>
@@ -26,7 +26,7 @@
 
       <div class="mu-info-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span class="mu-info-value">{{ loc.address }}</span>
+        <span class="mu-info-value">{{ loc.address || (loc.lat.toFixed(6) + ', ' + loc.lng.toFixed(6)) }}</span>
       </div>
 
       <div class="mu-info-item">
@@ -37,10 +37,17 @@
         </div>
       </div>
 
-      @if (currentZone(); as zona) {
+      @if (zonaSegura(); as zona) {
         <div class="mu-banner">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <p>Esta ubicación se encuentra dentro de una zona segura{{ currentPlace() ? ' y corresponde a uno de tus lugares frecuentes' : '' }}.</p>
+        </div>
+      }
+
+      @if (zonaRiesgo(); as zona) {
+        <div class="mu-banner mu-banner--riesgo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <p>Esta ubicación se encuentra dentro de una zona de riesgo: {{ zona.name }}.</p>
         </div>
       }
 
@@ -54,7 +61,14 @@
   </div>
 
   <div class="mu-map-wrap">
-    <div class="mu-map" #mapContainer></div>
+    @if (mapaVacio()) {
+      <div class="mu-map mu-map--vacio">
+        <p>Abre la app móvil y activa la ubicación.</p>
+        <p class="mu-map-vacio-nota">La información la genera la app móvil.</p>
+      </div>
+    } @else {
+      <div class="mu-map" #mapContainer></div>
+    }
     <div class="mu-legend">
       <span><i class="mu-dot mu-dot--you"></i> Tu ubicación</span>
       <span><i class="mu-dot mu-dot--segura"></i> Zona segura</span>

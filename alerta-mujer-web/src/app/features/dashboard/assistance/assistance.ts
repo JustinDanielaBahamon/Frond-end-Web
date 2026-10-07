@@ -5,6 +5,8 @@ import * as L from 'leaflet';
 import { AssistanceService } from '../../../core/services/assistance.service';
 import { LineaAyuda, CentroAyuda, RecursoGuardado, CategoriaCentro, TipoLinea } from '../../../core/models/assistance.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
+import { distanciaKm } from '../../../core/utils/geo.util';
 
 type Tab = 'lineas' | 'centros' | 'recursos';
 type FiltroCategoria = 'todos' | CategoriaCentro;
@@ -48,10 +50,15 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   private assistanceService = inject(AssistanceService);
   private authService = inject(AuthService);
+  private phoneLocationService = inject(PhoneLocationService);
 
   private map?: L.Map;
   private viewReady = false;
   private usuarioId = 0;
+
+  // Última ubicación registrada: distancia real a cada centro.
+  private ultimaLat?: number;
+  private ultimaLng?: number;
 
   loading = true;
   error = false;
@@ -95,6 +102,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
       next: (data) => {
         this.centros = data;
         this.loading = false;
+        this.actualizarDistanciasCentros();
         this.initMapIfReady();
       },
       error: () => { this.error = true; this.loading = false; },
@@ -103,6 +111,40 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
     this.assistanceService.getRecursosGuardados(this.usuarioId).subscribe({
       next: (data) => { this.recursosGuardados = data; },
     });
+
+    // Distancia real desde la última ubicación registrada de la usuaria.
+    this.phoneLocationService.getByUsuario(this.usuarioId).subscribe({
+      next: (ubicaciones) => {
+        const ultima = this.ultimaUbicacion(ubicaciones);
+        if (ultima) {
+          this.ultimaLat = ultima.lat;
+          this.ultimaLng = ultima.lng;
+          this.actualizarDistanciasCentros();
+        }
+      },
+    });
+  }
+
+  /** Recalcula la distancia a cada centro con la fórmula de Haversine. */
+  private actualizarDistanciasCentros(): void {
+    if (this.ultimaLat == null || this.ultimaLng == null || this.centros.length === 0) return;
+    this.centros = this.centros.map((c) => ({
+      ...c,
+      distanciaKm:
+        Math.round(distanciaKm(this.ultimaLat as number, this.ultimaLng as number, c.lat, c.lng) * 10) / 10,
+    }));
+  }
+
+  private ultimaUbicacion(ubicaciones: any[]): { lat: number; lng: number } | null {
+    const validas = (ubicaciones ?? []).filter((u) => u.lat != null && u.lng != null);
+    if (!validas.length) return null;
+    const instante = (u: any): number => {
+      const raw: string = u.recordedAt ?? `${u.date ?? ''}T${u.time ?? ''}`;
+      const iso = raw && !raw.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(raw) ? `${raw}Z` : raw;
+      const t = new Date(iso).getTime();
+      return isNaN(t) ? 0 : t;
+    };
+    return [...validas].sort((a, b) => instante(b) - instante(a))[0];
   }
 
   ngAfterViewInit() {
@@ -112,9 +154,13 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   setTab(tab: Tab) {
     this.tabActivo = tab;
-    // El contenedor del mapa puede cambiar de ancho al cambiar de tab;
-    // se recalcula el tamaño para que Leaflet no quede con tiles cortados.
-    setTimeout(() => this.map?.invalidateSize(), 0);
+    // El contenedor del mapa solo existe en la pestaña de centros:
+    // el mapa se crea cuando ese panel se renderiza. Además se
+    // recalcula el tamaño para que Leaflet no quede con tiles cortados.
+    setTimeout(() => {
+      this.initMapIfReady();
+      this.map?.invalidateSize();
+    }, 0);
   }
 
   iconoLinea(tipo: TipoLinea) { return ICONO_LINEA[tipo] ?? ICONO_LINEA['emergencia']; }

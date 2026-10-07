@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, delay } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Evidencia, EvidenciaFilters, EvidenciaStats } from '../models/evidence.model';
 
@@ -50,7 +51,36 @@ export class EvidenceService {
    * Usado por USUARIA: solo sus propias evidencias
    */
   getByUsuario(usuarioId: number): Observable<Evidencia[]> {
-    return this.http.get<Evidencia[]>(`${this.url}?usuarioId=${usuarioId}`);
+    return this.http.get<any[]>(this.url).pipe(
+      map((lista) =>
+        lista
+          .filter((e: any) => (e.userProfileId ?? e.usuarioId ?? e.usuario_id) === usuarioId)
+          .map((e: any) => this.normalizar(e))
+      )
+    );
+  }
+
+  private normalizar(e: any): Evidencia {
+    const mediaType = String(e.mediaType ?? '').toLowerCase();
+    return {
+      id: Number(e.id ?? 0),
+      usuarioId: Number(e.userProfileId ?? e.usuarioId ?? e.usuario_id ?? 0),
+      usuarioNombre: e.usuarioNombre ?? '',
+      usuarioEmail: e.usuarioEmail ?? '',
+      tipo: mediaType.includes('video') ? 'video' : mediaType.includes('audio') ? 'audio' : mediaType.includes('doc') ? 'documento' : 'foto',
+      nombre: e.fileUrl ? e.fileUrl.split('/').pop() ?? 'Evidencia' : `Evidencia-${e.id}`,
+      tamanio: e.tamanio ?? '',
+      fecha: e.createdAt ?? e.created_at ?? e.fecha ?? '',
+      hora: e.createdAt ? new Date(e.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '',
+      alertaId: String(e.alertId ?? ''),
+      alertaTipo: e.alertaTipo ?? '',
+      alertaCiudad: e.alertaCiudad ?? '',
+      estado: e.estado === 'Verificada' || e.estado === 'Rechazada' ? e.estado : 'Pendiente',
+      ubicacion: e.ubicacion,
+      metodoActivacion: e.metodoActivacion,
+      archivoUrl: e.fileUrl ?? e.archivoUrl,
+      duracion: e.duracion,
+    };
   }
 
   /**

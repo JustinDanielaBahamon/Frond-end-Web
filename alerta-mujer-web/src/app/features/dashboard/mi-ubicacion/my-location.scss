@@ -84,6 +84,13 @@
   p { font-size: 0.78rem; color: var(--purple-deep, #5b21b6); margin: 0; line-height: 1.35; }
 }
 
+.mu-banner--riesgo {
+  background: #fef2f2;
+
+  svg { color: #dc2626; }
+  p { color: #991b1b; }
+}
+
 .mu-btn {
   display: flex;
   align-items: center;
@@ -111,6 +118,34 @@
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.mu-map--vacio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--purple-pale, #f5f3ff);
+  color: var(--text-muted, #4b4b55);
+  font-size: 0.85rem;
+
+  p { margin: 0; }
+}
+
+.mu-map-vacio-nota {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--purple-mid, #7c3aed);
+}
+
+// Marcador de colores en CSS puro (se inyecta dentro del mapa).
+:host ::ng-deep .am-marker {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--am-marker-color, #7c3aed);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 .mu-legend {

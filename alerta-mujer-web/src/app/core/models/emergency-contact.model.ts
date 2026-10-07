@@ -6,4 +6,5 @@ export interface ContactoEmergencia {
   relacion: string;
   prioridad: number; // 1 = más importante
   activo: boolean;
+  creadoEn?: string; // fecha real del backend (createdAt)
 }

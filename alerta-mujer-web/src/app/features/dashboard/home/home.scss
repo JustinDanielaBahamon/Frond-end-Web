@@ -226,7 +226,13 @@
     align-items: center;
     justify-content: center;
     font-size: 0.65rem;
-    margin-top: 2px;
+    // Se alinea en la base de la tarjeta: todas las
+    // tarjetas de la grilla tienen la misma altura.
+    margin-top: auto;
+
+    &--off {
+      background: var(--color-peligro);
+    }
   }
 }
 
@@ -407,6 +413,28 @@
   border-radius: 10px;
   border: 1px solid #ede9fe;
   margin-bottom: 10px;
+}
+
+.home-mini-map--vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--color-texto-secundario);
+  font-size: var(--font-size-sm);
+
+  i { font-size: 1.6rem; color: var(--color-principal); }
+
+  p { margin: 0; }
+}
+
+.home-activity-empty,
+.home-emergencia-vacia {
+  font-size: var(--font-size-sm);
+  color: var(--color-texto-secundario);
+  margin: 12px 0;
+  text-align: center;
 }
 
 .home-mini-map__pin {

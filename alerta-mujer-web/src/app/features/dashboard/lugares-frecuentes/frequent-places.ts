@@ -1,11 +1,13 @@
 // frequent-places.ts
 import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { LocationTabsComponent } from '../../../shared/components/location-tabs/location-tabs';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
 import { FrequentPlace, PlaceType } from '../../../core/models/frequent-place.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { markerIcon } from '../../../core/utils/geo.util';
 
 const ICONS: Record<PlaceType, string> = {
   home: 'M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5Z',
@@ -14,14 +16,13 @@ const ICONS: Record<PlaceType, string> = {
   other: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',
 };
 
-const MARKER_COLORS: Record<PlaceType, string> = {
-  home: 'violet', work: 'blue', study: 'gold', other: 'grey',
-};
+// El backend no clasifica lugares por tipo: todos usan el marcador neutro.
+const MARKER_COLOR = '#6b7280';
 
 @Component({
   selector: 'app-frequent-places',
   standalone: true,
-  imports: [CommonModule, LocationTabsComponent],
+  imports: [CommonModule, FormsModule, LocationTabsComponent],
   templateUrl: './frequent-places.html',
   styleUrl: './frequent-places.scss'
 })
@@ -31,7 +32,7 @@ export class FrequentPlacesComponent implements OnInit, AfterViewInit, OnDestroy
   private placeService = inject(FrequentPlaceService);
   private authService = inject(AuthService);
 
-  private map!: L.Map;
+  private map: L.Map | null = null;
   private viewReady = false;
   private userId = 0;
 
@@ -40,6 +41,20 @@ export class FrequentPlacesComponent implements OnInit, AfterViewInit, OnDestroy
   openMenu = signal<number | null>(null);
 
   places = signal<FrequentPlace[]>([]);
+
+  // ── Formulario crear/editar (CRUD real) ─────────────
+  modalAbierto = signal(false);
+  editandoId = signal<number | null>(null);
+  formError = signal('');
+  enviando = false;
+  form = {
+    name: '',
+    address: '',
+    city: '',
+    lat: '',
+    lng: '',
+    notes: '',
+  };
 
   iconPath(type: PlaceType) { return ICONS[type] ?? ICONS['other']; }
 
@@ -60,33 +75,47 @@ export class FrequentPlacesComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  ngAfterViewInit() { this.viewReady = true; this.initMapIfReady(); }
+  ngAfterViewInit() {
+    this.viewReady = true;
+    this.initMapIfReady();
+    setTimeout(() => this.map?.invalidateSize(), 100);
+  }
 
   private initMapIfReady() {
     if (!this.viewReady || this.places().length === 0 || this.map) return;
     const places = this.places();
 
-    this.map = L.map(this.mapContainer.nativeElement, { scrollWheelZoom: false, zoomControl: true });
+    const contenedor = this.mapContainer?.nativeElement;
+    if (!contenedor) return;
+
+    this.map = L.map(contenedor, { scrollWheelZoom: false, zoomControl: true });
+    const mapa = this.map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap',
       maxZoom: 19,
-    }).addTo(this.map);
+    }).addTo(mapa);
 
     const markers: L.Marker[] = [];
     places.forEach(p => {
-      const icon = L.icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${MARKER_COLORS[p.type]}.png`,
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41], iconAnchor: [12, 41],
-      });
-      markers.push(L.marker([p.lat, p.lng], { icon }).addTo(this.map).bindPopup(p.name));
+      // El backend no clasifica lugares: marcador neutro con el color del módulo.
+      markers.push(L.marker([p.lat, p.lng], { icon: markerIcon('#6b7280') }).addTo(mapa).bindPopup(
+        `${p.name}<br>${p.address || `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`}`,
+      ));
     });
 
     const group = L.featureGroup(markers);
-    this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+    mapa.fitBounds(group.getBounds(), { padding: [50, 50] });
 
-    // Fuerza el recálculo de tamaño una vez que el grid terminó de asentar el layout.
-    setTimeout(() => this.map.invalidateSize(), 0);
+    setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  /** Reconstruye el mapa después de crear/eliminar (fitBounds nuevos). */
+  private reconstruirMapa() {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+    this.initMapIfReady();
   }
 
   toggleMenu(id: number) {
@@ -99,17 +128,84 @@ export class FrequentPlacesComponent implements OnInit, AfterViewInit, OnDestroy
     this.map?.flyTo([place.lat, place.lng], 16, { duration: 1 });
   }
 
-  remove(place: FrequentPlace) {
-    this.openMenu.set(null);
-    if (!confirm(`¿Eliminar "${place.name}" de tus lugares frecuentes?`)) return;
-    this.placeService.delete(place.id).subscribe(() => {
-      this.places.update(list => list.filter(p => p.id !== place.id));
+  // ── CRUD ────────────────────────────────────────────
+  abrirModalCrear() {
+    this.editandoId.set(null);
+    this.form = { name: '', address: '', city: '', lat: '', lng: '', notes: '' };
+    this.formError.set('');
+    this.modalAbierto.set(true);
+  }
+
+  abrirModalEditar(place: FrequentPlace) {
+    this.editandoId.set(place.id);
+    this.form = {
+      name: place.name,
+      address: place.address,
+      city: place.city,
+      lat: String(place.lat),
+      lng: String(place.lng),
+      notes: place.notes ?? '',
+    };
+    this.formError.set('');
+    this.modalAbierto.set(true);
+  }
+
+  cerrarModal() {
+    if (this.enviando) return;
+    this.modalAbierto.set(false);
+  }
+
+  guardar() {
+    const lat = Number(this.form.lat);
+    const lng = Number(this.form.lng);
+    if (!this.form.name.trim()) { this.formError.set('El nombre es obligatorio.'); return; }
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      this.formError.set('Latitud y longitud deben ser coordenadas válidas.');
+      return;
+    }
+
+    this.enviando = true;
+    this.formError.set('');
+
+    const payload = {
+      userId: this.userId,
+      name: this.form.name.trim(),
+      address: this.form.address.trim(),
+      city: this.form.city.trim(),
+      lat,
+      lng,
+      notes: this.form.notes.trim(),
+    };
+
+    const peticion = this.editandoId() !== null
+      ? this.placeService.update(this.editandoId()!, payload)
+      : this.placeService.create(payload);
+
+    peticion.subscribe({
+      next: () => {
+        this.enviando = false;
+        this.modalAbierto.set(false);
+        this.loadData();
+        this.reconstruirMapa();
+      },
+      error: () => {
+        this.enviando = false;
+        this.formError.set('No se pudo guardar el lugar. Intenta de nuevo.');
+      },
     });
   }
 
-  addPlace() {
-    alert('Aquí abrimos el modal para agregar un nuevo lugar frecuente.');
+  remove(place: FrequentPlace) {
+    this.openMenu.set(null);
+    if (!confirm(`¿Eliminar "${place.name}" de tus lugares frecuentes?`)) return;
+    this.placeService.delete(place.id).subscribe({
+      next: () => {
+        this.places.update(list => list.filter(p => p.id !== place.id));
+        this.reconstruirMapa();
+      },
+      error: () => { alert('No se pudo eliminar el lugar. Intenta de nuevo.'); },
+    });
   }
 
-  ngOnDestroy() { if (this.map) this.map.remove(); }
+  ngOnDestroy() { if (this.map) { this.map.remove(); this.map = null; } }
 }

@@ -28,11 +28,30 @@ export class DashboardLayoutComponent {
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];
 
-  // ⚠️ reemplaza por el usuario real cuando AuthService lo exponga
+  // Usuario real de la sesión
   user = {
-    name: 'María González',
-    email: 'maria.gonzalez@email.com'
+    name: '',
+    email: ''
   };
+
+  // Solo el primer nombre para el saludo del topbar
+  primerNombre = '';
+  avatarLetra = 'U';
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(usuario => {
+      if (!usuario) return;
+      const nombreCompleto = usuario.nombre?.trim() || usuario.firstName || '';
+      this.primerNombre = (usuario.firstName || usuario.nombre || '').trim().split(/\s+/)[0] || '';
+      this.user = {
+        name: nombreCompleto,
+        email: usuario.email ?? ''
+      };
+      this.avatarLetra = this.primerNombre
+        ? this.primerNombre.charAt(0).toUpperCase()
+        : 'U';
+    });
+  }
 
   toggleTheme() {
     this.themeService.toggleTheme();

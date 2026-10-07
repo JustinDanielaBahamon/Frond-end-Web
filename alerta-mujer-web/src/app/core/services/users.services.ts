@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 import { Usuario } from '../models/user.model';
@@ -25,28 +24,23 @@ export class UsersService {
     return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, cambios);
   }
 
-  // Crea la usuaria y también su perfil y cuenta, para no dejar tablas huérfanas
+  // Crea la usuaria desde el backend (cuenta + perfil + token)
   crearUsuaria(data: Record<string, any>): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/usuarios`, data).pipe(
-      switchMap((creada) =>
-        forkJoin([
-          this.http.post(`${this.apiUrl}/user_profile`, {
-            user_id: creada.id,
-            profile_photo_url: null,
-            tutorial_completed: false,
-            tutorial_seen_at: null,
-            created_at: data['created_at'],
-            updated_at: null,
-          }),
-          this.http.post(`${this.apiUrl}/account`, {
-            user_id: creada.id,
-            password_hash: data['password'],
-            status: 'active',
-            last_access: null,
-          }),
-        ]).pipe(map(() => creada))
-      )
-    );
+    return this.http.post<Usuario>(`${this.apiUrl}/api/auth/register`, {
+      nombre: data['nombre'] ?? data['name'],
+      email: data['email'] ?? data['correo'],
+      password: data['password'],
+      telefono: data['telefono'] ?? data['telephone'],
+    });
+  }
+
+  // ── Perfil de la usuaria autenticada (UserController) ──
+  getMe(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/users/me`);
+  }
+
+  updateMe(cambios: Record<string, unknown>): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/api/users/me`, cambios);
   }
 
   // ── Datos relacionados ───────────────────────────────────────

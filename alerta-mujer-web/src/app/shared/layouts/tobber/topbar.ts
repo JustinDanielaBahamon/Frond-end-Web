@@ -24,7 +24,7 @@ const READ_KEY = 'alerta-mujer-notif-read';
 export class TopbarComponent {
   @Input() brand: string = 'Alerta Mujer';
   @Input() avatarLetter: string = 'U';
-  // TODO: pásalo desde el layout (dashboard-layout.ts) con el nombre real del usuario logueado
+  // Se enlaza desde dashboard-layout.html con el primer nombre real del usuario logueado
   @Input() userName: string = 'Usuario';
   // TODO: pásalo desde cada página, o autogénéralo con router.data['title'] en NavigationEnd
   @Input() pageTitle: string = '';

@@ -1,5 +1,5 @@
 export interface UbicacionEntry {
-  id: string;
+  id: number;
   usuarioId: number;
   time: string;
   address: string;
@@ -10,4 +10,15 @@ export interface UbicacionEntry {
   date?: string;           // 'YYYY-MM-DD' — agrégalo en el backend para que el calendario filtre de verdad
   connectionType?: string; // opcional
   deviceName?: string;     // opcional
+}
+
+// Modelo que devuelve el backend LocationLog
+export interface LocationLogApi {
+  id: number;
+  userProfileId: number;
+  alertId?: number;
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  recordedAt: string;
 }

@@ -8,7 +8,7 @@ import { Alerta, EstadoAlerta, MedioActivacion } from '../models/alert.model';
 @Injectable({ providedIn: 'root' })
 export class AlertsService {
   private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/alertas`;
+  private url = `${environment.apiUrl}/api/alerts`;
 
   // Usado por ADMIN: todas las alertas
   getAll(): Observable<Alerta[]> {
@@ -18,9 +18,8 @@ export class AlertsService {
   }
 
   // Usado por USUARIA: solo sus propias alertas
-  // json-server soporta filtros por query param: /alertas?usuarioId=1
   getByUsuario(usuarioId: number): Observable<Alerta[]> {
-    return this.http.get<any[]>(`${this.url}?usuarioId=${usuarioId}`).pipe(
+    return this.http.get<any[]>(`${this.url}/user-id/${usuarioId}`).pipe(
       map(lista => lista.map(a => this.normalizar(a)))
     );
   }
@@ -32,7 +31,9 @@ export class AlertsService {
   }
 
   update(alerta: Alerta): Observable<Alerta> {
-    return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alerta);
+    // No enviamos usuarioId/userProfileId, el backend lo establece automáticamente
+    const { usuarioId, ...alertaData } = alerta as any;
+    return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alertaData);
   }
 
   // PATCH: cambia solo el estado sin pisar los demás campos del db.json

@@ -25,28 +25,14 @@ export class UsersService {
     return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, cambios);
   }
 
-  // Crea la usuaria y también su perfil y cuenta, para no dejar tablas huérfanas
+  // Crea la usuaria usando el endpoint de registro del backend
   crearUsuaria(data: Record<string, any>): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/usuarios`, data).pipe(
-      switchMap((creada) =>
-        forkJoin([
-          this.http.post(`${this.apiUrl}/user_profile`, {
-            user_id: creada.id,
-            profile_photo_url: null,
-            tutorial_completed: false,
-            tutorial_seen_at: null,
-            created_at: data['created_at'],
-            updated_at: null,
-          }),
-          this.http.post(`${this.apiUrl}/account`, {
-            user_id: creada.id,
-            password_hash: data['password'],
-            status: 'active',
-            last_access: null,
-          }),
-        ]).pipe(map(() => creada))
-      )
-    );
+    return this.http.post<Usuario>(`${this.apiUrl}/api/auth/register`, {
+      nombre: data['nombre'],
+      email: data['email'],
+      password: data['password'],
+      telefono: data['telefono']
+    });
   }
 
   // ── Datos relacionados ───────────────────────────────────────
@@ -56,11 +42,11 @@ export class UsersService {
   }
 
   getAlertasByUsuaria(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${usuarioId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user-id/${usuarioId}`);
   }
 
   // user_profile_id coincide con el id de la usuaria
   getContactos(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/contacts/user/${usuarioId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/api/contacts/user-id/${usuarioId}`);
   }
 }

@@ -68,7 +68,7 @@ export class EmergencyContacts implements OnInit {
   ngOnInit() {
     this.authService.currentUser$.subscribe((usuario: any) => {
       if (!usuario) { this.error = true; this.loading = false; return; }
-      this.usuarioId = usuario.id ?? usuario.usuarioId ?? 1;
+      this.usuarioId = usuario.id;
       this.cargarContactos();
     });
   }

@@ -44,7 +44,7 @@ export class NearbyZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.authService.currentUser$.subscribe((user: any) => {
       if (!user) { this.error = true; this.loading = false; return; }
-      this.userId = user.id ?? user.usuarioId ?? 1;
+      this.userId = user.id;
       this.loadData();
     });
   }

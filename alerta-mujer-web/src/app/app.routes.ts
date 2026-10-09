@@ -125,6 +125,36 @@ export const routes: Routes = [
               import('./features/dashboard/zonas-cercanas/nearby-zones')
                 .then(m => m.NearbyZonesComponent),
           },
+          {
+            path: 'guardar-ubicacion',
+            loadComponent: () =>
+              import('./features/dashboard/guardar-ubicacion/guardar-ubicacion')
+                .then(m => m.GuardarUbicacionComponent),
+          },
+          {
+            path: 'ubicaciones-guardadas',
+            loadComponent: () =>
+              import('./features/dashboard/ubicaciones-guardadas/ubicaciones-guardadas')
+                .then(m => m.UbicacionesGuardadasComponent),
+          },
+          {
+            path: 'zonas-auxiliares',
+            loadComponent: () =>
+              import('./features/dashboard/zonas-auxiliares/zonas-auxiliares')
+                .then(m => m.ZonasAuxiliaresComponent),
+          },
+          {
+            path: 'guardar-recorrido',
+            loadComponent: () =>
+              import('./features/dashboard/guardar-recorrido/guardar-recorrido')
+                .then(m => m.GuardarRecorridoComponent),
+          },
+          {
+            path: 'historial-recorridos',
+            loadComponent: () =>
+              import('./features/dashboard/historial-recorridos/historial-recorridos')
+                .then(m => m.HistorialRecorridosComponent),
+          },
         ],
       },
 

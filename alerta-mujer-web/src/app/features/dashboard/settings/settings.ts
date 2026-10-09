@@ -1,7 +1,8 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 type FontSize = 'pequeña' | 'normal' | 'grande';
 
@@ -24,9 +25,10 @@ interface ToggleSetting {
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
-export class Settings {
+export class Settings implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly accentColorService = inject(AccentColorService);
+  private readonly authService = inject(AuthService);
 
   // --- Cuenta (conectar con el usuario autenticado real) ---
   readonly user = signal({
@@ -36,6 +38,20 @@ export class Settings {
     avatarUrl: '',
     verified: false
   });
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(currentUser => {
+      if (currentUser) {
+        this.user.set({
+          name: currentUser.nombre,
+          email: currentUser.email,
+          phone: currentUser.telephone || '',
+          avatarUrl: '',
+          verified: true
+        });
+      }
+    });
+  }
 
   // --- Apariencia: tema (global, vía ThemeService) ---
   readonly theme = this.themeService.currentTheme; // 'light' | 'dark'

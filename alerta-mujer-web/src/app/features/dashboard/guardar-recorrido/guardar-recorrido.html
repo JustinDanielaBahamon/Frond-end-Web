@@ -1,0 +1,172 @@
+<div class="guardar-recorrido">
+  <div class="header">
+    <h1>Guardar Recorrido</h1>
+    <p>Define la ruta de punto A a punto B</p>
+  </div>
+
+  @if (exito()) {
+    <div class="alert alert-success">
+      <i class="ti ti-check"></i>
+      <span>Recorrido guardado exitosamente</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="form-container">
+    <!-- Método de selección -->
+    <div class="section">
+      <h3>Método de selección</h3>
+      <div class="method-selector">
+        <button
+          class="method-btn"
+          [class.active]="metodoSeleccion() === 'mapa'"
+          (click)="metodoSeleccion.set('mapa')">
+          <i class="ti ti-map"></i>
+          <span>Mapa</span>
+        </button>
+        <button
+          class="method-btn"
+          [class.active]="metodoSeleccion() === 'ubicaciones'"
+          (click)="metodoSeleccion.set('ubicaciones')">
+          <i class="ti ti-bookmark"></i>
+          <span>Ubicaciones</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Puntos del recorrido -->
+    <div class="section">
+      <h3>Puntos del recorrido</h3>
+
+      <!-- Punto A -->
+      <div class="point-selector">
+        <button
+          class="point-btn"
+          [class.selected]="puntoA() !== null"
+          [class.selecting]="puntoSeleccionando() === 'A'"
+          (click)="iniciarSeleccionPunto('A')">
+          <div class="point-icon" [class.selected]="puntoA() !== null">
+            <i class="ti ti-map-pin"></i>
+          </div>
+          <div class="point-info">
+            <span class="point-label">Punto A - Inicio</span>
+            @if (puntoA()) {
+              <span class="point-coords">
+                {{ puntoA()!.nombre || puntoA()!.direccion || `${puntoA()!.latitude.toFixed(4)}, ${puntoA()!.longitude.toFixed(4)}` }}
+              </span>
+            } @else {
+              <span class="point-placeholder">
+                {{ metodoSeleccion() === 'mapa' ? 'Usar ubicación actual' : 'Seleccionar de ubicaciones guardadas' }}
+              </span>
+            }
+          </div>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+
+        @if (puntoA()) {
+          <div class="name-input">
+            <i class="ti ti-edit"></i>
+            <input type="text" [(ngModel)]="nombrePuntoA" placeholder="Nombre del punto A (ej: Casa, Trabajo)" />
+          </div>
+        }
+      </div>
+
+      <!-- Punto B -->
+      <div class="point-selector">
+        <button
+          class="point-btn"
+          [class.selected]="puntoB() !== null"
+          [class.selecting]="puntoSeleccionando() === 'B'"
+          (click)="iniciarSeleccionPunto('B')">
+          <div class="point-icon point-b" [class.selected]="puntoB() !== null">
+            <i class="ti ti-map-pin"></i>
+          </div>
+          <div class="point-info">
+            <span class="point-label">Punto B - Fin</span>
+            @if (puntoB()) {
+              <span class="point-coords">
+                {{ puntoB()!.nombre || puntoB()!.direccion || `${puntoB()!.latitude.toFixed(4)}, ${puntoB()!.longitude.toFixed(4)}` }}
+              </span>
+            } @else {
+              <span class="point-placeholder">
+                {{ metodoSeleccion() === 'mapa' ? 'Usar ubicación actual' : 'Seleccionar de ubicaciones guardadas' }}
+              </span>
+            }
+          </div>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+
+        @if (puntoB()) {
+          <div class="name-input">
+            <i class="ti ti-edit"></i>
+            <input type="text" [(ngModel)]="nombrePuntoB" placeholder="Nombre del punto B (ej: Gimnasio, Supermercado)" />
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Nombre del recorrido -->
+    <div class="section">
+      <h3>Nombre del recorrido</h3>
+      <div class="input-group">
+        <i class="ti ti-route"></i>
+        <input type="text" [(ngModel)]="nombreRecorrido" placeholder="Ej: Camino seguro Sanjuan - Plaza, Recorrido de la tarde..." />
+      </div>
+      <p class="helper-text">Si no ingresas un nombre, se generará uno automáticamente</p>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button class="btn-secondary" (click)="limpiarSeleccion()">
+        <i class="ti ti-refresh"></i>
+        <span>Limpiar</span>
+      </button>
+      <button class="btn-primary" (click)="guardarRecorrido()" [disabled]="!puntoA() || !puntoB()">
+        <i class="ti ti-device-floppy"></i>
+        <span>Guardar Recorrido</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de ubicaciones guardadas -->
+  @if (modalUbicacionesVisible()) {
+    <div class="modal-overlay" (click)="modalUbicacionesVisible.set(false)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Seleccionar {{ puntoSeleccionando() === 'A' ? 'Punto A' : 'Punto B' }}</h3>
+          <button class="close-btn" (click)="modalUbicacionesVisible.set(false)">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          @for (ubicacion of ubicacionesGuardadas(); track ubicacion.id) {
+            <button class="ubicacion-item" (click)="seleccionarDesdeUbicaciones(ubicacion, puntoSeleccionando()!)">
+              <div class="ubicacion-icon">
+                <i class="ti ti-map-pin"></i>
+              </div>
+              <div class="ubicacion-info">
+                <span class="ubicacion-nombre">{{ ubicacion.name }}</span>
+                <span class="ubicacion-direccion">{{ ubicacion.address || ubicacion.city }}</span>
+              </div>
+              <i class="ti ti-chevron-right"></i>
+            </button>
+          }
+
+          @if (ubicacionesGuardadas().length === 0) {
+            <div class="empty-state">
+              <i class="ti ti-bookmark"></i>
+              <p>No hay ubicaciones guardadas</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

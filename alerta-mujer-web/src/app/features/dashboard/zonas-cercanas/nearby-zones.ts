@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
 type ZoneFilter = 'all' | ZoneType;
 
-const ZONE_COLORS: Record<ZoneType, string> = { safe: '#16a34a', risk: '#dc2626', help: '#7c3aed' };
+const ZONE_COLORS: Record<ZoneType, string> = { safe: '#16a34a', risk: '#dc2626', help: '#7c3aed', policia: '#9B59B6', asistencia: '#3498DB' };
 
 @Component({
   selector: 'app-nearby-zones',

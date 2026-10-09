@@ -1,0 +1,127 @@
+<div class="historial-recorridos">
+  <div class="header">
+    <h1>Historial de Recorridos</h1>
+    <p>Tus rutas guardadas y recorridos registrados</p>
+  </div>
+
+  @if (recorridosOrdenados().length === 0) {
+    <div class="empty-state">
+      <i class="ti ti-route"></i>
+      <h3>No hay recorridos guardados</h3>
+      <p>Guarda tus rutas favoritas para tenerlas siempre disponibles</p>
+    </div>
+  } @else {
+    <div class="recorridos-list">
+      @for (recorrido of recorridosOrdenados(); track recorrido.id) {
+        <div class="recorrido-card" (click)="selectedRecorrido.set(recorrido)">
+          <div class="recorrido-icon">
+            <i class="ti ti-route"></i>
+          </div>
+
+          <div class="recorrido-info">
+            <div class="recorrido-header">
+              <span class="recorrido-date">
+                <i class="ti ti-calendar"></i>
+                {{ recorrido.fecha }}
+              </span>
+              @if (recorrido.importante) {
+                <span class="importante-badge">
+                  <i class="ti ti-star"></i>
+                </span>
+              }
+            </div>
+
+            <h4 class="recorrido-name">
+              {{ recorrido.nombrePersonalizado || `${recorrido.barrioInicio} → ${recorrido.barrioFin}` }}
+            </h4>
+
+            <div class="recorrido-meta">
+              <span class="meta-item">
+                <i class="ti ti-clock"></i>
+                {{ recorrido.tiempoEstimado }}
+              </span>
+              <span class="meta-item">
+                <i class="ti ti-ruler"></i>
+                {{ recorrido.distanciaEstimada }}
+              </span>
+            </div>
+
+            <div class="recorrido-location">
+              <i class="ti ti-map-pin"></i>
+              <span>{{ recorrido.municipio }}, {{ recorrido.departamento }}</span>
+            </div>
+          </div>
+
+          <div class="recorrido-actions">
+            <button class="action-btn" (click)="$event.stopPropagation(); toggleImportante(recorrido.id)">
+              <i [ngClass]="recorrido.importante ? 'ti ti-star-filled' : 'ti ti-star'"></i>
+            </button>
+            <button class="action-btn delete" (click)="$event.stopPropagation(); confirmarEliminar(recorrido.id, recorrido.nombrePersonalizado || `${recorrido.barrioInicio} → ${recorrido.barrioFin}`)">
+              <i class="ti ti-trash"></i>
+            </button>
+            <i class="ti ti-chevron-right"></i>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Modal detalle -->
+  @if (selectedRecorrido()) {
+    <div class="modal-overlay" (click)="selectedRecorrido.set(null)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-icon">
+            <i class="ti ti-route"></i>
+          </div>
+          <h3>{{ selectedRecorrido()!.nombrePersonalizado || `Recorrido #${selectedRecorrido()!.id}` }}</h3>
+          <button class="close-btn" (click)="selectedRecorrido.set(null)">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="info-row">
+            <i class="ti ti-calendar"></i>
+            <span class="label">Fecha:</span>
+            <span class="value">{{ formatearFecha(selectedRecorrido()!.fecha) }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-clock"></i>
+            <span class="label">Tiempo estimado:</span>
+            <span class="value">{{ selectedRecorrido()!.tiempoEstimado }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-ruler"></i>
+            <span class="label">Distancia:</span>
+            <span class="value">{{ selectedRecorrido()!.distanciaEstimada }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-map-pin"></i>
+            <span class="label">Puntos registrados:</span>
+            <span class="value">{{ selectedRecorrido()!.cantidadPuntos }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-home"></i>
+            <span class="label">Barrio inicial:</span>
+            <span class="value">{{ selectedRecorrido()!.barrioInicio }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-location"></i>
+            <span class="label">Barrio final:</span>
+            <span class="value">{{ selectedRecorrido()!.barrioFin }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-building"></i>
+            <span class="label">Municipio:</span>
+            <span class="value">{{ selectedRecorrido()!.municipio }}, {{ selectedRecorrido()!.departamento }}</span>
+          </div>
+        </div>
+
+        <button class="modal-close-btn" (click)="selectedRecorrido.set(null)">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  }
+</div>

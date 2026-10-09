@@ -1,0 +1,96 @@
+<div class="guardar-ubicacion">
+  <div class="header">
+    <h1>Guardar Ubicación</h1>
+    <p>Guarda tus lugares favoritos y clasifica su nivel de seguridad</p>
+  </div>
+
+  @if (exito()) {
+    <div class="alert alert-success">
+      <i class="ti ti-check"></i>
+      <span>Ubicación guardada exitosamente</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="form-container">
+    <div class="form-group">
+      <label>Nombre *</label>
+      <input type="text" [(ngModel)]="nombre" placeholder="Ej: Casa, Trabajo, Gimnasio" />
+    </div>
+
+    <div class="form-group">
+      <label>Dirección *</label>
+      <input type="text" [(ngModel)]="direccion" placeholder="Ej: Calle 123 #45-67" />
+    </div>
+
+    <div class="form-group">
+      <label>Ciudad</label>
+      <input type="text" [(ngModel)]="ciudad" placeholder="Ej: Neiva" />
+    </div>
+
+    <div class="form-group">
+      <label>Notas</label>
+      <textarea [(ngModel)]="notas" placeholder="Información adicional sobre este lugar"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Nivel de riesgo</label>
+      <div class="risk-options">
+        <label class="risk-option">
+          <input type="radio" name="risk" value="muy_segura" [(ngModel)]="nivelRiesgo" />
+          <span class="risk-badge risk-safe">Muy segura</span>
+        </label>
+        <label class="risk-option">
+          <input type="radio" name="risk" value="moderada" [(ngModel)]="nivelRiesgo" />
+          <span class="risk-badge risk-moderate">Moderada</span>
+        </label>
+        <label class="risk-option">
+          <input type="radio" name="risk" value="muy_insegura" [(ngModel)]="nivelRiesgo" />
+          <span class="risk-badge risk-unsafe">Muy insegura</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="esPrincipal" />
+        <span>Marcar como ubicación principal</span>
+      </label>
+    </div>
+
+    <div class="location-section">
+      <label>Ubicación en el mapa</label>
+      <button class="btn-secondary" (click)="obtenerUbicacionActual()">
+        <i class="ti ti-current-location"></i>
+        Obtener mi ubicación actual
+      </button>
+      @if (ubicacionSeleccionada) {
+        <div class="location-info">
+          <i class="ti ti-map-pin"></i>
+          <span>Latitud: {{ latitud().toFixed(6) }}, Longitud: {{ longitud().toFixed(6) }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" (click)="limpiarFormulario()" [disabled]="loading()">
+        Limpiar
+      </button>
+      <button class="btn-primary" (click)="guardar()" [disabled]="loading()">
+        @if (loading()) {
+          <i class="ti ti-loader ti-spin"></i>
+          <span>Guardando...</span>
+        } @else {
+          <i class="ti ti-device-floppy"></i>
+          <span>Guardar Ubicación</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

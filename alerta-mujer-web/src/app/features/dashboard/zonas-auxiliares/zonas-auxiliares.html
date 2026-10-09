@@ -1,0 +1,131 @@
+<div class="zonas-auxiliares">
+  <div class="header">
+    <h1>Zonas Auxiliares</h1>
+    <p>Puntos de seguridad, asistencia y zonas de riesgo cercanas</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <i class="ti ti-loader ti-spin"></i>
+      <span>Cargando zonas...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <!-- Leyenda -->
+    <div class="legend-container">
+      <h3>Leyenda</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="legend-dot" style="background-color: #27AE60;"></div>
+          <span>Zona segura</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background-color: #E74C3C;"></div>
+          <span>Zona de riesgo</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background-color: #3498DB;"></div>
+          <span>Punto de asistencia</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background-color: #9B59B6;"></div>
+          <span>Policía</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de zonas -->
+    <h3>Zonas cercanas</h3>
+
+    @if (zonasAuxiliares().length === 0) {
+      <div class="empty-state">
+        <i class="ti ti-map"></i>
+        <h3>No hay zonas disponibles</h3>
+        <p>No se encontraron zonas auxiliares en tu área</p>
+      </div>
+    } @else {
+      <div class="zones-list">
+        @for (zona of zonasAuxiliares(); track zona.id) {
+          <div class="zone-card" (click)="selectedZone.set(zona)">
+            <div
+              class="zone-icon"
+              [style.background-color]="getZoneColor(zona.tipo) + '20'">
+              <i [ngClass]="getZoneIcon(zona.tipo)" [style.color]="getZoneColor(zona.tipo)"></i>
+            </div>
+
+            <div class="zone-info">
+              <h4 class="zone-name">{{ zona.nombre }}</h4>
+              <p class="zone-address">
+                <i class="ti ti-map-pin"></i>
+                {{ zona.direccion }}
+              </p>
+              <div class="zone-meta">
+                <span class="zone-type" [style.color]="getZoneColor(zona.tipo)">
+                  {{ getZoneLabel(zona.tipo) }}
+                </span>
+              </div>
+            </div>
+
+            <i class="ti ti-chevron-right"></i>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Modal detalle -->
+  @if (selectedZone()) {
+    <div class="modal-overlay" (click)="selectedZone.set(null)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div
+            class="modal-icon"
+            [style.background-color]="getZoneColor(selectedZone()!.tipo) + '20'">
+            <i [ngClass]="getZoneIcon(selectedZone()!.tipo)" [style.color]="getZoneColor(selectedZone()!.tipo)"></i>
+          </div>
+          <h3>{{ selectedZone()!.nombre }}</h3>
+          <button class="close-btn" (click)="selectedZone.set(null)">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="info-row">
+            <i class="ti ti-map-pin"></i>
+            <span class="label">Dirección:</span>
+            <span class="value">{{ selectedZone()!.direccion }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-category"></i>
+            <span class="label">Tipo:</span>
+            <span class="value" [style.color]="getZoneColor(selectedZone()!.tipo)">
+              {{ getZoneLabel(selectedZone()!.tipo) }}
+            </span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-current-location"></i>
+            <span class="label">Latitud:</span>
+            <span class="value">{{ selectedZone()!.coordenada.latitude.toFixed(5) }}</span>
+          </div>
+          <div class="info-row">
+            <i class="ti ti-location"></i>
+            <span class="label">Longitud:</span>
+            <span class="value">{{ selectedZone()!.coordenada.longitude.toFixed(5) }}</span>
+          </div>
+        </div>
+
+        <button class="modal-close-btn" (click)="selectedZone.set(null)">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,131 @@
+<div class="ubicaciones-guardadas">
+  <div class="header">
+    <h1>Ubicaciones Guardadas</h1>
+    <p>Tus lugares guardados y clasificados por nivel de seguridad</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <i class="ti ti-loader ti-spin"></i>
+      <span>Cargando ubicaciones...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <!-- Búsqueda -->
+    <div class="search-container">
+      <div class="search-box">
+        <i class="ti ti-search"></i>
+        <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por nombre, dirección o ciudad" />
+        @if (busqueda()) {
+          <button class="clear-btn" (click)="busqueda.set('')">
+            <i class="ti ti-x"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-container">
+      <button
+        class="filter-chip"
+        [class.active]="filtroRiesgo() === null"
+        (click)="filtroRiesgo.set(null)">
+        Todas
+      </button>
+      <button
+        class="filter-chip filter-safe"
+        [class.active]="filtroRiesgo() === 'muy_segura'"
+        (click)="filtroRiesgo.set('muy_segura')">
+        <i class="ti ti-shield-check"></i>
+        Seguras
+      </button>
+      <button
+        class="filter-chip filter-moderate"
+        [class.active]="filtroRiesgo() === 'moderada'"
+        (click)="filtroRiesgo.set('moderada')">
+        <i class="ti ti-alert-triangle"></i>
+        Moderadas
+      </button>
+      <button
+        class="filter-chip filter-unsafe"
+        [class.active]="filtroRiesgo() === 'muy_insegura'"
+        (click)="filtroRiesgo.set('muy_insegura')">
+        <i class="ti ti-alert-circle"></i>
+        Inseguras
+      </button>
+    </div>
+
+    <!-- Contador -->
+    @if (ubicacionesFiltradas().length !== ubicaciones().length) {
+      <div class="results-count">
+        {{ ubicacionesFiltradas().length }} de {{ ubicaciones().length }} ubicaciones
+      </div>
+    }
+
+    <!-- Lista de ubicaciones -->
+    @if (ubicacionesFiltradas().length === 0) {
+      <div class="empty-state">
+        <i class="ti ti-bookmark"></i>
+        <h3>No hay ubicaciones guardadas</h3>
+        <p>Guarda tus ubicaciones favoritas y clasifica su nivel de seguridad</p>
+      </div>
+    } @else {
+      <div class="locations-list">
+        @for (ubicacion of ubicacionesFiltradas(); track ubicacion.id) {
+          <div class="location-card">
+            <div class="card-header">
+              <div
+                class="risk-badge"
+                [style.background-color]="getRiskColor(ubicacion.riskLevel) + '20'">
+                <i [ngClass]="getRiskIcon(ubicacion.riskLevel)" [style.color]="getRiskColor(ubicacion.riskLevel)"></i>
+                <span [style.color]="getRiskColor(ubicacion.riskLevel)">
+                  {{ getRiskLabel(ubicacion.riskLevel) }}
+                </span>
+              </div>
+              <button class="delete-btn" (click)="eliminarUbicacion(ubicacion.id)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+
+            <h3 class="location-name">{{ ubicacion.name }}</h3>
+
+            @if (ubicacion.address) {
+              <p class="location-address">
+                <i class="ti ti-map-pin"></i>
+                {{ ubicacion.address }}
+              </p>
+            }
+
+            @if (ubicacion.city) {
+              <p class="location-city">
+                <i class="ti ti-building"></i>
+                {{ ubicacion.city }}
+              </p>
+            }
+
+            <div class="location-footer">
+              <div class="coords">
+                <i class="ti ti-location"></i>
+                <span>{{ ubicacion.lat.toFixed(5) }}, {{ ubicacion.lng.toFixed(5) }}</span>
+              </div>
+              @if (ubicacion.isMain) {
+                <span class="main-badge">
+                  <i class="ti ti-star"></i>
+                  Principal
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,324 @@
+.historial-recorridos {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .header {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #7c3aed;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    i {
+      font-size: 4rem;
+      color: #d1d5db;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+  }
+
+  .recorridos-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .recorrido-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .recorrido-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #f5f3ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      i {
+        font-size: 1.5rem;
+        color: #7c3aed;
+      }
+    }
+
+    .recorrido-info {
+      flex: 1;
+      min-width: 0;
+
+      .recorrido-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        .recorrido-date {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          color: #6b7280;
+          font-size: 0.75rem;
+
+          i {
+            font-size: 0.875rem;
+          }
+        }
+
+        .importante-badge {
+          color: #FFD700;
+
+          i {
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .recorrido-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .recorrido-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+
+        .meta-item {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          color: #6b7280;
+          font-size: 0.75rem;
+
+          i {
+            font-size: 0.875rem;
+          }
+        }
+      }
+
+      .recorrido-location {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #6b7280;
+        font-size: 0.75rem;
+
+        i {
+          font-size: 0.875rem;
+        }
+      }
+    }
+
+    .recorrido-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+
+      .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: #f3f4f6;
+          color: #374151;
+        }
+
+        &.delete:hover {
+          background-color: #fee2e2;
+          color: #ef4444;
+        }
+
+        i {
+          font-size: 1.125rem;
+        }
+      }
+
+      > i:last-child {
+        color: #9ca3af;
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  // Modal
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 1rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #f5f3ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      i {
+        font-size: 1.75rem;
+        color: #7c3aed;
+      }
+    }
+
+    h3 {
+      flex: 1;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #f3f4f6;
+        color: #374151;
+      }
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f3f4f6;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      i {
+        color: #7c3aed;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        min-width: 120px;
+      }
+
+      .value {
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .modal-close-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 0 0 1rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #6d28d9;
+    }
+  }
+}

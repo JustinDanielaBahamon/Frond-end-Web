@@ -13,7 +13,7 @@ export class FrequentPlaceService {
   private baseUrl = `${environment.apiUrl}/api/frequent-locations`;
 
   getByUser(userId: number): Observable<FrequentPlace[]> {
-    return this.http.get<FrequentPlace[]>(`${this.baseUrl}/user-id/${userId}`);
+    return this.http.get<FrequentPlace[]>(`${this.baseUrl}/user/${userId}`);
   }
 
   create(place: Omit<FrequentPlace, 'id'>): Observable<FrequentPlace> {

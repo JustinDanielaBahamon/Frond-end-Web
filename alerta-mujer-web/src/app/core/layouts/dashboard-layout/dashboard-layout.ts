@@ -22,10 +22,14 @@ export class DashboardLayoutComponent implements OnInit {
     { label: 'Inicio',                 route: '/dashboard',                    icon: 'fa-solid fa-house',       exact: true },
     { label: 'Mis emergencias',        route: '/dashboard/alert-history',      icon: 'fa-solid fa-triangle-exclamation' },
     { label: 'Ubicación',              route: '/dashboard/ubicacion',          icon: 'fa-solid fa-location-dot' },
+    { label: 'Guardar ubicación',      route: '/dashboard/guardar-ubicacion',  icon: 'fa-solid fa-map-location' },
+    { label: 'Ubicaciones guardadas',  route: '/dashboard/ubicaciones-guardadas', icon: 'fa-solid fa-folder-tree' },
     { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
     { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
     { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
+    { label: 'Guardar recorrido',      route: '/dashboard/guardar-recorrido',  icon: 'fa-solid fa-file-lines' },
+    { label: 'Historial recorridos',   route: '/dashboard/historial-recorridos', icon: 'fa-solid fa-history' },
   ];
 
   // Usuario real del AuthService

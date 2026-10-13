@@ -72,18 +72,23 @@ export class NearbyZonesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const circles: L.Circle[] = [];
     zones.forEach(z => {
-      const circle = L.circle([z.lat, z.lng], {
-        radius: z.radiusMeters,
-        color: this.colorFor(z.type),
-        fillColor: this.colorFor(z.type),
-        fillOpacity: 0.18,
-        weight: 1.5,
-      }).addTo(this.map).bindPopup(`<b>${z.name}</b><br>${z.description}`);
-      circles.push(circle);
+      if (z.lat != null && z.lng != null) {
+        const circle = L.circle([z.lat, z.lng], {
+          radius: z.radiusMeters,
+          color: this.colorFor(z.type),
+          fillColor: this.colorFor(z.type),
+          fillOpacity: 0.18,
+          weight: 1.5,
+        }).addTo(this.map).bindPopup(`<b>${z.name}</b><br>${z.description}`);
+        circles.push(circle);
+      }
     });
 
-    const group = L.featureGroup(circles);
-    this.map.fitBounds(group.getBounds(), { padding: [40, 40] });
+    // 2. Verificamos que haya círculos antes de ajustar los límites del mapa
+    if (circles.length > 0) {
+      const group = L.featureGroup(circles);
+      this.map.fitBounds(group.getBounds(), { padding: [40, 40] });
+    }
 
     setTimeout(() => this.map.invalidateSize(), 0);
   }

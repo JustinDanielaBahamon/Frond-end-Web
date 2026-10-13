@@ -107,30 +107,10 @@ export const routes: Routes = [
               import('./features/dashboard/mi-ubicacion/my-location')
                 .then(m => m.MyLocationComponent),
           },
-          {
-            path: 'history',
-            loadComponent: () =>
-              import('./features/dashboard/location-history/location-history')
-                .then(m => m.LocationHistoryComponent),
-          },
-          {
-            path: 'frequent-places',
-            loadComponent: () =>
-              import('./features/dashboard/lugares-frecuentes/frequent-places')
-                .then(m => m.FrequentPlacesComponent),
-          },
-          {
-            path: 'nearby-zones',
-            loadComponent: () =>
-              import('./features/dashboard/zonas-cercanas/nearby-zones')
-                .then(m => m.NearbyZonesComponent),
-          },
-          {
-            path: 'guardar-ubicacion',
-            loadComponent: () =>
-              import('./features/dashboard/guardar-ubicacion/guardar-ubicacion')
-                .then(m => m.GuardarUbicacionComponent),
-          },
+          { path: 'history', redirectTo: 'my-location', pathMatch: 'full' },
+          { path: 'frequent-places', redirectTo: 'ubicaciones-guardadas', pathMatch: 'full' },
+          { path: 'nearby-zones', redirectTo: 'zonas-auxiliares', pathMatch: 'full' },
+          { path: 'guardar-ubicacion', redirectTo: 'ubicaciones-guardadas', pathMatch: 'full' },
           {
             path: 'ubicaciones-guardadas',
             loadComponent: () =>
@@ -149,12 +129,7 @@ export const routes: Routes = [
               import('./features/dashboard/guardar-recorrido/guardar-recorrido')
                 .then(m => m.GuardarRecorridoComponent),
           },
-          {
-            path: 'historial-recorridos',
-            loadComponent: () =>
-              import('./features/dashboard/historial-recorridos/historial-recorridos')
-                .then(m => m.HistorialRecorridosComponent),
-          },
+          { path: 'historial-recorridos', redirectTo: 'guardar-recorrido', pathMatch: 'full' },
         ],
       },
 

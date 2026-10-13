@@ -1,227 +1,274 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, inject } from '@angular/core';
-import { CommonModule, NgClass } from '@angular/common';
+import {
+  AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild,
+  computed, effect, inject, signal,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { AssistanceService } from '../../../core/services/assistance.service';
-import { LineaAyuda, CentroAyuda, RecursoGuardado, CategoriaCentro, TipoLinea } from '../../../core/models/assistance.model';
-import { AuthService } from '../../../core/auth/auth.service';
+import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../../../core/models/assistance.model';
 
-type Tab = 'lineas' | 'centros' | 'recursos';
-type FiltroCategoria = 'todos' | CategoriaCentro;
+type Tab = 'lineas' | 'centros' | 'llamadas';
 
-const ICONO_LINEA: Record<TipoLinea, string> = {
-  emergencia: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z',
-  policia: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  bomberos: 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
-  mujeres: 'M12 21c-4.97 0-9-3-9-8a9 9 0 0 1 18 0c0 5-4.03 8-9 8Zm0 0v-4m-3 4h6',
-  defensoria: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Zm0-14v6',
-  saludMental: 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z',
+export const CATEGORIAS: Record<CategoriaRecurso, { etiqueta: string; color: string }> = {
+  linea: { etiqueta: 'Línea de ayuda', color: '#f59e0b' },
+  policia: { etiqueta: 'Policía', color: '#9333ea' },
+  salud: { etiqueta: 'Salud', color: '#3b82f6' },
+  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#ec4899' },
+  bomberos: { etiqueta: 'Bomberos', color: '#ef4444' },
 };
 
-const COLOR_LINEA: Record<TipoLinea, string> = {
-  emergencia: 'as-linea--rojo',
-  policia: 'as-linea--azul',
-  bomberos: 'as-linea--naranja',
-  mujeres: 'as-linea--morado',
-  defensoria: 'as-linea--teal',
-  saludMental: 'as-linea--rosa',
+const ESTADOS: Record<string, string> = {
+  initiated: 'Iniciada', completed: 'Completada', failed: 'Fallida', missed: 'Sin respuesta',
 };
 
-const COLOR_CATEGORIA: Record<CategoriaCentro, string> = {
-  mujeres: '#7c3aed',
-  seguridad: '#1e3a8a',
-  salud: '#0d9488',
-  legal: '#d97706',
-  psicologico: '#db2777',
-  refugios: '#2563eb',
-};
+const NUMERO_EMERGENCIA = '123';
+const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
 
 @Component({
   selector: 'app-assistance',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './assistance.html',
   styleUrl: './assistance.scss',
 })
 export class Assistance implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('mapContainer') mapContainer?: ElementRef;
+  @ViewChild('mapContainer') mapContainer?: ElementRef<HTMLDivElement>;
 
-  private assistanceService = inject(AssistanceService);
-  private authService = inject(AuthService);
+  private service = inject(AssistanceService);
+  private injector = inject(Injector);
 
-  private map?: L.Map;
-  private viewReady = false;
-  private usuarioId = 0;
+  private map: L.Map | null = null;
+  private resizeObserver?: ResizeObserver;
+  private capa = L.layerGroup();
+  private marcadores = new Map<number, L.Marker>();
+  private vistaAjustada = false;
 
-  loading = true;
-  error = false;
+  readonly categorias = CATEGORIAS;
+  readonly listaCategorias = Object.keys(CATEGORIAS) as CategoriaRecurso[];
+  readonly numeroEmergencia = NUMERO_EMERGENCIA;
 
-  tabActivo: Tab = 'lineas';
+  tab = signal<Tab>('lineas');
+  recursos = signal<RecursoAyuda[]>([]);
+  llamadas = signal<LlamadaRegistrada[]>([]);
+  cargando = signal(true);
+  error = signal('');
+  aviso = signal('');
 
-  lineas: LineaAyuda[] = [];
-  centros: CentroAyuda[] = [];
-  recursosGuardados: RecursoGuardado[] = [];
+  busqueda = signal('');
+  filtro = signal<CategoriaRecurso | null>(null);
+  seleccionado = signal<number | null>(null);
+  miPosicion = signal<{ lat: number; lng: number } | null>(null);
 
-  terminoBusquedaCentros = '';
-  categoriaActiva: FiltroCategoria = 'todos';
-  categorias: { key: FiltroCategoria; label: string }[] = [
-    { key: 'todos', label: 'Todos' },
-    { key: 'mujeres', label: 'Mujeres' },
-    { key: 'seguridad', label: 'Seguridad' },
-    { key: 'salud', label: 'Salud' },
-    { key: 'legal', label: 'Legal' },
-    { key: 'psicologico', label: 'Psicológico' },
-    { key: 'refugios', label: 'Refugios' },
-  ];
+  /** Recursos a los que se puede llamar. */
+  lineas = computed(() => this.recursos().filter((r) => r.telefono));
 
-  ngOnInit() {
-    this.authService.currentUser$.subscribe((usuario: any) => {
-      if (!usuario) { this.error = true; this.loading = false; return; }
-      this.usuarioId = usuario.id;
-      this.cargarDatos();
+  /** Recursos con ubicación, filtrados y ordenados por cercanía si se conoce. */
+  centros = computed(() => {
+    const termino = this.busqueda().trim().toLowerCase();
+    const filtro = this.filtro();
+    const lista = this.recursos().filter((r) => {
+      if (r.lat == null || r.lng == null) return false;
+      if (filtro && r.categoria !== filtro) return false;
+      if (!termino) return true;
+      return [r.nombre, r.descripcion, r.direccion, r.ciudad, CATEGORIAS[r.categoria].etiqueta]
+        .some((t) => (t ?? '').toLowerCase().includes(termino));
     });
-  }
+    if (!this.miPosicion()) return lista;
+    return [...lista].sort((a, b) => (this.distancia(a) ?? Infinity) - (this.distancia(b) ?? Infinity));
+  });
 
-  private cargarDatos() {
-    this.loading = true;
-    this.error = false;
+  conteoCentros = computed(() => {
+    const c = Object.fromEntries(this.listaCategorias.map((k) => [k, 0])) as Record<CategoriaRecurso, number>;
+    for (const r of this.recursos()) if (r.lat != null && r.lng != null) c[r.categoria]++;
+    return c;
+  });
 
-    this.assistanceService.getLineas().subscribe({
-      next: (data) => { this.lineas = data; },
-      error: () => { this.error = true; },
-    });
+  totalCentros = computed(() => this.recursos().filter((r) => r.lat != null && r.lng != null).length);
 
-    this.assistanceService.getCentros().subscribe({
-      next: (data) => {
-        this.centros = data;
-        this.loading = false;
-        this.initMapIfReady();
+  ngOnInit(): void {
+    this.service.getRecursos().subscribe({
+      next: (lista) => {
+        this.recursos.set(lista);
+        this.cargando.set(false);
       },
-      error: () => { this.error = true; this.loading = false; },
+      error: () => {
+        this.error.set('No se pudieron cargar los recursos de ayuda. Intenta de nuevo.');
+        this.cargando.set(false);
+      },
     });
+    this.cargarLlamadas();
 
-    this.assistanceService.getRecursosGuardados(this.usuarioId).subscribe({
-      next: (data) => { this.recursosGuardados = data; },
+    navigator.permissions?.query({ name: 'geolocation' as PermissionName })
+      .then((p) => { if (p.state === 'granted') this.usarMiUbicacion(); })
+      .catch(() => {});
+  }
+
+  ngAfterViewInit(): void {
+    effect(() => this.dibujar(), { injector: this.injector });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.map?.remove();
+    this.map = null;
+  }
+
+  setTab(tab: Tab): void {
+    this.tab.set(tab);
+    if (tab === 'centros') setTimeout(() => this.initMap(), 0);
+  }
+
+  // ── Llamadas ───────────────────────────────────
+  private cargarLlamadas(): void {
+    this.service.getMisLlamadas().subscribe({ next: (l) => this.llamadas.set(l), error: () => {} });
+  }
+
+  /**
+   * Registra la llamada en el historial y abre el marcador del dispositivo.
+   * Si el registro falla, igual se llama: en una emergencia no se puede bloquear.
+   */
+  llamar(r: RecursoAyuda, numero = r.telefono): void {
+    if (!numero) return;
+    this.service.registrarLlamada(r.id, numero).subscribe({
+      next: (llamada) => this.llamadas.update((l) => [llamada, ...l]),
+      error: () => {},
+    });
+    window.location.href = this.telHref(numero);
+  }
+
+  llamarEmergencia(): void {
+    const linea = this.lineas().find((r) => r.telefono === NUMERO_EMERGENCIA);
+    if (linea) this.llamar(linea);
+    else window.location.href = this.telHref(NUMERO_EMERGENCIA);
+  }
+
+  copiar(numero: string): void {
+    navigator.clipboard?.writeText(numero).then(() => this.mostrarAviso(`Número ${numero} copiado.`));
+  }
+
+  eliminarLlamada(l: LlamadaRegistrada): void {
+    this.service.eliminarLlamada(l.id).subscribe({
+      next: () => this.llamadas.update((lista) => lista.filter((x) => x.id !== l.id)),
+      error: () => this.mostrarAviso('No se pudo borrar el registro.'),
     });
   }
 
-  ngAfterViewInit() {
-    this.viewReady = true;
-    this.initMapIfReady();
+  recursoDe(l: LlamadaRegistrada): RecursoAyuda | undefined {
+    return this.recursos().find((r) => r.id === l.recursoId);
   }
 
-  setTab(tab: Tab) {
-    this.tabActivo = tab;
-    // El contenedor del mapa puede cambiar de ancho al cambiar de tab;
-    // se recalcula el tamaño para que Leaflet no quede con tiles cortados.
-    setTimeout(() => this.map?.invalidateSize(), 0);
+  // ── Centros y mapa ─────────────────────────────
+  usarMiUbicacion(): void {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => this.miPosicion.set({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => this.mostrarAviso('No pudimos acceder a tu ubicación. Actívala en el navegador para ver distancias.'),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
   }
 
-  iconoLinea(tipo: TipoLinea) { return ICONO_LINEA[tipo] ?? ICONO_LINEA['emergencia']; }
-  colorLinea(tipo: TipoLinea) { return COLOR_LINEA[tipo] ?? 'as-linea--morado'; }
-
-  get centrosFiltrados(): CentroAyuda[] {
-    let lista = this.categoriaActiva === 'todos'
-      ? this.centros
-      : this.centros.filter(c => c.categoria === this.categoriaActiva);
-
-    const termino = this.terminoBusquedaCentros.trim().toLowerCase();
-    if (termino) {
-      lista = lista.filter(c =>
-        c.nombre.toLowerCase().includes(termino) ||
-        c.descripcion.toLowerCase().includes(termino)
-      );
-    }
-
-    return lista.sort((a, b) => a.distanciaKm - b.distanciaKm);
+  distancia(r: RecursoAyuda): number | null {
+    const yo = this.miPosicion();
+    if (!yo || r.lat == null || r.lng == null) return null;
+    return L.latLng(yo.lat, yo.lng).distanceTo([r.lat, r.lng]);
   }
 
-  setCategoria(cat: FiltroCategoria) { this.categoriaActiva = cat; }
+  formatoDistancia(r: RecursoAyuda): string {
+    const d = this.distancia(r);
+    if (d == null) return '';
+    return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(d < 10000 ? 1 : 0)} km`;
+  }
 
-  private initMapIfReady() {
-    if (!this.viewReady || !this.mapContainer || this.centros.length === 0 || this.map) return;
+  comoLlegar(r: RecursoAyuda): string {
+    const yo = this.miPosicion();
+    return `https://www.openstreetmap.org/directions?route=${yo ? `${yo.lat},${yo.lng}` : ''};${r.lat},${r.lng}`;
+  }
 
-    this.map = L.map(this.mapContainer.nativeElement, { scrollWheelZoom: false, zoomControl: true });
+  verEnMapa(r: RecursoAyuda): void {
+    this.seleccionado.set(r.id);
+    if (r.lat == null || r.lng == null) return;
+    this.map?.flyTo([r.lat, r.lng], 16, { duration: 0.8 });
+    setTimeout(() => this.marcadores.get(r.id)?.openPopup(), 850);
+  }
+
+  private initMap(): void {
+    if (this.map || !this.mapContainer) return;
+    this.map = L.map(this.mapContainer.nativeElement, { center: CENTRO_POR_DEFECTO, zoom: 13 });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
-      referrerPolicy: 'strict-origin-when-cross-origin',
     }).addTo(this.map);
-
-    const markers: L.CircleMarker[] = [];
-    this.centros.forEach(c => {
-      const marker = L.circleMarker([c.lat, c.lng], {
-        radius: 9,
-        color: '#fff',
-        weight: 2,
-        fillColor: COLOR_CATEGORIA[c.categoria],
-        fillOpacity: 1,
-      }).addTo(this.map!).bindPopup(`<b>${c.nombre}</b><br>${c.descripcion}`);
-      markers.push(marker);
-    });
-
-    const group = L.featureGroup(markers);
-    this.map.fitBounds(group.getBounds(), { padding: [40, 40] });
-
-    setTimeout(() => this.map?.invalidateSize(), 0);
+    this.capa.addTo(this.map);
+    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    this.resizeObserver.observe(this.mapContainer.nativeElement);
+    this.dibujar();
   }
 
-  llamar(numero: string) {
-    window.location.href = `tel:${numero.replace(/\s+/g, '')}`;
-  }
+  private dibujar(): void {
+    const lista = this.centros();
+    const seleccionado = this.seleccionado();
+    const yo = this.miPosicion();
+    if (!this.map) return;
 
-  comoLlegar(centro: CentroAyuda) {
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${centro.lat},${centro.lng}`, '_blank');
-  }
+    this.capa.clearLayers();
+    this.marcadores.clear();
+    const bounds = L.latLngBounds([]);
 
-  centrarEnMapa(centro: CentroAyuda) {
-    this.tabActivo = 'centros';
-    setTimeout(() => this.map?.flyTo([centro.lat, centro.lng], 16, { duration: 1 }), 0);
-  }
+    for (const r of lista) {
+      const { color, etiqueta } = CATEGORIAS[r.categoria];
+      const activo = r.id === seleccionado;
+      const size = activo ? 30 : 24;
+      const marcador = L.marker([r.lat!, r.lng!], {
+        icon: L.divIcon({
+          className: '',
+          html: `<div class="as-pin${activo ? ' as-pin--active' : ''}" style="--pin:${color}"></div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        }),
+        zIndexOffset: activo ? 500 : 0,
+      })
+        .bindPopup(`<strong>${escapeHtml(r.nombre)}</strong><br><span style="color:${color};font-weight:700">${etiqueta}</span>`
+          + (r.direccion ? `<br>${escapeHtml(r.direccion)}` : '') + `<br>${escapeHtml(r.ciudad)}`)
+        .on('click', () => this.seleccionado.set(r.id))
+        .addTo(this.capa);
+      this.marcadores.set(r.id, marcador);
+      bounds.extend([r.lat!, r.lng!]);
+    }
 
-  esGuardado(refTipo: 'centro' | 'linea', refId: number): boolean {
-    return this.recursosGuardados.some(r => r.refTipo === refTipo && r.refId === refId);
-  }
+    if (yo) {
+      L.marker([yo.lat, yo.lng], {
+        icon: L.divIcon({ className: '', html: '<div class="as-you"></div>', iconSize: [20, 20], iconAnchor: [10, 10] }),
+        zIndexOffset: 1000,
+      }).bindTooltip('Estás aquí').addTo(this.capa);
+    }
 
-  toggleGuardarCentro(centro: CentroAyuda) {
-    const existente = this.recursosGuardados.find(r => r.refTipo === 'centro' && r.refId === centro.id);
-    if (existente) {
-      this.assistanceService.quitarRecurso(existente.id).subscribe(() => {
-        this.recursosGuardados = this.recursosGuardados.filter(r => r.id !== existente.id);
-      });
-    } else {
-      this.assistanceService.guardarRecurso({
-        usuarioId: this.usuarioId,
-        refTipo: 'centro',
-        refId: centro.id,
-        nombre: centro.nombre,
-        subtitulo: `Entidad · ${centro.distanciaKm} km`,
-      }).subscribe((creado) => { this.recursosGuardados = [...this.recursosGuardados, creado]; });
+    if (!this.vistaAjustada && bounds.isValid()) {
+      this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+      this.vistaAjustada = true;
     }
   }
 
-  toggleGuardarLinea(linea: LineaAyuda) {
-    const existente = this.recursosGuardados.find(r => r.refTipo === 'linea' && r.refId === linea.id);
-    if (existente) {
-      this.assistanceService.quitarRecurso(existente.id).subscribe(() => {
-        this.recursosGuardados = this.recursosGuardados.filter(r => r.id !== existente.id);
-      });
-    } else {
-      this.assistanceService.guardarRecurso({
-        usuarioId: this.usuarioId,
-        refTipo: 'linea',
-        refId: linea.id,
-        nombre: linea.nombre,
-        subtitulo: `Línea · ${linea.disponibilidad.replace('Disponible ', '')}`,
-      }).subscribe((creado) => { this.recursosGuardados = [...this.recursosGuardados, creado]; });
-    }
+  // ── Formato ────────────────────────────────────
+  telHref(numero: string): string {
+    return `tel:${numero.replace(/[^\d+]/g, '')}`;
   }
 
-  quitarRecursoGuardado(recurso: RecursoGuardado) {
-    this.assistanceService.quitarRecurso(recurso.id).subscribe(() => {
-      this.recursosGuardados = this.recursosGuardados.filter(r => r.id !== recurso.id);
-    });
+  estado(e: string): string {
+    return ESTADOS[e] ?? e;
   }
 
-  ngOnDestroy() { if (this.map) this.map.remove(); }
+  fecha(d: Date): string {
+    return d.toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  }
+
+  private mostrarAviso(texto: string): void {
+    this.aviso.set(texto);
+    setTimeout(() => {
+      if (this.aviso() === texto) this.aviso.set('');
+    }, 3500);
+  }
+}
+
+function escapeHtml(texto: string): string {
+  return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }

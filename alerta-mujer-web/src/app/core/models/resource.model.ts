@@ -20,3 +20,18 @@ export interface ResourceCall {
   status?: 'completada' | 'no_respondida' | 'fallida';
   createdAt?: string;
 }
+/** Recurso tal como lo devuelve el backend (/api/resources). */
+export interface EmergencyResourceApi {
+  id: number;
+  name: string;
+  resourceType: string;
+  telephone?: string | null;
+  secondaryTelephone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  city: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  description?: string | null;
+  isActive?: boolean;
+}

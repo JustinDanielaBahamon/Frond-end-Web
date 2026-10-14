@@ -107,24 +107,29 @@ export const routes: Routes = [
               import('./features/dashboard/mi-ubicacion/my-location')
                 .then(m => m.MyLocationComponent),
           },
+          { path: 'history', redirectTo: 'my-location', pathMatch: 'full' },
+          { path: 'frequent-places', redirectTo: 'ubicaciones-guardadas', pathMatch: 'full' },
+          { path: 'nearby-zones', redirectTo: 'zonas-auxiliares', pathMatch: 'full' },
+          { path: 'guardar-ubicacion', redirectTo: 'ubicaciones-guardadas', pathMatch: 'full' },
           {
-            path: 'history',
+            path: 'ubicaciones-guardadas',
             loadComponent: () =>
-              import('./features/dashboard/location-history/location-history')
-                .then(m => m.LocationHistoryComponent),
+              import('./features/dashboard/ubicaciones-guardadas/ubicaciones-guardadas')
+                .then(m => m.UbicacionesGuardadasComponent),
           },
           {
-            path: 'frequent-places',
+            path: 'zonas-auxiliares',
             loadComponent: () =>
-              import('./features/dashboard/lugares-frecuentes/frequent-places')
-                .then(m => m.FrequentPlacesComponent),
+              import('./features/dashboard/zonas-auxiliares/zonas-auxiliares')
+                .then(m => m.ZonasAuxiliaresComponent),
           },
           {
-            path: 'nearby-zones',
+            path: 'guardar-recorrido',
             loadComponent: () =>
-              import('./features/dashboard/zonas-cercanas/nearby-zones')
-                .then(m => m.NearbyZonesComponent),
+              import('./features/dashboard/guardar-recorrido/guardar-recorrido')
+                .then(m => m.GuardarRecorridoComponent),
           },
+          { path: 'historial-recorridos', redirectTo: 'guardar-recorrido', pathMatch: 'full' },
         ],
       },
 

@@ -1,33 +1,26 @@
-export type TipoLinea = 'emergencia' | 'policia' | 'bomberos' | 'mujeres' | 'defensoria' | 'saludMental';
+/** Categoría de un recurso de ayuda, derivada del resourceType del backend. */
+export type CategoriaRecurso = 'linea' | 'policia' | 'salud' | 'apoyo' | 'bomberos';
 
-export interface LineaAyuda {
+/** Recurso de ayuda (GET /api/resources) adaptado para la UI. */
+export interface RecursoAyuda {
   id: number;
   nombre: string;
-  numero: string;
+  categoria: CategoriaRecurso;
   descripcion: string;
-  disponibilidad: string; // 'Disponible 24/7' o 'Horario: Lun - Vie 7:00 a.m. - 7:00 p.m.'
-  tipo: TipoLinea;
+  telefono: string | null;
+  telefono2: string | null;
+  email: string | null;
+  direccion: string | null;
+  ciudad: string;
+  lat: number | null;
+  lng: number | null;
 }
 
-export type CategoriaCentro = 'mujeres' | 'seguridad' | 'salud' | 'legal' | 'psicologico' | 'refugios';
-
-export interface CentroAyuda {
+/** Llamada registrada por la usuaria (GET /api/resource-calls/me). */
+export interface LlamadaRegistrada {
   id: number;
-  nombre: string;
-  descripcion: string;
-  categoria: CategoriaCentro;
-  distanciaKm: number;
-  estado: string; // '8:00 a.m. - 5:00 p.m.' o '24/7'
-  abierto: boolean;
-  lat: number;
-  lng: number;
-}
-
-export interface RecursoGuardado {
-  id: number;
-  usuarioId: number;
-  refTipo: 'centro' | 'linea';
-  refId: number;
-  nombre: string;
-  subtitulo: string; // 'Entidad · 2.4 km' o 'Línea · 24/7'
+  recursoId: number;
+  telefono: string;
+  estado: string;
+  fecha: Date;
 }

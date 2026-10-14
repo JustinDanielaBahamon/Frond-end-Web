@@ -10,6 +10,8 @@ export interface UbicacionEntry {
   date?: string;           // 'YYYY-MM-DD' — agrégalo en el backend para que el calendario filtre de verdad
   connectionType?: string; // opcional
   deviceName?: string;     // opcional
+  recordedAt?: string;     // ISO con zona horaria (fuente de verdad para fecha/hora)
+  accuracy?: number;       // metros
 }
 
 // Modelo que devuelve el backend LocationLog

@@ -19,7 +19,7 @@ export class AlertsService {
 
   // Usado por USUARIA: solo sus propias alertas
   getByUsuario(usuarioId: number): Observable<Alerta[]> {
-    return this.http.get<any[]>(`${this.url}/user-id/${usuarioId}`).pipe(
+    return this.http.get<any[]>(`${this.url}/user/${usuarioId}`).pipe(
       map(lista => lista.map(a => this.normalizar(a)))
     );
   }
@@ -36,9 +36,9 @@ export class AlertsService {
     return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alertaData);
   }
 
-  // PATCH: cambia solo el estado sin pisar los demás campos del db.json
+  // PUT: mismo endpoint de actualización del backend (PUT /api/alerts/{id})
   updateEstado(id: number, estado: EstadoAlerta): Observable<Alerta> {
-    return this.http.patch<any>(`${this.url}/${id}`, { estado }).pipe(
+    return this.http.put<any>(`${this.url}/${id}`, { estado }).pipe(
       map(a => this.normalizar(a))
     );
   }

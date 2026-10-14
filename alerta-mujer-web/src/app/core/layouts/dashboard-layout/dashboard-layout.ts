@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/sidebar';
 import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/auth/auth.service';
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss'
 })
-export class DashboardLayoutComponent {
+export class DashboardLayoutComponent implements OnInit {
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
 
@@ -28,11 +28,22 @@ export class DashboardLayoutComponent {
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];
 
-  // ⚠️ reemplaza por el usuario real cuando AuthService lo exponga
+  // Usuario real del AuthService
   user = {
-    name: 'María González',
-    email: 'maria.gonzalez@email.com'
+    name: '',
+    email: ''
   };
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(currentUser => {
+      if (currentUser) {
+        this.user = {
+          name: currentUser.nombre,
+          email: currentUser.email
+        };
+      }
+    });
+  }
 
   toggleTheme() {
     this.themeService.toggleTheme();

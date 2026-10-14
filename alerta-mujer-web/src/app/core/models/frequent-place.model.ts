@@ -9,5 +9,10 @@ export interface FrequentPlace {
   city: string;
   lat: number;
   lng: number;
+  notes?: string;
+  riskLevel?: 'muy_segura' | 'moderada' | 'muy_insegura';
+  isActive?: boolean;
   isMain?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

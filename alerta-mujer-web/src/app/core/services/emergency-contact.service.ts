@@ -33,7 +33,7 @@ export class EmergencyContactService {
   }
 
   getByUsuario(usuarioId: number): Observable<ContactoEmergencia[]> {
-    return this.http.get<EmergencyContactApi[]>(`${this.url}/user-id/${usuarioId}`).pipe(
+    return this.http.get<EmergencyContactApi[]>(`${this.url}/user/${usuarioId}`).pipe(
       map(contacts => contacts.map(c => this.mapApiToContact(c)))
     );
   }

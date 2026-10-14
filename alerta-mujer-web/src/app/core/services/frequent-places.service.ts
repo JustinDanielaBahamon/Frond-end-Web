@@ -13,11 +13,13 @@ export class FrequentPlaceService {
   private baseUrl = `${environment.apiUrl}/api/frequent-locations`;
 
   getByUser(userId: number): Observable<FrequentPlace[]> {
-    return this.http.get<FrequentPlace[]>(`${this.baseUrl}?userId=${userId}`);
+    return this.http.get<FrequentPlace[]>(`${this.baseUrl}/user-id/${userId}`);
   }
 
   create(place: Omit<FrequentPlace, 'id'>): Observable<FrequentPlace> {
-    return this.http.post<FrequentPlace>(this.baseUrl, place);
+    // No enviamos userId/userProfileId, el backend lo establece automáticamente
+    const { userId, ...placeData } = place as any;
+    return this.http.post<FrequentPlace>(this.baseUrl, placeData);
   }
 
   update(id: number, place: Partial<FrequentPlace>): Observable<FrequentPlace> {

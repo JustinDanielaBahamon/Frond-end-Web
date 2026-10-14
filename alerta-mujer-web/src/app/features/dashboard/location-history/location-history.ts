@@ -122,7 +122,7 @@ export class LocationHistoryComponent implements OnInit, AfterViewInit, OnDestro
   ngOnInit() {
     this.authService.currentUser$.subscribe((usuario: any) => {
       if (!usuario) { this.error = true; this.cargando = false; return; }
-      this.usuarioId = usuario.id ?? usuario.usuarioId ?? 1;
+      this.usuarioId = usuario.id;
       this.loadData();
     });
   }

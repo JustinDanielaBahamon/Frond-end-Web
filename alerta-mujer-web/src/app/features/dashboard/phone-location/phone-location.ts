@@ -212,7 +212,8 @@ export class PhoneLocationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.cargando = false;
         return;
       }
-      this.loadData(DEVICE_TO_USUARIO_ID[this.selectedDevice()]);
+      // Usar el ID del usuario autenticado en lugar del hardcodeado
+      this.loadData(usuario.id);
     });
   }
 

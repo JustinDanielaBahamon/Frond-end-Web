@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap, catchError, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -92,44 +92,9 @@ export class AuthService {
     );
   }
 
-  registrarUsuaria(data: { nombre: string; email: string; rol: string }): void {
-    // Conectar al backend Spring Boot
-    this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
-      nombre: data.nombre,
-      email: data.email,
-      password: 'Default@123', // Contraseña por defecto para pruebas
-      telefono: ''
-    }).subscribe({
-      next: (response) => {
-        const backendUser = response.user;
-        
-        // Adaptar el formato del backend al modelo User de Angular
-        const user: User = {
-          id: backendUser.id,
-          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
-          email: backendUser.email,
-          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
-          firstName: backendUser.firstName,
-          lastName: backendUser.lastName,
-          telephone: backendUser.telephone,
-          roleId: backendUser.roleId
-        };
-        
-        this.saveSession(user, response.token);
-        this._currentUser$.next(user);
-        this._token$.next(response.token);
-      },
-      error: (err) => {
-        console.error('Error al registrar:', err);
-      },
-    });
-  }
-
   logout(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    this._currentUser$.next(null);
-    this._token$.next(null);
-    this.router.navigate(['/login']);
+    this.cerrarSesionLocal();
+    this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
@@ -141,8 +106,32 @@ export class AuthService {
     return user?.rol ?? '';
   }
 
+  /** Hay sesión solo si existe un token y todavía no ha vencido. */
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+    if (this.tokenVencido(token)) {
+      this.cerrarSesionLocal();
+      return false;
+    }
+    return true;
+  }
+
+  /** Lee el campo exp del JWT (segundos). Un token ilegible se trata como vencido. */
+  private tokenVencido(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
+  }
+
+  /** Borra la sesión sin navegar (lo usan el guard y el interceptor). */
+  cerrarSesionLocal(): void {
+    localStorage.removeItem(STORAGE_KEY);
+    this._currentUser$.next(null);
+    this._token$.next(null);
   }
 
   /** Inicio de sesión con Google: el backend valida el token de Firebase y entrega el JWT. */

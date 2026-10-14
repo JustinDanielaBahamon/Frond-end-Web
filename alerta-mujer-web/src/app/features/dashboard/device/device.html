@@ -1,1 +1,230 @@
-<p>device works!</p>
+<div class="device-wrap">
+  
+  <!-- 1. ENCABEZADO -->
+  <div class="device-header">
+    <div>
+      <h1 class="device-title">Estado del Dispositivo</h1>
+      <p class="device-subtitle">Diagnóstico completo del sistema • Última actualización: {{ lastRefresh() }}</p>
+    </div>
+    <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()">
+      <i class="ti ti-refresh"></i>
+    </button>
+  </div>
+
+  <!-- 2. PERMISOS DEL NAVEGADOR -->
+  <div class="device-panel">
+    <h2 class="device-panel__title">
+      <i class="ti ti-shield-check"></i> Permisos del Navegador
+    </h2>
+    <div class="device-grid device-grid--5col">
+      @for (perm of permissions(); track perm.name) {
+        <div class="device-item">
+          <div class="device-item__icon" [ngClass]="'device-item__icon--' + getStatusColor(perm.state)">
+            <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
+          </div>
+          <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : perm.name === 'camera' ? 'Cámara' : perm.name === 'microphone' ? 'Micrófono' : 'Portapapeles' }}</p>
+          <span class="device-badge" [ngClass]="'device-badge--' + getStatusColor(perm.state)">
+            {{ getStatusLabel(perm.state) }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- FILA DE 2 COLUMNAS: ESTADO DE SERVICIOS + INFORMACIÓN DEL DISPOSITIVO -->
+  <div class="device-row device-row--2col">
+    
+    <!-- 3. ESTADO DE SERVICIOS -->
+    <div class="device-panel">
+      <h2 class="device-panel__title">
+        <i class="ti ti-wifi"></i> Estado de Servicios
+      </h2>
+      <div class="device-list">
+        @for (service of services(); track service.name) {
+          <div class="device-list-item">
+            <i class="ti" [ngClass]="service.enabled ? 'ti-check' : 'ti-x'"></i>
+            <div class="device-list-item__body">
+              <span class="device-list-item__label">{{ service.name }}</span>
+              @if (service.details) {
+                <span class="device-list-item__details">{{ service.details }}</span>
+              }
+            </div>
+            <span class="device-badge" [ngClass]="service.enabled ? 'device-badge--exito' : 'device-badge--peligro'">
+              {{ service.enabled ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        }
+        
+        <!-- Estado de conexión -->
+        <div class="device-list-item device-list-item--highlight">
+          <i class="ti ti-wifi"></i>
+          <div class="device-list-item__body">
+            <span class="device-list-item__label">Estado de conexión</span>
+            <span class="device-list-item__details">{{ isOnline() ? 'En línea' : 'Sin conexión' }} • Calidad: {{ connectionQuality() }}</span>
+          </div>
+          <span class="device-badge" [ngClass]="isOnline() ? 'device-badge--exito' : 'device-badge--peligro'">
+            {{ isOnline() ? 'Conectado' : 'Desconectado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. INFORMACIÓN DEL DISPOSITIVO -->
+    <div class="device-panel">
+      <h2 class="device-panel__title">
+        <i class="ti ti-device-desktop"></i> Información del Dispositivo
+      </h2>
+      @if (deviceInfo(); as info) {
+        <div class="device-info-grid">
+          <div class="device-info-item">
+            <span class="device-info-item__label">Navegador</span>
+            <span class="device-info-item__value">{{ info.browser }} {{ info.version }}</span>
+          </div>
+          <div class="device-info-item">
+            <span class="device-info-item__label">Sistema Operativo</span>
+            <span class="device-info-item__value">{{ info.os }}</span>
+          </div>
+          <div class="device-info-item">
+            <span class="device-info-item__label">Idioma</span>
+            <span class="device-info-item__value">{{ info.language }}</span>
+          </div>
+          <div class="device-info-item">
+            <span class="device-info-item__label">Zona Horaria</span>
+            <span class="device-info-item__value">{{ info.timezone }}</span>
+          </div>
+          <div class="device-info-item">
+            <span class="device-info-item__label">Resolución de Pantalla</span>
+            <span class="device-info-item__value">{{ info.screenResolution }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- 5. ESTADO DE FUNCIONALIDADES CRÍTICAS -->
+  <div class="device-panel">
+    <h2 class="device-panel__title">
+      <i class="ti ti-activity"></i> Funcionalidades Críticas
+    </h2>
+    @if (criticalFeatures(); as features) {
+      <div class="device-grid device-grid--4col">
+        <div class="device-feature-item">
+          <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--peligro'">
+            <i class="ti ti-login"></i>
+          </div>
+          <div class="device-feature-item__body">
+            <span class="device-feature-item__label">Sesión</span>
+            <span class="device-feature-item__value">{{ features.sessionActive ? 'Activa' : 'Inactiva' }}</span>
+          </div>
+        </div>
+
+        <div class="device-feature-item">
+          <div class="device-feature-item__icon device-feature-item__icon--acento">
+            <i class="ti ti-map-pin"></i>
+          </div>
+          <div class="device-feature-item__body">
+            <span class="device-feature-item__label">Última ubicación</span>
+            <span class="device-feature-item__value">{{ features.lastLocationCaptured || 'No registrada' }}</span>
+          </div>
+        </div>
+
+        <div class="device-feature-item">
+          <div class="device-feature-item__icon" [ngClass]="features.notificationToken ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+            <i class="ti ti-bell"></i>
+          </div>
+          <div class="device-feature-item__body">
+            <span class="device-feature-item__label">Token de notificaciones</span>
+            <span class="device-feature-item__value">{{ features.notificationToken ? 'Configurado' : 'No configurado' }}</span>
+          </div>
+        </div>
+
+        <div class="device-feature-item">
+          <div class="device-feature-item__icon device-feature-item__icon--exito">
+            <i class="ti ti-users"></i>
+          </div>
+          <div class="device-feature-item__body">
+            <span class="device-feature-item__label">Contactos de emergencia</span>
+            <span class="device-feature-item__value">{{ features.emergencyContactsCount }} configurados</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- FILA DE 2 COLUMNAS: REGISTRO DE ACTIVIDAD + PRUEBAS DE FUNCIONALIDAD -->
+  <div class="device-row device-row--2col">
+
+    <!-- 6. REGISTRO DE ACTIVIDAD -->
+    <div class="device-panel">
+      <h2 class="device-panel__title">
+        <i class="ti ti-history"></i> Registro de Actividad (Últimas 5)
+      </h2>
+      @if (activityLog().length > 0) {
+        <div class="device-activity-list">
+          @for (log of activityLog(); track log.timestamp) {
+            <div class="device-activity-item">
+              <div class="device-activity-item__icon" [ngClass]="'device-activity-item__icon--' + log.type">
+                <i class="ti" [ngClass]="getIconForActivityType(log.type)"></i>
+              </div>
+              <div class="device-activity-item__body">
+                <p class="device-activity-item__message">{{ log.message }}</p>
+                <p class="device-activity-item__time">{{ log.timestamp }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="device-empty">Sin actividad reciente</p>
+      }
+    </div>
+
+    <!-- 7. PRUEBAS DE FUNCIONALIDAD -->
+    <div class="device-panel">
+      <h2 class="device-panel__title">
+        <i class="ti ti-test-pipe"></i> Pruebas de Funcionalidad
+      </h2>
+      <div class="device-test-grid">
+        <button class="device-test-btn" (click)="testGeolocation()" [disabled]="loading()">
+          <i class="ti ti-map-pin"></i>
+          <span>Probar Geolocalización</span>
+        </button>
+        <button class="device-test-btn" (click)="testNotifications()" [disabled]="loading()">
+          <i class="ti ti-bell"></i>
+          <span>Probar Notificaciones</span>
+        </button>
+        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()">
+          <i class="ti ti-wifi"></i>
+          <span>Probar Conectividad</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 8. ACCIONES RÁPIDAS -->
+  <div class="device-panel">
+    <h2 class="device-panel__title">
+      <i class="ti ti-bolt"></i> Acciones Rápidas
+    </h2>
+    <div class="device-actions-grid">
+      <button class="device-action-btn" (click)="syncData()" [disabled]="loading()">
+        <i class="ti ti-refresh"></i>
+        <span>Sincronizar datos</span>
+      </button>
+      <button class="device-action-btn" (click)="clearCache()" [disabled]="loading()">
+        <i class="ti ti-trash"></i>
+        <span>Limpiar caché</span>
+      </button>
+      <button class="device-action-btn" (click)="exportDiagnostic()" [disabled]="loading()">
+        <i class="ti ti-download"></i>
+        <span>Exportar diagnóstico</span>
+      </button>
+      <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()">
+        <i class="ti ti-shield-check"></i>
+        <span>Refrescar permisos</span>
+      </button>
+    </div>
+  </div>
+
+</div>

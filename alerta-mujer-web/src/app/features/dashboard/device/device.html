@@ -22,7 +22,7 @@
     </p>
     <div class="device-grid device-grid--5col">
       @for (perm of permissions(); track perm.name) {
-        <div class="device-item">
+        <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : perm.name === 'camera' ? 'Cámara' : perm.name === 'microphone' ? 'Micrófono' : 'Portapapeles')" aria-live="polite">
           <div class="device-item__icon" [ngClass]="'device-item__icon--' + getStatusColor(perm.state)">
             <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
           </div>
@@ -113,7 +113,7 @@
     </h2>
     @if (criticalFeatures(); as features) {
       <div class="device-grid device-grid--4col">
-        <div class="device-feature-item">
+        <div class="device-feature-item" role="status" aria-label="Estado de la sesión" aria-live="polite">
           <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--peligro'">
             <i class="ti ti-login"></i>
           </div>
@@ -123,7 +123,7 @@
           </div>
         </div>
 
-        <div class="device-feature-item">
+        <div class="device-feature-item" role="status" aria-label="Estado de ubicación" aria-live="polite">
           <div class="device-feature-item__icon device-feature-item__icon--acento">
             <i class="ti ti-map-pin"></i>
           </div>
@@ -133,7 +133,7 @@
           </div>
         </div>
 
-        <div class="device-feature-item">
+        <div class="device-feature-item" role="status" aria-label="Estado de notificaciones" aria-live="polite">
           <div class="device-feature-item__icon" [ngClass]="features.notificationToken ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
             <i class="ti ti-bell"></i>
           </div>
@@ -143,7 +143,7 @@
           </div>
         </div>
 
-        <div class="device-feature-item">
+        <div class="device-feature-item" role="status" aria-label="Estado de contactos de emergencia" aria-live="polite">
           <div class="device-feature-item__icon device-feature-item__icon--exito">
             <i class="ti ti-users"></i>
           </div>

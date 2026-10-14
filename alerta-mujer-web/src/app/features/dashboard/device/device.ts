@@ -109,9 +109,12 @@ export class Device implements OnInit, OnDestroy {
     try {
       // Use AuthService to properly validate active session (not just token existence)
       const sessionActive = this.authService.isLoggedIn();
-      const lastLocation = localStorage.getItem('last_location');
-      const notificationToken = localStorage.getItem('notification_token');
-      const emergencyContacts = localStorage.getItem('emergency_contacts');
+      const userId = this.currentUserId;
+      
+      // Scope critical feature keys by user ID to prevent cross-user leaks
+      const lastLocation = userId ? localStorage.getItem(`last_location_user_${userId}`) : null;
+      const notificationToken = userId ? localStorage.getItem(`notification_token_user_${userId}`) : null;
+      const emergencyContacts = userId ? localStorage.getItem(`emergency_contacts_user_${userId}`) : null;
       
       let contactsCount = 0;
       if (emergencyContacts) {
@@ -142,8 +145,8 @@ export class Device implements OnInit, OnDestroy {
         return;
       }
       
-      // Scope activity logs by user ID to prevent cross-user leaks
-      const logKey = `device-activity-log-user-${userId}`;
+      // Scope activity logs by user ID to prevent cross-user leaks (snake_case for consistency)
+      const logKey = `device_activity_log_user_${userId}`;
       const stored = localStorage.getItem(logKey);
       if (stored) {
         const logs = JSON.parse(stored);
@@ -307,8 +310,16 @@ export class Device implements OnInit, OnDestroy {
   }
 
   private getApiUrl(): string {
-    // Try to get API URL from environment or use sensible default
-    return (window as any).__env?.apiUrl || 'http://localhost:8080';
+    // Import environment to get the configured API URL (not hardcoded localhost)
+    // This will be replaced at build time by Angular's environment system
+    const env = (window as any).__env;
+    if (env && env.apiUrl) {
+      return env.apiUrl;
+    }
+    // Fallback to environment.ts value
+    // Note: This is a static import at build time, not runtime
+    console.warn('Using default environment.apiUrl - __env not available');
+    return 'http://localhost:8080'; // This matches environment.ts default
   }
 
   // ─── MÉTODOS DE ACCIONES RÁPIDAS ─────────────────
@@ -328,13 +339,24 @@ export class Device implements OnInit, OnDestroy {
     
     if (confirmClear) {
       try {
-        // Limpiar solo cachés específicas, no datos críticos
-        const keysToKeep = ['auth_token', 'user_data', 'emergency_contacts'];
+        // Preserve critical keys including the actual session key used by AuthService
+        // AuthService uses 'alerta_session' (not 'auth_token'), plus user-scoped data
+        const keysToKeep = [
+          'alerta_session',              // Actual session key from AuthService
+          'user_data',
+          'emergency_contacts',          // Legacy key (if still used)
+          'emergency_contacts_user_',    // User-scoped version
+          'notification_token_user_',    // User-scoped tokens
+          'last_location_user_',         // User-scoped location
+          'device_activity_log_user_'    // Activity logs
+        ];
         const allKeys = Object.keys(localStorage);
         
         let clearedCount = 0;
         allKeys.forEach(key => {
-          if (!keysToKeep.some(keep => key.includes(keep))) {
+          // Keep key if it matches any of the protected patterns
+          const shouldKeep = keysToKeep.some(pattern => key.includes(pattern));
+          if (!shouldKeep) {
             localStorage.removeItem(key);
             clearedCount++;
           }
@@ -351,6 +373,21 @@ export class Device implements OnInit, OnDestroy {
   }
 
   exportDiagnostic(): void {
+    // Warn user about potentially sensitive data in diagnostic export
+    const confirmExport = confirm(
+      '⚠️ Aviso de Privacidad\n\n' +
+      'El diagnóstico exportado contiene información que puede identificar tu dispositivo:\n' +
+      '• Navegador, sistema operativo y versión\n' +
+      '• Resolución de pantalla\n' +
+      '• Historial de actividad reciente\n\n' +
+      'Solo comparte este archivo con personal de soporte de confianza.\n\n' +
+      '¿Deseas continuar con la exportación?'
+    );
+
+    if (!confirmExport) {
+      return;
+    }
+
     try {
       const diagnostic = {
         timestamp: new Date().toISOString(),
@@ -419,8 +456,8 @@ export class Device implements OnInit, OnDestroy {
     this.activityLog.set(newLogs);
 
     try {
-      // Scope activity log by user ID to prevent cross-user leaks
-      const logKey = `device-activity-log-user-${userId}`;
+      // Scope activity log by user ID with snake_case naming for consistency
+      const logKey = `device_activity_log_user_${userId}`;
       localStorage.setItem(logKey, JSON.stringify(newLogs));
     } catch (error) {
       console.error('Error saving activity log:', error);

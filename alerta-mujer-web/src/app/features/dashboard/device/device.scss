@@ -1,24 +1,34 @@
-// ── PALETA DEL MÓDULO DEVICE ────────────────────────
-// Reutilizamos la misma paleta de home para consistencia visual
-:host {
-  --color-principal: #6d28d9;
-  --color-principal-claro: #7c3aed;
-  --color-acento: #0891b2;
-  --color-exito: #10b981;
-  --color-advertencia: #d97706;
-  --color-peligro: #ef4444;
-  --color-neutral: #6b7280;
-  --color-fondo: #f5f3ff;
-  --color-superficie: #ffffff;
-  --color-borde: #c4b5fd;
-  --color-texto-principal: #2d1457;
-  --color-texto-secundario: #8b7bac;
+// ── IMPORT PROJECT TOKENS ───────────────────────────
+// Use shared design tokens instead of duplicating them
+@use '../../../shared/styles/tokens.scss' as *;
 
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
+:host {
+  // Use project tokens instead of local redefinitions
+  // Dashboard-specific tokens from tokens.scss:
+  // --bg-base, --bg-card, --border, --text-primary, --text-muted
+  // --purple-mid, --purple-light, --purple-pale
+  // --green, --red, --amber, etc.
+  
+  // Map dashboard tokens to local semantic names for consistency
+  --color-principal: var(--purple-mid);
+  --color-principal-claro: var(--purple-light);
+  --color-acento: #0891b2;
+  --color-exito: var(--green);
+  --color-advertencia: var(--amber);
+  --color-peligro: var(--red);
+  --color-neutral: #6b7280;
+  --color-fondo: var(--purple-pale);
+  --color-superficie: var(--bg-card);
+  --color-borde: var(--border);
+  --color-texto-principal: var(--text-primary);
+  --color-texto-secundario: var(--text-muted);
+
+  // Typography tokens from tokens.scss
+  --font-size-xs: var(--font-size-xs);
+  --font-size-sm: var(--font-size-sm);
+  --font-size-base: var(--font-size-base);
+  --font-size-lg: var(--font-size-lg);
+  --font-size-xl: var(--font-size-xl);
 
   display: block;
 }

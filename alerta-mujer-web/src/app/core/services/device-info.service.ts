@@ -43,7 +43,8 @@ export class DeviceInfoService {
         return types[conn.effectiveType] || 'Desconocida';
       }
     }
-    return 'No disponible';
+    // Clarify this is not an error, just an unsupported API (Chromium-only)
+    return 'No soportado por navegador';
   }
 
   getScreenInfo(): { width: number; height: number; dpr: number } {

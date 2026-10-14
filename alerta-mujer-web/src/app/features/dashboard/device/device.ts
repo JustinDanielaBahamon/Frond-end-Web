@@ -48,13 +48,17 @@ export class Device implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUserId = user?.id || null;
+        
+        // Load user-scoped data only after user ID is available
+        if (this.currentUserId) {
+          this.loadCriticalFeatures();
+          this.loadActivityLog();
+        }
       });
 
     this.loadDeviceInfo();
     this.loadPermissions();
     this.loadServices();
-    this.loadCriticalFeatures();
-    this.loadActivityLog();
     this.subscribeToOnlineStatus();
     this.updateLastRefresh();
   }
@@ -220,27 +224,26 @@ export class Device implements OnInit, OnDestroy {
       return;
     }
 
-    if (Notification.permission === 'granted') {
-      alert('✅ Los permisos de notificación ya están concedidos.');
-      return;
-    }
-
-    if (Notification.permission === 'denied') {
-      alert('❌ Permisos de notificación denegados. Ve a configuración del navegador para habilitarlos.');
-      this.addActivityLog('warning', 'Intento de solicitar permiso denegado previamente');
-      return;
-    }
-
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        alert('✅ Permiso de notificación concedido correctamente.');
-        this.addActivityLog('success', 'Permiso de notificación concedido');
-        this.refreshPermissions();
-      } else {
-        alert('❌ Permiso de notificación denegado.');
-        this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
-      }
-    });
+    this.permissionsService.requestNotifications()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (permission) => {
+          if (permission === 'granted') {
+            alert('✅ Permiso de notificación concedido correctamente.');
+            this.addActivityLog('success', 'Permiso de notificación concedido');
+            this.refreshPermissions();
+          } else if (permission === 'denied') {
+            alert('❌ Permiso de notificación denegado.');
+            this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
+          } else {
+            alert('⚠️ Solicitud de permiso cancelada.');
+          }
+        },
+        error: (err) => {
+          alert('❌ Error al solicitar permiso de notificación.');
+          console.error('Error requesting notification permission:', err);
+        }
+      });
   }
 
   testNotificationDisplay(): void {

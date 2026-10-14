@@ -20,13 +20,13 @@
       <i class="ti ti-info-circle"></i>
       <span>Nota: Si un permiso muestra "No disponible", puede significar que tu navegador no soporta la API de consulta de permisos, pero la funcionalidad puede seguir funcionando mediante solicitudes directas.</span>
     </p>
-    <div class="device-grid device-grid--5col">
+    <div class="device-grid device-grid--3col">
       @for (perm of permissions(); track perm.name) {
-        <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : perm.name === 'camera' ? 'Cámara' : perm.name === 'microphone' ? 'Micrófono' : 'Portapapeles')" aria-live="polite">
+        <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles')" aria-live="polite">
           <div class="device-item__icon" [ngClass]="'device-item__icon--' + getStatusColor(perm.state)">
             <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
           </div>
-          <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : perm.name === 'camera' ? 'Cámara' : perm.name === 'microphone' ? 'Micrófono' : 'Portapapeles' }}</p>
+          <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles' }}</p>
           <span class="device-badge" [ngClass]="'device-badge--' + getStatusColor(perm.state)">
             {{ getStatusLabel(perm.state) }}
           </span>

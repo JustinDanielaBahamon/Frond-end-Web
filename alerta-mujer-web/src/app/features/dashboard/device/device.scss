@@ -3,20 +3,15 @@
 @use '../../../shared/styles/tokens.scss' as *;
 
 :host {
-  // Use project tokens instead of local redefinitions
-  // Dashboard-specific tokens from tokens.scss:
-  // --bg-base, --bg-card, --border, --text-primary, --text-muted
-  // --purple-mid, --purple-light, --purple-pale
-  // --green, --red, --amber, etc.
-  
+  // Use project tokens for all colors
   // Map dashboard tokens to local semantic names for consistency
   --color-principal: var(--purple-mid);
   --color-principal-claro: var(--purple-light);
-  --color-acento: #0891b2;
+  --color-acento: var(--purple-deep);
   --color-exito: var(--green);
   --color-advertencia: var(--amber);
   --color-peligro: var(--red);
-  --color-neutral: #6b7280;
+  --color-neutral: var(--text-muted);
   --color-fondo: var(--purple-pale);
   --color-superficie: var(--bg-card);
   --color-borde: var(--border);

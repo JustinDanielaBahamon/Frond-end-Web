@@ -110,9 +110,7 @@ export class PermissionsService {
   checkAllPermissions(): Observable<PermissionStatus[]> {
     const permissions: PermissionName[] = [
       'geolocation', 
-      'notifications', 
-      'camera', 
-      'microphone', 
+      'notifications',
       'clipboard-read'
     ];
 

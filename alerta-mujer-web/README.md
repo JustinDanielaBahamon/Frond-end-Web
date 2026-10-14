@@ -14,7 +14,7 @@ La app móvil (Expo) y esta web comparten el mismo backend (Spring Boot + Postgr
 | Angular (componentes standalone, signals) | 21.2 |
 | TypeScript | 5.9 |
 | RxJS | 7.8 |
-| Bootstrap / ngx-bootstrap | 5.3 / 21.2 |
+| Bootstrap | 5.3 |
 | Leaflet (mapas, teselas de OpenStreetMap) | 1.9 |
 | Vitest + jsdom (pruebas unitarias) | 4.1 |
 

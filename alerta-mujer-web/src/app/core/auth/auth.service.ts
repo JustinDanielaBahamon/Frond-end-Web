@@ -51,27 +51,7 @@ export class AuthService {
       email: credentials.email,
       password: credentials.password
     }).pipe(
-      map((response) => {
-        const backendUser = response.user;
-        
-        // Adaptar el formato del backend al modelo User de Angular
-        const user: User = {
-          id: backendUser.id,
-          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
-          email: backendUser.email,
-          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
-          firstName: backendUser.firstName,
-          lastName: backendUser.lastName,
-          telephone: backendUser.telephone,
-          roleId: backendUser.roleId
-        };
-        
-        this.saveSession(user, response.token);
-        this._currentUser$.next(user);
-        this._token$.next(response.token);
-        
-        return user;
-      }),
+      map((response) => this.iniciarSesion(response)),
       catchError((error) => {
         console.error('Error en login:', error);
         return throwError(() => new Error('Credenciales incorrectas'));
@@ -163,6 +143,40 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  /** Inicio de sesión con Google: el backend valida el token de Firebase y entrega el JWT. */
+  loginWithGoogle(idToken: string): Observable<User> {
+    return this.http
+      .post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, { idToken })
+      .pipe(
+        map((response) => this.iniciarSesion(response)),
+        catchError((error) => {
+          const mensaje = error?.error?.message === 'Account blocked'
+            ? 'Tu cuenta está bloqueada. Contacta al administrador.'
+            : 'No se pudo iniciar sesión con Google. Intenta de nuevo.';
+          return throwError(() => new Error(mensaje));
+        })
+      );
+  }
+
+  /** Adapta la respuesta del backend al modelo User de Angular y guarda la sesión. */
+  private iniciarSesion(response: { token: string; user: any }): User {
+    const backendUser = response.user;
+    const user: User = {
+      id: backendUser.id,
+      nombre: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+      email: backendUser.email,
+      rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+      firstName: backendUser.firstName,
+      lastName: backendUser.lastName,
+      telephone: backendUser.telephone,
+      roleId: backendUser.roleId,
+    };
+    this.saveSession(user, response.token);
+    this._currentUser$.next(user);
+    this._token$.next(response.token);
+    return user;
   }
 
   private saveSession(user: User, token: string): void {

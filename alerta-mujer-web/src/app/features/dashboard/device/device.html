@@ -6,7 +6,7 @@
       <h1 class="device-title">Estado del Dispositivo</h1>
       <p class="device-subtitle">Diagnóstico completo del sistema • Última actualización: {{ lastRefresh() }}</p>
     </div>
-    <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()">
+    <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()" aria-label="Refrescar información del dispositivo">
       <i class="ti ti-refresh"></i>
     </button>
   </div>
@@ -16,6 +16,10 @@
     <h2 class="device-panel__title">
       <i class="ti ti-shield-check"></i> Permisos del Navegador
     </h2>
+    <p class="device-permissions-note">
+      <i class="ti ti-info-circle"></i>
+      <span>Nota: Si un permiso muestra "No disponible", puede significar que tu navegador no soporta la API de consulta de permisos, pero la funcionalidad puede seguir funcionando mediante solicitudes directas.</span>
+    </p>
     <div class="device-grid device-grid--5col">
       @for (perm of permissions(); track perm.name) {
         <div class="device-item">
@@ -185,15 +189,19 @@
         <i class="ti ti-test-pipe"></i> Pruebas de Funcionalidad
       </h2>
       <div class="device-test-grid">
-        <button class="device-test-btn" (click)="testGeolocation()" [disabled]="loading()">
+        <button class="device-test-btn" (click)="testGeolocation()" [disabled]="loading()" aria-label="Probar geolocalización del dispositivo">
           <i class="ti ti-map-pin"></i>
           <span>Probar Geolocalización</span>
         </button>
-        <button class="device-test-btn" (click)="testNotifications()" [disabled]="loading()">
-          <i class="ti ti-bell"></i>
-          <span>Probar Notificaciones</span>
+        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Solicitar permiso de notificaciones">
+          <i class="ti ti-shield-check"></i>
+          <span>Solicitar Permiso</span>
         </button>
-        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()">
+        <button class="device-test-btn" (click)="testNotificationDisplay()" [disabled]="loading()" aria-label="Probar visualización de notificación">
+          <i class="ti ti-bell"></i>
+          <span>Mostrar Notificación</span>
+        </button>
+        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" aria-label="Probar conectividad de red">
           <i class="ti ti-wifi"></i>
           <span>Probar Conectividad</span>
         </button>
@@ -208,19 +216,19 @@
       <i class="ti ti-bolt"></i> Acciones Rápidas
     </h2>
     <div class="device-actions-grid">
-      <button class="device-action-btn" (click)="syncData()" [disabled]="loading()">
+      <button class="device-action-btn" (click)="syncData()" [disabled]="loading()" aria-label="Sincronizar datos con el servidor">
         <i class="ti ti-refresh"></i>
         <span>Sincronizar datos</span>
       </button>
-      <button class="device-action-btn" (click)="clearCache()" [disabled]="loading()">
+      <button class="device-action-btn" (click)="clearCache()" [disabled]="loading()" aria-label="Limpiar caché local del dispositivo">
         <i class="ti ti-trash"></i>
         <span>Limpiar caché</span>
       </button>
-      <button class="device-action-btn" (click)="exportDiagnostic()" [disabled]="loading()">
+      <button class="device-action-btn" (click)="exportDiagnostic()" [disabled]="loading()" aria-label="Exportar diagnóstico completo en formato JSON">
         <i class="ti ti-download"></i>
         <span>Exportar diagnóstico</span>
       </button>
-      <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()">
+      <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()" aria-label="Refrescar estado de permisos y servicios">
         <i class="ti ti-shield-check"></i>
         <span>Refrescar permisos</span>
       </button>

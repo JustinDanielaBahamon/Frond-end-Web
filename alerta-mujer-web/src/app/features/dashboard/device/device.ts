@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { DeviceInfoService } from '../../../core/services/device-info.service';
 import { PermissionsService } from '../../../core/services/permissions.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { 
   DeviceInfo, 
   PermissionStatus, 
@@ -23,6 +24,7 @@ import {
 export class Device implements OnInit, OnDestroy {
   private deviceInfoService = inject(DeviceInfoService);
   private permissionsService = inject(PermissionsService);
+  private authService = inject(AuthService);
 
   // Estado reactivo con signals
   deviceInfo = signal<DeviceInfo | null>(null);
@@ -35,10 +37,19 @@ export class Device implements OnInit, OnDestroy {
 
   lastRefresh = signal<string>('');
   loading = signal<boolean>(false);
+  
+  private currentUserId: number | null = null;
 
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
+    // Subscribe to current user to get user ID for scoped logging
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUserId = user?.id || null;
+      });
+
     this.loadDeviceInfo();
     this.loadPermissions();
     this.loadServices();
@@ -96,7 +107,8 @@ export class Device implements OnInit, OnDestroy {
 
   private loadCriticalFeatures(): void {
     try {
-      const sessionActive = !!localStorage.getItem('auth_token');
+      // Use AuthService to properly validate active session (not just token existence)
+      const sessionActive = this.authService.isLoggedIn();
       const lastLocation = localStorage.getItem('last_location');
       const notificationToken = localStorage.getItem('notification_token');
       const emergencyContacts = localStorage.getItem('emergency_contacts');
@@ -124,7 +136,15 @@ export class Device implements OnInit, OnDestroy {
 
   private loadActivityLog(): void {
     try {
-      const stored = localStorage.getItem('device-activity-log');
+      const userId = this.currentUserId;
+      if (!userId) {
+        this.activityLog.set([]);
+        return;
+      }
+      
+      // Scope activity logs by user ID to prevent cross-user leaks
+      const logKey = `device-activity-log-user-${userId}`;
+      const stored = localStorage.getItem(logKey);
       if (stored) {
         const logs = JSON.parse(stored);
         this.activityLog.set(Array.isArray(logs) ? logs.slice(0, 5) : []);
@@ -191,58 +211,104 @@ export class Device implements OnInit, OnDestroy {
     );
   }
 
-  testNotifications(): void {
+  requestNotificationPermission(): void {
     if (!('Notification' in window)) {
       alert('⚠️ Las notificaciones no están disponibles en este navegador.');
       return;
     }
 
     if (Notification.permission === 'granted') {
+      alert('✅ Los permisos de notificación ya están concedidos.');
+      return;
+    }
+
+    if (Notification.permission === 'denied') {
+      alert('❌ Permisos de notificación denegados. Ve a configuración del navegador para habilitarlos.');
+      this.addActivityLog('warning', 'Intento de solicitar permiso denegado previamente');
+      return;
+    }
+
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        alert('✅ Permiso de notificación concedido correctamente.');
+        this.addActivityLog('success', 'Permiso de notificación concedido');
+        this.refreshPermissions();
+      } else {
+        alert('❌ Permiso de notificación denegado.');
+        this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
+      }
+    });
+  }
+
+  testNotificationDisplay(): void {
+    if (!('Notification' in window)) {
+      alert('⚠️ Las notificaciones no están disponibles en este navegador.');
+      return;
+    }
+
+    if (Notification.permission !== 'granted') {
+      alert('⚠️ Primero debes conceder permisos de notificación. Usa el botón "Solicitar Permiso".');
+      return;
+    }
+
+    try {
+      // Wrap in try-catch to handle environments where Notification constructor is unavailable
       new Notification('🔔 Alerta Mujer', {
         body: 'Prueba de notificación exitosa',
         icon: '/logo.png',
         tag: 'test-notification'
       });
       alert('✅ Notificación enviada. Revisa tu bandeja de notificaciones.');
-      this.addActivityLog('success', 'Prueba de notificación exitosa');
-    } else if (Notification.permission === 'denied') {
-      alert('❌ Permisos de notificación denegados. Ve a configuración del navegador para habilitarlos.');
-      this.addActivityLog('warning', 'Permisos de notificación denegados');
-    } else {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          new Notification('🔔 Alerta Mujer', {
-            body: 'Permiso concedido. Prueba exitosa.',
-            icon: '/logo.png'
-          });
-          this.addActivityLog('success', 'Permiso de notificación concedido y prueba exitosa');
-          this.refreshPermissions();
-        } else {
-          alert('❌ Permiso de notificación denegado.');
-          this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
-        }
-      });
+      this.addActivityLog('success', 'Prueba de visualización de notificación exitosa');
+    } catch (error) {
+      alert('❌ Error al mostrar notificación. Tu navegador puede no soportar esta funcionalidad.');
+      this.addActivityLog('error', 'Error al crear notificación: Constructor no disponible');
     }
   }
 
   testConnectivity(): void {
     const startTime = Date.now();
-    const testUrl = 'https://www.google.com/favicon.ico'; // URL externa ligera para probar conectividad
-
+    
     this.loading.set(true);
-    fetch(testUrl, { method: 'HEAD', mode: 'no-cors' })
-      .then(() => {
+    
+    // Try backend health endpoint first, fallback to external canary if backend fails
+    const backendUrl = `${this.getApiUrl()}/api/health`;
+    const fallbackUrl = 'https://www.google.com/favicon.ico';
+    
+    fetch(backendUrl, { method: 'GET' })
+      .then(response => {
         const duration = Date.now() - startTime;
-        alert(`✅ Conectividad OK\n\nTiempo de respuesta: ${duration}ms\nConexión activa`);
-        this.addActivityLog('success', `Prueba de conectividad exitosa (${duration}ms)`);
+        if (response.ok) {
+          alert(`✅ Conectividad OK\n\nServidor: Backend\nTiempo de respuesta: ${duration}ms\nEstado: ${response.status}`);
+          this.addActivityLog('success', `Prueba de conectividad exitosa con backend (${duration}ms)`);
+        } else {
+          alert(`⚠️ Backend responde con error\n\nEstado: ${response.status}\nTiempo: ${duration}ms`);
+          this.addActivityLog('warning', `Backend respondió con error ${response.status} (${duration}ms)`);
+        }
         this.loading.set(false);
       })
-      .catch(error => {
-        const duration = Date.now() - startTime;
-        alert(`❌ Error de conectividad\n\n${error.message}\nTiempo: ${duration}ms`);
-        this.addActivityLog('error', `Error de conectividad: ${error.message}`);
-        this.loading.set(false);
+      .catch(() => {
+        // Fallback to external endpoint if backend is unreachable
+        const fallbackStartTime = Date.now();
+        fetch(fallbackUrl, { method: 'HEAD', mode: 'no-cors' })
+          .then(() => {
+            const duration = Date.now() - fallbackStartTime;
+            alert(`⚠️ Conectividad limitada\n\nBackend no accesible, pero conexión a internet activa.\nTiempo: ${duration}ms`);
+            this.addActivityLog('warning', `Backend no accesible, conexión externa OK (${duration}ms)`);
+            this.loading.set(false);
+          })
+          .catch(error => {
+            const duration = Date.now() - startTime;
+            alert(`❌ Error de conectividad total\n\n${error.message}\nTiempo: ${duration}ms`);
+            this.addActivityLog('error', `Error de conectividad total: ${error.message}`);
+            this.loading.set(false);
+          });
       });
+  }
+
+  private getApiUrl(): string {
+    // Try to get API URL from environment or use sensible default
+    return (window as any).__env?.apiUrl || 'http://localhost:8080';
   }
 
   // ─── MÉTODOS DE ACCIONES RÁPIDAS ─────────────────
@@ -336,6 +402,12 @@ export class Device implements OnInit, OnDestroy {
   // ─── MÉTODOS AUXILIARES ─────────────────
 
   private addActivityLog(type: ActivityLog['type'], message: string): void {
+    const userId = this.currentUserId;
+    if (!userId) {
+      console.warn('Cannot log activity: no user session');
+      return;
+    }
+
     const log: ActivityLog = {
       timestamp: new Date().toLocaleString('es-ES'),
       type,
@@ -347,7 +419,9 @@ export class Device implements OnInit, OnDestroy {
     this.activityLog.set(newLogs);
 
     try {
-      localStorage.setItem('device-activity-log', JSON.stringify(newLogs));
+      // Scope activity log by user ID to prevent cross-user leaks
+      const logKey = `device-activity-log-user-${userId}`;
+      localStorage.setItem(logKey, JSON.stringify(newLogs));
     } catch (error) {
       console.error('Error saving activity log:', error);
     }

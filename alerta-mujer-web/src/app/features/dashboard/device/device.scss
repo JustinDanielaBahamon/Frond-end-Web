@@ -124,6 +124,32 @@
   &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
 }
 
+// ── NOTA INFORMATIVA DE PERMISOS ────────────────────
+.device-permissions-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: rgba(8, 145, 178, 0.08);
+  border: 1px solid rgba(8, 145, 178, 0.2);
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  line-height: 1.4;
+
+  i {
+    color: var(--color-acento);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
 // ── FILAS RESPONSIVE ────────────────────────────────
 .device-row {
   display: grid;
@@ -378,10 +404,14 @@
 // ── PRUEBAS DE FUNCIONALIDAD ───────────────────────
 .device-test-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 500px) {
     grid-template-columns: 1fr;
   }
 }

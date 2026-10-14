@@ -1,29 +1,36 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, catchError, finalize, forkJoin, map, of, takeUntil } from 'rxjs';
 
+import { environment } from '../../../../environments/environment';
 import { DeviceInfoService } from '../../../core/services/device-info.service';
 import { PermissionsService } from '../../../core/services/permissions.service';
+import { DeviceService } from '../../../core/services/device.service';
+import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { AuthService } from '../../../core/auth/auth.service';
-import { 
-  DeviceInfo, 
-  PermissionStatus, 
-  ServiceStatus, 
-  ActivityLog, 
-  CriticalFeatureStatus 
+import { UbicacionEntry } from '../../../core/models/location.model';
+import {
+  DeviceInfo,
+  PermissionStatus,
+  ServiceStatus,
+  ActivityLog,
+  CriticalFeatureStatus
 } from '../../../core/models/device-info.model';
 
 @Component({
   selector: 'app-device',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './device.html',
   styleUrl: './device.scss',
 })
 export class Device implements OnInit, OnDestroy {
   private deviceInfoService = inject(DeviceInfoService);
   private permissionsService = inject(PermissionsService);
+  private deviceService = inject(DeviceService);
+  private contactService = inject(EmergencyContactService);
+  private locationService = inject(PhoneLocationService);
   private authService = inject(AuthService);
 
   // Estado reactivo con signals
@@ -37,8 +44,10 @@ export class Device implements OnInit, OnDestroy {
 
   lastRefresh = signal<string>('');
   loading = signal<boolean>(false);
-  
+  featuresLoading = signal<boolean>(false);
+
   private currentUserId: number | null = null;
+  private featuresSub?: Subscription;
 
   private destroy$ = new Subject<void>();
 
@@ -110,35 +119,65 @@ export class Device implements OnInit, OnDestroy {
   }
 
   private loadCriticalFeatures(): void {
-    try {
-      // Use AuthService to properly validate active session (not just token existence)
-      const sessionActive = this.authService.isLoggedIn();
-      const userId = this.currentUserId;
-      
-      // Scope critical feature keys by user ID to prevent cross-user leaks
-      const lastLocation = userId ? localStorage.getItem(`last_location_user_${userId}`) : null;
-      const notificationToken = userId ? localStorage.getItem(`notification_token_user_${userId}`) : null;
-      const emergencyContacts = userId ? localStorage.getItem(`emergency_contacts_user_${userId}`) : null;
-      
-      let contactsCount = 0;
-      if (emergencyContacts) {
-        try {
-          const contacts = JSON.parse(emergencyContacts);
-          contactsCount = Array.isArray(contacts) ? contacts.length : 0;
-        } catch {
-          contactsCount = 0;
-        }
-      }
+    this.featuresSub?.unsubscribe();
+    this.featuresSub = this.fetchCriticalFeatures().subscribe();
+  }
 
-      this.criticalFeatures.set({
-        sessionActive,
-        lastLocationCaptured: lastLocation || null,
-        notificationToken: notificationToken || null,
-        emergencyContactsCount: contactsCount
-      });
-    } catch (error) {
-      console.error('Error loading critical features:', error);
+  /**
+   * Consulta en el backend los contactos, los celulares vinculados y la última
+   * ubicación enviada por la app móvil. Emite false si alguna consulta falló.
+   */
+  private fetchCriticalFeatures(): Observable<boolean> {
+    const userId = this.currentUserId;
+    if (!userId) {
+      return of(false);
     }
+
+    if (!this.criticalFeatures()) {
+      this.criticalFeatures.set({
+        sessionActive: this.authService.isLoggedIn(),
+        lastLocationCaptured: null,
+        registeredDevices: null,
+        pushTokenRegistered: false,
+        emergencyContactsCount: null
+      });
+    }
+    this.featuresLoading.set(true);
+
+    // Cada consulta falla por separado: null = error (204 de "sin ubicación" llega como null válido)
+    const FAILED = 'failed' as const;
+    return forkJoin({
+      contacts: this.contactService.getByUsuario(userId).pipe(catchError(() => of(null))),
+      devices: this.deviceService.getMyDevices().pipe(catchError(() => of(null))),
+      latest: this.locationService.getLatest().pipe(catchError(() => of(FAILED)))
+    }).pipe(
+      map(({ contacts, devices, latest }) => {
+        this.criticalFeatures.set({
+          sessionActive: this.authService.isLoggedIn(),
+          lastLocationCaptured: latest === FAILED ? 'No disponible' : latest ? this.formatLocation(latest) : null,
+          registeredDevices: devices ? devices.length : null,
+          pushTokenRegistered: !!devices?.some(d => !!d.fcmToken),
+          emergencyContactsCount: contacts ? contacts.length : null
+        });
+        return contacts !== null && devices !== null && latest !== FAILED;
+      }),
+      finalize(() => this.featuresLoading.set(false)),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  private formatLocation(entry: UbicacionEntry): string {
+    const when = entry.recordedAt
+      ? new Date(entry.recordedAt).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : entry.time;
+    return `${when} · ${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
+  }
+
+  pushStatusLabel(features: CriticalFeatureStatus): string {
+    if (features.pushTokenRegistered) return 'Configurado';
+    if (features.registeredDevices === null) return 'No disponible';
+    if (features.registeredDevices === 0) return 'Sin celular vinculado';
+    return 'No configurado';
   }
 
   private loadActivityLog(): void {
@@ -277,15 +316,18 @@ export class Device implements OnInit, OnDestroy {
     
     this.loading.set(true);
     
-    // Try backend health endpoint first, fallback to external canary if backend fails
-    const backendUrl = `${this.getApiUrl()}/api/health`;
+    // Try backend health endpoint first, fallback to external canary if backend fails.
+    // /health es público. En el plan gratis de Render la primera petición despierta
+    // el servidor y puede tardar varios minutos; se espera hasta 90 s y luego se avisa.
+    const backendUrl = `${environment.apiUrl}/health`;
     const fallbackUrl = 'https://www.google.com/favicon.ico';
-    
-    fetch(backendUrl, { method: 'GET' })
+
+    fetch(backendUrl, { method: 'GET', signal: AbortSignal.timeout(90000) })
       .then(response => {
         const duration = Date.now() - startTime;
         if (response.ok) {
-          alert(`✅ Conectividad OK\n\nServidor: Backend\nTiempo de respuesta: ${duration}ms\nEstado: ${response.status}`);
+          const wokeUp = duration > 10000 ? '\n\nEl servidor estaba en reposo y tardó en despertar.' : '';
+          alert(`✅ Conectividad OK\n\nServidor: Backend\nTiempo de respuesta: ${duration}ms\nEstado: ${response.status}${wokeUp}`);
           this.addActivityLog('success', `Prueba de conectividad exitosa con backend (${duration}ms)`);
         } else {
           alert(`⚠️ Backend responde con error\n\nEstado: ${response.status}\nTiempo: ${duration}ms`);
@@ -299,7 +341,7 @@ export class Device implements OnInit, OnDestroy {
         fetch(fallbackUrl, { method: 'HEAD', mode: 'no-cors' })
           .then(() => {
             const duration = Date.now() - fallbackStartTime;
-            alert(`⚠️ Conectividad limitada\n\nBackend no accesible, pero conexión a internet activa.\nTiempo: ${duration}ms`);
+            alert(`⚠️ Conectividad limitada\n\nBackend no accesible, pero conexión a internet activa.\nSi el servidor estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.\nTiempo: ${duration}ms`);
             this.addActivityLog('warning', `Backend no accesible, conexión externa OK (${duration}ms)`);
             this.loading.set(false);
           })
@@ -312,29 +354,22 @@ export class Device implements OnInit, OnDestroy {
       });
   }
 
-  private getApiUrl(): string {
-    // Import environment to get the configured API URL (not hardcoded localhost)
-    // This will be replaced at build time by Angular's environment system
-    const env = (window as any).__env;
-    if (env && env.apiUrl) {
-      return env.apiUrl;
-    }
-    // Fallback to environment.ts value
-    // Note: This is a static import at build time, not runtime
-    console.warn('Using default environment.apiUrl - __env not available');
-    return 'http://localhost:8080'; // This matches environment.ts default
-  }
-
   // ─── MÉTODOS DE ACCIONES RÁPIDAS ─────────────────
 
   syncData(): void {
     this.loading.set(true);
-    setTimeout(() => {
-      alert('✅ Datos sincronizados correctamente');
-      this.addActivityLog('success', 'Sincronización de datos completada');
-      this.loading.set(false);
-      this.loadCriticalFeatures();
-    }, 1000);
+    this.featuresSub?.unsubscribe();
+    this.featuresSub = this.fetchCriticalFeatures()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe(ok => {
+        if (ok) {
+          alert('✅ Datos sincronizados con el servidor');
+          this.addActivityLog('success', 'Sincronización de datos completada');
+        } else {
+          alert('⚠️ No se pudieron traer todos los datos del servidor. Intenta de nuevo en un momento.');
+          this.addActivityLog('warning', 'Sincronización incompleta: el servidor no respondió');
+        }
+      });
   }
 
   clearCache(): void {

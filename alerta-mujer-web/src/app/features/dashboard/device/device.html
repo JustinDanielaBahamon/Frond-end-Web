@@ -129,27 +129,27 @@
           </div>
           <div class="device-feature-item__body">
             <span class="device-feature-item__label">Última ubicación</span>
-            <span class="device-feature-item__value">{{ features.lastLocationCaptured || 'No registrada' }}</span>
+            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : (features.lastLocationCaptured || 'No registrada') }}</span>
           </div>
         </div>
 
         <div class="device-feature-item" role="status" aria-label="Estado de notificaciones" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.notificationToken ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+          <div class="device-feature-item__icon" [ngClass]="features.pushTokenRegistered ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
             <i class="ti ti-bell"></i>
           </div>
           <div class="device-feature-item__body">
-            <span class="device-feature-item__label">Token de notificaciones</span>
-            <span class="device-feature-item__value">{{ features.notificationToken ? 'Configurado' : 'No configurado' }}</span>
+            <span class="device-feature-item__label">Notificaciones push en el celular</span>
+            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : pushStatusLabel(features) }}</span>
           </div>
         </div>
 
         <div class="device-feature-item" role="status" aria-label="Estado de contactos de emergencia" aria-live="polite">
-          <div class="device-feature-item__icon device-feature-item__icon--exito">
+          <div class="device-feature-item__icon" [ngClass]="features.emergencyContactsCount ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
             <i class="ti ti-users"></i>
           </div>
           <div class="device-feature-item__body">
             <span class="device-feature-item__label">Contactos de emergencia</span>
-            <span class="device-feature-item__value">{{ features.emergencyContactsCount }} configurados</span>
+            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : features.emergencyContactsCount === null ? 'No disponible' : features.emergencyContactsCount + ' configurados' }}</span>
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@
       </h2>
       @if (activityLog().length > 0) {
         <div class="device-activity-list">
-          @for (log of activityLog(); track log.timestamp) {
+          @for (log of activityLog(); track $index) {
             <div class="device-activity-item">
               <div class="device-activity-item__icon" [ngClass]="'device-activity-item__icon--' + log.type">
                 <i class="ti" [ngClass]="getIconForActivityType(log.type)"></i>

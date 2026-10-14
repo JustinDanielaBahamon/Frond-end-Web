@@ -35,6 +35,22 @@ export interface DeviceStats {
 }
 
 /**
+ * Celular que la app móvil registró para la usuaria (GET /api/devices/user)
+ */
+export interface UserDevice {
+  id: number;
+  brand: string | null;
+  model: string | null;
+  osName: string;
+  osVersion: string | null;
+  appVersion: string | null;
+  gpsStatus: string;
+  status: string;
+  lastAccess: string | null;
+  fcmToken: string | null;
+}
+
+/**
  * Interfaz para filtros de dispositivos
  */
 export interface DeviceFilters {
@@ -73,6 +89,13 @@ export class DeviceService {
    */
   getAll(): Observable<Device[]> {
     return this.http.get<Device[]>(this.url);
+  }
+
+  /**
+   * Celulares de la usuaria autenticada
+   */
+  getMyDevices(): Observable<UserDevice[]> {
+    return this.http.get<UserDevice[]>(`${this.url}/user`);
   }
 
   /**

@@ -18,6 +18,21 @@ export interface Evidencia {
   metodoActivacion?: string; // ej. 'Movimiento brusco'
   archivoUrl?: string;       // imagen/miniatura real. Sin esto, se usa el ícono por tipo.
   duracion?: string;         // solo video/audio, ej. '01:23'
+
+  // Información completa de alerta asociada
+  alertaAsociada?: AlertaAsociada;
+}
+
+export interface AlertaAsociada {
+  id: string;
+  tipo: string;
+  fecha: string;
+  hora: string;
+  ciudad: string;
+  ubicacion: string;
+  estado: string;
+  descripcion?: string;
+  metodoActivacion?: string;
 }
 
 export interface EvidenciaFilters {

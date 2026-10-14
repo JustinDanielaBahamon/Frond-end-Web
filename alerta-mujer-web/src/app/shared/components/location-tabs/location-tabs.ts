@@ -1,6 +1,23 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+export type LocationTabIcon =
+  | 'location'
+  | 'clock'
+  | 'star'
+  | 'shield'
+  | 'map-pin'
+  | 'bookmark'
+  | 'alert-triangle'
+  | 'route'
+  | 'history';
+
+export interface LocationTab {
+  label: string;
+  path: string;
+  icon: LocationTabIcon;
+}
+
 @Component({
   selector: 'app-location-tabs',
   standalone: true,
@@ -10,17 +27,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class LocationTabsComponent {
   @Input() title = 'Ubicación';
-  @Input() subtitle = 'Consulta tu ubicación, historial y lugares importantes.';
+  @Input() subtitle = 'Consulta tu ubicación, lugares guardados y zonas de auxilio.';
 
-  tabs = [
-    { label: 'Mi ubicación', path: '/dashboard/ubicacion/my-location', icon: 'location' as const },
-    { label: 'Historial', path: '/dashboard/ubicacion/history', icon: 'clock' as const },
-    { label: 'Lugares frecuentes', path: '/dashboard/ubicacion/frequent-places', icon: 'star' as const },
-    { label: 'Zonas cercanas', path: '/dashboard/ubicacion/nearby-zones', icon: 'shield' as const },
-    { label: 'Guardar ubicación', path: '/dashboard/ubicacion/guardar-ubicacion', icon: 'map-pin' as const },
-    { label: 'Ubicaciones guardadas', path: '/dashboard/ubicacion/ubicaciones-guardadas', icon: 'bookmark' as const },
-    { label: 'Zonas auxiliares', path: '/dashboard/ubicacion/zonas-auxiliares', icon: 'alert-triangle' as const },
-    { label: 'Guardar recorrido', path: '/dashboard/ubicacion/guardar-recorrido', icon: 'route' as const },
-    { label: 'Historial recorridos', path: '/dashboard/ubicacion/historial-recorridos', icon: 'history' as const },
+  tabs: LocationTab[] = [
+    { label: 'Mi ubicación',          path: '/dashboard/ubicacion/my-location',            icon: 'location' },
+    { label: 'Ubicaciones guardadas', path: '/dashboard/ubicacion/ubicaciones-guardadas', icon: 'bookmark' },
+    { label: 'Zonas auxiliares',      path: '/dashboard/ubicacion/zonas-auxiliares',      icon: 'alert-triangle' },
+    { label: 'Guardar recorrido',     path: '/dashboard/ubicacion/guardar-recorrido',     icon: 'route' },
   ];
 }

@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { EmergencyResource, ResourceCall } from '../models/resource.model';
+import { EmergencyResource, EmergencyResourceApi, ResourceCall } from '../models/resource.model';
 
 @Injectable({ providedIn: 'root' })
 export class ResourcesService {
@@ -14,6 +14,13 @@ export class ResourcesService {
    */
   getAllResources(): Observable<EmergencyResource[]> {
     return this.http.get<EmergencyResource[]>(this.apiUrl);
+  }
+
+  /** Recursos activos con los campos reales del backend (teléfonos y coordenadas). */
+  getActiveResources(): Observable<EmergencyResourceApi[]> {
+    return this.http
+      .get<EmergencyResourceApi[]>(this.apiUrl)
+      .pipe(map((lista) => lista.filter((r) => r.isActive !== false)));
   }
 
   /**

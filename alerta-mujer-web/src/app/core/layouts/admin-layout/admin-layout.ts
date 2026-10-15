@@ -6,6 +6,7 @@ import { catchError, filter, switchMap } from 'rxjs/operators';
 import { SidebarComponent, SidebarLink, SidebarUser } from '../../../shared/layouts/sidebar/sidebar';
 import { TopbarComponent, TopbarNotification } from '../../../shared/layouts/tobber/topbar';
 import { AuthService } from '../../../core/auth/auth.service';
+import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AlertsService } from '../../../core/services/alerts.services';
 
@@ -28,6 +29,7 @@ export class AdminLayoutComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private themeService = inject(ThemeService);
   private alertsService = inject(AlertsService);
+  private inactivity = inject(InactivityService);
 
   // En pantallas angostas el sidebar es un drawer y empieza cerrado
   private isDrawerMode = window.innerWidth <= DRAWER_BREAKPOINT;
@@ -51,6 +53,10 @@ export class AdminLayoutComponent implements OnInit {
   ];
 
   ngOnInit() {
+    // Cierre de sesión por inactividad, solo mientras se está dentro del panel
+    this.inactivity.iniciar();
+    this.destroyRef.onDestroy(() => this.inactivity.detener());
+
     // Perfil que se muestra abajo del sidebar (antes faltaba el [user], por eso no aparecía)
     this.authService.currentUser$.subscribe((usuario) => {
       this.usuarioActual = usuario

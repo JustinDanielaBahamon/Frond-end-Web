@@ -32,7 +32,7 @@
         <path d="m21 21-4.35-4.35" />
       </svg>
       <input class="search-input" type="text" placeholder="Buscar por nombre, email, etc." [(ngModel)]="searchTerm"
-        (input)="applyFilters()" />
+        (input)="paginaActual = 1; applyFilters()" />
       <button *ngIf="searchTerm" class="search-clear" (click)="clearSearch()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M18 6 6 18M6 6l12 12" />
@@ -197,7 +197,7 @@
       </div>
       <div class="pagination" *ngIf="selectedCount === 0">
         <span class="pagination__info">
-          Mostrando {{ (paginaActual - 1) * porPagina + 1 }}–{{ Math.min(paginaActual * porPagina, totalFiltradas) }} de
+          Mostrando {{ totalFiltradas === 0 ? 0 : (paginaActual - 1) * porPagina + 1 }}–{{ Math.min(paginaActual * porPagina, totalFiltradas) }} de
           {{ totalFiltradas }}
         </span>
         <div class="pagination__controls">
@@ -208,17 +208,12 @@
           </button>
           <button *ngFor="let p of paginas" class="page-btn" [class.page-btn--active]="p === paginaActual"
             (click)="cambiarPagina(p)">{{ p }}</button>
-          <button class="page-btn" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+          <button class="page-btn" [disabled]="paginaActual >= totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m9 18 6-6-6-6" />
             </svg>
           </button>
         </div>
-        <select class="per-page-select" [(ngModel)]="porPagina" (change)="applyFilters()">
-          <option [value]="10">10 / página</option>
-          <option [value]="25">25 / página</option>
-          <option [value]="50">50 / página</option>
-        </select>
       </div>
     </div>
   </div>

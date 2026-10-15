@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -56,6 +56,7 @@ const COLORES_AVATAR = ['#7c3aed', '#a78bfa', '#ec4899', '#6d28d9', '#c4b5fd'];
 export class UserComponent implements OnInit {
 
   private usersService = inject(UsersService);
+  private cdr = inject(ChangeDetectorRef);
 
   cargando = true;
 
@@ -67,7 +68,7 @@ export class UserComponent implements OnInit {
   filtroEstado = 'Todos';
 
   paginaActual = 1;
-  porPagina: number = 10;
+  readonly porPagina = 6;
   totalFiltradas = 0;
   totalPaginas = 1;
   paginas: number[] = [];
@@ -128,10 +129,12 @@ export class UserComponent implements OnInit {
         this.todasLasUsuarias = usuarios;
         this.applyFilters();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando usuarias:', err);
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }

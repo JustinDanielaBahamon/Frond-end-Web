@@ -23,12 +23,7 @@
       <div class="stat-card purple">
         <div class="stat-info">
           <span>Reportes Pendientes</span>
-          <h2>32</h2>
-          <p class="stat-change positive">
-            <i class="fa-solid fa-arrow-up"></i>
-            <span>+12%</span>
-            <span class="vs-ayer">vs ayer</span>
-          </p>
+          <h2>{{ stats.pendingReports }}</h2>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-flag"></i>
@@ -38,12 +33,7 @@
       <div class="stat-card purple">
         <div class="stat-info">
           <span>Casos Resueltos</span>
-          <h2>128</h2>
-          <p class="stat-change positive">
-            <i class="fa-solid fa-arrow-up"></i>
-            <span>+8%</span>
-            <span class="vs-ayer">vs ayer</span>
-          </p>
+          <h2>{{ stats.resolvedCases }}</h2>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-check-circle"></i>
@@ -53,12 +43,7 @@
       <div class="stat-card purple">
         <div class="stat-info">
           <span>Usuarios Sancionados</span>
-          <h2>15</h2>
-          <p class="stat-change negative">
-            <i class="fa-solid fa-arrow-down"></i>
-            <span>-3%</span>
-            <span class="vs-ayer">vs ayer</span>
-          </p>
+          <h2>{{ stats.sanctionedUsers }}</h2>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-user-slash"></i>
@@ -211,7 +196,7 @@
           <div class="table-footer">
             <div class="table-info">
               Mostrando
-              <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ getMinValue(currentPage * itemsPerPage, totalItems) }}</strong>
+              <strong>{{ totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1 }} - {{ getMinValue(currentPage * itemsPerPage, totalItems) }}</strong>
               de
               <strong>{{ totalItems }}</strong>
               reportes
@@ -220,12 +205,10 @@
               <button class="page-btn" (click)="prevPage(); $event.stopPropagation()" [disabled]="currentPage === 1" aria-label="Página anterior">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              <button class="page-btn" (click)="changePage(1); $event.stopPropagation()" [class.active]="currentPage === 1" aria-label="Página 1">1</button>
-              <button class="page-btn" (click)="changePage(2); $event.stopPropagation()" [class.active]="currentPage === 2" aria-label="Página 2">2</button>
-              <button class="page-btn" (click)="changePage(3); $event.stopPropagation()" [class.active]="currentPage === 3" aria-label="Página 3">3</button>
-              <button class="page-btn" (click)="changePage(4); $event.stopPropagation()" [class.active]="currentPage === 4" aria-label="Página 4">4</button>
-              <button class="page-btn" (click)="changePage(5); $event.stopPropagation()" [class.active]="currentPage === 5" aria-label="Página 5">5</button>
-              <button class="page-btn" (click)="nextPage(); $event.stopPropagation()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+              @for (pagina of paginas; track pagina) {
+                <button class="page-btn" (click)="changePage(pagina); $event.stopPropagation()" [class.active]="currentPage === pagina" [attr.aria-label]="'Página ' + pagina">{{ pagina }}</button>
+              }
+              <button class="page-btn" (click)="nextPage(); $event.stopPropagation()" [disabled]="currentPage >= totalPages" aria-label="Página siguiente">
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
             </div>

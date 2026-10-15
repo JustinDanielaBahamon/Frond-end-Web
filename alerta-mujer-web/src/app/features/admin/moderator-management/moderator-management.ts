@@ -21,9 +21,13 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   };
 
   currentPage = 1;
-  totalPages = 5;
+  totalPages = 1;
   itemsPerPage = 7;
-  totalItems = 32;
+  totalItems = 0;
+
+  get paginas(): number[] {
+    return Array.from({ length: Math.max(1, this.totalPages) }, (_, i) => i + 1);
+  }
 
   // Estados UI
   mostrarModalVer = false;

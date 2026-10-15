@@ -1,8 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import * as L from 'leaflet';
 
 import { AlertsService } from '../../../core/services/alerts.services';
+import { GeocodingService } from '../../../core/services/geocoding.service';
 import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../../core/services/risk-zones.services';
 import { UsersService } from '../../../core/services/users.services';
 import { Alerta } from '../../../core/models/alert.model';
@@ -16,113 +19,165 @@ type AlertaVM = Alerta & {
   started_at?: string;
 };
 
-export interface AlertaPorTipo {
-  tipo: string;
-  etiqueta: string;
-  cantidad: number;
-  porcentaje: number;
-  color: string;
-}
+type Periodo = 'hoy' | '7d' | '30d' | 'custom';
+type FiltroEstado = 'Todas' | 'Pendiente' | 'Atendida' | 'Cancelada';
 
-export interface DonutSegmento {
-  tipo: string;
-  d: string;
-  color: string;
-}
-
-export interface ModoActivacion {
-  nombre: string;
-  cantidad: number;
-  porcentaje: number;
-  color: string;
-  icono: 'campana' | 'movimiento' | 'voz' | 'auto';
-}
-
-export interface RankingZona {
-  nombre: string;
-  cantidad: number;
-}
-
-export interface BurbujaZona {
-  nombre: string;
-  cantidad: number;
+export interface BarraHora {
+  hora: number;
+  valor: number;
   x: number;
+  cx: number;
   y: number;
-  r: number;
+  h: number;
+  pico: boolean;
 }
 
-const COLOR_POR_TIPO: Record<string, string> = {
-  main: '#e11d48',
-  SOS: '#e11d48',
-  Acoso: '#7c3aed',
-  Robo: '#2563eb',
-  Medical: '#0d9488',
-};
-const COLOR_OTROS = '#f59e0b';
+export interface FranjaGraf {
+  nombre: string;
+  rango: string;
+  total: number;
+  x: number;
+  w: number;
+  cx: number;
+}
 
-const ETIQUETA_POR_TIPO: Record<string, string> = {
-  main: 'Alerta SOS',  // tipo que envía la app móvil
-  SOS: 'SOS',
-  Acoso: 'Acoso',
-  Robo: 'Robo',
-  Medical: 'Emergencia médica',
-};
+export interface ZonaIncidente {
+  rank: number;
+  nombre: string;
+  direccion: string;
+  buscando: boolean;
+  zonaRiesgo: string | null;
+  cantidad: number;
+  porcentaje: number;
+  barra: number;
+  lat: number;
+  lng: number;
+}
 
-const COLORES_MODO = ['#e11d48', '#7c3aed', '#2563eb', '#0d9488', '#f59e0b'];
+const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
+const DIA_MS = 86400000;
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+const FRANJAS = [
+  { nombre: 'Madrugada', rango: '0h – 5h', ini: 0, fin: 5 },
+  { nombre: 'Mañana', rango: '6h – 11h', ini: 6, fin: 11 },
+  { nombre: 'Tarde', rango: '12h – 17h', ini: 12, fin: 17 },
+  { nombre: 'Noche', rango: '18h – 23h', ini: 18, fin: 23 },
+];
+
+// Geometría del gráfico por hora (coincide con el viewBox 1000x275 del HTML)
+const H_X0 = 50;
+const H_SLOT = 38.75;
+const H_BARRA = 26;
+const H_TOP = 40;
+const H_BASE = 240;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private cdr = inject(ChangeDetectorRef);
   private alertsService = inject(AlertsService);
   private riskZonesService = inject(RiskZonesService);
   private usersService = inject(UsersService);
+  private geocoding = inject(GeocodingService);
+
+  @ViewChild('mapaZonas') mapaEl?: ElementRef<HTMLDivElement>;
 
   cargando = true;
   error = false;
+  actualizadoEn = new Date();
+
+  // --- Filtros ---
+  periodo: Periodo = '7d';
+  desde = '';
+  hasta = '';
+  filtroEstado: FiltroEstado = 'Todas';
+
+  readonly periodos: { valor: Periodo; etiqueta: string }[] = [
+    { valor: 'hoy', etiqueta: 'Hoy' },
+    { valor: '7d', etiqueta: '7 días' },
+    { valor: '30d', etiqueta: '30 días' },
+    { valor: 'custom', etiqueta: 'Personalizado' },
+  ];
+
+  readonly filtrosEstado: { valor: FiltroEstado; etiqueta: string }[] = [
+    { valor: 'Todas', etiqueta: 'Todas' },
+    { valor: 'Pendiente', etiqueta: 'Pendientes' },
+    { valor: 'Atendida', etiqueta: 'Atendidas' },
+    { valor: 'Cancelada', etiqueta: 'Canceladas' },
+  ];
 
   // --- Stat cards ---
   totalUsuarias = 0;
   usuariasActivas = 0;
   porcentajeActivas = 0;
-  totalAlertas = 0;
-  alertasActivas = 0;
-  zonasCriticas = 0;
-  alertasEnZonas = 0;
+  alertasPendientes = 0;
+  pendienteMasAntigua = '';
+  alertasAtendidas = 0;
+  alertasCanceladas = 0;
+  porcentajeAtendidas = 0;
+  porcentajeCanceladas = 0;
 
-  // --- Tendencia (alertas por día de la semana) ---
-  tendenciaTotal = 0;
+  // --- Alertas por hora del día ---
+  horasBarras: BarraHora[] = [];
+  horasTicks: { y: number; label: number }[] = [];
+  franjasGraf: FranjaGraf[] = [];
+  hayDatosHoras = false;
+  horaPicoTexto = '—';
+  horaPicoDetalle = 'Sin alertas en este periodo';
+  franjaRiesgosaTexto = '—';
+  franjaRiesgosaDetalle = 'Sin alertas en este periodo';
+  franjaTranquilaTexto = '—';
+  franjaTranquilaDetalle = 'Sin alertas en este periodo';
+
+  // --- Zonas con más incidentes ---
+  zonasIncidentes: ZonaIncidente[] = [];
+  zonaSeleccionada = 0;
+
+  // --- Tendencia (esta semana vs. la anterior) ---
+  tendenciaActualTotal = 0;
+  tendenciaPreviaTotal = 0;
   tendenciaTicks: { y: number; label: number }[] = [];
   tendenciaLabels: { x: number; texto: string }[] = [];
   tendenciaDots: { x: number; y: number; valor: number }[] = [];
   tendenciaLinea = '';
-  tendenciaArea = '';
-
-  // --- Modos de activación ---
-  modosActivacion: ModoActivacion[] = [];
-
-  // --- Alertas por zona ---
-  rankingZonas: RankingZona[] = [];
-  burbujasZona: BurbujaZona[] = [];
-
-  // --- Emergencias por tipo ---
-  alertasPorTipo: AlertaPorTipo[] = [];
-  donutSegs: DonutSegmento[] = [];
+  tendenciaLineaPrevia = '';
+  tendenciaPico: { x: number; y: number; valor: number } | null = null;
 
   // --- Tabla ---
   alertasRecientes: AlertaVM[] = [];
+
+  // Datos en memoria (se cargan una sola vez; los filtros no vuelven a llamar al backend)
+  private todas: AlertaVM[] = [];
+  private zonasApi: ZonaManual[] = [];
+  private zonasRiesgo: ZonaManual[] = [];
+  private listaPeriodo: AlertaVM[] = [];
+
+  // Mapa
+  private mapa?: L.Map;
+  private capaPuntos = L.layerGroup();
+  private marcadorAlerta?: L.CircleMarker;
+  private versionZonas = 0;
 
   // Geometría del gráfico de tendencia (coincide con el viewBox 640x230 del HTML)
   private readonly graf = { izq: 40, der: 620, arriba: 20, abajo: 190 };
 
   ngOnInit(): void {
     this.cargarDatos();
+  }
+
+  ngOnDestroy(): void {
+    this.versionZonas++;
+    this.mapa?.remove();
+  }
+
+  get zonaActual(): ZonaIncidente | null {
+    return this.zonasIncidentes[this.zonaSeleccionada] ?? null;
   }
 
   private cargarDatos(): void {
@@ -135,8 +190,8 @@ export class AdminDashboardComponent implements OnInit {
       usuarios: this.usersService.getAll(),
     }).subscribe({
       next: ({ alertas, zonas: zonasApi, usuarios }) => {
-        const lista = alertas as AlertaVM[];
-        const zonas = contarAlertasEnZonas(zonasApi, lista);
+        this.todas = alertas as AlertaVM[];
+        this.zonasApi = zonasApi;
 
         this.totalUsuarias = usuarios.length;
         this.usuariasActivas = usuarios.filter(u => this.estadoDe(u) === 'Activa').length;
@@ -144,22 +199,9 @@ export class AdminDashboardComponent implements OnInit {
           ? Math.round((this.usuariasActivas / this.totalUsuarias) * 100)
           : 0;
 
-        this.totalAlertas = lista.length;
-        this.alertasActivas = lista.filter(a => a.estado === 'Pendiente').length;
-        this.zonasCriticas = zonas.length;
-        this.alertasEnZonas = zonas.reduce((suma: number, z: ZonaManual) => suma + z.alertasEnZona, 0);
-
-        this.alertasPorTipo = this.calcularAlertasPorTipo(lista);
-        this.donutSegs = this.calcularDonut();
-        this.modosActivacion = this.calcularModos(lista);
-        this.calcularZonas(lista, zonas);
-        this.calcularTendencia(lista);
-
-        // El backend las envía de la más reciente a la más antigua
-        this.alertasRecientes = lista.slice(0, 5);
-
+        this.actualizadoEn = new Date();
         this.cargando = false;
-        this.cdr.detectChanges();
+        this.recalcular();
       },
       error: (err) => {
         console.error('Error cargando dashboard:', err);
@@ -170,185 +212,357 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  // ── Helpers de agregación ──────────────────────────────────────
-  private contarPor<T>(items: T[], obtenerClave: (item: T) => string): { clave: string; cantidad: number }[] {
-    const conteo: Record<string, number> = {};
-    items.forEach(item => {
-      const clave = obtenerClave(item);
-      conteo[clave] = (conteo[clave] ?? 0) + 1;
-    });
-    return Object.entries(conteo).map(([clave, cantidad]) => ({ clave, cantidad }));
-  }
-
   private estadoDe(u: unknown): string | undefined {
     return (u as { estado?: string }).estado;
   }
 
-  // ── Emergencias por tipo ───────────────────────────────────────
-  private calcularAlertasPorTipo(lista: AlertaVM[]): AlertaPorTipo[] {
-    const total = lista.length || 1;
-    return this.contarPor(lista, a => a.tipo)
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .map(({ clave, cantidad }) => ({
-        tipo: clave,
-        etiqueta: this.etiquetaTipo(clave),
-        cantidad,
-        porcentaje: Math.round((cantidad / total) * 100),
-        color: this.colorTipo(clave),
-      }));
+  // ── Filtros ────────────────────────────────────────────────────
+  setPeriodo(p: Periodo): void {
+    this.periodo = p;
+    this.recalcular();
   }
 
-  private calcularDonut(): DonutSegmento[] {
-    const r = 60, cx = 80, cy = 80;
-    const total = this.totalAlertas || 1;
-    let inicio = -90;
+  onDesde(ev: Event): void {
+    this.desde = (ev.target as HTMLInputElement).value;
+    this.recalcular();
+  }
 
-    return this.alertasPorTipo.map(item => {
-      const angulo = (item.cantidad / total) * 360;
-      const fin = inicio + angulo;
-      let d: string;
+  onHasta(ev: Event): void {
+    this.hasta = (ev.target as HTMLInputElement).value;
+    this.recalcular();
+  }
 
-      if (angulo >= 359.99) {
-        // un solo tipo = círculo completo (un arco de 360° no se dibuja)
-        d = `M ${cx} ${cy - r} A ${r} ${r} 0 1 1 ${cx} ${cy + r} A ${r} ${r} 0 1 1 ${cx} ${cy - r} Z`;
-      } else {
-        const grande = angulo > 180 ? 1 : 0;
-        const x1 = cx + r * Math.cos((inicio * Math.PI) / 180);
-        const y1 = cy + r * Math.sin((inicio * Math.PI) / 180);
-        const x2 = cx + r * Math.cos((fin * Math.PI) / 180);
-        const y2 = cy + r * Math.sin((fin * Math.PI) / 180);
-        d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${grande} 1 ${x2} ${y2} Z`;
-      }
+  setFiltroEstado(f: FiltroEstado): void {
+    this.filtroEstado = f;
+    this.actualizarRecientes();
+    this.cdr.detectChanges();
+  }
 
-      inicio = fin;
-      return { tipo: item.tipo, d, color: item.color };
+  private fechaDe(a: AlertaVM): Date | null {
+    const f = a.created_at ?? a.started_at;
+    if (!f) return null;
+    const d = new Date(f);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  private rango(): { ini: number; fin: number } {
+    const ahora = new Date();
+    const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
+    switch (this.periodo) {
+      case 'hoy': return { ini: hoy0, fin: Infinity };
+      case '7d': return { ini: hoy0 - 6 * DIA_MS, fin: Infinity };
+      case '30d': return { ini: hoy0 - 29 * DIA_MS, fin: Infinity };
+      default:
+        return {
+          ini: this.desde ? new Date(this.desde + 'T00:00:00').getTime() : -Infinity,
+          fin: this.hasta ? new Date(this.hasta + 'T23:59:59.999').getTime() : Infinity,
+        };
+    }
+  }
+
+  private enPeriodo(a: AlertaVM, r: { ini: number; fin: number }): boolean {
+    const d = this.fechaDe(a);
+    if (!d) return this.periodo === 'custom' && !this.desde && !this.hasta;
+    const t = d.getTime();
+    return t >= r.ini && t <= r.fin;
+  }
+
+  // ── Recalcula todo con el periodo elegido ──────────────────────
+  private recalcular(): void {
+    const r = this.rango();
+    this.listaPeriodo = this.todas.filter(a => this.enPeriodo(a, r));
+    this.zonasRiesgo = contarAlertasEnZonas(this.zonasApi, this.listaPeriodo);
+
+    this.calcularKpis(this.listaPeriodo);
+    this.calcularHoras(this.listaPeriodo);
+    this.calcularZonas(this.listaPeriodo);
+    this.calcularTendencia(this.todas);
+    this.actualizarRecientes();
+
+    this.marcadorAlerta?.remove();
+    this.marcadorAlerta = undefined;
+
+    this.cdr.detectChanges();      // pinta el HTML (y deja listo el contenedor del mapa)
+    this.pintarMapa(true);
+    void this.resolverLugares(this.versionZonas);
+  }
+
+  private pct(parte: number, total: number): number {
+    return total ? Math.round((parte / total) * 100) : 0;
+  }
+
+  // ── Stat cards ─────────────────────────────────────────────────
+  private calcularKpis(lista: AlertaVM[]): void {
+    // "Pendientes ahora" ignora el periodo: una alerta sin atender sigue importando aunque sea vieja
+    const pendientes = this.todas.filter(a => a.estado === 'Pendiente');
+    this.alertasPendientes = pendientes.length;
+
+    let masAntigua: AlertaVM | null = null;
+    let menorFecha = Infinity;
+    pendientes.forEach(a => {
+      const t = this.fechaDe(a)?.getTime();
+      if (t !== undefined && t < menorFecha) { menorFecha = t; masAntigua = a; }
     });
+    const tiempo = (masAntigua as AlertaVM | null)?.tiempo;
+    this.pendienteMasAntigua = tiempo ? `la más antigua: ${tiempo.toLowerCase()}` : 'Sin pendientes';
+
+    this.alertasAtendidas = lista.filter(a => a.estado === 'Atendida').length;
+    this.alertasCanceladas = lista.filter(a => a.estado === 'Cancelada').length;
+    this.porcentajeAtendidas = this.pct(this.alertasAtendidas, lista.length);
+    this.porcentajeCanceladas = this.pct(this.alertasCanceladas, lista.length);
   }
 
-  etiquetaTipo(tipo: string): string {
-    return ETIQUETA_POR_TIPO[tipo] ?? tipo;
+  // ── Alertas por hora del día ───────────────────────────────────
+  private calcularHoras(lista: AlertaVM[]): void {
+    const conteo = new Array<number>(24).fill(0);
+    lista.forEach(a => {
+      const d = this.fechaDe(a);
+      if (d) conteo[d.getHours()]++;
+    });
+
+    const total = conteo.reduce((s, v) => s + v, 0);
+    const max = Math.max(...conteo);
+    const eje = Math.max(4, Math.ceil(max / 4) * 4);
+    const alto = H_BASE - H_TOP;
+
+    this.horasTicks = [0, 1, 2, 3, 4].map(i => {
+      const valor = (eje / 4) * i;
+      return { y: H_BASE - (valor / eje) * alto, label: valor };
+    });
+
+    this.horasBarras = conteo.map((valor, hora) => {
+      const h = (valor / eje) * alto;
+      const x = H_X0 + hora * H_SLOT + (H_SLOT - H_BARRA) / 2;
+      return { hora, valor, x, cx: x + H_BARRA / 2, y: H_BASE - h, h, pico: valor > 0 && valor === max };
+    });
+
+    const totales = FRANJAS.map(f => conteo.slice(f.ini, f.fin + 1).reduce((s, v) => s + v, 0));
+    this.franjasGraf = FRANJAS.map((f, i) => {
+      const x = H_X0 + f.ini * H_SLOT;
+      const w = (f.fin - f.ini + 1) * H_SLOT;
+      return { nombre: f.nombre, rango: f.rango, total: totales[i], x, w, cx: x + w / 2 };
+    });
+
+    this.hayDatosHoras = total > 0;
+    if (!total) {
+      this.horaPicoTexto = '—';
+      this.franjaRiesgosaTexto = '—';
+      this.franjaTranquilaTexto = '—';
+      this.horaPicoDetalle = this.franjaRiesgosaDetalle = this.franjaTranquilaDetalle = 'Sin alertas en este periodo';
+      return;
+    }
+
+    const plural = (n: number) => (n === 1 ? 'alerta' : 'alertas');
+
+    // Hora pico
+    const picos = conteo.map((v, h) => ({ v, h })).filter(x => x.v === max).map(x => x.h);
+    this.horaPicoTexto = picos.slice(0, 3).map(h => `${h}h`).join(', ') + (picos.length > 3 ? '…' : '');
+    this.horaPicoDetalle = `${max} ${plural(max)}${picos.length > 1 ? ' en cada hora' : ''}`;
+
+    // Franja más riesgosa
+    const maxTot = Math.max(...totales);
+    const riesgosas = FRANJAS.filter((_, i) => totales[i] === maxTot);
+    this.franjaRiesgosaTexto = riesgosas.length === 1
+      ? `${riesgosas[0].nombre} (${riesgosas[0].rango})`
+      : riesgosas.map(f => f.nombre).join(' y ');
+    this.franjaRiesgosaDetalle = `${maxTot} de ${total} alertas · ${this.pct(maxTot, total)}%`;
+
+    // Franja más tranquila
+    const minTot = Math.min(...totales);
+    const tranquilas = FRANJAS.filter((_, i) => totales[i] === minTot);
+    this.franjaTranquilaTexto = tranquilas.map(f => f.nombre).join(' y ');
+    this.franjaTranquilaDetalle = `${minTot} ${plural(minTot)}${tranquilas.length > 1 ? ' en cada una' : ''}`;
   }
 
-  colorTipo(tipo: string): string {
-    return COLOR_POR_TIPO[tipo] ?? COLOR_OTROS;
-  }
+  // ── Zonas con más incidentes (agrupa por cercanía ~450 m) ──────
+  private calcularZonas(lista: AlertaVM[]): void {
+    this.versionZonas++;
+    this.zonaSeleccionada = 0;
 
-  getTipoBadgeClass(tipo: string): string {
-    const map: Record<string, string> = {
-      SOS: 'badge-sos',
-      Medical: 'badge-medica',
-      Robo: 'badge-robo',
-      Acoso: 'badge-acoso',
-    };
-    return map[tipo] ?? 'badge-otros';
-  }
-
-  // ── Modos de activación ────────────────────────────────────────
-  private calcularModos(lista: AlertaVM[]): ModoActivacion[] {
-    const total = lista.length || 1;
-    return this.contarPor(lista, a => a.medioActivacion || 'Sin especificar')
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5)
-      .map(({ clave, cantidad }, i) => ({
-        nombre: clave,
-        cantidad,
-        porcentaje: Math.round((cantidad / total) * 100),
-        color: COLORES_MODO[i % COLORES_MODO.length],
-        icono: this.iconoModo(clave),
-      }));
-  }
-
-  private iconoModo(nombre: string): ModoActivacion['icono'] {
-    const n = nombre.toLowerCase();
-    if (n.includes('bot') || n.includes('pan')) return 'campana';
-    if (n.includes('mov') || n.includes('sacud') || n.includes('agit')) return 'movimiento';
-    if (n.includes('voz')) return 'voz';
-    return 'auto';
-  }
-
-  // ── Alertas por zona (mapa esquemático con lat/lng reales) ─────
-  private calcularZonas(lista: AlertaVM[], zonas: ZonaManual[]): void {
+    const celda = 0.004;
     const grupos = new Map<string, { cantidad: number; lat: number; lng: number }>();
 
-    // Cada alerta con ubicación se agrupa en la zona de riesgo que la contiene;
-    // las alertas sin ubicación (0,0) no se pueden ubicar en el mapa.
-    lista.filter(a => a.lat || a.lng).forEach(a => {
-      const nombre = zonas.find(z => estaDentroDeZona(z, a.lat, a.lng))?.nombre ?? 'Fuera de zonas de riesgo';
-      const g = grupos.get(nombre) ?? { cantidad: 0, lat: 0, lng: 0 };
+    // Las alertas sin ubicación (0,0) no se pueden ubicar en el mapa
+    const conUbicacion = lista.filter(a => a.lat || a.lng);
+    conUbicacion.forEach(a => {
+      const clave = `${Math.round(Number(a.lat) / celda)}|${Math.round(Number(a.lng) / celda)}`;
+      const g = grupos.get(clave) ?? { cantidad: 0, lat: 0, lng: 0 };
       g.cantidad++;
       g.lat += Number(a.lat);
       g.lng += Number(a.lng);
-      grupos.set(nombre, g);
+      grupos.set(clave, g);
     });
 
-    const top = [...grupos.entries()]
-      .map(([nombre, g]) => ({
-        nombre,
-        cantidad: g.cantidad,
-        lat: g.lat / g.cantidad,
-        lng: g.lng / g.cantidad,
-      }))
+    const top = [...grupos.values()]
+      .map(g => ({ cantidad: g.cantidad, lat: g.lat / g.cantidad, lng: g.lng / g.cantidad }))
       .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 5);
 
-    this.rankingZonas = top.map(z => ({ nombre: z.nombre, cantidad: z.cantidad }));
-
-    const W = 300, H = 190, padX = 55, padY = 42;
-    const lats = top.map(z => z.lat);
-    const lngs = top.map(z => z.lng);
-    const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-    const rangoLat = maxLat - minLat || 1;
-    const rangoLng = maxLng - minLng || 1;
     const maxCant = top.length ? top[0].cantidad : 1;
 
-    this.burbujasZona = top.map(z => ({
-      nombre: z.nombre,
-      cantidad: z.cantidad,
-      x: top.length === 1 ? W / 2 : padX + ((z.lng - minLng) / rangoLng) * (W - 2 * padX),
-      y: top.length === 1 ? H / 2 - 10 : padY + (1 - (z.lat - minLat) / rangoLat) * (H - 2 * padY),
-      r: 10 + (z.cantidad / maxCant) * 14,
-    }));
+    this.zonasIncidentes = top.map((z, i) => {
+      const zonaRiesgo = this.zonasRiesgo.find(zr => estaDentroDeZona(zr, z.lat, z.lng))?.nombre ?? null;
+      return {
+        rank: i + 1,
+        nombre: zonaRiesgo ?? `${z.lat.toFixed(4)}, ${z.lng.toFixed(4)}`,
+        direccion: '',
+        buscando: true,
+        zonaRiesgo,
+        cantidad: z.cantidad,
+        porcentaje: this.pct(z.cantidad, conUbicacion.length),
+        barra: Math.max(8, Math.round((z.cantidad / maxCant) * 100)),
+        lat: z.lat,
+        lng: z.lng,
+      };
+    });
   }
 
-  // ── Tendencia: alertas por día de la semana ────────────────────
-  private calcularTendencia(lista: AlertaVM[]): void {
-    const conteo: number[] = new Array(7).fill(0);
+  // Barrio y dirección reales (OpenStreetMap), uno por uno para respetar el límite de Nominatim
+  private async resolverLugares(version: number): Promise<void> {
+    for (const z of this.zonasIncidentes) {
+      const lugar = await this.geocoding.obtener(z.lat, z.lng);
+      if (version !== this.versionZonas) return; // cambió el filtro mientras se consultaba
 
-    lista.forEach(a => {
-      const fecha = a.created_at ?? a.started_at;
-      if (!fecha) return;
-      const d = new Date(fecha);
-      if (isNaN(d.getTime())) return;
-      conteo[(d.getDay() + 6) % 7]++; // lunes = 0
+      if (lugar) {
+        const nombre = lugar.barrio ?? lugar.direccion ?? lugar.ciudad;
+        if (nombre) z.nombre = nombre;
+        z.direccion = lugar.barrio
+          ? (lugar.direccion ?? '')
+          : (lugar.direccion ? (lugar.ciudad ?? '') : '');
+      }
+      z.buscando = false;
+      this.cdr.detectChanges();
+      this.pintarMapa(false);
+    }
+  }
+
+  seleccionarZona(i: number): void {
+    const z = this.zonasIncidentes[i];
+    if (!z) return;
+    this.zonaSeleccionada = i;
+    this.pintarMapa(false);
+    this.mapa?.flyTo([z.lat, z.lng], 16, { duration: 0.8 });
+    this.cdr.detectChanges();
+  }
+
+  verEnMapa(a: AlertaVM): void {
+    if (!this.mapa || !(a.lat || a.lng)) return;
+    this.marcadorAlerta?.remove();
+    this.marcadorAlerta = L.circleMarker([a.lat, a.lng], {
+      radius: 10, color: '#ffffff', weight: 3, fillColor: '#e11d48', fillOpacity: 1,
+    })
+      .bindTooltip(`${this.escapar(a.nombre ?? '')} · ${this.escapar(a.tiempo)}`)
+      .addTo(this.mapa);
+    this.marcadorAlerta.openTooltip();
+    this.mapa.flyTo([a.lat, a.lng], 17, { duration: 0.8 });
+    this.mapaEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  private pintarMapa(ajustar: boolean): void {
+    const el = this.mapaEl?.nativeElement;
+    if (!el) return;
+
+    if (!this.mapa) {
+      this.mapa = L.map(el, { center: CENTRO_POR_DEFECTO, zoom: 13 });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(this.mapa);
+      this.capaPuntos.addTo(this.mapa);
+    }
+
+    this.capaPuntos.clearLayers();
+    const puntos: L.LatLngTuple[] = [];
+
+    this.zonasIncidentes.forEach((z, i) => {
+      const seleccionada = i === this.zonaSeleccionada;
+      const color = i === 0 ? '#e11d48' : '#7c3aed';
+      puntos.push([z.lat, z.lng]);
+      L.circleMarker([z.lat, z.lng], {
+        radius: 9 + Math.min(z.cantidad, 10) * 1.5,
+        color: seleccionada ? '#ffffff' : color,
+        weight: seleccionada ? 3 : 1.5,
+        fillColor: color,
+        fillOpacity: seleccionada ? 0.95 : 0.55,
+      })
+        .bindTooltip(`${this.escapar(z.nombre)} · ${z.cantidad}`)
+        .on('click', () => this.seleccionarZona(i))
+        .addTo(this.capaPuntos);
     });
 
-    this.tendenciaTotal = conteo.reduce((s, v) => s + v, 0);
+    setTimeout(() => this.mapa?.invalidateSize(), 0);
+
+    if (ajustar && puntos.length) {
+      if (puntos.length === 1) this.mapa.setView(puntos[0], 15);
+      else this.mapa.fitBounds(L.latLngBounds(puntos).pad(0.25));
+    }
+  }
+
+  private escapar(texto: string): string {
+    return texto.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  }
+
+  // ── Tendencia: esta semana vs. la anterior ─────────────────────
+  private calcularTendencia(lista: AlertaVM[]): void {
+    const ahora = new Date();
+    const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
+    const diaHoy = (ahora.getDay() + 6) % 7; // lunes = 0
+    const lunes = hoy0 - diaHoy * DIA_MS;
+    const lunesPrevio = lunes - 7 * DIA_MS;
+
+    const actual = new Array<number>(7).fill(0);
+    const previa = new Array<number>(7).fill(0);
+
+    lista.forEach(a => {
+      const d = this.fechaDe(a);
+      if (!d) return;
+      const t = d.getTime();
+      const dia = (d.getDay() + 6) % 7;
+      if (t >= lunes && t < lunes + 7 * DIA_MS) actual[dia]++;
+      else if (t >= lunesPrevio && t < lunes) previa[dia]++;
+    });
+
+    this.tendenciaActualTotal = actual.reduce((s, v) => s + v, 0);
+    this.tendenciaPreviaTotal = previa.reduce((s, v) => s + v, 0);
 
     const { izq, der, arriba, abajo } = this.graf;
-    const maximo = Math.max(...conteo, 1);
+    const maximo = Math.max(...actual, ...previa, 1);
     const escala = Math.max(4, Math.ceil(maximo / 4) * 4);
     const altoUtil = abajo - arriba;
+    const xDe = (i: number) => izq + (i * (der - izq)) / 6;
+    const yDe = (v: number) => abajo - (v / escala) * altoUtil;
 
     this.tendenciaTicks = [0, 1, 2, 3, 4].map(i => {
       const valor = (escala / 4) * i;
-      return { y: abajo - (valor / escala) * altoUtil, label: valor };
+      return { y: yDe(valor), label: valor };
     });
 
-    this.tendenciaDots = conteo.map((valor, i) => ({
-      x: izq + (i * (der - izq)) / 6,
-      y: abajo - (valor / escala) * altoUtil,
-      valor,
-    }));
+    // La semana actual solo se dibuja hasta hoy (los días que faltan no son "cero alertas")
+    this.tendenciaDots = actual
+      .map((valor, i) => ({ x: xDe(i), y: yDe(valor), valor }))
+      .filter((_, i) => i <= diaHoy);
 
-    this.tendenciaLabels = DIAS_SEMANA.map((texto, i) => ({
-      x: izq + (i * (der - izq)) / 6,
-      texto,
-    }));
+    this.tendenciaLabels = DIAS_SEMANA.map((texto, i) => ({ x: xDe(i), texto }));
 
-    this.tendenciaLinea = this.tendenciaDots
-      .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-      .join(' ');
-    this.tendenciaArea = `${izq},${abajo} ${this.tendenciaLinea} ${der},${abajo}`;
+    this.tendenciaLinea = this.tendenciaDots.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    this.tendenciaLineaPrevia = previa.map((v, i) => `${xDe(i).toFixed(1)},${yDe(v).toFixed(1)}`).join(' ');
+
+    const mayor = Math.max(...this.tendenciaDots.map(p => p.valor), 0);
+    this.tendenciaPico = mayor > 0 ? this.tendenciaDots.find(p => p.valor === mayor) ?? null : null;
+  }
+
+  // ── Tabla de alertas recientes ─────────────────────────────────
+  private actualizarRecientes(): void {
+    // El backend las envía de la más reciente a la más antigua
+    const base = this.filtroEstado === 'Todas'
+      ? this.listaPeriodo
+      : this.listaPeriodo.filter(a => a.estado === this.filtroEstado);
+    this.alertasRecientes = base.slice(0, 5);
+  }
+
+  claseEstado(estado: string): string {
+    if (estado === 'Atendida') return 'estado-badge--atendida';
+    if (estado === 'Cancelada') return 'estado-badge--cancelada';
+    return 'estado-badge--pendiente';
   }
 }

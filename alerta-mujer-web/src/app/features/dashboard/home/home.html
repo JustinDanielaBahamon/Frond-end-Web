@@ -69,30 +69,58 @@
 
   </div>
 
-  <!-- ACTIVIDAD RECIENTE + ÚLTIMA EMERGENCIA + ÚLTIMA UBICACIÓN -->
-  <div class="home-row home-row--mid">
-
-    
-      <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
-    <div class="home-panel ubication">
+  <!-- MAPA DE UBICACIÓN (ANCHO COMPLETO) -->
+  <div class="home-row home-row--full">
+    <div class="home-panel home-panel--mapa">
       <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
-        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-map-pin"></i> Última ubicación registrada
+        </h2>
+        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa completo <i class="ti ti-arrow-right"></i></a>
       </div>
 
-      <div id="home-mini-map" class="home-mini-map"></div>
+      <div id="home-mini-map" class="home-full-map"></div>
 
-      <p class="home-mini-map__direccion">
-        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
-      </p>
-      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
+      <div class="home-map-info">
+        <div class="home-map-info__item">
+          <i class="ti ti-map-pin"></i>
+          <div>
+            <p class="home-map-info__label">Dirección</p>
+            <p class="home-map-info__value">{{ ultimaUbicacion.direccion }}</p>
+          </div>
+        </div>
+        <div class="home-map-info__item">
+          <i class="ti ti-clock"></i>
+          <div>
+            <p class="home-map-info__label">Fecha y hora</p>
+            <p class="home-map-info__value">{{ ultimaUbicacion.fecha }}</p>
+          </div>
+        </div>
+        <div class="home-map-info__item">
+          <i class="ti ti-compass"></i>
+          <div>
+            <p class="home-map-info__label">Coordenadas</p>
+            <p class="home-map-info__value">{{ ultimaUbicacion.coordenadas }}</p>
+          </div>
+        </div>
+        <div class="home-map-info__item">
+          <i class="ti ti-target"></i>
+          <div>
+            <p class="home-map-info__label">Precisión</p>
+            <p class="home-map-info__value">{{ ultimaUbicacion.precision }}</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-
-    <!-- ÚLTIMA EMERGENCIA -->
-    <div class="home-panel emergency">
+  <!-- ÚLTIMA EMERGENCIA -->
+  <div class="home-row home-row--single">
+    <div class="home-panel home-panel--emergencia">
       <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Última emergencia</h2>
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-alert-octagon"></i> Última emergencia
+        </h2>
         <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
       </div>
 
@@ -131,11 +159,9 @@
       </div>
 
       <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/alert-history">
-        Ver detalles
+        Ver detalles de la emergencia
       </a>
     </div>
-
-  
   </div>
 
   <!-- ACCESOS RÁPIDOS + ACCIONES RÁPIDAS -->

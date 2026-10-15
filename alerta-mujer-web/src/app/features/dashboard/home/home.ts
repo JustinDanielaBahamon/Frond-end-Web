@@ -37,6 +37,8 @@ interface UltimaUbicacion {
   lng: number;
   direccion: string;
   fecha: string;
+  coordenadas: string;
+  precision: string;
 }
 
 interface AccesoRapido {
@@ -107,8 +109,10 @@ export class Home implements AfterViewInit, OnDestroy {
   ultimaUbicacion: UltimaUbicacion = {
     lat: 2.9273,
     lng: -75.2819,
-    direccion: 'Neiva, Huila',
+    direccion: 'Calle 21 #5-63, Centro, Neiva, Huila, Colombia',
     fecha: 'Hoy, 3:42 PM',
+    coordenadas: '2.9273, -75.2819',
+    precision: '±12 metros',
   };
 
   // ── ACCESOS RÁPIDOS ───────────────────────────────
@@ -131,25 +135,25 @@ export class Home implements AfterViewInit, OnDestroy {
     setTimeout(() => this.inicializarMiniMapa(), 100);
   }
 
-  /** Mini-mapa de solo lectura: un único marcador, sin controles,
-   * pensado como vista previa que enlaza a "Ver mapa". */
+  /** Mapa de ancho completo: muestra el marcador con más detalle */
   private inicializarMiniMapa(): void {
     this.map = L.map('home-mini-map', {
       center: [this.ultimaUbicacion.lat, this.ultimaUbicacion.lng],
-      zoom: 14,
-      zoomControl: false,
-      scrollWheelZoom: false,
-      dragging: false,
-      doubleClickZoom: false,
+      zoom: 15,
+      zoomControl: true,
+      scrollWheelZoom: true,
+      dragging: true,
+      doubleClickZoom: true,
       boxZoom: false,
-      keyboard: false,
-      touchZoom: false,
-      attributionControl: false,
+      keyboard: true,
+      touchZoom: true,
+      attributionControl: true,
     });
 
     L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
     }).addTo(this.map);
 
     const icono = L.divIcon({
@@ -159,7 +163,14 @@ export class Home implements AfterViewInit, OnDestroy {
       iconAnchor: [16, 32],
     });
 
-    L.marker([this.ultimaUbicacion.lat, this.ultimaUbicacion.lng], { icon: icono }).addTo(this.map);
+    L.marker([this.ultimaUbicacion.lat, this.ultimaUbicacion.lng], { icon: icono })
+      .addTo(this.map)
+      .bindPopup(`
+        <div style="text-align: center;">
+          <strong>${this.ultimaUbicacion.direccion}</strong><br>
+          <small>${this.ultimaUbicacion.fecha}</small>
+        </div>
+      `);
   }
 
   ngOnDestroy(): void {

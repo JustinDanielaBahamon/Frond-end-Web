@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 
@@ -52,6 +52,7 @@ export interface BurbujaZona {
 }
 
 const COLOR_POR_TIPO: Record<string, string> = {
+  main: '#e11d48',
   SOS: '#e11d48',
   Acoso: '#7c3aed',
   Robo: '#2563eb',
@@ -60,6 +61,7 @@ const COLOR_POR_TIPO: Record<string, string> = {
 const COLOR_OTROS = '#f59e0b';
 
 const ETIQUETA_POR_TIPO: Record<string, string> = {
+  main: 'Alerta SOS',  // tipo que envía la app móvil
   SOS: 'SOS',
   Acoso: 'Acoso',
   Robo: 'Robo',
@@ -77,6 +79,7 @@ const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 })
 export class AdminDashboardComponent implements OnInit {
 
+  private cdr = inject(ChangeDetectorRef);
   private alertsService = inject(AlertsService);
   private riskZonesService = inject(RiskZonesService);
   private usersService = inject(UsersService);
@@ -151,14 +154,17 @@ export class AdminDashboardComponent implements OnInit {
         this.calcularZonas(lista);
         this.calcularTendencia(lista);
 
-        this.alertasRecientes = lista.slice(-5).reverse();
+        // El backend las envía de la más reciente a la más antigua
+        this.alertasRecientes = lista.slice(0, 5);
 
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando dashboard:', err);
         this.error = true;
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }

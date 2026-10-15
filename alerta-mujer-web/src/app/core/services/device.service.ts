@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -15,12 +15,75 @@ export interface Device {
     name: string;
     email: string;
   };
-  type: 'Android';
+  type: 'Android';  // la app solo existe para Android
   imei: string;
   phone: string;
-  status: 'Activo' | 'Inactivo' | 'Bloqueado';
+  status: 'Activo' | 'Inactivo' | 'Bloqueado' | 'Perdido';
   lastSync: string;
   icon: string;
+  // Datos extra del backend (solo lectura)
+  appVersion?: string | null;
+  gpsStatus?: string | null;
+  pushTokenRegistered?: boolean;
+  lastAccessIso?: string | null;
+}
+
+/** Dispositivo tal como lo devuelve el backend al panel de administración. */
+interface AdminDeviceApi {
+  id: number;
+  accountId: number;
+  userId: number | null;
+  ownerName: string | null;
+  ownerEmail: string | null;
+  ownerPhone: string | null;
+  deviceUuid: string | null;
+  brand: string | null;
+  model: string | null;
+  osName: string | null;
+  osVersion: string | null;
+  appVersion: string | null;
+  gpsStatus: string | null;
+  status: string;
+  lastAccess: string | null;
+  createdAt: string | null;
+  pushTokenRegistered: boolean;
+}
+
+const ESTADO_DESDE_API: Record<string, Device['status']> = {
+  active: 'Activo', inactive: 'Inactivo', blocked: 'Bloqueado', lost: 'Perdido',
+};
+const ESTADO_HACIA_API: Record<Device['status'], string> = {
+  Activo: 'active', Inactivo: 'inactive', Bloqueado: 'blocked', Perdido: 'lost',
+};
+
+const esHoy = (iso?: string | null) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
+
+function formatearUltimoAcceso(iso: string | null): string {
+  if (!iso) return 'Sin registro';
+  const fecha = new Date(iso);
+  if (isNaN(fecha.getTime())) return 'Sin registro';
+  const hora = fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+  return esHoy(iso) ? `Hoy, ${hora}` : `${fecha.toLocaleDateString('es-CO')} ${hora}`;
+}
+
+function desdeApi(d: AdminDeviceApi): Device {
+  const nombre = [d.brand, d.model].filter(Boolean).join(' ');
+  return {
+    id: d.id,
+    name: nombre || 'Dispositivo sin nombre',
+    osVersion: d.osVersion ? `${d.osName ?? ''} ${d.osVersion}`.trim() : (d.osName ?? ''),
+    user: { name: d.ownerName ?? 'Sin usuaria', email: d.ownerEmail ?? '' },
+    type: 'Android',
+    imei: d.deviceUuid ?? '',
+    phone: d.ownerPhone ?? '',
+    status: ESTADO_DESDE_API[d.status] ?? 'Inactivo',
+    lastSync: formatearUltimoAcceso(d.lastAccess),
+    icon: 'fa-brands fa-android',
+    appVersion: d.appVersion,
+    gpsStatus: d.gpsStatus,
+    pushTokenRegistered: d.pushTokenRegistered,
+    lastAccessIso: d.lastAccess,
+  };
 }
 
 /**
@@ -88,7 +151,14 @@ export class DeviceService {
    * Obtener todos los dispositivos
    */
   getAll(): Observable<Device[]> {
-    return this.http.get<Device[]>(this.url);
+    return this.http.get<AdminDeviceApi[]>(this.url).pipe(
+      map(lista => lista.map(desdeApi)),
+      // La lista local alimenta los filtros y las estadísticas
+      tap(devices => {
+        this.devicesSubject.next(devices);
+        this.actualizarEstadisticas();
+      }),
+    );
   }
 
   /**
@@ -102,7 +172,7 @@ export class DeviceService {
    * Obtener dispositivo por ID
    */
   getById(id: number): Observable<Device> {
-    return this.http.get<Device>(`${this.url}/${id}`);
+    return this.http.get<AdminDeviceApi>(`${this.url}/${id}`).pipe(map(desdeApi));
   }
 
   /**
@@ -145,7 +215,7 @@ export class DeviceService {
     const activos = devices.filter(d => d.status === 'Activo').length;
     const inactivos = devices.filter(d => d.status === 'Inactivo').length;
     const bloqueados = devices.filter(d => d.status === 'Bloqueado').length;
-    const sincronizadosHoy = devices.filter(d => d.lastSync.includes('Hoy')).length;
+    const sincronizadosHoy = devices.filter(d => esHoy(d.lastAccessIso)).length;
     
     return {
       totalDevices: total,
@@ -167,7 +237,7 @@ export class DeviceService {
   /**
    * Cambiar estado de dispositivo
    */
-  cambiarEstado(id: number, nuevoEstado: 'Activo' | 'Inactivo' | 'Bloqueado'): Observable<Device> {
+  cambiarEstado(id: number, nuevoEstado: Device['status']): Observable<Device> {
     const currentDevices = this.devicesSubject.value;
     const device = currentDevices.find(d => d.id === id);
     if (device) {
@@ -179,9 +249,6 @@ export class DeviceService {
     return of({} as Device).pipe(delay(300));
   }
 
-  /**
-   * Filtrar dispositivos
-   */
   filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {
     let dispositivosFiltrados = [...this.devicesSubject.value];
 

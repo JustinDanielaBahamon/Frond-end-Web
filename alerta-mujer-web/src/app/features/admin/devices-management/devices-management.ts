@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DeviceService, Device, DeviceStats } from '../../../core/services/device.service';
@@ -54,7 +54,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private deviceService: DeviceService) {
+  constructor(private deviceService: DeviceService, private cdr: ChangeDetectorRef) {
     this.stats$ = this.deviceService.stats$;
     
     // Cerrar dropdowns al hacer clic fuera de ellos
@@ -90,18 +90,20 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         this.filteredDevices = devices;
         this.updatePagination();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar los dispositivos';
         this.cargando = false;
         console.error('Error cargando dispositivos:', err);
+        this.cdr.detectChanges();
       }
     });
 
     this.stats$.subscribe({
       next: (stats) => {
-        console.log('Estadísticas actualizadas:', stats);
         this.stats = stats;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -125,6 +127,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         this.filteredDevices = devices;
         this.updatePagination();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar dispositivos';
@@ -182,13 +185,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   /**
    * Helper para asignar la clase CSS correcta al badge de estado del dispositivo
    */
-  getDeviceStatusBadgeClass(status: 'Activo' | 'Inactivo' | 'Bloqueado'): string {
+  getDeviceStatusBadgeClass(status: Device['status']): string {
     switch (status) {
       case 'Activo':
         return 'status-active';
       case 'Inactivo':
         return 'status-inactive';
       case 'Bloqueado':
+      case 'Perdido':
         return 'status-blocked';
       default:
         return '';
@@ -223,7 +227,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         console.log('Dispositivo cargado:', device);
         this.dispositivoSeleccionado = device;
         this.mostrarModalVer = true;
-        console.log('Modal ver debería mostrarse');
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar el dispositivo';
@@ -282,7 +286,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         console.log('Dispositivo cargado para editar:', device);
         this.dispositivoSeleccionado = device;
         this.mostrarModalEditar = true;
-        console.log('Modal editar debería mostrarse');
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar el dispositivo';
@@ -333,7 +337,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   /**
    * Cambiar estado de un dispositivo
    */
-  cambiarEstadoDispositivo(id: number, nuevoEstado: 'Activo' | 'Inactivo' | 'Bloqueado'): void {
+  cambiarEstadoDispositivo(id: number, nuevoEstado: Device['status']): void {
     this.cargando = true;
     this.deviceService.cambiarEstado(id, nuevoEstado).subscribe({
       next: () => {
@@ -416,7 +420,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   selectStatusCrear(estado: string, event: Event): void {
     event.stopPropagation();
     if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.status = estado as 'Activo' | 'Inactivo' | 'Bloqueado';
+      this.dispositivoSeleccionado.status = estado as Device['status'];
     }
     this.isStatusDropdownOpenCrear = false;
   }
@@ -443,7 +447,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   selectStatusEditar(estado: string, event: Event): void {
     event.stopPropagation();
     if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.status = estado as 'Activo' | 'Inactivo' | 'Bloqueado';
+      this.dispositivoSeleccionado.status = estado as Device['status'];
     }
     this.isStatusDropdownOpenEditar = false;
   }

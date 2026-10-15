@@ -24,17 +24,6 @@ export interface EstadoSistema {
   enLineaDesde: Date;
 }
 
-export interface RegistroAuditoria {
-  id: number;
-  accion: string;
-  tipo: string;
-  registroId: number | null;
-  descripcion: string;
-  actor: string | null;
-  actorCorreo: string | null;
-  ip: string | null;
-  fecha: Date;
-}
 
 export interface DatosContacto {
   firstName: string;
@@ -88,21 +77,6 @@ export class AdminSettingsService {
     })));
   }
 
-  obtenerAuditoria(limite = 50): Observable<RegistroAuditoria[]> {
-    return this.http.get<any[]>(`${this.api}/api/admin/audit-log`, { params: { limit: limite } }).pipe(
-      map(lista => lista.map(r => ({
-        id: r.id,
-        accion: r.action,
-        tipo: r.entityType,
-        registroId: r.entityId,
-        descripcion: r.description ?? '',
-        actor: r.actorName,
-        actorCorreo: r.actorEmail,
-        ip: r.ipAddress,
-        fecha: new Date(r.createdAt)
-      })))
-    );
-  }
 
   /** Datos de la cuenta en sesión (nombre y teléfono). */
   actualizarMisDatos(datos: DatosContacto): Observable<DatosContacto> {

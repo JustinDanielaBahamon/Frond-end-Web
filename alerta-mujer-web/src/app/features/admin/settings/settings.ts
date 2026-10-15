@@ -1,95 +1,54 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../../core/auth/auth.service';
-import { InactivityService } from '../../../core/auth/inactivity.service';
-import { ThemeService, Theme } from '../../../core/theme/theme.service';
+import { RouterLink } from '@angular/router';
 import { UsersService } from '../../../core/services/users.services';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { AdminSettingsService, EstadoSistema, ParametrosApp, RegistroAuditoria } from '../../../core/services/admin-settings.service';
+import { AdminSettingsService, EstadoSistema, ParametrosApp } from '../../../core/services/admin-settings.service';
 
-type Panel = 'datos' | 'contrasena' | null;
+type FormParametros = Omit<ParametrosApp, 'actualizado'>;
 
-const TIPOS_AUDITORIA: Record<string, string> = {
-  ACCOUNT: 'Cuenta',
-  USER: 'Usuaria',
-  ALERT: 'Alerta',
-  EVIDENCE: 'Evidencia',
-  EMERGENCY_CONTACT: 'Contacto de emergencia',
-  SYSTEM_CONFIGURATION: 'Parámetros de la app',
+interface Cambio {
+  campo: string;
+  antes: string;
+  despues: string;
+}
+
+const ETIQUETAS: Record<keyof FormParametros, string> = {
+  duracionMaximaAlertaMin: 'Duración máxima de una alerta SOS',
+  numeroEmergencia: 'Número de emergencia',
+  correoSoporte: 'Correo de soporte',
+  maxContactos: 'Contactos de emergencia por usuaria',
+  versionMinimaApp: 'Versión mínima de la app móvil',
 };
 
-const ACCIONES_AUDITORIA: Record<string, string> = {
-  INSERT: 'Creó',
-  UPDATE: 'Modificó',
-  DELETE: 'Eliminó',
-};
-
-// Nombres legibles de las columnas que más aparecen en el historial
-const CAMPOS_AUDITORIA: Record<string, string> = {
-  status: 'estado',
-  ended_at: 'fin',
-  cancelled_at: 'cancelación',
-  last_access: 'último acceso',
-  password_hash: 'contraseña',
-  review_status: 'revisión',
-  first_name: 'nombre',
-  last_name: 'apellido',
-  telephone: 'teléfono',
-  email: 'correo',
-  role_id: 'rol',
-  sos_max_duration_minutes: 'duración máxima de alerta',
-  emergency_phone_number: 'número de emergencia',
-  admin_email: 'correo de soporte',
-  max_emergency_contacts: 'límite de contactos',
-  min_app_version: 'versión mínima de la app',
-  updated_by_admin_id: 'administradora',
-};
-
+/**
+ * Configuración del sistema: parámetros globales que afectan a todas las usuarias,
+ * estado del servidor y exportación de datos. Lo personal de cada admin está en Mi perfil.
+ */
 @Component({
   selector: 'app-admin-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
 export class AdminSettingsComponent {
-  private authService = inject(AuthService);
-  private themeService = inject(ThemeService);
   private usersService = inject(UsersService);
   private alertsService = inject(AlertsService);
   private settingsService = inject(AdminSettingsService);
-  readonly inactividad = inject(InactivityService);
-
-  // ── Usuario autenticado ──────────────────────────────────────
-  readonly user = toSignal(this.authService.currentUser$, { initialValue: null });
-
-  // ── Tema (global, lo maneja ThemeService) ────────────────────
-  readonly theme = this.themeService.currentTheme;
-  readonly isDark = computed(() => this.theme() === 'dark');
-
-  // ── Mi cuenta ────────────────────────────────────────────────
-  readonly panelAbierto = signal<Panel>(null);
-  datos = { firstName: '', lastName: '', telephone: '' };
-  contrasena = { actual: '', nueva: '', confirmar: '' };
-  readonly guardandoCuenta = signal(false);
 
   // ── Parámetros de la app (servidor) ──────────────────────────
   readonly parametros = signal<ParametrosApp | null>(null);
-  form = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '', maxContactos: 5, versionMinimaApp: '' };
+  form: FormParametros = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '', maxContactos: 5, versionMinimaApp: '' };
   readonly cargandoParametros = signal(true);
   readonly guardandoParametros = signal(false);
   readonly errorParametros = signal('');
+  readonly cambiosPendientes = signal<Cambio[] | null>(null);
 
-  // ── Estado del sistema e historial ───────────────────────────
+  // ── Estado del sistema ───────────────────────────────────────
   readonly estado = signal<EstadoSistema | null>(null);
   readonly errorEstado = signal(false);
-  readonly auditoria = signal<RegistroAuditoria[]>([]);
-  readonly cargandoAuditoria = signal(true);
-  readonly mostrarTodaAuditoria = signal(false);
-  readonly auditoriaVisible = computed(() =>
-    this.mostrarTodaAuditoria() ? this.auditoria() : this.auditoria().slice(0, 8));
 
   // ── Mensaje flotante ─────────────────────────────────────────
   readonly mensaje = signal('');
@@ -98,95 +57,9 @@ export class AdminSettingsComponent {
   constructor() {
     this.cargarParametros();
     this.cargarEstado();
-    this.cargarAuditoria();
   }
 
-  // ── Tema ─────────────────────────────────────────────────────
-  cambiarTema(tema: Theme): void {
-    this.themeService.setTheme(tema);
-  }
-
-  // ── Mi cuenta ────────────────────────────────────────────────
-  abrirPanel(panel: Exclude<Panel, null>): void {
-    if (this.panelAbierto() === panel) {
-      this.panelAbierto.set(null);
-      return;
-    }
-    if (panel === 'datos') {
-      // La sesión guardada puede no traer estos campos: se leen del servidor
-      this.settingsService.obtenerMisDatos().subscribe({
-        next: (d) => {
-          this.datos = d;
-          this.panelAbierto.set('datos');
-        },
-        error: () => this.avisar('No se pudieron cargar tus datos'),
-      });
-      return;
-    } else {
-      this.contrasena = { actual: '', nueva: '', confirmar: '' };
-    }
-    this.panelAbierto.set(panel);
-  }
-
-  guardarDatos(): void {
-    const datos = {
-      firstName: this.datos.firstName.trim(),
-      lastName: this.datos.lastName.trim(),
-      telephone: this.datos.telephone.trim(),
-    };
-    if (!datos.firstName) {
-      this.avisar('El nombre es obligatorio');
-      return;
-    }
-    this.guardandoCuenta.set(true);
-    this.settingsService.actualizarMisDatos(datos).subscribe({
-      next: () => {
-        this.authService.actualizarUsuarioActual(datos);
-        this.guardandoCuenta.set(false);
-        this.panelAbierto.set(null);
-        this.avisar('Datos actualizados');
-      },
-      error: (err) => {
-        this.guardandoCuenta.set(false);
-        this.avisar(err?.error?.message || 'No se pudieron guardar tus datos');
-      },
-    });
-  }
-
-  cambiarContrasena(): void {
-    const { actual, nueva, confirmar } = this.contrasena;
-    if (!actual || !nueva) {
-      this.avisar('Completa la contraseña actual y la nueva');
-      return;
-    }
-    if (nueva.length < 8) {
-      this.avisar('La nueva contraseña debe tener al menos 8 caracteres');
-      return;
-    }
-    if (nueva !== confirmar) {
-      this.avisar('Las contraseñas nuevas no coinciden');
-      return;
-    }
-    this.guardandoCuenta.set(true);
-    this.settingsService.cambiarContrasena(actual, nueva).subscribe({
-      next: () => {
-        this.guardandoCuenta.set(false);
-        this.panelAbierto.set(null);
-        this.contrasena = { actual: '', nueva: '', confirmar: '' };
-        this.avisar('Contraseña actualizada');
-      },
-      error: (err) => {
-        this.guardandoCuenta.set(false);
-        this.avisar(err?.error?.message || 'No se pudo cambiar la contraseña');
-      },
-    });
-  }
-
-  cerrarSesion(): void {
-    this.authService.logout();
-  }
-
-  // ── Parámetros de la app ─────────────────────────────────────
+  // ── Parámetros ───────────────────────────────────────────────
   private cargarParametros(): void {
     this.cargandoParametros.set(true);
     this.settingsService.obtenerParametros().subscribe({
@@ -201,23 +74,55 @@ export class AdminSettingsComponent {
     });
   }
 
-  guardarParametros(): void {
-    this.errorParametros.set('');
-    this.guardandoParametros.set(true);
-    this.settingsService.guardarParametros({
+  private normalizado(): FormParametros {
+    return {
       duracionMaximaAlertaMin: Number(this.form.duracionMaximaAlertaMin),
-      numeroEmergencia: this.form.numeroEmergencia.trim(),
-      correoSoporte: this.form.correoSoporte.trim(),
+      numeroEmergencia: String(this.form.numeroEmergencia ?? '').trim(),
+      correoSoporte: String(this.form.correoSoporte ?? '').trim(),
       maxContactos: Number(this.form.maxContactos),
-      versionMinimaApp: this.form.versionMinimaApp.trim(),
-    }).subscribe({
+      versionMinimaApp: String(this.form.versionMinimaApp ?? '').trim(),
+    };
+  }
+
+  /** Muestra los cambios (antes → después) y pide confirmarlos: afectan a todas las usuarias. */
+  revisarCambios(): void {
+    this.errorParametros.set('');
+    const actual = this.parametros();
+    if (!actual) return;
+    const nuevo = this.normalizado();
+    const valor = (v: string | number) => (v === '' ? '(sin definir)' : String(v));
+    const cambios = (Object.keys(ETIQUETAS) as (keyof FormParametros)[])
+      .filter((k) => String(actual[k]) !== String(nuevo[k]))
+      .map((k) => ({ campo: ETIQUETAS[k], antes: valor(actual[k]), despues: valor(nuevo[k]) }));
+    if (cambios.length === 0) {
+      this.avisar('No hay cambios para guardar');
+      return;
+    }
+    this.cambiosPendientes.set(cambios);
+  }
+
+  cancelarCambios(): void {
+    this.cambiosPendientes.set(null);
+  }
+
+  descartarCambios(): void {
+    const p = this.parametros();
+    if (p) this.aplicarParametros(p);
+    this.errorParametros.set('');
+  }
+
+  confirmarCambios(): void {
+    this.guardandoParametros.set(true);
+    this.settingsService.guardarParametros(this.normalizado()).subscribe({
       next: (p) => {
         this.aplicarParametros(p);
         this.guardandoParametros.set(false);
-        this.avisar('Parámetros guardados');
+        this.cambiosPendientes.set(null);
+        this.avisar('Parámetros guardados. El cambio quedó registrado en Auditoría.');
       },
       error: (err) => {
         this.guardandoParametros.set(false);
+        this.cambiosPendientes.set(null);
         this.errorParametros.set(err?.error?.message || 'No se pudieron guardar los parámetros');
       },
     });
@@ -246,46 +151,6 @@ export class AdminSettingsComponent {
         this.errorEstado.set(true);
       },
     });
-  }
-
-  get sistemaOk(): boolean {
-    const e = this.estado();
-    return !!e && e.baseDatos && e.notificacionesPush;
-  }
-
-  // ── Historial de cambios ─────────────────────────────────────
-  cargarAuditoria(): void {
-    this.cargandoAuditoria.set(true);
-    this.settingsService.obtenerAuditoria(50).subscribe({
-      next: (registros) => {
-        this.auditoria.set(registros);
-        this.cargandoAuditoria.set(false);
-      },
-      error: () => this.cargandoAuditoria.set(false),
-    });
-  }
-
-  textoAuditoria(r: RegistroAuditoria): string {
-    const accion = ACCIONES_AUDITORIA[r.accion] ?? r.accion;
-    const tipo = TIPOS_AUDITORIA[r.tipo] ?? r.tipo.toLowerCase();
-    return `${accion} ${tipo.toLowerCase()}${r.registroId != null ? ' #' + r.registroId : ''}`;
-  }
-
-  detalleAuditoria(r: RegistroAuditoria): string {
-    const prefijo = 'Columnas modificadas: ';
-    if (!r.descripcion.startsWith(prefijo)) return '';
-    const campos = r.descripcion.slice(prefijo.length).split(',').map(c => c.trim());
-    return 'Cambió ' + campos.map(c => CAMPOS_AUDITORIA[c] ?? c.replace(/_/g, ' ')).join(', ');
-  }
-
-  // ── Sesión ───────────────────────────────────────────────────
-  cambiarInactividad(valor: string): void {
-    this.inactividad.cambiar(Number(valor));
-    this.avisar('Preferencia de sesión guardada');
-  }
-
-  etiquetaInactividad(min: number): string {
-    return min === 0 ? 'Nunca' : `${min} minutos`;
   }
 
   // ── Ayuda ────────────────────────────────────────────────────
@@ -325,7 +190,6 @@ export class AdminSettingsComponent {
     });
   }
 
-  // ── Helpers ──────────────────────────────────────────────────
   private descargarCsv(nombre: string, columnas: string[], filas: unknown[][]): void {
     if (!filas.length) {
       this.avisar('No hay datos para descargar');
@@ -355,6 +219,6 @@ export class AdminSettingsComponent {
   private avisar(texto: string): void {
     this.mensaje.set(texto);
     if (this.mensajeTimer) clearTimeout(this.mensajeTimer);
-    this.mensajeTimer = setTimeout(() => this.mensaje.set(''), 3000);
+    this.mensajeTimer = setTimeout(() => this.mensaje.set(''), 3500);
   }
 }

@@ -198,24 +198,14 @@ export class EvidenceService {
   /**
    * Descargar evidencia
    */
+  // Descarga el archivo real (GET /api/evidences/{id}/file?download=true)
   descargar(id: number): Observable<Blob> {
-    // TODO: Conectar al backend
-    // return this.http.get(`${this.url}/${id}/descargar`, { responseType: 'blob' });
-    console.log(`Descargando evidencia ${id}. Contador antes: ${this.contadorDescargas}`);
-    this.contadorDescargas++;
-    console.log(`Contador después: ${this.contadorDescargas}`);
-    this.actualizarEstadisticas();
-    return of(new Blob()).pipe(delay(1000));
-  }
-
-  /**
-   * Ver evidencia (retorna URL para visualización)
-   */
-  getVerUrl(id: number): Observable<string> {
-    // TODO: Conectar al backend
-    // return this.http.get(`${this.url}/${id}/ver`, { responseType: 'text' });
-    const evidencia = this.evidenciasSubject.value.find(e => e.id === id);
-    return of(evidencia?.archivoUrl || '').pipe(delay(300));
+    return this.http.get(`${this.url}/${id}/file`, { params: { download: 'true' }, responseType: 'blob' }).pipe(
+      tap(() => {
+        this.contadorDescargas++;
+        this.actualizarEstadisticas();
+      }),
+    );
   }
 
   // ========================================

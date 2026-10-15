@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 
 import { UsersService } from '../../../core/services/users.services';
 import { Usuario } from '../../../core/models/user.model';
@@ -123,16 +122,10 @@ export class UserComponent implements OnInit {
   private cargarUsuarias(): void {
     this.cargando = true;
 
-    // Traemos usuarias y alertas juntas para calcular el contador real
-    forkJoin({
-      usuarios: this.usersService.getAll(),
-      alertas: this.usersService.getAlertas(),
-    }).subscribe({
-      next: ({ usuarios, alertas }) => {
-        this.todasLasUsuarias = usuarios.map(u => ({
-          ...u,
-          alertas: alertas.filter(a => String(a.usuarioId) === String(u.id)).length,
-        }));
+    // El DTO ya trae el contador de alertas calculado por el backend
+    this.usersService.getAll().subscribe({
+      next: (usuarios) => {
+        this.todasLasUsuarias = usuarios;
         this.applyFilters();
         this.cargando = false;
       },
@@ -235,6 +228,7 @@ export class UserComponent implements OnInit {
     this.cargandoDetalle = true;
     this.modalDetalle = true;
 
+    // GET /api/alerts/user/{usersId} acepta users.id para admin
     this.usersService.getAlertasByUsuaria(u.id).subscribe({
       next: (alertas) => {
         // Las más recientes primero, máximo 5

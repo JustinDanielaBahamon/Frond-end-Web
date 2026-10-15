@@ -11,12 +11,15 @@ export class RiskZonesService {
   // Los puntos CAI / Hospital del mapa son recursos de emergencia del backend.
   private recursosUrl = `${environment.apiUrl}/api/resources`;
 
+  /** Zonas de riesgo para el mapa de alertas (los puntos de apoyo no se dibujan como riesgo). */
   getZonas(): Observable<ZonaManual[]> {
-    return this.http.get<ZonaManual[]>(this.zonasUrl);
+    return this.http.get<ZonaApi[]>(this.zonasUrl).pipe(
+      map(zonas => zonas.filter(z => z.zoneType === 'risk' && z.isActive !== false).map(zonaDesdeApi))
+    );
   }
 
   createZona(zona: Omit<ZonaManual, 'id'>): Observable<ZonaManual> {
-    return this.http.post<ZonaManual>(this.zonasUrl, zona);
+    return this.http.post<ZonaApi>(this.zonasUrl, zonaHaciaApi(zona)).pipe(map(zonaDesdeApi));
   }
 
   deleteZona(id: number): Observable<void> {
@@ -67,3 +70,50 @@ const TIPO_PUNTO: Record<string, PuntoMapa['tipo'] | undefined> = {
   hospital: 'Hospital',
   health_center: 'Hospital',
 };
+
+/** Campos de /api/zones que usa el mapa de alertas. */
+interface ZonaApi {
+  id: number;
+  name: string;
+  zoneType: string;
+  riskLevel: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  isActive?: boolean;
+}
+
+// Una zona "pin" se guarda con un radio pequeño, porque el backend exige radio.
+const RADIO_PIN = 50;
+
+const NIVEL_DESDE_API: Record<string, ZonaManual['nivel']> = { high: 'Alto', medium: 'Medio', low: 'Bajo' };
+const NIVEL_HACIA_API: Record<ZonaManual['nivel'], string> = { Alto: 'high', Medio: 'medium', Bajo: 'low' };
+
+function zonaDesdeApi(z: ZonaApi): ZonaManual {
+  const radio = Number(z.radiusMeters);
+  return {
+    id: z.id,
+    nombre: z.name,
+    nivel: NIVEL_DESDE_API[z.riskLevel] ?? 'Medio',
+    metodo: radio > RADIO_PIN ? 'area' : 'pin',
+    radio: radio > RADIO_PIN ? radio : undefined,
+    centroLat: Number(z.latitude),
+    centroLng: Number(z.longitude),
+    alertasEnZona: 0,
+  };
+}
+
+function zonaHaciaApi(z: Omit<ZonaManual, 'id'>): Omit<ZonaApi, 'id'> {
+  return {
+    name: z.nombre,
+    zoneType: 'risk',
+    riskLevel: NIVEL_HACIA_API[z.nivel] ?? 'medium',
+    // El mapa no pide ciudad; se puede corregir luego en Gestión de zonas.
+    city: 'Sin especificar',
+    latitude: z.centroLat,
+    longitude: z.centroLng,
+    radiusMeters: z.metodo === 'area' && z.radio ? z.radio : RADIO_PIN,
+    isActive: true,
+  };
+}

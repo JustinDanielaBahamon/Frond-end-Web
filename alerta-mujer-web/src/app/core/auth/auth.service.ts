@@ -138,6 +138,17 @@ export class AuthService {
     this._token$.next(null);
   }
 
+  /** Actualiza los datos de la usuaria en sesión (p. ej. tras editar su nombre) sin tocar el token. */
+  actualizarUsuarioActual(cambios: Partial<User>): void {
+    const actual = this._currentUser$.value;
+    const token = this._token$.value;
+    if (!actual || !token) return;
+    const user: User = { ...actual, ...cambios };
+    user.nombre = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || actual.nombre;
+    this.saveSession(user, token);
+    this._currentUser$.next(user);
+  }
+
   /** Inicio de sesión con Google: el backend valida el token de Firebase y entrega el JWT. */
   loginWithGoogle(idToken: string): Observable<User> {
     return this.http

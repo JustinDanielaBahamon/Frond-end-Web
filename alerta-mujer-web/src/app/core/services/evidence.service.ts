@@ -1,8 +1,87 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, delay } from 'rxjs';
+import { Observable, of, BehaviorSubject, delay, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Evidencia, EvidenciaFilters, EvidenciaStats } from '../models/evidence.model';
+
+/** Evidencia tal como la devuelve el backend al panel de administración. */
+interface AdminEvidenceApi {
+  id: number;
+  alertId: number;
+  mediaType: string;          // photo | video | audio | document
+  fileName: string | null;
+  contentType: string | null;
+  sizeBytes: number | null;
+  hasFile: boolean;
+  reviewStatus: string;       // pending | verified | rejected
+  createdAt: string | null;
+  userId: number | null;
+  userName: string | null;
+  userEmail: string | null;
+  alertStatus: string | null;
+  alertActivationMethod: string | null;
+  alertMessage: string | null;
+  alertStartedAt: string | null;
+  alertLatitude: number | null;
+  alertLongitude: number | null;
+}
+
+const TIPO_DESDE_API: Record<string, Evidencia['tipo']> = {
+  photo: 'foto', video: 'video', audio: 'audio', document: 'documento',
+};
+const ESTADO_DESDE_API: Record<string, Evidencia['estado']> = {
+  pending: 'Pendiente', verified: 'Verificada', rejected: 'Rechazada',
+};
+const ESTADO_ALERTA: Record<string, string> = {
+  active: 'Activa', resolved: 'Atendida', cancelled: 'Cancelada', expired: 'Expirada',
+};
+const METODO_ACTIVACION: Record<string, string> = {
+  panic_button: 'Botón de pánico', contact: 'Desde contactos',
+};
+
+function tamanioLegible(bytes: number | null): string {
+  if (!bytes) return '0 KB';
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+const hora = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '';
+
+function desdeApi(e: AdminEvidenceApi): Evidencia {
+  const ubicacion = e.alertLatitude != null && e.alertLongitude != null
+    ? `${Number(e.alertLatitude).toFixed(5)}, ${Number(e.alertLongitude).toFixed(5)}`
+    : '';
+  const metodo = METODO_ACTIVACION[e.alertActivationMethod ?? ''] ?? (e.alertActivationMethod ?? '');
+  return {
+    id: e.id,
+    usuarioId: e.userId ?? 0,
+    usuarioNombre: e.userName ?? 'Sin usuaria',
+    usuarioEmail: e.userEmail ?? '',
+    tipo: TIPO_DESDE_API[e.mediaType] ?? 'documento',
+    nombre: e.fileName ?? `evidencia-${e.id}`,
+    tamanio: tamanioLegible(e.sizeBytes),
+    fecha: e.createdAt ?? '',
+    hora: hora(e.createdAt),
+    alertaId: String(e.alertId),
+    alertaTipo: 'Alerta SOS',
+    alertaCiudad: '',
+    estado: ESTADO_DESDE_API[e.reviewStatus] ?? 'Pendiente',
+    ubicacion,
+    metodoActivacion: metodo,
+    alertaAsociada: {
+      id: String(e.alertId),
+      tipo: 'Alerta SOS',
+      fecha: e.alertStartedAt ?? '',
+      hora: hora(e.alertStartedAt),
+      ciudad: '',
+      ubicacion,
+      estado: ESTADO_ALERTA[e.alertStatus ?? ''] ?? (e.alertStatus ?? ''),
+      descripcion: e.alertMessage ?? undefined,
+      metodoActivacion: metodo,
+    },
+  };
+}
 
 @Injectable({ providedIn: 'root' })
 export class EvidenceService {
@@ -33,7 +112,14 @@ export class EvidenceService {
    * Obtener todas las evidencias
    */
   getAll(): Observable<Evidencia[]> {
-    return this.http.get<Evidencia[]>(this.url);
+    return this.http.get<AdminEvidenceApi[]>(this.url).pipe(
+      map(lista => lista.map(desdeApi)),
+      // La lista local alimenta los filtros y las estadísticas
+      tap(evidencias => {
+        this.evidenciasSubject.next(evidencias);
+        this.actualizarEstadisticas();
+      }),
+    );
   }
 
   /**
@@ -77,11 +163,9 @@ export class EvidenceService {
   /**
    * Obtener estadísticas
    */
+  // Se actualiza cada vez que cambia la lista
   getStats(): Observable<EvidenciaStats> {
-    // TODO: Conectar al backend
-    // return this.http.get<EvidenciaStats>(`${this.url}/stats`);
-    const stats = this.calcularEstadisticas();
-    return of(stats).pipe(delay(200));
+    return this.stats$;
   }
 
   /**

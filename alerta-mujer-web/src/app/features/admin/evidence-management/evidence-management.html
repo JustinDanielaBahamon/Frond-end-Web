@@ -179,7 +179,7 @@
             <td>
               <div class="alert-related">
                 <span class="alert-id">{{ evidence.alertaId }}</span>
-                <span class="alert-type-city">{{ evidence.alertaTipo }} - {{ evidence.alertaCiudad }}</span>
+                <span class="alert-type-city">{{ evidence.alertaTipo }}<ng-container *ngIf="evidence.alertaCiudad"> - {{ evidence.alertaCiudad }}</ng-container></span>
               </div>
             </td>
             <td>
@@ -187,7 +187,7 @@
                 {{ getEvidenceTypeDisplay(evidence.tipo) }}
               </span>
             </td>
-            <td>{{ evidence.fecha }}<br>{{ evidence.hora }}</td>
+            <td>{{ evidence.fecha | date:'dd/MM/yyyy' }}<br>{{ evidence.hora }}</td>
             <td>
               <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.estado)">
                 {{ evidence.estado }}
@@ -294,7 +294,7 @@
                 </div>
                 <div class="detail-item">
                   <label>Fecha</label>
-                  <p>{{ evidenciaSeleccionada.fecha }}</p>
+                  <p>{{ evidenciaSeleccionada.fecha | date:'dd/MM/yyyy' }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Hora</label>
@@ -335,8 +335,8 @@
                   <p>{{ evidenciaSeleccionada.alertaTipo }}</p>
                 </div>
                 <div class="detail-item">
-                  <label>Ciudad</label>
-                  <p>{{ evidenciaSeleccionada.alertaCiudad }}</p>
+                  <label>Ubicación de la alerta</label>
+                  <p>{{ evidenciaSeleccionada.ubicacion || 'Sin ubicación' }}</p>
                 </div>
               </div>
             </div>

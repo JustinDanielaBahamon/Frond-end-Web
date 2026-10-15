@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -15,6 +15,7 @@ import { EvidenceService } from '../../../core/services/evidence.service';
 export class EvidencesManagementComponent implements OnInit {
   private destroy$ = new Subject<void>();
   private evidenceService = inject(EvidenceService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Datos
   evidencias$: Observable<Evidencia[]> = this.evidenceService.evidencias$;
@@ -97,18 +98,20 @@ export class EvidencesManagementComponent implements OnInit {
         this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
         this.actualizarPaginacion();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar las evidencias';
         this.cargando = false;
         console.error('Error cargando evidencias:', err);
+        this.cdr.detectChanges();
       }
     });
 
     this.stats$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (stats) => {
-        console.log('Estadísticas actualizadas:', stats);
         this.stats = stats;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -133,11 +136,11 @@ export class EvidencesManagementComponent implements OnInit {
 
     this.evidenceService.filtrarEvidencias(filtros).pipe(takeUntil(this.destroy$)).subscribe({
       next: (evidencias) => {
-        console.log('Evidencias filtradas:', evidencias.length, 'resultados');
         this.evidenciasFiltradas = evidencias;
         this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
         this.actualizarPaginacion();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar evidencias';

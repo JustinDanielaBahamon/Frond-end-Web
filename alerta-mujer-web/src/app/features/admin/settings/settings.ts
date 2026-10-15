@@ -41,7 +41,7 @@ export class AdminSettingsComponent {
 
   // ── Parámetros de la app (servidor) ──────────────────────────
   readonly parametros = signal<ParametrosApp | null>(null);
-  form = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '' };
+  form = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '', maxContactos: 5, versionMinimaApp: '' };
   readonly cargandoParametros = signal(true);
   readonly guardandoParametros = signal(false);
   readonly errorParametros = signal('');
@@ -161,6 +161,8 @@ export class AdminSettingsComponent {
       duracionMaximaAlertaMin: Number(this.form.duracionMaximaAlertaMin),
       numeroEmergencia: this.form.numeroEmergencia.trim(),
       correoSoporte: this.form.correoSoporte.trim(),
+      maxContactos: Number(this.form.maxContactos),
+      versionMinimaApp: this.form.versionMinimaApp.trim(),
     }).subscribe({
       next: (p) => {
         this.aplicarParametros(p);
@@ -180,6 +182,8 @@ export class AdminSettingsComponent {
       duracionMaximaAlertaMin: p.duracionMaximaAlertaMin,
       numeroEmergencia: p.numeroEmergencia,
       correoSoporte: p.correoSoporte,
+      maxContactos: p.maxContactos,
+      versionMinimaApp: p.versionMinimaApp,
     };
   }
 

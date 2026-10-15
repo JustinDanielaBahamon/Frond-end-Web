@@ -113,6 +113,16 @@
             <small>Línea que se ofrece a las usuarias (en Colombia, 123).</small>
           </label>
           <label class="field">
+            <span>Contactos de emergencia por usuaria</span>
+            <input type="number" name="maxContactos" [(ngModel)]="form.maxContactos" min="1" max="20" required />
+            <small>Máximo que puede registrar cada usuaria (entre 1 y 20).</small>
+          </label>
+          <label class="field">
+            <span>Versión mínima de la app móvil</span>
+            <input name="versionMinima" [(ngModel)]="form.versionMinimaApp" placeholder="Ej: 1.2.0 (vacío = sin mínimo)" maxlength="20" />
+            <small>Las versiones anteriores pedirán actualizar el APK.</small>
+          </label>
+          <label class="field">
             <span>Correo de soporte</span>
             <input type="email" name="correo" [(ngModel)]="form.correoSoporte" required />
             <small>Recibe las solicitudes de ayuda del panel.</small>

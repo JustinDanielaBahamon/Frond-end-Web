@@ -8,7 +8,32 @@ export interface ParametrosApp {
   duracionMaximaAlertaMin: number;
   numeroEmergencia: string;
   correoSoporte: string;
+  maxContactos: number;
+  /** '' = no se exige versión mínima de la app móvil */
+  versionMinimaApp: string;
   actualizado: Date | null;
+}
+
+export interface EstadoSistema {
+  baseDatos: boolean;
+  latenciaMs: number;
+  notificacionesPush: boolean;
+  alertasActivas: number;
+  ultimaRevisionExpiracion: Date | null;
+  expiradasUltimaRevision: number;
+  enLineaDesde: Date;
+}
+
+export interface RegistroAuditoria {
+  id: number;
+  accion: string;
+  tipo: string;
+  registroId: number | null;
+  descripcion: string;
+  actor: string | null;
+  actorCorreo: string | null;
+  ip: string | null;
+  fecha: Date;
 }
 
 export interface DatosContacto {
@@ -21,6 +46,8 @@ interface SettingsApi {
   sosMaxDurationMinutes: number;
   emergencyPhoneNumber: string;
   supportEmail: string;
+  maxEmergencyContacts: number;
+  minAppVersion: string | null;
   updatedAt: string | null;
 }
 
@@ -37,13 +64,43 @@ export class AdminSettingsService {
     return this.http.put<SettingsApi>(`${this.api}/api/admin/settings`, {
       sosMaxDurationMinutes: p.duracionMaximaAlertaMin,
       emergencyPhoneNumber: p.numeroEmergencia,
-      supportEmail: p.correoSoporte
+      supportEmail: p.correoSoporte,
+      maxEmergencyContacts: p.maxContactos,
+      minAppVersion: p.versionMinimaApp
     }).pipe(map(s => this.desdeApi(s)));
   }
 
   obtenerMisDatos(): Observable<DatosContacto> {
     return this.http.get<DatosContacto>(`${this.api}/api/users/me`).pipe(
       map(u => ({ firstName: u.firstName ?? '', lastName: u.lastName ?? '', telephone: u.telephone ?? '' }))
+    );
+  }
+
+  obtenerEstado(): Observable<EstadoSistema> {
+    return this.http.get<any>(`${this.api}/api/admin/system-status`).pipe(map(s => ({
+      baseDatos: s.database,
+      latenciaMs: s.databaseLatencyMs,
+      notificacionesPush: s.pushNotifications,
+      alertasActivas: s.activeAlerts,
+      ultimaRevisionExpiracion: s.lastExpirationCheck ? new Date(s.lastExpirationCheck) : null,
+      expiradasUltimaRevision: s.lastExpiredCount,
+      enLineaDesde: new Date(s.startedAt)
+    })));
+  }
+
+  obtenerAuditoria(limite = 50): Observable<RegistroAuditoria[]> {
+    return this.http.get<any[]>(`${this.api}/api/admin/audit-log`, { params: { limit: limite } }).pipe(
+      map(lista => lista.map(r => ({
+        id: r.id,
+        accion: r.action,
+        tipo: r.entityType,
+        registroId: r.entityId,
+        descripcion: r.description ?? '',
+        actor: r.actorName,
+        actorCorreo: r.actorEmail,
+        ip: r.ipAddress,
+        fecha: new Date(r.createdAt)
+      })))
     );
   }
 
@@ -64,6 +121,8 @@ export class AdminSettingsService {
       duracionMaximaAlertaMin: s.sosMaxDurationMinutes,
       numeroEmergencia: s.emergencyPhoneNumber,
       correoSoporte: s.supportEmail,
+      maxContactos: s.maxEmergencyContacts,
+      versionMinimaApp: s.minAppVersion ?? '',
       actualizado: s.updatedAt ? new Date(s.updatedAt) : null
     };
   }

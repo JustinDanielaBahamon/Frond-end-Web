@@ -7,28 +7,67 @@
     <div class="home-panel home-panel--estado">
       <div class="home-panel__header">
         <div>
-          <h2 class="home-panel__title">Estado de tu seguridad</h2>
-          <p class="home-panel__subtitle">Tu cuenta está protegida</p>
+          <h2 class="home-panel__title">
+            @if (estadoGeneral) {
+              <span class="estado-dot" [ngClass]="'estado-dot--' + estadoGeneral.color"></span>
+            }
+            Estado de tu seguridad
+          </h2>
+          @if (estadoGeneral) {
+            <p class="home-panel__subtitle" 
+               [ngClass]="{
+                 'home-panel__subtitle--advertencia': estadoGeneral.color === 'amarillo',
+                 'home-panel__subtitle--peligro': estadoGeneral.color === 'rojo'
+               }">
+              {{ estadoGeneral.nivel }} • {{ estadoGeneral.porcentaje }}% configurado
+            </p>
+          } @else {
+            <p class="home-panel__subtitle">Cargando...</p>
+          }
         </div>
         <button class="home-btn home-btn--outline" routerLink="/dashboard/settings">
           Ver configuración
         </button>
       </div>
 
-      <div class="home-seguridad-grid">
-        @for (item of estadoSeguridad; track item.descripcion) {
-          <div class="home-seguridad-item">
-            <div class="home-seguridad-item__icon">
-              <i class="ti {{ item.icon }}"></i>
+      @if (isLoadingStatus) {
+        <div class="home-seguridad-grid">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="home-seguridad-item" style="opacity: 0.5;">
+              <div class="home-seguridad-item__icon">
+                <i class="ti ti-loader-2" style="animation: spin 1s linear infinite;"></i>
+              </div>
+              <p class="home-seguridad-item__valor">...</p>
+              <p class="home-seguridad-item__descripcion">Cargando</p>
             </div>
-            <p class="home-seguridad-item__valor">{{ item.valor }}</p>
-            <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
-            @if (item.configurado) {
-              <span class="home-seguridad-item__check"><i class="ti ti-check"></i></span>
-            }
-          </div>
-        }
-      </div>
+          }
+        </div>
+      } @else {
+        <div class="home-seguridad-grid">
+          @for (item of estadoSeguridad; track item.descripcion) {
+            <div class="home-seguridad-item" [title]="item.tooltip || ''">
+              <div class="home-seguridad-item__icon">
+                <i class="ti {{ item.icon }}"></i>
+              </div>
+              <p class="home-seguridad-item__valor">{{ item.valor }}</p>
+              <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
+              @if (item.configurado) {
+                <span class="home-seguridad-item__check home-seguridad-item__check--exito">
+                  <i class="ti ti-check"></i>
+                </span>
+              } @else if (estadoGeneral?.color === 'rojo') {
+                <span class="home-seguridad-item__check home-seguridad-item__check--peligro">
+                  <i class="ti ti-x"></i>
+                </span>
+              } @else {
+                <span class="home-seguridad-item__check home-seguridad-item__check--advertencia">
+                  <i class="ti ti-alert-triangle"></i>
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <!-- MI DISPOSITIVO -->
@@ -92,6 +131,72 @@
       </div>
 
       <div id="home-mini-map" class="home-full-map"></div>
+
+      <!-- LEYENDA DEL MAPA -->
+      <div class="home-map-legend">
+        <h3 class="home-map-legend__title">
+          <i class="ti ti-info-circle"></i> Guía del mapa
+        </h3>
+        <div class="home-map-legend__grid">
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 2px solid white;">
+              📍
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Mi ubicación</strong>
+              <span>Pin violeta indica dónde estás ahora</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #dc2626; border: 2px solid #991b1b;">
+              ⚠️
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Zona de riesgo</strong>
+              <span>Áreas con precaución especial</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #16a34a; border: 2px solid #15803d;">
+              🛡️
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Zona segura</strong>
+              <span>Lugares con vigilancia permanente</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #9333ea; border: 2px solid #7e22ce;">
+              👮
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Estación de policía</strong>
+              <span>Ayuda inmediata disponible</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #3b82f6; border: 2px solid #2563eb;">
+              🏥
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Centro de asistencia</strong>
+              <span>Hospitales y Cruz Roja</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #0ea5e9; border: 2px solid #0284c7;">
+              🆘
+            </div>
+            <div class="home-map-legend__text">
+              <strong>Punto de ayuda</strong>
+              <span>Información y asistencia ciudadana</span>
+            </div>
+          </div>
+        </div>
+        <p class="home-map-legend__note">
+          <i class="ti ti-click"></i> Haz clic en cualquier marcador para ver más información
+        </p>
+      </div>
 
       <div class="home-map-info">
         <div class="home-map-info__item">

@@ -1,15 +1,18 @@
-import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
+import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';
+import { EstadoSeguridad } from '../../../core/models/security-status.model';
 
 interface SeguridadItem {
   icon: string;
   valor: string;
   descripcion: string;
   configurado: boolean;
+  tooltip?: string;
 }
 
 interface MiDispositivo {
@@ -65,27 +68,24 @@ interface AccionRapida {
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home implements AfterViewInit, OnDestroy {
+export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   private map: L.Map | null = null;
   private zoneService = inject(NearbyZoneService);
+  private securityStatusService = inject(UserSecurityStatusService);
   private zonas: NearbyZone[] = [];
   private userMarker: L.Marker | null = null;
   private zoneCircles: L.Circle[] = [];
+  private zoneMarkers: L.Marker[] = [];
   
   // Estado público para el template
   isRefreshing = false;
+  isLoadingStatus = true;
 
   // ── ESTADO DE SEGURIDAD ───────────────────────────
-  // Refleja qué tan configurada está la cuenta: cada item ya
-  // trae su check en verde cuando la usuaria completó ese paso.
-  estadoSeguridad: SeguridadItem[] = [
-    { icon: 'ti-users',        valor: '3',            descripcion: 'Contactos de emergencia', configurado: true },
-    { icon: 'ti-shield-check', valor: 'Movimiento',   descripcion: 'Método de activación',     configurado: true },
-    { icon: 'ti-map-pin',      valor: 'Ubicación',    descripcion: 'activa',                   configurado: true },
-    { icon: 'ti-bell',         valor: 'Notificaciones', descripcion: 'activas',                configurado: true },
-    { icon: 'ti-folder',       valor: '8',            descripcion: 'Evidencias almacenadas',   configurado: true },
-  ];
+  // Sincronizado con el backend: cada item refleja el estado real
+  estadoSeguridad: SeguridadItem[] = [];
+  estadoGeneral: { nivel: string; color: string; icono: string; porcentaje: number } | null = null;
 
   // ── MI DISPOSITIVO ────────────────────────────────
   miDispositivo: MiDispositivo = {
@@ -140,6 +140,69 @@ export class Home implements AfterViewInit, OnDestroy {
     { icon: 'ti-user',      label: 'Actualizar información personal',  route: '/dashboard/settings' },
   ];
 
+  ngOnInit(): void {
+    this.cargarEstadoSeguridad();
+  }
+
+  /** Cargar estado de seguridad desde el backend */
+  private cargarEstadoSeguridad(): void {
+    this.isLoadingStatus = true;
+    
+    this.securityStatusService.getSecurityStatus().subscribe({
+      next: (estado: EstadoSeguridad) => {
+        // Mapear requisitos a items de seguridad
+        this.estadoSeguridad = estado.requisitos.map(req => ({
+          icon: req.icon,
+          valor: req.valor,
+          descripcion: req.label,
+          configurado: req.cumplido,
+          tooltip: req.cumplido 
+            ? `${req.label}: ${req.valor}` 
+            : `${req.label}: ${req.valor} (requiere atención)`
+        }));
+
+        // Establecer estado general
+        const nivelTextos = {
+          seguro: 'Tu cuenta está protegida',
+          advertencia: 'Requiere atención',
+          critico: 'Configuración incompleta'
+        };
+
+        const iconos = {
+          seguro: 'ti-shield-check',
+          advertencia: 'ti-alert-triangle',
+          critico: 'ti-alert-octagon'
+        };
+
+        this.estadoGeneral = {
+          nivel: nivelTextos[estado.nivel],
+          color: estado.color,
+          icono: iconos[estado.nivel],
+          porcentaje: estado.porcentaje
+        };
+
+        this.isLoadingStatus = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar estado de seguridad:', err);
+        // Mantener datos de fallback estáticos
+        this.estadoSeguridad = [
+          { icon: 'ti-users', valor: '0', descripcion: 'Contactos de emergencia', configurado: false },
+          { icon: 'ti-shield-check', valor: 'No configurado', descripcion: 'Método de activación', configurado: false },
+          { icon: 'ti-map-pin', valor: 'Inactiva', descripcion: 'Ubicación', configurado: false },
+          { icon: 'ti-bell', valor: 'Inactivas', descripcion: 'Notificaciones', configurado: false },
+        ];
+        this.estadoGeneral = {
+          nivel: 'Error al cargar',
+          color: 'rojo',
+          icono: 'ti-alert-octagon',
+          porcentaje: 0
+        };
+        this.isLoadingStatus = false;
+      }
+    });
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.inicializarMiniMapa();
@@ -179,36 +242,45 @@ export class Home implements AfterViewInit, OnDestroy {
     const iconoVioleta = L.divIcon({
       className: '',
       html: `
-        <div style="position: relative;">
-          <div style="
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #6d28d9 0%, #a855f7 100%);
-            border: 3px solid white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.4);
-          ">
-            <i class="ti ti-map-pin-filled" style="color: white; font-size: 20px;"></i>
-          </div>
+        <div style="position: relative; width: 36px; height: 50px;">
+          <!-- Pin en forma de gota/lágrima -->
+          <svg width="36" height="50" viewBox="0 0 36 50" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
+            <!-- Gradiente violeta -->
+            <defs>
+              <linearGradient id="gradientPin" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <!-- Forma de pin -->
+            <path d="M18 0 C8 0 0 8 0 18 C0 28 18 50 18 50 C18 50 36 28 36 18 C36 8 28 0 18 0 Z" 
+                  fill="url(#gradientPin)" 
+                  stroke="white" 
+                  stroke-width="2"/>
+            <!-- Círculo interior blanco -->
+            <circle cx="18" cy="18" r="8" fill="white"/>
+            <!-- Punto violeta en el centro -->
+            <circle cx="18" cy="18" r="4" fill="#6d28d9"/>
+          </svg>
+          
+          <!-- Indicador verde pulsante (activo) -->
           <div style="
             position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 16px;
-            height: 16px;
+            top: 4px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
             background: #10b981;
             border: 2px solid white;
             border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
             animation: pulse 2s infinite;
           "></div>
         </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40],
+      iconSize: [36, 50],
+      iconAnchor: [18, 50],
+      popupAnchor: [0, -50],
     });
 
     this.userMarker = L.marker([this.ultimaUbicacion.lat, this.ultimaUbicacion.lng], { icon: iconoVioleta })
@@ -229,13 +301,110 @@ export class Home implements AfterViewInit, OnDestroy {
     // Obtener zonas del backend (usar userId real cuando esté disponible)
     this.zoneService.getByUser(1).subscribe({
       next: (zonas) => {
-        this.zonas = zonas;
+        this.zonas = zonas.length > 0 ? zonas : this.obtenerZonasEjemplo();
         this.dibujarZonasEnMapa();
       },
       error: (err) => {
-        console.error('Error al cargar zonas:', err);
+        console.error('Error al cargar zonas, usando datos de ejemplo:', err);
+        // Si hay error, usar zonas de ejemplo
+        this.zonas = this.obtenerZonasEjemplo();
+        this.dibujarZonasEnMapa();
       }
     });
+  }
+
+  /** Zonas de ejemplo para Neiva, Huila */
+  private obtenerZonasEjemplo(): NearbyZone[] {
+    return [
+      {
+        id: 1,
+        name: 'CAI Centro',
+        type: 'policia',
+        lat: 2.9295,
+        lng: -75.2810,
+        radiusMeters: 300,
+        address: 'Carrera 5 con Calle 10, Centro',
+        description: 'Centro de Atención Inmediata - Policía Nacional',
+        isActive: true
+      },
+      {
+        id: 2,
+        name: 'Hospital Universitario',
+        type: 'asistencia',
+        lat: 2.9330,
+        lng: -75.2850,
+        radiusMeters: 250,
+        address: 'Calle 5A # 15-25',
+        description: 'Centro médico de emergencias 24 horas',
+        isActive: true
+      },
+      {
+        id: 3,
+        name: 'Zona de riesgo - Sector La Floresta',
+        type: 'risk',
+        lat: 2.9210,
+        lng: -75.2790,
+        radiusMeters: 400,
+        address: 'Barrio La Floresta',
+        description: 'Zona con alto índice de delincuencia. Evitar transitar de noche.',
+        isActive: true
+      },
+      {
+        id: 4,
+        name: 'Parque Santander (Zona Segura)',
+        type: 'safe',
+        lat: 2.9265,
+        lng: -75.2805,
+        radiusMeters: 200,
+        address: 'Carrera 5 con Calle 7',
+        description: 'Zona con vigilancia permanente y buena iluminación',
+        isActive: true
+      },
+      {
+        id: 5,
+        name: 'Estación de Policía Sur',
+        type: 'policia',
+        lat: 2.9150,
+        lng: -75.2900,
+        radiusMeters: 350,
+        address: 'Calle 26 Sur # 20-45',
+        description: 'Estación de Policía - Comando Sur',
+        isActive: true
+      },
+      {
+        id: 6,
+        name: 'Punto de Ayuda Alcaldía',
+        type: 'help',
+        lat: 2.9285,
+        lng: -75.2825,
+        radiusMeters: 150,
+        address: 'Edificio Alcaldía Municipal',
+        description: 'Punto de información y asistencia ciudadana',
+        isActive: true
+      },
+      {
+        id: 7,
+        name: 'Zona de riesgo - Río del Oro',
+        type: 'risk',
+        lat: 2.9180,
+        lng: -75.2950,
+        radiusMeters: 500,
+        address: 'Sector Río del Oro',
+        description: 'Zona solitaria con poca iluminación. Alta precaución.',
+        isActive: true
+      },
+      {
+        id: 8,
+        name: 'Cruz Roja Colombiana',
+        type: 'asistencia',
+        lat: 2.9310,
+        lng: -75.2770,
+        radiusMeters: 200,
+        address: 'Carrera 7 # 12-30',
+        description: 'Centro de atención médica de emergencia',
+        isActive: true
+      }
+    ];
   }
 
   /** Dibujar zonas en el mapa con colores según el tipo */
@@ -245,31 +414,107 @@ export class Home implements AfterViewInit, OnDestroy {
     // Limpiar zonas anteriores
     this.zoneCircles.forEach(circle => circle.remove());
     this.zoneCircles = [];
+    this.zoneMarkers.forEach(marker => marker.remove());
+    this.zoneMarkers = [];
 
     this.zonas.forEach(zona => {
-      if (!zona.radiusMeters || !this.map) return;
+      if (!this.map) return;
 
       const config = this.obtenerConfigZona(zona.type);
       
-      const circle = L.circle([zona.lat, zona.lng], {
-        radius: zona.radiusMeters,
-        color: config.borderColor,
-        fillColor: config.fillColor,
-        fillOpacity: 0.25,
-        weight: 2,
-      }).addTo(this.map);
+      // Si tiene radio, dibujar círculo
+      if (zona.radiusMeters) {
+        const circle = L.circle([zona.lat, zona.lng], {
+          radius: zona.radiusMeters,
+          color: config.borderColor,
+          fillColor: config.fillColor,
+          fillOpacity: 0.25,
+          weight: 2,
+        }).addTo(this.map);
 
-      circle.bindPopup(`
-        <div style="min-width: 180px;">
-          <strong style="color: ${config.borderColor};">${config.icon} ${zona.name}</strong><br>
-          <span style="font-size: 12px; color: #666;">${config.label}</span><br>
-          ${zona.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zona.description}</p>` : ''}
-          ${zona.address ? `<small style="color: #999;">📍 ${zona.address}</small>` : ''}
-        </div>
-      `);
+        circle.bindPopup(`
+          <div style="min-width: 180px;">
+            <strong style="color: ${config.borderColor};">${config.emoji} ${zona.name}</strong><br>
+            <span style="font-size: 12px; color: #666;">${config.label}</span><br>
+            ${zona.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zona.description}</p>` : ''}
+            ${zona.address ? `<small style="color: #999;">📍 ${zona.address}</small>` : ''}
+          </div>
+        `);
 
-      this.zoneCircles.push(circle);
+        this.zoneCircles.push(circle);
+      }
+
+      // Agregar marcador con icono personalizado
+      const iconoZona = L.divIcon({
+        className: '',
+        html: `
+          <div style="
+            width: 36px;
+            height: 36px;
+            background: ${config.fillColor};
+            border: 2px solid ${config.borderColor};
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          ">
+            ${config.emoji}
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        popupAnchor: [0, -18],
+      });
+
+      const marker = L.marker([zona.lat, zona.lng], { icon: iconoZona })
+        .addTo(this.map)
+        .bindPopup(`
+          <div style="min-width: 180px;">
+            <strong style="color: ${config.borderColor};">${config.emoji} ${zona.name}</strong><br>
+            <span style="font-size: 12px; color: #666;">${config.label}</span><br>
+            ${zona.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zona.description}</p>` : ''}
+            ${zona.address ? `<small style="color: #999;">📍 ${zona.address}</small><br>` : ''}
+            ${zona.distanceKm ? `<small style="color: #999;">📏 ${zona.distanceKm.toFixed(2)} km de distancia</small>` : ''}
+          </div>
+        `);
+
+      this.zoneMarkers.push(marker);
     });
+
+    // Calcular distancias desde la ubicación del usuario
+    this.calcularDistancias();
+  }
+
+  /** Calcular distancias de zonas desde la ubicación del usuario */
+  private calcularDistancias(): void {
+    this.zonas = this.zonas.map(zona => ({
+      ...zona,
+      distanceKm: this.calcularDistanciaKm(
+        this.ultimaUbicacion.lat,
+        this.ultimaUbicacion.lng,
+        zona.lat,
+        zona.lng
+      )
+    })).sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+  }
+
+  /** Calcular distancia entre dos puntos en km (fórmula de Haversine) */
+  private calcularDistanciaKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
   }
 
   /** Obtener configuración de color e icono según el tipo de zona */
@@ -277,38 +522,38 @@ export class Home implements AfterViewInit, OnDestroy {
     fillColor: string; 
     borderColor: string; 
     label: string; 
-    icon: string;
+    emoji: string;
   } {
     const configs = {
       risk: { 
         fillColor: '#dc2626', 
         borderColor: '#991b1b', 
         label: 'Zona de riesgo', 
-        icon: '⚠️' 
+        emoji: '⚠️' 
       },
       safe: { 
         fillColor: '#16a34a', 
         borderColor: '#15803d', 
         label: 'Zona segura', 
-        icon: '✅' 
+        emoji: '🛡️' 
       },
       help: { 
         fillColor: '#0ea5e9', 
         borderColor: '#0284c7', 
         label: 'Punto de ayuda', 
-        icon: '🆘' 
+        emoji: '🆘' 
       },
       policia: { 
         fillColor: '#9333ea', 
         borderColor: '#7e22ce', 
         label: 'Estación de policía', 
-        icon: '👮' 
+        emoji: '👮' 
       },
       asistencia: { 
         fillColor: '#3b82f6', 
         borderColor: '#2563eb', 
         label: 'Centro de asistencia', 
-        icon: '🏥' 
+        emoji: '🏥' 
       },
     };
 

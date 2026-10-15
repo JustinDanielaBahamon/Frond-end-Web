@@ -1,0 +1,513 @@
+// ── IMPORT PROJECT TOKENS ───────────────────────────
+// Use shared design tokens instead of duplicating them
+@use '../../../shared/styles/tokens.scss' as *;
+
+:host {
+  // Use project tokens for all colors
+  // Map dashboard tokens to local semantic names for consistency
+  --color-principal: var(--purple-mid);
+  --color-principal-claro: var(--purple-light);
+  --color-acento: var(--purple-deep);
+  --color-exito: var(--green);
+  --color-advertencia: var(--amber);
+  --color-peligro: var(--red);
+  --color-neutral: var(--text-muted);
+  --color-fondo: var(--purple-pale);
+  --color-superficie: var(--bg-card);
+  --color-borde: var(--border);
+  --color-texto-principal: var(--text-primary);
+  --color-texto-secundario: var(--text-muted);
+
+  // Typography tokens from tokens.scss
+  --font-size-xs: var(--font-size-xs);
+  --font-size-sm: var(--font-size-sm);
+  --font-size-base: var(--font-size-base);
+  --font-size-lg: var(--font-size-lg);
+  --font-size-xl: var(--font-size-xl);
+
+  display: block;
+}
+
+.device-wrap {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Nunito', sans-serif;
+}
+
+// ── ENCABEZADO ──────────────────────────────────────
+.device-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.device-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0 0 4px;
+}
+
+.device-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+// ── PANEL BASE (reutilizable) ──────────────────────
+.device-panel {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.device-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0 0 1rem;
+
+  i { color: var(--color-principal); }
+}
+
+// ── BOTONES ──────────────────────────────────────────
+.device-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+  
+  &:hover:not(:disabled) { opacity: 0.92; }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &--primario {
+    background: #380759;
+    color: #fff;
+  }
+  
+  &--icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--color-superficie);
+    border: 1.5px solid var(--color-borde);
+    color: var(--color-principal);
+  }
+}
+
+// ── BADGES ───────────────────────────────────────────
+.device-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  white-space: nowrap;
+
+  &--exito { background: rgba(16, 185, 129, 0.15); color: #059669; }
+  &--advertencia { background: rgba(217, 119, 6, 0.15); color: #b45309; }
+  &--peligro { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+  &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
+}
+
+// ── NOTA INFORMATIVA DE PERMISOS ────────────────────
+.device-permissions-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: rgba(8, 145, 178, 0.08);
+  border: 1px solid rgba(8, 145, 178, 0.2);
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  line-height: 1.4;
+
+  i {
+    color: var(--color-acento);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
+// ── FILAS RESPONSIVE ────────────────────────────────
+.device-row {
+  display: grid;
+  gap: 1rem;
+
+  &--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 1000px) {
+    &--2col { grid-template-columns: 1fr; }
+  }
+}
+
+// ── GRIDS INTERNOS ──────────────────────────────────
+.device-grid {
+  display: grid;
+  gap: 1rem;
+  
+  &--5col {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  &--4col {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &--3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 1200px) {
+    &--5col { grid-template-columns: repeat(3, 1fr); }
+    &--4col { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    &--5col, &--4col, &--3col { grid-template-columns: repeat(2, 1fr); }
+  }
+}
+
+// ── ITEMS DE PERMISOS ───────────────────────────────
+.device-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 1rem 0.75rem;
+  border-radius: 12px;
+  background: var(--color-fondo);
+}
+
+.device-item__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  
+  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  &--neutral { background: rgba(107, 114, 128, 0.12); color: #6b7280; }
+}
+
+.device-item__label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  margin: 0;
+}
+
+// ── LISTA DE SERVICIOS ──────────────────────────────
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.device-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--color-fondo);
+  
+  i:first-child { 
+    color: var(--color-principal); 
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  &--highlight {
+    border: 1px solid var(--color-borde);
+  }
+}
+
+.device-list-item__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.device-list-item__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.device-list-item__details {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+}
+
+// ── INFORMACIÓN DEL DISPOSITIVO ─────────────────────
+.device-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.device-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--color-fondo);
+}
+
+.device-info-item__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+}
+
+.device-info-item__value {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+// ── FUNCIONALIDADES CRÍTICAS ───────────────────────
+.device-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--color-fondo);
+}
+
+.device-feature-item__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+
+  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  &--acento { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+}
+
+.device-feature-item__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.device-feature-item__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+}
+
+.device-feature-item__value {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+// ── REGISTRO DE ACTIVIDAD ───────────────────────────
+.device-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.device-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--color-fondo);
+}
+
+.device-activity-item__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+  &--info { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+  &--warning { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+  &--error { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  &--success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+}
+
+.device-activity-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-activity-item__message {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  margin: 0 0 2px;
+}
+
+.device-activity-item__time {
+  font-size: var(--font-size-xs);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+.device-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--color-texto-secundario);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+// ── PRUEBAS DE FUNCIONALIDAD ───────────────────────
+.device-test-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.device-test-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1.25rem 1rem;
+  border-radius: 12px;
+  background: var(--color-fondo);
+  border: 1.5px solid var(--color-borde);
+  color: var(--color-principal);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  i { font-size: 1.5rem; }
+
+  &:hover:not(:disabled) {
+    background: var(--color-principal);
+    color: #fff;
+    border-color: var(--color-principal);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── ACCIONES RÁPIDAS ────────────────────────────────
+.device-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.device-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #380759;
+  border: none;
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  i { font-size: 1.1rem; }
+
+  &:hover:not(:disabled) { opacity: 0.92; }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── RESPONSIVE ──────────────────────────────────────
+@media (max-width: 768px) {
+  .device-wrap {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .device-title {
+    font-size: 1.5rem;
+  }
+
+  .device-panel {
+    padding: 1rem;
+  }
+
+  .device-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

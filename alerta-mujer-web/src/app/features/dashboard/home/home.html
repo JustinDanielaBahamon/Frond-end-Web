@@ -72,30 +72,25 @@
   <!-- ACTIVIDAD RECIENTE + ÚLTIMA EMERGENCIA + ÚLTIMA UBICACIÓN -->
   <div class="home-row home-row--mid">
 
-    <!-- ACTIVIDAD RECIENTE -->
-    <div class="home-panel">
+    
+      <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
+    <div class="home-panel ubication">
       <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Actividad reciente</h2>
-        <a class="home-link" routerLink="/dashboard/alert-history">Ver todo</a>
+        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
+        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
       </div>
-      <div class="home-activity-list">
-        @for (item of actividadReciente; track item.titulo) {
-          <a class="home-activity-item" routerLink="/dashboard/alert-history">
-            <div class="home-activity-item__icon" [ngClass]="'home-activity-item__icon--' + item.color">
-              <i class="ti {{ item.icon }}"></i>
-            </div>
-            <div class="home-activity-item__body">
-              <p class="home-activity-item__titulo">{{ item.titulo }}</p>
-              <p class="home-activity-item__fecha">{{ item.fecha }}</p>
-            </div>
-            <i class="ti ti-chevron-right home-activity-item__chevron"></i>
-          </a>
-        }
-      </div>
+
+      <div id="home-mini-map" class="home-mini-map"></div>
+
+      <p class="home-mini-map__direccion">
+        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
+      </p>
+      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
     </div>
 
+
     <!-- ÚLTIMA EMERGENCIA -->
-    <div class="home-panel">
+    <div class="home-panel emergency">
       <div class="home-panel__header">
         <h2 class="home-panel__title-sm">Última emergencia</h2>
         <span class="home-badge home-badge--exito">{{ ultimaEmergencia.estado }}</span>
@@ -140,21 +135,7 @@
       </a>
     </div>
 
-    <!-- ÚLTIMA UBICACIÓN REGISTRADA -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Última ubicación registrada</h2>
-        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa</a>
-      </div>
-
-      <div id="home-mini-map" class="home-mini-map"></div>
-
-      <p class="home-mini-map__direccion">
-        <i class="ti ti-map-pin"></i> {{ ultimaUbicacion.direccion }}
-      </p>
-      <p class="home-mini-map__fecha">{{ ultimaUbicacion.fecha }}</p>
-    </div>
-
+  
   </div>
 
   <!-- ACCESOS RÁPIDOS + ACCIONES RÁPIDAS -->
@@ -178,29 +159,6 @@
       </div>
     </div>
 
-    <!-- ACCIONES RÁPIDAS -->
-    <div class="home-panel">
-      <div class="home-panel__header">
-        <h2 class="home-panel__title-sm">Acciones rápidas</h2>
-      </div>
-      <div class="home-acciones-list">
-        @for (accion of accionesRapidas; track accion.label) {
-          @if (!accion.disabled) {
-            <a class="home-accion-item" [routerLink]="accion.route">
-              <i class="ti {{ accion.icon }}"></i>
-              <span>{{ accion.label }}</span>
-              <i class="ti ti-chevron-right home-accion-item__chevron"></i>
-            </a>
-          } @else {
-            <div class="home-accion-item home-accion-item--disabled">
-              <i class="ti {{ accion.icon }}"></i>
-              <span>{{ accion.label }}</span>
-              <i class="ti ti-lock home-accion-item__chevron"></i>
-            </div>
-          }
-        }
-      </div>
-    </div>
 
   </div>
 

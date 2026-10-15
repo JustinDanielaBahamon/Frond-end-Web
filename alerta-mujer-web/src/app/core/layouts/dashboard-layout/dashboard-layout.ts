@@ -25,6 +25,7 @@ export class DashboardLayoutComponent implements OnInit {
     { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
     { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
     { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },
+    { label: 'Estado del Dispositivo', route: '/dashboard/device',             icon: 'fa-solid fa-microchip' },
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];
 

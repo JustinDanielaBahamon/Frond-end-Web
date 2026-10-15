@@ -1,9 +1,550 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Observable, Subject, Subscription, catchError, finalize, forkJoin, map, of, takeUntil } from 'rxjs';
+
+import { environment } from '../../../../environments/environment';
+import { DeviceInfoService } from '../../../core/services/device-info.service';
+import { PermissionsService } from '../../../core/services/permissions.service';
+import { DeviceService } from '../../../core/services/device.service';
+import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
+import { AuthService } from '../../../core/auth/auth.service';
+import { UbicacionEntry } from '../../../core/models/location.model';
+import {
+  DeviceInfo,
+  PermissionStatus,
+  ServiceStatus,
+  ActivityLog,
+  CriticalFeatureStatus
+} from '../../../core/models/device-info.model';
 
 @Component({
   selector: 'app-device',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './device.html',
   styleUrl: './device.scss',
 })
-export class Device {}
+export class Device implements OnInit, OnDestroy {
+  private deviceInfoService = inject(DeviceInfoService);
+  private permissionsService = inject(PermissionsService);
+  private deviceService = inject(DeviceService);
+  private contactService = inject(EmergencyContactService);
+  private locationService = inject(PhoneLocationService);
+  private authService = inject(AuthService);
+
+  // Estado reactivo con signals
+  deviceInfo = signal<DeviceInfo | null>(null);
+  permissions = signal<PermissionStatus[]>([]);
+  services = signal<ServiceStatus[]>([]);
+  isOnline = signal<boolean>(true);
+  connectionQuality = signal<string>('Desconocida');
+  criticalFeatures = signal<CriticalFeatureStatus | null>(null);
+  activityLog = signal<ActivityLog[]>([]);
+
+  lastRefresh = signal<string>('');
+  loading = signal<boolean>(false);
+  featuresLoading = signal<boolean>(false);
+
+  private currentUserId: number | null = null;
+  private featuresSub?: Subscription;
+
+  private destroy$ = new Subject<void>();
+
+  ngOnInit(): void {
+    // Subscribe to current user to get user ID for scoped logging
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUserId = user?.id || null;
+        
+        // Load user-scoped data only after user ID is available
+        if (this.currentUserId) {
+          this.loadCriticalFeatures();
+          this.loadActivityLog();
+        }
+      });
+
+    this.loadDeviceInfo();
+    this.loadPermissions();
+    this.loadServices();
+    this.subscribeToOnlineStatus();
+    this.updateLastRefresh();
+  }
+
+  private loadDeviceInfo(): void {
+    try {
+      const info = this.deviceInfoService.getDeviceInfo();
+      this.deviceInfo.set(info);
+    } catch (error) {
+      console.error('Error loading device info:', error);
+    }
+  }
+
+  private loadPermissions(): void {
+    this.permissionsService.checkAllPermissions()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (perms) => this.permissions.set(perms),
+        error: (error) => console.error('Error loading permissions:', error)
+      });
+  }
+
+  private loadServices(): void {
+    const services: ServiceStatus[] = [
+      {
+        name: 'GPS / Geolocalización',
+        enabled: 'geolocation' in navigator,
+        details: 'Permite rastrear tu ubicación en tiempo real'
+      },
+      {
+        name: 'Conectividad',
+        enabled: navigator.onLine,
+        details: 'Conexión a internet activa'
+      },
+      {
+        name: 'Almacenamiento Local',
+        enabled: typeof localStorage !== 'undefined',
+        details: 'Permite guardar datos localmente'
+      },
+      {
+        name: 'Notificaciones Push',
+        enabled: 'Notification' in window,
+        details: 'Permite recibir alertas del sistema'
+      }
+    ];
+
+    this.services.set(services);
+    this.connectionQuality.set(this.deviceInfoService.getConnectionQuality());
+  }
+
+  private loadCriticalFeatures(): void {
+    this.featuresSub?.unsubscribe();
+    this.featuresSub = this.fetchCriticalFeatures().subscribe();
+  }
+
+  /**
+   * Consulta en el backend los contactos, los celulares vinculados y la última
+   * ubicación enviada por la app móvil. Emite false si alguna consulta falló.
+   */
+  private fetchCriticalFeatures(): Observable<boolean> {
+    const userId = this.currentUserId;
+    if (!userId) {
+      return of(false);
+    }
+
+    if (!this.criticalFeatures()) {
+      this.criticalFeatures.set({
+        sessionActive: this.authService.isLoggedIn(),
+        lastLocationCaptured: null,
+        registeredDevices: null,
+        pushTokenRegistered: false,
+        emergencyContactsCount: null
+      });
+    }
+    this.featuresLoading.set(true);
+
+    // Cada consulta falla por separado: null = error (204 de "sin ubicación" llega como null válido)
+    const FAILED = 'failed' as const;
+    return forkJoin({
+      contacts: this.contactService.getByUsuario(userId).pipe(catchError(() => of(null))),
+      devices: this.deviceService.getMyDevices().pipe(catchError(() => of(null))),
+      latest: this.locationService.getLatest().pipe(catchError(() => of(FAILED)))
+    }).pipe(
+      map(({ contacts, devices, latest }) => {
+        this.criticalFeatures.set({
+          sessionActive: this.authService.isLoggedIn(),
+          lastLocationCaptured: latest === FAILED ? 'No disponible' : latest ? this.formatLocation(latest) : null,
+          registeredDevices: devices ? devices.length : null,
+          pushTokenRegistered: !!devices?.some(d => !!d.fcmToken),
+          emergencyContactsCount: contacts ? contacts.length : null
+        });
+        return contacts !== null && devices !== null && latest !== FAILED;
+      }),
+      finalize(() => this.featuresLoading.set(false)),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  private formatLocation(entry: UbicacionEntry): string {
+    const when = entry.recordedAt
+      ? new Date(entry.recordedAt).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : entry.time;
+    return `${when} · ${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
+  }
+
+  pushStatusLabel(features: CriticalFeatureStatus): string {
+    if (features.pushTokenRegistered) return 'Configurado';
+    if (features.registeredDevices === null) return 'No disponible';
+    if (features.registeredDevices === 0) return 'Sin celular vinculado';
+    return 'No configurado';
+  }
+
+  private loadActivityLog(): void {
+    try {
+      const userId = this.currentUserId;
+      if (!userId) {
+        this.activityLog.set([]);
+        return;
+      }
+      
+      // Scope activity logs by user ID to prevent cross-user leaks (snake_case for consistency)
+      const logKey = `device_activity_log_user_${userId}`;
+      const stored = localStorage.getItem(logKey);
+      if (stored) {
+        const logs = JSON.parse(stored);
+        this.activityLog.set(Array.isArray(logs) ? logs.slice(0, 5) : []);
+      }
+    } catch (error) {
+      console.error('Error loading activity log:', error);
+    }
+  }
+
+  private subscribeToOnlineStatus(): void {
+    this.deviceInfoService.isOnline()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (online) => {
+          this.isOnline.set(online);
+          this.updateServiceStatus('Conectividad', online);
+        }
+      });
+  }
+
+  private updateServiceStatus(name: string, enabled: boolean): void {
+    const services = this.services();
+    const index = services.findIndex(s => s.name === name);
+    if (index !== -1) {
+      services[index].enabled = enabled;
+      this.services.set([...services]);
+    }
+  }
+
+  private updateLastRefresh(): void {
+    const now = new Date();
+    this.lastRefresh.set(now.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }));
+  }
+
+  // ─── MÉTODOS DE PRUEBAS DE FUNCIONALIDAD ─────────────────
+
+  testGeolocation(): void {
+    if (!('geolocation' in navigator)) {
+      alert('⚠️ La API de Geolocalización no está disponible en este navegador.');
+      return;
+    }
+
+    this.loading.set(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        const acc = position.coords.accuracy.toFixed(2);
+        alert(`✅ Geolocalización OK\n\nLatitud: ${lat}\nLongitud: ${lng}\nPrecisión: ${acc}m`);
+        this.addActivityLog('success', `Prueba de geolocalización exitosa: ${lat}, ${lng}`);
+        this.loading.set(false);
+      },
+      (error) => {
+        alert(`❌ Error al obtener ubicación: ${error.message}`);
+        this.addActivityLog('error', `Error en prueba de geolocalización: ${error.message}`);
+        this.loading.set(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  requestNotificationPermission(): void {
+    if (!('Notification' in window)) {
+      alert('⚠️ Las notificaciones no están disponibles en este navegador.');
+      return;
+    }
+
+    this.permissionsService.requestNotifications()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (permission) => {
+          if (permission === 'granted') {
+            alert('✅ Permiso de notificación concedido correctamente.');
+            this.addActivityLog('success', 'Permiso de notificación concedido');
+            this.refreshPermissions();
+          } else if (permission === 'denied') {
+            alert('❌ Permiso de notificación denegado.');
+            this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
+          } else {
+            alert('⚠️ Solicitud de permiso cancelada.');
+          }
+        },
+        error: (err) => {
+          alert('❌ Error al solicitar permiso de notificación.');
+          console.error('Error requesting notification permission:', err);
+        }
+      });
+  }
+
+  testNotificationDisplay(): void {
+    if (!('Notification' in window)) {
+      alert('⚠️ Las notificaciones no están disponibles en este navegador.');
+      return;
+    }
+
+    if (Notification.permission !== 'granted') {
+      alert('⚠️ Primero debes conceder permisos de notificación. Usa el botón "Solicitar Permiso".');
+      return;
+    }
+
+    try {
+      // Wrap in try-catch to handle environments where Notification constructor is unavailable
+      new Notification('🔔 Alerta Mujer', {
+        body: 'Prueba de notificación exitosa',
+        icon: '/logo.png',
+        tag: 'test-notification'
+      });
+      alert('✅ Notificación enviada. Revisa tu bandeja de notificaciones.');
+      this.addActivityLog('success', 'Prueba de visualización de notificación exitosa');
+    } catch (error) {
+      alert('❌ Error al mostrar notificación. Tu navegador puede no soportar esta funcionalidad.');
+      this.addActivityLog('error', 'Error al crear notificación: Constructor no disponible');
+    }
+  }
+
+  testConnectivity(): void {
+    const startTime = Date.now();
+    
+    this.loading.set(true);
+    
+    // Try backend health endpoint first, fallback to external canary if backend fails.
+    // /health es público. En el plan gratis de Render la primera petición despierta
+    // el servidor y puede tardar varios minutos; se espera hasta 90 s y luego se avisa.
+    const backendUrl = `${environment.apiUrl}/health`;
+    const fallbackUrl = 'https://www.google.com/favicon.ico';
+
+    fetch(backendUrl, { method: 'GET', signal: AbortSignal.timeout(90000) })
+      .then(response => {
+        const duration = Date.now() - startTime;
+        if (response.ok) {
+          const wokeUp = duration > 10000 ? '\n\nEl servidor estaba en reposo y tardó en despertar.' : '';
+          alert(`✅ Conectividad OK\n\nServidor: Backend\nTiempo de respuesta: ${duration}ms\nEstado: ${response.status}${wokeUp}`);
+          this.addActivityLog('success', `Prueba de conectividad exitosa con backend (${duration}ms)`);
+        } else {
+          alert(`⚠️ Backend responde con error\n\nEstado: ${response.status}\nTiempo: ${duration}ms`);
+          this.addActivityLog('warning', `Backend respondió con error ${response.status} (${duration}ms)`);
+        }
+        this.loading.set(false);
+      })
+      .catch(() => {
+        // Fallback to external endpoint if backend is unreachable
+        const fallbackStartTime = Date.now();
+        fetch(fallbackUrl, { method: 'HEAD', mode: 'no-cors' })
+          .then(() => {
+            const duration = Date.now() - fallbackStartTime;
+            alert(`⚠️ Conectividad limitada\n\nBackend no accesible, pero conexión a internet activa.\nSi el servidor estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.\nTiempo: ${duration}ms`);
+            this.addActivityLog('warning', `Backend no accesible, conexión externa OK (${duration}ms)`);
+            this.loading.set(false);
+          })
+          .catch(error => {
+            const duration = Date.now() - startTime;
+            alert(`❌ Error de conectividad total\n\n${error.message}\nTiempo: ${duration}ms`);
+            this.addActivityLog('error', `Error de conectividad total: ${error.message}`);
+            this.loading.set(false);
+          });
+      });
+  }
+
+  // ─── MÉTODOS DE ACCIONES RÁPIDAS ─────────────────
+
+  syncData(): void {
+    this.loading.set(true);
+    this.featuresSub?.unsubscribe();
+    this.featuresSub = this.fetchCriticalFeatures()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe(ok => {
+        if (ok) {
+          alert('✅ Datos sincronizados con el servidor');
+          this.addActivityLog('success', 'Sincronización de datos completada');
+        } else {
+          alert('⚠️ No se pudieron traer todos los datos del servidor. Intenta de nuevo en un momento.');
+          this.addActivityLog('warning', 'Sincronización incompleta: el servidor no respondió');
+        }
+      });
+  }
+
+  clearCache(): void {
+    const confirmClear = confirm('¿Estás segura de que deseas limpiar la caché local? Esta acción eliminará datos temporales pero no afectará tu sesión ni contactos de emergencia.');
+    
+    if (confirmClear) {
+      try {
+        // Preserve critical keys including the actual session key used by AuthService
+        // AuthService uses 'alerta_session' (not 'auth_token'), plus user-scoped data
+        const keysToKeep = [
+          'alerta_session',              // Actual session key from AuthService
+          'user_data',
+          'emergency_contacts',          // Legacy key (if still used)
+          'emergency_contacts_user_',    // User-scoped version
+          'notification_token_user_',    // User-scoped tokens
+          'last_location_user_',         // User-scoped location
+          'device_activity_log_user_'    // Activity logs
+        ];
+        const allKeys = Object.keys(localStorage);
+        
+        let clearedCount = 0;
+        allKeys.forEach(key => {
+          // Keep key if it matches any of the protected patterns
+          const shouldKeep = keysToKeep.some(pattern => key.includes(pattern));
+          if (!shouldKeep) {
+            localStorage.removeItem(key);
+            clearedCount++;
+          }
+        });
+
+        alert(`✅ Caché limpiada: ${clearedCount} elementos eliminados`);
+        this.addActivityLog('success', `Caché limpiada: ${clearedCount} elementos`);
+        this.loadCriticalFeatures();
+      } catch (error) {
+        alert('❌ Error al limpiar caché');
+        this.addActivityLog('error', 'Error al limpiar caché');
+      }
+    }
+  }
+
+  exportDiagnostic(): void {
+    // Warn user about potentially sensitive data in diagnostic export
+    const confirmExport = confirm(
+      '⚠️ Aviso de Privacidad\n\n' +
+      'El diagnóstico exportado contiene información que puede identificar tu dispositivo:\n' +
+      '• Navegador, sistema operativo y versión\n' +
+      '• Resolución de pantalla\n' +
+      '• Historial de actividad reciente\n\n' +
+      'Solo comparte este archivo con personal de soporte de confianza.\n\n' +
+      '¿Deseas continuar con la exportación?'
+    );
+
+    if (!confirmExport) {
+      return;
+    }
+
+    try {
+      const diagnostic = {
+        timestamp: new Date().toISOString(),
+        deviceInfo: this.deviceInfo(),
+        permissions: this.permissions(),
+        services: this.services(),
+        isOnline: this.isOnline(),
+        connectionQuality: this.connectionQuality(),
+        criticalFeatures: this.criticalFeatures(),
+        activityLog: this.activityLog(),
+        screenInfo: this.deviceInfoService.getScreenInfo()
+      };
+
+      const blob = new Blob([JSON.stringify(diagnostic, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      a.href = url;
+      a.download = `diagnostico-alerta-mujer-${timestamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      this.addActivityLog('success', 'Diagnóstico exportado correctamente');
+      alert('✅ Diagnóstico exportado correctamente');
+    } catch (error) {
+      alert('❌ Error al exportar diagnóstico');
+      this.addActivityLog('error', 'Error al exportar diagnóstico');
+    }
+  }
+
+  refreshPermissions(): void {
+    this.loading.set(true);
+    this.loadPermissions();
+    this.loadServices();
+    this.loadCriticalFeatures();
+    this.updateLastRefresh();
+    setTimeout(() => {
+      this.loading.set(false);
+      this.addActivityLog('info', 'Permisos y servicios actualizados');
+    }, 500);
+  }
+
+  refreshAll(): void {
+    this.refreshPermissions();
+  }
+
+  // ─── MÉTODOS AUXILIARES ─────────────────
+
+  private addActivityLog(type: ActivityLog['type'], message: string): void {
+    const userId = this.currentUserId;
+    if (!userId) {
+      console.warn('Cannot log activity: no user session');
+      return;
+    }
+
+    const log: ActivityLog = {
+      timestamp: new Date().toLocaleString('es-ES'),
+      type,
+      message
+    };
+
+    const currentLogs = this.activityLog();
+    const newLogs = [log, ...currentLogs].slice(0, 5);
+    this.activityLog.set(newLogs);
+
+    try {
+      // Scope activity log by user ID with snake_case naming for consistency
+      const logKey = `device_activity_log_user_${userId}`;
+      localStorage.setItem(logKey, JSON.stringify(newLogs));
+    } catch (error) {
+      console.error('Error saving activity log:', error);
+    }
+  }
+
+  getStatusColor(state: string): string {
+    const colorMap: Record<string, string> = {
+      'granted': 'exito',
+      'denied': 'peligro',
+      'prompt': 'advertencia',
+      'unavailable': 'neutral'
+    };
+    return colorMap[state] || 'neutral';
+  }
+
+  getStatusLabel(state: string): string {
+    const labelMap: Record<string, string> = {
+      'granted': 'Concedido',
+      'denied': 'Denegado',
+      'prompt': 'Pendiente',
+      'unavailable': 'No disponible'
+    };
+    return labelMap[state] || 'Desconocido';
+  }
+
+  getIconForPermission(name: string): string {
+    const iconMap: Record<string, string> = {
+      'geolocation': 'ti-map-pin',
+      'notifications': 'ti-bell',
+      'camera': 'ti-camera',
+      'microphone': 'ti-microphone',
+      'clipboard-read': 'ti-clipboard'
+    };
+    return iconMap[name] || 'ti-shield-check';
+  }
+
+  getIconForActivityType(type: string): string {
+    const iconMap: Record<string, string> = {
+      'info': 'ti-info-circle',
+      'warning': 'ti-alert-triangle',
+      'error': 'ti-x-circle',
+      'success': 'ti-check-circle'
+    };
+    return iconMap[type] || 'ti-info-circle';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}

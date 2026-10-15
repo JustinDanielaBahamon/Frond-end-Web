@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card';
 import { AuthService } from '../../../core/auth/auth.service';
+import { GoogleAuthService } from '../../../core/auth/google-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class LoginComponent {
 
   private auth = inject(AuthService);
+  private googleAuth = inject(GoogleAuthService);
   private router = inject(Router);
 
   email = '';
@@ -90,6 +92,37 @@ export class LoginComponent {
   // ------------------------
   // Login
   // ------------------------
+
+  loadingGoogle = false;
+
+  // ------------------------
+  // Login con Google (Firebase -> backend)
+  // ------------------------
+  async continuarConGoogle() {
+    if (this.loadingGoogle) return;
+    this.error = '';
+    this.loadingGoogle = true;
+    try {
+      const idToken = await this.googleAuth.obtenerIdToken();
+      this.auth.loginWithGoogle(idToken).subscribe({
+        next: (user) => {
+          this.loadingGoogle = false;
+          this.router.navigate([user.rol === 'Admin' ? '/admin/dashboard' : '/dashboard']);
+        },
+        error: (err) => {
+          this.loadingGoogle = false;
+          this.error = err.message;
+        },
+      });
+    } catch (e: any) {
+      this.loadingGoogle = false;
+      // Cerrar la ventana de Google no es un error que haya que mostrar
+      if (e?.code === 'auth/popup-closed-by-user' || e?.code === 'auth/cancelled-popup-request') return;
+      this.error = e?.code === 'auth/popup-blocked'
+        ? 'Tu navegador bloqueó la ventana de Google. Permite ventanas emergentes e intenta de nuevo.'
+        : e?.message ?? 'No se pudo iniciar sesión con Google.';
+    }
+  }
 
   iniciarSesion() {
 

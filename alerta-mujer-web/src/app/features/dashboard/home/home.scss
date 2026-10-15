@@ -150,12 +150,10 @@
   }
 
   &--mid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  &--bottom {
-    grid-template-columns: 2fr 1fr;
-  }
+ 
 
   @media (max-width: 1200px) {
     &--mid { grid-template-columns: repeat(2, 1fr); }
@@ -344,6 +342,13 @@
   gap: 12px;
   flex: 1;
 }
+
+.emergency{
+  width: 70%;
+}
+
+
+
 
 .home-emergencia__fecha-row {
   display: flex;

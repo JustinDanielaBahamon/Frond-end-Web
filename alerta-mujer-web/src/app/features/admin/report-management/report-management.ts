@@ -550,6 +550,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   // Helpers para template
   get elementoInicio(): number {
+    if (this.paginacion.totalElementos === 0) return 0;
     return (this.paginacion.paginaActual - 1) * this.paginacion.elementosPorPagina + 1;
   }
 

@@ -337,7 +337,7 @@
                       >
                       <label [for]="'alerta-' + alerta.id" class="alerta-label">
                         <div class="alerta-info">
-                          <span class="alerta-tipo">{{ alerta.tipo }}</span>
+                          <span class="alerta-tipo">{{ etiquetaTipo(alerta.tipo) }} · {{ alerta.nombre }}</span>
                           <span class="alerta-ubicacion">{{ alerta.ubicacion }}</span>
                           <span class="alerta-fecha">{{ alerta.tiempo }}</span>
                         </div>

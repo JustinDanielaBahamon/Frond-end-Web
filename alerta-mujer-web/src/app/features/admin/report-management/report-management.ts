@@ -338,6 +338,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   editarReporte(reporte: Reporte): void {
     this.reporteEditando = { ...reporte };
+    this.alertasSeleccionadas = [...(reporte.alertasIds ?? [])];
     this.mostrarModalNuevo = true;
   }
 
@@ -359,7 +360,8 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       generadoPor: this.reporteEditando.generadoPor,
       formato: this.reporteEditando.formato, // Mantener el formato original
       tamano: this.reporteEditando.tamano,
-      descripcion: this.modeloDescripcion
+      descripcion: this.modeloDescripcion,
+      alertasIds: [...this.alertasSeleccionadas]
     };
 
     this.reportsService.update(reporteActualizado.id, reporteActualizado).pipe(takeUntil(this.destroy$)).subscribe({
@@ -414,22 +416,19 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
         // Generar nombre automático basado en alertas si no hay nombre personalizado
         if (!nombre) {
           const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          const tiposAlertas = [...new Set(alertasSeleccionadasObj.map(a => a.tipo))].join(', ');
+          const tiposAlertas = [...new Set(alertasSeleccionadasObj.map(a => this.etiquetaTipo(a.tipo)))].join(', ');
           nombre = `Reporte ${tiposAlertas} - ${fecha}`;
         }
         
         // Usar datos de la primera alerta seleccionada como base
-        if (!usuaria && alertasSeleccionadasObj[0].usuarioId) {
-          usuaria = `Usuario ${alertasSeleccionadasObj[0].usuarioId}`;
+        if (!usuaria) {
+          usuaria = [...new Set(alertasSeleccionadasObj.map(a => a.nombre))].join(', ');
         }
         if (!acontecimiento) {
-          acontecimiento = alertasSeleccionadasObj[0].tipo;
-        }
-        if (!ciudad || ciudad === 'No especificada') {
-          ciudad = alertasSeleccionadasObj[0].ubicacion || 'No especificada';
+          acontecimiento = this.etiquetaTipo(alertasSeleccionadasObj[0].tipo);
         }
         if (!descripcion) {
-          descripcion = `Reporte basado en ${this.alertasSeleccionadas.length} alerta(s): ${alertasSeleccionadasObj.map(a => a.tipo).join(', ')}`;
+          descripcion = `Reporte basado en ${this.alertasSeleccionadas.length} alerta(s)`;
         }
       }
     }
@@ -504,6 +503,12 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // ========================================
   // UTILIDADES
   // ========================================
+
+  /** Nombre legible del tipo de alerta que envía la app móvil. */
+  etiquetaTipo(tipo: string): string {
+    const etiquetas: Record<string, string> = { main: 'Alerta SOS', mini: 'Mini alerta', reminder: 'Recordatorio' };
+    return etiquetas[tipo] || tipo || 'Alerta';
+  }
 
   getStatusClass(estado: string): string {
     const clases: Record<string, string> = {

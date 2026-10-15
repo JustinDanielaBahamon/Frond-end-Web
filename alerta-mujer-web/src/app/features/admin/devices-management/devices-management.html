@@ -9,10 +9,6 @@
         <h1>Gestión de Dispositivos</h1>
         <p>Visualiza y administra los dispositivos registrados en la aplicación.</p>
       </div>
-      <button class="btn-register-device" (click)="abrirModalCrear()">
-        <i class="fa-solid fa-plus"></i>
-        Registrar Dispositivo
-      </button>
     </header>
   
     <!--==========================
@@ -292,77 +288,6 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" (click)="cerrarModalVer(); $event.stopPropagation()">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CREAR DISPOSITIVO -->
-<div class="modal-overlay" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Registrar Nuevo Dispositivo</h2>
-      <button class="modal-close" (click)="cerrarModalCrear(); $event.stopPropagation()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form (ngSubmit)="crearDispositivo(dispositivoSeleccionado!)">
-        <div class="form-group">
-          <label>Nombre del dispositivo</label>
-          <input type="text" name="name" [(ngModel)]="dispositivoSeleccionado!.name" required>
-        </div>
-        <div class="form-group">
-          <label>Versión del sistema operativo</label>
-          <input type="text" name="osVersion" [(ngModel)]="dispositivoSeleccionado!.osVersion" required>
-        </div>
-        <div class="form-group">
-          <label>Tipo</label>
-          <div class="custom-select" [class.open]="isTypeDropdownOpenCrear">
-            <div class="select-selected" (click)="toggleTypeDropdownCrear($event)">
-              {{ dispositivoSeleccionado!.type }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isTypeDropdownOpenCrear">
-              <div (click)="selectTypeCrear('Android', $event)">Android</div>
-              
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>IMEI</label>
-          <input type="text" name="imei" [(ngModel)]="dispositivoSeleccionado!.imei" required>
-        </div>
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" name="phone" [(ngModel)]="dispositivoSeleccionado!.phone" required>
-        </div>
-        <div class="form-group">
-          <label>Estado</label>
-          <div class="custom-select" [class.open]="isStatusDropdownOpenCrear">
-            <div class="select-selected" (click)="toggleStatusDropdownCrear($event)">
-              {{ dispositivoSeleccionado!.status }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isStatusDropdownOpenCrear">
-              <div (click)="selectStatusCrear('Activo', $event)">Activo</div>
-              <div (click)="selectStatusCrear('Inactivo', $event)">Inactivo</div>
-              <div (click)="selectStatusCrear('Bloqueado', $event)">Bloqueado</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Nombre del usuario</label>
-          <input type="text" name="userName" [(ngModel)]="dispositivoSeleccionado!.user.name" required>
-        </div>
-        <div class="form-group">
-          <label>Email del usuario</label>
-          <input type="email" name="userEmail" [(ngModel)]="dispositivoSeleccionado!.user.email" required>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalCrear(); $event.stopPropagation()">Cancelar</button>
-          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">Registrar</button>
-        </div>
-      </form>
     </div>
   </div>
 </div>

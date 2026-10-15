@@ -40,12 +40,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   dispositivoSeleccionado: Device | null = null;
   mostrarModalVer = false;
   mostrarModalEditar = false;
-  mostrarModalCrear = false;
   
   // Estados de dropdowns personalizados
   isStatusDropdownOpen = false;
-  isTypeDropdownOpenCrear = false;
-  isStatusDropdownOpenCrear = false;
   isTypeDropdownOpenEditar = false;
   isStatusDropdownOpenEditar = false;
   
@@ -237,46 +234,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Abrir modal para crear un nuevo dispositivo
-   */
-  abrirModalCrear(): void {
-    console.log('abrirModalCrear llamado');
-    this.dispositivoSeleccionado = {
-      id: 0,
-      name: '',
-      osVersion: '',
-      user: { name: '', email: '' },
-      type: 'Android',
-      imei: '',
-      phone: '',
-      status: 'Activo',
-      lastSync: '',
-      icon: 'fa-brands fa-android'
-    };
-    this.mostrarModalCrear = true;
-    console.log('Modal crear debería mostrarse');
-  }
-
-  /**
-   * Crear un nuevo dispositivo
-   */
-  crearDispositivo(device: Omit<Device, 'id'>): void {
-    this.cargando = true;
-    this.deviceService.create(device).subscribe({
-      next: (nuevoDevice) => {
-        this.cargarDatos();
-        this.mostrarModalCrear = false;
-        this.cargando = false;
-      },
-      error: (err) => {
-        this.error = 'Error al crear dispositivo';
-        this.cargando = false;
-        console.error('Error creando dispositivo:', err);
-      }
-    });
-  }
-
-  /**
    * Abrir modal para editar un dispositivo
    */
   abrirModalEditar(id: number): void {
@@ -366,11 +323,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.dispositivoSeleccionado = null;
   }
 
-  cerrarModalCrear(): void {
-    this.mostrarModalCrear = false;
-    this.dispositivoSeleccionado = null;
-  }
-
   // ========================================
   // DROPDOWN PERSONALIZADO
   // ========================================
@@ -396,33 +348,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       case 'Bloqueado': return 'Bloqueado';
       default: return estado;
     }
-  }
-
-  // Dropdowns para modal crear
-  toggleTypeDropdownCrear(event: Event): void {
-    event.stopPropagation();
-    this.isTypeDropdownOpenCrear = !this.isTypeDropdownOpenCrear;
-  }
-
-  selectTypeCrear(tipo: string, event: Event): void {
-    event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.type = tipo as 'Android';
-    }
-    this.isTypeDropdownOpenCrear = false;
-  }
-
-  toggleStatusDropdownCrear(event: Event): void {
-    event.stopPropagation();
-    this.isStatusDropdownOpenCrear = !this.isStatusDropdownOpenCrear;
-  }
-
-  selectStatusCrear(estado: string, event: Event): void {
-    event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.status = estado as Device['status'];
-    }
-    this.isStatusDropdownOpenCrear = false;
   }
 
   // Dropdowns para modal editar

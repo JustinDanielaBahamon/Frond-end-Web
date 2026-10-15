@@ -178,9 +178,6 @@ export class DeviceService {
   /**
    * Crear nuevo dispositivo
    */
-  create(device: Omit<Device, 'id'>): Observable<Device> {
-    return this.http.post<Device>(this.url, device);
-  }
 
   /**
    * Actualizar dispositivo

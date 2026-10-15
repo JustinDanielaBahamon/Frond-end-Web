@@ -7,9 +7,45 @@ import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { UsersService } from '../../../core/services/users.services';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { AdminSettingsService, ParametrosApp } from '../../../core/services/admin-settings.service';
+import { AdminSettingsService, EstadoSistema, ParametrosApp, RegistroAuditoria } from '../../../core/services/admin-settings.service';
 
 type Panel = 'datos' | 'contrasena' | null;
+
+const TIPOS_AUDITORIA: Record<string, string> = {
+  ACCOUNT: 'Cuenta',
+  USER: 'Usuaria',
+  ALERT: 'Alerta',
+  EVIDENCE: 'Evidencia',
+  EMERGENCY_CONTACT: 'Contacto de emergencia',
+  SYSTEM_CONFIGURATION: 'Parámetros de la app',
+};
+
+const ACCIONES_AUDITORIA: Record<string, string> = {
+  INSERT: 'Creó',
+  UPDATE: 'Modificó',
+  DELETE: 'Eliminó',
+};
+
+// Nombres legibles de las columnas que más aparecen en el historial
+const CAMPOS_AUDITORIA: Record<string, string> = {
+  status: 'estado',
+  ended_at: 'fin',
+  cancelled_at: 'cancelación',
+  last_access: 'último acceso',
+  password_hash: 'contraseña',
+  review_status: 'revisión',
+  first_name: 'nombre',
+  last_name: 'apellido',
+  telephone: 'teléfono',
+  email: 'correo',
+  role_id: 'rol',
+  sos_max_duration_minutes: 'duración máxima de alerta',
+  emergency_phone_number: 'número de emergencia',
+  admin_email: 'correo de soporte',
+  max_emergency_contacts: 'límite de contactos',
+  min_app_version: 'versión mínima de la app',
+  updated_by_admin_id: 'administradora',
+};
 
 @Component({
   selector: 'app-admin-settings',
@@ -46,12 +82,23 @@ export class AdminSettingsComponent {
   readonly guardandoParametros = signal(false);
   readonly errorParametros = signal('');
 
+  // ── Estado del sistema e historial ───────────────────────────
+  readonly estado = signal<EstadoSistema | null>(null);
+  readonly errorEstado = signal(false);
+  readonly auditoria = signal<RegistroAuditoria[]>([]);
+  readonly cargandoAuditoria = signal(true);
+  readonly mostrarTodaAuditoria = signal(false);
+  readonly auditoriaVisible = computed(() =>
+    this.mostrarTodaAuditoria() ? this.auditoria() : this.auditoria().slice(0, 8));
+
   // ── Mensaje flotante ─────────────────────────────────────────
   readonly mensaje = signal('');
   private mensajeTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.cargarParametros();
+    this.cargarEstado();
+    this.cargarAuditoria();
   }
 
   // ── Tema ─────────────────────────────────────────────────────
@@ -185,6 +232,50 @@ export class AdminSettingsComponent {
       maxContactos: p.maxContactos,
       versionMinimaApp: p.versionMinimaApp,
     };
+  }
+
+  // ── Estado del sistema ───────────────────────────────────────
+  cargarEstado(): void {
+    this.settingsService.obtenerEstado().subscribe({
+      next: (e) => {
+        this.estado.set(e);
+        this.errorEstado.set(false);
+      },
+      error: () => {
+        this.estado.set(null);
+        this.errorEstado.set(true);
+      },
+    });
+  }
+
+  get sistemaOk(): boolean {
+    const e = this.estado();
+    return !!e && e.baseDatos && e.notificacionesPush;
+  }
+
+  // ── Historial de cambios ─────────────────────────────────────
+  cargarAuditoria(): void {
+    this.cargandoAuditoria.set(true);
+    this.settingsService.obtenerAuditoria(50).subscribe({
+      next: (registros) => {
+        this.auditoria.set(registros);
+        this.cargandoAuditoria.set(false);
+      },
+      error: () => this.cargandoAuditoria.set(false),
+    });
+  }
+
+  textoAuditoria(r: RegistroAuditoria): string {
+    const accion = ACCIONES_AUDITORIA[r.accion] ?? r.accion;
+    const tipo = TIPOS_AUDITORIA[r.tipo] ?? r.tipo.toLowerCase();
+    return `${accion} ${tipo.toLowerCase()}${r.registroId != null ? ' #' + r.registroId : ''}`;
+  }
+
+  detalleAuditoria(r: RegistroAuditoria): string {
+    const prefijo = 'Columnas modificadas: ';
+    if (!r.descripcion.startsWith(prefijo)) return '';
+    const campos = r.descripcion.slice(prefijo.length).split(',').map(c => c.trim());
+    return 'Cambió ' + campos.map(c => CAMPOS_AUDITORIA[c] ?? c.replace(/_/g, ' ')).join(', ');
   }
 
   // ── Sesión ───────────────────────────────────────────────────

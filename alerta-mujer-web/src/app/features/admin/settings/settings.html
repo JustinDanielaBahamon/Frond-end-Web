@@ -237,5 +237,97 @@
       </div>
     </article>
 
+    <!-- ═════════ ESTADO DEL SISTEMA ═════════ -->
+    <article class="card">
+      <h2 class="card__title">
+        <i class="fa-solid fa-heart-pulse"></i> Estado del sistema
+        <button class="icon-btn" type="button" (click)="cargarEstado()" aria-label="Actualizar estado">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </h2>
+
+      @if (errorEstado()) {
+        <div class="status-line status-line--bad">
+          <i class="fa-solid fa-circle-xmark"></i>
+          <span>No se pudo consultar el servidor</span>
+        </div>
+      } @else if (estado(); as e) {
+        <div class="status-line" [class.status-line--bad]="!e.baseDatos">
+          <i class="fa-solid" [class.fa-circle-check]="e.baseDatos" [class.fa-circle-xmark]="!e.baseDatos"></i>
+          <span>Base de datos</span>
+          <strong>{{ e.baseDatos ? 'Conectada (' + e.latenciaMs + ' ms)' : 'Sin conexión' }}</strong>
+        </div>
+        <div class="status-line" [class.status-line--bad]="!e.notificacionesPush">
+          <i class="fa-solid" [class.fa-circle-check]="e.notificacionesPush" [class.fa-circle-xmark]="!e.notificacionesPush"></i>
+          <span>Notificaciones push</span>
+          <strong>{{ e.notificacionesPush ? 'Configuradas' : 'Sin configurar' }}</strong>
+        </div>
+        <div class="status-line">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Alertas activas</span>
+          <strong>{{ e.alertasActivas }}</strong>
+        </div>
+        <div class="status-line">
+          <i class="fa-regular fa-clock"></i>
+          <span>Revisión de alertas vencidas</span>
+          <strong>
+            @if (e.ultimaRevisionExpiracion; as f) {
+              {{ f | date: 'HH:mm' }}{{ e.expiradasUltimaRevision ? ' · ' + e.expiradasUltimaRevision + ' expiradas' : '' }}
+            } @else {
+              Pendiente
+            }
+          </strong>
+        </div>
+        <p class="card__note">
+          <i class="fa-solid fa-server"></i>
+          En línea desde {{ e.enLineaDesde | date: 'dd/MM/yyyy HH:mm' }}
+        </p>
+      } @else {
+        <p class="label">Consultando…</p>
+      }
+    </article>
+
+    <!-- ═════════ HISTORIAL DE CAMBIOS ═════════ -->
+    <article class="card card--wide">
+      <h2 class="card__title">
+        <i class="fa-solid fa-clock-rotate-left"></i> Historial de cambios
+        <button class="icon-btn" type="button" (click)="cargarAuditoria()" aria-label="Actualizar historial">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </h2>
+
+      @if (cargandoAuditoria()) {
+        <p class="label">Cargando…</p>
+      } @else if (auditoria().length === 0) {
+        <p class="label">Todavía no hay cambios registrados.</p>
+      } @else {
+        <ul class="audit-list">
+          @for (r of auditoriaVisible(); track r.id) {
+            <li class="audit-item">
+              <div class="audit-item__main">
+                <p class="audit-item__title">{{ textoAuditoria(r) }}</p>
+                @if (detalleAuditoria(r)) {
+                  <p class="audit-item__desc">{{ detalleAuditoria(r) }}</p>
+                }
+              </div>
+              <div class="audit-item__meta">
+                <span [title]="r.actorCorreo || ''">{{ r.actor || 'Sistema / app' }}</span>
+                <span>{{ r.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+        @if (auditoria().length > 8) {
+          <button class="link-btn" type="button" (click)="mostrarTodaAuditoria.set(!mostrarTodaAuditoria())">
+            {{ mostrarTodaAuditoria() ? 'Ver menos' : 'Ver los últimos ' + auditoria().length }}
+          </button>
+        }
+      }
+      <p class="card__note">
+        <i class="fa-solid fa-lock"></i>
+        Registro de solo lectura: no se puede editar ni borrar.
+      </p>
+    </article>
+
   </section>
 </div>

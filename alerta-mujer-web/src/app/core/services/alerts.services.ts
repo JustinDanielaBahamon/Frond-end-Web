@@ -5,6 +5,13 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Alerta, EstadoAlerta, MedioActivacion } from '../models/alert.model';
 
+// Estado del panel → estado del backend
+const ESTADO_API: Record<EstadoAlerta, string> = {
+  Pendiente: 'active',
+  Atendida: 'resolved',
+  Cancelada: 'cancelled',
+};
+
 @Injectable({ providedIn: 'root' })
 export class AlertsService {
   private http = inject(HttpClient);
@@ -36,9 +43,9 @@ export class AlertsService {
     return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alertaData);
   }
 
-  // PUT: mismo endpoint de actualización del backend (PUT /api/alerts/{id})
+  // Cambio de estado desde administración (PATCH /api/alerts/{id}/status, solo ADMIN)
   updateEstado(id: number, estado: EstadoAlerta): Observable<Alerta> {
-    return this.http.put<any>(`${this.url}/${id}`, { estado }).pipe(
+    return this.http.patch<any>(`${this.url}/${id}/status`, { status: ESTADO_API[estado] }).pipe(
       map(a => this.normalizar(a))
     );
   }

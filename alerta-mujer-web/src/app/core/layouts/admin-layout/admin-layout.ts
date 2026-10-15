@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { of, timer } from 'rxjs';
@@ -35,7 +35,8 @@ export class AdminLayoutComponent implements OnInit {
   usuarioActual: SidebarUser | null = null;
 
   // Notificaciones del topbar (alertas pendientes)
-  notificaciones: TopbarNotification[] = [];
+  // Signal: la app no usa zone.js, así que la campana solo se actualiza si la lista avisa del cambio.
+  notificaciones = signal<TopbarNotification[]>([]);
 
   links: SidebarLink[] = [
     { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
@@ -79,7 +80,7 @@ export class AdminLayoutComponent implements OnInit {
       .subscribe((alertas) => {
         if (!alertas) return;
 
-        this.notificaciones = alertas
+        this.notificaciones.set(alertas
           .filter((a) => a.estado === 'Pendiente')
           .sort((a, b) => Number(b.id) - Number(a.id))
           .slice(0, 20)
@@ -89,7 +90,7 @@ export class AdminLayoutComponent implements OnInit {
             message: a.ubicacion ? `${a.nombre} · ${a.ubicacion}` : a.nombre,
             time: a.tiempo,
             route: '/admin/alertas',
-          }));
+          })));
       });
   }
 

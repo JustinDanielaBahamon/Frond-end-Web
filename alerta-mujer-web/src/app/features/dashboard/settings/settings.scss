@@ -352,39 +352,7 @@
 }
 
 // --- Tamaño de letra ---
-.font-size-options {
-  display: flex;
-  gap: 10px;
-}
-
-.font-size-option {
-  flex: 1;
-  background: none;
-  border: 1px solid var(--am-border);
-  border-radius: 10px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  color: var(--am-text-secondary);
-  font-size: var(--font-size-xs);
-  text-transform: capitalize;
-
-  &.active {
-    border-color: var(--am-accent);
-    color: var(--am-accent);
-  }
-
-  &__sample {
-    font-weight: 700;
-
-    &--pequeña { font-size: var(--font-size-xs); }
-    &--normal { font-size: var(--font-size-base); }
-    &--grande { font-size: var(--font-size-xl); }
-  }
-}
+// (Removed - feature eliminated per user request)
 
 // --- Status pill (bloqueo de app) ---
 .status-pill {

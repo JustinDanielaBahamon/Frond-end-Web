@@ -80,20 +80,6 @@
           </button>
         }
       </div>
-
-      <p class="settings-card__label">Tamaño de letra</p>
-      <div class="font-size-options">
-        @for (size of fontSizes; track size) {
-          <button
-            type="button"
-            class="font-size-option"
-            [class.active]="selectedFontSize() === size"
-            (click)="selectFontSize(size)">
-            <span [class]="'font-size-option__sample font-size-option__sample--' + size">Aa</span>
-            <span class="font-size-option__label">{{ size }}</span>
-          </button>
-        }
-      </div>
     </article>
 
     <!-- NOTIFICACIONES -->
@@ -154,7 +140,7 @@
       <button type="button" class="setting-row setting-row--link">
         <div>
           <strong>Personalización de datos</strong>
-          <span>Controla qué información compartes.</span>
+          <span>Gestiona qué datos personales se sincronizan con el backend (nombre, teléfono, foto de perfil).</span>
         </div>
         <i class="ti ti-chevron-right"></i>
       </button>
@@ -168,52 +154,24 @@
       </div>
     </article>
 
-    <!-- SEGURIDAD -->
+    <!-- EMERGENCIA -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-shield"></i> Seguridad</h2>
+        <h2><i class="ti ti-alert-triangle"></i> Emergencia</h2>
       </div>
-
-      <button type="button" class="setting-row setting-row--link">
+      <div class="setting-row setting-row--link">
+        <i class="ti ti-users"></i>
         <div>
-          <strong>Bloqueo de la aplicación</strong>
-          <span>Usa un PIN o huella para acceder.</span>
+          <strong>Contactos de emergencia</strong>
+          <span>Agrega o edita tus contactos de confianza desde la app móvil.</span>
         </div>
-        <span class="status-pill" [class.status-pill--active]="appLockActive()">
-          {{ appLockActive() ? 'Activado' : 'Desactivado' }}
-        </span>
-      </button>
-
-      <div class="setting-row setting-row--toggle">
-        <div>
-          <strong>Autenticación biométrica</strong>
-          <span>Huella dactilar o reconocimiento facial.</span>
-        </div>
-        <button
-          type="button"
-          class="switch"
-          [class.on]="biometricAuth()"
-          role="switch"
-          [attr.aria-checked]="biometricAuth()"
-          (click)="toggleBiometricAuth()">
-          <span class="switch__thumb"></span>
-        </button>
+        <i class="ti ti-device-mobile" style="color: var(--am-accent); margin-left: auto;"></i>
       </div>
-
-      <button type="button" class="setting-row setting-row--link">
+      <div class="setting-row setting-row--link">
+        <i class="ti ti-map-pin"></i>
         <div>
-          <strong>Tiempo de bloqueo automático</strong>
-          <span>Después de inactividad.</span>
-        </div>
-        <span class="setting-row__value">{{ autoLockTime() }}</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-
-      <div class="settings-card__banner">
-        <i class="ti ti-shield-check"></i>
-        <div>
-          <strong>Tu seguridad es nuestra prioridad</strong>
-          <span>Mantén tu cuenta protegida en todo momento.</span>
+          <strong>Zonas y alertas</strong>
+          <span>Las zonas de riesgo y alertas activas se gestionan desde el módulo Mapa.</span>
         </div>
       </div>
     </article>
@@ -271,13 +229,6 @@
       <div>
         <strong>Personaliza colores</strong>
         <span>Hazla única con tu color favorito.</span>
-      </div>
-    </div>
-    <div class="footer-item">
-      <i class="ti ti-text-size"></i>
-      <div>
-        <strong>Tamaño de letra</strong>
-        <span>Mejora la legibilidad.</span>
       </div>
     </div>
     <div class="footer-item">

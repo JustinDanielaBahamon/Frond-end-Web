@@ -4,8 +4,6 @@ import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
-type FontSize = 'pequeña' | 'normal' | 'grande';
-
 interface AccentColor {
   name: string;
   value: string;
@@ -59,14 +57,14 @@ export class Settings implements OnInit {
 
   // --- Apariencia: color de acento (global, vía AccentColorService) ---
   readonly accentColors: AccentColor[] = [
-    { name: 'purpura', value: '#7c3aed' }, // color por defecto de la app
-    { name: 'rosa', value: '#130253' },
+    { name: 'purpura', value: '#7c3aed' },
+    { name: 'azulOscuro', value: '#130253' },
     { name: 'magenta', value: '#710592' },
+    { name: 'rosa', value: '#ec4899' },
+    { name: 'celeste', value: '#0891b2' },
+    { name: 'rojo', value: '#ef4444' }
   ];
   readonly selectedColor = this.accentColorService.currentAccent;
-
-  readonly fontSizes: FontSize[] = ['pequeña', 'normal', 'grande'];
-  readonly selectedFontSize = signal<FontSize>('normal');
 
   // --- Notificaciones ---
   readonly notifications = signal<ToggleSetting[]>([
@@ -81,23 +79,12 @@ export class Settings implements OnInit {
   readonly backgroundLocation = signal(true);
   readonly dataUsage = signal<'wifi' | 'wifi-data'>('wifi-data');
 
-  // --- Seguridad ---
-  readonly appLockActive = signal(true);
-  readonly biometricAuth = signal(true);
-  readonly autoLockTime = signal('5 minutos');
-
   toggleTheme(mode: Theme): void {
     this.themeService.setTheme(mode);
   }
 
   selectColor(color: string): void {
     this.accentColorService.setAccent(color);
-  }
-
-  selectFontSize(size: FontSize): void {
-    this.selectedFontSize.set(size);
-    document.documentElement.setAttribute('data-font-size', size);
-    // TODO: aplicar clase/variable global de tamaño de fuente en styles.scss
   }
 
   toggleNotification(key: string): void {
@@ -108,10 +95,6 @@ export class Settings implements OnInit {
 
   toggleBackgroundLocation(): void {
     this.backgroundLocation.update(v => !v);
-  }
-
-  toggleBiometricAuth(): void {
-    this.biometricAuth.update(v => !v);
   }
 
   onEditProfile(): void {

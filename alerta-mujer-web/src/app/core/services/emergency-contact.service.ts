@@ -16,9 +16,9 @@ export class EmergencyContactService {
       usuarioId: api.userProfileId,
       nombre: api.contactName,
       telefono: api.telephone,
+      email: api.email,
       relacion: api.relationship || 'Otro',
-      prioridad: 1, // El backend no tiene prioridad, valor por defecto
-      activo: true, // El backend no tiene activo, valor por defecto
+      activo: true, // El backend no tiene campo activo, valor por defecto
     };
   }
 

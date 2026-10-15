@@ -3,32 +3,32 @@
   <!-- 1. ENCABEZADO -->
   <div class="device-header">
     <div>
-      <h1 class="device-title">Estado del Dispositivo</h1>
-      <p class="device-subtitle">Diagnóstico completo del sistema • Última actualización: {{ lastRefresh() }}</p>
+      <h1 class="device-title">Estado del Dispositivo Móvil</h1>
+      <p class="device-subtitle">Diagnóstico de tu celular vinculado • Última actualización: {{ lastRefresh() }}</p>
     </div>
     <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()" aria-label="Refrescar información del dispositivo">
       <i class="ti ti-refresh"></i>
     </button>
   </div>
 
-  <!-- 2. PERMISOS DEL NAVEGADOR -->
+  <!-- 2. PERMISOS DEL CELULAR (APP MÓVIL) -->
   <div class="device-panel">
     <h2 class="device-panel__title">
-      <i class="ti ti-shield-check"></i> Permisos del Navegador
+      <i class="ti ti-shield-check"></i> Permisos del Celular (App Móvil)
     </h2>
     <p class="device-permissions-note">
       <i class="ti ti-info-circle"></i>
-      <span>Nota: Si un permiso muestra "No disponible", puede significar que tu navegador no soporta la API de consulta de permisos, pero la funcionalidad puede seguir funcionando mediante solicitudes directas.</span>
+      <span>Estos son los permisos que la app móvil necesita en tu celular. Para cambiarlos, ve a Configuración en tu teléfono.</span>
     </p>
     <div class="device-grid device-grid--3col">
       @for (perm of permissions(); track perm.name) {
         <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles')" aria-live="polite">
-          <div class="device-item__icon" [ngClass]="'device-item__icon--' + getStatusColor(perm.state)">
+          <div class="device-item__icon device-item__icon--neutral">
             <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
           </div>
           <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles' }}</p>
-          <span class="device-badge" [ngClass]="'device-badge--' + getStatusColor(perm.state)">
-            {{ getStatusLabel(perm.state) }}
+          <span class="device-badge device-badge--neutral">
+            Ver en celular
           </span>
         </div>
       }
@@ -73,34 +73,34 @@
       </div>
     </div>
 
-    <!-- 4. INFORMACIÓN DEL DISPOSITIVO -->
+    <!-- 4. DISPOSITIVO MÓVIL VINCULADO -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-device-desktop"></i> Información del Dispositivo
+        <i class="ti ti-device-mobile"></i> Dispositivo Móvil Vinculado
       </h2>
-      @if (deviceInfo(); as info) {
-        <div class="device-info-grid">
-          <div class="device-info-item">
-            <span class="device-info-item__label">Navegador</span>
-            <span class="device-info-item__value">{{ info.browser }} {{ info.version }}</span>
+      @if (criticalFeatures(); as features) {
+        @if (features.registeredDevices !== null && features.registeredDevices > 0) {
+          <div class="device-info-grid">
+            <div class="device-info-item">
+              <span class="device-info-item__label">Dispositivos registrados</span>
+              <span class="device-info-item__value">{{ features.registeredDevices }}</span>
+            </div>
+            <div class="device-info-item">
+              <span class="device-info-item__label">Token FCM</span>
+              <span class="device-info-item__value">{{ features.pushTokenRegistered ? 'Activo' : 'Inactivo' }}</span>
+            </div>
+            <div class="device-info-item">
+              <span class="device-info-item__label">Última ubicación</span>
+              <span class="device-info-item__value">{{ features.lastLocationCaptured || 'No registrada' }}</span>
+            </div>
+            <div class="device-info-item">
+              <span class="device-info-item__label">Sesión</span>
+              <span class="device-info-item__value">{{ features.sessionActive ? 'Activa' : 'Inactiva' }}</span>
+            </div>
           </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Sistema Operativo</span>
-            <span class="device-info-item__value">{{ info.os }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Idioma</span>
-            <span class="device-info-item__value">{{ info.language }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Zona Horaria</span>
-            <span class="device-info-item__value">{{ info.timezone }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Resolución de Pantalla</span>
-            <span class="device-info-item__value">{{ info.screenResolution }}</span>
-          </div>
-        </div>
+        } @else {
+          <p class="device-empty">No tienes un celular vinculado. Inicia sesión en la app móvil para vincular tu dispositivo.</p>
+        }
       }
     </div>
 
@@ -189,17 +189,17 @@
         <i class="ti ti-test-pipe"></i> Pruebas de Funcionalidad
       </h2>
       <div class="device-test-grid">
-        <button class="device-test-btn" (click)="testGeolocation()" [disabled]="loading()" aria-label="Probar geolocalización del dispositivo">
+        <button class="device-test-btn" (click)="viewMobileLocation()" [disabled]="loading()" aria-label="Ver ubicación del dispositivo móvil">
           <i class="ti ti-map-pin"></i>
-          <span>Probar Geolocalización</span>
+          <span>Ver Ubicación Móvil</span>
         </button>
-        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Solicitar permiso de notificaciones">
+        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Estado de notificaciones push móvil">
           <i class="ti ti-shield-check"></i>
-          <span>Solicitar Permiso</span>
+          <span>Estado Push Móvil</span>
         </button>
-        <button class="device-test-btn" (click)="testNotificationDisplay()" [disabled]="loading()" aria-label="Probar visualización de notificación">
-          <i class="ti ti-bell"></i>
-          <span>Mostrar Notificación</span>
+        <button class="device-test-btn" (click)="testNotificationDisplay()" [disabled]="loading()" aria-label="Gestionar notificaciones desde la app móvil">
+          <i class="ti ti-device-mobile"></i>
+          <span>Notificaciones Móvil</span>
         </button>
         <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" aria-label="Probar conectividad de red">
           <i class="ti ti-wifi"></i>

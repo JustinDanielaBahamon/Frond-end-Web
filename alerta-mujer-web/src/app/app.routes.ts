@@ -307,6 +307,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/settings/settings')
             .then(m => m.AdminSettingsComponent)
+      },
+      {
+        path: 'auditoria',
+        loadComponent: () =>
+          import('./features/admin/audit/audit')
+            .then(m => m.AuditComponent)
       }
 
     ],

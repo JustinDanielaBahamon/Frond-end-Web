@@ -1,0 +1,155 @@
+<div class="audit-page">
+
+  <header class="page-header">
+    <div>
+      <h1>Auditoría</h1>
+      <p>Quién entró al panel, desde dónde y qué cambió. Registro de solo lectura.</p>
+    </div>
+    <button class="btn-primary" (click)="exportar()" [disabled]="exportando()">
+      <i class="fa-solid fa-file-arrow-down"></i>
+      {{ exportando() ? 'Exportando…' : 'Exportar CSV' }}
+    </button>
+  </header>
+
+  <!-- Accesos rápidos -->
+  <div class="quick">
+    <button class="chip" [class.chip--active]="!filtros.tipo && !filtros.accion" (click)="limpiarFiltros()">Todo</button>
+    <button class="chip" [class.chip--active]="filtros.tipo === 'SESSION' && !filtros.accion" (click)="verSesiones()">
+      <i class="fa-solid fa-right-to-bracket"></i> Sesiones
+    </button>
+    <button class="chip chip--danger" [class.chip--active]="filtros.accion === 'LOGIN_FAILED'" (click)="verIntentosFallidos()">
+      <i class="fa-solid fa-triangle-exclamation"></i> Intentos fallidos
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <section class="filters">
+    <label class="field">
+      <span>Responsable</span>
+      <select [(ngModel)]="filtros.responsableId" (ngModelChange)="aplicarFiltros()">
+        <option [ngValue]="null">Todas las personas</option>
+        @for (r of responsables(); track r.cuentaId) {
+          <option [ngValue]="r.cuentaId">{{ r.nombre || r.correo }}</option>
+        }
+        <option [ngValue]="0">Sistema / app</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Tipo</span>
+      <select [(ngModel)]="filtros.tipo" (ngModelChange)="aplicarFiltros()">
+        <option value="">Todos</option>
+        @for (t of tipos; track t.valor) {
+          <option [value]="t.valor">{{ t.etiqueta }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>Acción</span>
+      <select [(ngModel)]="filtros.accion" (ngModelChange)="aplicarFiltros()">
+        <option value="">Todas</option>
+        @for (a of acciones; track a.valor) {
+          <option [value]="a.valor">{{ a.etiqueta }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>Desde</span>
+      <input type="date" [(ngModel)]="filtros.desde" (change)="aplicarFiltros()" />
+    </label>
+    <label class="field">
+      <span>Hasta</span>
+      <input type="date" [(ngModel)]="filtros.hasta" (change)="aplicarFiltros()" />
+    </label>
+    <button class="btn-clear" (click)="limpiarFiltros()">
+      <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar
+    </button>
+  </section>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <!-- Tabla -->
+  <section class="table-card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Responsable</th>
+            <th>Acción</th>
+            <th>Sobre</th>
+            <th>Detalle</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (cargando()) {
+            <tr><td colspan="6" class="empty">Cargando…</td></tr>
+          } @else if (registros().length === 0) {
+            <tr><td colspan="6" class="empty">No hay registros con estos filtros.</td></tr>
+          } @else {
+            @for (r of registros(); track r.id) {
+              <tr (click)="verDetalle(r)" tabindex="0" (keydown.enter)="verDetalle(r)">
+                <td class="nowrap">{{ r.fecha | date: 'dd/MM/yyyy' }}<br /><small>{{ r.fecha | date: 'HH:mm:ss' }}</small></td>
+                <td>
+                  @if (r.responsable) {
+                    <strong>{{ r.responsable }}</strong><br /><small>{{ r.responsableCorreo }}</small>
+                  } @else {
+                    <span class="muted">Sistema / app</span>
+                  }
+                </td>
+                <td><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></td>
+                <td>{{ objeto(r) }}</td>
+                <td class="detail">
+                  @for (linea of detalle(r); track $index) {
+                    <div>{{ linea }}</div>
+                  }
+                </td>
+                <td class="nowrap"><small>{{ r.ip || '—' }}</small></td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer">
+      <span>Mostrando <strong>{{ desdeItem() }} - {{ hastaItem() }}</strong> de <strong>{{ total() }}</strong> registros</span>
+      <div class="pagination">
+        <button class="page-btn" (click)="irAPagina(pagina())" [disabled]="pagina() === 0" aria-label="Página anterior">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        @for (n of paginas(); track n) {
+          <button class="page-btn" [class.active]="n === pagina() + 1" (click)="irAPagina(n)">{{ n }}</button>
+        }
+        <button class="page-btn" (click)="irAPagina(pagina() + 2)" [disabled]="pagina() + 1 >= totalPaginas()" aria-label="Página siguiente">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- Detalle -->
+  @if (seleccionado(); as r) {
+    <div class="overlay" (click)="cerrarDetalle()">
+      <div class="dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <header class="dialog__header">
+          <h2>Registro #{{ r.id }}</h2>
+          <button class="icon-btn" (click)="cerrarDetalle()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <dl class="dialog__grid">
+          <dt>Fecha</dt><dd>{{ r.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</dd>
+          <dt>Responsable</dt><dd>{{ r.responsable ? r.responsable + ' (' + r.responsableCorreo + ')' : 'Sistema / app' }}</dd>
+          <dt>Acción</dt><dd><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></dd>
+          <dt>Sobre</dt><dd>{{ objeto(r) }}</dd>
+          <dt>Detalle</dt>
+          <dd>
+            @for (linea of detalle(r); track $index) { <div>{{ linea }}</div> } @empty { — }
+          </dd>
+          <dt>IP</dt><dd>{{ r.ip || '—' }}</dd>
+        </dl>
+      </div>
+    </div>
+  }
+</div>

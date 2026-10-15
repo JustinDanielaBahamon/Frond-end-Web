@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -17,10 +17,10 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private reportsService = inject(ReportsService);
   private alertsService = inject(AlertsService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Datos
   reportes$: Observable<Reporte[]> = this.reportsService.reportes$;
-  stats$: Observable<ReporteStats> = this.reportsService.getStats();
   
   reportesFiltrados: Reporte[] = [];
   stats: ReporteStats = {
@@ -91,10 +91,12 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       next: (alertas) => {
         this.alertasDisponibles = alertas;
         this.cargandoAlertas = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando alertas:', err);
         this.cargandoAlertas = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -107,18 +109,26 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
         this.reportesFiltrados = reportes;
         this.actualizarPaginacion();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar los reportes';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error cargando reportes:', err);
       }
     });
 
-    this.stats$.pipe(takeUntil(this.destroy$)).subscribe({
+    this.cargarEstadisticas();
+  }
+
+  private cargarEstadisticas(): void {
+    this.reportsService.getStats().pipe(takeUntil(this.destroy$)).subscribe({
       next: (stats) => {
         this.stats = stats;
-      }
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando estadísticas:', err)
     });
   }
 
@@ -135,6 +145,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
         this.reportesFiltrados = reportes;
         this.actualizarPaginacion();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar reportes';
@@ -205,33 +216,25 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   descargarPDF(id: number): void {
-    this.cargando = true;
-    this.reportsService.descargarPDF(id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (blob) => {
-        console.log('PDF blob recibido:', blob);
-        this.descargarArchivo(blob, `reporte_${id}.pdf`);
-        this.cargando = false;
-      },
-      error: (err) => {
-        this.error = 'Error al descargar PDF';
-        this.cargando = false;
-        console.error('Error descargando PDF:', err);
-      }
-    });
+    this.descargar(this.reportsService.descargarPDF(id), `informe-${id}.pdf`, 'Error al descargar PDF');
   }
 
+  /** El backend entrega un CSV que Excel abre directamente. */
   descargarExcel(id: number): void {
-    this.cargando = true;
-    this.reportsService.descargarExcel(id).pipe(takeUntil(this.destroy$)).subscribe({
+    this.descargar(this.reportsService.descargarExcel(id), `informe-${id}.csv`, 'Error al descargar Excel');
+  }
+
+  private descargar(archivo$: Observable<Blob>, nombre: string, mensajeError: string): void {
+    this.error = '';
+    archivo$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
-        console.log('Excel blob recibido:', blob);
-        this.descargarArchivo(blob, `reporte_${id}.xlsx`);
-        this.cargando = false;
+        this.descargarArchivo(blob, nombre);
+        this.cargarEstadisticas(); // cada descarga suma una exportación
       },
       error: (err) => {
-        this.error = 'Error al descargar Excel';
-        this.cargando = false;
-        console.error('Error descargando Excel:', err);
+        this.error = mensajeError;
+        this.cdr.detectChanges();
+        console.error(mensajeError, err);
       }
     });
   }
@@ -249,8 +252,11 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       estado: 'Pendiente',
       generadoPor: 'Administrador',
       formato: formato,
-      tamano: 'Calculando...',
-      descripcion: `Reporte generado con filtros: ${this.descripcionFiltros()}`
+      tamano: '',
+      descripcion: `Reporte generado con filtros: ${this.descripcionFiltros()}`,
+      // Sin alertas elegidas, el backend incluye las del rango de fechas
+      desde: this.filtros.fechaInicio ? new Date(`${this.filtros.fechaInicio}T00:00:00`) : null,
+      hasta: this.filtros.fechaFin ? new Date(`${this.filtros.fechaFin}T23:59:59`) : null
     };
 
     this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
@@ -265,8 +271,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
         this.cargando = false;
       },
       error: (err) => {
-        this.error = 'Error al generar reporte';
+        this.error = err?.error?.message || 'Error al generar reporte';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error generando reporte:', err);
       }
     });
@@ -310,23 +317,6 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   private descargarArchivo(blob: Blob, nombre: string): void {
-    console.log('Iniciando descarga:', nombre, 'Tamaño blob:', blob.size);
-    
-    if (blob.size === 0) {
-      // Crear un archivo de ejemplo si el blob está vacío
-      const contenido = `Reporte generado el ${new Date().toLocaleString('es-ES')}\n\nEste es un reporte de ejemplo generado por el sistema AlertaMujer.`;
-      const blobReal = new Blob([contenido], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blobReal);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nombre.endsWith('.pdf') ? nombre : nombre.replace('.xlsx', '.txt');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      return;
-    }
-    
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -372,18 +362,16 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       descripcion: this.modeloDescripcion
     };
 
-    console.log('Actualizando reporte:', reporteActualizado);
-
     this.reportsService.update(reporteActualizado.id, reporteActualizado).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        console.log('Reporte actualizado exitosamente');
         this.cargarDatos();
         this.cerrarModalNuevo();
         this.cargando = false;
       },
       error: (err) => {
-        this.error = 'Error al actualizar reporte';
+        this.error = err?.error?.message || 'Error al actualizar reporte';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error actualizando:', err);
       }
     });
@@ -398,8 +386,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
           this.cargando = false;
         },
         error: (err) => {
-          this.error = 'Error al eliminar reporte';
+          this.error = err?.error?.message || 'Error al eliminar reporte';
           this.cargando = false;
+          this.cdr.detectChanges();
           console.error('Error eliminando:', err);
         }
       });
@@ -454,31 +443,21 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       acontecimiento: acontecimiento,
       generadoPor: 'Administrador',
       formato: 'PDF' as 'PDF' | 'Excel' | 'CSV', // Formato por defecto
-      tamano: 'Calculando...',
+      tamano: '',
       descripcion: descripcion,
       alertasIds: this.alertasSeleccionadas.length > 0 ? this.alertasSeleccionadas : undefined
     };
 
-    console.log('Creando reporte:', reporteACrear);
-    console.log('Valores del formulario:', {
-      nombre: this.modeloNombre,
-      ciudad: this.modeloCiudad,
-      estado: this.modeloEstado,
-      usuaria: this.modeloUsuaria,
-      acontecimiento: this.modeloAcontecimiento,
-      alertasSeleccionadas: this.alertasSeleccionadas
-    });
-    
     this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (reporteCreado) => {
-        console.log('Reporte creado exitosamente:', reporteCreado);
+      next: () => {
         this.cargarDatos();
         this.cerrarModalNuevo();
         this.cargando = false;
       },
       error: (err) => {
-        this.error = 'Error al crear reporte';
+        this.error = err?.error?.message || 'Error al crear reporte';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error creando:', err);
       }
     });

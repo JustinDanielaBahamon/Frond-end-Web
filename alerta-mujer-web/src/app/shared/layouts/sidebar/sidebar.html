@@ -45,10 +45,18 @@
       @if (user.avatarUrl) {
         <img [src]="user.avatarUrl" class="sidebar__user-avatar" [alt]="user.name" />
       }
-      <div class="sidebar__user-info">
-        <p class="sidebar__user-name">{{ user.name }}</p>
-        <p class="sidebar__user-email">{{ user.email }}</p>
-      </div>
+      @if (profileRoute) {
+        <a class="sidebar__user-info sidebar__user-link" [routerLink]="profileRoute"
+           routerLinkActive="sidebar__user-link--active" title="Mi perfil">
+          <p class="sidebar__user-name">{{ user.name }}</p>
+          <p class="sidebar__user-email">{{ user.email }}</p>
+        </a>
+      } @else {
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ user.name }}</p>
+          <p class="sidebar__user-email">{{ user.email }}</p>
+        </div>
+      }
       <button class="sidebar__logout-btn" title="Cerrar sesión" (click)="logout.emit()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

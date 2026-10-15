@@ -309,6 +309,12 @@ export const routes: Routes = [
             .then(m => m.AdminSettingsComponent)
       },
       {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/admin/profile/profile')
+            .then(m => m.AdminProfileComponent)
+      },
+      {
         path: 'auditoria',
         loadComponent: () =>
           import('./features/admin/audit/audit')

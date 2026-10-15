@@ -34,5 +34,7 @@ export class SidebarComponent {
   @Input() mobileAppUrl: string = '';
 
   @Input() user: SidebarUser | null = null;
+  /** Si se indica, el nombre de abajo abre esta ruta (p. ej. Mi perfil). */
+  @Input() profileRoute: string | null = null;
   @Output() logout = new EventEmitter<void>();
 }

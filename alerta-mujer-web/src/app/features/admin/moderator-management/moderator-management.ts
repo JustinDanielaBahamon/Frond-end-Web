@@ -376,10 +376,15 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
         description: this.nuevoReporte.description
       };
 
-      this.moderatorService.create(reporteSinId).subscribe(() => {
-        this.loadReports();
-        this.cerrarModalAgregar();
-        console.log('Reporte agregado exitosamente');
+      this.moderatorService.create(reporteSinId).subscribe({
+        next: () => {
+          this.loadReports();
+          this.cerrarModalAgregar();
+        },
+        error: (err) => {
+          console.error('Error creando reporte:', err);
+          alert(err?.error?.message || 'No se pudo crear el reporte');
+        }
       });
     }
   }
@@ -398,8 +403,9 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   }
 
   abrirModalEditar(reportId: string): void {
-    console.log('Abrir modal editar:', reportId);
-    this.reporteSeleccionado = this.reports.find(r => r.id === reportId) || null;
+    // Se edita una copia: al cancelar, la tabla no debe cambiar
+    const reporte = this.reports.find(r => r.id === reportId);
+    this.reporteSeleccionado = reporte ? { ...reporte } : null;
     if (this.reporteSeleccionado) {
       this.mostrarModalEditar = true;
     }
@@ -412,15 +418,15 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   actualizarReporte(): void {
     if (this.reporteSeleccionado) {
-      console.log('Actualizando reporte:', this.reporteSeleccionado.id);
-      this.moderatorService.update(this.reporteSeleccionado.id, this.reporteSeleccionado).subscribe(() => {
-        const index = this.allReports.findIndex(r => r.id === this.reporteSeleccionado!.id);
-        if (index !== -1 && this.reporteSeleccionado) {
-          this.allReports[index] = this.reporteSeleccionado;
-          this.calculateStats();
-          this.applyFilters();
+      this.moderatorService.update(this.reporteSeleccionado.id, this.reporteSeleccionado).subscribe({
+        next: () => {
+          this.cerrarModalEditar();
+          this.loadReports();
+        },
+        error: (err) => {
+          console.error('Error actualizando reporte:', err);
+          alert(err?.error?.message || 'No se pudo actualizar el reporte');
         }
-        this.cerrarModalEditar();
       });
     }
   }
@@ -430,27 +436,15 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   }
 
   approveReport(reportId: string): void {
-    console.log('Aprobar reporte:', reportId);
     const report = this.allReports.find(r => r.id === reportId);
     if (report) {
-      report.status = 'Resuelto';
-      this.moderatorService.update(reportId, report).subscribe(() => {
-        this.calculateStats();
-        this.applyFilters();
-        console.log('Reporte aprobado:', reportId);
-      });
+      this.moderatorService.update(reportId, { ...report, status: 'Resuelto' }).subscribe(() => this.loadReports());
     }
   }
 
   deleteReport(reportId: string): void {
-    console.log('Eliminar reporte:', reportId);
     if (confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
-      this.moderatorService.delete(reportId).subscribe(() => {
-        this.allReports = this.allReports.filter(r => r.id !== reportId);
-        this.calculateStats();
-        this.applyFilters();
-        console.log('Reporte eliminado:', reportId);
-      });
+      this.moderatorService.delete(reportId).subscribe(() => this.loadReports());
     }
   }
 

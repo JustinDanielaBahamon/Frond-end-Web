@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -51,7 +51,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private moderatorService: ModeratorService) {
+  constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef) {
     // Cerrar dropdowns al hacer clic fuera
     this.clickHandler = () => {
       this.isReasonDropdownOpen = false;
@@ -86,6 +86,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       this.totalItems = reports.length;
       this.totalPages = Math.ceil(reports.length / this.itemsPerPage);
       this.calculateStats();
+      this.applyFilters();
+      this.cdr.detectChanges();
     });
   }
 
@@ -98,7 +100,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.stats = {
       pendingReports: reports.filter(r => r.status === 'Pendiente').length,
       resolvedCases: reports.filter(r => r.status === 'Resuelto').length,
-      sanctionedUsers: reports.filter(r => r.status === 'Resuelto').length
+      // Usuarias distintas con al menos un reporte resuelto
+      sanctionedUsers: new Set(reports.filter(r => r.status === 'Resuelto').map(r => r.userEmail)).size
     };
   }
 

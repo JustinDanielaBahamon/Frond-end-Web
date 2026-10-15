@@ -76,7 +76,19 @@
         <h2 class="home-panel__title-sm">
           <i class="ti ti-map-pin"></i> Última ubicación registrada
         </h2>
-        <a class="home-link" routerLink="/dashboard/ubicacion">Ver mapa completo <i class="ti ti-arrow-right"></i></a>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button 
+            class="home-btn home-btn--refresh" 
+            (click)="refrescarUbicacion()"
+            [disabled]="isRefreshing"
+            title="Refrescar ubicación del dispositivo">
+            <i class="ti" [class.ti-loader-2]="isRefreshing" [class.ti-refresh]="!isRefreshing"></i>
+            Refrescar ubicación
+          </button>
+          <a class="home-link" routerLink="/dashboard/ubicacion">
+            Ver mapa completo <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
       </div>
 
       <div id="home-mini-map" class="home-full-map"></div>

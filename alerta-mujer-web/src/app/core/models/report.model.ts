@@ -124,6 +124,10 @@ export interface Reporte {
   
   // Referencia a alertas del sistema
   alertasIds?: number[]; // IDs de las alertas incluidas en este reporte
+  // Sin alertas elegidas, el informe cubre las alertas iniciadas en este rango
+  desde?: Date | null;
+  hasta?: Date | null;
+  exportaciones?: number;
   
   // Datos detallados de la alerta
   alertaData?: AlertaData;

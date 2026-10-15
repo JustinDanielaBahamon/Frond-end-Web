@@ -101,6 +101,10 @@ export class AuthService {
     return this._token$.value;
   }
 
+  getCurrentUser(): User | null {
+    return this._currentUser$.value;
+  }
+
   getRol(): string {
     const user = this._currentUser$.value;
     return user?.rol ?? '';

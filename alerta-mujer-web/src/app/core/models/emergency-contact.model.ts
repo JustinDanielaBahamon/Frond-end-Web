@@ -3,8 +3,8 @@ export interface ContactoEmergencia {
   usuarioId: number;
   nombre: string;
   telefono: string;
+  email?: string;
   relacion: string;
-  prioridad: number; // 1 = más importante
   activo: boolean;
 }
 

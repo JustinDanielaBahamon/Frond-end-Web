@@ -7,27 +7,19 @@ import { AuthService } from '../../../core/auth/auth.service';
 
 const RELACIONES = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 
-const PRIORIDADES = [
-  { value: 1, label: '1 - Más importante' },
-  { value: 2, label: '2 - Importante' },
-  { value: 3, label: '3 - Media' },
-  { value: 4, label: '4 - Baja' },
-  { value: 5, label: '5 - Menos importante' },
-];
-
 type ContactoForm = {
   nombre: string;
   telefono: string;
+  email?: string;
   relacion: string;
-  prioridad: number;
   activo: boolean;
 };
 
 const FORM_VACIO = (): ContactoForm => ({
   nombre: '',
   telefono: '',
+  email: '',
   relacion: '',
-  prioridad: 1,
   activo: true,
 });
 
@@ -50,7 +42,6 @@ export class EmergencyContacts implements OnInit {
   contactos: ContactoEmergencia[] = [];
 
   relaciones = RELACIONES;
-  prioridades = PRIORIDADES;
 
   menuAbierto: number | null = null;
 
@@ -78,7 +69,7 @@ export class EmergencyContacts implements OnInit {
     this.error = false;
     this.contactService.getByUsuario(this.usuarioId).subscribe({
       next: (data) => {
-        this.contactos = data.sort((a, b) => a.prioridad - b.prioridad);
+        this.contactos = data;
         this.loading = false;
       },
       error: () => { this.error = true; this.loading = false; },
@@ -128,14 +119,14 @@ export class EmergencyContacts implements OnInit {
       usuarioId: this.usuarioId,
       nombre: this.formAgregar.nombre.trim(),
       telefono: this.formAgregar.telefono.trim(),
+      email: this.formAgregar.email?.trim(),
       relacion: this.formAgregar.relacion,
-      prioridad: this.formAgregar.prioridad,
       activo: this.formAgregar.activo,
     };
 
     this.contactService.create(nuevo).subscribe({
       next: (creado) => {
-        this.contactos = [...this.contactos, creado].sort((a, b) => a.prioridad - b.prioridad);
+        this.contactos = [...this.contactos, creado];
         this.guardandoAgregar = false;
         this.modalAgregarAbierto = false;
       },
@@ -151,8 +142,8 @@ export class EmergencyContacts implements OnInit {
     this.formEditar = {
       nombre: contacto.nombre,
       telefono: contacto.telefono,
+      email: contacto.email,
       relacion: contacto.relacion,
-      prioridad: contacto.prioridad,
       activo: contacto.activo,
     };
     this.confirmandoEliminar = false;
@@ -180,16 +171,15 @@ export class EmergencyContacts implements OnInit {
     const cambios: Partial<ContactoEmergencia> = {
       nombre: this.formEditar.nombre.trim(),
       telefono: this.formEditar.telefono.trim(),
+      email: this.formEditar.email?.trim(),
       relacion: this.formEditar.relacion,
-      prioridad: this.formEditar.prioridad,
       activo: this.formEditar.activo,
     };
 
     this.contactService.update(id, cambios).subscribe({
       next: (actualizado) => {
         this.contactos = this.contactos
-          .map(c => (c.id === id ? actualizado : c))
-          .sort((a, b) => a.prioridad - b.prioridad);
+          .map(c => (c.id === id ? actualizado : c));
         this.guardandoEditar = false;
         this.modalEditarAbierto = false;
         this.contactoEditando = null;

@@ -1,0 +1,26 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "issue": "Private field access",
+      "description": "Replace `authService['_currentUser$'].value` with a public getter in AuthService (e.g., `getCurrentUser()`) to avoid breaking on refactor.",
+      "severity": "medium"
+    },
+    {
+      "issue": "Activation method stub",
+      "description": "`checkActivationMethod()` always returns `'Movimiento'`. Until the backend endpoint exists, return `null` and mark as not configured, or document that this is a temporary optimistic default and must be replaced.",
+      "severity": "high"
+    },
+    {
+      "issue": "Subscription leak",
+      "description": "`cargarEstadoSeguridad()` subscribes in `ngOnInit` with no cleanup. Use `takeUntilDestroyed()` or store the subscription and unsubscribe in `ngOnDestroy()`.",
+      "severity": "high"
+    },
+    {
+      "issue": "Hardcoded userId in zones",
+      "description": "`cargarZonasPeligrosas()` calls `getByUser(1)` instead of the authenticated user's ID. Use the same user object from AuthService.",
+      "severity": "medium"
+    }
+  ],
+  "reviewDoc": "/home/maicol/Documentos/proyecto /Frond-end-Web/alerta-mujer-web/.agents/tasks/2026-10-15-022614-review.md"
+}

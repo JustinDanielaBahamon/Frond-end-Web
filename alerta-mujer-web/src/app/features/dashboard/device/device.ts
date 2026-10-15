@@ -93,24 +93,24 @@ export class Device implements OnInit, OnDestroy {
   private loadServices(): void {
     const services: ServiceStatus[] = [
       {
-        name: 'GPS / Geolocalización',
-        enabled: 'geolocation' in navigator,
-        details: 'Permite rastrear tu ubicación en tiempo real'
+        name: 'Celular Vinculado',
+        enabled: false,
+        details: 'Se actualiza al sincronizar'
+      },
+      {
+        name: 'Token Push Activo',
+        enabled: false,
+        details: 'Notificaciones push en el celular'
+      },
+      {
+        name: 'Última Ubicación Registrada',
+        enabled: false,
+        details: 'Ubicación reportada por la app móvil'
       },
       {
         name: 'Conectividad',
         enabled: navigator.onLine,
         details: 'Conexión a internet activa'
-      },
-      {
-        name: 'Almacenamiento Local',
-        enabled: typeof localStorage !== 'undefined',
-        details: 'Permite guardar datos localmente'
-      },
-      {
-        name: 'Notificaciones Push',
-        enabled: 'Notification' in window,
-        details: 'Permite recibir alertas del sistema'
       }
     ];
 
@@ -120,7 +120,7 @@ export class Device implements OnInit, OnDestroy {
 
   private loadCriticalFeatures(): void {
     this.featuresSub?.unsubscribe();
-    this.featuresSub = this.fetchCriticalFeatures().subscribe();
+    this.featuresSub = this.fetchCriticalFeatures().subscribe(() => this.updateMobileServices());
   }
 
   /**
@@ -171,6 +171,16 @@ export class Device implements OnInit, OnDestroy {
       ? new Date(entry.recordedAt).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
       : entry.time;
     return `${when} · ${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
+  }
+
+  private updateMobileServices(): void {
+    const features = this.criticalFeatures();
+    if (!features) return;
+
+    this.updateServiceStatus('Celular Vinculado', (features.registeredDevices ?? 0) > 0);
+    this.updateServiceStatus('Token Push Activo', features.pushTokenRegistered);
+    this.updateServiceStatus('Última Ubicación Registrada', 
+      features.lastLocationCaptured !== null && features.lastLocationCaptured !== 'No disponible');
   }
 
   pushStatusLabel(features: CriticalFeatureStatus): string {
@@ -232,29 +242,18 @@ export class Device implements OnInit, OnDestroy {
 
   // ─── MÉTODOS DE PRUEBAS DE FUNCIONALIDAD ─────────────────
 
-  testGeolocation(): void {
-    if (!('geolocation' in navigator)) {
-      alert('⚠️ La API de Geolocalización no está disponible en este navegador.');
-      return;
+  viewMobileLocation(): void {
+    const features = this.criticalFeatures();
+    const loc = features?.lastLocationCaptured;
+    if (loc && loc !== 'No disponible') {
+      alert('Última ubicación del celular: ' + loc);
+    } else {
+      alert('No hay ubicación registrada desde la app móvil. Abre la app en tu celular para registrar tu ubicación.');
     }
+  }
 
-    this.loading.set(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(6);
-        const lng = position.coords.longitude.toFixed(6);
-        const acc = position.coords.accuracy.toFixed(2);
-        alert(`✅ Geolocalización OK\n\nLatitud: ${lat}\nLongitud: ${lng}\nPrecisión: ${acc}m`);
-        this.addActivityLog('success', `Prueba de geolocalización exitosa: ${lat}, ${lng}`);
-        this.loading.set(false);
-      },
-      (error) => {
-        alert(`❌ Error al obtener ubicación: ${error.message}`);
-        this.addActivityLog('error', `Error en prueba de geolocalización: ${error.message}`);
-        this.loading.set(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+  testGeolocation(): void {
+    this.viewMobileLocation();
   }
 
   requestNotificationPermission(): void {
@@ -286,29 +285,7 @@ export class Device implements OnInit, OnDestroy {
   }
 
   testNotificationDisplay(): void {
-    if (!('Notification' in window)) {
-      alert('⚠️ Las notificaciones no están disponibles en este navegador.');
-      return;
-    }
-
-    if (Notification.permission !== 'granted') {
-      alert('⚠️ Primero debes conceder permisos de notificación. Usa el botón "Solicitar Permiso".');
-      return;
-    }
-
-    try {
-      // Wrap in try-catch to handle environments where Notification constructor is unavailable
-      new Notification('🔔 Alerta Mujer', {
-        body: 'Prueba de notificación exitosa',
-        icon: '/logo.png',
-        tag: 'test-notification'
-      });
-      alert('✅ Notificación enviada. Revisa tu bandeja de notificaciones.');
-      this.addActivityLog('success', 'Prueba de visualización de notificación exitosa');
-    } catch (error) {
-      alert('❌ Error al mostrar notificación. Tu navegador puede no soportar esta funcionalidad.');
-      this.addActivityLog('error', 'Error al crear notificación: Constructor no disponible');
-    }
+    alert('Las notificaciones push se gestionan desde la app móvil en tu celular.');
   }
 
   testConnectivity(): void {

@@ -16,7 +16,7 @@ export class UserSecurityStatusService {
   private contactService = inject(EmergencyContactService);
 
   getSecurityStatus(): Observable<EstadoSeguridad> {
-    const user = this.authService['_currentUser$'].value;
+    const user = this.authService.getCurrentUser();
 
     if (!user) {
       return of(this.createDefaultCriticoEstado());
@@ -110,10 +110,10 @@ export class UserSecurityStatusService {
   }
 
   private checkActivationMethod(): Observable<string | null> {
-    // TODO: Replace with actual backend call to check activation method
-    // For now, we assume if the user exists, they have an activation method configured
-    // This is a safe default that avoids false negatives
-    return of('Movimiento');
+    // TODO: Replace with actual backend call when endpoint exists (e.g., GET /api/profile or /api/user-profile)
+    // Until then, return null to reflect that activation method is not yet configured/verified
+    // This ensures users see an honest "not configured" status rather than a false positive
+    return of(null);
   }
 
   private createDefaultCriticoEstado(): EstadoSeguridad {

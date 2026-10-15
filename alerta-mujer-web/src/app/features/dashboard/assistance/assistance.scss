@@ -8,7 +8,7 @@ $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
 $danger: #ef4444;
-$call: #16a34a;
+$call: #7c3aed;
 
 :host { display: block; }
 
@@ -384,7 +384,7 @@ $call: #16a34a;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #7c3aed;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.25);
 }

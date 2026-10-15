@@ -11,10 +11,10 @@ import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../../../core
 type Tab = 'lineas' | 'centros' | 'llamadas';
 
 export const CATEGORIAS: Record<CategoriaRecurso, { etiqueta: string; color: string }> = {
-  linea: { etiqueta: 'Línea de ayuda', color: '#f59e0b' },
-  policia: { etiqueta: 'Policía', color: '#9333ea' },
-  salud: { etiqueta: 'Salud', color: '#3b82f6' },
-  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#ec4899' },
+  linea: { etiqueta: 'Línea de ayuda', color: '#8b5cf6' },
+  policia: { etiqueta: 'Policía', color: '#7c3aed' },
+  salud: { etiqueta: 'Salud', color: '#0891b2' },
+  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#6d28d9' },
   bomberos: { etiqueta: 'Bomberos', color: '#ef4444' },
 };
 

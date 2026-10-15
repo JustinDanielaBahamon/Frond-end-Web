@@ -1,11 +1,13 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';
 import { EstadoSeguridad } from '../../../core/models/security-status.model';
+import { AuthService } from '../../../core/auth/auth.service';
 
 interface SeguridadItem {
   icon: string;
@@ -73,6 +75,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private map: L.Map | null = null;
   private zoneService = inject(NearbyZoneService);
   private securityStatusService = inject(UserSecurityStatusService);
+  private authService = inject(AuthService);
   private zonas: NearbyZone[] = [];
   private userMarker: L.Marker | null = null;
   private zoneCircles: L.Circle[] = [];
@@ -148,59 +151,61 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private cargarEstadoSeguridad(): void {
     this.isLoadingStatus = true;
     
-    this.securityStatusService.getSecurityStatus().subscribe({
-      next: (estado: EstadoSeguridad) => {
-        // Mapear requisitos a items de seguridad
-        this.estadoSeguridad = estado.requisitos.map(req => ({
-          icon: req.icon,
-          valor: req.valor,
-          descripcion: req.label,
-          configurado: req.cumplido,
-          tooltip: req.cumplido 
-            ? `${req.label}: ${req.valor}` 
-            : `${req.label}: ${req.valor} (requiere atención)`
-        }));
+    this.securityStatusService.getSecurityStatus()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (estado: EstadoSeguridad) => {
+          // Mapear requisitos a items de seguridad
+          this.estadoSeguridad = estado.requisitos.map(req => ({
+            icon: req.icon,
+            valor: req.valor,
+            descripcion: req.label,
+            configurado: req.cumplido,
+            tooltip: req.cumplido 
+              ? `${req.label}: ${req.valor}` 
+              : `${req.label}: ${req.valor} (requiere atención)`
+          }));
 
-        // Establecer estado general
-        const nivelTextos = {
-          seguro: 'Tu cuenta está protegida',
-          advertencia: 'Requiere atención',
-          critico: 'Configuración incompleta'
-        };
+          // Establecer estado general
+          const nivelTextos = {
+            seguro: 'Tu cuenta está protegida',
+            advertencia: 'Requiere atención',
+            critico: 'Configuración incompleta'
+          };
 
-        const iconos = {
-          seguro: 'ti-shield-check',
-          advertencia: 'ti-alert-triangle',
-          critico: 'ti-alert-octagon'
-        };
+          const iconos = {
+            seguro: 'ti-shield-check',
+            advertencia: 'ti-alert-triangle',
+            critico: 'ti-alert-octagon'
+          };
 
-        this.estadoGeneral = {
-          nivel: nivelTextos[estado.nivel],
-          color: estado.color,
-          icono: iconos[estado.nivel],
-          porcentaje: estado.porcentaje
-        };
+          this.estadoGeneral = {
+            nivel: nivelTextos[estado.nivel],
+            color: estado.color,
+            icono: iconos[estado.nivel],
+            porcentaje: estado.porcentaje
+          };
 
-        this.isLoadingStatus = false;
-      },
-      error: (err) => {
-        console.error('Error al cargar estado de seguridad:', err);
-        // Mantener datos de fallback estáticos
-        this.estadoSeguridad = [
-          { icon: 'ti-users', valor: '0', descripcion: 'Contactos de emergencia', configurado: false },
-          { icon: 'ti-shield-check', valor: 'No configurado', descripcion: 'Método de activación', configurado: false },
-          { icon: 'ti-map-pin', valor: 'Inactiva', descripcion: 'Ubicación', configurado: false },
-          { icon: 'ti-bell', valor: 'Inactivas', descripcion: 'Notificaciones', configurado: false },
-        ];
-        this.estadoGeneral = {
-          nivel: 'Error al cargar',
-          color: 'rojo',
-          icono: 'ti-alert-octagon',
-          porcentaje: 0
-        };
-        this.isLoadingStatus = false;
-      }
-    });
+          this.isLoadingStatus = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar estado de seguridad:', err);
+          // Mantener datos de fallback estáticos
+          this.estadoSeguridad = [
+            { icon: 'ti-users', valor: '0', descripcion: 'Contactos de emergencia', configurado: false },
+            { icon: 'ti-shield-check', valor: 'No configurado', descripcion: 'Método de activación', configurado: false },
+            { icon: 'ti-map-pin', valor: 'Inactiva', descripcion: 'Ubicación', configurado: false },
+            { icon: 'ti-bell', valor: 'Inactivas', descripcion: 'Notificaciones', configurado: false },
+          ];
+          this.estadoGeneral = {
+            nivel: 'Error al cargar',
+            color: 'rojo',
+            icono: 'ti-alert-octagon',
+            porcentaje: 0
+          };
+          this.isLoadingStatus = false;
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -298,8 +303,17 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private cargarZonasPeligrosas(): void {
     if (!this.map) return;
 
-    // Obtener zonas del backend (usar userId real cuando esté disponible)
-    this.zoneService.getByUser(1).subscribe({
+    // Obtener el usuario autenticado
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.warn('No hay usuario autenticado, usando zonas de ejemplo');
+      this.zonas = this.obtenerZonasEjemplo();
+      this.dibujarZonasEnMapa();
+      return;
+    }
+
+    // Obtener zonas del backend usando el ID del usuario actual
+    this.zoneService.getByUser(currentUser.id).subscribe({
       next: (zonas) => {
         this.zonas = zonas.length > 0 ? zonas : this.obtenerZonasEjemplo();
         this.dibujarZonasEnMapa();

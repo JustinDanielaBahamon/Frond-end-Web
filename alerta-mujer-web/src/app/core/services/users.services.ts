@@ -6,6 +6,21 @@ import { environment } from '../../../environments/environment';
 
 import { Usuario } from '../models/user.model';
 
+// Backend DTO interface
+interface AdminUserDto {
+  id: number;
+  userProfileId: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  telephone: string | null;
+  role: string | null;
+  accountStatus: string | null;
+  createdAt: string;
+  lastAccess: string | null;
+  alertCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsersService {
 
@@ -14,25 +29,144 @@ export class UsersService {
 
   // ── Usuarias ─────────────────────────────────────────────────
   getAll(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.apiUrl}/api/admin/users`);
+    return this.http.get<AdminUserDto[]>(`${this.apiUrl}/api/admin/users`).pipe(
+      map(dtos => dtos.map(dto => this.fromApi(dto)))
+    );
   }
 
   updateEstado(id: string | number, estado: Usuario['estado']): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, { estado });
+    const accountStatus = this.mapEstadoToApi(estado);
+    return this.http.patch<AdminUserDto>(`${this.apiUrl}/api/admin/users/${id}`, { accountStatus }).pipe(
+      map(dto => this.fromApi(dto))
+    );
   }
 
   actualizarUsuaria(id: string | number, cambios: Partial<Usuario> & Record<string, unknown>): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/api/admin/users/${id}`, cambios);
+    const apiChanges = this.toApi(cambios);
+    return this.http.patch<AdminUserDto>(`${this.apiUrl}/api/admin/users/${id}`, apiChanges).pipe(
+      map(dto => this.fromApi(dto))
+    );
   }
 
   // Crea la usuaria usando el endpoint de registro del backend
   crearUsuaria(data: Record<string, any>): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/api/auth/register`, {
+    return this.http.post<any>(`${this.apiUrl}/api/auth/register`, {
       nombre: data['nombre'],
       email: data['email'],
       password: data['password'],
       telefono: data['telefono']
-    });
+    }).pipe(
+      map(response => {
+        // El registro devuelve un formato diferente, mapearlo
+        const user = response.user;
+        return {
+          id: user.id.toString(),
+          nombre: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          telefono: user.telephone || '',
+          fechaRegistro: user.createdAt,
+          alertas: 0,
+          ultimaActividad: user.createdAt,
+          estado: 'Activa' as const,
+          rol: user.roleName || 'USER',
+          avatarColor: this.generateAvatarColor(),
+          first_name: user.firstName,
+          last_name: user.lastName
+        };
+      })
+    );
+  }
+
+  // ── Mapeo de datos ───────────────────────────────────────────
+  /**
+   * Convert backend AdminUserDto to frontend Usuario model
+   */
+  private fromApi(dto: AdminUserDto): Usuario {
+    return {
+      id: dto.id.toString(),
+      nombre: `${dto.firstName} ${dto.lastName}`,
+      email: dto.email,
+      telefono: dto.telephone || '',
+      fechaRegistro: dto.createdAt,
+      alertas: dto.alertCount,
+      ultimaActividad: dto.lastAccess || dto.createdAt,
+      estado: this.mapEstadoFromApi(dto.accountStatus),
+      rol: dto.role || 'user',
+      avatarColor: this.generateAvatarColor(),
+      first_name: dto.firstName,
+      last_name: dto.lastName
+    };
+  }
+
+  /**
+   * Convert frontend changes to backend format
+   */
+  private toApi(cambios: Partial<Usuario> & Record<string, unknown>): Record<string, unknown> {
+    const apiChanges: Record<string, unknown> = {};
+
+    if (cambios['estado']) {
+      apiChanges['accountStatus'] = this.mapEstadoToApi(cambios['estado'] as Usuario['estado']);
+    }
+    if (cambios['nombre']) {
+      // Split nombre into firstName and lastName
+      const parts = (cambios['nombre'] as string).split(' ');
+      apiChanges['firstName'] = parts[0];
+      apiChanges['lastName'] = parts.slice(1).join(' ') || parts[0];
+    }
+    if (cambios['first_name']) {
+      apiChanges['firstName'] = cambios['first_name'];
+    }
+    if (cambios['last_name']) {
+      apiChanges['lastName'] = cambios['last_name'];
+    }
+    if (cambios['telefono']) {
+      apiChanges['telephone'] = cambios['telefono'];
+    }
+    if (cambios['email']) {
+      apiChanges['email'] = cambios['email'];
+    }
+
+    return apiChanges;
+  }
+
+  /**
+   * Map backend account status to frontend estado
+   */
+  private mapEstadoFromApi(accountStatus: string | null): Usuario['estado'] {
+    switch (accountStatus) {
+      case 'active':
+        return 'Activa';
+      case 'inactive':
+        return 'Inactiva';
+      case 'blocked':
+        return 'Bloqueada por Fraude';
+      default:
+        return 'Inactiva';
+    }
+  }
+
+  /**
+   * Map frontend estado to backend account status
+   */
+  private mapEstadoToApi(estado: Usuario['estado']): string {
+    switch (estado) {
+      case 'Activa':
+        return 'active';
+      case 'Inactiva':
+        return 'inactive';
+      case 'Bloqueada por Fraude':
+        return 'blocked';
+      default:
+        return 'inactive';
+    }
+  }
+
+  /**
+   * Generate a random avatar color
+   */
+  private generateAvatarColor(): string {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+    return colors[Math.floor(Math.random() * colors.length)];
   }
 
   // ── Datos relacionados ───────────────────────────────────────

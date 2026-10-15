@@ -185,8 +185,9 @@ export class DeviceService {
   /**
    * Actualizar dispositivo
    */
+  // Desde el panel solo se edita el estado; el resto lo registra la app móvil.
   update(id: number, device: Device): Observable<Device> {
-    return this.http.put<Device>(`${this.url}/${id}`, device);
+    return this.cambiarEstado(id, device.status);
   }
 
   /**
@@ -238,15 +239,13 @@ export class DeviceService {
    * Cambiar estado de dispositivo
    */
   cambiarEstado(id: number, nuevoEstado: Device['status']): Observable<Device> {
-    const currentDevices = this.devicesSubject.value;
-    const device = currentDevices.find(d => d.id === id);
-    if (device) {
-      device.status = nuevoEstado;
-      this.devicesSubject.next(currentDevices);
-      this.actualizarEstadisticas();
-      return of(device).pipe(delay(300));
-    }
-    return of({} as Device).pipe(delay(300));
+    return this.http.patch<AdminDeviceApi>(`${this.url}/${id}/status`, { status: ESTADO_HACIA_API[nuevoEstado] }).pipe(
+      map(desdeApi),
+      tap(actualizado => {
+        this.devicesSubject.next(this.devicesSubject.value.map(d => (d.id === id ? actualizado : d)));
+        this.actualizarEstadisticas();
+      }),
+    );
   }
 
   filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {

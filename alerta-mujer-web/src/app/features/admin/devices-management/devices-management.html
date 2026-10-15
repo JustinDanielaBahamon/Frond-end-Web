@@ -378,34 +378,26 @@
     </div>
     <div class="modal-body">
       <form (ngSubmit)="actualizarDispositivo(dispositivoSeleccionado!)">
+        <!-- Los datos del celular y de la usuaria vienen de la app móvil; aquí solo se cambia el estado. -->
         <div class="form-group">
           <label>Nombre del dispositivo</label>
-          <input type="text" name="name" [(ngModel)]="dispositivoSeleccionado!.name" required>
+          <input type="text" name="name" readonly [ngModel]="dispositivoSeleccionado!.name" required>
         </div>
         <div class="form-group">
           <label>Versión del sistema operativo</label>
-          <input type="text" name="osVersion" [(ngModel)]="dispositivoSeleccionado!.osVersion" required>
+          <input type="text" name="osVersion" readonly [ngModel]="dispositivoSeleccionado!.osVersion" required>
         </div>
         <div class="form-group">
           <label>Tipo</label>
-          <div class="custom-select" [class.open]="isTypeDropdownOpenEditar">
-            <div class="select-selected" (click)="toggleTypeDropdownEditar($event)">
-              {{ dispositivoSeleccionado!.type }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isTypeDropdownOpenEditar">
-              <div (click)="selectTypeEditar('Android', $event)">Android</div>
-              
-            </div>
-          </div>
+          <input type="text" name="type" readonly [ngModel]="dispositivoSeleccionado!.type">
         </div>
         <div class="form-group">
           <label>IMEI</label>
-          <input type="text" name="imei" [(ngModel)]="dispositivoSeleccionado!.imei" required>
+          <input type="text" name="imei" readonly [ngModel]="dispositivoSeleccionado!.imei" required>
         </div>
         <div class="form-group">
           <label>Teléfono</label>
-          <input type="text" name="phone" [(ngModel)]="dispositivoSeleccionado!.phone" required>
+          <input type="text" name="phone" readonly [ngModel]="dispositivoSeleccionado!.phone" required>
         </div>
         <div class="form-group">
           <label>Estado</label>
@@ -418,16 +410,17 @@
               <div (click)="selectStatusEditar('Activo', $event)">Activo</div>
               <div (click)="selectStatusEditar('Inactivo', $event)">Inactivo</div>
               <div (click)="selectStatusEditar('Bloqueado', $event)">Bloqueado</div>
+              <div (click)="selectStatusEditar('Perdido', $event)">Perdido</div>
             </div>
           </div>
         </div>
         <div class="form-group">
           <label>Nombre del usuario</label>
-          <input type="text" name="userName" [(ngModel)]="dispositivoSeleccionado!.user.name" required>
+          <input type="text" name="userName" readonly [ngModel]="dispositivoSeleccionado!.user.name" required>
         </div>
         <div class="form-group">
           <label>Email del usuario</label>
-          <input type="email" name="userEmail" [(ngModel)]="dispositivoSeleccionado!.user.email" required>
+          <input type="email" name="userEmail" readonly [ngModel]="dispositivoSeleccionado!.user.email" required>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-secondary" (click)="cerrarModalEditar(); $event.stopPropagation()">Cancelar</button>

@@ -44,7 +44,7 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   // NOTA: estos 4 valores deben coincidir exactamente con los que envía el backend
   // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
-  mediosDisponibles = ['Botón de pánico', 'Widget', 'Movimiento sospechoso', 'Manual'];
+  mediosDisponibles = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Manual'];
 
   @ViewChild('fechaInput') private fechaInputRef?: ElementRef<HTMLInputElement>;
 
@@ -55,6 +55,7 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   medioBadge: Record<string, string> = {
     'Botón de pánico': 'badge-boton',
+    'Contacto': 'badge-manual',
     'Widget': 'badge-widget',
     'Movimiento sospechoso': 'badge-movimiento',
     'Manual': 'badge-manual',

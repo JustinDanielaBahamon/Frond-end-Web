@@ -149,6 +149,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   claseMedio(medio: MedioActivacion): string {
     const map: Record<MedioActivacion, string> = {
       'Botón de pánico':       'boton',
+      'Contacto':              'manual',
       'Widget':                'widget',
       'Movimiento sospechoso': 'movimiento',
       'Manual':                'manual',
@@ -571,6 +572,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private crearIconoPin(medio: MedioActivacion, atendida = false): any {
     const colores: Record<MedioActivacion, string> = {
       'Botón de pánico':       '#ef4444',
+      'Contacto':              '#ec4899',
       'Widget':                '#3b82f6',
       'Movimiento sospechoso': '#8b5cf6',
       'Manual':                '#f59e0b',

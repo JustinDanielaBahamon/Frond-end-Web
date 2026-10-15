@@ -44,38 +44,43 @@ export class AlertsService {
   }
 
   // ── Normalización ──────────────────────────────────────────────
-  // Adapta lo que venga de db.json a la forma de la interfaz Alerta.
-  // Ajusta los nombres alternativos según lo que veas en el console.log.
+  // Convierte la alerta del backend (campos en inglés) al modelo Alerta del panel.
+  // En administración el backend agrega userId, userName y userEmail.
   private normalizar(a: any): Alerta {
+    const lat = a.latitude != null ? Number(a.latitude) : 0;
+    const lng = a.longitude != null ? Number(a.longitude) : 0;
+    const usuarioId = a.userId ?? a.userProfileId;
     return {
       id: a.id,
-      nombre: a.nombre ?? a.usuaria ?? a.user_name ?? 'Sin nombre',
-      descripcion: a.descripcion ?? a.description ?? a.tipo ?? '',
-      medioActivacion: this.normalizarMedio(a.medioActivacion ?? a.medio),
-      tiempo: a.tiempo ?? this.haceCuanto(a.created_at ?? a.started_at),
-      ubicacion: a.ubicacion ?? a.location ?? '',
-      lat: Number(a.lat ?? a.latitude ?? 0) || 0,
-      lng: Number(a.lng ?? a.longitude ?? 0) || 0,
-      estado: this.normalizarEstado(a.estado ?? a.status),
-      usuarioId: a.usuarioId,
-      tipo: a.tipo,
-      created_at: a.created_at,
-      started_at: a.started_at,
+      nombre: a.userName || (usuarioId != null ? `Usuaria #${usuarioId}` : 'Sin nombre'),
+      descripcion: a.message ?? '',
+      medioActivacion: this.normalizarMedio(a.activationMethod),
+      tiempo: this.haceCuanto(a.startedAt ?? a.createdAt),
+      ubicacion: lat || lng ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : '',
+      lat,
+      lng,
+      estado: this.normalizarEstado(a.status),
+      usuarioId,
+      tipo: a.alertType ?? '',
+      created_at: a.createdAt,
+      started_at: a.startedAt,
     };
   }
 
   private normalizarMedio(valor: unknown): MedioActivacion {
     const v = String(valor ?? '').toLowerCase();
     if (v.includes('widget')) return 'Widget';
-    if (v.includes('mov') || v.includes('sospech') || v.includes('sacud') || v.includes('agit')) return 'Movimiento sospechoso';
-    if (v.includes('manual')) return 'Manual';
+    if (v.includes('contact')) return 'Contacto';
+    if (v.includes('shake') || v.includes('motion') || v.includes('mov')) return 'Movimiento sospechoso';
+    if (v.includes('manual') || v.includes('lock')) return 'Manual';
     return 'Botón de pánico';
   }
 
   private normalizarEstado(valor: unknown): EstadoAlerta {
     const v = String(valor ?? '').toLowerCase();
-    if (v.startsWith('atend') || v === 'resolved' || v === 'attended') return 'Atendida';
-    if (v.startsWith('cancel')) return 'Cancelada';
+    if (v === 'resolved') return 'Atendida';
+    // "expired" (tiempo agotado sin atención) se agrupa con las canceladas
+    if (v === 'cancelled' || v === 'expired') return 'Cancelada';
     return 'Pendiente';
   }
 

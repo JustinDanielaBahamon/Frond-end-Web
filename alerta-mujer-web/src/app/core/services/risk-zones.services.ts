@@ -117,3 +117,24 @@ function zonaHaciaApi(z: Omit<ZonaManual, 'id'>): Omit<ZonaApi, 'id'> {
     isActive: true,
   };
 }
+
+/** Distancia en metros entre dos coordenadas (fórmula del haversine). */
+function distanciaMetros(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const rad = (g: number) => (g * Math.PI) / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLng = rad(lng2 - lng1);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** True si la coordenada cae dentro del radio de la zona. Las coordenadas 0,0 se consideran "sin ubicación". */
+export function estaDentroDeZona(z: ZonaManual, lat: number, lng: number): boolean {
+  if (!lat && !lng) return false;
+  return distanciaMetros(z.centroLat, z.centroLng, lat, lng) <= (z.radio ?? RADIO_PIN);
+}
+
+/** Llena alertasEnZona de cada zona con las alertas que caen dentro de su radio. */
+export function contarAlertasEnZonas(zonas: ZonaManual[], alertas: { lat: number; lng: number }[]): ZonaManual[] {
+  return zonas.map(z => ({ ...z, alertasEnZona: alertas.filter(a => estaDentroDeZona(z, a.lat, a.lng)).length }));
+}

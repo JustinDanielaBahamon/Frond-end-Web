@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 
 import { AlertsService } from '../../../core/services/alerts.services';
-import { RiskZonesService } from '../../../core/services/risk-zones.services';
+import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../../core/services/risk-zones.services';
 import { UsersService } from '../../../core/services/users.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { ZonaManual } from '../../../core/models/zona.model';
@@ -134,8 +134,9 @@ export class AdminDashboardComponent implements OnInit {
       zonas: this.riskZonesService.getZonas(),
       usuarios: this.usersService.getAll(),
     }).subscribe({
-      next: ({ alertas, zonas, usuarios }) => {
+      next: ({ alertas, zonas: zonasApi, usuarios }) => {
         const lista = alertas as AlertaVM[];
+        const zonas = contarAlertasEnZonas(zonasApi, lista);
 
         this.totalUsuarias = usuarios.length;
         this.usuariasActivas = usuarios.filter(u => this.estadoDe(u) === 'Activa').length;
@@ -151,7 +152,7 @@ export class AdminDashboardComponent implements OnInit {
         this.alertasPorTipo = this.calcularAlertasPorTipo(lista);
         this.donutSegs = this.calcularDonut();
         this.modosActivacion = this.calcularModos(lista);
-        this.calcularZonas(lista);
+        this.calcularZonas(lista, zonas);
         this.calcularTendencia(lista);
 
         // El backend las envía de la más reciente a la más antigua
@@ -266,15 +267,18 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // ── Alertas por zona (mapa esquemático con lat/lng reales) ─────
-  private calcularZonas(lista: AlertaVM[]): void {
+  private calcularZonas(lista: AlertaVM[], zonas: ZonaManual[]): void {
     const grupos = new Map<string, { cantidad: number; lat: number; lng: number }>();
 
-    lista.forEach(a => {
-      const g = grupos.get(a.ubicacion) ?? { cantidad: 0, lat: 0, lng: 0 };
+    // Cada alerta con ubicación se agrupa en la zona de riesgo que la contiene;
+    // las alertas sin ubicación (0,0) no se pueden ubicar en el mapa.
+    lista.filter(a => a.lat || a.lng).forEach(a => {
+      const nombre = zonas.find(z => estaDentroDeZona(z, a.lat, a.lng))?.nombre ?? 'Fuera de zonas de riesgo';
+      const g = grupos.get(nombre) ?? { cantidad: 0, lat: 0, lng: 0 };
       g.cantidad++;
-      g.lat += Number(a.lat) || 0;
-      g.lng += Number(a.lng) || 0;
-      grupos.set(a.ubicacion, g);
+      g.lat += Number(a.lat);
+      g.lng += Number(a.lng);
+      grupos.set(nombre, g);
     });
 
     const top = [...grupos.entries()]

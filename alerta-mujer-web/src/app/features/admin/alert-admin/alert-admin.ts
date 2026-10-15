@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 import { AlertsService } from '../../../core/services/alerts.services';
-import { RiskZonesService } from '../../../core/services/risk-zones.services';
+import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../../core/services/risk-zones.services';
 import { Alerta, MedioActivacion } from '../../../core/models/alert.model';
 import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
 import { Modal } from '../../../shared/components/modal/modal';
@@ -183,7 +183,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         console.log('Primera alerta normalizada:', alertas[0]);
 
         this.alertas = alertas;
-        this.zonasManuales = zonas;
+        this.zonasManuales = contarAlertasEnZonas(zonas, alertas);
         this.puntosMapa = puntos;
         this.alertasFiltradas = [...this.alertas];
 
@@ -428,12 +428,12 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   guardarZona(): void {
     if (!this.nuevaZona.nombre || this.nuevaZona.lat === 0) return;
 
-    const alertasEnZona = this.alertas.filter(a => {
-      const dLat = Math.abs(a.lat - this.nuevaZona.lat);
-      const dLng = Math.abs(a.lng - this.nuevaZona.lng);
-      const gradosAprox = this.nuevaZona.radio / 111000;
-      return dLat <= gradosAprox && dLng <= gradosAprox;
-    }).length;
+    const zonaTemporal = {
+      centroLat: this.nuevaZona.lat,
+      centroLng: this.nuevaZona.lng,
+      radio: this.modoZona === 'area' ? this.nuevaZona.radio : undefined,
+    } as ZonaManual;
+    const alertasEnZona = this.alertas.filter(a => estaDentroDeZona(zonaTemporal, a.lat, a.lng)).length;
 
     const payload: Omit<ZonaManual, 'id'> = {
       nombre: this.nuevaZona.nombre,

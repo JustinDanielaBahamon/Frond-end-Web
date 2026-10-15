@@ -139,10 +139,12 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
         this.todasLasZonas = zonas;
         this.applyFilters();
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando zonas:', err);
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -296,6 +298,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
       next: () => {
         this.todasLasZonas = this.todasLasZonas.filter(x => x.id !== z.id);
         this.applyFilters();
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Error eliminando zona:', err)
     });

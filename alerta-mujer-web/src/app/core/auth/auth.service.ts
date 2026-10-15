@@ -92,7 +92,17 @@ export class AuthService {
     );
   }
 
-  logout(): void {
+  /**
+   * Cierra la sesión. Antes avisa al backend para que quede en la auditoría
+   * (voluntario o por inactividad); si el aviso falla, la sesión se cierra igual.
+   */
+  logout(motivo: 'voluntario' | 'inactividad' = 'voluntario'): void {
+    const token = this.getToken();
+    if (token) {
+      this.http.post(`${environment.apiUrl}/api/auth/logout`, { reason: motivo }, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({ error: () => {} });
+    }
     this.cerrarSesionLocal();
     this.router.navigate(['/auth/login']);
   }

@@ -48,7 +48,7 @@ export class InactivityService {
     const limite = this.minutos();
     if (limite > 0 && Date.now() - this.ultimaActividad >= limite * 60000) {
       this.detener();
-      this.authService.logout();
+      this.authService.logout('inactividad');
     }
   }
 

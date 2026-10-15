@@ -8,9 +8,9 @@ export const environment = {
   // Firebase (inicio de sesión con Google). Datos públicos de la "app web" del proyecto
   // en Firebase Console -> Configuración del proyecto -> Tus apps. No son secretos.
   firebase: {
-    apiKey: '',
-    authDomain: '',
-    projectId: '',
-    appId: '',
+    apiKey: 'AIzaSyAbsx-T3GLgE3w1YIN-1AiUslK2oOUkBmM',
+    authDomain: 'alerta-mujer-b4fae.firebaseapp.com',
+    projectId: 'alerta-mujer-b4fae',
+    appId: '1:656563018279:web:b60ad55bf3f52ad1c30c02',
   },
 };

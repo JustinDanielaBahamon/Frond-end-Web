@@ -1,35 +1,20 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core/auth/auth.service';
+import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { UsersService } from '../../../core/services/users.services';
 import { AlertsService } from '../../../core/services/alerts.services';
+import { AdminSettingsService, ParametrosApp } from '../../../core/services/admin-settings.service';
 
-interface AdminConfig {
-  dailySummary: boolean;
-  twoFactor: boolean;
-  inactivityMinutes: number;
-  strongPasswords: boolean;
-  autoBackup: boolean;
-}
-
-type ToggleKey = 'dailySummary' | 'twoFactor' | 'strongPasswords' | 'autoBackup';
-
-const STORAGE_KEY = 'alerta-mujer-admin-config';
-
-const DEFAULT_CONFIG: AdminConfig = {
-  dailySummary: true,
-  twoFactor: true,
-  inactivityMinutes: 15,
-  strongPasswords: true,
-  autoBackup: true,
-};
+type Panel = 'datos' | 'contrasena' | null;
 
 @Component({
   selector: 'app-admin-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -38,6 +23,8 @@ export class AdminSettingsComponent {
   private themeService = inject(ThemeService);
   private usersService = inject(UsersService);
   private alertsService = inject(AlertsService);
+  private settingsService = inject(AdminSettingsService);
+  readonly inactividad = inject(InactivityService);
 
   // ── Usuario autenticado ──────────────────────────────────────
   readonly user = toSignal(this.authService.currentUser$, { initialValue: null });
@@ -46,61 +33,181 @@ export class AdminSettingsComponent {
   readonly theme = this.themeService.currentTheme;
   readonly isDark = computed(() => this.theme() === 'dark');
 
-  // ── Configuración editable ───────────────────────────────────
-  readonly config = signal<AdminConfig>(this.cargarConfig());
-  readonly opcionesInactividad = [5, 10, 15, 30, 60];
+  // ── Mi cuenta ────────────────────────────────────────────────
+  readonly panelAbierto = signal<Panel>(null);
+  datos = { firstName: '', lastName: '', telephone: '' };
+  contrasena = { actual: '', nueva: '', confirmar: '' };
+  readonly guardandoCuenta = signal(false);
 
-  // ── Textos de estado (fijos por ahora) ───────────────────────
-  readonly versionSistema = 'v1.0.0';
-  readonly ultimaCopia = 'Hace 10 min';
+  // ── Parámetros de la app (servidor) ──────────────────────────
+  readonly parametros = signal<ParametrosApp | null>(null);
+  form = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '' };
+  readonly cargandoParametros = signal(true);
+  readonly guardandoParametros = signal(false);
+  readonly errorParametros = signal('');
 
   // ── Mensaje flotante ─────────────────────────────────────────
   readonly mensaje = signal('');
   private mensajeTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    this.cargarParametros();
+  }
 
   // ── Tema ─────────────────────────────────────────────────────
   cambiarTema(tema: Theme): void {
     this.themeService.setTheme(tema);
   }
 
-  // ── Toggles ──────────────────────────────────────────────────
-  toggle(key: ToggleKey): void {
-    this.config.update((c) => ({ ...c, [key]: !c[key] }));
-  }
-
-  // Cada clic pasa a la siguiente opción: 5 → 10 → 15 → 30 → 60 → 5 ...
-  cambiarInactividad(): void {
-    const opciones = this.opcionesInactividad;
-    const actual = opciones.indexOf(this.config().inactivityMinutes);
-    const siguiente = opciones[(actual + 1) % opciones.length];
-    this.config.update((c) => ({ ...c, inactivityMinutes: siguiente }));
-  }
-
-  // ── Guardar ──────────────────────────────────────────────────
-  guardarCambios(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config()));
-      this.avisar('Cambios guardados correctamente');
-    } catch {
-      this.avisar('No se pudieron guardar los cambios');
+  // ── Mi cuenta ────────────────────────────────────────────────
+  abrirPanel(panel: Exclude<Panel, null>): void {
+    if (this.panelAbierto() === panel) {
+      this.panelAbierto.set(null);
+      return;
     }
+    if (panel === 'datos') {
+      // La sesión guardada puede no traer estos campos: se leen del servidor
+      this.settingsService.obtenerMisDatos().subscribe({
+        next: (d) => {
+          this.datos = d;
+          this.panelAbierto.set('datos');
+        },
+        error: () => this.avisar('No se pudieron cargar tus datos'),
+      });
+      return;
+    } else {
+      this.contrasena = { actual: '', nueva: '', confirmar: '' };
+    }
+    this.panelAbierto.set(panel);
   }
 
-  // ── Cuenta ───────────────────────────────────────────────────
+  guardarDatos(): void {
+    const datos = {
+      firstName: this.datos.firstName.trim(),
+      lastName: this.datos.lastName.trim(),
+      telephone: this.datos.telephone.trim(),
+    };
+    if (!datos.firstName) {
+      this.avisar('El nombre es obligatorio');
+      return;
+    }
+    this.guardandoCuenta.set(true);
+    this.settingsService.actualizarMisDatos(datos).subscribe({
+      next: () => {
+        this.authService.actualizarUsuarioActual(datos);
+        this.guardandoCuenta.set(false);
+        this.panelAbierto.set(null);
+        this.avisar('Datos actualizados');
+      },
+      error: (err) => {
+        this.guardandoCuenta.set(false);
+        this.avisar(err?.error?.message || 'No se pudieron guardar tus datos');
+      },
+    });
+  }
+
+  cambiarContrasena(): void {
+    const { actual, nueva, confirmar } = this.contrasena;
+    if (!actual || !nueva) {
+      this.avisar('Completa la contraseña actual y la nueva');
+      return;
+    }
+    if (nueva.length < 8) {
+      this.avisar('La nueva contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    if (nueva !== confirmar) {
+      this.avisar('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    this.guardandoCuenta.set(true);
+    this.settingsService.cambiarContrasena(actual, nueva).subscribe({
+      next: () => {
+        this.guardandoCuenta.set(false);
+        this.panelAbierto.set(null);
+        this.contrasena = { actual: '', nueva: '', confirmar: '' };
+        this.avisar('Contraseña actualizada');
+      },
+      error: (err) => {
+        this.guardandoCuenta.set(false);
+        this.avisar(err?.error?.message || 'No se pudo cambiar la contraseña');
+      },
+    });
+  }
+
   cerrarSesion(): void {
     this.authService.logout();
   }
 
-  // ── Opciones sin pantalla aún (conéctalas cuando existan) ────
-  abrirOpcion(nombre: string): void {
-    this.avisar(`${nombre}: próximamente`);
+  // ── Parámetros de la app ─────────────────────────────────────
+  private cargarParametros(): void {
+    this.cargandoParametros.set(true);
+    this.settingsService.obtenerParametros().subscribe({
+      next: (p) => {
+        this.aplicarParametros(p);
+        this.cargandoParametros.set(false);
+      },
+      error: () => {
+        this.errorParametros.set('No se pudieron cargar los parámetros');
+        this.cargandoParametros.set(false);
+      },
+    });
   }
 
-  // ── Descargas (CSV, se abre directo en Excel) ────────────────
+  guardarParametros(): void {
+    this.errorParametros.set('');
+    this.guardandoParametros.set(true);
+    this.settingsService.guardarParametros({
+      duracionMaximaAlertaMin: Number(this.form.duracionMaximaAlertaMin),
+      numeroEmergencia: this.form.numeroEmergencia.trim(),
+      correoSoporte: this.form.correoSoporte.trim(),
+    }).subscribe({
+      next: (p) => {
+        this.aplicarParametros(p);
+        this.guardandoParametros.set(false);
+        this.avisar('Parámetros guardados');
+      },
+      error: (err) => {
+        this.guardandoParametros.set(false);
+        this.errorParametros.set(err?.error?.message || 'No se pudieron guardar los parámetros');
+      },
+    });
+  }
+
+  private aplicarParametros(p: ParametrosApp): void {
+    this.parametros.set(p);
+    this.form = {
+      duracionMaximaAlertaMin: p.duracionMaximaAlertaMin,
+      numeroEmergencia: p.numeroEmergencia,
+      correoSoporte: p.correoSoporte,
+    };
+  }
+
+  // ── Sesión ───────────────────────────────────────────────────
+  cambiarInactividad(valor: string): void {
+    this.inactividad.cambiar(Number(valor));
+    this.avisar('Preferencia de sesión guardada');
+  }
+
+  etiquetaInactividad(min: number): string {
+    return min === 0 ? 'Nunca' : `${min} minutos`;
+  }
+
+  // ── Ayuda ────────────────────────────────────────────────────
+  get enlaceSoporte(): string {
+    const correo = this.parametros()?.correoSoporte;
+    return correo ? `mailto:${correo}?subject=${encodeURIComponent('Ayuda panel Alerta Mujer')}` : '';
+  }
+
+  // ── Descargas (CSV con ';', se abre directo en Excel en español) ──
   descargarUsuarios(): void {
     this.usersService.getAll().subscribe({
       next: (usuarios) =>
-        this.descargarCsv('lista-usuarios', usuarios as unknown as Record<string, unknown>[]),
+        this.descargarCsv(
+          'lista-usuarios',
+          ['ID', 'Nombre', 'Correo', 'Teléfono', 'Estado', 'Rol', 'Alertas', 'Registro'],
+          usuarios.map((u) => [u.id, u.nombre, u.email, u.telefono, u.estado, u.rol, u.alertas, u.fechaRegistro])
+        ),
       error: () => this.avisar('No se pudo descargar la lista de usuarios'),
     });
   }
@@ -110,44 +217,36 @@ export class AdminSettingsComponent {
       next: (alertas) => {
         const hace30Dias = Date.now() - 30 * 24 * 60 * 60 * 1000;
         const ultimoMes = alertas.filter((a) => {
-          const fecha = a.created_at ?? a.started_at;
-          if (!fecha) return true; // si no trae fecha, la incluimos
-          const t = new Date(fecha).getTime();
+          const t = new Date(a.started_at ?? a.created_at ?? '').getTime();
           return isNaN(t) || t >= hace30Dias;
         });
-        this.descargarCsv('historial-alertas', ultimoMes as unknown as Record<string, unknown>[]);
+        this.descargarCsv(
+          'historial-alertas',
+          ['ID', 'Usuaria', 'Activación', 'Estado', 'Inicio', 'Latitud', 'Longitud', 'Mensaje'],
+          ultimoMes.map((a) => [a.id, a.nombre, a.medioActivacion, a.estado, a.started_at ?? '', a.lat, a.lng, a.descripcion])
+        );
       },
       error: () => this.avisar('No se pudo descargar el historial de alertas'),
     });
   }
 
   // ── Helpers ──────────────────────────────────────────────────
-  private descargarCsv(nombre: string, filas: Record<string, unknown>[]): void {
+  private descargarCsv(nombre: string, columnas: string[], filas: unknown[][]): void {
     if (!filas.length) {
       this.avisar('No hay datos para descargar');
       return;
     }
 
-    const columnas = Array.from(new Set(filas.flatMap((f) => Object.keys(f)))).filter(
-      (c) => c !== 'password'
-    );
-
     const escapar = (valor: unknown): string => {
-      const texto =
-        valor === null || valor === undefined
-          ? ''
-          : typeof valor === 'object'
-            ? JSON.stringify(valor)
-            : String(valor);
+      let texto = valor === null || valor === undefined ? '' : String(valor);
+      // Evita que Excel interprete un texto como fórmula
+      if (/^[=+\-@]/.test(texto) && !/^-?\d+(\.\d+)?$/.test(texto)) texto = `'${texto}`;
       return `"${texto.replace(/"/g, '""')}"`;
     };
 
-    const csv = [
-      columnas.join(','),
-      ...filas.map((f) => columnas.map((c) => escapar(f[c])).join(',')),
-    ].join('\r\n');
+    const csv = [columnas, ...filas].map((fila) => fila.map(escapar).join(';')).join('\r\n');
 
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const enlace = document.createElement('a');
     enlace.href = url;
@@ -161,15 +260,6 @@ export class AdminSettingsComponent {
   private avisar(texto: string): void {
     this.mensaje.set(texto);
     if (this.mensajeTimer) clearTimeout(this.mensajeTimer);
-    this.mensajeTimer = setTimeout(() => this.mensaje.set(''), 2500);
-  }
-
-  private cargarConfig(): AdminConfig {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...DEFAULT_CONFIG, ...JSON.parse(raw) } : { ...DEFAULT_CONFIG };
-    } catch {
-      return { ...DEFAULT_CONFIG };
-    }
+    this.mensajeTimer = setTimeout(() => this.mensaje.set(''), 3000);
   }
 }

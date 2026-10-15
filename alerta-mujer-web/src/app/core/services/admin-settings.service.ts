@@ -41,6 +41,12 @@ export class AdminSettingsService {
     }).pipe(map(s => this.desdeApi(s)));
   }
 
+  obtenerMisDatos(): Observable<DatosContacto> {
+    return this.http.get<DatosContacto>(`${this.api}/api/users/me`).pipe(
+      map(u => ({ firstName: u.firstName ?? '', lastName: u.lastName ?? '', telephone: u.telephone ?? '' }))
+    );
+  }
+
   /** Datos de la cuenta en sesión (nombre y teléfono). */
   actualizarMisDatos(datos: DatosContacto): Observable<DatosContacto> {
     return this.http.put<DatosContacto>(`${this.api}/api/users/me`, datos);

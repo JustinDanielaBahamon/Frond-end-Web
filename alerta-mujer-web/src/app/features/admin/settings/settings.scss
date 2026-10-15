@@ -36,27 +36,6 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-.btn-save {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 22px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #fff;
-  background: $btn-purple;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 8px 18px rgba($btn-purple, 0.3);
-  transition: all 0.25s ease;
-
-  &:hover {
-    background: $btn-purple-hover;
-    transform: translateY(-2px);
-  }
-}
 
 /* ── Mensaje flotante ───────────────────────── */
 .toast {
@@ -225,6 +204,7 @@ $btn-purple-hover: #6d28d9;
   border-radius: 10px;
   background: transparent;
   color: var(--text-primary);
+  align-items: stretch;
   text-align: left;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -297,48 +277,7 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-.switch {
-  position: relative;
-  flex-shrink: 0;
-  width: 54px;
-  height: 30px;
-  border: none;
-  border-radius: 999px;
-  background: var(--text-dim);
-  cursor: pointer;
-  transition: background 0.25s ease;
 
-  &__knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #fff;
-    transition: transform 0.25s ease;
-  }
-
-  &--on {
-    background: $btn-purple;
-
-    .switch__knob { transform: translateX(24px); }
-  }
-}
-
-.badge {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: $btn-purple;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-
-  &--off { background: var(--text-dim); }
-}
 
 /* ── Cajas informativas ─────────────────────── */
 .info-box {
@@ -370,20 +309,6 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-.version-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-
-  &__value {
-    font-family: monospace;
-    font-weight: 400;
-    color: var(--text-muted);
-  }
-}
 
 /* ── Ayuda y soporte ────────────────────────── */
 .help-box {
@@ -427,6 +352,7 @@ $btn-purple-hover: #6d28d9;
 
 .btn-help {
   display: flex;
+  text-decoration: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -444,37 +370,82 @@ $btn-purple-hover: #6d28d9;
   &:hover { background: $btn-purple-hover; }
 }
 
-/* ── Barra de estado ────────────────────────── */
-.status-bar {
+
+/* ── Formularios ────────────────────────────── */
+.form-panel {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 16px 22px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--bg-card);
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--purple-pale);
+
+  &--flat {
+    padding: 0;
+    background: transparent;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  text-align: left;
+  font-size: 0.85rem;
   color: var(--text-muted);
 
-  &__left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  > span { font-weight: 600; color: var(--text-primary); }
 
-    i { color: var(--purple-deep); font-size: 1.1rem; }
-    strong { color: var(--text-primary); }
+  input,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: 2px solid var(--purple-deep);
+      outline-offset: 1px;
+    }
   }
 
-  &__right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
+  small { font-size: 0.78rem; }
+}
 
-  &__dot { font-size: 0.7rem; }
+.field-hint {
+  margin: -4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #dc2626;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) { background: $btn-purple-hover; }
+  &:disabled { opacity: 0.6; cursor: default; }
 }
 
 /* ── Responsive ─────────────────────────────── */

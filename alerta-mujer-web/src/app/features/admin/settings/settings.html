@@ -4,17 +4,13 @@
   <header class="page-header">
     <div>
       <h1>Configuración</h1>
-      <p>Ajusta los detalles de tu cuenta y el funcionamiento general de la plataforma.</p>
+      <p>Tu cuenta, la sesión del panel y los parámetros generales de la app.</p>
     </div>
-    <button class="btn-save" (click)="guardarCambios()">
-      <i class="fa-solid fa-check"></i>
-      Guardar cambios
-    </button>
   </header>
 
   <!-- MENSAJE FLOTANTE -->
   @if (mensaje()) {
-    <div class="toast">{{ mensaje() }}</div>
+    <div class="toast" role="status">{{ mensaje() }}</div>
   }
 
   <section class="settings-grid">
@@ -28,26 +24,69 @@
           <i class="fa-regular fa-circle-user"></i>
         </div>
         <div class="account-box__info">
-          <p class="account-box__name">{{ user()?.nombre || 'Admin Principal' }}</p>
-          <p class="account-box__email">{{ user()?.email || 'contacto@alertamujer.org' }}</p>
+          <p class="account-box__name">{{ user()?.nombre || 'Administración' }}</p>
+          <p class="account-box__email">{{ user()?.email }}</p>
         </div>
       </div>
 
-      <button class="row-link" (click)="abrirOpcion('Cambiar contraseña')">
-        <span class="row-link__left">
-          <i class="fa-solid fa-lock"></i>
-          <span class="row-link__title">Cambiar contraseña</span>
-        </span>
-        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
-      </button>
-
-      <button class="row-link" (click)="abrirOpcion('Datos de contacto')">
+      <button class="row-link" (click)="abrirPanel('datos')" [attr.aria-expanded]="panelAbierto() === 'datos'">
         <span class="row-link__left">
           <i class="fa-regular fa-address-card"></i>
           <span class="row-link__title">Datos de contacto</span>
         </span>
-        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
+        <i class="fa-solid row-link__chevron" [class.fa-chevron-down]="panelAbierto() === 'datos'"
+           [class.fa-chevron-right]="panelAbierto() !== 'datos'"></i>
       </button>
+
+      @if (panelAbierto() === 'datos') {
+        <form class="form-panel" (ngSubmit)="guardarDatos()">
+          <label class="field">
+            <span>Nombre</span>
+            <input name="firstName" [(ngModel)]="datos.firstName" maxlength="100" required autocomplete="given-name" />
+          </label>
+          <label class="field">
+            <span>Apellido</span>
+            <input name="lastName" [(ngModel)]="datos.lastName" maxlength="100" autocomplete="family-name" />
+          </label>
+          <label class="field">
+            <span>Teléfono</span>
+            <input name="telephone" [(ngModel)]="datos.telephone" maxlength="20" inputmode="tel" autocomplete="tel" />
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="guardandoCuenta()">
+            {{ guardandoCuenta() ? 'Guardando…' : 'Guardar datos' }}
+          </button>
+        </form>
+      }
+
+      <button class="row-link" (click)="abrirPanel('contrasena')" [attr.aria-expanded]="panelAbierto() === 'contrasena'">
+        <span class="row-link__left">
+          <i class="fa-solid fa-lock"></i>
+          <span class="row-link__title">Cambiar contraseña</span>
+        </span>
+        <i class="fa-solid row-link__chevron" [class.fa-chevron-down]="panelAbierto() === 'contrasena'"
+           [class.fa-chevron-right]="panelAbierto() !== 'contrasena'"></i>
+      </button>
+
+      @if (panelAbierto() === 'contrasena') {
+        <form class="form-panel" (ngSubmit)="cambiarContrasena()">
+          <label class="field">
+            <span>Contraseña actual</span>
+            <input type="password" name="actual" [(ngModel)]="contrasena.actual" autocomplete="current-password" required />
+          </label>
+          <label class="field">
+            <span>Nueva contraseña</span>
+            <input type="password" name="nueva" [(ngModel)]="contrasena.nueva" autocomplete="new-password" minlength="8" required />
+          </label>
+          <label class="field">
+            <span>Repite la nueva contraseña</span>
+            <input type="password" name="confirmar" [(ngModel)]="contrasena.confirmar" autocomplete="new-password" required />
+          </label>
+          <p class="field-hint">Mínimo 8 caracteres.</p>
+          <button class="btn-primary" type="submit" [disabled]="guardandoCuenta()">
+            {{ guardandoCuenta() ? 'Guardando…' : 'Cambiar contraseña' }}
+          </button>
+        </form>
+      }
 
       <button class="btn-logout" (click)="cerrarSesion()">
         <i class="fa-solid fa-right-from-bracket"></i>
@@ -55,9 +94,62 @@
       </button>
     </article>
 
-    <!-- ═════════ APARIENCIA ═════════ -->
+    <!-- ═════════ PARÁMETROS DE LA APP ═════════ -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-palette"></i> Apariencia</h2>
+      <h2 class="card__title"><i class="fa-solid fa-sliders"></i> Parámetros de la app</h2>
+
+      @if (cargandoParametros()) {
+        <p class="label">Cargando…</p>
+      } @else {
+        <form class="form-panel form-panel--flat" (ngSubmit)="guardarParametros()">
+          <label class="field">
+            <span>Duración máxima de una alerta SOS (minutos)</span>
+            <input type="number" name="duracion" [(ngModel)]="form.duracionMaximaAlertaMin" min="30" max="1440" step="5" required />
+            <small>Al pasar este tiempo, una alerta que siga activa se marca como expirada. Entre 30 y 1440.</small>
+          </label>
+          <label class="field">
+            <span>Número de emergencia</span>
+            <input name="numero" [(ngModel)]="form.numeroEmergencia" inputmode="tel" maxlength="16" required />
+            <small>Línea que se ofrece a las usuarias (en Colombia, 123).</small>
+          </label>
+          <label class="field">
+            <span>Correo de soporte</span>
+            <input type="email" name="correo" [(ngModel)]="form.correoSoporte" required />
+            <small>Recibe las solicitudes de ayuda del panel.</small>
+          </label>
+
+          @if (errorParametros()) {
+            <p class="field-error">{{ errorParametros() }}</p>
+          }
+
+          <button class="btn-primary" type="submit" [disabled]="guardandoParametros()">
+            <i class="fa-solid fa-check"></i>
+            {{ guardandoParametros() ? 'Guardando…' : 'Guardar parámetros' }}
+          </button>
+        </form>
+
+        @if (parametros()?.actualizado; as fecha) {
+          <p class="card__note">
+            <i class="fa-regular fa-clock"></i>
+            Última modificación: {{ fecha | date: 'dd/MM/yyyy HH:mm' }}
+          </p>
+        }
+      }
+    </article>
+
+    <!-- ═════════ SESIÓN Y APARIENCIA ═════════ -->
+    <article class="card">
+      <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> Sesión y apariencia</h2>
+
+      <label class="field">
+        <span>Cerrar sesión por inactividad</span>
+        <select [ngModel]="inactividad.minutos()" (ngModelChange)="cambiarInactividad($event)">
+          @for (op of inactividad.opciones; track op) {
+            <option [value]="op">{{ etiquetaInactividad(op) }}</option>
+          }
+        </select>
+        <small>Si el panel queda abierto sin uso, se cierra la sesión. Se aplica a este navegador.</small>
+      </label>
 
       <p class="label">Tema</p>
       <div class="theme-options">
@@ -78,111 +170,19 @@
       </div>
 
       <p class="card__note">
-        <i class="fa-regular fa-eye"></i>
-        Vista cómoda y adaptada para cualquier pantalla.
+        <i class="fa-solid fa-circle-info"></i>
+        Por seguridad, la sesión también vence 24 horas después de iniciarla.
       </p>
     </article>
 
-    <!-- ═════════ NOTIFICACIONES Y ALERTAS ═════════ -->
+    <!-- ═════════ DATOS ═════════ -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-regular fa-bell"></i> Notificaciones y Alertas</h2>
-
-      <div class="toggle-row">
-        <div>
-          <p class="toggle-row__title">Resumen diario</p>
-          <p class="toggle-row__desc">Reporte sencillo al final del día</p>
-        </div>
-        <button
-          class="switch"
-          [class.switch--on]="config().dailySummary"
-          role="switch"
-          [attr.aria-checked]="config().dailySummary"
-          (click)="toggle('dailySummary')">
-          <span class="switch__knob"></span>
-        </button>
-      </div>
-
-      <p class="card__note">
-        <i class="fa-regular fa-circle-check"></i>
-        Las notificaciones llegan de manera instantánea.
-      </p>
-    </article>
-
-    <!-- ═════════ SEGURIDAD BÁSICA ═════════ -->
-    <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> Seguridad Básica</h2>
-
-      <div class="toggle-row toggle-row--box">
-        <div>
-          <p class="toggle-row__title">Verificación en dos pasos</p>
-          <p class="toggle-row__desc">Pedir un código al iniciar sesión</p>
-        </div>
-        <button
-          class="switch"
-          [class.switch--on]="config().twoFactor"
-          role="switch"
-          [attr.aria-checked]="config().twoFactor"
-          (click)="toggle('twoFactor')">
-          <span class="switch__knob"></span>
-        </button>
-      </div>
-
-      <button class="row-link row-link--stack" (click)="cambiarInactividad()">
-        <span class="row-link__text">
-          <span class="row-link__title">Cerrar sesión por inactividad</span>
-          <span class="row-link__desc">Si no se usa la pantalla</span>
-        </span>
-        <span class="row-link__value">
-          {{ config().inactivityMinutes }} minutos
-          <i class="fa-solid fa-chevron-right row-link__chevron"></i>
-        </span>
-      </button>
-
-      <div class="toggle-row">
-        <div>
-          <p class="toggle-row__title">Contraseñas seguras para operadores</p>
-          <p class="toggle-row__desc">Requisito mínimo de seguridad</p>
-        </div>
-        <button
-          class="switch"
-          [class.switch--on]="config().strongPasswords"
-          role="switch"
-          [attr.aria-checked]="config().strongPasswords"
-          (click)="toggle('strongPasswords')">
-          <span class="switch__knob"></span>
-        </button>
-      </div>
-
-      <div class="info-box">
-        <i class="fa-solid fa-shield-halved"></i>
-        <div>
-          <p class="info-box__title">Tus datos están protegidos</p>
-          <p class="info-box__desc">La información de las usuarias está resguardada de forma confidencial.</p>
-        </div>
-      </div>
-    </article>
-
-    <!-- ═════════ SISTEMA Y DATOS ═════════ -->
-    <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-cloud"></i> Sistema y Datos</h2>
-
-      <div class="toggle-row toggle-row--box">
-        <div>
-          <p class="toggle-row__title">Copia de seguridad automática</p>
-          <p class="toggle-row__desc">Guardar una copia diaria de las alertas</p>
-        </div>
-        <button
-          class="badge"
-          [class.badge--off]="!config().autoBackup"
-          (click)="toggle('autoBackup')">
-          {{ config().autoBackup ? 'Activada' : 'Desactivada' }}
-        </button>
-      </div>
+      <h2 class="card__title"><i class="fa-solid fa-database"></i> Datos</h2>
 
       <button class="row-link row-link--stack" (click)="descargarUsuarios()">
         <span class="row-link__text">
           <span class="row-link__title">Descargar lista de usuarios</span>
-          <span class="row-link__desc">En formato Excel o PDF</span>
+          <span class="row-link__desc">Archivo CSV que se abre en Excel</span>
         </span>
         <i class="fa-solid fa-download row-link__chevron"></i>
       </button>
@@ -190,21 +190,16 @@
       <button class="row-link row-link--stack" (click)="descargarAlertas()">
         <span class="row-link__text">
           <span class="row-link__title">Descargar historial de alertas</span>
-          <span class="row-link__desc">Registro del último mes</span>
+          <span class="row-link__desc">Alertas de los últimos 30 días, en CSV</span>
         </span>
         <i class="fa-solid fa-download row-link__chevron"></i>
       </button>
 
-      <div class="version-row">
-        <span>Versión del sistema</span>
-        <span class="version-row__value">{{ versionSistema }}</span>
-      </div>
-
       <div class="info-box">
-        <i class="fa-solid fa-circle-info"></i>
+        <i class="fa-solid fa-user-shield"></i>
         <div>
-          <p class="info-box__title">Todo en orden</p>
-          <p class="info-box__desc">El sistema funciona con normalidad y sin errores registrados hoy.</p>
+          <p class="info-box__title">Información sensible</p>
+          <p class="info-box__desc">Los archivos incluyen datos personales de las usuarias. Guárdalos en un lugar seguro y no los compartas.</p>
         </div>
       </div>
     </article>
@@ -213,51 +208,24 @@
     <article class="card">
       <h2 class="card__title"><i class="fa-regular fa-circle-question"></i> Ayuda y Soporte</h2>
 
-      <button class="row-link row-link--stack" (click)="abrirOpcion('Preguntas frecuentes')">
-        <span class="row-link__text">
-          <span class="row-link__title">Preguntas frecuentes</span>
-          <span class="row-link__desc">Guía rápida para resolver dudas comunes</span>
-        </span>
-        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
-      </button>
-
-      <button class="row-link row-link--stack" (click)="abrirOpcion('Manual de uso para operadores')">
-        <span class="row-link__text">
-          <span class="row-link__title">Manual de uso para operadores</span>
-          <span class="row-link__desc">Pasos sencillos para atender emergencias</span>
-        </span>
-        <i class="fa-solid fa-chevron-right row-link__chevron"></i>
-      </button>
-
       <div class="help-box">
         <div class="help-box__top">
           <div class="help-box__icon"><i class="fa-solid fa-headset"></i></div>
           <div>
             <p class="help-box__title">¿Tienes algún problema?</p>
-            <p class="help-box__desc">Te ayudamos con cualquier duda.</p>
+            <p class="help-box__desc">
+              Escríbenos a {{ parametros()?.correoSoporte || 'soporte' }} y te ayudamos.
+            </p>
           </div>
         </div>
-        <button class="btn-help" (click)="abrirOpcion('Pedir ayuda')">
-          <i class="fa-regular fa-circle-question"></i>
-          Pedir ayuda
-        </button>
+        @if (enlaceSoporte) {
+          <a class="btn-help" [href]="enlaceSoporte">
+            <i class="fa-regular fa-envelope"></i>
+            Pedir ayuda
+          </a>
+        }
       </div>
     </article>
 
   </section>
-
-  <!-- BARRA DE ESTADO -->
-  <footer class="status-bar">
-    <div class="status-bar__left">
-      <i class="fa-regular fa-circle-check"></i>
-      <strong>Estado del sistema:</strong>
-      <span>Funcionando correctamente</span>
-    </div>
-    <div class="status-bar__right">
-      <span>Última copia: {{ ultimaCopia }}</span>
-      <span class="status-bar__dot">•</span>
-      <span>Soporte activo</span>
-    </div>
-  </footer>
-
 </div>

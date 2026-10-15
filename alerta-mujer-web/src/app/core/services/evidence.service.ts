@@ -270,15 +270,15 @@ export class EvidenceService {
   /**
    * Cambiar estado de evidencia
    */
+  // Guarda la revisión en el backend (PATCH /api/evidences/{id}/review)
   cambiarEstado(id: number, nuevoEstado: 'Verificada' | 'Pendiente' | 'Rechazada'): Observable<Evidencia> {
-    const currentEvidencias = this.evidenciasSubject.value;
-    const evidencia = currentEvidencias.find(e => e.id === id);
-    if (evidencia) {
-      evidencia.estado = nuevoEstado;
-      this.evidenciasSubject.next(currentEvidencias);
-      this.actualizarEstadisticas();
-      return of(evidencia).pipe(delay(300));
-    }
-    return of({} as Evidencia).pipe(delay(300));
+    const reviewStatus = { Verificada: 'verified', Pendiente: 'pending', Rechazada: 'rejected' }[nuevoEstado];
+    return this.http.patch<AdminEvidenceApi>(`${this.url}/${id}/review`, { reviewStatus }).pipe(
+      map(desdeApi),
+      tap(actualizada => {
+        this.evidenciasSubject.next(this.evidenciasSubject.value.map(e => (e.id === id ? actualizada : e)));
+        this.actualizarEstadisticas();
+      }),
+    );
   }
 }

@@ -40,8 +40,8 @@ export class AdminLayoutComponent implements OnInit {
 
   links: SidebarLink[] = [
     { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
-    { label: 'Usuarios',     route: '/admin/usuarios' },
-    { label: 'Alertas',      route: '/admin/alertas' },
+    { label: 'Gestión de usuarios', route: '/admin/usuarios' },
+    { label: 'Gestión de alertas', route: '/admin/alertas' },
     { label: 'Gestion de Zonas', route: '/admin/zone-management' },
     { label: 'Gestion de Reportes', route: '/admin/report-management' },
     { label: 'Gestion de evidencias' , route:'/admin/evidence-management'},

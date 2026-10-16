@@ -218,10 +218,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
    * Ver detalles de un dispositivo
    */
   verDispositivo(id: number): void {
-    console.log('verDispositivo llamado con ID:', id);
     this.deviceService.getById(id).subscribe({
       next: (device) => {
-        console.log('Dispositivo cargado:', device);
         this.dispositivoSeleccionado = device;
         this.mostrarModalVer = true;
         this.cdr.detectChanges();
@@ -237,10 +235,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
    * Abrir modal para editar un dispositivo
    */
   abrirModalEditar(id: number): void {
-    console.log('abrirModalEditar llamado con ID:', id);
     this.deviceService.getById(id).subscribe({
       next: (device) => {
-        console.log('Dispositivo cargado para editar:', device);
         this.dispositivoSeleccionado = device;
         this.mostrarModalEditar = true;
         this.cdr.detectChanges();
@@ -336,7 +332,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.filterStatus = estado;
     this.isStatusDropdownOpen = false;
-    console.log('Seleccionado estado:', estado);
     this.applyFilters();
   }
 

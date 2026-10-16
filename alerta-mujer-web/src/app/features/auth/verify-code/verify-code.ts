@@ -125,7 +125,6 @@ export class VerifyCodeComponent {
 
     this.iniciarTemporizador();
 
-    console.log('Código reenviado');
 
   }
 
@@ -133,7 +132,6 @@ export class VerifyCodeComponent {
 
     const codigo = this.codigo.join('');
 
-    console.log('Código:', codigo);
 
     // Aquí luego llamarás al backend
 

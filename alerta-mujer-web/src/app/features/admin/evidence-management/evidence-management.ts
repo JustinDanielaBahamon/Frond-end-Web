@@ -132,7 +132,6 @@ export class EvidencesManagementComponent implements OnInit {
       fechaFin: null
     };
 
-    console.log('Aplicando filtros:', filtros);
 
     this.evidenceService.filtrarEvidencias(filtros).pipe(takeUntil(this.destroy$)).subscribe({
       next: (evidencias) => {
@@ -209,7 +208,6 @@ export class EvidencesManagementComponent implements OnInit {
     this.cargando = true;
     this.evidenceService.descargar(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
-        console.log('Blob recibido:', blob);
         const evidencia = this.evidenciaSeleccionada || this.evidenciasFiltradas.find(e => e.id === id);
         const nombreArchivo = evidencia?.nombre || `evidencia_${id}`;
         this.descargarArchivo(blob, nombreArchivo, evidencia?.tipo);
@@ -263,7 +261,6 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   private descargarArchivo(blob: Blob, nombre: string, tipo?: string): void {
-    console.log('Iniciando descarga:', nombre, 'Tipo:', tipo, 'Tamaño blob:', blob.size);
     
     if (blob.size === 0) {
       // Generar contenido simulado según el tipo de archivo
@@ -373,7 +370,6 @@ export class EvidencesManagementComponent implements OnInit {
     event.stopPropagation();
     this.filterEvidenceType = tipo;
     this.isEvidenceTypeDropdownOpen = false;
-    console.log('Seleccionado tipo:', tipo);
     // No aplicar filtros automáticamente, esperar al botón Buscar
   }
 
@@ -381,7 +377,6 @@ export class EvidencesManagementComponent implements OnInit {
     event.stopPropagation();
     this.filterStatus = estado;
     this.isStatusDropdownOpen = false;
-    console.log('Seleccionado estado:', estado);
     // No aplicar filtros automáticamente, esperar al botón Buscar
   }
 

@@ -103,7 +103,6 @@ export class ForgotPhoneComponent {
     // Número listo para enviar al backend
     const numeroCompleto = `+57${this.telefono}`;
 
-    console.log('Número enviado:', numeroCompleto);
 
     // Aquí después llamarás al servicio
 

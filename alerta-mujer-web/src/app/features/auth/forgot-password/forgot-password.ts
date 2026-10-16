@@ -55,7 +55,6 @@ export class ForgotPasswordComponent {
       return;
     }
   
-    console.log("Enviar correo a:", this.email);
   
     // Ir a verificar código
     this.router.navigate(['/auth/verify-code']);

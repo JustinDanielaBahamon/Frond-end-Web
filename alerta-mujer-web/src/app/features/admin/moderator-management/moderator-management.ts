@@ -239,13 +239,6 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   applyFilters(): void {
-    console.log('Aplicando filtros:', {
-      searchTerm: this.searchTerm,
-      filterReason: this.filterReason,
-      filterSeverity: this.filterSeverity,
-      filterStatus: this.filterStatus,
-      filterDate: this.filterDate
-    });
 
     this.filteredReports = this.allReports.filter(report => {
       // Filtrar por término de búsqueda (ID, usuario, motivo, gravedad, estado)
@@ -311,7 +304,6 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.currentPage = 1; // Resetear a primera página
     this.updatePaginatedReports();
 
-    console.log('Reportes filtrados:', this.filteredReports.length);
   }
 
   updatePaginatedReports(): void {
@@ -327,7 +319,6 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.filterStatus = '';
     this.filterDate = '';
     this.applyFilters();
-    console.log('Filtros limpiados');
   }
 
   // ========================================
@@ -390,7 +381,6 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   }
 
   verReporte(reportId: string): void {
-    console.log('Ver reporte:', reportId);
     this.reporteSeleccionado = this.reports.find(r => r.id === reportId) || null;
     if (this.reporteSeleccionado) {
       this.mostrarModalVer = true;

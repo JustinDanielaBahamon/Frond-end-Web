@@ -137,7 +137,6 @@ export class LoginComponent {
     this.error = '';
     this.loading = true;
 
-    console.log('Intentando login con:', this.email);
 
     this.auth.login({
       email: this.email,
@@ -145,7 +144,6 @@ export class LoginComponent {
     }).subscribe({
       next: (user) => {
         this.loading = false;
-        console.log('Login exitoso, usuario:', user);
 
         if (user.rol === 'Admin' || user.rol === 'admin') {
           this.router.navigate(['/admin/dashboard']);

@@ -180,7 +180,6 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     }).subscribe({
       next: ({ alertas, zonas, puntos }) => {
         // DEBUG: quítalo cuando ya veas bien los datos
-        console.log('Primera alerta normalizada:', alertas[0]);
 
         this.alertas = alertas;
         this.zonasManuales = contarAlertasEnZonas(zonas, alertas);

@@ -275,10 +275,10 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
             right: 2px;
             width: 12px;
             height: 12px;
-            background: #10b981;
+            background: #5910b9;
             border: 2px solid white;
             border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            box-shadow: 0 0 0 0 rgba(89, 16, 185, 0.7);
             animation: pulse 2s infinite;
           "></div>
         </div>
@@ -438,20 +438,20 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   } {
     const configs = {
       risk: { 
-        fillColor: '#dc2626', 
-        borderColor: '#991b1b', 
+        fillColor: '#cb1ce6', 
+        borderColor: '#8f12a2', 
         label: 'Zona de riesgo', 
         emoji: '⚠️' 
       },
       safe: { 
-        fillColor: '#16a34a', 
-        borderColor: '#15803d', 
+        fillColor: '#5316a3', 
+        borderColor: '#431580', 
         label: 'Zona segura', 
         emoji: '🛡️' 
       },
       help: { 
-        fillColor: '#0ea5e9', 
-        borderColor: '#0284c7', 
+        fillColor: '#500ee9', 
+        borderColor: '#3d02c7', 
         label: 'Punto de ayuda', 
         emoji: '🆘' 
       },
@@ -462,8 +462,8 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         emoji: '👮' 
       },
       asistencia: { 
-        fillColor: '#3b82f6', 
-        borderColor: '#2563eb', 
+        fillColor: '#733bf6', 
+        borderColor: '#6025eb', 
         label: 'Centro de asistencia', 
         emoji: '🏥' 
       },

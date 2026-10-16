@@ -123,9 +123,9 @@
   border-radius: 50px;
   white-space: nowrap;
 
-  &--exito { background: rgba(16, 185, 129, 0.15); color: #059669; }
-  &--advertencia { background: rgba(217, 119, 6, 0.15); color: #b45309; }
-  &--peligro { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+  &--exito { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--advertencia { background: rgba(147, 6, 217, 0.15); color: #7b09b4; }
+  &--peligro { background: rgba(216, 68, 239, 0.15); color: #cb1ce6; }
   &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
 }
 
@@ -137,8 +137,8 @@
   padding: 0.75rem;
   margin-bottom: 1rem;
   border-radius: 10px;
-  background: rgba(8, 145, 178, 0.08);
-  border: 1px solid rgba(8, 145, 178, 0.2);
+  background: rgba(59, 8, 178, 0.08);
+  border: 1px solid rgba(59, 8, 178, 0.2);
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   line-height: 1.4;
@@ -218,9 +218,9 @@
   font-size: 1.2rem;
   flex-shrink: 0;
   
-  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--peligro { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
   &--neutral { background: rgba(107, 114, 128, 0.12); color: #6b7280; }
 }
 
@@ -323,10 +323,10 @@
   font-size: 1.2rem;
   flex-shrink: 0;
 
-  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-  &--acento { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+  &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--peligro { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
+  &--acento { background: rgba(59, 8, 178, 0.12); color: #3b08b2; }
 }
 
 .device-feature-item__body {
@@ -374,10 +374,10 @@
   font-size: 1rem;
   flex-shrink: 0;
 
-  &--info { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
-  &--warning { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--error { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-  &--success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  &--info { background: rgba(59, 8, 178, 0.12); color: #3b08b2; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--error { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
 }
 
 .device-activity-item__body {

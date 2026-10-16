@@ -9,17 +9,17 @@ $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
 $grad: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3));
-$danger: #f87171;
-$sos: #f59e0b;
+$danger: #e671f8;
+$sos: #a70bf5;
 
 :host { display: block; }
 
 .za-alert {
   margin-bottom: 1rem;
   padding: 0.7rem 0.95rem;
-  border: 1px solid rgba(248, 113, 113, 0.4);
+  border: 1px solid rgba(230, 113, 248, 0.4);
   border-radius: 0.75rem;
-  background: rgba(248, 113, 113, 0.12);
+  background: rgba(230, 113, 248, 0.12);
   color: $danger;
   font-size: 0.82rem;
   font-weight: 600;
@@ -197,7 +197,7 @@ $sos: #f59e0b;
   border-radius: 50%;
   background: var(--cat, #{$accent});
 
-  &--you { background: #6366f1; box-shadow: 0 0 0 2px #fff; }
+  &--you { background: #8e63f1; box-shadow: 0 0 0 2px #fff; }
 }
 
 // ── Lista ─────────────────────────────────────────
@@ -345,9 +345,9 @@ $sos: #f59e0b;
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #8e63f1;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 6px rgba(142, 99, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 :host ::ng-deep .za-popup { min-width: 180px; font-family: inherit; }
@@ -359,7 +359,7 @@ $sos: #f59e0b;
   margin-top: 0.45rem;
   padding: 0.3rem 0.65rem;
   border-radius: 999px;
-  background: #f59e0b;
+  background: #a70bf5;
   color: #1a1428 !important;
   font-size: 0.76rem;
   font-weight: 800;

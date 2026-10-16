@@ -7,12 +7,12 @@ $text: var(--text-primary, #ede9fe);
 $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
-$live: #22c55e;
-$star: #fbbf24;
+$live: #6922c5;
+$star: #b324fb;
 
 :host { display: block; }
 
-.mu-error { color: #f87171; font-size: 0.85rem; margin: 0; }
+.mu-error { color: #e671f8; font-size: 0.85rem; margin: 0; }
 .mu-muted { color: $muted; font-size: 0.82rem; margin: 0; line-height: 1.4; }
 
 // ── Sub-pestañas ──────────────────────────────────
@@ -92,7 +92,7 @@ $star: #fbbf24;
   gap: 0.4rem;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: rgba(34, 197, 94, 0.14);
+  background: rgba(105, 34, 197, 0.14);
   color: $live;
   font-size: 0.72rem;
   font-weight: 800;
@@ -107,8 +107,8 @@ $star: #fbbf24;
 }
 
 @keyframes mu-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
-  100% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(105, 34, 197, 0.6); }
+  100% { box-shadow: 0 0 0 8px rgba(105, 34, 197, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) { .mu-live-dot { animation: none; } }
@@ -121,7 +121,7 @@ $star: #fbbf24;
   font-size: 0.72rem;
   font-weight: 700;
 
-  &--off { color: #f87171; }
+  &--off { color: #e671f8; }
 }
 
 .mu-address {
@@ -214,8 +214,8 @@ $star: #fbbf24;
 
   svg { width: 16px; height: 16px; }
   &--star { color: $star; font-size: 1rem; }
-  &--place { color: #f59e0b; }
-  &--zone { color: #16a34a; }
+  &--place { color: #a70bf5; }
+  &--zone { color: #5316a3; }
 }
 
 .mu-switch-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
@@ -313,7 +313,7 @@ $star: #fbbf24;
   span { display: inline-flex; align-items: center; gap: 0.25rem; }
 }
 
-.mu-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; &--you { background: #6366f1; } &--phone { background: #ec4899; } }
+.mu-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; &--you { background: #8e63f1; } &--phone { background: #d648ec; } }
 .mu-ring { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid; }
 .mu-line { display: inline-block; width: 16px; border-top: 3px solid $accent; &--dashed { border-top-style: dashed; } }
 
@@ -321,9 +321,9 @@ $star: #fbbf24;
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #8e63f1;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 6px rgba(142, 99, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 :host ::ng-deep .mu-place-pin {
@@ -397,10 +397,10 @@ $star: #fbbf24;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #ec4899;
+  background: #d648ec;
   color: #fff;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(236, 72, 153, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 6px rgba(214, 72, 236, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
 
   svg { width: 16px; height: 16px; }
 }

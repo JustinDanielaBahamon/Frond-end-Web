@@ -29,20 +29,20 @@ const CAPAS_KEY = 'alerta_mujer_capas_mapa';
 const CAPAS_DEFECTO: Capas = { recorridos: true, soloImportantes: false, ubicaciones: true, zonas: true };
 // Neiva (Huila): mismo centro por defecto que la app móvil
 const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
-const COLORES_RECORRIDO = ['#a78bfa', '#38bdf8', '#f472b6', '#34d399'];
+const COLORES_RECORRIDO = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 // Colores alineados con la app móvil
 export const ZONA_ESTILO: Record<NearbyZone['type'], { color: string; etiqueta: string }> = {
-  safe: { color: '#16a34a', etiqueta: 'Zona segura' },
-  risk: { color: '#dc2626', etiqueta: 'Zona de riesgo' },
-  help: { color: '#0ea5e9', etiqueta: 'Punto de ayuda' },
-  asistencia: { color: '#3b82f6', etiqueta: 'Asistencia' },
+  safe: { color: '#5316a3', etiqueta: 'Zona segura' },
+  risk: { color: '#cb1ce6', etiqueta: 'Zona de riesgo' },
+  help: { color: '#500ee9', etiqueta: 'Punto de ayuda' },
+  asistencia: { color: '#733bf6', etiqueta: 'Asistencia' },
   policia: { color: '#9333ea', etiqueta: 'Policía' },
 };
 const RIESGO_LUGAR: Record<string, { color: string; etiqueta: string }> = {
-  muy_segura: { color: '#16a34a', etiqueta: 'Muy segura' },
-  moderada: { color: '#f59e0b', etiqueta: 'Moderada' },
-  muy_insegura: { color: '#dc2626', etiqueta: 'Muy insegura' },
+  muy_segura: { color: '#5316a3', etiqueta: 'Muy segura' },
+  moderada: { color: '#a70bf5', etiqueta: 'Moderada' },
+  muy_insegura: { color: '#cb1ce6', etiqueta: 'Muy insegura' },
 };
 
 const phoneIcon = L.divIcon({
@@ -308,7 +308,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!p) return;
 
     L.circle([p.lat, p.lng], {
-      radius: p.precision, color: '#6366f1', weight: 1, fillColor: '#6366f1', fillOpacity: 0.12,
+      radius: p.precision, color: '#8e63f1', weight: 1, fillColor: '#8e63f1', fillOpacity: 0.12,
     }).addTo(this.capaYo);
     L.marker([p.lat, p.lng], { icon: youIcon, zIndexOffset: 1000 })
       .bindTooltip('Estás aquí')
@@ -331,7 +331,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (loc.accuracy) {
       L.circle([loc.lat, loc.lng], {
-        radius: loc.accuracy, color: '#ec4899', weight: 1, fillColor: '#ec4899', fillOpacity: 0.12,
+        radius: loc.accuracy, color: '#d648ec', weight: 1, fillColor: '#d648ec', fillOpacity: 0.12,
       }).addTo(this.capaCelular);
     }
     const detalle = lugar ? escapeHtml(this.textoLugar(lugar)) : 'Buscando dirección…';
@@ -356,10 +356,10 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
       L.polyline(latlngs, { color, weight: r.importante ? 5 : 4, opacity: 0.95, dashArray: r.importante ? undefined : '8 8' })
         .bindTooltip(`${r.importante ? '★ ' : ''}${nombre}`, { sticky: true })
         .addTo(this.capaRecorridos);
-      L.circleMarker(latlngs[0], { radius: 6, color: '#fff', weight: 2, fillColor: '#22c55e', fillOpacity: 1 })
+      L.circleMarker(latlngs[0], { radius: 6, color: '#fff', weight: 2, fillColor: '#6922c5', fillOpacity: 1 })
         .bindPopup(`<strong>${nombre}</strong><br>Inicio: ${escapeHtml(r.barrioInicio)}`)
         .addTo(this.capaRecorridos);
-      L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#ef4444', fillOpacity: 1 })
+      L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#d844ef', fillOpacity: 1 })
         .bindPopup(`<strong>${nombre}</strong><br>Destino: ${escapeHtml(r.barrioFin)}`)
         .addTo(this.capaRecorridos);
     }

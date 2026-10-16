@@ -31,12 +31,12 @@ interface Punto {
 
 // Colores alineados con "Mi ubicación" y la app móvil
 export const CATEGORIAS: Record<Categoria, { etiqueta: string; color: string }> = {
-  riesgo: { etiqueta: 'Zona de riesgo', color: '#dc2626' },
-  segura: { etiqueta: 'Zona segura', color: '#16a34a' },
+  riesgo: { etiqueta: 'Zona de riesgo', color: '#cb1ce6' },
+  segura: { etiqueta: 'Zona segura', color: '#5316a3' },
   policia: { etiqueta: 'Policía', color: '#9333ea' },
-  salud: { etiqueta: 'Salud', color: '#3b82f6' },
-  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#ec4899' },
-  linea: { etiqueta: 'Línea de ayuda', color: '#f59e0b' },
+  salud: { etiqueta: 'Salud', color: '#733bf6' },
+  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#d648ec' },
+  linea: { etiqueta: 'Línea de ayuda', color: '#a70bf5' },
 };
 
 const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];

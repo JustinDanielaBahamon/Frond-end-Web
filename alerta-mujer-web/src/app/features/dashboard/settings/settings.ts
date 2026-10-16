@@ -60,9 +60,9 @@ export class Settings implements OnInit {
     { name: 'purpura', value: '#7c3aed' },
     { name: 'azulOscuro', value: '#130253' },
     { name: 'magenta', value: '#710592' },
-    { name: 'rosa', value: '#ec4899' },
-    { name: 'celeste', value: '#0891b2' },
-    { name: 'rojo', value: '#ef4444' }
+    { name: 'rosa', value: '#d648ec' },
+    { name: 'celeste', value: '#3b08b2' },
+    { name: 'rojo', value: '#d844ef' }
   ];
   readonly selectedColor = this.accentColorService.currentAccent;
 

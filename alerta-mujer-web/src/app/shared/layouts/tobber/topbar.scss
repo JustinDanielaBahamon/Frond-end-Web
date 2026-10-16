@@ -60,7 +60,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #be185d, #7c3aed);
+    background: linear-gradient(135deg, #aa15c1, #7c3aed);
     color: #fff;
     font-weight: 800;
     font-size: 0.875rem;
@@ -147,13 +147,13 @@
     }
 
     &--danger {
-      color: #be185d;
-      svg { stroke: #be185d; }
+      color: #aa15c1;
+      svg { stroke: #aa15c1; }
 
       &:hover {
         background: #fff0f6;
-        color: #be185d;
-        svg { stroke: #be185d; }
+        color: #aa15c1;
+        svg { stroke: #aa15c1; }
       }
     }
   }
@@ -187,7 +187,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #db2777);
+    background: linear-gradient(135deg, #7c3aed, #cb1ce6);
     color: #fff;
     font-size: 0.8rem;
     font-weight: 800;
@@ -232,7 +232,7 @@
   &__email { margin: 2px 0 0; color: #a78bfa; font-size: 0.75rem; }
 
   .profile-menu__item i { width: 18px; text-align: center; color: #7c3aed; }
-  .profile-menu__item--danger i { color: #be185d; }
+  .profile-menu__item--danger i { color: #aa15c1; }
 }
 
 // En pantallas angostas solo se ve la inicial
@@ -307,7 +307,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  background: #ec4899;
+  background: #d648ec;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 800;
@@ -407,7 +407,7 @@
     background: transparent;
   }
 
-  &--unread &__dot { background: #ec4899; }
+  &--unread &__dot { background: #d648ec; }
 
   &__body {
     display: flex;

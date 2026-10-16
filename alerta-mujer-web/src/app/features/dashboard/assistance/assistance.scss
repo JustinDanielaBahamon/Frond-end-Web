@@ -7,7 +7,7 @@ $text: var(--text-primary, #ede9fe);
 $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
-$danger: #ef4444;
+$danger: #d844ef;
 $call: #7c3aed;
 
 :host { display: block; }
@@ -46,9 +46,9 @@ $call: #7c3aed;
   gap: 1rem;
   flex-wrap: wrap;
   padding: 1rem 1.15rem;
-  border: 1px solid rgba(239, 68, 68, 0.45);
+  border: 1px solid rgba(216, 68, 239, 0.45);
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.16), rgba(239, 68, 68, 0.05));
+  background: linear-gradient(135deg, rgba(216, 68, 239, 0.16), rgba(216, 68, 239, 0.05));
 }
 
 .as-sos-text {
@@ -72,7 +72,7 @@ $call: #7c3aed;
   font-size: 0.95rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+  box-shadow: 0 6px 18px rgba(216, 68, 239, 0.35);
   transition: filter 0.15s, transform 0.15s;
 
   svg { width: 18px; height: 18px; }
@@ -87,7 +87,7 @@ $call: #7c3aed;
   font-size: 0.82rem;
   font-weight: 600;
 
-  &--error { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
+  &--error { background: rgba(230, 113, 248, 0.12); border-color: rgba(230, 113, 248, 0.4); color: #e671f8; }
   &--info { background: $soft; border-color: $border; color: $text; }
 }
 
@@ -221,7 +221,7 @@ $call: #7c3aed;
   cursor: pointer;
 
   svg { width: 14px; height: 14px; }
-  &:hover { color: #f87171; border-color: #f87171; }
+  &:hover { color: #e671f8; border-color: #e671f8; }
 }
 
 // ── Centros ───────────────────────────────────────

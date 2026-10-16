@@ -8,8 +8,8 @@ $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
 $grad: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3));
-$star: #fbbf24;
-$danger: #f87171;
+$star: #b324fb;
+$danger: #e671f8;
 
 :host { display: block; }
 
@@ -71,9 +71,9 @@ $danger: #f87171;
   font-size: 0.82rem;
   font-weight: 600;
 
-  &--error { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); color: $danger; }
-  &--warning { background: rgba(251, 191, 36, 0.12); border-color: rgba(251, 191, 36, 0.4); color: $star; }
-  &--success { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+  &--error { background: rgba(230, 113, 248, 0.12); border-color: rgba(230, 113, 248, 0.4); color: $danger; }
+  &--warning { background: rgba(179, 36, 251, 0.12); border-color: rgba(179, 36, 251, 0.4); color: $star; }
+  &--success { background: rgba(120, 45, 218, 0.12); border-color: rgba(120, 45, 218, 0.4); color: #782dda; }
 }
 
 // ── Layout de dos columnas ────────────────────────
@@ -111,7 +111,7 @@ $danger: #f87171;
   white-space: nowrap;
 
   &--star { color: $star; }
-  &--full { background: rgba(248, 113, 113, 0.14); color: $danger; }
+  &--full { background: rgba(230, 113, 248, 0.14); color: $danger; }
 }
 
 .gr-banner {
@@ -189,12 +189,12 @@ $danger: #f87171;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #22c55e;
+  background: #6922c5;
   color: #fff;
   font-weight: 800;
   font-size: 0.8rem;
 
-  &--b { background: #ef4444; }
+  &--b { background: #d844ef; }
 }
 
 .gr-point-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
@@ -300,7 +300,7 @@ $danger: #f87171;
 
   &--primary { background: $grad; color: #fff; &:not(:disabled):hover { filter: brightness(1.08); } }
   &--ghost { background: transparent; border-color: $border; color: $text; &:not(:disabled):hover { border-color: $accent; } }
-  &--danger { background: transparent; border-color: rgba(248, 113, 113, 0.5); color: $danger; &:hover { background: rgba(248, 113, 113, 0.1); } }
+  &--danger { background: transparent; border-color: rgba(230, 113, 248, 0.5); color: $danger; &:hover { background: rgba(230, 113, 248, 0.1); } }
 }
 
 // ── Lista de recorridos ───────────────────────────
@@ -469,8 +469,8 @@ $danger: #f87171;
   height: 9px;
   border-radius: 50%;
 
-  &--a { background: #22c55e; }
-  &--b { background: #ef4444; }
+  &--a { background: #6922c5; }
+  &--b { background: #d844ef; }
   &--place { background: #7c3aed; box-shadow: 0 0 0 2px #fff; width: 7px; height: 7px; }
 }
 

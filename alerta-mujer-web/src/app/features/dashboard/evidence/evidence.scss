@@ -8,9 +8,9 @@ $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
 $grad: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3));
-$danger: #f87171;
+$danger: #e671f8;
 
-$tipo-colores: (photo: #38bdf8, video: #f472b6, audio: #fbbf24, document: #a78bfa);
+$tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bfa);
 
 :host { display: block; }
 
@@ -52,8 +52,8 @@ $tipo-colores: (photo: #38bdf8, video: #f472b6, audio: #fbbf24, document: #a78bf
   font-size: 0.82rem;
   font-weight: 600;
 
-  &--error { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); color: $danger; }
-  &--success { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+  &--error { background: rgba(230, 113, 248, 0.12); border-color: rgba(230, 113, 248, 0.4); color: $danger; }
+  &--success { background: rgba(120, 45, 218, 0.12); border-color: rgba(120, 45, 218, 0.4); color: #782dda; }
 }
 
 .ev-muted { margin: 0; font-size: 0.82rem; color: $muted; }
@@ -267,8 +267,8 @@ $tipo-colores: (photo: #38bdf8, video: #f472b6, audio: #fbbf24, document: #a78bf
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: color-mix(in srgb, #fbbf24 18%, transparent);
-  color: #fbbf24;
+  background: color-mix(in srgb, #b324fb 18%, transparent);
+  color: #b324fb;
 
   svg { width: 28px; height: 28px; }
 }
@@ -333,7 +333,7 @@ $tipo-colores: (photo: #38bdf8, video: #f472b6, audio: #fbbf24, document: #a78bf
 
   &--primary { background: $grad; color: #fff; &:not(:disabled):hover { filter: brightness(1.08); } }
   &--ghost { background: transparent; border-color: $border; color: $text; &:not(:disabled):hover { border-color: $accent; } }
-  &--danger { background: transparent; border-color: rgba(248, 113, 113, 0.5); color: $danger; &:hover { background: rgba(248, 113, 113, 0.1); } }
+  &--danger { background: transparent; border-color: rgba(230, 113, 248, 0.5); color: $danger; &:hover { background: rgba(230, 113, 248, 0.1); } }
 }
 
 .ev-icon-btn {

@@ -226,8 +226,8 @@
     transition: background 0.15s, color 0.15s;
 
     &:hover {
-      background: color-mix(in srgb, var(--accent-grad-to, #be185d) 25%, transparent);
-      color: var(--purple-mid, #f472b6);
+      background: color-mix(in srgb, var(--accent-grad-to, #aa15c1) 25%, transparent);
+      color: var(--purple-mid, #e372f4);
     }
   }
 
@@ -270,23 +270,23 @@
     background: #4a1d0f; // marrón cálido oscuro, en vez del morado de usuaria
 
     .sidebar__divider {
-      background: linear-gradient(90deg, #fbbf24, #ea580c, transparent);
+      background: linear-gradient(90deg, #b324fb, #a00cea, transparent);
     }
 
     .sidebar__link--active {
-      background: linear-gradient(135deg, #d97706, #ea580c); // ámbar → naranja
-      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+      background: linear-gradient(135deg, #9306d9, #a00cea); // ámbar → naranja
+      box-shadow: 0 4px 14px rgba(160, 12, 234, 0.35);
 
       .sidebar__link-icon { color: #fff7ed; }
     }
 
     .sidebar__mobile-btn {
-      background: linear-gradient(90deg, #ea580c, #d97706);
+      background: linear-gradient(90deg, #a00cea, #9306d9);
     }
 
     .sidebar__logout-btn:hover {
-      background: rgba(234, 88, 12, 0.25);
-      color: #fdba74;
+      background: rgba(160, 12, 234, 0.25);
+      color: #cf74fd;
     }
   }
 }

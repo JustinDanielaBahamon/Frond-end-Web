@@ -9,7 +9,7 @@ $muted: var(--text-muted, #a8a0c4);
 $accent: var(--purple-mid, #aa86ea);
 $accent-strong: var(--purple-deep, #9463e9);
 $grad: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3));
-$danger: #f87171;
+$danger: #e671f8;
 
 :host { display: block; }
 
@@ -22,8 +22,8 @@ $danger: #f87171;
   font-size: 0.82rem;
   font-weight: 600;
 
-  &--error { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); color: $danger; }
-  &--success { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+  &--error { background: rgba(230, 113, 248, 0.12); border-color: rgba(230, 113, 248, 0.4); color: $danger; }
+  &--success { background: rgba(120, 45, 218, 0.12); border-color: rgba(120, 45, 218, 0.4); color: #782dda; }
 }
 
 // ── Layout ────────────────────────────────────────

@@ -25,7 +25,7 @@ const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
 // Velocidad a pie usada por el móvil para estimar el tiempo
 const VELOCIDAD_KMH = 5;
 // Un color por recorrido (máximo 4)
-const COLORES = ['#a78bfa', '#38bdf8', '#f472b6', '#34d399'];
+const COLORES = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 @Component({
   selector: 'app-guardar-recorrido',
@@ -205,8 +205,8 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     if (!this.map) return;
 
     this.capaSeleccion.clearLayers();
-    if (a) L.marker([a.latitude, a.longitude], { icon: iconoPunto('A', '#22c55e', true) }).addTo(this.capaSeleccion);
-    if (b) L.marker([b.latitude, b.longitude], { icon: iconoPunto('B', '#ef4444', true) }).addTo(this.capaSeleccion);
+    if (a) L.marker([a.latitude, a.longitude], { icon: iconoPunto('A', '#6922c5', true) }).addTo(this.capaSeleccion);
+    if (b) L.marker([b.latitude, b.longitude], { icon: iconoPunto('B', '#d844ef', true) }).addTo(this.capaSeleccion);
     if (a && b) {
       L.polyline([[a.latitude, a.longitude], [b.latitude, b.longitude]], {
         color: '#f5f3ff', weight: 4, opacity: 0.95, dashArray: '2 8', lineCap: 'round',

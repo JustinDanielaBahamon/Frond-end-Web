@@ -18,8 +18,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: rgba(219, 39, 119, 0.12);
-    color: var(--pink, #db2777);
+    background: rgba(203, 28, 230, 0.12);
+    color: var(--pink, #cb1ce6);
 
     svg { width: 20px; height: 20px; }
   }
@@ -64,8 +64,8 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:focus-within {
-    border-color: #e91e63;
-    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+    border-color: #ce1ee9;
+    box-shadow: 0 0 0 3px rgba(206, 30, 233, 0.1);
   }
 
   &-icon {
@@ -139,7 +139,7 @@
     line-height: 1;
     padding: 2px;
 
-    &:hover { color: var(--red, #dc2626); }
+    &:hover { color: var(--red, #cb1ce6); }
   }
 }
 
@@ -200,7 +200,7 @@
 
     &--total      { border-left-color:  #560c79; }
     &--atendidas  { border-left-color: #055f1a; }
-    &--canceladas { border-left-color: #e60f4f }
+    &--canceladas { border-left-color: #c90fe6 }
 
     .ah-stat-icon {
       width: 40px;
@@ -216,8 +216,8 @@
     }
 
     &--total .ah-stat-icon      { background: linear-gradient(135deg, #560c79, #9236ad); }
-    &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #055f1a, #06bd3d); }
-    &--canceladas .ah-stat-icon { background: linear-gradient(135deg,  #e60f4f, #fa5b95 ); }
+    &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #055f1a, #5506bd); }
+    &--canceladas .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
 
     .ah-stat-body { min-width: 0; }
 
@@ -292,7 +292,7 @@
     vertical-align: middle;
   }
 
-  .ah-id    { color: var(--pink,  #e60f4f); font-weight: 700; }
+  .ah-id    { color: var(--pink,  #c90fe6); font-weight: 700; }
   .ah-fecha { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
   // antes 0.75rem con color casi negro sobre texto ya negro: subo contraste con gris intermedio legible
   .ah-hora  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
@@ -310,15 +310,15 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
 
-  &.badge-boton      { background: rgba(219, 39, 119, 0.18); color: #e60f4f; }
-  &.badge-widget     { background: var(--purple-pale, #dbeafe); color: var(--purple-deep, #1e40af); }
-  &.badge-movimiento { background: var(--amber-pale, #fef3c7); color: var(--amber, #92400e); }
+  &.badge-boton      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
+  &.badge-widget     { background: var(--purple-pale, #e6dbfe); color: var(--purple-deep, #481ab3); }
+  &.badge-movimiento { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
   &.badge-manual     { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
 
   // BADGES — estado
   &.badge-ok        { background: rgb(5 141 50 / 98%); color: #ffffff; }
   &.badge-pendiente { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
-  &.badge-falsa     { background: rgba(16, 185, 129, 0.18); color: #047857; }
+  &.badge-falsa     { background: rgba(89, 16, 185, 0.18); color: #360478; }
 }
 
 // Acciones (ojo + menú de tres puntos)
@@ -372,7 +372,7 @@
     &:hover { background: var(--purple-pale, #f5f3ff); color: var(--purple-deep, #5b21b6); }
   }
 
-  &-danger, .ah-menu-danger { color: var(--red, #be123c) !important; }
+  &-danger, .ah-menu-danger { color: var(--red, #a712be) !important; }
 }
 
 // Fila expandida
@@ -463,10 +463,10 @@
   z-index: 1;
 }
 
-.ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #16a34a); }
+.ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3); }
 .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
-  background: var(--amber, #ea580c);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+  background: var(--amber, #a00cea);
+  box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.15);
 }
 
 .ah-mini-timeline-label { font-size: var(--font-size-sm); font-weight: 700; color: var(--text-primary, #1a1a1a); }
@@ -597,7 +597,7 @@
   padding: 1.5rem;
 }
 
-.ah-error { color: var(--red, #dc2626); }
+.ah-error { color: var(--red, #cb1ce6); }
 
 /* ==================================================
    MODO OSCURO — MIS EMERGENCIAS (scope local al componente)
@@ -636,7 +636,7 @@
 
     &:focus-within {
       border-color: var(--pink) !important;
-      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15) !important;
+      box-shadow: 0 0 0 3px rgba(203, 28, 230, 0.15) !important;
     }
   }
 
@@ -665,7 +665,7 @@
 
     &--total      { border-left-color: #560c79 !important; }
     &--atendidas  { border-left-color: #055f1a !important; }
-    &--canceladas { border-left-color: #e60f4f !important; }
+    &--canceladas { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -695,14 +695,14 @@
 
   /* Badges */
   .ah-badge {
-    &.badge-boton      { background: rgba(219, 39, 119, 0.22) !important; color: var(--pink) !important; }
+    &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
     &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
     &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
 
-    &.badge-ok        { background: var(--green, #16a34a) !important; color: #fff !important; }
+    &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
     &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #16a34a) !important; }
+    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
   /* Iconos de acción */
@@ -736,10 +736,10 @@
 
   .ah-mini-timeline-item:not(:last-child)::after { background: var(--border) !important; }
   .ah-mini-timeline-dot { background: var(--text-dim) !important; }
-  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #16a34a) !important; }
+  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3) !important; }
   .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
     background: var(--amber) !important;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.2) !important;
   }
 
   .ah-mini-timeline-label { color: var(--text-primary) !important; }

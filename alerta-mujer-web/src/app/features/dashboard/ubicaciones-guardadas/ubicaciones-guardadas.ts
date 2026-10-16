@@ -17,9 +17,9 @@ const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
 
 // Mismos niveles y colores que la app móvil
 export const NIVELES: Record<NivelRiesgo, { etiqueta: string; color: string }> = {
-  muy_segura: { etiqueta: 'Muy segura', color: '#16a34a' },
-  moderada: { etiqueta: 'Moderada', color: '#f59e0b' },
-  muy_insegura: { etiqueta: 'Muy insegura', color: '#dc2626' },
+  muy_segura: { etiqueta: 'Muy segura', color: '#5316a3' },
+  moderada: { etiqueta: 'Moderada', color: '#a70bf5' },
+  muy_insegura: { etiqueta: 'Muy insegura', color: '#cb1ce6' },
 };
 
 const NOMBRES_RAPIDOS = ['Casa', 'Trabajo', 'Universidad', 'Colegio', 'Gimnasio'];

@@ -5,7 +5,7 @@ import { Observable, Subject, Subscription, catchError, finalize, forkJoin, map,
 import { environment } from '../../../../environments/environment';
 import { DeviceInfoService } from '../../../core/services/device-info.service';
 import { PermissionsService } from '../../../core/services/permissions.service';
-import { DeviceService } from '../../../core/services/device.service';
+import { DeviceService, UserDevice } from '../../../core/services/device.service';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -41,6 +41,8 @@ export class Device implements OnInit, OnDestroy {
   connectionQuality = signal<string>('Desconocida');
   criticalFeatures = signal<CriticalFeatureStatus | null>(null);
   activityLog = signal<ActivityLog[]>([]);
+  /** Celulares en los que la usuaria inició sesión con la app móvil. */
+  misCelulares = signal<UserDevice[]>([]);
 
   lastRefresh = signal<string>('');
   loading = signal<boolean>(false);
@@ -152,6 +154,7 @@ export class Device implements OnInit, OnDestroy {
       latest: this.locationService.getLatest().pipe(catchError(() => of(FAILED)))
     }).pipe(
       map(({ contacts, devices, latest }) => {
+        if (devices) this.misCelulares.set(devices);
         this.criticalFeatures.set({
           sessionActive: this.authService.isLoggedIn(),
           lastLocationCaptured: latest === FAILED ? 'No disponible' : latest ? this.formatLocation(latest) : null,
@@ -181,6 +184,16 @@ export class Device implements OnInit, OnDestroy {
     this.updateServiceStatus('Token Push Activo', features.pushTokenRegistered);
     this.updateServiceStatus('Última Ubicación Registrada', 
       features.lastLocationCaptured !== null && features.lastLocationCaptured !== 'No disponible');
+  }
+
+  nombreCelular(d: UserDevice): string {
+    const nombre = [d.brand, d.model].filter(Boolean).join(' ');
+    return nombre || 'Celular sin nombre';
+  }
+
+  ultimaConexion(d: UserDevice): string {
+    if (!d.lastAccess) return 'Sin registro';
+    return new Date(d.lastAccess).toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   pushStatusLabel(features: CriticalFeatureStatus): string {

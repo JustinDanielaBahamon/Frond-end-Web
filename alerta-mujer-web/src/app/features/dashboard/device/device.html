@@ -76,31 +76,35 @@
     <!-- 4. DISPOSITIVO MÓVIL VINCULADO -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-device-mobile"></i> Dispositivo Móvil Vinculado
+        <i class="ti ti-device-mobile"></i> Mis celulares
       </h2>
-      @if (criticalFeatures(); as features) {
-        @if (features.registeredDevices !== null && features.registeredDevices > 0) {
-          <div class="device-info-grid">
-            <div class="device-info-item">
-              <span class="device-info-item__label">Dispositivos registrados</span>
-              <span class="device-info-item__value">{{ features.registeredDevices }}</span>
-            </div>
-            <div class="device-info-item">
-              <span class="device-info-item__label">Token FCM</span>
-              <span class="device-info-item__value">{{ features.pushTokenRegistered ? 'Activo' : 'Inactivo' }}</span>
-            </div>
-            <div class="device-info-item">
-              <span class="device-info-item__label">Última ubicación</span>
-              <span class="device-info-item__value">{{ features.lastLocationCaptured || 'No registrada' }}</span>
-            </div>
-            <div class="device-info-item">
-              <span class="device-info-item__label">Sesión</span>
-              <span class="device-info-item__value">{{ features.sessionActive ? 'Activa' : 'Inactiva' }}</span>
-            </div>
-          </div>
-        } @else {
-          <p class="device-empty">No tienes un celular vinculado. Inicia sesión en la app móvil para vincular tu dispositivo.</p>
+      @if (misCelulares().length > 0) {
+        <ul class="device-phones">
+          @for (d of misCelulares(); track d.id) {
+            <li class="device-phone">
+              <div class="device-phone__icon"><i class="ti ti-device-mobile"></i></div>
+              <div class="device-phone__body">
+                <span class="device-phone__name">{{ nombreCelular(d) }}</span>
+                <span class="device-phone__meta">
+                  {{ d.osName || 'Android' }}{{ d.osVersion ? ' ' + d.osVersion : '' }}{{ d.appVersion ? ' · App ' + d.appVersion : '' }}
+                </span>
+                <span class="device-phone__meta">Última conexión: {{ ultimaConexion(d) }}</span>
+              </div>
+              <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--exito' : 'device-badge--advertencia'">
+                {{ d.fcmToken ? 'Recibe alertas' : 'Sin notificaciones' }}
+              </span>
+            </li>
+          }
+        </ul>
+        @if (criticalFeatures(); as features) {
+          <p class="device-phone__meta device-phone__last">
+            <i class="ti ti-map-pin"></i> Última ubicación enviada: {{ features.lastLocationCaptured || 'No registrada' }}
+          </p>
         }
+      } @else if (featuresLoading()) {
+        <p class="device-empty">Cargando tus celulares…</p>
+      } @else {
+        <p class="device-empty">No tienes un celular vinculado. Inicia sesión en la app móvil para vincular tu dispositivo.</p>
       }
     </div>
 

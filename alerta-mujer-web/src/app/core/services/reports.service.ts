@@ -182,17 +182,11 @@ export class ReportsService {
       description: r.descripcion ?? null,
       format: r.formato === 'PDF' ? 'PDF' : 'EXCEL',
       alertIds: r.alertasIds ?? null,
-      fromDate: r.desde ? this.fechaLocal(r.desde) : null,
-      toDate: r.hasta ? this.fechaLocal(r.hasta) : null
+      fromDate: r.desde ? new Date(r.desde).toISOString() : null,
+      toDate: r.hasta ? new Date(r.hasta).toISOString() : null
     };
   }
 
-  /** LocalDateTime del backend: 'yyyy-MM-ddTHH:mm:ss' en hora local, sin zona. */
-  private fechaLocal(fecha: Date): string {
-    const d = new Date(fecha);
-    const dos = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}T${dos(d.getHours())}:${dos(d.getMinutes())}:${dos(d.getSeconds())}`;
-  }
 
   private inicioDelDia(valor: Date | string): Date {
     if (typeof valor === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {

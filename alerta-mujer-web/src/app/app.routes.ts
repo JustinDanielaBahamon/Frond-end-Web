@@ -41,6 +41,17 @@ export const routes: Routes = [
   },
 
   // ─────────────────────────────────────────────────────────────
+  // Seguimiento público de una alerta (enlace del correo a los contactos)
+  // ─────────────────────────────────────────────────────────────
+
+  {
+    path: 'seguimiento/:codigo',
+    loadComponent: () =>
+      import('./features/tracking/tracking')
+        .then(m => m.TrackingComponent)
+  },
+
+  // ─────────────────────────────────────────────────────────────
   // Auth
   // ─────────────────────────────────────────────────────────────
 

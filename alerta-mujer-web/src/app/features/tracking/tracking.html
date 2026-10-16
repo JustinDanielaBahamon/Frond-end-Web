@@ -1,0 +1,48 @@
+<main class="tracking">
+  @if (cargando()) {
+    <section class="estado estado--cargando">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Cargando la alerta…</p>
+      @if (despertando()) {
+        <p class="sub">El servidor se está iniciando, puede tardar hasta un minuto.</p>
+      }
+    </section>
+  } @else if (error()) {
+    <section class="estado estado--error">
+      <p class="icono" aria-hidden="true">⚠️</p>
+      <p>{{ error() }}</p>
+      <button class="btn btn--secundario" (click)="reintentar()">Intentar de nuevo</button>
+    </section>
+  } @else if (datos(); as d) {
+    <header class="banda" [class.banda--terminada]="!d.activa">
+      <p class="banda__titulo">{{ d.activa ? '🚨 Alerta activa' : 'La alerta terminó' }}</p>
+      <p class="banda__texto">
+        <strong>{{ d.nombre }}</strong>
+        {{ d.activa ? 'activó una alerta de emergencia' : 'tuvo una alerta' }}
+        @if (d.inicio) { a las {{ d.inicio | date: 'h:mm a' }} }
+      </p>
+    </header>
+
+    @if (ultimo()) {
+      <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Ubicación de ' + d.nombre"></div>
+      <p class="actualizado">
+        Última ubicación {{ haceCuanto() }}
+        @if (d.activa) { · se actualiza sola }
+      </p>
+    } @else {
+      <p class="sin-ubicacion">Todavía no hay una ubicación registrada. Esta pantalla se actualiza sola.</p>
+    }
+
+    <section class="acciones">
+      <a class="btn btn--llamar" [href]="'tel:' + d.numeroEmergencia">📞 Llamar al {{ d.numeroEmergencia }}</a>
+      @if (mapsUrl()) {
+        <a class="btn btn--secundario" [href]="mapsUrl()" target="_blank" rel="noopener">Abrir en Google Maps</a>
+      }
+    </section>
+
+    <footer class="nota">
+      Estás viendo esto porque te registraron como contacto de emergencia en AlertaMujer.
+      El enlace es personal: no lo compartas en redes sociales.
+    </footer>
+  }
+</main>

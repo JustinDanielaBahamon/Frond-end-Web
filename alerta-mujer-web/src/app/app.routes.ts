@@ -187,61 +187,6 @@ export const routes: Routes = [
             .then(m => m.Settings),
       },
 
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./features/admin/dashboard/dashboard')
-            .then(m => m.AdminDashboardComponent),
-      },
-      
-      {
-        path: 'usuarios',
-        loadComponent: () =>
-          import('./features/admin/user/user')
-            .then(m => m.UserComponent),
-      },
-      
-      {
-        path: 'alertas',
-        loadComponent: () =>
-          import('./features/admin/alert-admin/alert-admin')
-            .then(m => m.AlertAdminComponent),
-      },
-      
-      {
-        path: 'zone-management',
-        loadComponent: () =>
-          import('./features/admin/zone-management/zone-management')
-            .then(m => m.ZoneManagementComponent),
-      },
-      
-      {
-        path: 'report-management',
-        loadComponent: () =>
-          import('./features/admin/report-management/report-management')
-            .then(m => m.ReportManagementComponent),
-      },
-      
-      {
-        path: 'evidence-management',
-        loadComponent: () =>
-          import('./features/admin/evidence-management/evidence-management')
-            .then(m => m.EvidencesManagementComponent),
-      },
-      
-      {
-        path: 'moderator-management',
-        loadComponent: () =>
-          import('./features/admin/moderator-management/moderator-management')
-            .then(m => m.ModeratorManagementComponent),
-      },
-      
-      {
-        path: 'devices-management',
-        loadComponent: () =>
-          import('./features/admin/devices-management/devices-management')
-            .then(m => m.DeviceManagementComponent),
-      },
 
     ],
   },

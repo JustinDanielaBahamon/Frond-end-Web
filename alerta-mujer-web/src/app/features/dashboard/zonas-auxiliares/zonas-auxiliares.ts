@@ -253,10 +253,6 @@ export class ZonasAuxiliaresComponent implements OnInit, AfterViewInit, OnDestro
     const yo = this.miPosicion();
     if (yo) this.map?.flyTo([yo.lat, yo.lng], 15, { duration: 0.8 });
   }
-
-  telHref(tel: string): string {
-    return `tel:${tel.replace(/[^\d+]/g, '')}`;
-  }
 }
 
 function desdeZona(z: NearbyZone): Punto {
@@ -324,7 +320,7 @@ function popupPunto(p: Punto, distancia: string): string {
       ${lugar ? `<div class="za-popup-row">${escapeHtml(lugar)}</div>` : ''}
       ${p.descripcion ? `<div class="za-popup-row">${escapeHtml(p.descripcion)}</div>` : ''}
       ${distancia ? `<div class="za-popup-row"><strong>A ${distancia} de ti</strong></div>` : ''}
-      ${p.telefono ? `<a class="za-popup-call" href="tel:${p.telefono.replace(/[^\d+]/g, '')}">Llamar ${escapeHtml(p.telefono)}</a>` : ''}
+      ${p.telefono ? `<div class="za-popup-row">Tel. ${escapeHtml(p.telefono)}</div>` : ''}
     </div>`;
 }
 

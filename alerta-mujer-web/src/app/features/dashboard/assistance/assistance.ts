@@ -124,25 +124,6 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
     this.service.getMisLlamadas().subscribe({ next: (l) => this.llamadas.set(l), error: () => {} });
   }
 
-  /**
-   * Registra la llamada en el historial y abre el marcador del dispositivo.
-   * Si el registro falla, igual se llama: en una emergencia no se puede bloquear.
-   */
-  llamar(r: RecursoAyuda, numero = r.telefono): void {
-    if (!numero) return;
-    this.service.registrarLlamada(r.id, numero).subscribe({
-      next: (llamada) => this.llamadas.update((l) => [llamada, ...l]),
-      error: () => {},
-    });
-    window.location.href = this.telHref(numero);
-  }
-
-  llamarEmergencia(): void {
-    const linea = this.lineas().find((r) => r.telefono === NUMERO_EMERGENCIA);
-    if (linea) this.llamar(linea);
-    else window.location.href = this.telHref(NUMERO_EMERGENCIA);
-  }
-
   copiar(numero: string): void {
     navigator.clipboard?.writeText(numero).then(() => this.mostrarAviso(`Número ${numero} copiado.`));
   }
@@ -249,10 +230,6 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Formato ────────────────────────────────────
-  telHref(numero: string): string {
-    return `tel:${numero.replace(/[^\d+]/g, '')}`;
-  }
-
   estado(e: string): string {
     return ESTADOS[e] ?? e;
   }

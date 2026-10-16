@@ -23,16 +23,16 @@
     <!-- Llamada rápida -->
     @if (lineas().length > 0) {
       <section class="za-card za-card--sos">
-        <h2 class="za-card-title">¿Necesitas ayuda ya?</h2>
+        <h2 class="za-card-title">¿Necesitas ayuda ya? Llama desde tu celular</h2>
         <div class="za-lines">
           @for (l of lineas(); track l.clave) {
-            <a class="za-line" [href]="telHref(l.telefono!)" [title]="l.descripcion ?? l.nombre">
+            <div class="za-line" [title]="l.descripcion ?? l.nombre">
               <span class="za-line-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: 'linea' }" /></span>
               <span class="za-line-text">
                 <strong>{{ l.telefono }}</strong>
                 <span>{{ l.nombre }}</span>
               </span>
-            </a>
+            </div>
           }
         </div>
       </section>
@@ -118,10 +118,10 @@
                 </span>
               </button>
               @if (p.telefono) {
-                <a class="za-call" [href]="telHref(p.telefono)" [attr.aria-label]="'Llamar a ' + p.nombre">
+                <span class="za-call" [attr.aria-label]="'Teléfono de ' + p.nombre">
                   <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'linea' }" />
                   {{ p.telefono }}
-                </a>
+                </span>
               }
             </li>
           } @empty {

@@ -23,12 +23,12 @@
   <section class="as-sos">
     <div class="as-sos-text">
       <strong>¿Estás en peligro ahora?</strong>
-      <span>Llama a la línea de emergencias. Es gratuita y atiende las 24 horas.</span>
+      <span>Llama desde tu celular a la línea de emergencias. Es gratuita y atiende las 24 horas.</span>
     </div>
-    <button class="as-sos-btn" (click)="llamarEmergencia()">
+    <div class="as-sos-btn" aria-label="Línea de emergencias">
       <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'linea' }" />
-      Llamar al {{ numeroEmergencia }}
-    </button>
+      {{ numeroEmergencia }}
+    </div>
   </section>
 
   @if (error()) {
@@ -72,20 +72,17 @@
           }
           <div class="as-line-number">{{ r.telefono }}</div>
           <div class="as-line-actions">
-            <button class="as-btn as-btn--call" (click)="llamar(r)">
-              <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'linea' }" /> Llamar
-            </button>
-            <button class="as-btn as-btn--ghost" (click)="copiar(r.telefono!)" [attr.aria-label]="'Copiar número de ' + r.nombre">Copiar</button>
+            <button class="as-btn as-btn--ghost" (click)="copiar(r.telefono!)" [attr.aria-label]="'Copiar número de ' + r.nombre">Copiar número</button>
           </div>
           @if (r.telefono2) {
-            <button class="as-link" (click)="llamar(r, r.telefono2)">Otro número: {{ r.telefono2 }}</button>
+            <p class="as-line-desc">Otro número: {{ r.telefono2 }}</p>
           }
         </article>
       } @empty {
         <p class="as-muted">No hay líneas de ayuda registradas.</p>
       }
     </div>
-    <p class="as-help">En Colombia también puedes llamar a la <strong>Línea 155</strong> (orientación a mujeres víctimas de violencia) desde cualquier operador.</p>
+    <p class="as-help">Para llamar usa tu celular. En Colombia también puedes llamar a la <strong>Línea 155</strong> (orientación a mujeres víctimas de violencia) desde cualquier operador.</p>
   </section>
 
   <!-- ══════════ CENTROS ══════════ -->
@@ -128,7 +125,7 @@
             <div class="as-item-actions">
               <a class="as-btn as-btn--ghost as-btn--sm" [href]="comoLlegar(r)" target="_blank" rel="noopener">Cómo llegar</a>
               @if (r.telefono) {
-                <button class="as-btn as-btn--call as-btn--sm" (click)="llamar(r)">Llamar</button>
+                <span class="as-item-meta">Tel. {{ r.telefono }}</span>
               }
             </div>
           </li>
@@ -145,7 +142,7 @@
 
   <!-- ══════════ MIS LLAMADAS ══════════ -->
   <section class="as-card" [hidden]="tab() !== 'llamadas' || cargando()">
-    <p class="as-muted">Llamadas que hiciste desde AlertaMujer. Solo tú puedes verlas.</p>
+    <p class="as-muted">Llamadas que hiciste desde la app móvil de AlertaMujer. Solo tú puedes verlas.</p>
     <ul class="as-list">
       @for (l of llamadas(); track l.id) {
         @let r = recursoDe(l);
@@ -156,16 +153,13 @@
             <span class="as-item-meta">{{ l.telefono }} · {{ fecha(l.fecha) }} · {{ estado(l.estado) }}</span>
           </span>
           <div class="as-item-actions">
-            @if (r) {
-              <button class="as-btn as-btn--call as-btn--sm" (click)="llamar(r, l.telefono)">Volver a llamar</button>
-            }
             <button class="as-icon-btn" title="Borrar del historial" aria-label="Borrar del historial" (click)="eliminarLlamada(l)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
         </li>
       } @empty {
-        <li class="as-empty">Aún no has llamado a ninguna línea desde la app.</li>
+        <li class="as-empty">Aún no has llamado a ninguna línea desde la app móvil.</li>
       }
     </ul>
   </section>

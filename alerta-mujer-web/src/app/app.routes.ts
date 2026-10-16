@@ -8,7 +8,6 @@ import { AdminLayoutComponent } from './core/layouts/admin-layout/admin-layout';
 import { PublicLayoutComponent } from './core/layouts/public-layout/public-layout';
 
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
-import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone';
 import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
 import { TermsComponent } from './features/auth/terms/terms'; // NUEVO
 import { PrivacyComponent } from './features/auth/privacy/privacy'; // NUEVO
@@ -69,16 +68,16 @@ export const routes: Routes = [
             .then(m => m.ForgotPasswordComponent)
       },
       {
-        path: 'forgot-phone',
-        loadComponent: () =>
-          import('./features/auth/forgot-phone/forgot-phone')
-            .then(m => m.ForgotPhoneComponent)
-      },
-      {
         path: 'verify-code',
         loadComponent: () =>
           import('./features/auth/verify-code/verify-code')
             .then(m => m.VerifyCodeComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () =>
+          import('./features/auth/reset-password/reset-password')
+            .then(m => m.ResetPasswordComponent)
       },
     ]
   },

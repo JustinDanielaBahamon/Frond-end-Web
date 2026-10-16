@@ -68,7 +68,8 @@
           Verifica tu <span class="card__title--accent">código</span>
         </h1>
         <p class="card__subtitle">
-          {{ mensajeEnvio }}
+          Enviamos un código de 6 dígitos a <strong>{{ correoOculto() }}</strong>. Vence en 15 minutos.
+          Si no lo ves, revisa la carpeta de spam.
         </p>
   
         <!-- Formulario de Verificación de Código -->
@@ -76,53 +77,58 @@
   
           <!-- Campos de Entrada para el Código OTP -->
           <div class="code-inputs">
-            <input
-              *ngFor="let digito of codigo; let i = index; trackBy: trackByIndex"
-              #codeInput
-              class="code-input"
-              type="text"
-              inputmode="numeric"
-              maxlength="1"
-              [name]="'codigo' + i"
-              [value]="digito"
-              (input)="onInput($event, i)"
-              (keydown)="onKeyDown($event, i)"
-              (paste)="onPaste($event)"
-              aria-label="Dígito {{i + 1}} del código de verificación">
+            @for (digito of codigo(); track $index) {
+              <input
+                class="code-input"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                [name]="'codigo' + $index"
+                [value]="digito"
+                (input)="onInput($event, $index)"
+                (keydown)="onKeyDown($event)"
+                (paste)="onPaste($event)"
+                [attr.aria-label]="'Dígito ' + ($index + 1) + ' del código'">
+            }
           </div>
-  
+
+          @if (error()) {
+            <p class="code-error" role="alert">{{ error() }}</p>
+          } @else if (aviso()) {
+            <p class="code-aviso" role="status">{{ aviso() }}</p>
+          }
+
           <!-- Sección de Temporizador y Reenvío de Código -->
           <div class="timer-section">
             <span class="timer">
-              {{ tiempoFormateado }}
+              {{ puedeReenviar() ? '¿No te llegó?' : 'Reenviar en ' + tiempoFormateado() }}
             </span>
             <button
               type="button"
               class="resend-link"
-              [class.resend-link--disabled]="!puedeReenviar"
-              [disabled]="!puedeReenviar"
+              [class.resend-link--disabled]="!puedeReenviar()"
+              [disabled]="!puedeReenviar()"
               (click)="reenviarCodigo()">
               Reenviar código
             </button>
           </div>
-  
           <!-- Botón de Verificación -->
           <button
             class="btn-submit"
             type="submit"
-            [disabled]="!codigoCompleto">
+            [disabled]="!codigoCompleto() || verificando()">
             <i class="fa-solid fa-shield-halved"></i>
-            VERIFICAR CÓDIGO
+            {{ verificando() ? 'VERIFICANDO…' : 'VERIFICAR CÓDIGO' }}
           </button>
-  
         </form>
   
         <!-- Pie de Tarjeta (Cambiar Método de Recuperación) -->
         <p class="card__footer">
           <span
             class="form__link"
-            (click)="cambiarMetodo()">
-            Cambiar método de recuperación
+            (click)="cambiarCorreo()">
+            Usar otro correo
           </span>
         </p>
   

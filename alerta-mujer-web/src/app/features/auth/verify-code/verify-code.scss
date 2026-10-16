@@ -279,16 +279,19 @@
     gap: 20px;
   }
   
+  // Seis casillas que se reparten el ancho de la tarjeta (antes se salían por los lados)
   .code-inputs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 52px));
     justify-content: center;
-    gap: 15px;
+    gap: 8px;
     margin-bottom: 30px;
   }
-  
+
   .code-input {
-    width: 55px;
-    height: 65px;
+    width: 100%;
+    min-width: 0;
+    height: 60px;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     text-align: center;
@@ -445,12 +448,11 @@
     }
   
     .code-inputs {
-      gap: 10px;
+      gap: 6px;
     }
   
     .code-input {
-      width: 45px;
-      height: 55px;
+      height: 52px;
       font-size: 1.5rem;
     }
   
@@ -460,3 +462,19 @@
     }
   }
   
+
+.code-error,
+.code-aviso {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 13px;
+}
+
+.code-error { color: #c026d3; }
+.code-aviso { color: #7c3aed; }
+
+// La regla global del modo oscuro pinta el <strong> casi blanco, pero esta tarjeta sigue clara
+.verify-code-page .card__subtitle strong {
+  color: #7c3aed !important;
+  font-weight: 700;
+}

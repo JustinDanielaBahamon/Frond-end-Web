@@ -31,6 +31,18 @@ export class AlertsService {
     );
   }
 
+  // Usado por USUARIA: sus alertas, de la más reciente a la más antigua
+  getMine(): Observable<Alerta[]> {
+    return this.http.get<any[]>(`${this.url}/me`).pipe(
+      map(lista => lista.map(a => this.normalizar(a)))
+    );
+  }
+
+  /** Cuántos contactos recibieron el aviso de una alerta. */
+  contarContactosAvisados(id: number): Observable<number> {
+    return this.http.get<unknown[]>(`${this.url}/${id}/contacts`).pipe(map(l => l.length));
+  }
+
   getById(id: number): Observable<Alerta> {
     return this.http.get<any>(`${this.url}/${id}`).pipe(
       map(a => this.normalizar(a))

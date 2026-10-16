@@ -2,7 +2,7 @@ export type NivelSeguridad = 'seguro' | 'advertencia' | 'critico';
 export type ColorIndicador = 'verde' | 'amarillo' | 'rojo';
 
 export interface RequisitoSeguridad {
-  key: 'contactos' | 'activacion' | 'ubicacion' | 'notificaciones';
+  key: 'contactos' | 'correo' | 'celular' | 'alertas';
   label: string;
   cumplido: boolean;
   valor: string;

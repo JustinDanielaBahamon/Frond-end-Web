@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,6 +8,12 @@ import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';
 import { EstadoSeguridad } from '../../../core/models/security-status.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { DeviceService, UserDevice } from '../../../core/services/device.service';
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
+import { AlertsService } from '../../../core/services/alerts.services';
+import { GeocodingService } from '../../../core/services/geocoding.service';
+import { Alerta } from '../../../core/models/alert.model';
+import { UbicacionEntry } from '../../../core/models/location.model';
 
 interface SeguridadItem {
   icon: string;
@@ -15,28 +21,6 @@ interface SeguridadItem {
   descripcion: string;
   configurado: boolean;
   tooltip?: string;
-}
-
-interface MiDispositivo {
-  estado: string;
-  ultimaComunicacion: string;
-  ultimaUbicacion: string;
-}
-
-interface ActividadItem {
-  icon: string;
-  color: 'peligro' | 'exito' | 'principal';
-  titulo: string;
-  fecha: string;
-}
-
-interface UltimaEmergencia {
-  fecha: string;
-  hora: string;
-  ubicacion: string;
-  activadaMediante: string;
-  contactosNotificados: number;
-  estado: string;
 }
 
 interface UltimaUbicacion {
@@ -48,20 +32,28 @@ interface UltimaUbicacion {
   precision: string;
 }
 
+interface UltimaEmergencia {
+  id: number;
+  fecha: string;
+  hora: string;
+  ubicacion: string;
+  activadaMediante: string;
+  contactosNotificados: number | null;
+  estado: string;
+}
+
 interface AccesoRapido {
   icon: string;
-  color: 'peligro' | 'exito' | 'principal' | 'acento' | 'advertencia';
   label: string;
   sub: string;
   route: string;
 }
 
-interface AccionRapida {
-  icon: string;
-  label: string;
-  route: string;
-  disabled?: boolean;
-}
+// Mientras no haya ubicación del celular, el mapa muestra Neiva
+const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
+
+const fechaLarga = (d: Date) => d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+const horaCorta = (d: Date) => d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
 
 @Component({
   selector: 'app-dashboard',
@@ -76,227 +68,256 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private zoneService = inject(NearbyZoneService);
   private securityStatusService = inject(UserSecurityStatusService);
   private authService = inject(AuthService);
+  private deviceService = inject(DeviceService);
+  private phoneLocation = inject(PhoneLocationService);
+  private alertsService = inject(AlertsService);
+  private geocoding = inject(GeocodingService);
+  private destroyRef = inject(DestroyRef);
   private zonas: NearbyZone[] = [];
   private userMarker: L.Marker | null = null;
   private zoneCircles: L.Circle[] = [];
   private zoneMarkers: L.Marker[] = [];
-  
-  // Estado público para el template
-  isRefreshing = false;
-  isLoadingStatus = true;
 
   // ── ESTADO DE SEGURIDAD ───────────────────────────
-  // Sincronizado con el backend: cada item refleja el estado real
-  estadoSeguridad: SeguridadItem[] = [];
-  estadoGeneral: { nivel: string; color: string; icono: string; porcentaje: number } | null = null;
+  isLoadingStatus = signal(true);
+  estadoSeguridad = signal<SeguridadItem[]>([]);
+  estadoGeneral = signal<{ nivel: string; color: string; porcentaje: number } | null>(null);
 
-  // ── MI DISPOSITIVO ────────────────────────────────
-  miDispositivo: MiDispositivo = {
-    estado: 'Conectado',
-    ultimaComunicacion: 'Hoy, 3:42 PM',
-    ultimaUbicacion: 'Neiva, Huila',
-  };
+  // ── MI DISPOSITIVO (celular más reciente) ─────────
+  miCelular = signal<UserDevice | null>(null);
+  celularesCargados = signal(false);
 
-  // ── ACTIVIDAD RECIENTE ────────────────────────────
-  // Solo la alerta usa el rojo de peligro; el resto se queda
-  // en la paleta principal para no sobrecargar la vista.
-  actividadReciente: ActividadItem[] = [
-    { icon: 'ti-alert-octagon', color: 'peligro',   titulo: 'Alerta de emergencia',              fecha: '28 ago. 2026 · 8:42 PM · Neiva, Huila' },
-    { icon: 'ti-camera',        color: 'principal', titulo: 'Evidencia agregada',                 fecha: '28 ago. 2026 · 8:45 PM' },
-    { icon: 'ti-map-pin',       color: 'exito',      titulo: 'Ubicación registrada',               fecha: '28 ago. 2026 · 8:42 PM' },
-    { icon: 'ti-users',         color: 'principal', titulo: 'Contacto de emergencia notificado',   fecha: '28 ago. 2026 · 8:42 PM' },
-  ];
+  // ── ÚLTIMA UBICACIÓN (enviada por el celular) ─────
+  ultimaUbicacion = signal<UltimaUbicacion | null>(null);
+  isRefreshing = signal(false);
+  avisoUbicacion = signal<string | null>(null);
 
-  // ── ÚLTIMA EMERGENCIA ─────────────────────────────
-  ultimaEmergencia: UltimaEmergencia = {
-    fecha: '28 agosto 2026',
-    hora: '8:42 PM',
-    ubicacion: 'Neiva, Huila',
-    activadaMediante: 'Movimiento brusco',
-    contactosNotificados: 3,
-    estado: 'Atendida',
-  };
+  // ── ALERTAS ───────────────────────────────────────
+  ultimaEmergencia = signal<UltimaEmergencia | null>(null);
+  alertasCargadas = signal(false);
 
-  // ── ÚLTIMA UBICACIÓN REGISTRADA ───────────────────
-  ultimaUbicacion: UltimaUbicacion = {
-    lat: 2.9273,
-    lng: -75.2819,
-    direccion: 'Calle 21 #5-63, Centro, Neiva, Huila, Colombia',
-    fecha: 'Hoy, 3:42 PM',
-    coordenadas: '2.9273, -75.2819',
-    precision: '±12 metros',
-  };
-
-  // ── ACCESOS RÁPIDOS ───────────────────────────────
   accesosRapidos: AccesoRapido[] = [
-    { icon: 'ti-alert-triangle', color: 'peligro',     label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/alert-history' },
-    { icon: 'ti-folder',         color: 'exito',       label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidence' },
-    { icon: 'ti-users',          color: 'principal',   label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/emergency-contacts' },
-    { icon: 'ti-map-pin',        color: 'acento',      label: 'Ubicación',       sub: 'Ver mapa',         route: '/dashboard/ubicacion' },
-    { icon: 'ti-phone',          color: 'advertencia', label: 'Asistencia',      sub: 'Recursos y ayuda', route: '/dashboard/assistance' },
-  ];
-
-  // ── ACCIONES RÁPIDAS ──────────────────────────────
-  accionesRapidas: AccionRapida[] = [
-    { icon: 'ti-file-text', label: 'Generar informe de emergencia',   route: '/dashboard/informe', disabled: true },
-    { icon: 'ti-book',      label: 'Ver tutorial nuevamente',          route: '/dashboard/tutorial', disabled: true },
-    { icon: 'ti-user',      label: 'Actualizar información personal',  route: '/dashboard/settings' },
+    { icon: 'ti-alert-triangle', label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/alert-history' },
+    { icon: 'ti-folder',         label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidence' },
+    { icon: 'ti-users',          label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/emergency-contacts' },
+    { icon: 'ti-map-pin',        label: 'Ubicación',       sub: 'Ver mapa',         route: '/dashboard/ubicacion' },
+    { icon: 'ti-lifebuoy',       label: 'Asistencia',      sub: 'Recursos y ayuda', route: '/dashboard/assistance' },
   ];
 
   ngOnInit(): void {
     this.cargarEstadoSeguridad();
-  }
-
-  /** Cargar estado de seguridad desde el backend */
-  private cargarEstadoSeguridad(): void {
-    this.isLoadingStatus = true;
-    
-    this.securityStatusService.getSecurityStatus()
-      .pipe(takeUntilDestroyed())
-      .subscribe({
-        next: (estado: EstadoSeguridad) => {
-          // Mapear requisitos a items de seguridad
-          this.estadoSeguridad = estado.requisitos.map(req => ({
-            icon: req.icon,
-            valor: req.valor,
-            descripcion: req.label,
-            configurado: req.cumplido,
-            tooltip: req.cumplido 
-              ? `${req.label}: ${req.valor}` 
-              : `${req.label}: ${req.valor} (requiere atención)`
-          }));
-
-          // Establecer estado general
-          const nivelTextos = {
-            seguro: 'Tu cuenta está protegida',
-            advertencia: 'Requiere atención',
-            critico: 'Configuración incompleta'
-          };
-
-          const iconos = {
-            seguro: 'ti-shield-check',
-            advertencia: 'ti-alert-triangle',
-            critico: 'ti-alert-octagon'
-          };
-
-          this.estadoGeneral = {
-            nivel: nivelTextos[estado.nivel],
-            color: estado.color,
-            icono: iconos[estado.nivel],
-            porcentaje: estado.porcentaje
-          };
-
-          this.isLoadingStatus = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar estado de seguridad:', err);
-          // Mantener datos de fallback estáticos
-          this.estadoSeguridad = [
-            { icon: 'ti-users', valor: '0', descripcion: 'Contactos de emergencia', configurado: false },
-            { icon: 'ti-shield-check', valor: 'No configurado', descripcion: 'Método de activación', configurado: false },
-            { icon: 'ti-map-pin', valor: 'Inactiva', descripcion: 'Ubicación', configurado: false },
-            { icon: 'ti-bell', valor: 'Inactivas', descripcion: 'Notificaciones', configurado: false },
-          ];
-          this.estadoGeneral = {
-            nivel: 'Error al cargar',
-            color: 'rojo',
-            icono: 'ti-alert-octagon',
-            porcentaje: 0
-          };
-          this.isLoadingStatus = false;
-        }
-      });
+    this.cargarCelular();
+    this.cargarUltimaEmergencia();
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.inicializarMiniMapa();
+      this.cargarUltimaUbicacion();
       this.cargarZonasPeligrosas();
     }, 100);
   }
 
-  /** Mapa de ancho completo: muestra el marcador con más detalle */
+  /** Estado de seguridad calculado con los datos reales de la cuenta y del celular */
+  private cargarEstadoSeguridad(): void {
+    this.isLoadingStatus.set(true);
+    this.securityStatusService.getSecurityStatus()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (estado: EstadoSeguridad) => {
+          this.estadoSeguridad.set(estado.requisitos.map(req => ({
+            icon: req.icon,
+            valor: req.valor,
+            descripcion: req.label,
+            configurado: req.cumplido,
+            tooltip: req.cumplido ? `${req.label}: ${req.valor}` : `${req.label}: ${req.valor} (requiere atención)`,
+          })));
+          const nivelTextos = {
+            seguro: 'Tu cuenta está protegida',
+            advertencia: 'Requiere atención',
+            critico: 'Configuración incompleta',
+          };
+          this.estadoGeneral.set({ nivel: nivelTextos[estado.nivel], color: estado.color, porcentaje: estado.porcentaje });
+          this.isLoadingStatus.set(false);
+        },
+        error: () => {
+          this.estadoSeguridad.set([]);
+          this.estadoGeneral.set({ nivel: 'No se pudo consultar', color: 'rojo', porcentaje: 0 });
+          this.isLoadingStatus.set(false);
+        },
+      });
+  }
+
+  private cargarCelular(): void {
+    this.deviceService.getMyDevices()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (celulares) => {
+          const masReciente = [...celulares].sort((a, b) =>
+            (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0] ?? null;
+          this.miCelular.set(masReciente);
+          this.celularesCargados.set(true);
+        },
+        error: () => this.celularesCargados.set(true),
+      });
+  }
+
+  nombreCelular(d: UserDevice): string {
+    return [d.brand, d.model].filter(Boolean).join(' ') || 'Celular';
+  }
+
+  ultimaConexion(d: UserDevice): string {
+    if (!d.lastAccess) return 'Sin registro';
+    const f = new Date(d.lastAccess);
+    return `${f.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${horaCorta(f)}`;
+  }
+
+  private cargarUltimaEmergencia(): void {
+    this.alertsService.getMine()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (alertas) => {
+          this.alertasCargadas.set(true);
+          const a = alertas[0];
+          if (!a) return;
+          this.ultimaEmergencia.set(this.aEmergencia(a));
+          this.alertsService.contarContactosAvisados(a.id).subscribe({
+            next: (n) => this.ultimaEmergencia.update(e => e && { ...e, contactosNotificados: n }),
+            error: () => {},
+          });
+        },
+        error: () => this.alertasCargadas.set(true),
+      });
+  }
+
+  private aEmergencia(a: Alerta): UltimaEmergencia {
+    const inicio = new Date(a.started_at ?? a.created_at ?? Date.now());
+    return {
+      id: a.id,
+      fecha: fechaLarga(inicio),
+      hora: horaCorta(inicio),
+      ubicacion: a.ubicacion || 'Sin ubicación',
+      activadaMediante: a.medioActivacion,
+      contactosNotificados: null,
+      estado: a.estado,
+    };
+  }
+
+  // ── Ubicación del celular ─────────────────────────
+
+  private cargarUltimaUbicacion(): void {
+    this.phoneLocation.getLatest()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (loc) => this.mostrarUbicacion(loc), error: () => {} });
+  }
+
+  private mostrarUbicacion(loc: UbicacionEntry | null): void {
+    if (!loc) return;
+    const fecha = loc.recordedAt ? new Date(loc.recordedAt) : null;
+    this.ultimaUbicacion.set({
+      lat: loc.lat,
+      lng: loc.lng,
+      direccion: 'Buscando dirección…',
+      fecha: fecha ? `${fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${horaCorta(fecha)}` : loc.time,
+      coordenadas: `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`,
+      precision: loc.accuracy ? `±${Math.round(loc.accuracy)} metros` : 'Sin dato',
+    });
+    this.geocoding.obtener(loc.lat, loc.lng).then((lugar) => {
+      const texto = lugar ? [lugar.direccion, lugar.barrio, lugar.ciudad].filter(Boolean).join(', ') : '';
+      this.ultimaUbicacion.update(u => u && { ...u, direccion: texto || 'Dirección no disponible' });
+      this.actualizarMarcador();
+    });
+    this.actualizarMarcador();
+    this.calcularDistancias();
+  }
+
+  /**
+   * Pide al celular su ubicación actual (push silencioso) y espera hasta 20 s el punto nuevo.
+   * Si no responde, se queda la última que envió.
+   */
+  refrescarUbicacion(): void {
+    if (this.isRefreshing()) return;
+    this.isRefreshing.set(true);
+    this.avisoUbicacion.set(null);
+    this.phoneLocation.pedirAlCelular().subscribe({
+      next: (r) => this.esperarUbicacion(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+      error: (e) => {
+        this.avisoUbicacion.set(e?.error?.message ?? 'No se pudo contactar al celular.');
+        this.isRefreshing.set(false);
+      },
+    });
+  }
+
+  private esperarUbicacion(desde: number, limite: number): void {
+    this.phoneLocation.getLatest().subscribe({
+      next: (loc) => {
+        const nueva = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= desde;
+        if (nueva || Date.now() >= limite) {
+          if (!nueva) this.avisoUbicacion.set('El celular no respondió. Se muestra la última ubicación que envió.');
+          this.mostrarUbicacion(loc);
+          this.isRefreshing.set(false);
+          return;
+        }
+        setTimeout(() => this.esperarUbicacion(desde, limite), 2500);
+      },
+      error: () => this.isRefreshing.set(false),
+    });
+  }
+
+  // ── Mapa ──────────────────────────────────────────
+
   private inicializarMiniMapa(): void {
     this.map = L.map('home-mini-map', {
-      center: [this.ultimaUbicacion.lat, this.ultimaUbicacion.lng],
-      zoom: 15,
+      center: CENTRO_POR_DEFECTO,
+      zoom: 13,
       zoomControl: true,
-      scrollWheelZoom: true,
-      dragging: true,
-      doubleClickZoom: true,
-      boxZoom: false,
-      keyboard: true,
-      touchZoom: true,
+      // La rueda del mouse desplaza la página; el mapa se acerca con los botones + y -
+      scrollWheelZoom: false,
       attributionControl: true,
     });
 
-    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-      maxZoom: 20,
-      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-      attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
-
-    // Marcador personalizado violeta para mi ubicación
-    this.crearMarcadorUbicacion();
   }
 
-  /** Crear marcador violeta personalizado para mi ubicación */
-  private crearMarcadorUbicacion(): void {
-    if (!this.map) return;
+  private actualizarMarcador(): void {
+    const u = this.ultimaUbicacion();
+    if (!this.map || !u) return;
+    const popup = `
+      <div style="text-align: center; min-width: 200px;">
+        <strong style="color: #6d28d9; font-size: 14px;">📍 Mi celular</strong><br>
+        <span style="font-size: 12px; color: #666;">${u.direccion}</span><br>
+        <small style="color: #999;">${u.fecha}</small>
+      </div>`;
+    if (this.userMarker) {
+      this.userMarker.setLatLng([u.lat, u.lng]).setPopupContent(popup);
+    } else {
+      this.userMarker = L.marker([u.lat, u.lng], { icon: this.iconoCelular() }).addTo(this.map).bindPopup(popup);
+    }
+    this.map.setView([u.lat, u.lng], 16);
+  }
 
-    const iconoVioleta = L.divIcon({
+  private iconoCelular(): L.DivIcon {
+    return L.divIcon({
       className: '',
       html: `
-        <div style="position: relative; width: 36px; height: 50px;">
-          <!-- Pin en forma de gota/lágrima -->
-          <svg width="36" height="50" viewBox="0 0 36 50" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
-            <!-- Gradiente violeta -->
-            <defs>
-              <linearGradient id="gradientPin" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <!-- Forma de pin -->
-            <path d="M18 0 C8 0 0 8 0 18 C0 28 18 50 18 50 C18 50 36 28 36 18 C36 8 28 0 18 0 Z" 
-                  fill="url(#gradientPin)" 
-                  stroke="white" 
-                  stroke-width="2"/>
-            <!-- Círculo interior blanco -->
-            <circle cx="18" cy="18" r="8" fill="white"/>
-            <!-- Punto violeta en el centro -->
-            <circle cx="18" cy="18" r="4" fill="#6d28d9"/>
-          </svg>
-          
-          <!-- Indicador verde pulsante (activo) -->
-          <div style="
-            position: absolute;
-            top: 4px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background: #5910b9;
-            border: 2px solid white;
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(89, 16, 185, 0.7);
-            animation: pulse 2s infinite;
-          "></div>
-        </div>
-      `,
+        <svg width="36" height="50" viewBox="0 0 36 50" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
+          <defs>
+            <linearGradient id="gradientPin" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#a855f7" />
+              <stop offset="100%" style="stop-color:#6d28d9" />
+            </linearGradient>
+          </defs>
+          <path d="M18 0 C8 0 0 8 0 18 C0 28 18 50 18 50 C18 50 36 28 36 18 C36 8 28 0 18 0 Z" fill="url(#gradientPin)" stroke="white" stroke-width="2"/>
+          <circle cx="18" cy="18" r="8" fill="white"/>
+          <circle cx="18" cy="18" r="4" fill="#6d28d9"/>
+        </svg>`,
       iconSize: [36, 50],
       iconAnchor: [18, 50],
       popupAnchor: [0, -50],
     });
-
-    this.userMarker = L.marker([this.ultimaUbicacion.lat, this.ultimaUbicacion.lng], { icon: iconoVioleta })
-      .addTo(this.map)
-      .bindPopup(`
-        <div style="text-align: center; min-width: 200px;">
-          <strong style="color: #6d28d9; font-size: 14px;">📍 Mi ubicación</strong><br>
-          <span style="font-size: 12px; color: #666;">${this.ultimaUbicacion.direccion}</span><br>
-          <small style="color: #999;">${this.ultimaUbicacion.fecha}</small>
-        </div>
-      `);
   }
 
   /** Cargar y mostrar las zonas del backend (sin datos inventados: si no hay, el mapa queda sin zonas) */
@@ -399,16 +420,13 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.calcularDistancias();
   }
 
-  /** Calcular distancias de zonas desde la ubicación del usuario */
+  /** Calcular distancias de zonas desde la última ubicación del celular */
   private calcularDistancias(): void {
+    const u = this.ultimaUbicacion();
+    if (!u) return;
     this.zonas = this.zonas.map(zona => ({
       ...zona,
-      distanceKm: this.calcularDistanciaKm(
-        this.ultimaUbicacion.lat,
-        this.ultimaUbicacion.lng,
-        zona.lat,
-        zona.lng
-      )
+      distanceKm: this.calcularDistanciaKm(u.lat, u.lng, zona.lat, zona.lng)
     })).sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
   }
 
@@ -470,48 +488,6 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     };
 
     return configs[type] || configs.risk;
-  }
-
-  /** Refrescar ubicación del dispositivo */
-  refrescarUbicacion(): void {
-    if (this.isRefreshing) return;
-    
-    this.isRefreshing = true;
-
-    // Simular obtención de nueva ubicación
-    // TODO: Reemplazar con llamada real al servicio de ubicación
-    setTimeout(() => {
-      // Actualizar coordenadas (ejemplo con pequeña variación)
-      this.ultimaUbicacion = {
-        ...this.ultimaUbicacion,
-        lat: this.ultimaUbicacion.lat + (Math.random() - 0.5) * 0.001,
-        lng: this.ultimaUbicacion.lng + (Math.random() - 0.5) * 0.001,
-        fecha: new Date().toLocaleString('es-CO', { 
-          month: 'short', 
-          day: 'numeric', 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }),
-      };
-
-      // Actualizar mapa
-      if (this.map && this.userMarker) {
-        const newLatLng: L.LatLngExpression = [this.ultimaUbicacion.lat, this.ultimaUbicacion.lng];
-        this.userMarker.setLatLng(newLatLng);
-        this.map.panTo(newLatLng);
-        
-        // Actualizar popup
-        this.userMarker.setPopupContent(`
-          <div style="text-align: center; min-width: 200px;">
-            <strong style="color: #6d28d9; font-size: 14px;">📍 Mi ubicación</strong><br>
-            <span style="font-size: 12px; color: #666;">${this.ultimaUbicacion.direccion}</span><br>
-            <small style="color: #999;">${this.ultimaUbicacion.fecha}</small>
-          </div>
-        `);
-      }
-
-      this.isRefreshing = false;
-    }, 1500);
   }
 
   ngOnDestroy(): void {

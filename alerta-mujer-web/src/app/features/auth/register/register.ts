@@ -57,7 +57,7 @@ export class RegisterComponent {
     numeroDocumento:   ['', [requerido]],
     fechaNacimiento:   ['', [Validators.required, Validators.minLength(10)]],
     correo:            ['', [Validators.required, contieneArroba]],
-    password:          ['', [Validators.required, Validators.minLength(6)]],
+    password:          ['', [Validators.required, Validators.minLength(8)]],
     confirmarPassword: ['', [coincideConPassword]],
   });
 
@@ -90,7 +90,7 @@ export class RegisterComponent {
     },
     password:          {
       required: 'La contraseña es obligatoria',
-      minlength: 'Mínimo 6 caracteres'
+      minlength: 'Mínimo 8 caracteres'
     },
     confirmarPassword: { noCoincide: 'Las contraseñas no coinciden' },
   };

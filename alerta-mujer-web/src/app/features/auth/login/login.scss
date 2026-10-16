@@ -12,7 +12,7 @@
     padding: 30px 20px;
 
     background: linear-gradient(180deg,
-            #fde7f3 0%,
+            #fae7fd 0%,
             #fdf8ff 30%,
             #ffffff 100%);
 }
@@ -41,7 +41,7 @@
         height: 420px;
         bottom: -150px;
         right: -120px;
-        background: #ff3da4;
+        background: #e53dff;
     }
 }
 
@@ -96,7 +96,7 @@
     &--2 {
         width: 340px;
         height: 340px;
-        background: #ffd4ef;
+        background: #f9d4ff;
         opacity: .7;
     }
 
@@ -156,7 +156,7 @@
 .leaf {
     position: absolute;
 
-    fill: #c82e88;
+    fill: #c319dd;
 
     opacity: .45;
 
@@ -183,7 +183,7 @@
 .spark {
     position: absolute;
 
-    color: #f7c948;
+    color: #bd48f7;
 
     font-size: 22px;
 
@@ -238,7 +238,7 @@
     backdrop-filter: blur(20px);
     box-shadow:
         0 25px 70px rgba(0, 0, 0, .08),
-        0 5px 20px rgba(190, 24, 93, .08);
+        0 5px 20px rgba(170, 21, 193, .08);
 
     transition: .35s;
 }
@@ -254,7 +254,7 @@
     border: 2px solid #b48ee0 !important;
     box-shadow:
         0 25px 70px rgba(0, 0, 0, .08),
-        0 5px 20px rgba(190, 24, 93, .08) !important;
+        0 5px 20px rgba(170, 21, 193, .08) !important;
 }
 
 
@@ -339,7 +339,7 @@
 
 
 /* INPUTS */
-/* Campos de correo y contraseña. Borde más visible: de #f3d4e7 a #b48ee0 */
+/* Campos de correo y contraseña. Borde más visible: de #f4cdfa a #b48ee0 */
 .field {
     position: relative;
 }
@@ -379,9 +379,9 @@
 .field__input:focus {
     outline: none;
 
-    border-color: #ec4899;
+    border-color: #d648ec;
 
-    box-shadow: 0 0 0 4px rgba(236, 72, 153, .12);
+    box-shadow: 0 0 0 4px rgba(214, 72, 236, .12);
 }
 
 .field__input::placeholder {
@@ -422,7 +422,7 @@
 
     font-size: .82rem;
 
-    color: #e11d48;
+    color: #ca19e5;
 
     line-height: 1.4;
 }
@@ -439,7 +439,7 @@
 }
 
 .form__link {
-    color: #d61f74;
+    color: #c218dc;
 
     font-weight: 600;
 
@@ -449,13 +449,13 @@
 }
 
 .form__link:hover {
-    color: #b30d59;
+    color: #9d0db3;
     text-decoration: underline;
 }
 
 
 /* CHECKBOX */
-/* Casilla "Recuérdame". Borde más visible: de #f1b4d0 a #b48ee0 */
+/* Casilla "Recuérdame". Borde más visible: de #edaff6 a #b48ee0 */
 .checkbox {
     display: flex;
     align-items: center;
@@ -482,8 +482,8 @@
 }
 
 .checkbox input:checked+.checkbox__mark {
-    background: #ec4899;
-    border-color: #ec4899;
+    background: #d648ec;
+    border-color: #d648ec;
 }
 
 .checkbox input:checked+.checkbox__mark::after {
@@ -524,7 +524,7 @@
 
     background: linear-gradient(90deg,
             #6d28d9,
-            #ec4899);
+            #d648ec);
 
     color: white;
 
@@ -537,13 +537,13 @@
 
     transition: .30s;
 
-    box-shadow: 0 18px 30px rgba(236, 72, 153, .25);
+    box-shadow: 0 18px 30px rgba(214, 72, 236, .25);
 }
 
 .btn-submit:hover {
     transform: translateY(-3px);
 
-    box-shadow: 0 22px 35px rgba(236, 72, 153, .35);
+    box-shadow: 0 22px 35px rgba(214, 72, 236, .35);
 }
 
 
@@ -560,7 +560,7 @@
 }
 
 .card__footer span {
-    color: #d61f74;
+    color: #c218dc;
 
     font-weight: 700;
 
@@ -953,7 +953,7 @@ html {
 
 /* SELECCION DE TEXTO */
 ::selection {
-    background: #ec4899;
+    background: #d648ec;
     color: white;
 }
 
@@ -1091,7 +1091,7 @@ html {
     .form__link {
         color: var(--pink) !important;
 
-        &:hover { color: #ff85bd !important; }
+        &:hover { color: #ef85ff !important; }
     }
 
     .card__footer {

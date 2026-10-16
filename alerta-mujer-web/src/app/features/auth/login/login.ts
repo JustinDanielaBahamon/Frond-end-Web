@@ -62,15 +62,9 @@ export class LoginComponent {
 
   validarPassword() {
 
-    if (!this.password) {
-      this.passwordValida = true;
-      return;
-    }
-
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,}$/;
-
-    this.passwordValida = regex.test(this.password);
+    // Al iniciar sesión no se exigen reglas de formato: las cuentas creadas en la app o con
+    // recuperación solo piden 8 caracteres, y el backend es quien valida la contraseña.
+    this.passwordValida = true;
   }
 
   // ------------------------

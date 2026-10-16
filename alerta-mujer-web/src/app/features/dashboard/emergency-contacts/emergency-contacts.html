@@ -6,9 +6,12 @@
 <div class="ec-wrap" (click)="cerrarMenu()">
 
   <div class="ec-header">
-    <div>
-      <h2 class="ec-title">Contactos de emergencia</h2>
-      <p class="ec-sub">Gestiona las personas que recibirán tus alertas.</p>
+    <div class="page-title-row">
+      <span class="page-title-icon"><i class="ti ti-users"></i></span>
+      <div>
+        <h1 class="ec-title">Contactos de emergencia</h1>
+        <p class="ec-sub">Gestiona las personas que recibirán tus alertas.</p>
+      </div>
     </div>
     <button type="button" class="ec-add-btn" (click)="$event.stopPropagation(); abrirModalAgregar()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -2,9 +2,12 @@
   
   <!-- 1. ENCABEZADO -->
   <div class="device-header">
-    <div>
-      <h1 class="device-title">Estado del Dispositivo Móvil</h1>
-      <p class="device-subtitle">Diagnóstico de tu celular vinculado • Última actualización: {{ lastRefresh() }}</p>
+    <div class="page-title-row">
+      <span class="page-title-icon"><i class="ti ti-device-mobile"></i></span>
+      <div>
+        <h1 class="device-title">Estado del dispositivo</h1>
+        <p class="device-subtitle">Tus celulares vinculados • Última actualización: {{ lastRefresh() }}</p>
+      </div>
     </div>
     <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()" aria-label="Refrescar información del dispositivo">
       <i class="ti ti-refresh"></i>

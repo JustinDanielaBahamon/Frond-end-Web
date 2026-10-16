@@ -1,5 +1,7 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { PasswordChangeComponent } from '../../../shared/components/password-change/password-change';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -19,7 +21,7 @@ interface ToggleSetting {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, PasswordChangeComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
@@ -57,12 +59,12 @@ export class Settings implements OnInit {
 
   // --- Apariencia: color de acento (global, vía AccentColorService) ---
   readonly accentColors: AccentColor[] = [
-    { name: 'purpura', value: '#7c3aed' },
-    { name: 'azulOscuro', value: '#130253' },
-    { name: 'magenta', value: '#710592' },
-    { name: 'rosa', value: '#d648ec' },
-    { name: 'celeste', value: '#3b08b2' },
-    { name: 'rojo', value: '#d844ef' }
+    { name: 'Violeta', value: '#7c3aed' },
+    { name: 'Índigo profundo', value: '#130253' },
+    { name: 'Morado', value: '#710592' },
+    { name: 'Orquídea', value: '#d648ec' },
+    { name: 'Violeta azulado', value: '#3b08b2' },
+    { name: 'Violeta neón', value: '#d844ef' }
   ];
   readonly selectedColor = this.accentColorService.currentAccent;
 
@@ -75,9 +77,8 @@ export class Settings implements OnInit {
     { key: 'soundVibration', label: 'Sonidos y vibración', description: 'Vibración y sonido en alertas.', enabled: true }
   ]);
 
-  // --- Privacidad ---
-  readonly backgroundLocation = signal(true);
-  readonly dataUsage = signal<'wifi' | 'wifi-data'>('wifi-data');
+  // --- Cambio de contraseña ---
+  readonly cambiandoContrasena = signal(false);
 
   toggleTheme(mode: Theme): void {
     this.themeService.setTheme(mode);
@@ -91,24 +92,5 @@ export class Settings implements OnInit {
     this.notifications.update(list =>
       list.map(item => item.key === key ? { ...item, enabled: !item.enabled } : item)
     );
-  }
-
-  toggleBackgroundLocation(): void {
-    this.backgroundLocation.update(v => !v);
-  }
-
-  onEditProfile(): void {
-    // TODO: this.router.navigate(['/dashboard/perfil'])
-  }
-
-  onDeleteAccount(): void {
-    const confirmed = confirm('¿Estás segura de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');
-    if (confirmed) {
-      // TODO: this.usersService.deleteAccount(this.user().email)
-    }
-  }
-
-  onContactSupport(): void {
-    // TODO: this.router.navigate(['/dashboard/asistencia'])
   }
 }

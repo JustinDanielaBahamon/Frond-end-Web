@@ -15,3 +15,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+// Mapa base de OpenStreetMap oscurecido para el modo oscuro (Leaflet, capa con className)
+.leaflet-tile-pane .tiles-oscuras,
+img.tiles-oscuras {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}

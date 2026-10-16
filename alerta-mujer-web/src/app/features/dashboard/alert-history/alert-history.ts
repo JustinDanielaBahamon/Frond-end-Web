@@ -14,10 +14,10 @@ const iconDefault = L.icon({
   iconAnchor: [12, 41],
 });
 
-// Tiles de CARTO: mismo mapa base, una versión clara y una oscura.
-const TILES_CLARO = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-const TILES_OSCURO = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const ATRIBUCION_TILES = '© OpenStreetMap contributors © CARTO';
+// Teselas de OpenStreetMap (las de CARTO ahora exigen clave y salían con "API KEY REQUIRED").
+// En modo oscuro se oscurecen con un filtro CSS (clase tiles-oscuras en la capa).
+const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ATRIBUCION_TILES = '© OpenStreetMap contributors';
 
 @Component({
   selector: 'app-alert-history',
@@ -173,10 +173,10 @@ cerrarMenu() {
       this.map.removeLayer(this.tileLayer);
     }
 
-    const url = this.esModoOscuro() ? TILES_OSCURO : TILES_CLARO;
-    this.tileLayer = L.tileLayer(url, {
+    this.tileLayer = L.tileLayer(TILES, {
       attribution: ATRIBUCION_TILES,
       maxZoom: 19,
+      className: this.esModoOscuro() ? 'tiles-oscuras' : '',
     }).addTo(this.map);
   }
 

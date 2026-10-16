@@ -28,6 +28,8 @@ export class EmergencyContactService {
       // No enviamos userProfileId, el backend lo establece automáticamente
       contactName: contacto.nombre,
       telephone: contacto.telefono,
+      // El correo es el canal por el que el contacto recibe el aviso cuando se activa una alerta
+      email: contacto.email?.trim() || null,
       relationship: contacto.relacion,
     };
   }
@@ -50,7 +52,9 @@ export class EmergencyContactService {
     if (contacto.nombre !== undefined) apiData.contactName = contacto.nombre;
     if (contacto.telefono !== undefined) apiData.telephone = contacto.telefono;
     if (contacto.relacion !== undefined) apiData.relationship = contacto.relacion;
-    return this.http.patch<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
+    if (contacto.email !== undefined) apiData.email = contacto.email?.trim() || null;
+    // El backend expone PUT (no PATCH) y solo cambia los campos enviados
+    return this.http.put<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
       map(api => this.mapApiToContact(api))
     );
   }

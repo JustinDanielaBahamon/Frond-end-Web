@@ -299,126 +299,24 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
       `);
   }
 
-  /** Cargar y mostrar zonas peligrosas del backend */
+  /** Cargar y mostrar las zonas del backend (sin datos inventados: si no hay, el mapa queda sin zonas) */
   private cargarZonasPeligrosas(): void {
     if (!this.map) return;
 
-    // Obtener el usuario autenticado
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
-      console.warn('No hay usuario autenticado, usando zonas de ejemplo');
-      this.zonas = this.obtenerZonasEjemplo();
-      this.dibujarZonasEnMapa();
-      return;
-    }
+    if (!currentUser) return;
 
-    // Obtener zonas del backend usando el ID del usuario actual
     this.zoneService.getByUser(currentUser.id).subscribe({
       next: (zonas) => {
-        this.zonas = zonas.length > 0 ? zonas : this.obtenerZonasEjemplo();
+        this.zonas = zonas;
         this.dibujarZonasEnMapa();
       },
       error: (err) => {
-        console.error('Error al cargar zonas, usando datos de ejemplo:', err);
-        // Si hay error, usar zonas de ejemplo
-        this.zonas = this.obtenerZonasEjemplo();
+        console.error('Error al cargar zonas:', err);
+        this.zonas = [];
         this.dibujarZonasEnMapa();
       }
     });
-  }
-
-  /** Zonas de ejemplo para Neiva, Huila */
-  private obtenerZonasEjemplo(): NearbyZone[] {
-    return [
-      {
-        id: 1,
-        name: 'CAI Centro',
-        type: 'policia',
-        lat: 2.9295,
-        lng: -75.2810,
-        radiusMeters: 300,
-        address: 'Carrera 5 con Calle 10, Centro',
-        description: 'Centro de Atención Inmediata - Policía Nacional',
-        isActive: true
-      },
-      {
-        id: 2,
-        name: 'Hospital Universitario',
-        type: 'asistencia',
-        lat: 2.9330,
-        lng: -75.2850,
-        radiusMeters: 250,
-        address: 'Calle 5A # 15-25',
-        description: 'Centro médico de emergencias 24 horas',
-        isActive: true
-      },
-      {
-        id: 3,
-        name: 'Zona de riesgo - Sector La Floresta',
-        type: 'risk',
-        lat: 2.9210,
-        lng: -75.2790,
-        radiusMeters: 400,
-        address: 'Barrio La Floresta',
-        description: 'Zona con alto índice de delincuencia. Evitar transitar de noche.',
-        isActive: true
-      },
-      {
-        id: 4,
-        name: 'Parque Santander (Zona Segura)',
-        type: 'safe',
-        lat: 2.9265,
-        lng: -75.2805,
-        radiusMeters: 200,
-        address: 'Carrera 5 con Calle 7',
-        description: 'Zona con vigilancia permanente y buena iluminación',
-        isActive: true
-      },
-      {
-        id: 5,
-        name: 'Estación de Policía Sur',
-        type: 'policia',
-        lat: 2.9150,
-        lng: -75.2900,
-        radiusMeters: 350,
-        address: 'Calle 26 Sur # 20-45',
-        description: 'Estación de Policía - Comando Sur',
-        isActive: true
-      },
-      {
-        id: 6,
-        name: 'Punto de Ayuda Alcaldía',
-        type: 'help',
-        lat: 2.9285,
-        lng: -75.2825,
-        radiusMeters: 150,
-        address: 'Edificio Alcaldía Municipal',
-        description: 'Punto de información y asistencia ciudadana',
-        isActive: true
-      },
-      {
-        id: 7,
-        name: 'Zona de riesgo - Río del Oro',
-        type: 'risk',
-        lat: 2.9180,
-        lng: -75.2950,
-        radiusMeters: 500,
-        address: 'Sector Río del Oro',
-        description: 'Zona solitaria con poca iluminación. Alta precaución.',
-        isActive: true
-      },
-      {
-        id: 8,
-        name: 'Cruz Roja Colombiana',
-        type: 'asistencia',
-        lat: 2.9310,
-        lng: -75.2770,
-        radiusMeters: 200,
-        address: 'Carrera 7 # 12-30',
-        description: 'Centro de atención médica de emergencia',
-        isActive: true
-      }
-    ];
   }
 
   /** Dibujar zonas en el mapa con colores según el tipo */

@@ -14,6 +14,14 @@ export interface TopbarNotification {
 
 const READ_KEY = 'alerta-mujer-notif-read';
 
+export interface TopbarAccountLink {
+  label: string;
+  route: string;
+  /** Clase de Font Awesome, p. ej. 'fa-solid fa-key' */
+  icon: string;
+  fragment?: string;
+}
+
 @Component({
   selector: 'app-topbar',
   standalone: true,
@@ -30,6 +38,12 @@ export class TopbarComponent {
   @Input() pageTitle: string = '';
   // Lista de notificaciones que le pasa cada layout. Si no pasa nada, el panel sale vacío.
   @Input() notifications: TopbarNotification[] = [];
+
+  /** Menú de cuenta (arriba a la derecha). Solo se muestra si hay profileRoute. */
+  @Input() userEmail: string = '';
+  @Input() userRole: string = '';
+  @Input() profileRoute: string | null = null;
+  @Input() accountLinks: TopbarAccountLink[] = [];
   @Output() sidebarToggle = new EventEmitter<void>();
   @Output() themeToggle = new EventEmitter<void>();
 
@@ -45,6 +59,25 @@ export class TopbarComponent {
 
   // Menú de idioma
   menuOpen = false;
+
+  // Menú de cuenta
+  accountOpen = false;
+
+  get initials(): string {
+    return (this.userName || '?').split(' ').filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
+  }
+
+  toggleAccount() {
+    this.accountOpen = !this.accountOpen;
+    if (this.accountOpen) {
+      this.menuOpen = false;
+      this.notifOpen = false;
+    }
+  }
+
+  closeAccount() {
+    this.accountOpen = false;
+  }
 
   // Panel de notificaciones
   notifOpen = false;
@@ -65,7 +98,10 @@ export class TopbarComponent {
   // ── Idioma ───────────────────────────────────
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
-    if (this.menuOpen) this.notifOpen = false;
+    if (this.menuOpen) {
+      this.notifOpen = false;
+      this.accountOpen = false;
+    }
   }
 
   closeMenu() {
@@ -78,13 +114,17 @@ export class TopbarComponent {
 
   logout() {
     this.closeMenu();
+    this.closeAccount();
     this.authService.logout();
   }
 
   // ── Notificaciones ───────────────────────────
   toggleNotif() {
     this.notifOpen = !this.notifOpen;
-    if (this.notifOpen) this.menuOpen = false;
+    if (this.notifOpen) {
+      this.menuOpen = false;
+      this.accountOpen = false;
+    }
   }
 
   closeNotif() {

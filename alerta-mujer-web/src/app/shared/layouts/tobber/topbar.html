@@ -94,6 +94,53 @@
       }
     </button>
 
+    <!-- ═════════ CUENTA ═════════ -->
+    @if (profileRoute) {
+      <div class="topbar__account">
+        @if (accountOpen) {
+          <div class="profile-menu__overlay" (click)="closeAccount()"></div>
+        }
+
+        <button class="account-btn" (click)="toggleAccount()" [attr.aria-expanded]="accountOpen"
+                aria-haspopup="menu" title="Mi cuenta">
+          <span class="account-btn__avatar">{{ initials }}</span>
+          <span class="account-btn__text">
+            <span class="account-btn__name">{{ userName }}</span>
+            @if (userRole) {
+              <span class="account-btn__role">{{ userRole }}</span>
+            }
+          </span>
+          <i class="fa-solid fa-chevron-down account-btn__chevron"></i>
+        </button>
+
+        @if (accountOpen) {
+          <div class="profile-menu account-menu" role="menu">
+            <div class="account-menu__header">
+              <span class="account-btn__avatar account-btn__avatar--lg">{{ initials }}</span>
+              <div>
+                <p class="account-menu__name">{{ userName }}</p>
+                <p class="account-menu__email">{{ userEmail }}</p>
+              </div>
+            </div>
+            <div class="profile-menu__divider"></div>
+            <a class="profile-menu__item" role="menuitem" [routerLink]="profileRoute" (click)="closeAccount()">
+              <i class="fa-regular fa-user"></i> Mi perfil
+            </a>
+            @for (link of accountLinks; track link.label) {
+              <a class="profile-menu__item" role="menuitem" [routerLink]="link.route"
+                 [fragment]="link.fragment" (click)="closeAccount()">
+                <i [class]="link.icon"></i> {{ link.label }}
+              </a>
+            }
+            <div class="profile-menu__divider"></div>
+            <button class="profile-menu__item profile-menu__item--danger" role="menuitem" (click)="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </button>
+          </div>
+        }
+      </div>
+    }
+
     <!-- ═════════ IDIOMA ═════════ -->
     <div class="topbar__profile">
       @if (menuOpen) {

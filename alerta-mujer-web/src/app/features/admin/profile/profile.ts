@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -24,7 +25,8 @@ const ACCIONES_SESION: Record<string, string> = {
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
-export class AdminProfileComponent {
+export class AdminProfileComponent implements AfterViewInit {
+  private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   private themeService = inject(ThemeService);
   private settingsService = inject(AdminSettingsService);
@@ -63,6 +65,16 @@ export class AdminProfileComponent {
       },
     });
     this.cargarActividad();
+  }
+
+  ngAfterViewInit(): void {
+    this.route.fragment.subscribe((f) => {
+      if (f !== 'contrasena') return;
+      setTimeout(() => {
+        document.getElementById('contrasena')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        (document.querySelector('input[name=actual]') as HTMLInputElement | null)?.focus();
+      });
+    });
   }
 
   // ── Datos ────────────────────────────────────────────────────

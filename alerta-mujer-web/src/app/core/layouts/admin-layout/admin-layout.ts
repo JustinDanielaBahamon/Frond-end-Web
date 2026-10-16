@@ -4,7 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { of, timer } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 import { SidebarComponent, SidebarLink, SidebarUser } from '../../../shared/layouts/sidebar/sidebar';
-import { TopbarComponent, TopbarNotification } from '../../../shared/layouts/tobber/topbar';
+import { TopbarAccountLink, TopbarComponent, TopbarNotification } from '../../../shared/layouts/tobber/topbar';
 import { AuthService } from '../../../core/auth/auth.service';
 import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService } from '../../../core/theme/theme.service';
@@ -51,6 +51,14 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Gestion de Dispositivos', route: '/admin/devices-management'},
     { label: 'Auditoría', route: '/admin/auditoria' },
     { label: 'Configuración', route: '/admin/settings' },
+    { label: 'Mi perfil', route: '/admin/perfil' },
+  ];
+
+  // Accesos del menú de cuenta (arriba a la derecha), además de "Mi perfil"
+  readonly enlacesCuenta: TopbarAccountLink[] = [
+    { label: 'Cambiar contraseña', route: '/admin/perfil', fragment: 'contrasena', icon: 'fa-solid fa-key' },
+    { label: 'Configuración del sistema', route: '/admin/settings', icon: 'fa-solid fa-sliders' },
+    { label: 'Auditoría', route: '/admin/auditoria', icon: 'fa-solid fa-clock-rotate-left' },
   ];
 
   ngOnInit() {

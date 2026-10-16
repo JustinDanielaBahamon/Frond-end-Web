@@ -21,6 +21,11 @@
     <app-topbar
       brand="Alerta Mujer — Admin"
       avatarLetter="A"
+      [userName]="usuarioActual?.name || 'Administración'"
+      [userEmail]="usuarioActual?.email || ''"
+      userRole="Administración"
+      profileRoute="/admin/perfil"
+      [accountLinks]="enlacesCuenta"
       [notifications]="notificaciones()"
       (sidebarToggle)="toggleSidebar()"
       (themeToggle)="toggleTheme()">

@@ -68,6 +68,19 @@
 
   .settings-section__title { color: var(--purple-mid) !important; }
 
+  .account-btn {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+
+    &__name { color: var(--text-primary) !important; }
+    &__role, &__chevron { color: var(--purple-mid) !important; }
+  }
+
+  .account-menu {
+    &__name { color: var(--text-primary) !important; }
+    &__email { color: var(--text-muted) !important; }
+  }
+
   .settings-pill {
     background: var(--purple-pale) !important;
     border-color: var(--border) !important;

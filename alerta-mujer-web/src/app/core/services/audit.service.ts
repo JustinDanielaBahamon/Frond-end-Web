@@ -12,6 +12,10 @@ export interface RegistroAuditoria {
   responsableId: number | null;
   responsable: string | null;
   responsableCorreo: string | null;
+  /** 'Administración' | 'Usuaria' | null */
+  rol: string | null;
+  /** Desde dónde se hizo: 'Panel web · Chrome · Linux', 'App móvil · Android', 'Tarea automática · …' */
+  origen: string | null;
   ip: string | null;
   fecha: Date;
 }
@@ -83,6 +87,8 @@ export class AuditService {
       responsableId: r.actorAccountId,
       responsable: r.actorName,
       responsableCorreo: r.actorEmail,
+      rol: r.actorRole ?? null,
+      origen: r.source ?? null,
       ip: r.ipAddress,
       fecha: new Date(r.createdAt)
     };

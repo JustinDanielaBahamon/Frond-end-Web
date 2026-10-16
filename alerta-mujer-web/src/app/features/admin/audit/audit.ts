@@ -170,6 +170,29 @@ export class AuditComponent implements OnInit {
     return `${this.tipo(r)}${r.registroId != null ? ' #' + r.registroId : ''}`;
   }
 
+  /** Quién hizo el cambio cuando no hubo una persona con sesión. */
+  sinResponsable(r: RegistroAuditoria): { texto: string; ayuda: string; icono: string } {
+    if (r.origen?.startsWith('Tarea automática')) {
+      return { texto: r.origen.replace('Tarea automática · ', ''), ayuda: 'Proceso automático del servidor', icono: 'fa-gears' };
+    }
+    if (r.origen) {
+      return { texto: 'Sin sesión', ayuda: 'Petición sin usuario autenticado (' + r.origen + ')', icono: 'fa-user-slash' };
+    }
+    return {
+      texto: 'No registrado',
+      ayuda: 'Registro anterior al seguimiento de responsables, o cambio hecho directamente en la base de datos',
+      icono: 'fa-circle-question',
+    };
+  }
+
+  iconoOrigen(origen: string | null): string {
+    if (!origen) return 'fa-circle-question';
+    if (origen.startsWith('App móvil')) return 'fa-mobile-screen';
+    if (origen.startsWith('Panel web')) return 'fa-desktop';
+    if (origen.startsWith('Tarea automática')) return 'fa-gears';
+    return 'fa-plug';
+  }
+
   claseAccion(r: RegistroAuditoria): string {
     if (r.accion === 'LOGIN_FAILED' || r.accion === 'DELETE') return 'badge--danger';
     if (r.accion === 'LOGIN_SUCCESS' || r.accion === 'INSERT') return 'badge--ok';

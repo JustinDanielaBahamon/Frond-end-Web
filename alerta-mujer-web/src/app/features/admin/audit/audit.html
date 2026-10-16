@@ -31,7 +31,7 @@
         @for (r of responsables(); track r.cuentaId) {
           <option [ngValue]="r.cuentaId">{{ r.nombre || r.correo }}</option>
         }
-        <option [ngValue]="0">Sistema / app</option>
+        <option [ngValue]="0">Sin persona (tareas automáticas y registros antiguos)</option>
       </select>
     </label>
     <label class="field">
@@ -77,6 +77,7 @@
           <tr>
             <th>Fecha</th>
             <th>Responsable</th>
+            <th>Origen</th>
             <th>Acción</th>
             <th>Sobre</th>
             <th>Detalle</th>
@@ -85,18 +86,30 @@
         </thead>
         <tbody>
           @if (cargando()) {
-            <tr><td colspan="6" class="empty">Cargando…</td></tr>
+            <tr><td colspan="7" class="empty">Cargando…</td></tr>
           } @else if (registros().length === 0) {
-            <tr><td colspan="6" class="empty">No hay registros con estos filtros.</td></tr>
+            <tr><td colspan="7" class="empty">No hay registros con estos filtros.</td></tr>
           } @else {
             @for (r of registros(); track r.id) {
               <tr (click)="verDetalle(r)" tabindex="0" (keydown.enter)="verDetalle(r)">
                 <td class="nowrap">{{ r.fecha | date: 'dd/MM/yyyy' }}<br /><small>{{ r.fecha | date: 'HH:mm:ss' }}</small></td>
                 <td>
                   @if (r.responsable) {
-                    <strong>{{ r.responsable }}</strong><br /><small>{{ r.responsableCorreo }}</small>
+                    <strong>{{ r.responsable }}</strong>
+                    @if (r.rol) {
+                      <span class="role" [class.role--admin]="r.rol === 'Administración'">{{ r.rol }}</span>
+                    }
+                    <br /><small>{{ r.responsableCorreo }}</small>
                   } @else {
-                    <span class="muted">Sistema / app</span>
+                    @let sin = sinResponsable(r);
+                    <span class="muted" [title]="sin.ayuda"><i class="fa-solid" [ngClass]="sin.icono"></i> {{ sin.texto }}</span>
+                  }
+                </td>
+                <td class="origin">
+                  @if (r.origen) {
+                    <i class="fa-solid" [ngClass]="iconoOrigen(r.origen)"></i> {{ r.origen }}
+                  } @else {
+                    <span class="muted">—</span>
                   }
                 </td>
                 <td><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></td>
@@ -140,7 +153,15 @@
         </header>
         <dl class="dialog__grid">
           <dt>Fecha</dt><dd>{{ r.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</dd>
-          <dt>Responsable</dt><dd>{{ r.responsable ? r.responsable + ' (' + r.responsableCorreo + ')' : 'Sistema / app' }}</dd>
+          <dt>Responsable</dt>
+          <dd>
+            @if (r.responsable) {
+              {{ r.responsable }} ({{ r.responsableCorreo }}){{ r.rol ? ' · ' + r.rol : '' }}
+            } @else {
+              {{ sinResponsable(r).texto }} — <small>{{ sinResponsable(r).ayuda }}</small>
+            }
+          </dd>
+          <dt>Origen</dt><dd>{{ r.origen || 'No registrado' }}</dd>
           <dt>Acción</dt><dd><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></dd>
           <dt>Sobre</dt><dd>{{ objeto(r) }}</dd>
           <dt>Detalle</dt>

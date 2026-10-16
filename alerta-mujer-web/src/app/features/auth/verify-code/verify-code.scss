@@ -39,7 +39,7 @@
   .bg-orb--2 {
     width: 480px;
     height: 480px;
-    background: radial-gradient(circle, #ec4899, transparent); /* Rosa */
+    background: radial-gradient(circle, #d648ec, transparent); /* Rosa */
     right: -150px;
     bottom: -150px;
     animation-delay: 5s;
@@ -48,7 +48,7 @@
   .bg-orb--3 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, #6366f1, transparent); /* Azul */
+    background: radial-gradient(circle, #8e63f1, transparent); /* Azul */
     left: 50%;
     top: 45%;
     transform: translate(-50%, -50%);
@@ -238,7 +238,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899); /* Degradado coherente */
+    background: linear-gradient(135deg, #8b5cf6, #d648ec); /* Degradado coherente */
     color: white;
     font-size: 2.2rem;
     box-shadow: 0 18px 45px rgba(139, 92, 246, 0.25);
@@ -258,7 +258,7 @@
   }
   
   .card__title--accent {
-    color: #ec4899; /* Color rosa */
+    color: #d648ec; /* Color rosa */
   }
   
   .card__subtitle {
@@ -353,7 +353,7 @@
   ======================================*/
   
   .btn-submit {
-    background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%);
+    background: linear-gradient(90deg, #8b5cf6 0%, #d648ec 100%);
     color: #ffffff;
     border: none;
     border-radius: 8px;

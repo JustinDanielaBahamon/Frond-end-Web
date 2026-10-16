@@ -77,7 +77,7 @@
   padding      : 14px;
   border       : none;
   border-radius: 12px;
-  background   : linear-gradient(90deg, #6D28D9, #ec4899);
+  background   : linear-gradient(90deg, #6D28D9, #d648ec);
   color        : #fff;
   font-weight  : 800;
   font-size    : 0.95rem;
@@ -87,7 +87,7 @@
 
   &:hover {
     transform : translateY(-2px);
-    box-shadow: 0 14px 28px rgba(233, 30, 140, 0.4);
+    box-shadow: 0 14px 28px rgba(206, 30, 233, 0.4);
   }
 }
 

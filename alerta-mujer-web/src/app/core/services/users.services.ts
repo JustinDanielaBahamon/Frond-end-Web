@@ -170,11 +170,6 @@ export class UsersService {
   }
 
   // ── Datos relacionados ───────────────────────────────────────
-  // Todas las alertas (para calcular el contador por usuaria)
-  getAlertas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/admin/alerts`);
-  }
-
   getAlertasByUsuaria(usuarioId: string | number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${usuarioId}`);
   }

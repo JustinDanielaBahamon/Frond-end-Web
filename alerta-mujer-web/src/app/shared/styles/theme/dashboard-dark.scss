@@ -192,8 +192,8 @@
 
   /* ── 3. Badge "Conectado" / "Atendida" ─────────── */
   .home-badge--exito {
-    background: rgba(16, 185, 129, 0.2) !important;
-    color: #34d399 !important;
+    background: rgba(89, 16, 185, 0.2) !important;
+    color: #782dda !important;
   }
 
   /* ── 4. Estado de seguridad (5 fichas) ─────────── */
@@ -224,9 +224,9 @@
 
     &--peligro     { background: var(--pink) !important; color: #fff !important; }
     &--principal   { background: #7c3aed !important; color: #ede9fe !important; }
-    &--exito       { background: #10b981 !important; color: #ecfdf5 !important; }
-    &--acento      { background: #0891b2 !important; color: #ecfeff !important; }
-    &--advertencia { background: #d97706 !important; color: #fffbeb !important; }
+    &--exito       { background: #5910b9 !important; color: #ecfdf5 !important; }
+    &--acento      { background: #3b08b2 !important; color: #ecfeff !important; }
+    &--advertencia { background: #9306d9 !important; color: #fffbeb !important; }
   }
 
   .home-emergencia__icon {
@@ -425,7 +425,7 @@
 [data-theme="dark"] {
 
   .ev-error {
-    color: var(--red, #f87171) !important;
+    color: var(--red, #e671f8) !important;
   }
 
   /* ── Toolbar: tabs + búsqueda + filtro ───────── */
@@ -495,8 +495,8 @@
   .ev-card-detalle { color: var(--purple-mid) !important; }
 
   .tipo-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
-  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #451a03), #92400e) !important; color: #fbbf24 !important; }
-  .tipo-audio { background: linear-gradient(135deg, #164e63, #0e7490) !important; color: #67e8f9 !important; }
+  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #451a03), #660e92) !important; color: #b324fb !important; }
+  .tipo-audio { background: linear-gradient(135deg, #2a0f6a, #350e90) !important; color: #a667f9 !important; }
 
   .ev-empty,
   .ev-muted { color: var(--text-dim) !important; }
@@ -590,7 +590,7 @@
 
     &:focus-within {
       border-color: var(--pink) !important;
-      box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15) !important;
+      box-shadow: 0 0 0 3px rgba(203, 28, 230, 0.15) !important;
     }
   }
 
@@ -619,7 +619,7 @@
 
     &--total      { border-left-color: #560c79 !important; }
     &--atendidas  { border-left-color: #055f1a !important; }
-    &--canceladas { border-left-color: #e60f4f !important; }
+    &--canceladas { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -653,14 +653,14 @@
 
   /* ── Badges — medio de activación y estado ────── */
   .ah-badge {
-    &.badge-boton      { background: rgba(219, 39, 119, 0.22) !important; color: var(--pink) !important; }
+    &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
     &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
     &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
 
-    &.badge-ok        { background: var(--green, #16a34a) !important; color: #fff !important; }
+    &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
     &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #16a34a) !important; }
+    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
   /* ── Acciones (ojo / menú) ───────────────────── */
@@ -700,10 +700,10 @@
   }
 
   .ah-mini-timeline-dot { background: var(--text-dim) !important; }
-  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #16a34a) !important; }
+  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3) !important; }
   .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
     background: var(--amber) !important;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.2) !important;
   }
 
   .ah-mini-timeline-label { color: var(--text-primary) !important; }
@@ -802,8 +802,8 @@
   }
 
   .ec-badge {
-    &--activo   { background: rgba(22, 163, 74, 0.22) !important; color: #4ade80 !important; }
-    &--inactivo { background: rgba(220, 38, 38, 0.22) !important; color: #f87171 !important; }
+    &--activo   { background: rgba(83, 22, 163, 0.22) !important; color: #8a49df !important; }
+    &--inactivo { background: rgba(203, 28, 230, 0.22) !important; color: #e671f8 !important; }
   }
 
   .ec-icon-btn {
@@ -862,8 +862,8 @@
   .ec-switch { background: var(--border) !important; &--on { background: var(--purple-mid) !important; } }
 
   .ec-danger-zone {
-    background: rgba(220, 38, 38, 0.1) !important;
-    border-color: rgba(220, 38, 38, 0.35) !important;
+    background: rgba(203, 28, 230, 0.1) !important;
+    border-color: rgba(203, 28, 230, 0.35) !important;
   }
 
   .ec-danger-head p { color: var(--text-dim) !important; }

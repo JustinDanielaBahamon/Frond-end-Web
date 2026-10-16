@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ForgotPhone } from './forgot-phone';
+import { ForgotPhoneComponent } from './forgot-phone';
 
-describe('ForgotPhone', () => {
-  let component: ForgotPhone;
-  let fixture: ComponentFixture<ForgotPhone>;
+describe('ForgotPhoneComponent', () => {
+  let component: ForgotPhoneComponent;
+  let fixture: ComponentFixture<ForgotPhoneComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ForgotPhone],
+      imports: [ForgotPhoneComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ForgotPhone);
+    fixture = TestBed.createComponent(ForgotPhoneComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

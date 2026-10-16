@@ -39,7 +39,7 @@ export class ThemeService {
 
     // si el usuario nunca eligió, respeta la preferencia del
     // sistema operativo/navegador
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
     return prefersDark ? 'dark' : 'light';
   }
 }

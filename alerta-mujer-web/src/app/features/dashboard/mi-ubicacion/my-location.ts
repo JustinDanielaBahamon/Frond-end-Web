@@ -112,6 +112,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   cargandoCelular = signal(false);
   celularConsultado = signal(false);
   errorCelular = signal(false);
+  avisoCelular = signal<string | null>(null);
 
   // ── Datos del mapa ─────────────────────────────
   recorridos = this.recorridosService.recorridos$;
@@ -230,28 +231,64 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Ubicación del celular ──────────────────────
-  /** Trae la última ubicación que envió la app móvil y la muestra en el mapa. */
+  /**
+   * Pide al celular su ubicación actual (push silencioso) y espera hasta 20 s a que llegue un punto
+   * nuevo. Si el celular no responde (sin internet, sin permiso de ubicación en segundo plano), se
+   * muestra la última ubicación que envió, con su antigüedad.
+   */
   verCelular(): void {
     this.cargandoCelular.set(true);
     this.errorCelular.set(false);
+    this.avisoCelular.set(null);
+    this.phoneLocationService.pedirAlCelular().subscribe({
+      next: (r) => this.esperarRespuesta(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+      error: (e) => {
+        // 409: sin celular con notificaciones o pedido muy seguido; igual se muestra el último punto
+        this.avisoCelular.set(e?.error?.message ?? null);
+        this.mostrarUltima();
+      },
+    });
+  }
+
+  private esperarRespuesta(desde: number, limite: number): void {
     this.phoneLocationService.getLatest().subscribe({
       next: (loc) => {
-        this.cargandoCelular.set(false);
-        this.celularConsultado.set(true);
-        this.celular.set(loc);
-        if (!loc) return;
-        this.setTab('mapa');
-        this.seguir.set(false);
-        setTimeout(() => this.map?.flyTo([loc.lat, loc.lng], 17, { duration: 0.9 }), 150);
-        this.lugarCelular.set(null);
-        this.geocoding.obtener(loc.lat, loc.lng).then((lugar) => {
-          if (this.celular()?.id === loc.id) this.lugarCelular.set(lugar);
-        });
+        const nueva = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= desde;
+        if (nueva || Date.now() >= limite) {
+          if (!nueva) this.avisoCelular.set('El celular no respondió. Se muestra la última ubicación que envió.');
+          this.aplicarCelular(loc);
+          return;
+        }
+        setTimeout(() => this.esperarRespuesta(desde, limite), 2500);
       },
       error: () => {
         this.cargandoCelular.set(false);
         this.errorCelular.set(true);
       },
+    });
+  }
+
+  private mostrarUltima(): void {
+    this.phoneLocationService.getLatest().subscribe({
+      next: (loc) => this.aplicarCelular(loc),
+      error: () => {
+        this.cargandoCelular.set(false);
+        this.errorCelular.set(true);
+      },
+    });
+  }
+
+  private aplicarCelular(loc: UbicacionEntry | null): void {
+    this.cargandoCelular.set(false);
+    this.celularConsultado.set(true);
+    this.celular.set(loc);
+    if (!loc) return;
+    this.setTab('mapa');
+    this.seguir.set(false);
+    setTimeout(() => this.map?.flyTo([loc.lat, loc.lng], 17, { duration: 0.9 }), 150);
+    this.lugarCelular.set(null);
+    this.geocoding.obtener(loc.lat, loc.lng).then((lugar) => {
+      if (this.celular()?.id === loc.id) this.lugarCelular.set(lugar);
     });
   }
 

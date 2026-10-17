@@ -21,6 +21,17 @@
     </app-topbar>
 
     <main class="layout__main">
+      <!-- Alerta activa de un contacto: aviso en todo el panel hasta que termine -->
+      @for (a of alertasRecibidas.activas(); track a.id) {
+        <a class="aviso-contacto" routerLink="/dashboard/alertas-contactos" role="alert">
+          <span class="aviso-contacto__pulso" aria-hidden="true"></span>
+          <span class="aviso-contacto__texto">
+            <strong>{{ a.nombre }}</strong> activó una alerta de emergencia
+            @if (a.inicio) { a las {{ a.inicio | date: 'h:mm a' }} }
+          </span>
+          <span class="aviso-contacto__accion">Ver seguimiento <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </a>
+      }
       <router-outlet></router-outlet>
     </main>
 

@@ -90,3 +90,37 @@
    No agregues aquí ningún bloque "body.dark-mode" ni
    "[data-theme='dark']" — todo el dark mode del dashboard
    se centraliza en ese único archivo de tema. */
+
+/* Aviso: un contacto de la usuaria activó una alerta (visible en todo el panel) */
+.aviso-contacto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #6d28d9, #c026d3);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+
+  &__pulso {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fff;
+    animation: aviso-pulso 1.6s infinite;
+  }
+
+  &__texto { flex: 1; }
+  &__accion { font-weight: 800; white-space: nowrap; }
+}
+
+@keyframes aviso-pulso {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) { .aviso-contacto__pulso { animation: none; } }

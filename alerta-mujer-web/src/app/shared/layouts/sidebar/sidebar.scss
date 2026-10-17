@@ -89,13 +89,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    scrollbar-width: thin;
-
-    &::-webkit-scrollbar { width: 4px; }
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-    }
+    // La barra delgada y violeta viene de styles.scss
   }
 
   &__link {
@@ -113,6 +107,16 @@
     &:hover {
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
+    }
+
+    // Sin el contorno blanco del navegador al hacer clic; con teclado, un anillo violeta
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px #c084fc;
     }
 
     &--active {

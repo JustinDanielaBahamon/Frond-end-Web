@@ -41,3 +41,41 @@ img.tiles-oscuras {
   font-size: 20px;
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
 }
+
+// ── Barras de desplazamiento ──────────────────────────────────────
+// Delgadas, sin flechas y violetas en toda la web (antes salía la barra del sistema, blanca y
+// con flechas, sobre los fondos oscuros). Chrome/Edge usan los pseudo-elementos ::-webkit-*;
+// Firefox, las propiedades estándar. No se combinan: en Chrome, scrollbar-width anula los ::-webkit-*.
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.6) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a855f7, #7c3aed);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c084fc, #a855f7);
+  background-clip: padding-box;
+}

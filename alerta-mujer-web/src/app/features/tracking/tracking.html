@@ -1,6 +1,6 @@
 <main class="tracking">
   @if (cargando()) {
-    <section class="estado estado--cargando">
+    <section class="estado">
       <div class="spinner" aria-hidden="true"></div>
       <p>Cargando la alerta…</p>
       @if (despertando()) {
@@ -9,40 +9,144 @@
     </section>
   } @else if (error()) {
     <section class="estado estado--error">
-      <p class="icono" aria-hidden="true">⚠️</p>
+      <i class="ti ti-link-off icono-grande" aria-hidden="true"></i>
       <p>{{ error() }}</p>
       <button class="btn btn--secundario" (click)="reintentar()">Intentar de nuevo</button>
     </section>
   } @else if (datos(); as d) {
+    <!-- Encabezado: quién y en qué estado está la alerta -->
     <header class="banda" [class.banda--terminada]="!d.activa">
-      <p class="banda__titulo">{{ d.activa ? '🚨 Alerta activa' : 'La alerta terminó' }}</p>
-      <p class="banda__texto">
+      <div class="banda__marca">
+        <img src="logo.png" alt="" width="28" height="28" />
+        <span>AlertaMujer</span>
+      </div>
+      <span class="pildora" [class.pildora--activa]="d.activa">
+        @if (d.activa) { <span class="pulso" aria-hidden="true"></span> Alerta activa } @else { La alerta terminó }
+      </span>
+      <h1 class="banda__titulo">
         <strong>{{ d.nombre }}</strong>
-        {{ d.activa ? 'activó una alerta de emergencia' : 'tuvo una alerta' }}
-        @if (d.inicio) { a las {{ d.inicio | date: 'h:mm a' }} }
+        {{ d.activa ? 'necesita ayuda' : 'tuvo una alerta de emergencia' }}
+      </h1>
+      <p class="banda__texto">
+        @if (d.inicio) { Activó la alerta a las {{ d.inicio | date: 'h:mm a' }} · }
+        {{ d.activa ? 'lleva' : 'duró' }} {{ duracion() }}
       </p>
     </header>
 
+    <!-- Mapa con el recorrido -->
     @if (ultimo()) {
-      <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Ubicación de ' + d.nombre"></div>
-      <p class="actualizado">
-        Última ubicación {{ haceCuanto() }}
-        @if (d.activa) { · se actualiza sola }
-      </p>
+      <section class="mapa-wrap">
+        <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Recorrido de ' + d.nombre"></div>
+        <button class="btn-centrar" type="button" (click)="centrar()" aria-label="Ver todo el recorrido">
+          <i class="ti ti-focus-centered" aria-hidden="true"></i>
+        </button>
+        <div class="leyenda" aria-hidden="true">
+          <span><i class="punto punto--inicio"></i> Inicio</span>
+          <span><i class="punto punto--actual"></i> Última ubicación</span>
+        </div>
+      </section>
     } @else {
       <p class="sin-ubicacion">Todavía no hay una ubicación registrada. Esta pantalla se actualiza sola.</p>
     }
 
-    <section class="acciones">
-      <a class="btn btn--llamar" [href]="'tel:' + d.numeroEmergencia">📞 Llamar al {{ d.numeroEmergencia }}</a>
-      @if (mapsUrl()) {
-        <a class="btn btn--secundario" [href]="mapsUrl()" target="_blank" rel="noopener">Abrir en Google Maps</a>
+    <div class="contenido">
+      <!-- Dónde está ahora -->
+      @if (ultimo(); as u) {
+        <section class="tarjeta tarjeta--lugar">
+          <i class="ti ti-map-pin tarjeta__icono" aria-hidden="true"></i>
+          <div>
+            <p class="tarjeta__etiqueta">Última ubicación · {{ haceCuanto() }}</p>
+            <p class="tarjeta__valor">
+              {{ lugar()?.direccion || 'Buscando la dirección…' }}
+            </p>
+            @if (zona()) {
+              <p class="tarjeta__sub">{{ zona() }}</p>
+            }
+            <p class="tarjeta__sub">
+              {{ u.lat.toFixed(5) }}, {{ u.lng.toFixed(5) }}
+              @if (u.precision) { · precisión ±{{ u.precision | number: '1.0-0' }} m }
+            </p>
+            @if (d.activa) { <p class="tarjeta__vivo">Se actualiza sola cada 10 segundos</p> }
+          </div>
+        </section>
       }
-    </section>
 
-    <footer class="nota">
-      Estás viendo esto porque te registraron como contacto de emergencia en AlertaMujer.
-      El enlace es personal: no lo compartas en redes sociales.
-    </footer>
+      <!-- Acciones -->
+      <section class="acciones">
+        <a class="btn btn--llamar" [href]="'tel:' + d.numeroEmergencia">
+          <i class="ti ti-phone" aria-hidden="true"></i> Llamar al {{ d.numeroEmergencia }}
+        </a>
+        @if (comoLlegarUrl()) {
+          <a class="btn btn--secundario" [href]="comoLlegarUrl()" target="_blank" rel="noopener">
+            <i class="ti ti-directions" aria-hidden="true"></i> Cómo llegar
+          </a>
+          <a class="btn btn--secundario" [href]="mapsUrl()" target="_blank" rel="noopener">
+            <i class="ti ti-map" aria-hidden="true"></i> Ver en Google Maps
+          </a>
+        }
+      </section>
+
+      <!-- Resumen -->
+      <section class="datos">
+        <div class="dato">
+          <i class="ti ti-clock" aria-hidden="true"></i>
+          <p class="dato__valor">{{ duracion() }}</p>
+          <p class="dato__etiqueta">{{ d.activa ? 'Activa desde hace' : 'Duración' }}</p>
+        </div>
+        <div class="dato">
+          <i class="ti ti-current-location" aria-hidden="true"></i>
+          <p class="dato__valor">{{ d.recorrido.length }}</p>
+          <p class="dato__etiqueta">Ubicaciones enviadas</p>
+        </div>
+        <div class="dato">
+          <i class="ti ti-route" aria-hidden="true"></i>
+          <p class="dato__valor">{{ recorridoKm() | number: '1.1-1' }} km</p>
+          <p class="dato__etiqueta">Recorrido</p>
+        </div>
+      </section>
+
+      <!-- Evidencias grabadas durante la alerta -->
+      @if (videos().length || audios().length) {
+        <section class="tarjeta">
+          <h2 class="tarjeta__titulo">
+            <i class="ti ti-photo-video" aria-hidden="true"></i> Grabaciones de la alerta
+          </h2>
+          <p class="tarjeta__sub">Pueden ayudar a ubicarla o a saber qué está pasando. No las compartas.</p>
+          @for (v of videos(); track v.id) {
+            <figure class="evidencia">
+              <video [src]="v.url" controls preload="metadata" playsinline></video>
+              <figcaption>Video · {{ v.creada | date: 'h:mm:ss a' }}</figcaption>
+            </figure>
+          }
+          @for (a of audios(); track a.id) {
+            <figure class="evidencia">
+              <audio [src]="a.url" controls preload="none"></audio>
+              <figcaption>Audio · {{ a.creada | date: 'h:mm:ss a' }}</figcaption>
+            </figure>
+          }
+        </section>
+      }
+
+      <!-- Qué hacer -->
+      @if (d.activa) {
+        <section class="tarjeta tarjeta--guia">
+          <h2 class="tarjeta__titulo">
+            <i class="ti ti-list-check" aria-hidden="true"></i> Qué hacer ahora
+          </h2>
+          <ol class="pasos">
+            <li>Intenta llamarla o escribirle. Si no responde, no esperes.</li>
+            <li>Llama al {{ d.numeroEmergencia }} y da la dirección que aparece arriba.</li>
+            <li>Si vas al lugar, no vayas sola o solo y avisa a alguien de confianza.</li>
+            <li>Mantén esta página abierta: la ubicación se actualiza sola.</li>
+          </ol>
+        </section>
+      }
+
+      <footer class="nota">
+        Estás viendo esto porque te registraron como contacto de emergencia en AlertaMujer.
+        El enlace es personal y deja de funcionar 2 horas después de que termina la alerta.
+        No lo compartas en redes sociales.
+      </footer>
+    </div>
   }
 </main>

@@ -86,8 +86,10 @@ export class AuthService {
         return user;
       }),
       catchError((error) => {
-        console.error('Error en registro:', error);
-        return throwError(() => new Error('No se pudo completar el registro'));
+        console.error('Error en registro:', error?.status);
+        // 409 con fieldErrors: correo, teléfono o documento que ya usa otra cuenta
+        const campos: Record<string, string> | undefined = error?.status === 409 ? error?.error?.fieldErrors : undefined;
+        return throwError(() => Object.assign(new Error('No se pudo completar el registro'), { campos }));
       })
     );
   }

@@ -122,6 +122,8 @@ export class RegisterComponent {
     const errores = this.form.get(campo)?.errors;
     if (!errores) return '';
     const clave = Object.keys(errores)[0];
+    // Los avisos del servidor (dato ya registrado) traen su propio texto
+    if (typeof errores[clave] === 'string') return errores[clave];
     return this.mensajes[campo]?.[clave] ?? '';
   }
 
@@ -240,10 +242,29 @@ export class RegisterComponent {
         this.draft.limpiar();
         setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       },
-      error: () => {
+      error: (e: { campos?: Record<string, string> }) => {
         this.cargando.set(false);
+        if (e.campos && this.marcarRepetidos(e.campos)) return;
         this.errorServidor.set('No se pudo completar el registro. Intenta de nuevo.');
       }
     });
+  }
+
+  /* Datos que ya usa otra cuenta: el aviso queda debajo de su campo hasta que se edite */
+  private marcarRepetidos(campos: Record<string, string>): boolean {
+    const controles: Record<string, AbstractControl> = {
+      email: this.form.controls.correo,
+      telefono: this.form.controls.telefono,
+      numeroDocumento: this.form.controls.numeroDocumento,
+    };
+    let marcados = 0;
+    for (const [campo, aviso] of Object.entries(campos)) {
+      const control = controles[campo];
+      if (!control) continue;
+      control.setErrors({ repetido: aviso });
+      control.markAsTouched();
+      marcados++;
+    }
+    return marcados > 0;
   }
 }

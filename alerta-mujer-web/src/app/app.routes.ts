@@ -144,6 +144,12 @@ export const routes: Routes = [
       },
 
       {
+        path: 'alertas-contactos',
+        loadComponent: () =>
+          import('./features/dashboard/alertas-contactos/alertas-contactos')
+            .then(m => m.AlertasContactosComponent),
+      },
+      {
         path: 'alert-history',
         loadComponent: () =>
           import('./features/dashboard/alert-history/alert-history')

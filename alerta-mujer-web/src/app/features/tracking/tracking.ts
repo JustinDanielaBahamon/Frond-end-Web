@@ -4,12 +4,33 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { Seguimiento, TrackingService } from '../../core/services/tracking.service';
+import { GeocodingService, Lugar } from '../../core/services/geocoding.service';
 
 const REFRESCO_MS = 10000;
 
+const COLOR_INICIO = '#7c3aed';
+const COLOR_ACTUAL = '#d946ef';
+
+/** Distancia en km entre dos puntos (Haversine). */
+function distanciaKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+const duracionTexto = (ms: number): string => {
+  const min = Math.max(0, Math.round(ms / 60000));
+  if (min < 1) return 'menos de 1 min';
+  if (min < 60) return `${min} min`;
+  return `${Math.floor(min / 60)} h ${min % 60} min`;
+};
+
 /**
- * Pantalla pública que abre un contacto de emergencia desde el correo: estado de la alerta,
- * ubicación en vivo y accesos rápidos para llamar o abrir Google Maps.
+ * Pantalla pública que abre un contacto de emergencia desde el correo: estado de la alerta, mapa
+ * con el recorrido, dirección de la última ubicación, evidencias grabadas, qué hacer y accesos
+ * rápidos para llamar o llegar al lugar.
  */
 @Component({
   selector: 'app-tracking',
@@ -21,6 +42,7 @@ const REFRESCO_MS = 10000;
 export class TrackingComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private trackingService = inject(TrackingService);
+  private geocoding = inject(GeocodingService);
   private destroyRef = inject(DestroyRef);
 
   readonly datos = signal<Seguimiento | null>(null);
@@ -45,6 +67,29 @@ export class TrackingComponent implements OnInit {
     const u = this.ultimo();
     return u ? `https://www.google.com/maps/search/?api=1&query=${u.lat},${u.lng}` : '';
   });
+  /** Ruta en Google Maps desde donde está el contacto hasta la última ubicación. */
+  readonly comoLlegarUrl = computed(() => {
+    const u = this.ultimo();
+    return u ? `https://www.google.com/maps/dir/?api=1&destination=${u.lat},${u.lng}` : '';
+  });
+  /** Dirección y barrio de la última ubicación (OpenStreetMap). */
+  readonly lugar = signal<Lugar | null>(null);
+  readonly zona = computed(() => [this.lugar()?.barrio, this.lugar()?.ciudad].filter(Boolean).join(', '));
+  readonly duracion = computed(() => {
+    const d = this.datos();
+    if (!d?.inicio) return '';
+    const fin = d.fin ?? new Date(this.ahora());
+    return duracionTexto(fin.getTime() - d.inicio.getTime());
+  });
+  readonly recorridoKm = computed(() => {
+    const r = this.datos()?.recorrido ?? [];
+    let total = 0;
+    for (let i = 1; i < r.length; i++) total += distanciaKm(r[i - 1], r[i]);
+    return total;
+  });
+  readonly videos = computed(() => (this.datos()?.evidencias ?? []).filter((e) => e.tipo === 'video'));
+  readonly audios = computed(() => (this.datos()?.evidencias ?? []).filter((e) => e.tipo === 'audio'));
+  private claveLugar = '';
 
   private codigo = '';
   private mapa: L.Map | null = null;
@@ -73,6 +118,7 @@ export class TrackingComponent implements OnInit {
         this.despertando.set(false);
         this.ahora.set(Date.now());
         setTimeout(() => this.pintarMapa(d));
+        this.buscarLugar();
         if (d.activa && !this.temporizador) {
           this.temporizador = setInterval(() => this.consultar(), REFRESCO_MS);
         } else if (!d.activa && this.temporizador) {
@@ -96,6 +142,31 @@ export class TrackingComponent implements OnInit {
     });
   }
 
+  /** Busca la dirección solo cuando la última ubicación cambió (~11 m). */
+  private buscarLugar(): void {
+    const u = this.ultimo();
+    if (!u) return;
+    const clave = `${u.lat.toFixed(4)},${u.lng.toFixed(4)}`;
+    if (clave === this.claveLugar) return;
+    this.claveLugar = clave;
+    this.geocoding.obtener(u.lat, u.lng).then((l) => {
+      if (clave === this.claveLugar) this.lugar.set(l);
+    });
+  }
+
+  /** Vuelve a encuadrar todo el recorrido. */
+  centrar(): void {
+    const d = this.datos();
+    if (d) this.encuadrar(d);
+  }
+
+  private encuadrar(d: Seguimiento): void {
+    if (!this.mapa || !d.recorrido.length) return;
+    const puntos = d.recorrido.map((p) => L.latLng(p.lat, p.lng));
+    if (puntos.length === 1) this.mapa.setView(puntos[0], 16);
+    else this.mapa.fitBounds(L.latLngBounds(puntos), { padding: [40, 40], maxZoom: 17 });
+  }
+
   reintentar(): void {
     this.error.set('');
     this.cargando.set(true);
@@ -116,16 +187,22 @@ export class TrackingComponent implements OnInit {
     this.capa!.clearLayers();
     const puntos = d.recorrido.map((p) => L.latLng(p.lat, p.lng));
     if (puntos.length > 1) {
-      L.polyline(puntos, { color: '#7c3aed', weight: 4, opacity: 0.8 }).addTo(this.capa!);
+      L.polyline(puntos, { color: COLOR_INICIO, weight: 4, opacity: 0.85 }).addTo(this.capa!);
+      L.circleMarker(puntos[0], { radius: 7, color: '#fff', weight: 2, fillColor: COLOR_INICIO, fillOpacity: 1 })
+        .bindTooltip('Donde se activó la alerta')
+        .addTo(this.capa!);
     }
     const u = puntos[puntos.length - 1];
     const precision = d.recorrido[d.recorrido.length - 1].precision;
     if (precision && precision > 0) {
-      L.circle(u, { radius: precision, color: '#d946ef', weight: 1, fillOpacity: 0.12 }).addTo(this.capa!);
+      L.circle(u, { radius: precision, color: COLOR_ACTUAL, weight: 1, fillOpacity: 0.12 }).addTo(this.capa!);
     }
-    L.circleMarker(u, { radius: 10, color: '#fff', weight: 3, fillColor: '#d946ef', fillOpacity: 1 }).addTo(this.capa!);
+    L.circleMarker(u, { radius: 10, color: '#fff', weight: 3, fillColor: COLOR_ACTUAL, fillOpacity: 1 })
+      .bindTooltip('Última ubicación')
+      .addTo(this.capa!);
+    // La primera vez se ve todo el recorrido; después solo se sigue la posición actual
     if (this.primeraVista) {
-      this.mapa.setView(u, 16);
+      this.encuadrar(d);
       this.primeraVista = false;
     } else {
       this.mapa.panTo(u);

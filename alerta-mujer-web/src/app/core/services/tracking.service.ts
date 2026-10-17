@@ -10,6 +10,15 @@ export interface PuntoSeguimiento {
   hora: Date;
 }
 
+/** Video, audio o foto grabado durante la alerta (se abre con un enlace que vence en minutos). */
+export interface EvidenciaSeguimiento {
+  id: number;
+  tipo: 'video' | 'audio' | 'photo' | 'document';
+  contentType: string;
+  creada: Date | null;
+  url: string;
+}
+
 /** Lo que ve un contacto de emergencia desde el enlace del correo (sin iniciar sesión). */
 export interface Seguimiento {
   nombre: string;
@@ -19,6 +28,7 @@ export interface Seguimiento {
   fin: Date | null;
   recorrido: PuntoSeguimiento[];
   numeroEmergencia: string;
+  evidencias: EvidenciaSeguimiento[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -39,7 +49,14 @@ export class TrackingService {
           precision: p.accuracy != null ? Number(p.accuracy) : null,
           hora: new Date(p.recordedAt)
         })),
-        numeroEmergencia: t.emergencyNumber || '123'
+        numeroEmergencia: t.emergencyNumber || '123',
+        evidencias: (t.evidence ?? []).map((e: any) => ({
+          id: e.id,
+          tipo: e.mediaType,
+          contentType: e.contentType,
+          creada: e.createdAt ? new Date(e.createdAt) : null,
+          url: `${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/evidence/${e.id}`
+        }))
       }))
     );
   }

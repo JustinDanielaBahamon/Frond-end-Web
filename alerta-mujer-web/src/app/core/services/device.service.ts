@@ -102,6 +102,9 @@ export interface DeviceStats {
  */
 export interface UserDevice {
   id: number;
+  deviceUuid?: string;
+  deviceName?: string | null;
+  createdAt?: string | null;
   brand: string | null;
   model: string | null;
   osName: string;

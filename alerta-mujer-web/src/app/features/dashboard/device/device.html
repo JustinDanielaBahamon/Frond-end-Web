@@ -79,35 +79,46 @@
     <!-- 4. DISPOSITIVO MÓVIL VINCULADO -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-device-mobile"></i> Mis celulares
+        <i class="ti ti-devices"></i> Mis dispositivos
       </h2>
-      @if (misCelulares().length > 0) {
-        <ul class="device-phones">
-          @for (d of misCelulares(); track d.id) {
-            <li class="device-phone">
-              <div class="device-phone__icon"><i class="ti ti-device-mobile"></i></div>
-              <div class="device-phone__body">
+      <ul class="device-phones">
+        @for (d of misCelulares(); track d.id) {
+          <li>
+            <button type="button" class="device-phone" (click)="abrirCelular(d)" [attr.aria-label]="'Ver detalles de ' + nombreCelular(d)">
+              <span class="device-phone__icon"><i class="ti ti-device-mobile"></i></span>
+              <span class="device-phone__body">
                 <span class="device-phone__name">{{ nombreCelular(d) }}</span>
                 <span class="device-phone__meta">
-                  {{ d.osName || 'Android' }}{{ d.osVersion ? ' ' + d.osVersion : '' }}{{ d.appVersion ? ' · App ' + d.appVersion : '' }}
+                  {{ d.osName === 'ios' ? 'iOS' : 'Android' }}{{ d.osVersion ? ' ' + d.osVersion : '' }}{{ d.appVersion ? ' · App ' + d.appVersion : '' }}
                 </span>
                 <span class="device-phone__meta">Última conexión: {{ ultimaConexion(d) }}</span>
-              </div>
+              </span>
               <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--exito' : 'device-badge--advertencia'">
                 {{ d.fcmToken ? 'Recibe alertas' : 'Sin notificaciones' }}
               </span>
-            </li>
-          }
-        </ul>
-        @if (criticalFeatures(); as features) {
-          <p class="device-phone__meta device-phone__last">
-            <i class="ti ti-map-pin"></i> Última ubicación enviada: {{ features.lastLocationCaptured || 'No registrada' }}
-          </p>
+              <i class="ti ti-chevron-right device-phone__chevron"></i>
+            </button>
+          </li>
         }
-      } @else if (featuresLoading()) {
-        <p class="device-empty">Cargando tus celulares…</p>
-      } @else {
-        <p class="device-empty">No tienes un celular vinculado. Inicia sesión en la app móvil para vincular tu dispositivo.</p>
+        <li>
+          <button type="button" class="device-phone device-phone--pc" (click)="abrirComputador()" aria-label="Ver detalles de este computador">
+            <span class="device-phone__icon"><i class="ti ti-device-desktop"></i></span>
+            <span class="device-phone__body">
+              <span class="device-phone__name">Este computador</span>
+              <span class="device-phone__meta">{{ nombreComputador() }}</span>
+              <span class="device-phone__meta">Solo para consultar · no recibe alertas</span>
+            </span>
+            <i class="ti ti-chevron-right device-phone__chevron"></i>
+          </button>
+        </li>
+      </ul>
+      @if (misCelulares().length === 0 && !featuresLoading()) {
+        <p class="device-empty">Todavía no tienes un celular vinculado. Inicia sesión en la app móvil para vincularlo.</p>
+      }
+      @if (criticalFeatures(); as features) {
+        <p class="device-phone__meta device-phone__last">
+          <i class="ti ti-map-pin"></i> Última ubicación enviada: {{ features.lastLocationCaptured || 'No registrada' }}
+        </p>
       }
     </div>
 
@@ -243,3 +254,29 @@
   </div>
 
 </div>
+
+@if (detalle(); as det) {
+  <div class="dd-backdrop" (click)="cerrarDetalle()">
+    <section class="dd-modal" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
+      <header class="dd-head">
+        <span class="dd-head__icon"><i class="ti" [ngClass]="det.icono"></i></span>
+        <div>
+          <h2 id="dd-titulo">{{ det.titulo }}</h2>
+          <p>{{ det.subtitulo }}</p>
+        </div>
+        <button type="button" class="dd-close" (click)="cerrarDetalle()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+      </header>
+      <dl class="dd-list">
+        @for (f of det.filas; track f.etiqueta) {
+          <div class="dd-row">
+            <dt>{{ f.etiqueta }}</dt>
+            <dd>{{ f.valor }}</dd>
+          </div>
+        }
+      </dl>
+      @if (det.nota) {
+        <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.nota }}</p>
+      }
+    </section>
+  </div>
+}

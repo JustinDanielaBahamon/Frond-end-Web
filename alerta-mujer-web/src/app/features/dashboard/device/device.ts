@@ -18,6 +18,21 @@ import {
   CriticalFeatureStatus
 } from '../../../core/models/device-info.model';
 
+interface DetalleDispositivo {
+  titulo: string;
+  subtitulo: string;
+  icono: string;
+  filas: { etiqueta: string; valor: string }[];
+  nota?: string;
+}
+
+const ESTADOS_GPS: Record<string, string> = {
+  active: 'Activo', inactive: 'Apagado', denied: 'Permiso denegado', unknown: 'Sin dato',
+};
+const ESTADOS_DISPOSITIVO: Record<string, string> = {
+  active: 'Activo', inactive: 'Inactivo', blocked: 'Bloqueado', lost: 'Reportado como perdido',
+};
+
 @Component({
   selector: 'app-device',
   standalone: true,
@@ -43,6 +58,8 @@ export class Device implements OnInit, OnDestroy {
   activityLog = signal<ActivityLog[]>([]);
   /** Celulares en los que la usuaria inició sesión con la app móvil. */
   misCelulares = signal<UserDevice[]>([]);
+  /** Ventana con el detalle de un dispositivo (celular o este computador). */
+  detalle = signal<DetalleDispositivo | null>(null);
 
   lastRefresh = signal<string>('');
   loading = signal<boolean>(false);
@@ -187,8 +204,67 @@ export class Device implements OnInit, OnDestroy {
   }
 
   nombreCelular(d: UserDevice): string {
+    if (d.deviceName) return d.deviceName;
     const nombre = [d.brand, d.model].filter(Boolean).join(' ');
     return nombre || 'Celular sin nombre';
+  }
+
+  /** "Chrome 130 en Linux" */
+  nombreComputador(): string {
+    const i = this.deviceInfo();
+    return i ? `${i.browser} en ${i.os}` : 'Este navegador';
+  }
+
+  abrirCelular(d: UserDevice): void {
+    const fecha = (iso?: string | null) => iso
+      ? new Date(iso).toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : 'Sin registro';
+    this.detalle.set({
+      titulo: this.nombreCelular(d),
+      subtitulo: [d.brand, d.model].filter(Boolean).join(' ') || 'Celular con la app AlertaMujer',
+      icono: 'ti-device-mobile',
+      filas: [
+        { etiqueta: 'Nombre del celular', valor: d.deviceName || 'No informado' },
+        { etiqueta: 'Marca', valor: d.brand || 'No informada' },
+        { etiqueta: 'Modelo', valor: d.model || 'No informado' },
+        { etiqueta: 'Sistema', valor: `${d.osName === 'ios' ? 'iOS' : 'Android'}${d.osVersion ? ' ' + d.osVersion : ''}` },
+        { etiqueta: 'Versión de la app', valor: d.appVersion || 'No informada' },
+        { etiqueta: 'Recibe alertas (push)', valor: d.fcmToken ? 'Sí' : 'No' },
+        { etiqueta: 'GPS', valor: ESTADOS_GPS[d.gpsStatus] ?? d.gpsStatus },
+        { etiqueta: 'Estado', valor: ESTADOS_DISPOSITIVO[d.status] ?? d.status },
+        { etiqueta: 'Última conexión', valor: fecha(d.lastAccess) },
+        { etiqueta: 'Vinculado desde', valor: fecha(d.createdAt) },
+      ],
+      nota: d.model === 'Dispositivo Expo'
+        ? 'Este celular se registró con una versión anterior de la app. Sus datos se completan la próxima vez que abras la app actualizada.'
+        : undefined,
+    });
+  }
+
+  abrirComputador(): void {
+    const i = this.deviceInfo();
+    const pantalla = this.deviceInfoService.getScreenInfo();
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    this.detalle.set({
+      titulo: 'Este computador',
+      subtitulo: this.nombreComputador(),
+      icono: 'ti-device-desktop',
+      filas: [
+        { etiqueta: 'Navegador', valor: i ? `${i.browser} ${i.version}` : 'Desconocido' },
+        { etiqueta: 'Sistema operativo', valor: i?.os ?? 'Desconocido' },
+        { etiqueta: 'Pantalla', valor: `${pantalla.width} × ${pantalla.height} px (escala ${pantalla.dpr})` },
+        { etiqueta: 'Procesador', valor: navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} núcleos` : 'Sin dato' },
+        { etiqueta: 'Memoria', valor: nav.deviceMemory ? `${nav.deviceMemory} GB aprox.` : 'Sin dato' },
+        { etiqueta: 'Idioma', valor: i?.language ?? navigator.language },
+        { etiqueta: 'Zona horaria', valor: i?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone },
+        { etiqueta: 'Conexión', valor: `${this.isOnline() ? 'En línea' : 'Sin conexión'} · ${this.connectionQuality()}` },
+      ],
+      nota: 'El computador solo sirve para consultar tu información. Las alertas se activan y se reciben en el celular con la app.',
+    });
+  }
+
+  cerrarDetalle(): void {
+    this.detalle.set(null);
   }
 
   ultimaConexion(d: UserDevice): string {

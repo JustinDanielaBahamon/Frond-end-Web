@@ -34,7 +34,7 @@ $btn-purple-hover: #6d28d9;
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #db2777);
+    background: linear-gradient(135deg, #7c3aed, #c026d3);
     color: #fff;
     font-size: 1.4rem;
     font-weight: 800;
@@ -47,15 +47,15 @@ $btn-purple-hover: #6d28d9;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border: 1px solid #dc2626;
+  border: 1px solid #c026d3;
   border-radius: 12px;
   background: transparent;
-  color: #dc2626;
+  color: #c026d3;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
 
-  &:hover { background: rgba(220, 38, 38, 0.1); }
+  &:hover { background: rgba(192, 38, 211, 0.1); }
 }
 
 .toast {
@@ -65,12 +65,12 @@ $btn-purple-hover: #6d28d9;
   z-index: 1000;
   padding: 12px 18px;
   border-radius: 12px;
-  background: #16a34a;
+  background: #7c3aed;
   color: #fff;
   font-weight: 600;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 
-  &--error { background: #dc2626; }
+  &--error { background: #c026d3; }
 }
 
 .grid {
@@ -176,7 +176,7 @@ $btn-purple-hover: #6d28d9;
 
   @for $i from 1 through 4 {
     &[data-nivel="#{$i}"] .strength__bar span:nth-child(-n + #{$i}) {
-      background: nth((#dc2626, #f59e0b, #22c55e, #16a34a), $i);
+      background: nth((#c026d3, #9333ea, #8b5cf6, #7c3aed), $i);
     }
   }
 }
@@ -233,7 +233,7 @@ $btn-purple-hover: #6d28d9;
     strong { display: block; font-size: 0.9rem; }
     small { color: var(--text-muted); font-size: 0.78rem; }
 
-    &--bad strong { color: #dc2626; }
+    &--bad strong { color: #c026d3; }
   }
 
   &__meta {

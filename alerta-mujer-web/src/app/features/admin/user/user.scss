@@ -439,7 +439,7 @@ table {
   }
 
   &--reset {
-    &:hover { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    &:hover { border-color: #6d28d9; color: #4c1d95; background: #eff6ff; }
   }
 
   &--block {
@@ -812,10 +812,10 @@ table {
 // Peligro: rojo sólido con texto blanco en ambos modos
 .btn-danger {
   border: none;
-  background: #dc2626;
+  background: #c026d3;
   color: #fff;
 
-  &:hover:not(:disabled) { background: #b91c1c; }
+  &:hover:not(:disabled) { background: #a21caf; }
 }
 
 // =============================================

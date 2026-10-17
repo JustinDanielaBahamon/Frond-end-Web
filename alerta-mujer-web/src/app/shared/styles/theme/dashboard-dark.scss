@@ -495,7 +495,7 @@
   .ev-card-detalle { color: var(--purple-mid) !important; }
 
   .tipo-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
-  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #451a03), #660e92) !important; color: #b324fb !important; }
+  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #3b0764), #660e92) !important; color: #b324fb !important; }
   .tipo-audio { background: linear-gradient(135deg, #2a0f6a, #350e90) !important; color: #a667f9 !important; }
 
   .ev-empty,
@@ -618,7 +618,7 @@
     border-color: var(--border) !important;
 
     &--total      { border-left-color: #560c79 !important; }
-    &--atendidas  { border-left-color: #055f1a !important; }
+    &--atendidas  { border-left-color: #2e1065 !important; }
     &--canceladas { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }

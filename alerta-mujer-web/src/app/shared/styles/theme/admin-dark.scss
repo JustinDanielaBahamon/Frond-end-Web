@@ -357,9 +357,9 @@
   .severity {
     &.red,    &.critical { background: var(--red-pale) !important;   color: var(--red) !important; }
     &.orange, &.high     { background: var(--amber-pale) !important; color: var(--amber) !important; }
-    &.yellow, &.medium   { background: rgba(234, 179, 8, 0.18) !important; color: #facc15 !important; }
+    &.yellow, &.medium   { background: rgba(192, 132, 252, 0.18) !important; color: #e9d5ff !important; }
     &.green,  &.low      { background: var(--green-pale) !important; color: var(--green) !important; }
-    &.blue   { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.blue   { background: rgba(109, 40, 217, 0.2) !important; color: #c4b5fd !important; }
     &.purple { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
   }
 
@@ -371,7 +371,7 @@
   }
 
   .actions button {
-    &.view:hover    { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.view:hover    { background: rgba(109, 40, 217, 0.2) !important; color: #c4b5fd !important; }
     &.approve:hover { background: var(--green-pale) !important; color: var(--green) !important; }
     &.reject:hover  { background: var(--red-pale) !important;   color: var(--red) !important; }
   }

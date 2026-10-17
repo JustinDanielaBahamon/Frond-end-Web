@@ -62,13 +62,13 @@ app-admin-layout .layout__main {
       &:last-child { border-bottom: none !important; }
     }
 
-    /* Fila bloqueada: fondo rosado fuerte + franja roja a la izquierda */
+    /* Fila bloqueada: fondo fucsia claro + franja fucsia a la izquierda */
     table tbody tr.row--blocked {
-      background: #fecaca !important;
+      background: #f5d0fe !important;
 
-      &:hover { background: #fca5a5 !important; }
+      &:hover { background: #f0abfc !important; }
 
-      td:first-child { box-shadow: inset 4px 0 0 #dc2626; }
+      td:first-child { box-shadow: inset 4px 0 0 #c026d3; }
 
       td { color: #1e1a3c !important; }
     }
@@ -79,13 +79,13 @@ app-admin-layout .layout__main {
   --text-muted : #374151;   // antes #6b7280
   --text-dim   : #4b5563;   // antes #9ca3af (contraste 2.5:1)
   --border     : #9d8fd6;   // antes #c4b5fd (casi invisible)
-  --green      : #15803d;
-  --amber      : #b45309;
-  --red        : #b91c1c;
+  --green      : #5b21b6;
+  --amber      : #7e22ce;
+  --red        : #a21caf;
 
   app-dashboard {
-    .badge-robo   { color: #1d4ed8 !important; }
-    .badge-medica { color: #0f766e !important; }
+    .badge-robo   { color: #4c1d95 !important; }
+    .badge-medica { color: #6d28d9 !important; }
   }
 }
 
@@ -266,24 +266,24 @@ app-admin-layout .layout__main {
   @include admin-light('moderator-management');
 
   .stat-change {
-    &.positive { color: #15803d !important; }
-    &.negative { color: #b91c1c !important; }
+    &.positive { color: #5b21b6 !important; }
+    &.negative { color: #a21caf !important; }
   }
 
   .badge,
   .severity {
-    &.red,    &.critical { color: #b91c1c !important; }
-    &.orange, &.high     { color: #b45309 !important; }
-    &.yellow, &.medium   { color: #854d0e !important; }
-    &.green,  &.low      { color: #15803d !important; }
-    &.blue               { color: #1d4ed8 !important; }
+    &.red,    &.critical { color: #a21caf !important; }
+    &.orange, &.high     { color: #7e22ce !important; }
+    &.yellow, &.medium   { color: #6b21a8 !important; }
+    &.green,  &.low      { color: #5b21b6 !important; }
+    &.blue               { color: #4c1d95 !important; }
     &.purple             { color: #6b21a8 !important; }
   }
 
   .status {
-    &.pending   { color: #b91c1c !important; }
-    &.in-review { color: #b45309 !important; }
-    &.resolved  { color: #15803d !important; }
+    &.pending   { color: #a21caf !important; }
+    &.in-review { color: #7e22ce !important; }
+    &.resolved  { color: #5b21b6 !important; }
     &.rejected  { color: #374151 !important; }
   }
 }

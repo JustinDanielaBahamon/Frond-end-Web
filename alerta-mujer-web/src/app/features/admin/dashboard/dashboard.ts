@@ -449,7 +449,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     if (!this.mapa || !(a.lat || a.lng)) return;
     this.marcadorAlerta?.remove();
     this.marcadorAlerta = L.circleMarker([a.lat, a.lng], {
-      radius: 10, color: '#ffffff', weight: 3, fillColor: '#e11d48', fillOpacity: 1,
+      radius: 10, color: '#ffffff', weight: 3, fillColor: '#c026d3', fillOpacity: 1,
     })
       .bindTooltip(`${this.escapar(a.nombre ?? '')} · ${this.escapar(a.tiempo)}`)
       .addTo(this.mapa);
@@ -476,7 +476,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     this.zonasIncidentes.forEach((z, i) => {
       const seleccionada = i === this.zonaSeleccionada;
-      const color = i === 0 ? '#e11d48' : '#7c3aed';
+      const color = i === 0 ? '#c026d3' : '#7c3aed';
       puntos.push([z.lat, z.lng]);
       L.circleMarker([z.lat, z.lng], {
         radius: 9 + Math.min(z.cantidad, 10) * 1.5,

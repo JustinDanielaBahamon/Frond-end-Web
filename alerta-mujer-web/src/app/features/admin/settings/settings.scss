@@ -301,7 +301,7 @@ $btn-purple-hover: #6d28d9;
 .field-error {
   margin: 0;
   font-size: 0.85rem;
-  color: #dc2626;
+  color: #c026d3;
 }
 
 .btn-primary {
@@ -345,10 +345,10 @@ $btn-purple-hover: #6d28d9;
   font-size: 0.9rem;
   color: var(--text-primary);
 
-  i { color: #16a34a; width: 18px; text-align: center; }
+  i { color: #7c3aed; width: 18px; text-align: center; }
   strong { margin-left: auto; font-weight: 600; text-align: right; }
 
-  &--bad i, &--bad strong { color: #dc2626; }
+  &--bad i, &--bad strong { color: #c026d3; }
 }
 
 .card--wide { grid-column: 1 / -1; min-height: 0; }
@@ -365,11 +365,11 @@ $btn-purple-hover: #6d28d9;
   gap: 10px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(147, 51, 234, 0.12);
   color: var(--text-primary);
   font-size: 0.88rem;
 
-  i { color: #f59e0b; margin-top: 2px; }
+  i { color: #9333ea; margin-top: 2px; }
 }
 
 .params-form {
@@ -430,7 +430,7 @@ $btn-purple-hover: #6d28d9;
     margin: 0 0 8px;
     font-size: 1.2rem;
 
-    i { color: #f59e0b; }
+    i { color: #9333ea; }
   }
 
   p { margin: 0 0 12px; color: var(--text-muted); font-size: 0.9rem; }
@@ -464,8 +464,8 @@ $btn-purple-hover: #6d28d9;
 
   &__campo { font-size: 0.8rem; color: var(--text-muted); }
   &__valores { font-size: 0.95rem; }
-  del { color: #dc2626; }
-  strong { color: #16a34a; }
+  del { color: #c026d3; }
+  strong { color: #7c3aed; }
   i { font-size: 0.75rem; color: var(--text-muted); margin: 0 4px; }
 }
 

@@ -6,8 +6,8 @@
 $color-primary: #7e22ce; // Purple
 $color-purple-custom: #9C27B0; // Custom purple for evidence icons
 $color-primary-light: #f3e8ff; // Light Purple
-$color-secondary: #ec4899; // Pink
-$color-accent: #6366f1; // Blue
+$color-secondary: #d946ef; // Pink
+$color-accent: #7c3aed; // Blue
 $color-text-dark: #000000;
 $color-text-medium: #000000;
 $color-text-light: #000000;
@@ -932,14 +932,14 @@ $shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.1);
     &.verify {
       background-color: $status-verified-color;
       &:hover {
-        background-color: #15803d !important;
+        background-color: #5b21b6 !important;
       }
     }
 
     &.reject {
       background-color: $status-rejected-color;
       &:hover {
-        background-color: #b91c1c !important;
+        background-color: #a21caf !important;
       }
     }
   }

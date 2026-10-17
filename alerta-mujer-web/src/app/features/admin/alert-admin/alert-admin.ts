@@ -238,7 +238,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
     const esCAI = p.tipo === 'CAI';
     const emoji = esCAI ? '🚔' : '🏥';
-    const fondo = esCAI ? '#dbeafe' : '#fce7f3';
+    const fondo = esCAI ? '#ede9fe' : '#fce7f3';
 
     const icon = L.divIcon({
       html: `<div style="width:30px;height:30px;border-radius:50%;background:${fondo};
@@ -534,7 +534,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   // ── Helpers iconos / zonas ────────────────────────────────────
   private colorPorNivel(nivel: 'Alto' | 'Medio' | 'Bajo'): string {
-    return nivel === 'Alto' ? '#ef4444' : nivel === 'Medio' ? '#f97316' : '#eab308';
+    return nivel === 'Alto' ? '#d946ef' : nivel === 'Medio' ? '#a855f7' : '#c084fc';
   }
 
   /**
@@ -570,14 +570,14 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   // Color del pin según el medio de activación (gris si ya fue atendida)
   private crearIconoPin(medio: MedioActivacion, atendida = false): any {
     const colores: Record<MedioActivacion, string> = {
-      'Botón de pánico':       '#ef4444',
-      'Contacto':              '#ec4899',
-      'Widget':                '#3b82f6',
+      'Botón de pánico':       '#d946ef',
+      'Contacto':              '#d946ef',
+      'Widget':                '#6d28d9',
       'Movimiento sospechoso': '#8b5cf6',
-      'Manual':                '#f59e0b',
+      'Manual':                '#9333ea',
     };
 
-    const color = atendida ? '#9ca3af' : (colores[medio] ?? '#ef4444');
+    const color = atendida ? '#9ca3af' : (colores[medio] ?? '#d946ef');
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
       <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z"
             fill="${color}" stroke="white" stroke-width="1.5"/>

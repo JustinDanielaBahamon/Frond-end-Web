@@ -2,9 +2,9 @@
 @use '../../../shared/styles/variables.scss' as *;
 
 // Variables propias de esta pantalla (no están en el set compartido)
-$blue:   #3b82f6;
-$orange: #f97316;
-$yellow: #eab308;
+$blue:   #6d28d9;
+$orange: #a855f7;
+$yellow: #c084fc;
 
 // =============================================
 // PAGE
@@ -667,9 +667,9 @@ $yellow: #eab308;
     margin-bottom: 5px;
 
     &.popup-tipo--boton      { background: $red-pale;    color: $red; }
-    &.popup-tipo--widget     { background: #dbeafe;      color: $blue; }
+    &.popup-tipo--widget     { background: #ede9fe;      color: $blue; }
     &.popup-tipo--movimiento { background: $purple-pale; color: $purple-deep; }
-    &.popup-tipo--manual     { background: #fef3c7;      color: $amber; }
+    &.popup-tipo--manual     { background: #f3e8ff;      color: $amber; }
   }
 
   &__nombre {

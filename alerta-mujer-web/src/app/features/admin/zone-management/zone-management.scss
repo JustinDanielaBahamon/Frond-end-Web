@@ -1,8 +1,8 @@
 @use '../../../shared/styles/variables.scss' as *;
 
-$blue:   #3b82f6;
-$orange: #f97316;
-$yellow: #eab308;
+$blue:   #6d28d9;
+$orange: #a855f7;
+$yellow: #c084fc;
 
 // Fondo suave del color dado, válido en claro y oscuro
 @function tint($color, $pct: 16%) {
@@ -426,7 +426,7 @@ $yellow: #eab308;
 
   &--activa.opcion--red     { background: $red; }
   &--activa.opcion--orange  { background: $orange; }
-  &--activa.opcion--yellow  { background: $yellow; color: #422006; }
+  &--activa.opcion--yellow  { background: $yellow; color: #3b0764; }
   &--activa.opcion--green   { background: $green; }
   &--activa.opcion--neutral { background: $purple-deep; }
 }

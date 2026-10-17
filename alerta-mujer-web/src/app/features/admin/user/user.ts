@@ -44,7 +44,7 @@ interface FormUsuaria {
   password: string;
 }
 
-const COLORES_AVATAR = ['#7c3aed', '#a78bfa', '#ec4899', '#6d28d9', '#c4b5fd'];
+const COLORES_AVATAR = ['#7c3aed', '#a78bfa', '#d946ef', '#6d28d9', '#c4b5fd'];
 
 @Component({
   selector: 'app-user',
@@ -99,9 +99,9 @@ export class UserComponent implements OnInit {
   get chips(): ChipData[] {
     return [
       { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.todasLasUsuarias.length },
-      { label: 'Activas',               value: 'Activa',               color: '#16a34a', count: this.contar('Activa') },
-      { label: 'Inactivas',             value: 'Inactiva',             color: '#d97706', count: this.contar('Inactiva') },
-      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#dc2626', count: this.contar('Bloqueada por Fraude') },
+      { label: 'Activas',               value: 'Activa',               color: '#7c3aed', count: this.contar('Activa') },
+      { label: 'Inactivas',             value: 'Inactiva',             color: '#9333ea', count: this.contar('Inactiva') },
+      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#c026d3', count: this.contar('Bloqueada por Fraude') },
     ];
   }
 

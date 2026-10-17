@@ -61,7 +61,7 @@ $btn-purple-hover: #6d28d9;
   cursor: pointer;
 
   &--active { background: $btn-purple; border-color: $btn-purple; color: #fff; }
-  &--danger:not(.chip--active) i { color: #dc2626; }
+  &--danger:not(.chip--active) i { color: #c026d3; }
 }
 
 .filters {
@@ -115,7 +115,7 @@ $btn-purple-hover: #6d28d9;
   &:hover { background: var(--bg-card-hover); }
 }
 
-.error { color: #dc2626; margin: 0 0 12px; }
+.error { color: #c026d3; margin: 0 0 12px; }
 
 .table-card {
   border: 1px solid var(--border);
@@ -189,8 +189,8 @@ table {
   font-weight: 700;
   white-space: nowrap;
 
-  &--ok { background: rgba(22, 163, 74, 0.15); color: #16a34a; }
-  &--danger { background: rgba(220, 38, 38, 0.15); color: #dc2626; }
+  &--ok { background: rgba(124, 58, 237, 0.15); color: #7c3aed; }
+  &--danger { background: rgba(192, 38, 211, 0.15); color: #c026d3; }
   &--info { background: rgba(124, 58, 237, 0.15); color: var(--purple-deep); }
   &--muted { background: var(--bg-card-hover); color: var(--text-muted); }
 }

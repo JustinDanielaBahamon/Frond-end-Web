@@ -410,10 +410,10 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
   private colorPorTipo(tipo: TipoZona): string {
     const map: Record<TipoZona, string> = {
-      'Riesgo Alto':  '#ef4444',
-      'Riesgo Medio': '#eab308',
-      'Riesgo Bajo':  '#f97316',
-      'Segura':       '#22c55e',
+      'Riesgo Alto':  '#d946ef',
+      'Riesgo Medio': '#c084fc',
+      'Riesgo Bajo':  '#a855f7',
+      'Segura':       '#8b5cf6',
     };
     return map[tipo] ?? '#8b5cf6';
   }

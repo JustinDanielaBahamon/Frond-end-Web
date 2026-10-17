@@ -66,16 +66,16 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   };
 
   nivelesRiesgo: { value: 'Alto' | 'Medio' | 'Bajo'; label: string }[] = [
-    { value: 'Alto',  label: '🔴 Alto'  },
-    { value: 'Medio', label: '🟠 Medio' },
-    { value: 'Bajo',  label: '🟡 Bajo'  },
+    { value: 'Alto',  label: 'Alto'  },
+    { value: 'Medio', label: 'Medio' },
+    { value: 'Bajo',  label: 'Bajo'  },
   ];
 
   filtrosNivel = [
     { value: 'Todos', label: 'Todas'    },
-    { value: 'Alto',  label: '🔴 Alto'  },
-    { value: 'Medio', label: '🟠 Medio' },
-    { value: 'Bajo',  label: '🟡 Bajo'  },
+    { value: 'Alto',  label: 'Alto'  },
+    { value: 'Medio', label: 'Medio' },
+    { value: 'Bajo',  label: 'Bajo'  },
   ];
 
   // ── Modal punto CAI/Hospital ──────────────────────────────────

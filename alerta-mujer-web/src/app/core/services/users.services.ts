@@ -165,7 +165,7 @@ export class UsersService {
    * Generate a random avatar color
    */
   private generateAvatarColor(): string {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+    const colors = ['#7B1DB2', '#9333EA', '#A855F7', '#C026D3', '#D946EF', '#6D28D9', '#BB8FCE', '#8B5CF6'];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 

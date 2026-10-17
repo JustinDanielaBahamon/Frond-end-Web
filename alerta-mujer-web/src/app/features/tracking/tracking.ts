@@ -121,9 +121,9 @@ export class TrackingComponent implements OnInit {
     const u = puntos[puntos.length - 1];
     const precision = d.recorrido[d.recorrido.length - 1].precision;
     if (precision && precision > 0) {
-      L.circle(u, { radius: precision, color: '#be123c', weight: 1, fillOpacity: 0.12 }).addTo(this.capa!);
+      L.circle(u, { radius: precision, color: '#d946ef', weight: 1, fillOpacity: 0.12 }).addTo(this.capa!);
     }
-    L.circleMarker(u, { radius: 10, color: '#fff', weight: 3, fillColor: '#be123c', fillOpacity: 1 }).addTo(this.capa!);
+    L.circleMarker(u, { radius: 10, color: '#fff', weight: 3, fillColor: '#d946ef', fillOpacity: 1 }).addTo(this.capa!);
     if (this.primeraVista) {
       this.mapa.setView(u, 16);
       this.primeraVista = false;

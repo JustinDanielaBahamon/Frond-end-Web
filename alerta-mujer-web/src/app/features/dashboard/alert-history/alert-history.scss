@@ -199,7 +199,7 @@
     padding: 0.9rem 1rem;
 
     &--total      { border-left-color:  #560c79; }
-    &--atendidas  { border-left-color: #055f1a; }
+    &--atendidas  { border-left-color: #2e1065; }
     &--canceladas { border-left-color: #c90fe6 }
 
     .ah-stat-icon {
@@ -216,7 +216,7 @@
     }
 
     &--total .ah-stat-icon      { background: linear-gradient(135deg, #560c79, #9236ad); }
-    &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #055f1a, #5506bd); }
+    &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #2e1065, #5506bd); }
     &--canceladas .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
 
     .ah-stat-body { min-width: 0; }
@@ -664,7 +664,7 @@
     border-color: var(--border) !important;
 
     &--total      { border-left-color: #560c79 !important; }
-    &--atendidas  { border-left-color: #055f1a !important; }
+    &--atendidas  { border-left-color: #2e1065 !important; }
     &--canceladas { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }

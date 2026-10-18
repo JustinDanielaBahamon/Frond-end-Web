@@ -16,5 +16,5 @@ export const environment = {
   },
   // Notificaciones del navegador: clave pública VAPID (Firebase Console -> Cloud Messaging ->
   // Certificados push web). No es secreta. Vacía = sin notificaciones con la pestaña cerrada.
-  webPushVapidKey: '',
+  webPushVapidKey: 'BLSiU9gEWnISkoKuhb8fFlSfT8G6PVmezlBWl9s6KHI6Dor7DmyFXuyNibpXOYmXUShIDId_8AxmEr_Fz4ANc6w',
 };

@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { WebPushService } from './web-push.service';
 
 /** Alerta de otra persona que tiene a la usuaria como contacto de emergencia. */
 export interface AlertaRecibida {
@@ -25,6 +26,7 @@ const CLAVE_AVISADAS = 'alerta-mujer-alertas-avisadas';
 @Injectable({ providedIn: 'root' })
 export class ReceivedAlertsService {
   private http = inject(HttpClient);
+  private webPush = inject(WebPushService);
   private temporizador: ReturnType<typeof setInterval> | null = null;
 
   readonly recibidas = signal<AlertaRecibida[]>([]);
@@ -38,6 +40,8 @@ export class ReceivedAlertsService {
   iniciar(): void {
     if (this.temporizador) return;
     this.consultar();
+    // Con permiso ya concedido, se (re)registra el navegador para recibir avisos con la pestaña cerrada
+    if (this.permisoNotificaciones() === 'granted') this.webPush.activar(() => this.consultar());
     this.temporizador = setInterval(() => this.consultar(), REFRESCO_MS);
   }
 
@@ -78,7 +82,14 @@ export class ReceivedAlertsService {
 
   async pedirPermisoNotificaciones(): Promise<void> {
     if (typeof Notification === 'undefined') return;
-    this.permisoNotificaciones.set(await Notification.requestPermission());
+    const permiso = await Notification.requestPermission();
+    this.permisoNotificaciones.set(permiso);
+    if (permiso === 'granted') await this.webPush.activar(() => this.consultar());
+  }
+
+  /** true si los avisos llegan aunque se cierre la pestaña (falta la clave VAPID si es false). */
+  get avisosConPestanaCerrada(): boolean {
+    return this.webPush.configurado;
   }
 
   // Notificación del navegador una sola vez por alerta (se recuerda entre recargas)

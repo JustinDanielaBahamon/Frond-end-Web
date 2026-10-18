@@ -80,19 +80,34 @@
 
 .mapa { height: 46vh; min-height: 260px; width: 100%; }
 
-.btn-centrar {
+.mapa-controles {
   position: absolute;
+  top: 12px;
   right: 12px;
-  bottom: 12px;
   z-index: 500;
-  width: 44px;
-  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.btn-mapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 999px;
+  font: 800 0.9rem 'Nunito', Arial, sans-serif;
+  color: var(--violeta-oscuro);
   background: #fff;
-  color: var(--violeta);
   box-shadow: 0 2px 10px rgba(30, 26, 60, 0.25);
   cursor: pointer;
+
+  &--principal {
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #c026d3);
+  }
 }
 
 .leyenda {

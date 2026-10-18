@@ -38,9 +38,16 @@
     @if (ultimo()) {
       <section class="mapa-wrap">
         <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Recorrido de ' + d.nombre"></div>
-        <button class="btn-centrar" type="button" (click)="centrar()" aria-label="Ver todo el recorrido">
-          <i class="ti ti-focus-centered" aria-hidden="true"></i>
-        </button>
+        <div class="mapa-controles">
+          <button class="btn-mapa btn-mapa--principal" type="button" (click)="centrarEnPersona()">
+            <i class="ti ti-current-location" aria-hidden="true"></i> Centrar en {{ d.nombre }}
+          </button>
+          @if (d.recorrido.length > 1) {
+            <button class="btn-mapa" type="button" (click)="centrar()">
+              <i class="ti ti-route" aria-hidden="true"></i> Ver recorrido
+            </button>
+          }
+        </div>
         <div class="leyenda" aria-hidden="true">
           <span><i class="punto punto--inicio"></i> Inicio</span>
           <span><i class="punto punto--medio"></i> Recorrido</span>

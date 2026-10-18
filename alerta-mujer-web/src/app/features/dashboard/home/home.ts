@@ -299,6 +299,14 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.map.setView([u.lat, u.lng], 16);
   }
 
+  /** Lleva el mapa a la última ubicación del celular y abre su información. */
+  centrarEnCelular(): void {
+    const u = this.ultimaUbicacion();
+    if (!this.map || !u) return;
+    this.map.flyTo([u.lat, u.lng], 17, { duration: 0.8 });
+    this.userMarker?.openPopup();
+  }
+
   private iconoCelular(): L.DivIcon {
     return L.divIcon({
       className: '',

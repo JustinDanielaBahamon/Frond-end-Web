@@ -119,6 +119,7 @@
   vertical-align: -1px;
 
   &--inicio { background: var(--violeta); }
+  &--medio { background: #a78bfa; }
   &--actual { background: var(--neon); }
 }
 
@@ -244,4 +245,105 @@
 @media (max-width: 380px) {
   .acciones { grid-template-columns: 1fr; }
   .datos { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* ── Pines numerados del recorrido (los crea Leaflet fuera de la plantilla) ── */
+:host ::ng-deep .pin-ruta {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #a78bfa;
+  color: #fff;
+  font: 800 11px/1 'Nunito', Arial, sans-serif;
+  box-shadow: 0 1px 4px rgba(30, 26, 60, 0.35);
+
+  &--inicio { background: var(--violeta); }
+
+  &--actual {
+    width: 34px;
+    height: 34px;
+    border-width: 3px;
+    background: var(--neon);
+    font-size: 13px;
+    box-shadow: 0 0 0 6px rgba(217, 70, 239, 0.25), 0 2px 8px rgba(30, 26, 60, 0.35);
+  }
+}
+
+/* ── Línea de tiempo del recorrido ── */
+.tarjeta__conteo { margin-left: auto; font-size: 0.8rem; font-weight: 700; color: var(--suave); }
+
+.linea-tiempo {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.linea-tiempo__item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 0 0 14px;
+
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    bottom: 0;
+    width: 2px;
+    background: var(--borde);
+  }
+}
+
+.linea-tiempo__nodo {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #efe7ff;
+  color: var(--violeta-oscuro);
+  font-weight: 800;
+  font-size: 0.8rem;
+
+  .linea-tiempo__item--actual & { background: var(--neon); color: #fff; }
+}
+
+.linea-tiempo__hora { margin: 3px 0 0; font-weight: 800; }
+.linea-tiempo__lugar { margin: 2px 0 0; font-size: 0.86rem; color: var(--texto); }
+.linea-tiempo__coords { margin: 2px 0 0; font-size: 0.78rem; color: var(--suave); }
+
+.etiqueta-reciente {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: #fff;
+  background: var(--neon);
+}
+
+/* ── Computador: mapa grande a la izquierda e información a la derecha ── */
+@media (min-width: 960px) {
+  .tracking { max-width: 1280px; }
+
+  .banda { padding: 20px 32px 24px; }
+  .banda__titulo { font-size: 1.9rem; }
+
+  .cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(380px, 1fr);
+    align-items: start;
+  }
+
+  .mapa-wrap { position: sticky; top: 0; }
+  .mapa { height: calc(100vh - 140px); min-height: 520px; }
+
+  .contenido { padding: 20px 24px; }
 }

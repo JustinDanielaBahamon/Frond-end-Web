@@ -33,6 +33,7 @@
       </p>
     </header>
 
+    <div class="cuerpo">
     <!-- Mapa con el recorrido -->
     @if (ultimo()) {
       <section class="mapa-wrap">
@@ -42,7 +43,8 @@
         </button>
         <div class="leyenda" aria-hidden="true">
           <span><i class="punto punto--inicio"></i> Inicio</span>
-          <span><i class="punto punto--actual"></i> Última ubicación</span>
+          <span><i class="punto punto--medio"></i> Recorrido</span>
+          <span><i class="punto punto--actual"></i> Ahora</span>
         </div>
       </section>
     } @else {
@@ -68,6 +70,33 @@
             </p>
             @if (d.activa) { <p class="tarjeta__vivo">Se actualiza sola cada 10 segundos</p> }
           </div>
+        </section>
+      }
+
+      <!-- Recorrido, como en la app: cada ubicación enviada con su hora y lugar -->
+      @if (recorridoLista().length > 1) {
+        <section class="tarjeta">
+          <h2 class="tarjeta__titulo">
+            <i class="ti ti-timeline-event" aria-hidden="true"></i> Recorrido
+            <span class="tarjeta__conteo">{{ d.recorrido.length }} ubicaciones</span>
+          </h2>
+          <ol class="linea-tiempo">
+            @for (p of recorridoLista(); track p.numero) {
+              <li class="linea-tiempo__item" [class.linea-tiempo__item--actual]="p.esActual">
+                <span class="linea-tiempo__nodo">{{ p.numero }}</span>
+                <div>
+                  <p class="linea-tiempo__hora">
+                    {{ p.hora | date: 'h:mm:ss a' }}
+                    @if (p.esActual) { <span class="etiqueta-reciente">Reciente</span> }
+                  </p>
+                  @if (lugaresPuntos()[claveDe(p)]) {
+                    <p class="linea-tiempo__lugar"><i class="ti ti-map-pin" aria-hidden="true"></i> {{ lugaresPuntos()[claveDe(p)] }}</p>
+                  }
+                  <p class="linea-tiempo__coords">{{ p.lat.toFixed(5) }}, {{ p.lng.toFixed(5) }}</p>
+                </div>
+              </li>
+            }
+          </ol>
         </section>
       }
 
@@ -147,6 +176,7 @@
         El enlace es personal y deja de funcionar 2 horas después de que termina la alerta.
         No lo compartas en redes sociales.
       </footer>
+    </div>
     </div>
   }
 </main>

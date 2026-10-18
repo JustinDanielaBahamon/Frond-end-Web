@@ -87,6 +87,16 @@ export class TrackingComponent implements OnInit {
     for (let i = 1; i < r.length; i++) total += distanciaKm(r[i - 1], r[i]);
     return total;
   });
+  /** Recorrido para la línea de tiempo: del más reciente al primero (máx. 20). */
+  readonly recorridoLista = computed(() => {
+    const r = this.datos()?.recorrido ?? [];
+    return r
+      .map((p, i) => ({ ...p, numero: i + 1, esActual: i === r.length - 1 }))
+      .reverse()
+      .slice(0, 20);
+  });
+  /** Barrio y dirección de cada punto ("lat,lng" redondeado -> texto). */
+  readonly lugaresPuntos = signal<Record<string, string>>({});
   readonly videos = computed(() => (this.datos()?.evidencias ?? []).filter((e) => e.tipo === 'video'));
   readonly audios = computed(() => (this.datos()?.evidencias ?? []).filter((e) => e.tipo === 'audio'));
   private claveLugar = '';
@@ -119,6 +129,7 @@ export class TrackingComponent implements OnInit {
         this.ahora.set(Date.now());
         setTimeout(() => this.pintarMapa(d));
         this.buscarLugar();
+        this.buscarLugaresPuntos();
         if (d.activa && !this.temporizador) {
           this.temporizador = setInterval(() => this.consultar(), REFRESCO_MS);
         } else if (!d.activa && this.temporizador) {
@@ -140,6 +151,28 @@ export class TrackingComponent implements OnInit {
         // Con datos ya mostrados, un fallo puntual no borra la pantalla: el siguiente intento la actualiza
       },
     });
+  }
+
+  static claveDe(p: { lat: number; lng: number }): string {
+    return `${p.lat.toFixed(4)},${p.lng.toFixed(4)}`;
+  }
+
+  /** Para la plantilla. */
+  claveDe(p: { lat: number; lng: number }): string {
+    return TrackingComponent.claveDe(p);
+  }
+
+  /** Dirección de los puntos más recientes (OpenStreetMap: una consulta por segundo, en caché). */
+  private buscarLugaresPuntos(): void {
+    for (const p of this.recorridoLista().slice(0, 8)) {
+      const clave = TrackingComponent.claveDe(p);
+      if (this.lugaresPuntos()[clave] !== undefined) continue;
+      this.lugaresPuntos.update((l) => ({ ...l, [clave]: '' }));
+      this.geocoding.obtener(p.lat, p.lng).then((lugar) => {
+        const texto = [lugar?.direccion, lugar?.barrio].filter(Boolean).join(' · ');
+        this.lugaresPuntos.update((l) => ({ ...l, [clave]: texto }));
+      });
+    }
   }
 
   /** Busca la dirección solo cuando la última ubicación cambió (~11 m). */
@@ -186,20 +219,28 @@ export class TrackingComponent implements OnInit {
     }
     this.capa!.clearLayers();
     const puntos = d.recorrido.map((p) => L.latLng(p.lat, p.lng));
+    // Igual que en la app: línea punteada y un pin numerado por cada ubicación enviada
     if (puntos.length > 1) {
-      L.polyline(puntos, { color: COLOR_INICIO, weight: 4, opacity: 0.85 }).addTo(this.capa!);
-      L.circleMarker(puntos[0], { radius: 7, color: '#fff', weight: 2, fillColor: COLOR_INICIO, fillOpacity: 1 })
-        .bindTooltip('Donde se activó la alerta')
-        .addTo(this.capa!);
+      L.polyline(puntos, { color: COLOR_INICIO, weight: 3, opacity: 0.85, dashArray: '6 8', lineCap: 'round' }).addTo(this.capa!);
     }
     const u = puntos[puntos.length - 1];
     const precision = d.recorrido[d.recorrido.length - 1].precision;
     if (precision && precision > 0) {
       L.circle(u, { radius: precision, color: COLOR_ACTUAL, weight: 1, fillOpacity: 0.12 }).addTo(this.capa!);
     }
-    L.circleMarker(u, { radius: 10, color: '#fff', weight: 3, fillColor: COLOR_ACTUAL, fillOpacity: 1 })
-      .bindTooltip('Última ubicación')
-      .addTo(this.capa!);
+    d.recorrido.forEach((p, i) => {
+      const esUltimo = i === d.recorrido.length - 1;
+      const icono = L.divIcon({
+        className: '',
+        html: `<span class="pin-ruta${esUltimo ? ' pin-ruta--actual' : i === 0 ? ' pin-ruta--inicio' : ''}">${i + 1}</span>`,
+        iconSize: esUltimo ? [34, 34] : [24, 24],
+        iconAnchor: esUltimo ? [17, 17] : [12, 12],
+      });
+      const hora = p.hora.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+      L.marker([p.lat, p.lng], { icon: icono, zIndexOffset: esUltimo ? 1000 : i })
+        .bindTooltip(`${esUltimo ? 'Última ubicación' : i === 0 ? 'Inicio' : `Punto ${i + 1}`} · ${hora}`)
+        .addTo(this.capa!);
+    });
     // La primera vez se ve todo el recorrido; después solo se sigue la posición actual
     if (this.primeraVista) {
       this.encuadrar(d);

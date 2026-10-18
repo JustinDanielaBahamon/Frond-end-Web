@@ -31,6 +31,23 @@ export interface Seguimiento {
   evidencias: EvidenciaSeguimiento[];
 }
 
+/** Mensaje del chat de la alerta. deElla: lo escribió quien activó la alerta. */
+export interface MensajeAlerta {
+  id: number;
+  deElla: boolean;
+  nombre: string;
+  texto: string;
+  hora: Date;
+}
+
+const aMensaje = (m: any): MensajeAlerta => ({
+  id: m.id,
+  deElla: m.senderType === 'owner',
+  nombre: m.senderName,
+  texto: m.body,
+  hora: new Date(m.createdAt),
+});
+
 @Injectable({ providedIn: 'root' })
 export class TrackingService {
   private http = inject(HttpClient);
@@ -59,5 +76,23 @@ export class TrackingService {
         }))
       }))
     );
+  }
+
+  /** Mensajes del chat posteriores a despuesDe (0 = todos). */
+  mensajes(codigo: string, despuesDe = 0): Observable<MensajeAlerta[]> {
+    return this.http
+      .get<any[]>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/messages`, {
+        params: { after: despuesDe },
+      })
+      .pipe(map((lista) => (lista ?? []).map(aMensaje)));
+  }
+
+  enviarMensaje(codigo: string, nombre: string, texto: string): Observable<MensajeAlerta> {
+    return this.http
+      .post<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/messages`, {
+        name: nombre,
+        body: texto,
+      })
+      .pipe(map(aMensaje));
   }
 }

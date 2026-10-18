@@ -187,6 +187,12 @@ export class TrackingComponent implements OnInit {
     });
   }
 
+  /** Lleva el mapa a la posición actual de la persona, con zoom de calle. */
+  centrarEnPersona(): void {
+    const u = this.ultimo();
+    if (u && this.mapa) this.mapa.flyTo([u.lat, u.lng], 17, { duration: 0.8 });
+  }
+
   /** Vuelve a encuadrar todo el recorrido. */
   centrar(): void {
     const d = this.datos();

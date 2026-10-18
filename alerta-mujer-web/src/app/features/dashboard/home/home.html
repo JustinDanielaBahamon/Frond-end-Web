@@ -125,6 +125,11 @@
             <i class="ti" [class.ti-loader-2]="isRefreshing()" [class.ti-refresh]="!isRefreshing()"></i>
             {{ isRefreshing() ? 'Preguntando al celular…' : 'Actualizar ubicación' }}
           </button>
+          @if (ultimaUbicacion()) {
+            <button class="home-btn" type="button" (click)="centrarEnCelular()" title="Llevar el mapa a donde está el celular">
+              <i class="ti ti-current-location"></i> Centrar en mi celular
+            </button>
+          }
           <a class="home-link" routerLink="/dashboard/ubicacion">
             Ver mapa completo <i class="ti ti-arrow-right"></i>
           </a>

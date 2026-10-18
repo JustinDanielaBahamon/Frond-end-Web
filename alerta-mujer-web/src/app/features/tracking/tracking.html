@@ -80,6 +80,56 @@
         </section>
       }
 
+      <!-- Chat de la alerta: mensajes de ella y de sus contactos -->
+      @if (d.activa || mensajes().length) {
+        <section class="tarjeta chat">
+          <h2 class="tarjeta__titulo">
+            <i class="ti ti-messages" aria-hidden="true"></i> Mensajes con {{ d.nombre }}
+          </h2>
+
+          <div id="chat-lista" class="chat__lista" aria-live="polite">
+            @for (m of mensajes(); track m.id) {
+              <div class="chat__msg" [class.chat__msg--ella]="m.deElla">
+                <p class="chat__autor">{{ m.deElla ? d.nombre : m.nombre }} · {{ m.hora | date: 'h:mm a' }}</p>
+                <p class="chat__texto">{{ m.texto }}</p>
+              </div>
+            } @empty {
+              <p class="chat__vacio">Aún no hay mensajes. Escríbele para que sepa que la estás ayudando.</p>
+            }
+          </div>
+
+          @if (d.activa) {
+            @if (!nombreContacto()) {
+              <form class="chat__nombre" (submit)="$event.preventDefault(); guardarNombre()">
+                <label for="nombre-contacto">¿Cómo te llamas? Así sabrá quién le escribe.</label>
+                <div class="chat__fila">
+                  <input id="nombre-contacto" maxlength="60" autocomplete="name" placeholder="Tu nombre"
+                         [value]="borradorNombre()" (input)="borradorNombre.set($any($event.target).value)" />
+                  <button type="submit" class="chat__enviar">Continuar</button>
+                </div>
+              </form>
+            } @else {
+              <div class="chat__rapidas">
+                @for (r of respuestasRapidas; track r) {
+                  <button type="button" class="chat__rapida" [disabled]="enviando()" (click)="enviar(r)">{{ r }}</button>
+                }
+              </div>
+              <form class="chat__fila" (submit)="$event.preventDefault(); enviar(textoMensaje())">
+                <input maxlength="500" placeholder="Escribe un mensaje…" aria-label="Mensaje"
+                       [value]="textoMensaje()" (input)="textoMensaje.set($any($event.target).value)" />
+                <button type="submit" class="chat__enviar" [disabled]="enviando() || !textoMensaje().trim()">
+                  <i class="ti ti-send" aria-hidden="true"></i>
+                </button>
+              </form>
+              <p class="chat__como">Escribes como <strong>{{ nombreContacto() }}</strong></p>
+            }
+            @if (errorChat()) { <p class="chat__error" role="alert">{{ errorChat() }}</p> }
+          } @else {
+            <p class="chat__vacio">El chat se cerró cuando terminó la alerta.</p>
+          }
+        </section>
+      }
+
       <!-- Recorrido, como en la app: cada ubicación enviada con su hora y lugar -->
       @if (recorridoLista().length > 1) {
         <section class="tarjeta">

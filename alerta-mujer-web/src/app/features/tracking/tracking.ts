@@ -3,10 +3,22 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
-import { Seguimiento, TrackingService } from '../../core/services/tracking.service';
+import { MensajeAlerta, Seguimiento, TrackingService } from '../../core/services/tracking.service';
 import { GeocodingService, Lugar } from '../../core/services/geocoding.service';
 
 const REFRESCO_MS = 10000;
+
+const CHAT_REFRESCO_MS = 5000;
+const CLAVE_NOMBRE = 'alerta-mujer-nombre-contacto';
+
+/** Respuestas rápidas del contacto (un toque, como los mensajes rápidos de la app). */
+export const RESPUESTAS_RAPIDAS = [
+  'Voy en camino',
+  'Ya llamé a la policía',
+  '¿Dónde estás?',
+  '¿Estás bien?',
+  'Mantén la calma, ya vamos',
+];
 
 const COLOR_INICIO = '#7c3aed';
 const COLOR_ACTUAL = '#d946ef';
@@ -101,6 +113,16 @@ export class TrackingComponent implements OnInit {
   readonly audios = computed(() => (this.datos()?.evidencias ?? []).filter((e) => e.tipo === 'audio'));
   private claveLugar = '';
 
+  // ── Chat de la alerta ──
+  readonly respuestasRapidas = RESPUESTAS_RAPIDAS;
+  readonly mensajes = signal<MensajeAlerta[]>([]);
+  readonly nombreContacto = signal(this.leerNombre());
+  readonly borradorNombre = signal('');
+  readonly textoMensaje = signal('');
+  readonly enviando = signal(false);
+  readonly errorChat = signal('');
+  private chatTemporizador: ReturnType<typeof setInterval> | null = null;
+
   private codigo = '';
   private mapa: L.Map | null = null;
   private capa: L.LayerGroup | null = null;
@@ -114,6 +136,7 @@ export class TrackingComponent implements OnInit {
     this.consultar(() => clearTimeout(aviso));
     this.destroyRef.onDestroy(() => {
       if (this.temporizador) clearInterval(this.temporizador);
+      if (this.chatTemporizador) clearInterval(this.chatTemporizador);
       this.mapa?.remove();
     });
   }
@@ -130,6 +153,7 @@ export class TrackingComponent implements OnInit {
         setTimeout(() => this.pintarMapa(d));
         this.buscarLugar();
         this.buscarLugaresPuntos();
+        this.actualizarChat(d.activa);
         if (d.activa && !this.temporizador) {
           this.temporizador = setInterval(() => this.consultar(), REFRESCO_MS);
         } else if (!d.activa && this.temporizador) {
@@ -204,6 +228,72 @@ export class TrackingComponent implements OnInit {
     const puntos = d.recorrido.map((p) => L.latLng(p.lat, p.lng));
     if (puntos.length === 1) this.mapa.setView(puntos[0], 16);
     else this.mapa.fitBounds(L.latLngBounds(puntos), { padding: [40, 40], maxZoom: 17 });
+  }
+
+  // Mensajes nuevos cada 5 s mientras la alerta está activa (al terminar, una última lectura)
+  private actualizarChat(activa: boolean): void {
+    this.leerMensajesNuevos();
+    if (activa && !this.chatTemporizador) {
+      this.chatTemporizador = setInterval(() => this.leerMensajesNuevos(), CHAT_REFRESCO_MS);
+    } else if (!activa && this.chatTemporizador) {
+      clearInterval(this.chatTemporizador);
+      this.chatTemporizador = null;
+    }
+  }
+
+  private leerMensajesNuevos(): void {
+    const ultimo = this.mensajes().at(-1)?.id ?? 0;
+    this.trackingService.mensajes(this.codigo, ultimo).subscribe({
+      next: (nuevos) => {
+        if (nuevos.length) this.agregarMensajes(nuevos);
+      },
+      error: () => {
+        // Un fallo puntual no borra el chat: se reintenta en la siguiente lectura
+      },
+    });
+  }
+
+  private agregarMensajes(nuevos: MensajeAlerta[]): void {
+    const ids = new Set(this.mensajes().map((m) => m.id));
+    this.mensajes.update((actuales) => [...actuales, ...nuevos.filter((m) => !ids.has(m.id))]);
+    setTimeout(() => document.getElementById('chat-lista')?.scrollTo({ top: 1e6, behavior: 'smooth' }));
+  }
+
+  guardarNombre(): void {
+    const nombre = this.borradorNombre().trim().slice(0, 60);
+    if (!nombre) return;
+    this.nombreContacto.set(nombre);
+    try {
+      localStorage.setItem(CLAVE_NOMBRE, nombre);
+    } catch {
+      // modo privado: se pedirá de nuevo la próxima vez
+    }
+  }
+
+  enviar(texto: string): void {
+    const cuerpo = texto.trim();
+    if (!cuerpo || this.enviando() || !this.nombreContacto()) return;
+    this.enviando.set(true);
+    this.errorChat.set('');
+    this.trackingService.enviarMensaje(this.codigo, this.nombreContacto(), cuerpo).subscribe({
+      next: (m) => {
+        this.agregarMensajes([m]);
+        this.textoMensaje.set('');
+        this.enviando.set(false);
+      },
+      error: (e) => {
+        this.enviando.set(false);
+        this.errorChat.set(e?.error?.message || 'No se pudo enviar el mensaje. Intenta de nuevo.');
+      },
+    });
+  }
+
+  private leerNombre(): string {
+    try {
+      return localStorage.getItem(CLAVE_NOMBRE) ?? '';
+    } catch {
+      return '';
+    }
   }
 
   reintentar(): void {

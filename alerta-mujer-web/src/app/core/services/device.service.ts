@@ -168,7 +168,10 @@ export class DeviceService {
    * Celulares de la usuaria autenticada
    */
   getMyDevices(): Observable<UserDevice[]> {
-    return this.http.get<UserDevice[]>(`${this.url}/user`);
+    // El panel web se registra como dispositivo "web" (notificaciones del navegador): no es un celular
+    return this.http.get<UserDevice[]>(`${this.url}/user`).pipe(
+      map(lista => lista.filter(d => (d.osName || '').toLowerCase() !== 'web')),
+    );
   }
 
   /**

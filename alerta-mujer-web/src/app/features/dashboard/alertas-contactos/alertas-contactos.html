@@ -11,7 +11,10 @@
     @case ('default') {
       <div class="ac__aviso">
         <i class="ti ti-bell-ringing" aria-hidden="true"></i>
-        <p>Activa los avisos del navegador para enterarte al instante cuando alguien active una alerta mientras tienes el panel abierto.</p>
+        <p>
+          Activa los avisos del navegador para enterarte al instante cuando alguien active una alerta
+          {{ servicio.avisosConPestanaCerrada ? ', aunque cierres esta pestaña.' : ' mientras tienes el panel abierto.' }}
+        </p>
         <button type="button" class="ac__btn" (click)="servicio.pedirPermisoNotificaciones()">Activar avisos</button>
       </div>
     }

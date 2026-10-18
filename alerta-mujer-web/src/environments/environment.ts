@@ -11,5 +11,9 @@ export const environment = {
     authDomain: 'alerta-mujer-b4fae.firebaseapp.com',
     projectId: 'alerta-mujer-b4fae',
     appId: '1:656563018279:web:b60ad55bf3f52ad1c30c02',
+    messagingSenderId: '656563018279',
   },
+  // Notificaciones del navegador: clave pública VAPID (Firebase Console -> Cloud Messaging ->
+  // Certificados push web). No es secreta. Vacía = sin notificaciones con la pestaña cerrada.
+  webPushVapidKey: '',
 };

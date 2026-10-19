@@ -17,9 +17,9 @@
     </span>
     <div class="ev-titlebar-text">
       <h1 class="ev-title">Evidencias</h1>
-      <p class="ev-sub">Fotos, videos, audios y documentos asociados a tus alertas. Solo tú puedes verlos.</p>
+      <p class="ev-sub">Fotos, videos y audios de tus alertas. Los ven tú y los contactos que recibieron cada alerta mientras su enlace está activo.</p>
     </div>
-    <button class="ev-btn ev-btn--primary" (click)="abrirSubida()">
+    <button class="ev-btn ev-btn--primary" (click)="abrirSubida()" [disabled]="!alertaActual()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
       Subir evidencia
     </button>
@@ -35,50 +35,66 @@
   }
 
   <div class="ev-grid">
-    <!-- ══════════ LISTA ══════════ -->
+    <!-- ══════════ ALERTAS Y SUS EVIDENCIAS ══════════ -->
     <section class="ev-card ev-list-card">
-      <div class="ev-filters" role="tablist">
-        <button role="tab" class="ev-filter" [class.active]="filtro() === 'todas'" (click)="filtro.set('todas')">
-          Todas <span>{{ evidencias().length }}</span>
-        </button>
-        @for (t of listaTipos; track t) {
-          <button role="tab" class="ev-filter" [class.active]="filtro() === t" (click)="filtro.set(t)" [disabled]="conteo()[t] === 0">
-            <ng-container *ngTemplateOutlet="icono; context: { $implicit: t }" />{{ tipos[t].plural }} <span>{{ conteo()[t] }}</span>
-          </button>
-        }
+      <div class="ev-alertas-head">
+        <span class="ev-label">Tus alertas</span>
+        <label class="ev-check">
+          <input type="checkbox" [ngModel]="soloConEvidencias()" (ngModelChange)="soloConEvidencias.set($event); resolverDirecciones()" />
+          Solo con evidencias
+        </label>
       </div>
-
-      <div class="ev-toolbar">
-        <div class="ev-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="search" placeholder="Buscar por nombre, tipo, fecha o alerta (#12)" aria-label="Buscar evidencias"
-                 [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
-        </div>
-        <select class="ev-select" aria-label="Orden" [ngModel]="orden()" (ngModelChange)="orden.set($event)">
-          <option value="recientes">Más recientes</option>
-          <option value="antiguas">Más antiguas</option>
-        </select>
+      <div class="ev-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" placeholder="Buscar por fecha, barrio o estado" aria-label="Buscar alertas"
+               [ngModel]="buscarAlerta()" (ngModelChange)="buscarAlerta.set($event); resolverDirecciones()" />
       </div>
 
       @if (cargando()) {
         <p class="ev-muted">Cargando evidencias…</p>
-      } @else if (evidencias().length === 0 && !error()) {
-        <div class="ev-empty">
-          <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'document' }" />
-          <p>Aún no tienes evidencias</p>
-          <span>Cuando actives una alerta, aquí aparecerán sus grabaciones. También puedes subir un archivo y asociarlo a una alerta.</span>
-          <button class="ev-btn ev-btn--ghost" (click)="abrirSubida()">Subir evidencia</button>
-        </div>
       } @else {
-        <div class="ev-groups">
-          @for (g of grupos(); track g.alertId) {
-            <div class="ev-group">
-              <div class="ev-group-head">
-                <span class="ev-group-title">Alerta #{{ g.alertId }}</span>
-                <span class="ev-group-meta">{{ fechaCorta(g.alerta?.inicio ?? null) }} · {{ estado(g.alerta?.estado) }}</span>
-              </div>
-              @for (e of g.items; track e.id) {
-                <button class="ev-item" [class.ev-item--selected]="seleccionada()?.id === e.id" (click)="ver(e)">
+        <ul class="ev-alertas" role="listbox" aria-label="Alertas">
+          @for (a of alertasFiltradas(); track a.id) {
+            <li>
+              <button class="ev-alerta" role="option" [attr.aria-selected]="alertaId() === a.id"
+                      [class.ev-alerta--activa]="alertaId() === a.id" (click)="elegirAlerta(a.id)">
+                <span class="ev-alerta-fecha">
+                  <strong>{{ a.inicio | date: 'd' }}</strong>
+                  <small>{{ a.inicio | date: 'MMM' }}</small>
+                </span>
+                <span class="ev-alerta-texto">
+                  <span class="ev-alerta-titulo">{{ fechaCorta(a.inicio) }} · {{ hora(a.inicio) }}</span>
+                  <span class="ev-alerta-lugar">{{ direcciones()[a.id] || (a.lat != null ? 'Buscando la dirección…' : 'Sin ubicación') }}</span>
+                </span>
+                <span class="ev-alerta-meta">
+                  <span class="ev-chip ev-chip--{{ a.estado }}">{{ estado(a.estado) }}</span>
+                  <span class="ev-alerta-cantidad">{{ a.cantidad }} {{ a.cantidad === 1 ? 'archivo' : 'archivos' }}</span>
+                </span>
+              </button>
+            </li>
+          } @empty {
+            <li class="ev-muted ev-alertas-vacio">
+              {{ listaAlertas().length === 0 ? 'Aún no tienes alertas. Cuando actives una, aquí aparecerán sus grabaciones.' : 'Ninguna alerta coincide con la búsqueda.' }}
+            </li>
+          }
+        </ul>
+
+        @if (alertaActual(); as alerta) {
+          <div class="ev-de-alerta">
+            <div class="ev-filters" role="tablist">
+              <button role="tab" class="ev-filter" [class.active]="filtro() === 'todas'" (click)="filtro.set('todas')">
+                Todas <span>{{ conteo().photo + conteo().video + conteo().audio + conteo().document }}</span>
+              </button>
+              @for (t of tiposVisibles(); track t) {
+                <button role="tab" class="ev-filter" [class.active]="filtro() === t" (click)="filtro.set(t)">
+                  <ng-container *ngTemplateOutlet="icono; context: { $implicit: t }" />{{ tipos[t].plural }} <span>{{ conteo()[t] }}</span>
+                </button>
+              }
+            </div>
+
+            <div class="ev-tiles">
+              @for (e of filtradas(); track e.id) {
+                <button class="ev-tile" [class.ev-tile--selected]="seleccionada()?.id === e.id" (click)="ver(e)" [title]="e.nombreArchivo">
                   <span class="ev-thumb ev-thumb--{{ e.tipo }}">
                     @if (miniatura(e); as src) {
                       <img [src]="src" alt="" />
@@ -86,17 +102,18 @@
                       <ng-container *ngTemplateOutlet="icono; context: { $implicit: e.tipo }" />
                     }
                   </span>
-                  <span class="ev-item-text">
-                    <span class="ev-item-name">{{ e.nombreArchivo }}</span>
-                    <span class="ev-item-meta">{{ tipos[e.tipo].etiqueta }} · {{ tamano(e.tamanoBytes) }} · {{ fechaCorta(e.fecha) }}</span>
-                  </span>
+                  <span class="ev-tile-name">{{ e.nombreArchivo }}</span>
+                  <span class="ev-tile-meta">{{ tipos[e.tipo].etiqueta }} · {{ hora(e.fecha) }}</span>
                 </button>
+              } @empty {
+                <div class="ev-empty ev-empty--compacto">
+                  <p>Esta alerta no tiene evidencias</p>
+                  <button class="ev-btn ev-btn--ghost" (click)="abrirSubida()">Agregar una</button>
+                </div>
               }
             </div>
-          } @empty {
-            <p class="ev-muted">Nada coincide con la búsqueda.</p>
-          }
-        </div>
+          </div>
+        }
       }
     </section>
 
@@ -130,18 +147,31 @@
           }
         </div>
 
-        <h2 class="ev-detail-title">{{ e.nombreArchivo }}</h2>
+        @if (editandoNombre()) {
+          <form class="ev-rename" (submit)="$event.preventDefault(); guardarNombre(e)">
+            <input class="ev-rename-input" maxlength="80" aria-label="Nuevo nombre" [ngModel]="nuevoNombre()" (ngModelChange)="nuevoNombre.set($event)" name="nombre" />
+            <button type="submit" class="ev-btn ev-btn--primary" [disabled]="!nuevoNombre().trim() || guardandoNombre()">Guardar</button>
+            <button type="button" class="ev-btn ev-btn--ghost" (click)="cerrarEdicion()">Cancelar</button>
+          </form>
+        } @else {
+          <div class="ev-detail-head">
+            <h2 class="ev-detail-title">{{ e.nombreArchivo }}</h2>
+            <button class="ev-icon-btn" title="Cambiar nombre" aria-label="Cambiar el nombre" (click)="editarNombre(e)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+        }
 
         <dl class="ev-meta">
           <div><dt>Tipo</dt><dd>{{ tipos[e.tipo].etiqueta }}</dd></div>
           <div><dt>Tamaño</dt><dd>{{ tamano(e.tamanoBytes) }}</dd></div>
           <div><dt>Guardada</dt><dd>{{ fechaLarga(e.fecha) }}</dd></div>
-          <div><dt>Alerta</dt><dd>#{{ e.alertId }} · {{ estado(e.alerta?.estado) }}</dd></div>
+          <div><dt>Alerta</dt><dd>{{ fechaCorta(e.alerta?.inicio ?? null) }} · {{ estado(e.alerta?.estado) }}</dd></div>
           @if (e.alerta?.inicio) {
             <div><dt>Inicio de la alerta</dt><dd>{{ fechaLarga(e.alerta!.inicio) }}</dd></div>
           }
-          @if (mapaUrl(e); as mapa) {
-            <div><dt>Ubicación</dt><dd><a class="ev-link" [href]="mapa" target="_blank" rel="noopener">Ver en el mapa</a></dd></div>
+          @if (alertaActual()?.lat != null) {
+            <div><dt>Ubicación</dt><dd>{{ direcciones()[e.alertId] || 'Lugar de la alerta' }} · <button class="ev-link" (click)="abrirMapa()">Ver en el mapa</button></dd></div>
           }
         </dl>
 
@@ -186,17 +216,12 @@
         </button>
       </header>
 
-      @if (misAlertas().length === 0) {
-        <p class="ev-muted">Las evidencias se asocian a una alerta y todavía no tienes ninguna. Cuando actives una alerta desde la app móvil podrás adjuntarle archivos.</p>
-      } @else {
-        <label class="ev-field">
-          <span class="ev-label">Alerta</span>
-          <select class="ev-select" [ngModel]="alertaElegida()" (ngModelChange)="alertaElegida.set(+$event)">
-            @for (a of misAlertas(); track a.id) {
-              <option [value]="a.id">#{{ a.id }} · {{ fechaLarga(a.inicio) }} · {{ estado(a.estado) }}</option>
-            }
-          </select>
-        </label>
+      @if (alertaActual(); as alerta) {
+        <p class="ev-destino">
+          Se agregará a la alerta del <strong>{{ fechaLarga(alerta.inicio) }}</strong>
+          @if (direcciones()[alerta.id]; as lugar) { en {{ lugar }} }.
+          <span>Para otra alerta, elígela primero en la lista.</span>
+        </p>
 
         <label class="ev-drop" [class.ev-drop--over]="arrastrando()" [class.ev-drop--ready]="archivo()"
                (dragover)="$event.preventDefault(); arrastrando.set(true)" (dragleave)="arrastrando.set(false)" (drop)="soltar($event)">
@@ -207,7 +232,7 @@
             <span>{{ tamano(f.size) }} · haz clic para cambiarlo</span>
           } @else {
             <strong>Arrastra un archivo o haz clic para elegirlo</strong>
-            <span>Foto, video, audio o PDF · máximo {{ maxMb }} MB</span>
+            <span>Foto, video o audio · máximo {{ maxMb }} MB</span>
           }
         </label>
 
@@ -224,10 +249,28 @@
 
       <footer class="ev-modal-footer">
         <button class="ev-btn ev-btn--ghost" (click)="cerrarSubida()" [disabled]="progreso() !== null">Cancelar</button>
-        <button class="ev-btn ev-btn--primary" (click)="subir()" [disabled]="!archivo() || !alertaElegida() || progreso() !== null">
+        <button class="ev-btn ev-btn--primary" (click)="subir()" [disabled]="!archivo() || !alertaId() || progreso() !== null">
           {{ progreso() !== null ? 'Subiendo ' + progreso() + '%' : 'Subir' }}
         </button>
       </footer>
+    </div>
+  </div>
+}
+
+<!-- ══════════ MAPA DE LA ALERTA ══════════ -->
+@if (mapaVisible()) {
+  <div class="ev-modal-overlay" (click)="cerrarMapa()">
+    <div class="ev-modal ev-modal--mapa" role="dialog" aria-modal="true" aria-labelledby="ev-mapa-titulo" (click)="$event.stopPropagation()">
+      <header class="ev-modal-header">
+        <div>
+          <h3 id="ev-mapa-titulo">Lugar de la alerta</h3>
+          <p class="ev-muted">{{ alertaActual() ? direcciones()[alertaActual()!.id] || fechaLarga(alertaActual()!.inicio) : '' }}</p>
+        </div>
+        <button class="ev-icon-btn" aria-label="Cerrar" (click)="cerrarMapa()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div #mapaAlerta class="ev-mapa"></div>
     </div>
   </div>
 }

@@ -32,6 +32,8 @@ export interface MiAlerta {
   estado: string;
   metodo: string;
   inicio: Date;
+  lat: number | null;
+  lng: number | null;
 }
 
 interface EvidenceViewApi {
@@ -81,10 +83,23 @@ export class MisEvidenciasService {
 
   misAlertas(): Observable<MiAlerta[]> {
     return this.http
-      .get<Array<{ id: number; status: string; activationMethod: string; startedAt: string }>>(
-        `${environment.apiUrl}/api/alerts/me`
-      )
-      .pipe(map((l) => l.map((a) => ({ id: a.id, estado: a.status, metodo: a.activationMethod, inicio: fechaUtc(a.startedAt)! }))));
+      .get<Array<{
+        id: number; status: string; activationMethod: string; startedAt: string;
+        latitude: number | null; longitude: number | null;
+      }>>(`${environment.apiUrl}/api/alerts/me`)
+      .pipe(map((l) => l.map((a) => ({
+        id: a.id,
+        estado: a.status,
+        metodo: a.activationMethod,
+        inicio: fechaUtc(a.startedAt)!,
+        lat: a.latitude != null ? Number(a.latitude) : null,
+        lng: a.longitude != null ? Number(a.longitude) : null,
+      }))));
+  }
+
+  /** Cambia el nombre que se muestra (el archivo y su huella no cambian). */
+  renombrar(id: number, nombre: string): Observable<MiEvidencia> {
+    return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: nombre }).pipe(map(desdeApi));
   }
 
   desdeApi = desdeApi;

@@ -1,13 +1,15 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import * as L from 'leaflet';
 import {
   MiAlerta, MiEvidencia, MisEvidenciasService, TipoEvidencia,
 } from '../../../core/services/mis-evidencias.service';
+import { GeocodingService } from '../../../core/services/geocoding.service';
 
 type Filtro = 'todas' | TipoEvidencia;
-type Orden = 'recientes' | 'antiguas';
 
 export const TIPOS: Record<TipoEvidencia, { etiqueta: string; plural: string }> = {
   photo: { etiqueta: 'Foto', plural: 'Fotos' },
@@ -21,7 +23,14 @@ const ESTADOS: Record<string, string> = {
 };
 
 const MAX_MB = 50;
-const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*,application/pdf';
+// Solo lo que sirve como evidencia de una emergencia (los documentos ya subidos se siguen viendo)
+const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
+const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+/** Alerta de la lista de la izquierda, con cuántas evidencias tiene. */
+interface AlertaConEvidencias extends MiAlerta {
+  cantidad: number;
+}
 
 @Component({
   selector: 'app-evidence',
@@ -32,20 +41,26 @@ const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*,ap
 })
 export class Evidence implements OnInit, OnDestroy {
   private service = inject(MisEvidenciasService);
+  private geocoding = inject(GeocodingService);
+  private route = inject(ActivatedRoute);
 
   readonly tipos = TIPOS;
-  readonly listaTipos = Object.keys(TIPOS) as TipoEvidencia[];
   readonly aceptados = ACEPTADOS;
   readonly maxMb = MAX_MB;
 
   evidencias = signal<MiEvidencia[]>([]);
+  alertas = signal<MiAlerta[]>([]);
   cargando = signal(true);
   error = signal('');
   aviso = signal('');
 
+  /** Alerta elegida en la lista: solo se muestran sus evidencias. */
+  alertaId = signal<number | null>(null);
+  buscarAlerta = signal('');
+  soloConEvidencias = signal(true);
   filtro = signal<Filtro>('todas');
-  busqueda = signal('');
-  orden = signal<Orden>('recientes');
+  /** Barrio y dirección de cada alerta (se resuelven al mostrarse). */
+  direcciones = signal<Record<number, string>>({});
 
   // ── Visor ──────────────────────────────────────
   seleccionada = signal<MiEvidencia | null>(null);
@@ -55,43 +70,70 @@ export class Evidence implements OnInit, OnDestroy {
   private miniaturas = signal<Record<number, string>>({});
   private urlsCreadas = new Set<string>();
 
+  // ── Renombrar ──────────────────────────────────
+  editandoNombre = signal(false);
+  nuevoNombre = signal('');
+  guardandoNombre = signal(false);
+
+  // ── Mapa de la alerta ──────────────────────────
+  mapaVisible = signal(false);
+  @ViewChild('mapaAlerta') private mapaRef?: ElementRef<HTMLDivElement>;
+  private mapa: L.Map | null = null;
+
   // ── Subida ─────────────────────────────────────
   subirVisible = signal(false);
-  misAlertas = signal<MiAlerta[]>([]);
-  alertaElegida = signal<number | null>(null);
   archivo = signal<File | null>(null);
   progreso = signal<number | null>(null);
   errorSubida = signal('');
   arrastrando = signal(false);
 
+  /** Todas las alertas de la usuaria (más recientes primero) con su número de evidencias. */
+  listaAlertas = computed<AlertaConEvidencias[]>(() => {
+    const cantidad = new Map<number, number>();
+    for (const e of this.evidencias()) cantidad.set(e.alertId, (cantidad.get(e.alertId) ?? 0) + 1);
+    // Alertas con evidencias que no vinieron en la lista de alertas
+    const conocidas = new Map<number, MiAlerta>(this.alertas().map((a) => [a.id, a]));
+    for (const e of this.evidencias()) {
+      if (!conocidas.has(e.alertId) && e.alerta) {
+        conocidas.set(e.alertId, {
+          id: e.alertId, estado: e.alerta.estado, metodo: e.alerta.metodo,
+          inicio: e.alerta.inicio ?? e.fecha, lat: e.alerta.lat, lng: e.alerta.lng,
+        });
+      }
+    }
+    return [...conocidas.values()]
+      .map((a) => ({ ...a, cantidad: cantidad.get(a.id) ?? 0 }))
+      .sort((a, b) => b.inicio.getTime() - a.inicio.getTime());
+  });
+
+  alertasFiltradas = computed(() => {
+    const termino = this.buscarAlerta().trim().toLowerCase();
+    return this.listaAlertas().filter((a) => {
+      if (this.soloConEvidencias() && a.cantidad === 0 && a.id !== this.alertaId()) return false;
+      if (!termino) return true;
+      return [this.fechaLarga(a.inicio), this.estado(a.estado), this.direcciones()[a.id] ?? '', `#${a.id}`]
+        .some((t) => t.toLowerCase().includes(termino));
+    });
+  });
+
+  alertaActual = computed(() => this.listaAlertas().find((a) => a.id === this.alertaId()) ?? null);
+
+  private deLaAlerta = computed(() => this.evidencias().filter((e) => e.alertId === this.alertaId()));
+
   conteo = computed(() => {
     const c = { photo: 0, video: 0, audio: 0, document: 0 } as Record<TipoEvidencia, number>;
-    for (const e of this.evidencias()) c[e.tipo]++;
+    for (const e of this.deLaAlerta()) c[e.tipo]++;
     return c;
   });
 
-  filtradas = computed(() => {
-    const termino = this.busqueda().trim().toLowerCase();
-    const filtro = this.filtro();
-    const lista = this.evidencias().filter((e) => {
-      if (filtro !== 'todas' && e.tipo !== filtro) return false;
-      if (!termino) return true;
-      return [e.nombreArchivo, TIPOS[e.tipo].etiqueta, `#${e.alertId}`, this.fechaLarga(e.fecha)]
-        .some((t) => t.toLowerCase().includes(termino));
-    });
-    const signo = this.orden() === 'recientes' ? -1 : 1;
-    return [...lista].sort((a, b) => signo * (a.fecha.getTime() - b.fecha.getTime()));
-  });
+  /** Pestañas visibles: solo los tipos que tiene la alerta. */
+  tiposVisibles = computed(() => (Object.keys(TIPOS) as TipoEvidencia[]).filter((t) => this.conteo()[t] > 0));
 
-  /** Agrupadas por alerta, en el orden de la lista filtrada. */
-  grupos = computed(() => {
-    const grupos: { alertId: number; alerta: MiEvidencia['alerta']; items: MiEvidencia[] }[] = [];
-    for (const e of this.filtradas()) {
-      let g = grupos.find((x) => x.alertId === e.alertId);
-      if (!g) grupos.push((g = { alertId: e.alertId, alerta: e.alerta, items: [] }));
-      g.items.push(e);
-    }
-    return grupos;
+  filtradas = computed(() => {
+    const filtro = this.filtro();
+    return this.deLaAlerta()
+      .filter((e) => filtro === 'todas' || e.tipo === filtro)
+      .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
   });
 
   ngOnInit(): void {
@@ -100,17 +142,27 @@ export class Evidence implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.urlsCreadas.forEach((u) => URL.revokeObjectURL(u));
+    this.mapa?.remove();
   }
 
   cargar(): void {
     this.cargando.set(true);
     this.error.set('');
+    // "Mis emergencias" abre este módulo con ?alertaId=ID
+    const pedida = Number(this.route.snapshot.queryParamMap.get('alertaId')) || null;
+    this.service.misAlertas().subscribe({
+      next: (a) => {
+        this.alertas.set(a);
+        this.resolverDirecciones();
+      },
+      error: () => {},
+    });
     this.service.listar().subscribe({
       next: (lista) => {
         this.evidencias.set(lista);
         this.cargando.set(false);
-        lista.filter((e) => e.tipo === 'photo' && e.tieneArchivo).slice(0, 30).forEach((e) => this.cargarMiniatura(e));
-        if (!this.seleccionada() && lista.length) this.ver(lista[0]);
+        const inicial = pedida ?? this.listaAlertas().find((a) => a.cantidad > 0)?.id ?? null;
+        if (inicial) this.elegirAlerta(inicial);
       },
       error: () => {
         this.error.set('No se pudieron cargar tus evidencias. Intenta de nuevo.');
@@ -119,11 +171,39 @@ export class Evidence implements OnInit, OnDestroy {
     });
   }
 
+  elegirAlerta(id: number): void {
+    this.alertaId.set(id);
+    this.filtro.set('todas');
+    this.cerrarEdicion();
+    const primera = this.filtradas()[0];
+    if (primera) this.ver(primera);
+    else {
+      this.seleccionada.set(null);
+      this.urlVisor.set(null);
+    }
+    this.filtradas()
+      .filter((e) => e.tipo === 'photo' && e.tieneArchivo)
+      .forEach((e) => this.cargarMiniatura(e));
+    this.resolverDirecciones();
+  }
+
+  /** Barrio y dirección de las alertas de la lista (OpenStreetMap, de a una por segundo). */
+  resolverDirecciones(): void {
+    for (const a of this.alertasFiltradas().slice(0, 15)) {
+      if (a.lat == null || a.lng == null || this.direcciones()[a.id]) continue;
+      this.geocoding.obtener(a.lat, a.lng).then((lugar) => {
+        const texto = lugar ? [lugar.barrio, lugar.direccion].filter(Boolean).join(' · ') || lugar.ciudad : null;
+        if (texto) this.direcciones.update((d) => ({ ...d, [a.id]: texto }));
+      });
+    }
+  }
+
   miniatura(e: MiEvidencia): string | null {
     return this.miniaturas()[e.id] ?? null;
   }
 
   private cargarMiniatura(e: MiEvidencia): void {
+    if (this.miniatura(e)) return;
     this.service.archivo(e.id).subscribe({
       next: (blob) => this.miniaturas.update((m) => ({ ...m, [e.id]: this.crearUrl(blob) })),
       error: () => {},
@@ -133,6 +213,7 @@ export class Evidence implements OnInit, OnDestroy {
   // ── Visor ──────────────────────────────────────
   ver(e: MiEvidencia): void {
     this.seleccionada.set(e);
+    this.cerrarEdicion();
     this.errorVisor.set('');
     this.urlVisor.set(null);
     if (!e.tieneArchivo) return;
@@ -174,12 +255,12 @@ export class Evidence implements OnInit, OnDestroy {
     if (!confirm(`¿Eliminar "${e.nombreArchivo}"? Esta acción no se puede deshacer.`)) return;
     this.service.eliminar(e.id).subscribe({
       next: () => {
-        const restantes = this.evidencias().filter((x) => x.id !== e.id);
-        this.evidencias.set(restantes);
+        this.evidencias.set(this.evidencias().filter((x) => x.id !== e.id));
         if (this.seleccionada()?.id === e.id) {
           this.seleccionada.set(null);
           this.urlVisor.set(null);
-          if (restantes.length) this.ver(this.filtradas()[0] ?? restantes[0]);
+          const siguiente = this.filtradas()[0];
+          if (siguiente) this.ver(siguiente);
         }
         this.mostrarAviso('Evidencia eliminada.');
       },
@@ -192,19 +273,66 @@ export class Evidence implements OnInit, OnDestroy {
     navigator.clipboard?.writeText(e.sha256).then(() => this.mostrarAviso('Huella SHA-256 copiada.'));
   }
 
+  // ── Renombrar ──────────────────────────────────
+  /** Se edita el nombre sin la extensión; el servidor se la vuelve a poner. */
+  editarNombre(e: MiEvidencia): void {
+    this.nuevoNombre.set(e.nombreArchivo.replace(/\.[a-z0-9]{1,5}$/i, ''));
+    this.editandoNombre.set(true);
+  }
+
+  cerrarEdicion(): void {
+    this.editandoNombre.set(false);
+    this.guardandoNombre.set(false);
+  }
+
+  guardarNombre(e: MiEvidencia): void {
+    const nombre = this.nuevoNombre().trim();
+    if (!nombre || this.guardandoNombre()) return;
+    this.guardandoNombre.set(true);
+    this.service.renombrar(e.id, nombre).subscribe({
+      next: (actualizada) => {
+        this.evidencias.update((l) => l.map((x) => (x.id === e.id ? { ...x, nombreArchivo: actualizada.nombreArchivo } : x)));
+        this.seleccionada.set({ ...e, nombreArchivo: actualizada.nombreArchivo });
+        this.cerrarEdicion();
+        this.mostrarAviso('Nombre actualizado.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.guardandoNombre.set(false);
+        this.mostrarAviso(err.error?.message ?? 'No se pudo cambiar el nombre.');
+      },
+    });
+  }
+
+  // ── Mapa de la alerta (dentro de la app, con zoom) ─────
+  abrirMapa(): void {
+    const a = this.alertaActual();
+    if (a?.lat == null || a?.lng == null) return;
+    const centro: L.LatLngTuple = [a.lat, a.lng];
+    this.mapaVisible.set(true);
+    setTimeout(() => {
+      if (!this.mapaRef) return;
+      this.mapa?.remove();
+      this.mapa = L.map(this.mapaRef.nativeElement, { center: centro, zoom: 17 });
+      L.tileLayer(TILES, { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(this.mapa);
+      L.circleMarker(centro, { radius: 10, color: '#fff', weight: 3, fillColor: '#7c3aed', fillOpacity: 1 })
+        .addTo(this.mapa)
+        .bindPopup(this.direcciones()[a.id] ?? 'Lugar de la alerta')
+        .openPopup();
+    }, 50);
+  }
+
+  cerrarMapa(): void {
+    this.mapaVisible.set(false);
+    this.mapa?.remove();
+    this.mapa = null;
+  }
+
   // ── Subida ─────────────────────────────────────
   abrirSubida(): void {
     this.subirVisible.set(true);
     this.archivo.set(null);
     this.errorSubida.set('');
     this.progreso.set(null);
-    this.service.misAlertas().subscribe({
-      next: (alertas) => {
-        this.misAlertas.set(alertas);
-        this.alertaElegida.set(alertas[0]?.id ?? null);
-      },
-      error: () => this.errorSubida.set('No se pudieron cargar tus alertas.'),
-    });
   }
 
   cerrarSubida(): void {
@@ -227,9 +355,8 @@ export class Evidence implements OnInit, OnDestroy {
   private validarArchivo(f: File | null): void {
     this.errorSubida.set('');
     if (!f) return;
-    const tipoOk = /^(image\/(png|jpeg|webp|heic)|video\/|audio\/|application\/pdf$)/.test(f.type);
-    if (!tipoOk) {
-      this.errorSubida.set('Solo se permiten fotos, videos, audios o PDF.');
+    if (!/^(image\/(png|jpeg|webp|heic)|video\/|audio\/)/.test(f.type)) {
+      this.errorSubida.set('Solo se permiten fotos, videos o audios.');
       return;
     }
     if (f.size > MAX_MB * 1024 * 1024) {
@@ -241,7 +368,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   subir(): void {
     const f = this.archivo();
-    const alertId = this.alertaElegida();
+    const alertId = this.alertaId();
     if (!f || !alertId) return;
     this.progreso.set(0);
     this.errorSubida.set('');
@@ -284,15 +411,12 @@ export class Evidence implements OnInit, OnDestroy {
       : '—';
   }
 
-  estado(s: string | undefined): string {
-    return s ? ESTADOS[s] ?? s : '—';
+  hora(d: Date | null): string {
+    return d ? d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }) : '';
   }
 
-  mapaUrl(e: MiEvidencia): string | null {
-    const a = e.alerta;
-    return a?.lat != null && a?.lng != null
-      ? `https://www.openstreetmap.org/?mlat=${a.lat}&mlon=${a.lng}#map=17/${a.lat}/${a.lng}`
-      : null;
+  estado(s: string | undefined): string {
+    return s ? ESTADOS[s] ?? s : '—';
   }
 
   private crearUrl(blob: Blob): string {

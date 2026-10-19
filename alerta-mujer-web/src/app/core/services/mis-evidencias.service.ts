@@ -34,6 +34,8 @@ export interface MiAlerta {
   inicio: Date;
   lat: number | null;
   lng: number | null;
+  /** La usuaria la marcó para que sus evidencias no se borren a los 60 días. */
+  conservar: boolean;
 }
 
 interface EvidenceViewApi {
@@ -85,7 +87,7 @@ export class MisEvidenciasService {
     return this.http
       .get<Array<{
         id: number; status: string; activationMethod: string; startedAt: string;
-        latitude: number | null; longitude: number | null;
+        latitude: number | null; longitude: number | null; keepEvidence?: boolean;
       }>>(`${environment.apiUrl}/api/alerts/me`)
       .pipe(map((l) => l.map((a) => ({
         id: a.id,
@@ -94,7 +96,15 @@ export class MisEvidenciasService {
         inicio: fechaUtc(a.startedAt)!,
         lat: a.latitude != null ? Number(a.latitude) : null,
         lng: a.longitude != null ? Number(a.longitude) : null,
+        conservar: !!a.keepEvidence,
       }))));
+  }
+
+  /** Conservar (o no) las evidencias de una alerta más allá de los 60 días. */
+  conservar(alertId: number, conservar: boolean): Observable<void> {
+    return this.http
+      .patch(`${environment.apiUrl}/api/alerts/${alertId}/keep-evidence`, { keep: conservar })
+      .pipe(map(() => undefined));
   }
 
   /** Cambia el nombre que se muestra (el archivo y su huella no cambian). */

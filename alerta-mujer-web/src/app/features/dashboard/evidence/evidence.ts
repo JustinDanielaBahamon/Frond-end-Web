@@ -26,6 +26,10 @@ const MAX_MB = 50;
 // Solo lo que sirve como evidencia de una emergencia (los documentos ya subidos se siguen viendo)
 const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+/** Días que se guardan las evidencias si la alerta no se marca para conservar (backend). */
+export const DIAS_RETENCION = 60;
+/** Máximo de alertas que se pueden conservar (backend: AlertService.MAX_ALERTAS_CONSERVADAS). */
+export const MAX_CONSERVADAS = 5;
 
 /** Alerta de la lista de la izquierda, con cuántas evidencias tiene. */
 interface AlertaConEvidencias extends MiAlerta {
@@ -47,6 +51,8 @@ export class Evidence implements OnInit, OnDestroy {
   readonly tipos = TIPOS;
   readonly aceptados = ACEPTADOS;
   readonly maxMb = MAX_MB;
+  readonly diasRetencion = DIAS_RETENCION;
+  readonly maxConservadas = MAX_CONSERVADAS;
 
   evidencias = signal<MiEvidencia[]>([]);
   alertas = signal<MiAlerta[]>([]);
@@ -97,7 +103,7 @@ export class Evidence implements OnInit, OnDestroy {
       if (!conocidas.has(e.alertId) && e.alerta) {
         conocidas.set(e.alertId, {
           id: e.alertId, estado: e.alerta.estado, metodo: e.alerta.metodo,
-          inicio: e.alerta.inicio ?? e.fecha, lat: e.alerta.lat, lng: e.alerta.lng,
+          inicio: e.alerta.inicio ?? e.fecha, lat: e.alerta.lat, lng: e.alerta.lng, conservar: false,
         });
       }
     }
@@ -271,6 +277,34 @@ export class Evidence implements OnInit, OnDestroy {
   copiarHuella(e: MiEvidencia): void {
     if (!e.sha256) return;
     navigator.clipboard?.writeText(e.sha256).then(() => this.mostrarAviso('Huella SHA-256 copiada.'));
+  }
+
+  // ── Conservar ──────────────────────────────────
+  guardandoConservar = signal(false);
+  totalConservadas = computed(() => this.listaAlertas().filter((a) => a.conservar).length);
+
+  /** Fecha en que se borrará la evidencia (si su alerta no está marcada para conservar). */
+  fechaBorrado(e: MiEvidencia): Date {
+    return new Date(e.fecha.getTime() + DIAS_RETENCION * 24 * 60 * 60 * 1000);
+  }
+
+  cambiarConservar(alerta: AlertaConEvidencias): void {
+    if (this.guardandoConservar()) return;
+    const conservar = !alerta.conservar;
+    this.guardandoConservar.set(true);
+    this.service.conservar(alerta.id, conservar).subscribe({
+      next: () => {
+        this.alertas.update((l) => l.map((a) => (a.id === alerta.id ? { ...a, conservar } : a)));
+        this.guardandoConservar.set(false);
+        this.mostrarAviso(conservar
+          ? 'Las evidencias de esta alerta se conservarán hasta que tú las borres.'
+          : `Las evidencias de esta alerta se borrarán a los ${DIAS_RETENCION} días.`);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.guardandoConservar.set(false);
+        this.mostrarAviso(err.error?.message ?? 'No se pudo cambiar. Intenta de nuevo.');
+      },
+    });
   }
 
   // ── Renombrar ──────────────────────────────────

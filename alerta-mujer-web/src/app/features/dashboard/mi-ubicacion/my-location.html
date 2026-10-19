@@ -205,6 +205,10 @@
       <h2 class="mu-card-title">Historial de ubicaciones del móvil</h2>
       <span class="mu-muted">{{ historial().length }} registros</span>
     </header>
+    <p class="mu-retencion">
+      <i class="ti ti-trash-x" aria-hidden="true"></i>
+      Por tu privacidad el historial se limpia solo: las ubicaciones del día a día se borran a los 7 días y los recorridos de tus alertas, a los 30.
+    </p>
 
     @if (cargandoHistorial()) {
       <p class="mu-muted">Cargando historial…</p>

@@ -10,6 +10,7 @@ import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../
 import { UsersService } from '../../../core/services/users.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { ZonaManual } from '../../../core/models/zona.model';
+import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
 
 // Campos extra que vienen en db.json; opcionales para no depender del modelo
 type AlertaVM = Alerta & {
@@ -109,7 +110,7 @@ const H_BASE = 240;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink],
+  imports: [SelectorFecha, CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -255,13 +256,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.recalcular();
   }
 
-  onDesde(ev: Event): void {
-    this.desde = (ev.target as HTMLInputElement).value;
+  onDesde(valor: string | null): void {
+    this.desde = valor ?? '';
     this.recalcular();
   }
 
-  onHasta(ev: Event): void {
-    this.hasta = (ev.target as HTMLInputElement).value;
+  onHasta(valor: string | null): void {
+    this.hasta = valor ?? '';
     this.recalcular();
   }
 

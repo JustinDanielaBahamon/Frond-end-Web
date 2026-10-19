@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   AuditService, FiltrosAuditoria, RegistroAuditoria, ResponsableAuditoria
 } from '../../../core/services/audit.service';
+import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
 
 const POR_PAGINA = 10;
 
@@ -56,7 +57,7 @@ const CAMPOS: Record<string, string> = {
 @Component({
   selector: 'app-admin-audit',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [SelectorFecha, CommonModule, FormsModule],
   templateUrl: './audit.html',
   styleUrl: './audit.scss',
 })

@@ -26,27 +26,8 @@
         (input)="onBuscarChange($event)" />
     </div>
 
-    <div class="ah-filtro-fecha" (click)="abrirCalendario()">
-      <svg class="ah-filtro-fecha-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span class="ah-filtro-fecha-label">
-        {{ fechaFiltro ? formatearFecha(fechaFiltro) : 'Todas' }}
-      </span>
-      <input
-        #fechaInput
-        type="date"
-        class="ah-filtro-fecha-input"
-        [value]="fechaFiltro ?? ''"
-        (change)="onFechaChange($event)"
-        aria-label="Filtrar historial por día" />
-      @if (fechaFiltro) {
-        <button type="button" class="ah-filtro-fecha-clear" (click)="$event.stopPropagation(); limpiarFiltroFecha()">✕</button>
-      }
-    </div>
+    <app-selector-fecha class="ah-filtro-fecha-selector" etiqueta="Filtrar historial por día" placeholder="Todas las fechas"
+                        [value]="fechaFiltro" (valueChange)="onFecha($event)" />
 
     <div class="ah-filtro-tipo">
       <svg class="ah-filtro-tipo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

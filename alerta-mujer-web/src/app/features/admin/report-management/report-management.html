@@ -64,23 +64,11 @@
       <div class="filter-group">
         <div class="filter-item">
           <label>Fecha Inicial</label>
-          <input 
-            type="date" 
-            class="select-date" 
-            aria-label="Fecha inicial"
-            [(ngModel)]="filtros.fechaInicio"
-            (change)="aplicarFiltros()"
-          >
+          <app-selector-fecha etiqueta="Fecha inicial" [(ngModel)]="filtros.fechaInicio" (valueChange)="aplicarFiltros()" />
         </div>
         <div class="filter-item">
           <label>Fecha Final</label>
-          <input 
-            type="date" 
-            class="select-date" 
-            aria-label="Fecha final"
-            [(ngModel)]="filtros.fechaFin"
-            (change)="aplicarFiltros()"
-          >
+          <app-selector-fecha etiqueta="Fecha final" [(ngModel)]="filtros.fechaFin" (valueChange)="aplicarFiltros()" />
         </div>
         <div class="filter-item">
           <label>Lugar de Alerta</label>

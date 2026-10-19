@@ -20,10 +20,10 @@
     @if (periodo === 'custom') {
       <div class="filtros filtros--fechas">
         <label class="fecha-label">Desde
-          <input class="fecha-input" type="date" [value]="desde" [max]="hasta || null" (change)="onDesde($event)" />
+          <app-selector-fecha etiqueta="Desde" [value]="desde" [max]="hasta || null" [limpiable]="false" (valueChange)="onDesde($event)" />
         </label>
         <label class="fecha-label">Hasta
-          <input class="fecha-input" type="date" [value]="hasta" [min]="desde || null" (change)="onHasta($event)" />
+          <app-selector-fecha etiqueta="Hasta" [value]="hasta" [min]="desde || null" [limpiable]="false" (valueChange)="onHasta($event)" />
         </label>
       </div>
     }

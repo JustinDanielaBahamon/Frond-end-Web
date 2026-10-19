@@ -151,7 +151,7 @@
                   {{ alerta.medioActivacion }}
                 </span>
               </td>
-              <td class="ah-ubicacion">{{ alerta.ubicacion }}</td>
+              <td class="ah-ubicacion">{{ alerta.ubicacion || 'Sin ubicación' }}</td>
               <td>
                 <span class="ah-badge" [ngClass]="estadoBadge[alerta.estado]">
                   {{ alerta.estado }}

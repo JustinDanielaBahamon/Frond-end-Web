@@ -1,10 +1,11 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import * as L from 'leaflet';
 import { AlertsService } from '../../../core/services/alerts.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { GeocodingService } from '../../../core/services/geocoding.service';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -30,6 +31,8 @@ export class AlertHistory implements OnInit, OnDestroy {
   private alertsService = inject(AlertsService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private geocoding = inject(GeocodingService);
+  private cdr = inject(ChangeDetectorRef);
 
   alertas: Alerta[] = [];
   alertasFiltradas: Alerta[] = [];
@@ -186,16 +189,16 @@ cerrarMenu() {
 
     this.map = L.map(elementId, {
       center: [lat, lng],
-      zoom: 15,
-      zoomControl: false,
-      scrollWheelZoom: false,
+      zoom: 16,
+      zoomControl: true,
+      scrollWheelZoom: true,
     });
 
     this.agregarCapaSegunTema();
 
     L.marker([lat, lng], { icon: iconDefault })
       .addTo(this.map)
-      .bindPopup('Ubicación de la alerta')
+      .bindPopup(this.alertas.find((a) => a.lat === lat && a.lng === lng)?.ubicacion || 'Ubicación de la alerta')
       .openPopup();
 
     // Si el usuario cambia de tema con el mini-mapa abierto, repintamos las teselas.
@@ -309,6 +312,7 @@ cerrarMenu() {
 
     this.alertasFiltradas = resultado;
     this.currentPage = 1;
+    this.resolverDirecciones();
   }
 
   /** Convierte una fecha a 'YYYY-MM-DD' usando la hora local (evita el corrimiento de un día que da toISOString con UTC). */
@@ -360,14 +364,39 @@ cerrarMenu() {
 
   irAPagina(p: number) {
     this.currentPage = p;
+    this.resolverDirecciones();
   }
 
   paginaAnterior() {
     if (this.currentPage > 1) this.currentPage--;
+    this.resolverDirecciones();
   }
 
   paginaSiguiente() {
     if (this.currentPage < this.totalPages) this.currentPage++;
+    this.resolverDirecciones();
+  }
+
+  /**
+   * Cambia las coordenadas por barrio y dirección (OpenStreetMap, como en la app). Solo las de la
+   * página visible: el servicio consulta de a una por segundo y guarda lo ya resuelto.
+   */
+  private resolverDirecciones() {
+    for (const alerta of this.alertasPagina) {
+      if (!alerta.lat && !alerta.lng) continue;
+      if (alerta.direccionResuelta) continue;
+      this.geocoding.obtener(alerta.lat, alerta.lng).then((lugar) => {
+        if (!lugar) return;
+        const texto = [lugar.barrio, lugar.direccion].filter(Boolean).join(' · ') || lugar.ciudad;
+        if (!texto) return;
+        alerta.ubicacion = texto;
+        alerta.direccionResuelta = true;
+        if (this.expandedAlertaId === alerta.id) this.map?.eachLayer((capa) => {
+          if (capa instanceof L.Marker) capa.setPopupContent(texto);
+        });
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   /**

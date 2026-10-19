@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of, catchError } from 'rxjs';
 import * as L from 'leaflet';
+import { iconoZona } from '../../../core/utils/icono-zona';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { ResourcesService } from '../../../core/services/resources.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
@@ -300,14 +301,7 @@ export function iconoSvg(c: Categoria): string {
 }
 
 function iconoPunto(c: Categoria, activo: boolean): L.DivIcon {
-  const size = activo ? 34 : 28;
-  return L.divIcon({
-    className: '',
-    html: `<div class="za-pin${activo ? ' za-pin--active' : ''}" style="--pin:${CATEGORIAS[c].color}">${iconoSvg(c)}</div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2],
-  });
+  return iconoZona(c, CATEGORIAS[c].color, activo);
 }
 
 function popupPunto(p: Punto, distancia: string): string {

@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
+import { iconoZona } from '../../../core/utils/icono-zona';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
@@ -436,7 +437,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
           radius: z.radiusMeters, color: estilo.color, weight: 1.5, fillColor: estilo.color, fillOpacity: 0.12,
         }).addTo(this.capaZonas);
       }
-      L.circleMarker([z.lat, z.lng], { radius: 5, color: '#fff', weight: 1.5, fillColor: estilo.color, fillOpacity: 1 })
+      L.marker([z.lat, z.lng], { icon: iconoZona(z.type, estilo.color) })
         .bindPopup(`<strong>${escapeHtml(z.name)}</strong><br>${estilo.etiqueta}${z.city ? ' · ' + escapeHtml(z.city) : ''}`)
         .addTo(this.capaZonas);
     }

@@ -1,14 +1,36 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
-import { UsersService } from '../../../core/services/users.services';
+import { CelularAdmin, HistorialModeracion, UsersService } from '../../../core/services/users.services';
+import { reducirFoto } from '../../../core/utils/foto';
 import { Usuario } from '../../../core/models/user.model';
 import { Chip } from '../../../shared/components/chip/chip';
 import { Modal } from '../../../shared/components/modal/modal';
 
 // Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
 type UsuariaUI = Usuario & { selected?: boolean };
+
+/** Motivos para bloquear una cuenta (quedan en el caso de moderación). */
+export const MOTIVOS_BLOQUEO = [
+  'Falsas alarmas reiteradas',
+  'Fraude o suplantación de identidad',
+  'Acoso o amenazas',
+  'Uso indebido de la plataforma',
+  'Solicitud de las autoridades',
+  'Otro',
+];
+
+const PERMISOS_ETIQUETA: Record<string, string> = {
+  ubicacion: 'Ubicación', notificaciones: 'Notificaciones', agitar: 'Agitar para alertar', bateria: 'Batería sin restricciones',
+  pantallaCompleta: 'Pantalla completa', microfono: 'Micrófono', camara: 'Cámara',
+};
+
+const TIPO_HISTORIAL: Record<string, string> = {
+  block: 'Cuenta bloqueada', unblock: 'Cuenta desbloqueada', deletion_pending: 'Eliminación solicitada',
+  deletion_approved: 'Cuenta eliminada', deletion_rejected: 'Eliminación rechazada',
+};
 
 interface ChipData {
   label: string;
@@ -41,10 +63,8 @@ interface FormUsuaria {
   last_name: string;
   email: string;
   telefono: string;
-  password: string;
 }
 
-const COLORES_AVATAR = ['#7c3aed', '#a78bfa', '#d946ef', '#6d28d9', '#c4b5fd'];
 
 @Component({
   selector: 'app-user',
@@ -82,13 +102,34 @@ export class UserComponent implements OnInit {
   modalForm = false;
   usuariaSeleccionada: UsuariaUI | null = null;
   accionBloqueo: 'bloquear' | 'desbloquear' = 'bloquear';
+  readonly motivosBloqueo = MOTIVOS_BLOQUEO;
+  /** Una o varias (bloqueo masivo) usuarias del modal de bloqueo. */
+  usuariasBloqueo: UsuariaUI[] = [];
+  motivoBloqueo = '';
+  descripcionBloqueo = '';
+  evidenciaBloqueo: string | null = null;
+  errorBloqueo = '';
+  guardandoBloqueo = false;
+
+  // Detalle: celulares, permisos e historial de moderación
+  celularesDetalle: CelularAdmin[] = [];
+  historialDetalle: HistorialModeracion[] = [];
+  evidenciaAbierta: string | null = null;
+
+  // Eliminación (la aprueba otra administradora)
+  modalEliminar = false;
+  motivoEliminar = '';
+  errorEliminar = '';
+  guardandoEliminar = false;
+
+  aviso = '';
 
   // ── Detalle (datos reales de otras tablas) ───────────────────
   alertasDetalle: AlertaResumen[] = [];
   cargandoDetalle = false;
 
   // ── Formulario ───────────────────────────────────────────────
-  modoForm: 'crear' | 'editar' = 'crear';
+  modoForm: 'editar' = 'editar';
   guardando = false;
   errorForm = '';
   form: FormUsuaria = this.formVacio();
@@ -208,28 +249,33 @@ export class UserComponent implements OnInit {
 
   // ── Bloqueo masivo vía API ────────────────────────────────────
   bloquearSeleccionadas(): void {
-    const seleccionadas = this.usuariasFiltradas.filter(u => u.selected);
-
-    seleccionadas.forEach(u => {
-      this.usersService.updateEstado(u.id, 'Bloqueada por Fraude').subscribe({
-        next: (usuarioActualizado) => {
-          const original = this.todasLasUsuarias.find(x => x.id === usuarioActualizado.id);
-          if (original) original.estado = usuarioActualizado.estado;
-          this.applyFilters();
-        },
-        error: (err) => console.error('Error bloqueando usuaria:', err)
-      });
-    });
-
-    this.deselectAll();
+    const seleccionadas = this.usuariasFiltradas.filter(u => u.selected && u.estado !== 'Bloqueada por Fraude');
+    if (seleccionadas.length === 0) return;
+    this.abrirBloqueo(seleccionadas, 'bloquear');
   }
 
   // ── Ver detalle: carga las últimas alertas reales ────────────
   verDetalle(u: UsuariaUI): void {
     this.usuariaSeleccionada = u;
     this.alertasDetalle = [];
+    this.celularesDetalle = [];
+    this.historialDetalle = [];
     this.cargandoDetalle = true;
     this.modalDetalle = true;
+    this.usersService.celulares().subscribe({
+      next: (lista) => {
+        this.celularesDetalle = lista.filter(c => String(c.userId) === String(u.id) && c.osName !== 'web');
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
+    this.usersService.historial(u.id).subscribe({
+      next: (h) => {
+        this.historialDetalle = h;
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
 
     // GET /api/alerts/user/{usersId} acepta users.id para admin
     this.usersService.getAlertasByUsuaria(u.id).subscribe({
@@ -247,46 +293,147 @@ export class UserComponent implements OnInit {
     });
   }
 
+  /** La contraseña solo la cambia la usuaria: se le envía el correo con el código. */
   restablecerPassword(u: UsuariaUI): void {
-    // TODO: cuando exista el backend, llamar al endpoint de recuperación
-    alert(`Se envió un correo de restablecimiento a ${u.email}`);
-    this.cerrarModales();
+    this.usersService.enviarRecuperacion(u.email).subscribe({
+      next: () => this.mostrarAviso(`Enviamos a ${u.email} un código para que cree una contraseña nueva.`),
+      error: () => this.mostrarAviso('No se pudo enviar el correo de recuperación. Intenta de nuevo.'),
+    });
   }
 
   toggleBloqueo(u: UsuariaUI): void {
-    this.usuariaSeleccionada = u;
-    this.accionBloqueo = u.estado === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear';
+    this.abrirBloqueo([u], u.estado === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear');
+  }
+
+  private abrirBloqueo(usuarias: UsuariaUI[], accion: 'bloquear' | 'desbloquear'): void {
+    this.usuariasBloqueo = usuarias;
+    this.usuariaSeleccionada = usuarias[0];
+    this.accionBloqueo = accion;
+    this.motivoBloqueo = '';
+    this.descripcionBloqueo = '';
+    this.evidenciaBloqueo = null;
+    this.errorBloqueo = '';
+    this.modalDetalle = false;
     this.modalBloqueo = true;
   }
 
+  async elegirEvidencia(evento: Event): Promise<void> {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    input.value = '';
+    if (!archivo) return;
+    try {
+      // Captura legible pero liviana (el servidor acepta hasta ~300 KB)
+      this.evidenciaBloqueo = await reducirFoto(archivo, 1100);
+      this.errorBloqueo = '';
+    } catch (e) {
+      this.errorBloqueo = e instanceof Error ? e.message : 'No se pudo usar la imagen';
+    }
+    this.cdr.detectChanges();
+  }
+
+  get bloqueoValido(): boolean {
+    const nota = this.descripcionBloqueo.trim().length >= 10;
+    return this.accionBloqueo === 'desbloquear' ? nota : nota && !!this.motivoBloqueo;
+  }
+
   confirmarBloqueo(): void {
-    if (!this.usuariaSeleccionada) return;
-
-    const nuevoEstado: Usuario['estado'] =
-      this.accionBloqueo === 'bloquear' ? 'Bloqueada por Fraude' : 'Activa';
-
-    this.usersService.updateEstado(this.usuariaSeleccionada.id, nuevoEstado).subscribe({
-      next: (usuarioActualizado) => {
-        const original = this.todasLasUsuarias.find(x => x.id === usuarioActualizado.id);
-        if (original) original.estado = usuarioActualizado.estado;
+    if (!this.bloqueoValido || this.guardandoBloqueo) return;
+    this.guardandoBloqueo = true;
+    this.errorBloqueo = '';
+    const descripcion = this.descripcionBloqueo.trim();
+    const peticiones = this.usuariasBloqueo.map(u => this.accionBloqueo === 'bloquear'
+      ? this.usersService.bloquear(u.id, this.motivoBloqueo, descripcion, this.evidenciaBloqueo)
+      : this.usersService.desbloquear(u.id, descripcion));
+    forkJoin(peticiones).subscribe({
+      next: () => {
+        const n = this.usuariasBloqueo.length;
+        this.mostrarAviso(this.accionBloqueo === 'bloquear'
+          ? `${n === 1 ? 'Cuenta bloqueada' : n + ' cuentas bloqueadas'}. El caso quedó registrado en Moderación.`
+          : 'Cuenta desbloqueada.');
+        this.guardandoBloqueo = false;
+        this.deselectAll();
         this.cerrarModales();
-        this.applyFilters();
+        this.cargarUsuarias();
       },
-      error: (err) => console.error('Error actualizando estado:', err)
+      error: (err) => {
+        this.guardandoBloqueo = false;
+        this.errorBloqueo = err?.error?.message ?? 'No se pudo completar. Intenta de nuevo.';
+        this.cdr.detectChanges();
+      },
     });
+  }
+
+  verEvidencia(item: HistorialModeracion): void {
+    if (!item.casoId) return;
+    this.usersService.evidenciaDeCaso(item.casoId).subscribe({
+      next: (e) => {
+        this.evidenciaAbierta = e;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  // ── Eliminar cuenta (la aprueba otra administradora) ─────────
+  abrirEliminar(u: UsuariaUI): void {
+    this.usuariaSeleccionada = u;
+    this.motivoEliminar = '';
+    this.errorEliminar = '';
+    this.modalDetalle = false;
+    this.modalEliminar = true;
+  }
+
+  solicitarEliminacion(): void {
+    const u = this.usuariaSeleccionada;
+    if (!u || this.motivoEliminar.trim().length < 10 || this.guardandoEliminar) return;
+    this.guardandoEliminar = true;
+    this.usersService.solicitarEliminacion(u.id, this.motivoEliminar.trim()).subscribe({
+      next: () => {
+        this.guardandoEliminar = false;
+        this.cerrarModales();
+        this.mostrarAviso('Solicitud enviada. Otra administradora debe aprobarla en Moderación.');
+      },
+      error: (err) => {
+        this.guardandoEliminar = false;
+        this.errorEliminar = err?.error?.message ?? 'No se pudo enviar la solicitud.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  // ── Ayudas del detalle ───────────────────────────────────────
+  permisosDe(c: CelularAdmin): { nombre: string; ok: boolean }[] {
+    if (!c.permissions) return [];
+    try {
+      const datos = JSON.parse(c.permissions) as Record<string, boolean>;
+      return Object.entries(datos).map(([k, v]) => ({ nombre: PERMISOS_ETIQUETA[k] ?? k, ok: v === true }));
+    } catch {
+      return [];
+    }
+  }
+
+  nombreCelular(c: CelularAdmin): string {
+    return c.deviceName || [c.brand, c.model].filter(Boolean).join(' ') || 'Celular';
+  }
+
+  tipoHistorial(t: string): string {
+    return TIPO_HISTORIAL[t] ?? t;
+  }
+
+  private mostrarAviso(texto: string): void {
+    this.aviso = texto;
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      if (this.aviso === texto) {
+        this.aviso = '';
+        this.cdr.detectChanges();
+      }
+    }, 5000);
   }
 
   // ── Formulario crear / editar ────────────────────────────────
   private formVacio(): FormUsuaria {
-    return { first_name: '', last_name: '', email: '', telefono: '', password: '' };
-  }
-
-  abrirModalNueva(): void {
-    this.modoForm = 'crear';
-    this.form = this.formVacio();
-    this.errorForm = '';
-    this.usuariaSeleccionada = null;
-    this.modalForm = true;
+    return { first_name: '', last_name: '', email: '', telefono: '' };
   }
 
   abrirModalEditar(u: UsuariaUI): void {
@@ -297,7 +444,6 @@ export class UserComponent implements OnInit {
       last_name: u.last_name ?? '',
       email: u.email,
       telefono: u.telefono,
-      password: '', // vacío = no cambiar
     };
     this.errorForm = '';
     this.modalDetalle = false;
@@ -310,7 +456,7 @@ export class UserComponent implements OnInit {
     const email = this.form.email.trim().toLowerCase();
     const duplicado = this.todasLasUsuarias.some(u =>
       u.email.toLowerCase() === email &&
-      (this.modoForm === 'crear' || u.id !== this.usuariaSeleccionada?.id)
+      u.id !== this.usuariaSeleccionada?.id
     );
     if (duplicado) {
       this.errorForm = 'Ya existe una usuaria con ese correo.';
@@ -319,42 +465,7 @@ export class UserComponent implements OnInit {
 
     this.guardando = true;
 
-    if (this.modoForm === 'crear') {
-      const nombreCompleto = `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim();
-      const ahora = new Date();
-      const dd = String(ahora.getDate()).padStart(2, '0');
-      const mm = String(ahora.getMonth() + 1).padStart(2, '0');
-
-      const nueva = {
-        nombre: nombreCompleto,
-        first_name: this.form.first_name.trim(),
-        last_name: this.form.last_name.trim(),
-        email,
-        correo: email,
-        telefono: this.form.telefono.trim(),
-        fechaRegistro: `${dd}/${mm}/${ahora.getFullYear()}`,
-        alertas: 0,
-        ultimaActividad: 'recién registrada',
-        estado: 'Activa',
-        rol: 'Usuaria',
-        role_id: 1,
-        contactoEmergencia: 'N/A',
-        avatarColor: COLORES_AVATAR[Math.floor(Math.random() * COLORES_AVATAR.length)],
-        document_number: '',
-        document_type: '',
-        birthdate: null,
-        created_at: ahora.toISOString(),
-        password: this.form.password,
-      };
-
-      this.usersService.crearUsuaria(nueva).subscribe({
-        next: (creada) => {
-          this.todasLasUsuarias = [...this.todasLasUsuarias, creada];
-          this.finalizarGuardado();
-        },
-        error: (err) => this.manejarErrorGuardado(err),
-      });
-    } else {
+    {
       const u = this.usuariaSeleccionada!;
       const cambios: Partial<Usuario> & Record<string, unknown> = {
         nombre: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
@@ -364,7 +475,6 @@ export class UserComponent implements OnInit {
         correo: email,
         telefono: this.form.telefono.trim(),
       };
-      if (this.form.password) cambios['password'] = this.form.password;
 
       this.usersService.actualizarUsuaria(u.id, cambios).subscribe({
         next: (actualizada) => {
@@ -394,6 +504,8 @@ export class UserComponent implements OnInit {
     this.modalDetalle = false;
     this.modalBloqueo = false;
     this.modalForm = false;
+    this.modalEliminar = false;
+    this.evidenciaAbierta = null;
     this.usuariaSeleccionada = null;
     this.errorForm = '';
   }

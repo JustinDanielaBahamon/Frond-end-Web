@@ -124,3 +124,45 @@
 }
 
 @media (prefers-reduced-motion: reduce) { .aviso-contacto__pulso { animation: none; } }
+
+// ── Aviso "tu celular cambió de lugar" ──────────────
+.aviso-movimiento {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(91, 33, 182, 0.3);
+
+  > i { font-size: 1.4rem; }
+
+  &__texto {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    small { display: block; opacity: 0.8; font-size: 0.75rem; }
+  }
+
+  &__accion {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  &__cerrar {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+}

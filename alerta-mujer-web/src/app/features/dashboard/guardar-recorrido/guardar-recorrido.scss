@@ -358,6 +358,7 @@ $danger: #e671f8;
   &--lg {
     width: 2.25rem;
     height: 2.25rem;
+    position: relative;
     border-radius: 0.65rem;
     display: inline-flex;
     align-items: center;
@@ -365,7 +366,23 @@ $danger: #e671f8;
   }
 }
 
-.gr-swatch-star { color: #1a1428; font-size: 0.95rem; }
+.gr-swatch-icon { width: 1.1rem; height: 1.1rem; color: #fff; }
+
+.gr-swatch-star {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #7c3aed;
+  font-size: 0.7rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
 
 .gr-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
 .gr-row-name { font-size: 0.84rem; font-weight: 700; color: $text; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

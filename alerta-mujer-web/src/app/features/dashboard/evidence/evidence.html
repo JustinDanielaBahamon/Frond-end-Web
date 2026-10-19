@@ -68,6 +68,7 @@
                 </span>
                 <span class="ev-alerta-meta">
                   <span class="ev-chip ev-chip--{{ a.estado }}">{{ estado(a.estado) }}</span>
+                  @if (a.conservar) { <span class="ev-chip ev-chip--conservada" title="Evidencias conservadas">Conservada</span> }
                   <span class="ev-alerta-cantidad">{{ a.cantidad }} {{ a.cantidad === 1 ? 'archivo' : 'archivos' }}</span>
                 </span>
               </button>
@@ -81,6 +82,27 @@
 
         @if (alertaActual(); as alerta) {
           <div class="ev-de-alerta">
+            <div class="ev-conservar" [class.ev-conservar--on]="alerta.conservar">
+              <span class="ev-conservar-texto">
+                @if (alerta.conservar) {
+                  <strong>Evidencias conservadas</strong>
+                  <small>No se borran hasta que tú lo hagas · {{ totalConservadas() }} de {{ maxConservadas }} alertas conservadas.</small>
+                } @else {
+                  <strong>Se borran a los {{ diasRetencion }} días</strong>
+                  <small>
+                    @if (totalConservadas() < maxConservadas) {
+                      ¿Las necesitas para una denuncia? Consérvalas ({{ totalConservadas() }} de {{ maxConservadas }} usadas).
+                    } @else {
+                      Ya conservas {{ maxConservadas }} alertas: deja de conservar otra para guardar esta.
+                    }
+                  </small>
+                }
+              </span>
+              <button class="ev-btn" [class.ev-btn--primary]="!alerta.conservar" [class.ev-btn--ghost]="alerta.conservar"
+                      [disabled]="guardandoConservar() || (!alerta.conservar && totalConservadas() >= maxConservadas)" (click)="cambiarConservar(alerta)">
+                {{ alerta.conservar ? 'Dejar de conservar' : 'Conservar' }}
+              </button>
+            </div>
             <div class="ev-filters" role="tablist">
               <button role="tab" class="ev-filter" [class.active]="filtro() === 'todas'" (click)="filtro.set('todas')">
                 Todas <span>{{ conteo().photo + conteo().video + conteo().audio + conteo().document }}</span>
@@ -166,6 +188,7 @@
           <div><dt>Tipo</dt><dd>{{ tipos[e.tipo].etiqueta }}</dd></div>
           <div><dt>Tamaño</dt><dd>{{ tamano(e.tamanoBytes) }}</dd></div>
           <div><dt>Guardada</dt><dd>{{ fechaLarga(e.fecha) }}</dd></div>
+          <div><dt>Se borra</dt><dd>{{ alertaActual()?.conservar ? 'Conservada' : fechaCorta(fechaBorrado(e)) }}</dd></div>
           <div><dt>Alerta</dt><dd>{{ fechaCorta(e.alerta?.inicio ?? null) }} · {{ estado(e.alerta?.estado) }}</dd></div>
           @if (e.alerta?.inicio) {
             <div><dt>Inicio de la alerta</dt><dd>{{ fechaLarga(e.alerta!.inicio) }}</dd></div>

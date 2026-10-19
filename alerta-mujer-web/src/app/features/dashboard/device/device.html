@@ -14,28 +14,48 @@
     </button>
   </div>
 
-  <!-- 2. PERMISOS DEL CELULAR (APP MÓVIL) -->
+  <!-- 2. PERMISOS DEL CELULAR (los informa la app móvil) -->
   <div class="device-panel">
     <h2 class="device-panel__title">
-      <i class="ti ti-shield-check"></i> Permisos del Celular (App Móvil)
+      <i class="ti ti-shield-check"></i> Permisos de tu celular
     </h2>
-    <p class="device-permissions-note">
-      <i class="ti ti-info-circle"></i>
-      <span>Estos son los permisos que la app móvil necesita en tu celular. Para cambiarlos, ve a Configuración en tu teléfono.</span>
-    </p>
-    <div class="device-grid device-grid--3col">
-      @for (perm of permissions(); track perm.name) {
-        <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles')" aria-live="polite">
-          <div class="device-item__icon device-item__icon--neutral">
-            <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
+    @if (permisosCelular(); as pc) {
+      @if (pc.faltan > 0) {
+        <div class="device-perm-aviso" role="alert">
+          <i class="ti ti-alert-circle"></i>
+          <div>
+            <strong>Por favor otorga los permisos a AlertaMujer para que pueda funcionar correctamente.</strong>
+            <span>En tu celular abre la app → menú → «Permisos y protección» y activa lo que falta ({{ pc.faltan }}).</span>
           </div>
-          <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles' }}</p>
-          <span class="device-badge device-badge--neutral">
-            Ver en celular
-          </span>
         </div>
+      } @else {
+        <p class="device-permissions-note">
+          <i class="ti ti-circle-check"></i>
+          <span>Tu celular tiene todo listo para una emergencia.</span>
+        </p>
       }
-    </div>
+      <div class="device-grid device-grid--3col">
+        @for (perm of pc.lista; track perm.id) {
+          <div class="device-perm" [class.device-perm--ok]="perm.concedido" role="status"
+               [attr.aria-label]="perm.titulo + ': ' + (perm.concedido ? 'listo' : 'falta')">
+            <span class="device-perm__icon"><i class="ti" [ngClass]="perm.icono"></i></span>
+            <span class="device-perm__body">
+              <span class="device-perm__titulo">{{ perm.titulo }}</span>
+              <span class="device-perm__desc">{{ perm.descripcion }}</span>
+            </span>
+            <span class="device-perm__estado">
+              <i class="ti" [ngClass]="perm.concedido ? 'ti-check' : 'ti-x'"></i> {{ perm.concedido ? 'Listo' : 'Falta' }}
+            </span>
+          </div>
+        }
+      </div>
+      <p class="device-perm__fecha">Informado por {{ pc.celular }} · {{ pc.actualizado }}</p>
+    } @else {
+      <p class="device-permissions-note">
+        <i class="ti ti-info-circle"></i>
+        <span>{{ featuresLoading() ? 'Consultando tu celular…' : 'Abre la app actualizada en tu celular para ver aquí el estado de sus permisos.' }}</span>
+      </p>
+    }
   </div>
 
   <!-- FILA DE 2 COLUMNAS: ESTADO DE SERVICIOS + INFORMACIÓN DEL DISPOSITIVO -->
@@ -47,6 +67,14 @@
         <i class="ti ti-wifi"></i> Estado de Servicios
       </h2>
       <div class="device-list">
+        <div class="device-list-item">
+          <i class="ti ti-clock-hour-4"></i>
+          <div class="device-list-item__body">
+            <span class="device-list-item__label">Tiempo restante de la sesión</span>
+            <span class="device-list-item__details">Cuando llegue a cero tendrás que volver a iniciar sesión en la web. En el celular la sesión se renueva sola mientras uses la app.</span>
+          </div>
+          <span class="device-badge" [ngClass]="sesionPorVencer() ? 'device-badge--advertencia' : 'device-badge--exito'">{{ sesionRestante() }}</span>
+        </div>
         @for (service of services(); track service.name) {
           <div class="device-list-item">
             <i class="ti" [ngClass]="service.enabled ? 'ti-check' : 'ti-x'"></i>
@@ -207,21 +235,21 @@
         <i class="ti ti-test-pipe"></i> Pruebas de Funcionalidad
       </h2>
       <div class="device-test-grid">
-        <button class="device-test-btn" (click)="viewMobileLocation()" [disabled]="loading()" aria-label="Ver ubicación del dispositivo móvil">
+        <button class="device-test-btn" (click)="viewMobileLocation()" [disabled]="loading()" aria-label="Ver dónde está tu celular">
           <i class="ti ti-map-pin"></i>
-          <span>Ver Ubicación Móvil</span>
+          <span>¿Dónde está mi celular?</span>
         </button>
-        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Estado de notificaciones push móvil">
-          <i class="ti ti-shield-check"></i>
-          <span>Estado Push Móvil</span>
+        <button class="device-test-btn" (click)="probarAlertasCelular()" [disabled]="loading()" aria-label="Comprobar si tu celular recibe alertas">
+          <i class="ti ti-device-mobile-message"></i>
+          <span>¿Mi celular recibe alertas?</span>
         </button>
-        <button class="device-test-btn" (click)="testNotificationDisplay()" [disabled]="loading()" aria-label="Gestionar notificaciones desde la app móvil">
-          <i class="ti ti-device-mobile"></i>
-          <span>Notificaciones Móvil</span>
+        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Probar notificaciones en este computador">
+          <i class="ti ti-bell-ringing"></i>
+          <span>Avisos en este computador</span>
         </button>
-        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" aria-label="Probar conectividad de red">
+        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" aria-label="Probar la conexión con el servidor">
           <i class="ti ti-wifi"></i>
-          <span>Probar Conectividad</span>
+          <span>Conexión con el servidor</span>
         </button>
       </div>
     </div>
@@ -242,10 +270,6 @@
         <i class="ti ti-trash"></i>
         <span>Limpiar caché</span>
       </button>
-      <button class="device-action-btn" (click)="exportDiagnostic()" [disabled]="loading()" aria-label="Exportar diagnóstico completo en formato JSON">
-        <i class="ti ti-download"></i>
-        <span>Exportar diagnóstico</span>
-      </button>
       <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()" aria-label="Refrescar estado de permisos y servicios">
         <i class="ti ti-shield-check"></i>
         <span>Refrescar permisos</span>
@@ -257,7 +281,7 @@
 
 @if (detalle(); as det) {
   <div class="dd-backdrop" (click)="cerrarDetalle()">
-    <section class="dd-modal" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
+    <section class="dd-modal" [ngClass]="det.tono ? 'dd-modal--' + det.tono : ''" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
       <header class="dd-head">
         <span class="dd-head__icon"><i class="ti" [ngClass]="det.icono"></i></span>
         <div>
@@ -277,6 +301,10 @@
       @if (det.nota) {
         <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.nota }}</p>
       }
+      @if (det.enlace) {
+        <a class="dd-enlace" [href]="det.enlace.url" target="_blank" rel="noopener">{{ det.enlace.texto }} <i class="ti ti-external-link"></i></a>
+      }
+      <button type="button" class="dd-ok" (click)="cerrarDetalle()">Entendido</button>
     </section>
   </div>
 }

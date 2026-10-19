@@ -114,6 +114,9 @@ export interface UserDevice {
   status: string;
   lastAccess: string | null;
   fcmToken: string | null;
+  /** JSON con los permisos que informa la app, p. ej. {"ubicacion":true,"agitar":false}. */
+  permissions?: string | null;
+  permissionsUpdatedAt?: string | null;
 }
 
 /**

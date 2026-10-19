@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subject, Subscription, catchError, finalize, forkJoin, map, of, takeUntil } from 'rxjs';
 
@@ -9,10 +9,10 @@ import { DeviceService, UserDevice } from '../../../core/services/device.service
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { AuthService } from '../../../core/auth/auth.service';
+import { GeocodingService } from '../../../core/services/geocoding.service';
 import { UbicacionEntry } from '../../../core/models/location.model';
 import {
   DeviceInfo,
-  PermissionStatus,
   ServiceStatus,
   ActivityLog,
   CriticalFeatureStatus
@@ -24,7 +24,22 @@ interface DetalleDispositivo {
   icono: string;
   filas: { etiqueta: string; valor: string }[];
   nota?: string;
+  /** Color del encabezado en los resultados de las pruebas. */
+  tono?: 'ok' | 'aviso' | 'error';
+  enlace?: { url: string; texto: string };
 }
+
+/** Permisos que informa la app (ver reportarPermisos en la app móvil). */
+const PERMISOS_CELULAR = [
+  { id: 'ubicacion', titulo: 'Ubicación', descripcion: 'Para enviar dónde estás en una alerta', icono: 'ti-map-pin' },
+  { id: 'notificaciones', titulo: 'Notificaciones', descripcion: 'Para recibir las alertas de tus contactos', icono: 'ti-bell' },
+  { id: 'agitar', titulo: 'Métodos de activación', descripcion: 'Agitar el celular para enviar una alerta', icono: 'ti-hand-move' },
+  { id: 'bateria', titulo: 'Batería sin restricciones', descripcion: 'Para que el teléfono no apague la protección', icono: 'ti-battery-charging' },
+  { id: 'microfono', titulo: 'Micrófono', descripcion: 'Para grabar audio como evidencia', icono: 'ti-microphone' },
+  { id: 'camara', titulo: 'Cámara', descripcion: 'Para grabar video como evidencia', icono: 'ti-camera' },
+];
+
+const FECHA_CORTA: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' };
 
 const ESTADOS_GPS: Record<string, string> = {
   active: 'Activo', inactive: 'Apagado', denied: 'Permiso denegado', unknown: 'Sin dato',
@@ -47,10 +62,10 @@ export class Device implements OnInit, OnDestroy {
   private contactService = inject(EmergencyContactService);
   private locationService = inject(PhoneLocationService);
   private authService = inject(AuthService);
+  private geocoding = inject(GeocodingService);
 
   // Estado reactivo con signals
   deviceInfo = signal<DeviceInfo | null>(null);
-  permissions = signal<PermissionStatus[]>([]);
   services = signal<ServiceStatus[]>([]);
   isOnline = signal<boolean>(true);
   connectionQuality = signal<string>('Desconocida');
@@ -60,6 +75,34 @@ export class Device implements OnInit, OnDestroy {
   misCelulares = signal<UserDevice[]>([]);
   /** Ventana con el detalle de un dispositivo (celular o este computador). */
   detalle = signal<DetalleDispositivo | null>(null);
+
+  /** Permisos del celular usado más recientemente, tal como los informó la app. */
+  permisosCelular = computed(() => {
+    const celular = [...this.misCelulares()]
+      .filter((d) => !!d.permissions)
+      .sort((a, b) => (b.permissionsUpdatedAt ?? '').localeCompare(a.permissionsUpdatedAt ?? ''))[0];
+    if (!celular?.permissions) return null;
+    let datos: Record<string, boolean>;
+    try {
+      datos = JSON.parse(celular.permissions);
+    } catch {
+      return null;
+    }
+    const lista = PERMISOS_CELULAR.filter((p) => p.id in datos).map((p) => ({ ...p, concedido: datos[p.id] === true }));
+    return {
+      lista,
+      faltan: lista.filter((p) => !p.concedido).length,
+      celular: this.nombreCelular(celular),
+      actualizado: celular.permissionsUpdatedAt
+        ? new Date(celular.permissionsUpdatedAt).toLocaleString('es-CO', FECHA_CORTA)
+        : 'sin fecha',
+    };
+  });
+
+  /** Tiempo que le queda a la sesión de la web ("5 h 20 min"). */
+  sesionRestante = signal('');
+  sesionPorVencer = signal(false);
+  private relojSesion?: ReturnType<typeof setInterval>;
 
   lastRefresh = signal<string>('');
   loading = signal<boolean>(false);
@@ -85,8 +128,9 @@ export class Device implements OnInit, OnDestroy {
       });
 
     this.loadDeviceInfo();
-    this.loadPermissions();
     this.loadServices();
+    this.actualizarSesion();
+    this.relojSesion = setInterval(() => this.actualizarSesion(), 30000);
     this.subscribeToOnlineStatus();
     this.updateLastRefresh();
   }
@@ -100,13 +144,17 @@ export class Device implements OnInit, OnDestroy {
     }
   }
 
-  private loadPermissions(): void {
-    this.permissionsService.checkAllPermissions()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (perms) => this.permissions.set(perms),
-        error: (error) => console.error('Error loading permissions:', error)
-      });
+  private actualizarSesion(): void {
+    const ms = this.authService.tiempoRestanteMs();
+    if (ms === null) {
+      this.sesionRestante.set('Sin sesión');
+      this.sesionPorVencer.set(true);
+      return;
+    }
+    const minutos = Math.floor(ms / 60000);
+    const horas = Math.floor(minutos / 60);
+    this.sesionRestante.set(horas > 0 ? `${horas} h ${minutos % 60} min` : `${minutos} min`);
+    this.sesionPorVencer.set(minutos < 60);
   }
 
   private loadServices(): void {
@@ -117,9 +165,9 @@ export class Device implements OnInit, OnDestroy {
         details: 'Se actualiza al sincronizar'
       },
       {
-        name: 'Token Push Activo',
+        name: 'Recibe alertas en el celular',
         enabled: false,
-        details: 'Notificaciones push en el celular'
+        details: 'Tus contactos te pueden avisar al celular'
       },
       {
         name: 'Última Ubicación Registrada',
@@ -179,6 +227,8 @@ export class Device implements OnInit, OnDestroy {
           pushTokenRegistered: !!devices?.some(d => !!d.fcmToken),
           emergencyContactsCount: contacts ? contacts.length : null
         });
+        if (latest && latest !== FAILED) this.resolverDireccion(latest);
+        this.ultimaUbicacion = latest && latest !== FAILED ? latest : null;
         return contacts !== null && devices !== null && latest !== FAILED;
       }),
       finalize(() => this.featuresLoading.set(false)),
@@ -186,11 +236,26 @@ export class Device implements OnInit, OnDestroy {
     );
   }
 
+  /** Última ubicación que envió la app del celular (no la del computador). */
+  private ultimaUbicacion: UbicacionEntry | null = null;
+  private direccionUltima: string | null = null;
+
+  private fechaUbicacion(entry: UbicacionEntry): string {
+    return entry.recordedAt ? new Date(entry.recordedAt).toLocaleString('es-CO', FECHA_CORTA) : entry.time;
+  }
+
   private formatLocation(entry: UbicacionEntry): string {
-    const when = entry.recordedAt
-      ? new Date(entry.recordedAt).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-      : entry.time;
-    return `${when} · ${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
+    return `${this.direccionUltima ?? 'Buscando la dirección…'} · ${this.fechaUbicacion(entry)}`;
+  }
+
+  /** Cambia las coordenadas por barrio y dirección (OpenStreetMap, igual que en la app). */
+  private resolverDireccion(entry: UbicacionEntry): void {
+    this.geocoding.obtener(entry.lat, entry.lng).then((lugar) => {
+      const texto = lugar ? [lugar.barrio, lugar.direccion].filter(Boolean).join(' · ') || lugar.ciudad : null;
+      this.direccionUltima = texto ?? `${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
+      const actual = this.criticalFeatures();
+      if (actual) this.criticalFeatures.set({ ...actual, lastLocationCaptured: this.formatLocation(entry) });
+    });
   }
 
   private updateMobileServices(): void {
@@ -198,7 +263,7 @@ export class Device implements OnInit, OnDestroy {
     if (!features) return;
 
     this.updateServiceStatus('Celular Vinculado', (features.registeredDevices ?? 0) > 0);
-    this.updateServiceStatus('Token Push Activo', features.pushTokenRegistered);
+    this.updateServiceStatus('Recibe alertas en el celular', features.pushTokenRegistered);
     this.updateServiceStatus('Última Ubicación Registrada', 
       features.lastLocationCaptured !== null && features.lastLocationCaptured !== 'No disponible');
   }
@@ -329,25 +394,73 @@ export class Device implements OnInit, OnDestroy {
     }));
   }
 
-  // ─── MÉTODOS DE PRUEBAS DE FUNCIONALIDAD ─────────────────
+  // ─── PRUEBAS DE FUNCIONALIDAD (el resultado sale en una tarjeta, no en el aviso del navegador) ───
 
-  viewMobileLocation(): void {
-    const features = this.criticalFeatures();
-    const loc = features?.lastLocationCaptured;
-    if (loc && loc !== 'No disponible') {
-      alert('Última ubicación del celular: ' + loc);
-    } else {
-      alert('No hay ubicación registrada desde la app móvil. Abre la app en tu celular para registrar tu ubicación.');
-    }
+  private mostrarResultado(r: Omit<DetalleDispositivo, 'filas'> & { filas?: DetalleDispositivo['filas'] }): void {
+    this.detalle.set({ filas: [], ...r });
   }
 
-  testGeolocation(): void {
-    this.viewMobileLocation();
+  viewMobileLocation(): void {
+    const u = this.ultimaUbicacion;
+    if (!u) {
+      this.mostrarResultado({
+        titulo: 'Sin ubicación del celular',
+        subtitulo: 'La app todavía no ha enviado tu ubicación',
+        icono: 'ti-map-pin-off',
+        tono: 'aviso',
+        nota: 'Abre AlertaMujer en tu celular con la ubicación activada y vuelve a intentarlo.',
+      });
+      return;
+    }
+    this.mostrarResultado({
+      titulo: 'Tu celular está aquí',
+      subtitulo: 'Última ubicación que envió la app del celular',
+      icono: 'ti-map-pin',
+      tono: 'ok',
+      filas: [
+        { etiqueta: 'Dirección', valor: this.direccionUltima ?? 'Buscando la dirección…' },
+        { etiqueta: 'Fecha y hora', valor: this.fechaUbicacion(u) },
+      ],
+      enlace: { url: `https://www.google.com/maps?q=${u.lat},${u.lng}`, texto: 'Ver en el mapa' },
+    });
+  }
+
+  probarAlertasCelular(): void {
+    const celulares = this.misCelulares();
+    const conPush = celulares.filter((d) => !!d.fcmToken);
+    if (celulares.length === 0) {
+      this.mostrarResultado({
+        titulo: 'No tienes un celular vinculado',
+        subtitulo: 'Las alertas se reciben en la app del celular',
+        icono: 'ti-device-mobile-off',
+        tono: 'aviso',
+        nota: 'Instala AlertaMujer en tu celular e inicia sesión con esta cuenta.',
+      });
+      return;
+    }
+    const pc = this.permisosCelular();
+    const notificaciones = pc?.lista.find((p) => p.id === 'notificaciones');
+    const ok = conPush.length > 0 && notificaciones?.concedido !== false;
+    this.mostrarResultado({
+      titulo: ok ? 'Tu celular recibe alertas' : 'Tu celular no recibe alertas',
+      subtitulo: ok
+        ? 'Si un contacto activa una alerta, sonará una alarma en tu celular'
+        : 'Si un contacto activa una alerta, no te llegará al celular',
+      icono: ok ? 'ti-bell-check' : 'ti-bell-off',
+      tono: ok ? 'ok' : 'error',
+      filas: celulares.map((d) => ({ etiqueta: this.nombreCelular(d), valor: d.fcmToken ? 'Recibe alertas' : 'No recibe alertas' })),
+      nota: ok ? undefined : 'Abre la app en tu celular y permite las notificaciones cuando te lo pida.',
+    });
   }
 
   requestNotificationPermission(): void {
     if (!('Notification' in window)) {
-      alert('⚠️ Las notificaciones no están disponibles en este navegador.');
+      this.mostrarResultado({
+        titulo: 'Este navegador no muestra avisos',
+        subtitulo: 'Usa Chrome, Edge o Firefox para recibir avisos en el computador',
+        icono: 'ti-bell-off',
+        tono: 'aviso',
+      });
       return;
     }
 
@@ -356,71 +469,74 @@ export class Device implements OnInit, OnDestroy {
       .subscribe({
         next: (permission) => {
           if (permission === 'granted') {
-            alert('✅ Permiso de notificación concedido correctamente.');
-            this.addActivityLog('success', 'Permiso de notificación concedido');
-            this.refreshPermissions();
-          } else if (permission === 'denied') {
-            alert('❌ Permiso de notificación denegado.');
-            this.addActivityLog('warning', 'Permiso de notificación denegado por el usuario');
+            new Notification('AlertaMujer', { body: 'Así te avisaremos en este computador cuando un contacto active una alerta.', icon: '/email/logo.png' });
+            this.mostrarResultado({
+              titulo: 'Los avisos funcionan',
+              subtitulo: 'Te enviamos un aviso de prueba a este computador',
+              icono: 'ti-bell-ringing',
+              tono: 'ok',
+            });
+            this.addActivityLog('success', 'Avisos del computador activados');
           } else {
-            alert('⚠️ Solicitud de permiso cancelada.');
+            this.mostrarResultado({
+              titulo: 'Los avisos están bloqueados',
+              subtitulo: 'No te llegarán avisos en este computador',
+              icono: 'ti-bell-off',
+              tono: 'aviso',
+              nota: 'Toca el candado junto a la dirección de la página, busca «Notificaciones» y elige «Permitir».',
+            });
+            this.addActivityLog('warning', 'Avisos del computador bloqueados');
           }
         },
-        error: (err) => {
-          alert('❌ Error al solicitar permiso de notificación.');
-          console.error('Error requesting notification permission:', err);
-        }
+        error: () => this.mostrarResultado({ titulo: 'No se pudo probar', subtitulo: 'Intenta de nuevo', icono: 'ti-alert-circle', tono: 'error' }),
       });
-  }
-
-  testNotificationDisplay(): void {
-    alert('Las notificaciones push se gestionan desde la app móvil en tu celular.');
   }
 
   testConnectivity(): void {
     const startTime = Date.now();
-    
     this.loading.set(true);
-    
-    // Try backend health endpoint first, fallback to external canary if backend fails.
-    // /health es público. En el plan gratis de Render la primera petición despierta
-    // el servidor y puede tardar varios minutos; se espera hasta 90 s y luego se avisa.
-    const backendUrl = `${environment.apiUrl}/health`;
-    const fallbackUrl = 'https://www.google.com/favicon.ico';
 
-    fetch(backendUrl, { method: 'GET', signal: AbortSignal.timeout(90000) })
+    // /health es público. En el plan gratis de Render la primera petición despierta el servidor y
+    // puede tardar; se espera hasta 90 s.
+    fetch(`${environment.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(90000) })
       .then(response => {
         const duration = Date.now() - startTime;
+        const segundos = (duration / 1000).toFixed(1);
         if (response.ok) {
-          const wokeUp = duration > 10000 ? '\n\nEl servidor estaba en reposo y tardó en despertar.' : '';
-          alert(`✅ Conectividad OK\n\nServidor: Backend\nTiempo de respuesta: ${duration}ms\nEstado: ${response.status}${wokeUp}`);
-          this.addActivityLog('success', `Prueba de conectividad exitosa con backend (${duration}ms)`);
+          this.mostrarResultado({
+            titulo: 'Conexión correcta',
+            subtitulo: 'El servidor de AlertaMujer responde',
+            icono: 'ti-wifi',
+            tono: 'ok',
+            filas: [{ etiqueta: 'Tiempo de respuesta', valor: `${segundos} s` }],
+            nota: duration > 10000 ? 'El servidor estaba en reposo y tardó en despertar.' : undefined,
+          });
+          this.addActivityLog('success', `Conexión con el servidor correcta (${segundos} s)`);
         } else {
-          alert(`⚠️ Backend responde con error\n\nEstado: ${response.status}\nTiempo: ${duration}ms`);
-          this.addActivityLog('warning', `Backend respondió con error ${response.status} (${duration}ms)`);
+          this.mostrarResultado({
+            titulo: 'El servidor tiene un problema',
+            subtitulo: 'Respondió con un error',
+            icono: 'ti-server-off',
+            tono: 'error',
+            filas: [{ etiqueta: 'Código', valor: String(response.status) }],
+          });
+          this.addActivityLog('warning', `El servidor respondió con error ${response.status}`);
         }
-        this.loading.set(false);
       })
       .catch(() => {
-        // Fallback to external endpoint if backend is unreachable
-        const fallbackStartTime = Date.now();
-        fetch(fallbackUrl, { method: 'HEAD', mode: 'no-cors' })
-          .then(() => {
-            const duration = Date.now() - fallbackStartTime;
-            alert(`⚠️ Conectividad limitada\n\nBackend no accesible, pero conexión a internet activa.\nSi el servidor estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.\nTiempo: ${duration}ms`);
-            this.addActivityLog('warning', `Backend no accesible, conexión externa OK (${duration}ms)`);
-            this.loading.set(false);
-          })
-          .catch(error => {
-            const duration = Date.now() - startTime;
-            alert(`❌ Error de conectividad total\n\n${error.message}\nTiempo: ${duration}ms`);
-            this.addActivityLog('error', `Error de conectividad total: ${error.message}`);
-            this.loading.set(false);
-          });
-      });
+        this.mostrarResultado({
+          titulo: navigator.onLine ? 'El servidor no responde' : 'Sin internet',
+          subtitulo: navigator.onLine ? 'Tu internet funciona, pero el servidor no contestó' : 'Revisa tu conexión a internet',
+          icono: 'ti-wifi-off',
+          tono: 'error',
+          nota: navigator.onLine ? 'Si estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.' : undefined,
+        });
+        this.addActivityLog('error', 'No hubo conexión con el servidor');
+      })
+      .finally(() => this.loading.set(false));
   }
 
-  // ─── MÉTODOS DE ACCIONES RÁPIDAS ─────────────────
+  // ─── ACCIONES RÁPIDAS ─────────────────
 
   syncData(): void {
     this.loading.set(true);
@@ -428,112 +544,85 @@ export class Device implements OnInit, OnDestroy {
     this.featuresSub = this.fetchCriticalFeatures()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe(ok => {
+        this.updateMobileServices();
+        this.updateLastRefresh();
         if (ok) {
-          alert('✅ Datos sincronizados con el servidor');
-          this.addActivityLog('success', 'Sincronización de datos completada');
+          const f = this.criticalFeatures();
+          this.mostrarResultado({
+            titulo: 'Datos actualizados',
+            subtitulo: 'Se trajo la información más reciente del servidor',
+            icono: 'ti-refresh',
+            tono: 'ok',
+            filas: [
+              { etiqueta: 'Celulares vinculados', valor: String(this.misCelulares().length) },
+              { etiqueta: 'Contactos de emergencia', valor: String(f?.emergencyContactsCount ?? 0) },
+              { etiqueta: 'Última ubicación', valor: f?.lastLocationCaptured ?? 'No registrada' },
+            ],
+          });
+          this.addActivityLog('success', 'Datos sincronizados con el servidor');
         } else {
-          alert('⚠️ No se pudieron traer todos los datos del servidor. Intenta de nuevo en un momento.');
+          this.mostrarResultado({
+            titulo: 'No se pudo actualizar todo',
+            subtitulo: 'El servidor no respondió a tiempo',
+            icono: 'ti-refresh-alert',
+            tono: 'aviso',
+            nota: 'Intenta de nuevo en un momento.',
+          });
           this.addActivityLog('warning', 'Sincronización incompleta: el servidor no respondió');
         }
       });
   }
 
   clearCache(): void {
-    const confirmClear = confirm('¿Estás segura de que deseas limpiar la caché local? Esta acción eliminará datos temporales pero no afectará tu sesión ni contactos de emergencia.');
-    
-    if (confirmClear) {
-      try {
-        // Preserve critical keys including the actual session key used by AuthService
-        // AuthService uses 'alerta_session' (not 'auth_token'), plus user-scoped data
-        const keysToKeep = [
-          'alerta_session',              // Actual session key from AuthService
-          'user_data',
-          'emergency_contacts',          // Legacy key (if still used)
-          'emergency_contacts_user_',    // User-scoped version
-          'notification_token_user_',    // User-scoped tokens
-          'last_location_user_',         // User-scoped location
-          'device_activity_log_user_'    // Activity logs
-        ];
-        const allKeys = Object.keys(localStorage);
-        
-        let clearedCount = 0;
-        allKeys.forEach(key => {
-          // Keep key if it matches any of the protected patterns
-          const shouldKeep = keysToKeep.some(pattern => key.includes(pattern));
-          if (!shouldKeep) {
-            localStorage.removeItem(key);
-            clearedCount++;
-          }
-        });
-
-        alert(`✅ Caché limpiada: ${clearedCount} elementos eliminados`);
-        this.addActivityLog('success', `Caché limpiada: ${clearedCount} elementos`);
-        this.loadCriticalFeatures();
-      } catch (error) {
-        alert('❌ Error al limpiar caché');
-        this.addActivityLog('error', 'Error al limpiar caché');
-      }
-    }
-  }
-
-  exportDiagnostic(): void {
-    // Warn user about potentially sensitive data in diagnostic export
-    const confirmExport = confirm(
-      '⚠️ Aviso de Privacidad\n\n' +
-      'El diagnóstico exportado contiene información que puede identificar tu dispositivo:\n' +
-      '• Navegador, sistema operativo y versión\n' +
-      '• Resolución de pantalla\n' +
-      '• Historial de actividad reciente\n\n' +
-      'Solo comparte este archivo con personal de soporte de confianza.\n\n' +
-      '¿Deseas continuar con la exportación?'
-    );
-
-    if (!confirmExport) {
-      return;
-    }
-
+    const confirmClear = confirm('¿Limpiar los datos temporales de la web? No se cierra tu sesión ni se borran tus contactos.');
+    if (!confirmClear) return;
     try {
-      const diagnostic = {
-        timestamp: new Date().toISOString(),
-        deviceInfo: this.deviceInfo(),
-        permissions: this.permissions(),
-        services: this.services(),
-        isOnline: this.isOnline(),
-        connectionQuality: this.connectionQuality(),
-        criticalFeatures: this.criticalFeatures(),
-        activityLog: this.activityLog(),
-        screenInfo: this.deviceInfoService.getScreenInfo()
-      };
-
-      const blob = new Blob([JSON.stringify(diagnostic, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-      a.href = url;
-      a.download = `diagnostico-alerta-mujer-${timestamp}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      this.addActivityLog('success', 'Diagnóstico exportado correctamente');
-      alert('✅ Diagnóstico exportado correctamente');
-    } catch (error) {
-      alert('❌ Error al exportar diagnóstico');
-      this.addActivityLog('error', 'Error al exportar diagnóstico');
+      // Se conservan la sesión (AuthService usa 'alerta_session') y los datos de la usuaria
+      const keysToKeep = [
+        'alerta_session',
+        'user_data',
+        'emergency_contacts',
+        'emergency_contacts_user_',
+        'notification_token_user_',
+        'last_location_user_',
+        'device_activity_log_user_'
+      ];
+      let clearedCount = 0;
+      Object.keys(localStorage).forEach(key => {
+        if (!keysToKeep.some(pattern => key.includes(pattern))) {
+          localStorage.removeItem(key);
+          clearedCount++;
+        }
+      });
+      this.mostrarResultado({
+        titulo: 'Caché limpiada',
+        subtitulo: `${clearedCount} ${clearedCount === 1 ? 'dato temporal eliminado' : 'datos temporales eliminados'}`,
+        icono: 'ti-trash',
+        tono: 'ok',
+      });
+      this.addActivityLog('success', `Caché limpiada: ${clearedCount} elementos`);
+      this.loadCriticalFeatures();
+    } catch {
+      this.mostrarResultado({ titulo: 'No se pudo limpiar la caché', subtitulo: 'Intenta de nuevo', icono: 'ti-alert-circle', tono: 'error' });
     }
   }
 
+  /** Vuelve a consultar los permisos que informó el celular y el estado de los servicios. */
   refreshPermissions(): void {
     this.loading.set(true);
-    this.loadPermissions();
     this.loadServices();
-    this.loadCriticalFeatures();
-    this.updateLastRefresh();
-    setTimeout(() => {
-      this.loading.set(false);
-      this.addActivityLog('info', 'Permisos y servicios actualizados');
-    }, 500);
+    this.actualizarSesion();
+    this.featuresSub?.unsubscribe();
+    this.featuresSub = this.fetchCriticalFeatures()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe(() => {
+        this.updateMobileServices();
+        this.updateLastRefresh();
+        const pc = this.permisosCelular();
+        this.addActivityLog('info', pc
+          ? `Permisos revisados: ${pc.lista.length - pc.faltan} de ${pc.lista.length} listos`
+          : 'Permisos revisados: el celular aún no los informa');
+      });
   }
 
   refreshAll(): void {
@@ -610,6 +699,7 @@ export class Device implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.relojSesion) clearInterval(this.relojSesion);
     this.destroy$.next();
     this.destroy$.complete();
   }

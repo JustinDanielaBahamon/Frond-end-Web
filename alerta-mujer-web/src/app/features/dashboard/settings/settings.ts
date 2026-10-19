@@ -5,6 +5,7 @@ import { PasswordChangeComponent } from '../../../shared/components/password-cha
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { MovimientoCelularService } from '../../../core/services/movimiento-celular.service';
 
 interface AccentColor {
   name: string;
@@ -29,6 +30,7 @@ export class Settings implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly accentColorService = inject(AccentColorService);
   private readonly authService = inject(AuthService);
+  private readonly movimiento = inject(MovimientoCelularService);
 
   // --- Cuenta (conectar con el usuario autenticado real) ---
   readonly user = signal({
@@ -71,7 +73,7 @@ export class Settings implements OnInit {
     { key: 'emergencyAlerts', label: 'Alertas de emergencia', description: 'Recibe notificaciones de alertas activas.', enabled: true },
     { key: 'appUpdates', label: 'Actualizaciones de la app', description: 'Entérate de nuevas funciones y mejoras.', enabled: true },
     { key: 'securityReminders', label: 'Recordatorios de seguridad', description: 'Consejos y recomendaciones.', enabled: false },
-    { key: 'locationNotifications', label: 'Notificaciones de ubicación', description: 'Cambios en tu ubicación o zonas cercanas.', enabled: false },
+    { key: 'locationNotifications', label: 'Notificaciones de ubicación', description: 'Te avisamos aquí, con un sonido, cuando tu celular cambia de lugar (como mucho cada 30 min). Solo lo ves tú.', enabled: this.movimiento.activo() },
     { key: 'soundVibration', label: 'Sonidos y vibración', description: 'Vibración y sonido en alertas.', enabled: true }
   ]);
 
@@ -90,5 +92,8 @@ export class Settings implements OnInit {
     this.notifications.update(list =>
       list.map(item => item.key === key ? { ...item, enabled: !item.enabled } : item)
     );
+    if (key === 'locationNotifications') {
+      this.movimiento.cambiarActivo(!!this.notifications().find((n) => n.key === key)?.enabled);
+    }
   }
 }

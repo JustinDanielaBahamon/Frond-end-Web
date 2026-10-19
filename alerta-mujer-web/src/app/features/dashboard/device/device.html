@@ -115,7 +115,12 @@
             <button type="button" class="device-phone" (click)="abrirCelular(d)" [attr.aria-label]="'Ver detalles de ' + nombreCelular(d)">
               <span class="device-phone__icon"><i class="ti ti-device-mobile"></i></span>
               <span class="device-phone__body">
-                <span class="device-phone__name">{{ nombreCelular(d) }}</span>
+                <span class="device-phone__name">
+                  {{ nombreCelular(d) }}
+                  @if (misCelulares().length > 1 && principalId() === d.id) {
+                    <span class="device-principal" title="Tu ubicación del día a día se toma de este celular">Principal</span>
+                  }
+                </span>
                 <span class="device-phone__meta">
                   {{ d.osName === 'ios' ? 'iOS' : 'Android' }}{{ d.osVersion ? ' ' + d.osVersion : '' }}{{ d.appVersion ? ' · App ' + d.appVersion : '' }}
                 </span>
@@ -140,6 +145,11 @@
           </button>
         </li>
       </ul>
+      @if (misCelulares().length > 1) {
+        <p class="device-phone__meta device-phone__last">
+          <i class="ti ti-info-circle"></i> Tienes la cuenta en varios celulares: tu ubicación del día a día se toma del que usaste más recientemente (el principal). En una alerta se usa el celular que la activó.
+        </p>
+      }
       @if (misCelulares().length === 0 && !featuresLoading()) {
         <p class="device-empty">Todavía no tienes un celular vinculado. Inicia sesión en la app móvil para vincularlo.</p>
       }

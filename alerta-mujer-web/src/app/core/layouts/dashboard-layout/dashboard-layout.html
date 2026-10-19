@@ -32,6 +32,19 @@
           <span class="aviso-contacto__accion">Ver seguimiento <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
         </a>
       }
+      @if (movimiento.aviso(); as m) {
+        <div class="aviso-movimiento" role="status">
+          <i class="ti ti-walk" aria-hidden="true"></i>
+          <span class="aviso-movimiento__texto">
+            Tu celular se desplazó de <strong>{{ m.desde }}</strong> y ahora está cerca de <strong>{{ m.hasta }}</strong>
+            <small>{{ m.hora | date: 'h:mm a' }}</small>
+          </span>
+          <a class="aviso-movimiento__accion" routerLink="/dashboard/ubicacion" (click)="movimiento.cerrarAviso()">Ver en el mapa</a>
+          <button type="button" class="aviso-movimiento__cerrar" aria-label="Cerrar aviso" (click)="movimiento.cerrarAviso()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
       <router-outlet></router-outlet>
     </main>
 

@@ -99,6 +99,13 @@ export class Device implements OnInit, OnDestroy {
     };
   });
 
+  /** Celular usado más recientemente: de él se toma la ubicación del día a día. */
+  principalId = computed(() => {
+    const celulares = this.misCelulares().filter((d) => d.osName !== 'web');
+    if (celulares.length === 0) return null;
+    return [...celulares].sort((a, b) => (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0].id;
+  });
+
   /** Tiempo que le queda a la sesión de la web ("5 h 20 min"). */
   sesionRestante = signal('');
   sesionPorVencer = signal(false);

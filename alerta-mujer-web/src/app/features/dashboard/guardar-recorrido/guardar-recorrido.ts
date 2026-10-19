@@ -206,7 +206,7 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
 
     this.capaSeleccion.clearLayers();
     if (a) L.marker([a.latitude, a.longitude], { icon: iconoPunto('A', '#6922c5', true) }).addTo(this.capaSeleccion);
-    if (b) L.marker([b.latitude, b.longitude], { icon: iconoPunto('B', '#d844ef', true) }).addTo(this.capaSeleccion);
+    if (b) L.marker([b.latitude, b.longitude], { icon: iconoPunto('B', '#c026d3', true) }).addTo(this.capaSeleccion);
     if (a && b) {
       L.polyline([[a.latitude, a.longitude], [b.latitude, b.longitude]], {
         color: '#f5f3ff', weight: 4, opacity: 0.95, dashArray: '2 8', lineCap: 'round',

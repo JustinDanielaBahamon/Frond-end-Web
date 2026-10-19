@@ -6,10 +6,10 @@
 :host {
   --color-principal: #6d28d9;
   --color-principal-claro: #7c3aed;
-  --color-acento: #3b08b2;
+  --color-acento: #5b21b6;
   --color-exito: #5910b9;
   --color-advertencia: #9306d9;
-  --color-peligro: #d844ef;
+  --color-peligro: #c026d3;
   --color-fondo: #f5f3ff;
   --color-superficie: #ffffff;
   --color-borde: #c4b5fd;
@@ -87,8 +87,8 @@
 }
 
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(216, 68, 239, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(216, 68, 239, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 38, 211, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(192, 38, 211, 0); }
 }
 
 .home-panel__subtitle {
@@ -393,7 +393,7 @@
     font-size: 0.95rem;
     flex-shrink: 0;
 
-    &--peligro   { background: rgba(216, 68, 239, 0.12);  color: var(--color-peligro); }
+    &--peligro   { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
     &--exito     { background: rgba(89, 16, 185, 0.12); color: #440596; }
     &--principal { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
   }
@@ -448,7 +448,7 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: rgba(216, 68, 239, 0.12);
+  background: rgba(192, 38, 211, 0.12);
   color: var(--color-peligro);
   display: flex;
   align-items: center;
@@ -627,10 +627,10 @@
     justify-content: center;
     font-size: 1.3rem;
 
-    &--peligro     { background: rgba(216, 68, 239, 0.12);  color: var(--color-peligro); }
+    &--peligro     { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
     &--exito       { background: rgba(89, 16, 185, 0.12); color: #440596; }
     &--principal   { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
-    &--acento      { background: rgba(59, 8, 178, 0.12);  color: var(--color-acento); }
+    &--acento      { background: rgba(91, 33, 182, 0.12);  color: var(--color-acento); }
     &--advertencia { background: rgba(147, 6, 217, 0.12);  color: var(--color-advertencia); }
   }
 

@@ -18,7 +18,7 @@ export class EmergencyContactService {
       telefono: api.telephone,
       email: api.email,
       relacion: api.relationship || 'Otro',
-      activo: true, // El backend no tiene campo activo, valor por defecto
+      foto: api.photo || null,
     };
   }
 
@@ -31,6 +31,7 @@ export class EmergencyContactService {
       // El correo es el canal por el que el contacto recibe el aviso cuando se activa una alerta
       email: contacto.email?.trim() || null,
       relationship: contacto.relacion,
+      photo: contacto.foto || undefined,
     };
   }
 
@@ -53,6 +54,8 @@ export class EmergencyContactService {
     if (contacto.telefono !== undefined) apiData.telephone = contacto.telefono;
     if (contacto.relacion !== undefined) apiData.relationship = contacto.relacion;
     if (contacto.email !== undefined) apiData.email = contacto.email?.trim() || null;
+    // "" quita la foto; sin el campo no se toca
+    if (contacto.foto !== undefined) apiData.photo = contacto.foto ?? '';
     // El backend expone PUT (no PATCH) y solo cambia los campos enviados
     return this.http.put<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
       map(api => this.mapApiToContact(api))

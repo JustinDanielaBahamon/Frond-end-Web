@@ -125,7 +125,7 @@
 
   &--exito { background: rgba(89, 16, 185, 0.15); color: #440596; }
   &--advertencia { background: rgba(147, 6, 217, 0.15); color: #7b09b4; }
-  &--peligro { background: rgba(216, 68, 239, 0.15); color: #cb1ce6; }
+  &--peligro { background: rgba(192, 38, 211, 0.15); color: #cb1ce6; }
   &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
 }
 
@@ -137,8 +137,8 @@
   padding: 0.75rem;
   margin-bottom: 1rem;
   border-radius: 10px;
-  background: rgba(59, 8, 178, 0.08);
-  border: 1px solid rgba(59, 8, 178, 0.2);
+  background: rgba(91, 33, 182, 0.08);
+  border: 1px solid rgba(91, 33, 182, 0.2);
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   line-height: 1.4;
@@ -197,16 +197,6 @@
 }
 
 // ── ITEMS DE PERMISOS ───────────────────────────────
-.device-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 1rem 0.75rem;
-  border-radius: 12px;
-  background: var(--color-fondo);
-}
 
 .device-item__icon {
   width: 40px;
@@ -220,7 +210,7 @@
   
   &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
   &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
-  &--peligro { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
+  &--peligro { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
   &--neutral { background: rgba(107, 114, 128, 0.12); color: #6b7280; }
 }
 
@@ -277,20 +267,7 @@
 }
 
 // ── INFORMACIÓN DEL DISPOSITIVO ─────────────────────
-.device-info-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
 
-.device-info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0.75rem;
-  border-radius: 10px;
-  background: var(--color-fondo);
-}
 
 .device-info-item__label {
   font-size: var(--font-size-xs);
@@ -325,8 +302,8 @@
 
   &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
   &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
-  &--peligro { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
-  &--acento { background: rgba(59, 8, 178, 0.12); color: #3b08b2; }
+  &--peligro { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
+  &--acento { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
 }
 
 .device-feature-item__body {
@@ -374,9 +351,9 @@
   font-size: 1rem;
   flex-shrink: 0;
 
-  &--info { background: rgba(59, 8, 178, 0.12); color: #3b08b2; }
+  &--info { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
   &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
-  &--error { background: rgba(216, 68, 239, 0.12); color: #d844ef; }
+  &--error { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
   &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
 }
 
@@ -675,4 +652,106 @@
   font-size: 13px;
   line-height: 1.4;
   color: var(--text-primary, #1f1535);
+}
+
+// ── PERMISOS DEL CELULAR (informados por la app) ───────
+.device-perm-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(192, 38, 211, 0.35);
+  background: rgba(192, 38, 211, 0.08);
+  color: var(--color-texto-principal);
+  font-size: var(--font-size-sm);
+
+  i { font-size: 22px; color: #a21caf; }
+  div { display: flex; flex-direction: column; gap: 2px; }
+  span { color: var(--color-texto-secundario); }
+}
+
+.device-perm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--color-borde);
+  background: var(--color-superficie);
+  transition: background 0.2s;
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    font-size: 20px;
+    background: rgba(107, 114, 128, 0.12);
+    color: #6b7280;
+  }
+
+  &__body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  &__titulo { font-weight: 700; font-size: var(--font-size-sm); color: var(--color-texto-principal); }
+  &__desc { font-size: var(--font-size-xs); color: var(--color-texto-secundario); }
+
+  &__estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    white-space: nowrap;
+    background: rgba(192, 38, 211, 0.12);
+    color: #a21caf;
+  }
+
+  &--ok {
+    border: 1.5px solid transparent;
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+
+    .device-perm__icon { background: rgba(255, 255, 255, 0.18); color: #fff; }
+    .device-perm__titulo { color: #fff; }
+    .device-perm__desc { color: rgba(255, 255, 255, 0.8); }
+    .device-perm__estado { background: rgba(255, 255, 255, 0.2); color: #fff; }
+  }
+
+  &__fecha {
+    margin: 12px 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-texto-secundario);
+  }
+}
+
+// ── RESULTADO DE LAS PRUEBAS (misma ventana del detalle) ───
+.dd-modal--ok .dd-head__icon { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
+.dd-modal--aviso .dd-head__icon { background: linear-gradient(135deg, #c026d3, #7e22ce); }
+.dd-modal--error .dd-head__icon { background: linear-gradient(135deg, #a21caf, #4c1d95); }
+
+.dd-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 20px 12px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-decoration: none;
+}
+
+.dd-ok {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 4px 20px 20px;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
 }

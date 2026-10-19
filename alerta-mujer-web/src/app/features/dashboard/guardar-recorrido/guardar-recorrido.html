@@ -191,7 +191,11 @@
             @for (r of recorridos(); track r.id) {
               <button class="gr-history-item" [class.gr-history-item--selected]="seleccionado()?.id === r.id" (click)="verDetalle(r)">
                 <span class="gr-swatch gr-swatch--lg" [style.background]="colorDe(r)">
-                  @if (r.importante) { <span class="gr-swatch-star">★</span> }
+                  <!-- El ícono va siempre: antes solo aparecía la estrella y al quitarla la tarjeta quedaba vacía -->
+                  <svg class="gr-swatch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>
+                  </svg>
+                  @if (r.importante) { <span class="gr-swatch-star" aria-label="Con estrella">★</span> }
                 </span>
                 <span class="gr-row-text">
                   <span class="gr-row-name">{{ r.nombrePersonalizado || 'Recorrido sin nombre' }}</span>

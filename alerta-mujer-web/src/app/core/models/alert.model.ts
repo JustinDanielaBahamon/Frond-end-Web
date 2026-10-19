@@ -8,6 +8,8 @@ export interface Alerta {
   medioActivacion: MedioActivacion;
   tiempo: string;
   ubicacion: string;
+  /** true cuando ubicacion ya es barrio y dirección (no coordenadas). */
+  direccionResuelta?: boolean;
   lat: number;
   lng: number;
   estado: EstadoAlerta;

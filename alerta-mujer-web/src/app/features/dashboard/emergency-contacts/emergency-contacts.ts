@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
 import { ContactoEmergencia } from '../../../core/models/emergency-contact.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { reducirFoto } from '../../../core/utils/foto';
 
 const RELACIONES = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 
@@ -12,7 +13,7 @@ type ContactoForm = {
   telefono: string;
   email?: string;
   relacion: string;
-  activo: boolean;
+  foto: string | null;
 };
 
 const FORM_VACIO = (): ContactoForm => ({
@@ -20,7 +21,7 @@ const FORM_VACIO = (): ContactoForm => ({
   telefono: '',
   email: '',
   relacion: '',
-  activo: true,
+  foto: null,
 });
 
 @Component({
@@ -33,6 +34,8 @@ const FORM_VACIO = (): ContactoForm => ({
 export class EmergencyContacts implements OnInit {
   private contactService = inject(EmergencyContactService);
   private authService = inject(AuthService);
+  // La app no usa zone.js: tras cada respuesta del servidor hay que avisar que cambió la vista
+  private cdr = inject(ChangeDetectorRef);
 
   private usuarioId = 0;
 
@@ -58,7 +61,7 @@ export class EmergencyContacts implements OnInit {
 
   ngOnInit() {
     this.authService.currentUser$.subscribe((usuario: any) => {
-      if (!usuario) { this.error = true; this.loading = false; return; }
+      if (!usuario) { this.error = true; this.loading = false; this.cdr.markForCheck(); return; }
       this.usuarioId = usuario.id;
       this.cargarContactos();
     });
@@ -71,8 +74,9 @@ export class EmergencyContacts implements OnInit {
       next: (data) => {
         this.contactos = data;
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.error = true; this.loading = false; },
+      error: () => { this.error = true; this.loading = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -83,6 +87,26 @@ export class EmergencyContacts implements OnInit {
       .slice(0, 2)
       .map(p => p[0]?.toUpperCase())
       .join('');
+  }
+
+  errorFoto = '';
+
+  async elegirFoto(evento: Event, form: ContactoForm) {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    input.value = ''; // permite volver a elegir la misma foto
+    if (!archivo) return;
+    this.errorFoto = '';
+    try {
+      form.foto = await reducirFoto(archivo);
+    } catch (e) {
+      this.errorFoto = e instanceof Error ? e.message : 'No se pudo usar la foto';
+    }
+    this.cdr.markForCheck();
+  }
+
+  quitarFoto(form: ContactoForm) {
+    form.foto = null;
   }
 
   toggleMenu(id: number) {
@@ -121,7 +145,7 @@ export class EmergencyContacts implements OnInit {
       telefono: this.formAgregar.telefono.trim(),
       email: this.formAgregar.email?.trim(),
       relacion: this.formAgregar.relacion,
-      activo: this.formAgregar.activo,
+      foto: this.formAgregar.foto,
     };
 
     this.contactService.create(nuevo).subscribe({
@@ -129,8 +153,9 @@ export class EmergencyContacts implements OnInit {
         this.contactos = [...this.contactos, creado];
         this.guardandoAgregar = false;
         this.modalAgregarAbierto = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoAgregar = false; },
+      error: () => { this.guardandoAgregar = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -144,7 +169,7 @@ export class EmergencyContacts implements OnInit {
       telefono: contacto.telefono,
       email: contacto.email,
       relacion: contacto.relacion,
-      activo: contacto.activo,
+      foto: contacto.foto ?? null,
     };
     this.confirmandoEliminar = false;
     this.modalEditarAbierto = true;
@@ -173,7 +198,7 @@ export class EmergencyContacts implements OnInit {
       telefono: this.formEditar.telefono.trim(),
       email: this.formEditar.email?.trim(),
       relacion: this.formEditar.relacion,
-      activo: this.formEditar.activo,
+      foto: this.formEditar.foto,
     };
 
     this.contactService.update(id, cambios).subscribe({
@@ -183,8 +208,9 @@ export class EmergencyContacts implements OnInit {
         this.guardandoEditar = false;
         this.modalEditarAbierto = false;
         this.contactoEditando = null;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoEditar = false; },
+      error: () => { this.guardandoEditar = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -209,21 +235,13 @@ export class EmergencyContacts implements OnInit {
         this.modalEditarAbierto = false;
         this.contactoEditando = null;
         this.confirmandoEliminar = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.eliminando = false; },
+      error: () => { this.eliminando = false; this.cdr.markForCheck(); },
     });
   }
 
   // --- Acciones rápidas desde el menú ---
-
-  toggleActivo(contacto: ContactoEmergencia) {
-    this.cerrarMenu();
-    this.contactService.update(contacto.id, { activo: !contacto.activo }).subscribe({
-      next: (actualizado) => {
-        this.contactos = this.contactos.map(c => (c.id === contacto.id ? actualizado : c));
-      },
-    });
-  }
 
   eliminarDesdeMenu(contacto: ContactoEmergencia) {
     this.abrirModalEditar(contacto);

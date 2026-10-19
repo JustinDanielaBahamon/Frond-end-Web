@@ -6,6 +6,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { AssistanceService } from '../../../core/services/assistance.service';
+import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
+import { PhoneLocationService } from '../../../core/services/phone.location.services';
+import { NearbyZone } from '../../../core/models/nearby-zone.model';
+import { iconoZona } from '../../../core/utils/icono-zona';
 import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../../../core/models/assistance.model';
 
 type Tab = 'lineas' | 'centros' | 'llamadas';
@@ -13,9 +17,9 @@ type Tab = 'lineas' | 'centros' | 'llamadas';
 export const CATEGORIAS: Record<CategoriaRecurso, { etiqueta: string; color: string }> = {
   linea: { etiqueta: 'Línea de ayuda', color: '#8b5cf6' },
   policia: { etiqueta: 'Policía', color: '#7c3aed' },
-  salud: { etiqueta: 'Salud', color: '#3b08b2' },
+  salud: { etiqueta: 'Salud', color: '#5b21b6' },
   apoyo: { etiqueta: 'Apoyo a la mujer', color: '#6d28d9' },
-  bomberos: { etiqueta: 'Bomberos', color: '#d844ef' },
+  bomberos: { etiqueta: 'Bomberos', color: '#c026d3' },
 };
 
 const ESTADOS: Record<string, string> = {
@@ -36,6 +40,8 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer?: ElementRef<HTMLDivElement>;
 
   private service = inject(AssistanceService);
+  private zonasService = inject(NearbyZoneService);
+  private ubicacionCelular = inject(PhoneLocationService);
   private injector = inject(Injector);
 
   private map: L.Map | null = null;
@@ -50,6 +56,10 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   tab = signal<Tab>('lineas');
   recursos = signal<RecursoAyuda[]>([]);
+  /** Zonas de auxilio del mapa del inicio (policía, centros de asistencia, puntos de ayuda). */
+  zonasAuxilio = signal<RecursoAyuda[]>([]);
+  /** Todo lo que se puede mostrar en el mapa de centros. */
+  private puntos = computed(() => [...this.recursos(), ...this.zonasAuxilio()]);
   llamadas = signal<LlamadaRegistrada[]>([]);
   cargando = signal(true);
   error = signal('');
@@ -67,7 +77,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   centros = computed(() => {
     const termino = this.busqueda().trim().toLowerCase();
     const filtro = this.filtro();
-    const lista = this.recursos().filter((r) => {
+    const lista = this.puntos().filter((r) => {
       if (r.lat == null || r.lng == null) return false;
       if (filtro && r.categoria !== filtro) return false;
       if (!termino) return true;
@@ -80,11 +90,11 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   conteoCentros = computed(() => {
     const c = Object.fromEntries(this.listaCategorias.map((k) => [k, 0])) as Record<CategoriaRecurso, number>;
-    for (const r of this.recursos()) if (r.lat != null && r.lng != null) c[r.categoria]++;
+    for (const r of this.puntos()) if (r.lat != null && r.lng != null) c[r.categoria]++;
     return c;
   });
 
-  totalCentros = computed(() => this.recursos().filter((r) => r.lat != null && r.lng != null).length);
+  totalCentros = computed(() => this.puntos().filter((r) => r.lat != null && r.lng != null).length);
 
   ngOnInit(): void {
     this.service.getRecursos().subscribe({
@@ -97,11 +107,13 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
         this.cargando.set(false);
       },
     });
+    this.zonasService.getByUser(0).subscribe({
+      next: (zonas) => this.zonasAuxilio.set(zonas.map(desdeZona).filter((z): z is RecursoAyuda => z !== null)),
+      error: () => {},
+    });
     this.cargarLlamadas();
-
-    navigator.permissions?.query({ name: 'geolocation' as PermissionName })
-      .then((p) => { if (p.state === 'granted') this.usarMiUbicacion(); })
-      .catch(() => {});
+    // La distancia se mide desde el celular (la ubicación que envía la app), no desde el computador
+    this.usarMiUbicacion(false);
   }
 
   ngAfterViewInit(): void {
@@ -140,12 +152,18 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Centros y mapa ─────────────────────────────
-  usarMiUbicacion(): void {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => this.miPosicion.set({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => this.mostrarAviso('No pudimos acceder a tu ubicación. Actívala en el navegador para ver distancias.'),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-    );
+  usarMiUbicacion(avisar = true): void {
+    this.ubicacionCelular.getLatest().subscribe({
+      next: (u) => {
+        if (u) {
+          this.miPosicion.set({ lat: u.lat, lng: u.lng });
+          this.vistaAjustada = false;
+        } else if (avisar) {
+          this.mostrarAviso('Tu celular aún no ha enviado su ubicación. Abre AlertaMujer en el celular para ver distancias.');
+        }
+      },
+      error: () => { if (avisar) this.mostrarAviso('No pudimos obtener la ubicación de tu celular.'); },
+    });
   }
 
   distancia(r: RecursoAyuda): number | null {
@@ -198,14 +216,8 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
     for (const r of lista) {
       const { color, etiqueta } = CATEGORIAS[r.categoria];
       const activo = r.id === seleccionado;
-      const size = activo ? 30 : 24;
       const marcador = L.marker([r.lat!, r.lng!], {
-        icon: L.divIcon({
-          className: '',
-          html: `<div class="as-pin${activo ? ' as-pin--active' : ''}" style="--pin:${color}"></div>`,
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
-        }),
+        icon: iconoZona(r.categoria, color, activo),
         zIndexOffset: activo ? 500 : 0,
       })
         .bindPopup(`<strong>${escapeHtml(r.nombre)}</strong><br><span style="color:${color};font-weight:700">${etiqueta}</span>`
@@ -213,8 +225,11 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
         .on('click', () => this.seleccionado.set(r.id))
         .addTo(this.capa);
       this.marcadores.set(r.id, marcador);
-      bounds.extend([r.lat!, r.lng!]);
     }
+    // Con la ubicación del celular se encuadran los más cercanos (la lista ya viene ordenada);
+    // sin ella, todos
+    for (const r of yo ? lista.slice(0, 8) : lista) bounds.extend([r.lat!, r.lng!]);
+    if (yo) bounds.extend([yo.lat, yo.lng]);
 
     if (yo) {
       L.marker([yo.lat, yo.lng], {
@@ -248,4 +263,27 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
 function escapeHtml(texto: string): string {
   return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
+// Zonas de auxilio como centros (ids negativos para no chocar con los recursos)
+const CATEGORIA_ZONA: Partial<Record<NearbyZone['type'], CategoriaRecurso>> = {
+  policia: 'policia', asistencia: 'salud', help: 'apoyo',
+};
+
+function desdeZona(z: NearbyZone): RecursoAyuda | null {
+  const categoria = CATEGORIA_ZONA[z.type];
+  if (!categoria) return null; // las zonas de riesgo y seguras no son centros de atención
+  return {
+    id: -z.id,
+    nombre: z.name,
+    categoria,
+    descripcion: z.description ?? '',
+    telefono: null,
+    telefono2: null,
+    email: null,
+    direccion: z.address ?? null,
+    ciudad: z.city ?? '',
+    lat: z.lat,
+    lng: z.lng,
+  };
 }

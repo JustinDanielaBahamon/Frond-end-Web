@@ -5,7 +5,8 @@ export interface ContactoEmergencia {
   telefono: string;
   email?: string;
   relacion: string;
-  activo: boolean;
+  /** Data URI de la foto (la misma que se pone desde la app). */
+  foto?: string | null;
 }
 
 // Modelo que devuelve el backend EmergencyContact
@@ -16,6 +17,7 @@ export interface EmergencyContactApi {
   telephone: string;
   email?: string;
   relationship?: string;
+  photo?: string | null;
   createdAt: string;
   updatedAt?: string;
 }

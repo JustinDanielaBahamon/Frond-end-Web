@@ -133,6 +133,18 @@ export class AuthService {
     return true;
   }
 
+  /** Milisegundos que le quedan a la sesión de la web (el token vence a las 24 h), o null sin sesión. */
+  tiempoRestanteMs(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' ? Math.max(0, payload.exp * 1000 - Date.now()) : null;
+    } catch {
+      return null;
+    }
+  }
+
   /** Lee el campo exp del JWT (segundos). Un token ilegible se trata como vencido. */
   private tokenVencido(token: string): boolean {
     try {

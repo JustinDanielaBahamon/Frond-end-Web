@@ -21,6 +21,49 @@ interface AdminUserDto {
   alertCount: number;
 }
 
+/** Lo que se ha hecho con una cuenta (bloqueos, desbloqueos, solicitudes de eliminación). */
+export interface HistorialModeracion {
+  fecha: string;
+  tipo: string;
+  adminNombre: string | null;
+  motivo: string | null;
+  nota: string | null;
+  casoId: number | null;
+  tieneEvidencia: boolean;
+}
+
+/** Celular de la usuaria tal como lo ve el panel (GET /api/devices, solo admin). */
+export interface CelularAdmin {
+  id: number;
+  userId: number | null;
+  brand: string | null;
+  model: string | null;
+  deviceName: string | null;
+  osName: string;
+  osVersion: string | null;
+  appVersion: string | null;
+  gpsStatus: string;
+  lastAccess: string | null;
+  pushTokenRegistered: boolean;
+  permissions: string | null;
+  permissionsUpdatedAt: string | null;
+}
+
+export interface SolicitudEliminacion {
+  id: number;
+  userId: number;
+  userName: string | null;
+  userEmail: string | null;
+  requestedBy: number;
+  requestedByName: string | null;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  decidedByName: string | null;
+  decisionNote: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsersService {
 
@@ -167,6 +210,48 @@ export class UsersService {
   private generateAvatarColor(): string {
     const colors = ['#7B1DB2', '#9333EA', '#A855F7', '#C026D3', '#D946EF', '#6D28D9', '#BB8FCE', '#8B5CF6'];
     return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // ── Moderación ───────────────────────────────────────────────
+  bloquear(id: string | number, motivo: string, descripcion: string, evidencia: string | null): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/block`, {
+      reason: motivo, description: descripcion, evidence: evidencia,
+    });
+  }
+
+  desbloquear(id: string | number, nota: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/unblock`, { note: nota });
+  }
+
+  historial(id: string | number): Observable<HistorialModeracion[]> {
+    return this.http.get<HistorialModeracion[]>(`${this.apiUrl}/api/admin/users/${id}/moderation-history`);
+  }
+
+  evidenciaDeCaso(casoId: number): Observable<string | null> {
+    return this.http.get<{ evidence: string } | null>(`${this.apiUrl}/api/admin/user-reports/${casoId}/evidence`)
+      .pipe(map(r => r?.evidence ?? null));
+  }
+
+  solicitarEliminacion(id: string | number, motivo: string): Observable<SolicitudEliminacion> {
+    return this.http.post<SolicitudEliminacion>(`${this.apiUrl}/api/admin/users/${id}/deletion-requests`, { reason: motivo });
+  }
+
+  solicitudesEliminacion(): Observable<SolicitudEliminacion[]> {
+    return this.http.get<SolicitudEliminacion[]>(`${this.apiUrl}/api/admin/deletion-requests`);
+  }
+
+  decidirEliminacion(id: number, aprobar: boolean, nota: string): Observable<SolicitudEliminacion> {
+    return this.http.post<SolicitudEliminacion>(
+      `${this.apiUrl}/api/admin/deletion-requests/${id}/${aprobar ? 'approve' : 'reject'}`, { note: nota });
+  }
+
+  /** Envía a la usuaria el correo con el código para crear una contraseña nueva. */
+  enviarRecuperacion(email: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/api/auth/forgot-password`, { email });
+  }
+
+  celulares(): Observable<CelularAdmin[]> {
+    return this.http.get<CelularAdmin[]>(`${this.apiUrl}/api/devices`);
   }
 
   // ── Datos relacionados ───────────────────────────────────────

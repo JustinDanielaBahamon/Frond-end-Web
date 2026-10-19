@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import * as L from 'leaflet';
@@ -6,6 +6,7 @@ import { AlertsService } from '../../../core/services/alerts.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
+import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -22,7 +23,7 @@ const ATRIBUCION_TILES = '© OpenStreetMap contributors';
 
 @Component({
   selector: 'app-alert-history',
-  imports: [CommonModule, NgClass],
+  imports: [SelectorFecha, CommonModule, NgClass],
   templateUrl: './alert-history.html',
   styleUrl: './alert-history.scss',
 })
@@ -49,7 +50,6 @@ export class AlertHistory implements OnInit, OnDestroy {
   // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
   mediosDisponibles = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Manual'];
 
-  @ViewChild('fechaInput') private fechaInputRef?: ElementRef<HTMLInputElement>;
 
   totalAlertas = 0;
   alertasEsteMes = 0;
@@ -239,31 +239,8 @@ cerrarMenu() {
     setTimeout(() => this.map?.invalidateSize(), 300);
   }
 
-  /** Abre el date picker nativo al hacer clic en cualquier parte de la pastilla, no solo en el input invisible. */
-  abrirCalendario() {
-    const input = this.fechaInputRef?.nativeElement;
-    if (!input) return;
-
-    input.focus();
-
-    // showPicker() es lo ideal (Chrome/Edge/Opera); usamos "any" porque no todas las
-    // versiones de TypeScript/lib.dom lo tienen tipado, y así evitamos un error de compilación.
-    const conShowPicker = input as HTMLInputElement & { showPicker?: () => void };
-    if (typeof conShowPicker.showPicker === 'function') {
-      try {
-        conShowPicker.showPicker();
-        return;
-      } catch {
-        // Algunos navegadores lanzan error si no se llama justo desde el gesto del usuario;
-        // en ese caso caemos al respaldo de abajo.
-      }
-    }
-    input.click();
-  }
-
-  /** Se dispara cuando la usuaria elige un día en el input de fecha. */
-  onFechaChange(event: Event) {
-    const valor = (event.target as HTMLInputElement).value;
+  /** La usuaria eligió (o quitó) un día en el calendario. */
+  onFecha(valor: string | null) {
     this.fechaFiltro = valor || null;
     this.aplicarFiltros();
   }

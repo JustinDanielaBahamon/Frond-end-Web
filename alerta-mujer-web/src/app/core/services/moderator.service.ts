@@ -12,6 +12,10 @@ export interface Report {
   date: string;
   status: string;
   description: string;
+  /** Quién registró el caso (en un bloqueo, la administradora que bloqueó). */
+  reporterName?: string;
+  resolutionNotes?: string;
+  hasEvidence?: boolean;
 }
 
 /** Reporte tal como lo devuelve el backend (/api/admin/user-reports). */
@@ -27,6 +31,7 @@ interface UserReportApi {
   status: string;     // pending | in_review | reviewed | resolved | approved | rejected
   resolutionNotes: string | null;
   createdAt: string | null;
+  hasEvidence?: boolean;
 }
 
 const GRAVEDAD_DESDE_API: Record<string, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' };
@@ -56,6 +61,9 @@ function desdeApi(r: UserReportApi): Report {
     date: fechaLegible(r.createdAt),
     status: ESTADO_DESDE_API[r.status] ?? 'Pendiente',
     description: r.description,
+    reporterName: r.reporterName ?? undefined,
+    resolutionNotes: r.resolutionNotes ?? undefined,
+    hasEvidence: !!r.hasEvidence,
   };
 }
 

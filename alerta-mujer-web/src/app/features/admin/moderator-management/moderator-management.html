@@ -6,8 +6,8 @@
   
     <header class="page-header">
       <div>
-        <h1>Gestión de Moderación</h1>
-        <p>Administra los reportes de usuarios y aplica las medidas correspondientes.</p>
+        <h1>Moderación</h1>
+        <p>Casos de usuarias reportadas, bloqueos hechos desde Gestión de usuarios (con su motivo y evidencia) y solicitudes para eliminar cuentas.</p>
       </div>
       <button class="btn-add-report" (click)="abrirModalAgregarReporte(); $event.stopPropagation()">
         <i class="fa-solid fa-plus"></i>
@@ -51,6 +51,8 @@
       </div>
     </section>
   
+    <app-solicitudes-eliminacion />
+
     <!--==========================
         TOOLBAR (FILTERS & SEARCH)
     ==========================-->
@@ -290,6 +292,13 @@
               <p class="user-name">{{ reporteSeleccionado!.userName }}</p>
               <p class="user-email">{{ reporteSeleccionado!.userEmail }}</p>
             </div>
+          </div>
+          <div class="caso-extra">
+            <p *ngIf="reporteSeleccionado!.reporterName"><strong>Registrado por:</strong> {{ reporteSeleccionado!.reporterName }}</p>
+            <p *ngIf="reporteSeleccionado!.resolutionNotes"><strong>Resolución:</strong> {{ reporteSeleccionado!.resolutionNotes }}</p>
+            <button type="button" class="btn-secondary" *ngIf="reporteSeleccionado!.hasEvidence && !evidenciaCaso"
+                    (click)="verEvidenciaCaso(reporteSeleccionado!); $event.stopPropagation()">Ver evidencia adjunta</button>
+            <img *ngIf="evidenciaCaso" [src]="evidenciaCaso" alt="Evidencia del caso" class="caso-evidencia" />
           </div>
         </div>
       </div>

@@ -235,7 +235,7 @@
 
 .charts-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   align-items: start;
 }
@@ -319,30 +319,8 @@
   font-size: 11px;
 }
 
-.trend-line {
-  fill: none;
-  stroke: $purple-deep;
-  stroke-width: 2.5;
-  stroke-linejoin: round;
 
-  &--prev {
-    stroke: $text-dim;
-    stroke-width: 2;
-    stroke-dasharray: 6 5;
-  }
-}
 
-.trend-dot {
-  fill: $bg-card;
-  stroke: $purple-deep;
-  stroke-width: 2;
-}
-
-.trend-pico {
-  fill: $text-primary;
-  font-size: 12px;
-  font-weight: 700;
-}
 
 .leyenda {
   display: flex;
@@ -592,55 +570,10 @@ table {
 }
 
 // ── Accesos Rápidos ───────────────────────────
-.accesos-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 14px;
-}
 
-.accesos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.acceso-btn {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 14px;
-  border-radius: $radius-sm;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  border: 1.5px solid transparent;
-  transition: all 0.15s;
-  text-align: left;
 
-  svg { flex-shrink: 0; }
-}
 
-.acceso-primary {
-  background: linear-gradient(135deg, var(--accent-grad-from, #{$purple-deep}), var(--accent-grad-to, #{$purple-mid}));
-  color: #fff;
-  box-shadow: 0 4px 14px color-mix(in srgb, #{$purple-deep} 30%, transparent);
-
-  &:hover { filter: brightness(1.08); }
-}
-
-.acceso-secondary {
-  background: $bg-card;
-  border-color: $border;
-  color: $text-muted;
-
-  &:hover {
-    background: $bg-card-hover;
-    border-color: $purple-mid;
-    color: $purple-deep;
-  }
-}
 
 // =============================================
 // RESPONSIVE
@@ -656,4 +589,95 @@ table {
   .stats-row { grid-template-columns: 1fr; }
   .mapa-leaflet { height: 260px; }
   .dash-card__header--filtros .filtros--tabla { margin-left: 0; }
+}
+
+// =============================================
+// TENDENCIA EN BARRAS (colores validados para CVD en claro y oscuro)
+// =============================================
+:host {
+  --serie-actual: #6d28d9;
+  --serie-previa: #a78bfa;
+}
+
+:host-context([data-theme='dark']) {
+  --serie-actual: #9f67fa;
+  --serie-previa: #6d28d9;
+}
+
+.trend-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  margin: 4px 0 10px;
+
+  &__dato { display: flex; flex-direction: column; }
+  &__valor { font-size: 1.8rem; font-weight: 800; line-height: 1.1; color: $text-primary; }
+  &__valor--previa { color: $text-muted; }
+  &__etiqueta { font-size: 0.75rem; color: $text-muted; }
+  &__frase { flex: 1 1 240px; margin: 0; font-size: 0.9rem; font-weight: 700; color: $text-primary; }
+}
+
+.trend-bar {
+  fill: var(--serie-actual);
+  &--previa { fill: var(--serie-previa); }
+}
+
+.trend-hit { fill: transparent; }
+
+.trend-dia:hover .trend-hit { fill: $border; opacity: 0.35; }
+
+.trend-valor {
+  fill: $text-muted;
+  font-size: 11px;
+  font-weight: 700;
+  &--actual { fill: $text-primary; }
+}
+
+.axis-text--hoy { fill: $text-primary; font-weight: 800; }
+
+.leyenda__barra {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+  background: var(--serie-actual);
+  &--previa { background: var(--serie-previa); }
+}
+
+.leyenda__nota { margin-left: auto; font-style: italic; }
+
+// =============================================
+// ATAJOS
+// =============================================
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.atajo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid $border;
+  border-radius: 24px;
+  background: $bg-card;
+  color: $text-primary;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  i { font-size: 1.1rem; color: $purple-deep; }
+  &:hover { border-color: $purple-deep; }
+
+  &--urgente {
+    border-color: transparent;
+    background: linear-gradient(135deg, #7c3aed, #a21caf);
+    color: #fff;
+    i { color: #fff; }
+  }
 }

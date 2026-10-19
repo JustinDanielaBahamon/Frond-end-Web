@@ -48,14 +48,9 @@
         <option value="Bloqueada por Fraude">Bloqueada por Fraude</option>
       </select>
     </div>
-
-    <button class="btn-add" (click)="abrirModalNueva()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-      Añadir Usuaria
-    </button>
   </div>
+
+  <p class="aviso-panel" *ngIf="aviso" role="status">{{ aviso }}</p>
 
   <!-- FILTER CHIPS -->
   <div class="filter-chips">
@@ -259,6 +254,46 @@
       </div>
     </div>
 
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Última actividad</span>
+        <span class="detail-value">{{ usuariaSeleccionada.ultimaActividad || 'Sin registro' }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Celulares con la app</span>
+        <span class="detail-value">{{ celularesDetalle.length }}</span>
+      </div>
+    </div>
+
+    <!-- Celulares y permisos (los informa la app) -->
+    <h4 class="detail-section">Celulares y permisos</h4>
+    <p class="detail-empty" *ngIf="celularesDetalle.length === 0">No tiene la app móvil instalada o aún no ha entrado.</p>
+    <div class="celular" *ngFor="let c of celularesDetalle">
+      <div class="celular__cabecera">
+        <strong>{{ nombreCelular(c) }}</strong>
+        <span>Android {{ c.osVersion || '' }} · App {{ c.appVersion || '?' }} · {{ c.pushTokenRegistered ? 'recibe alertas' : 'sin notificaciones' }}</span>
+        <span>Última conexión: {{ c.lastAccess ? (c.lastAccess | date:'dd/MM/yyyy HH:mm') : 'sin registro' }}</span>
+      </div>
+      <div class="celular__permisos" *ngIf="permisosDe(c).length > 0; else sinPermisos">
+        <span class="permiso" *ngFor="let p of permisosDe(c)" [class.permiso--ok]="p.ok">{{ p.ok ? '✓' : '✕' }} {{ p.nombre }}</span>
+      </div>
+      <ng-template #sinPermisos><span class="detail-empty">Su versión de la app aún no informa los permisos.</span></ng-template>
+    </div>
+
+    <!-- Historial de moderación -->
+    <h4 class="detail-section">Historial de moderación</h4>
+    <p class="detail-empty" *ngIf="historialDetalle.length === 0">Sin bloqueos ni solicitudes.</p>
+    <ul class="historial" *ngIf="historialDetalle.length > 0">
+      <li *ngFor="let h of historialDetalle">
+        <strong>{{ tipoHistorial(h.tipo) }}</strong>
+        <span>{{ h.fecha | date:'dd/MM/yyyy HH:mm' }} · {{ h.adminNombre || 'Administración' }}</span>
+        <span *ngIf="h.motivo">Motivo: {{ h.motivo }}</span>
+        <span *ngIf="h.nota" class="historial__nota">{{ h.nota }}</span>
+        <button type="button" class="link-btn" *ngIf="h.tieneEvidencia" (click)="verEvidencia(h)">Ver evidencia</button>
+      </li>
+    </ul>
+    <img class="evidencia-img" *ngIf="evidenciaAbierta" [src]="evidenciaAbierta" alt="Evidencia del bloqueo" />
+
     <!-- Últimas alertas (tabla alertas) -->
     <h4 class="detail-section">Últimas alertas</h4>
     <p class="detail-empty" *ngIf="!cargandoDetalle && alertasDetalle.length === 0">
@@ -273,16 +308,16 @@
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" (click)="cerrarModales()">Cerrar</button>
-    <button class="btn-secondary" (click)="abrirModalEditar(usuariaSeleccionada!)">Editar</button>
-    <button class="btn-primary" (click)="restablecerPassword(usuariaSeleccionada!)">Restablecer contraseña</button>
+    <button class="btn-danger-outline" (click)="abrirEliminar(usuariaSeleccionada!)">Solicitar eliminación</button>
+    <button class="btn-secondary" (click)="abrirModalEditar(usuariaSeleccionada!)">Editar datos</button>
+    <button class="btn-primary" (click)="restablecerPassword(usuariaSeleccionada!)">Enviar correo para cambiar contraseña</button>
   </div>
 </app-modal>
 
 <!-- ===================== MODAL: CREAR / EDITAR ===================== -->
 <app-modal
   *ngIf="modalForm"
-  [titulo]="modoForm === 'crear' ? 'Añadir Usuaria' : 'Editar Usuaria'"
+  titulo="Editar datos de la usuaria"
   (cerrar)="cerrarModales()">
 
   <div modal-body>
@@ -308,12 +343,7 @@
         <span>Teléfono</span>
         <input name="telefono" [(ngModel)]="form.telefono" required pattern="^[+0-9 ]{7,20}$" />
       </label>
-
-      <label class="form-field">
-        <span>{{ modoForm === 'crear' ? 'Contraseña temporal' : 'Nueva contraseña (opcional)' }}</span>
-        <input type="password" name="password" [(ngModel)]="form.password"
-               [required]="modoForm === 'crear'" minlength="8" />
-      </label>
+      <p class="form-ayuda">La contraseña solo la cambia la usuaria: usa "Enviar correo para cambiar contraseña" en su detalle.</p>
 
       <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
       <p class="form-error" *ngIf="f.submitted && f.invalid">Revisa los campos marcados.</p>
@@ -338,21 +368,74 @@
 
   <div modal-body *ngIf="usuariaSeleccionada">
     <p class="confirm-text">
-      ¿Estás segura de que deseas
-      <strong>{{ accionBloqueo === 'bloquear' ? 'bloquear por fraude' : 'desbloquear' }}</strong>
-      la cuenta de <strong>{{ usuariaSeleccionada.nombre }}</strong>?
+      <ng-container *ngIf="usuariasBloqueo.length === 1">
+        {{ accionBloqueo === 'bloquear' ? 'Vas a bloquear' : 'Vas a desbloquear' }} la cuenta de <strong>{{ usuariaSeleccionada.nombre }}</strong>.
+      </ng-container>
+      <ng-container *ngIf="usuariasBloqueo.length > 1">
+        Vas a bloquear <strong>{{ usuariasBloqueo.length }} cuentas</strong>.
+      </ng-container>
     </p>
+    <label class="form-field" *ngIf="accionBloqueo === 'bloquear'">
+      <span>Motivo *</span>
+      <select [(ngModel)]="motivoBloqueo" name="motivoBloqueo">
+        <option value="" disabled>Elige el motivo</option>
+        <option *ngFor="let m of motivosBloqueo" [value]="m">{{ m }}</option>
+      </select>
+    </label>
+    <label class="form-field">
+      <span>{{ accionBloqueo === 'bloquear' ? '¿Qué pasó? *' : '¿Por qué se desbloquea? *' }}</span>
+      <textarea rows="3" [(ngModel)]="descripcionBloqueo" name="descripcionBloqueo" maxlength="1000"
+                placeholder="Mínimo 10 caracteres. Queda registrado en Moderación."></textarea>
+    </label>
+    <div class="evidencia" *ngIf="accionBloqueo === 'bloquear'">
+      <label class="btn-secondary evidencia__boton">
+        {{ evidenciaBloqueo ? 'Cambiar captura' : 'Adjuntar captura (opcional)' }}
+        <input type="file" accept="image/*" hidden (change)="elegirEvidencia($event)" />
+      </label>
+      <img *ngIf="evidenciaBloqueo" [src]="evidenciaBloqueo" alt="Captura adjunta" />
+      <button type="button" class="link-btn" *ngIf="evidenciaBloqueo" (click)="evidenciaBloqueo = null">Quitar</button>
+    </div>
     <p class="confirm-sub" *ngIf="accionBloqueo === 'bloquear'">
-      La usuaria no podrá acceder a la aplicación hasta que su cuenta sea reactivada.
+      No podrá entrar a la app ni a la web hasta que se desbloquee. El caso queda en Moderación con el motivo y la captura.
     </p>
+    <p class="form-error" *ngIf="errorBloqueo">{{ errorBloqueo }}</p>
   </div>
 
   <div modal-footer>
     <button class="btn-secondary" (click)="cerrarModales()">Cancelar</button>
-    <button class="btn-danger" *ngIf="accionBloqueo === 'bloquear'" (click)="confirmarBloqueo()">Bloquear
-      cuenta</button>
-    <button class="btn-primary" *ngIf="accionBloqueo === 'desbloquear'" (click)="confirmarBloqueo()">Desbloquear
-      cuenta</button>
+    <button class="btn-danger" *ngIf="accionBloqueo === 'bloquear'" [disabled]="!bloqueoValido || guardandoBloqueo" (click)="confirmarBloqueo()">
+      {{ guardandoBloqueo ? 'Bloqueando…' : 'Bloquear' }}</button>
+    <button class="btn-primary" *ngIf="accionBloqueo === 'desbloquear'" [disabled]="!bloqueoValido || guardandoBloqueo" (click)="confirmarBloqueo()">
+      {{ guardandoBloqueo ? 'Desbloqueando…' : 'Desbloquear' }}</button>
   </div>
 
+</app-modal>
+
+<!-- ===================== MODAL: SOLICITAR ELIMINACIÓN ===================== -->
+<app-modal
+  *ngIf="modalEliminar"
+  tamano="sm"
+  variante="danger"
+  titulo="Solicitar eliminación de la cuenta"
+  (cerrar)="cerrarModales()">
+
+  <div modal-body *ngIf="usuariaSeleccionada">
+    <p class="confirm-text">
+      Se eliminarán los datos personales de <strong>{{ usuariaSeleccionada.nombre }}</strong> (nombre, correo, teléfono, documento y foto)
+      y no podrá volver a entrar. Sus alertas quedan en el historial sin sus datos.
+    </p>
+    <p class="confirm-sub">Por seguridad, <strong>otra administradora</strong> debe aprobarlo en Moderación.</p>
+    <label class="form-field">
+      <span>Motivo *</span>
+      <textarea rows="3" [(ngModel)]="motivoEliminar" name="motivoEliminar" maxlength="500"
+                placeholder="Ej.: la usuaria lo pidió por correo el 19/10. Mínimo 10 caracteres."></textarea>
+    </label>
+    <p class="form-error" *ngIf="errorEliminar">{{ errorEliminar }}</p>
+  </div>
+
+  <div modal-footer>
+    <button class="btn-secondary" (click)="cerrarModales()">Cancelar</button>
+    <button class="btn-danger" [disabled]="motivoEliminar.trim().length < 10 || guardandoEliminar" (click)="solicitarEliminacion()">
+      {{ guardandoEliminar ? 'Enviando…' : 'Enviar solicitud' }}</button>
+  </div>
 </app-modal>

@@ -10,6 +10,7 @@ import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../
 import { UsersService } from '../../../core/services/users.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { ZonaManual } from '../../../core/models/zona.model';
+import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
 
 // Campos extra que vienen en db.json; opcionales para no depender del modelo
 type AlertaVM = Alerta & {
@@ -57,6 +58,41 @@ export interface ZonaIncidente {
 const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
 const DIA_MS = 86400000;
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const DIAS_LARGOS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+interface BarraDia {
+  dia: string;
+  diaLargo: string;
+  esHoy: boolean;
+  xGrupo: number;
+  anchoGrupo: number;
+  previa: number;
+  actual: number | null;
+  xPrevia: number;
+  yPrevia: number;
+  dPrevia: string;
+  xActual: number;
+  yActual: number;
+  dActual: string;
+}
+
+/** Barra con las esquinas de arriba redondeadas (4 px) apoyada en la línea base. */
+function barraRedondeada(x: number, y: number, ancho: number, base: number): string {
+  const alto = base - y;
+  if (alto <= 0) return '';
+  const r = Math.min(4, alto, ancho / 2);
+  return `M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + ancho - r} Q${x + ancho},${y} ${x + ancho},${y + r} V${base} Z`;
+}
+
+/** "3 alertas menos que la semana pasada a esta altura (−50 %)". */
+function fraseTendencia(actual: number, previa: number): string {
+  if (actual === previa) return actual === 0 ? 'Sin alertas en ninguna de las dos semanas hasta hoy.' : 'Igual que la semana pasada a esta altura.';
+  const diff = actual - previa;
+  const n = Math.abs(diff);
+  const palabra = n === 1 ? 'alerta' : 'alertas';
+  const pct = previa > 0 ? ` (${diff > 0 ? '+' : '−'}${Math.round((n / previa) * 100)} %)` : '';
+  return `${n} ${palabra} ${diff > 0 ? 'más' : 'menos'} que la semana pasada a esta altura${pct}.`;
+}
 
 const FRANJAS = [
   { nombre: 'Madrugada', rango: '0h – 5h', ini: 0, fin: 5 },
@@ -74,7 +110,7 @@ const H_BASE = 240;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink],
+  imports: [SelectorFecha, CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -142,12 +178,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // --- Tendencia (esta semana vs. la anterior) ---
   tendenciaActualTotal = 0;
   tendenciaPreviaTotal = 0;
+  tendenciaPreviaHastaHoy = 0;
+  tendenciaFrase = '';
   tendenciaTicks: { y: number; label: number }[] = [];
-  tendenciaLabels: { x: number; texto: string }[] = [];
-  tendenciaDots: { x: number; y: number; valor: number }[] = [];
-  tendenciaLinea = '';
-  tendenciaLineaPrevia = '';
-  tendenciaPico: { x: number; y: number; valor: number } | null = null;
+  tendenciaBarras: BarraDia[] = [];
 
   // --- Tabla ---
   alertasRecientes: AlertaVM[] = [];
@@ -222,13 +256,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.recalcular();
   }
 
-  onDesde(ev: Event): void {
-    this.desde = (ev.target as HTMLInputElement).value;
+  onDesde(valor: string | null): void {
+    this.desde = valor ?? '';
     this.recalcular();
   }
 
-  onHasta(ev: Event): void {
-    this.hasta = (ev.target as HTMLInputElement).value;
+  onHasta(valor: string | null): void {
+    this.hasta = valor ?? '';
     this.recalcular();
   }
 
@@ -525,30 +559,44 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.tendenciaActualTotal = actual.reduce((s, v) => s + v, 0);
     this.tendenciaPreviaTotal = previa.reduce((s, v) => s + v, 0);
 
+    // Comparación justa: la semana pasada solo hasta el mismo día de hoy
+    this.tendenciaPreviaHastaHoy = previa.slice(0, diaHoy + 1).reduce((s, v) => s + v, 0);
+    this.tendenciaFrase = fraseTendencia(this.tendenciaActualTotal, this.tendenciaPreviaHastaHoy);
+
     const { izq, der, arriba, abajo } = this.graf;
     const maximo = Math.max(...actual, ...previa, 1);
     const escala = Math.max(4, Math.ceil(maximo / 4) * 4);
-    const altoUtil = abajo - arriba;
-    const xDe = (i: number) => izq + (i * (der - izq)) / 6;
-    const yDe = (v: number) => abajo - (v / escala) * altoUtil;
+    const yDe = (v: number) => abajo - (v / Math.max(escala, 1)) * (abajo - arriba);
 
     this.tendenciaTicks = [0, 1, 2, 3, 4].map(i => {
       const valor = (escala / 4) * i;
       return { y: yDe(valor), label: valor };
     });
 
-    // La semana actual solo se dibuja hasta hoy (los días que faltan no son "cero alertas")
-    this.tendenciaDots = actual
-      .map((valor, i) => ({ x: xDe(i), y: yDe(valor), valor }))
-      .filter((_, i) => i <= diaHoy);
-
-    this.tendenciaLabels = DIAS_SEMANA.map((texto, i) => ({ x: xDe(i), texto }));
-
-    this.tendenciaLinea = this.tendenciaDots.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-    this.tendenciaLineaPrevia = previa.map((v, i) => `${xDe(i).toFixed(1)},${yDe(v).toFixed(1)}`).join(' ');
-
-    const mayor = Math.max(...this.tendenciaDots.map(p => p.valor), 0);
-    this.tendenciaPico = mayor > 0 ? this.tendenciaDots.find(p => p.valor === mayor) ?? null : null;
+    const anchoGrupo = (der - izq) / 7;
+    const ancho = 22;
+    this.tendenciaBarras = DIAS_SEMANA.map((dia, i) => {
+      const xGrupo = izq + i * anchoGrupo;
+      const xPrevia = xGrupo + anchoGrupo / 2 - ancho - 1;
+      const xActual = xGrupo + anchoGrupo / 2 + 1;
+      // Los días que aún no llegan no son "cero alertas": no se dibujan
+      const valorActual = i <= diaHoy ? actual[i] : null;
+      return {
+        dia,
+        diaLargo: DIAS_LARGOS[i],
+        esHoy: i === diaHoy,
+        xGrupo,
+        anchoGrupo,
+        previa: previa[i],
+        actual: valorActual,
+        xPrevia,
+        yPrevia: yDe(previa[i]),
+        dPrevia: barraRedondeada(xPrevia, yDe(previa[i]), ancho, abajo),
+        xActual,
+        yActual: yDe(valorActual ?? 0),
+        dActual: barraRedondeada(xActual, yDe(valorActual ?? 0), ancho, abajo),
+      };
+    });
   }
 
   // ── Tabla de alertas recientes ─────────────────────────────────

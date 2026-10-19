@@ -6,10 +6,11 @@ import { Reporte, ReporteFilters, ReporteStats, Paginacion } from '../../../core
 import { ReportsService } from '../../../core/services/reports.service';
 import { AlertsService } from '../../../core/services/alerts.services';
 import { Alerta } from '../../../core/models/alert.model';
+import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
 
 @Component({
   selector: 'app-report-management',
-  imports: [CommonModule, FormsModule],
+  imports: [SelectorFecha, CommonModule, FormsModule],
   templateUrl: './report-management.html',
   styleUrl: './report-management.scss',
 })

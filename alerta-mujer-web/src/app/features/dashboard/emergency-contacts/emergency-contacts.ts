@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
@@ -34,6 +34,8 @@ const FORM_VACIO = (): ContactoForm => ({
 export class EmergencyContacts implements OnInit {
   private contactService = inject(EmergencyContactService);
   private authService = inject(AuthService);
+  // La app no usa zone.js: tras cada respuesta del servidor hay que avisar que cambió la vista
+  private cdr = inject(ChangeDetectorRef);
 
   private usuarioId = 0;
 
@@ -59,7 +61,7 @@ export class EmergencyContacts implements OnInit {
 
   ngOnInit() {
     this.authService.currentUser$.subscribe((usuario: any) => {
-      if (!usuario) { this.error = true; this.loading = false; return; }
+      if (!usuario) { this.error = true; this.loading = false; this.cdr.markForCheck(); return; }
       this.usuarioId = usuario.id;
       this.cargarContactos();
     });
@@ -72,8 +74,9 @@ export class EmergencyContacts implements OnInit {
       next: (data) => {
         this.contactos = data;
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.error = true; this.loading = false; },
+      error: () => { this.error = true; this.loading = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -99,6 +102,7 @@ export class EmergencyContacts implements OnInit {
     } catch (e) {
       this.errorFoto = e instanceof Error ? e.message : 'No se pudo usar la foto';
     }
+    this.cdr.markForCheck();
   }
 
   quitarFoto(form: ContactoForm) {
@@ -149,8 +153,9 @@ export class EmergencyContacts implements OnInit {
         this.contactos = [...this.contactos, creado];
         this.guardandoAgregar = false;
         this.modalAgregarAbierto = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoAgregar = false; },
+      error: () => { this.guardandoAgregar = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -203,8 +208,9 @@ export class EmergencyContacts implements OnInit {
         this.guardandoEditar = false;
         this.modalEditarAbierto = false;
         this.contactoEditando = null;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoEditar = false; },
+      error: () => { this.guardandoEditar = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -229,8 +235,9 @@ export class EmergencyContacts implements OnInit {
         this.modalEditarAbierto = false;
         this.contactoEditando = null;
         this.confirmandoEliminar = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.eliminando = false; },
+      error: () => { this.eliminando = false; this.cdr.markForCheck(); },
     });
   }
 

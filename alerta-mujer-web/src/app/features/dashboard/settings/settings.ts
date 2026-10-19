@@ -62,9 +62,7 @@ export class Settings implements OnInit {
     { name: 'Violeta', value: '#7c3aed' },
     { name: 'Índigo profundo', value: '#130253' },
     { name: 'Morado', value: '#710592' },
-    { name: 'Orquídea', value: '#d648ec' },
-    { name: 'Violeta azulado', value: '#3b08b2' },
-    { name: 'Violeta neón', value: '#d844ef' }
+    { name: 'Orquídea', value: '#d648ec' }
   ];
   readonly selectedColor = this.accentColorService.currentAccent;
 

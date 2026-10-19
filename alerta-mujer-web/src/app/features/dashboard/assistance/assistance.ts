@@ -13,9 +13,9 @@ type Tab = 'lineas' | 'centros' | 'llamadas';
 export const CATEGORIAS: Record<CategoriaRecurso, { etiqueta: string; color: string }> = {
   linea: { etiqueta: 'Línea de ayuda', color: '#8b5cf6' },
   policia: { etiqueta: 'Policía', color: '#7c3aed' },
-  salud: { etiqueta: 'Salud', color: '#3b08b2' },
+  salud: { etiqueta: 'Salud', color: '#5b21b6' },
   apoyo: { etiqueta: 'Apoyo a la mujer', color: '#6d28d9' },
-  bomberos: { etiqueta: 'Bomberos', color: '#d844ef' },
+  bomberos: { etiqueta: 'Bomberos', color: '#c026d3' },
 };
 
 const ESTADOS: Record<string, string> = {

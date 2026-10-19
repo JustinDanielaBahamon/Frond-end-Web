@@ -396,7 +396,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
       L.circleMarker(latlngs[0], { radius: 6, color: '#fff', weight: 2, fillColor: '#6922c5', fillOpacity: 1 })
         .bindPopup(`<strong>${nombre}</strong><br>Inicio: ${escapeHtml(r.barrioInicio)}`)
         .addTo(this.capaRecorridos);
-      L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#d844ef', fillOpacity: 1 })
+      L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#c026d3', fillOpacity: 1 })
         .bindPopup(`<strong>${nombre}</strong><br>Destino: ${escapeHtml(r.barrioFin)}`)
         .addTo(this.capaRecorridos);
     }

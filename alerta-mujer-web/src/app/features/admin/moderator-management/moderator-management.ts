@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ModeratorService, Report } from '../../../core/services/moderator.service';
+import { UsersService } from '../../../core/services/users.services';
+import { SolicitudesEliminacion } from './solicitudes-eliminacion/solicitudes-eliminacion';
 
 @Component({
   selector: 'app-moderator-management',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SolicitudesEliminacion],
   templateUrl: './moderator-management.html',
   styleUrl: './moderator-management.scss',
 })
@@ -55,7 +57,10 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef) {
+  evidenciaCaso: string | null = null;
+
+  constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef,
+              private usersService: UsersService) {
     // Cerrar dropdowns al hacer clic fuera
     this.clickHandler = () => {
       this.isReasonDropdownOpen = false;
@@ -68,6 +73,15 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadReports();
     this.loadStats();
+  }
+
+  verEvidenciaCaso(r: Report): void {
+    this.usersService.evidenciaDeCaso(Number(r.id)).subscribe({
+      next: (e) => {
+        this.evidenciaCaso = e;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -390,6 +404,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   cerrarModalVer(): void {
     this.mostrarModalVer = false;
     this.reporteSeleccionado = null;
+    this.evidenciaCaso = null;
   }
 
   abrirModalEditar(reportId: string): void {

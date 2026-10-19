@@ -25,7 +25,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
     </svg>
-    En caso de emergencia, todos tus contactos activos recibirán una notificación simultánea.
+    En caso de emergencia, todos tus contactos recibirán una notificación simultánea.
   </div>
 
   @if (loading) {
@@ -40,7 +40,6 @@
             <th>Teléfono</th>
             <th>Correo</th>
             <th>Relación</th>
-            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -48,17 +47,16 @@
           @for (c of contactos; track c.id) {
             <tr>
               <td>
-                <span class="ec-avatar">{{ iniciales(c.nombre) }}</span>
+                @if (c.foto) {
+                  <img class="ec-avatar ec-avatar--foto" [src]="c.foto" [alt]="'Foto de ' + c.nombre" />
+                } @else {
+                  <span class="ec-avatar">{{ iniciales(c.nombre) }}</span>
+                }
               </td>
               <td class="ec-nombre">{{ c.nombre }}</td>
               <td>{{ c.telefono }}</td>
               <td class="ec-email">{{ c.email || '-' }}</td>
               <td>{{ c.relacion }}</td>
-              <td>
-                <span class="ec-badge" [ngClass]="c.activo ? 'ec-badge--activo' : 'ec-badge--inactivo'">
-                  {{ c.activo ? 'Activo' : 'Inactivo' }}
-                </span>
-              </td>
               <td>
                 <div class="ec-actions">
                   <button type="button" class="ec-icon-btn" title="Editar" (click)="$event.stopPropagation(); abrirModalEditar(c)">
@@ -72,7 +70,6 @@
                     @if (menuAbierto === c.id) {
                       <div class="ec-menu" (click)="$event.stopPropagation()">
                         <button type="button" (click)="abrirModalEditar(c)">Editar</button>
-                        <button type="button" (click)="toggleActivo(c)">{{ c.activo ? 'Desactivar' : 'Activar' }}</button>
                         <button type="button" class="ec-menu-danger" (click)="eliminarDesdeMenu(c)">Eliminar</button>
                       </div>
                     }
@@ -81,7 +78,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="7" class="ec-empty">Aún no tienes contactos de emergencia registrados.</td></tr>
+            <tr><td colspan="6" class="ec-empty">Aún no tienes contactos de emergencia registrados.</td></tr>
           }
         </tbody>
       </table>
@@ -92,7 +89,7 @@
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
       <p>
-        Los contactos inactivos no recibirán notificaciones. El correo es opcional pero recomendado.
+        Todos tus contactos reciben un aviso cuando activas una alerta. Agrega su correo para que les llegue el enlace con tu ubicación.
       </p>
     </div>
   }
@@ -112,6 +109,24 @@
       </div>
 
       <div class="ec-modal-body">
+        <div class="ec-foto">
+          @if (formAgregar.foto) {
+            <img class="ec-foto-img" [src]="formAgregar.foto" alt="Foto del contacto" />
+          } @else {
+            <span class="ec-foto-vacia">{{ iniciales(formAgregar.nombre) || '?' }}</span>
+          }
+          <div class="ec-foto-acciones">
+            <label class="ec-foto-boton">
+              <i class="ti ti-camera" aria-hidden="true"></i> {{ formAgregar.foto ? 'Cambiar foto' : 'Poner foto' }}
+              <input type="file" accept="image/*" hidden (change)="elegirFoto($event, formAgregar)" />
+            </label>
+            @if (formAgregar.foto) {
+              <button type="button" class="ec-foto-quitar" (click)="quitarFoto(formAgregar)">Quitar</button>
+            }
+            @if (errorFoto) { <span class="ec-foto-error">{{ errorFoto }}</span> }
+          </div>
+        </div>
+
         <label class="ec-field">
           <span class="ec-field-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -147,18 +162,6 @@
           </select>
         </label>
 
-        <div class="ec-toggle-row">
-          <div>
-            <span class="ec-toggle-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              Contacto activo
-            </span>
-            <p class="ec-toggle-sub">Recibirá notificaciones en caso de emergencia.</p>
-          </div>
-          <button type="button" class="ec-switch" [class.ec-switch--on]="formAgregar.activo" (click)="formAgregar.activo = !formAgregar.activo">
-            <span class="ec-switch-knob"></span>
-          </button>
-        </div>
       </div>
 
       <div class="ec-modal-actions">
@@ -184,6 +187,24 @@
       </div>
 
       <div class="ec-modal-body">
+        <div class="ec-foto">
+          @if (formEditar.foto) {
+            <img class="ec-foto-img" [src]="formEditar.foto" alt="Foto del contacto" />
+          } @else {
+            <span class="ec-foto-vacia">{{ iniciales(formEditar.nombre) || '?' }}</span>
+          }
+          <div class="ec-foto-acciones">
+            <label class="ec-foto-boton">
+              <i class="ti ti-camera" aria-hidden="true"></i> {{ formEditar.foto ? 'Cambiar foto' : 'Poner foto' }}
+              <input type="file" accept="image/*" hidden (change)="elegirFoto($event, formEditar)" />
+            </label>
+            @if (formEditar.foto) {
+              <button type="button" class="ec-foto-quitar" (click)="quitarFoto(formEditar)">Quitar</button>
+            }
+            @if (errorFoto) { <span class="ec-foto-error">{{ errorFoto }}</span> }
+          </div>
+        </div>
+
         <label class="ec-field">
           <span class="ec-field-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -218,18 +239,6 @@
           </select>
         </label>
 
-        <div class="ec-toggle-row">
-          <div>
-            <span class="ec-toggle-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              Contacto activo
-            </span>
-            <p class="ec-toggle-sub">Recibirá notificaciones en caso de emergencia.</p>
-          </div>
-          <button type="button" class="ec-switch" [class.ec-switch--on]="formEditar.activo" (click)="formEditar.activo = !formEditar.activo">
-            <span class="ec-switch-knob"></span>
-          </button>
-        </div>
 
         <div class="ec-danger-zone">
           <div class="ec-danger-head">

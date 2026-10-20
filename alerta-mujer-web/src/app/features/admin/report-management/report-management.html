@@ -15,6 +15,33 @@
       </button>
     </header>
   
+    <!-- Qué es esta sección (se puede ocultar) -->
+    @if (mostrarAyuda) {
+      <section class="ayuda-informes" aria-label="Cómo funcionan los informes">
+        <div class="ayuda-informes__icono"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="ayuda-informes__texto">
+          <h2>¿Para qué sirven los informes?</h2>
+          <p>Un informe junta alertas para revisarlas o entregarlas, por ejemplo en una revisión mensual o a una entidad aliada.
+            Puedes elegirlas una por una o usar filtros de fechas y estado; con filtros, cada descarga trae las alertas que los
+            cumplen en ese momento. La ciudad, la usuaria y el acontecimiento describen el informe en el documento.</p>
+          <ol>
+            <li><strong>Nuevo reporte:</strong> elige las alertas o los filtros y ponle un nombre que diga qué contiene.</li>
+            <li><strong>PDF:</strong> para leer o imprimir. Trae un resumen por estado y por forma de activación, y la lista de alertas.</li>
+            <li><strong>Excel (CSV):</strong> para filtrar, ordenar o hacer gráficas. Se abre directamente en Excel.</li>
+          </ol>
+          <p class="ayuda-informes__aviso"><i class="fa-solid fa-lock"></i> Los informes contienen datos personales: compártelos
+            solo con quien deba verlos y bórralos cuando ya no se necesiten.</p>
+        </div>
+        <button class="ayuda-informes__cerrar" (click)="ocultarAyuda()" aria-label="Ocultar la explicación">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </section>
+    } @else {
+      <button class="ayuda-informes__mostrar" (click)="mostrarAyudaDeNuevo()">
+        <i class="fa-solid fa-circle-info"></i> ¿Cómo funcionan los informes?
+      </button>
+    }
+
     <!--==========================
         STAT CARDS
     ==========================-->

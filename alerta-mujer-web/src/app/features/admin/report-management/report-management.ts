@@ -15,6 +15,25 @@ import { SelectorFecha } from '../../../shared/components/selector-fecha/selecto
   styleUrl: './report-management.scss',
 })
 export class ReportManagementComponent implements OnInit, OnDestroy {
+  /** Explicación de la sección; se recuerda si la administradora la ocultó. */
+  mostrarAyuda = (() => {
+    try {
+      return localStorage.getItem('informes-ayuda-oculta') !== '1';
+    } catch {
+      return true;
+    }
+  })();
+
+  ocultarAyuda(): void {
+    this.mostrarAyuda = false;
+    try { localStorage.setItem('informes-ayuda-oculta', '1'); } catch { /* modo privado */ }
+  }
+
+  mostrarAyudaDeNuevo(): void {
+    this.mostrarAyuda = true;
+    try { localStorage.removeItem('informes-ayuda-oculta'); } catch { /* modo privado */ }
+  }
+
   private destroy$ = new Subject<void>();
   private reportsService = inject(ReportsService);
   private alertsService = inject(AlertsService);

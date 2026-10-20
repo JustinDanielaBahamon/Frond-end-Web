@@ -268,6 +268,51 @@
           </div>
         </div>
 
+        <!-- App y protección: lo que informa la app móvil -->
+        <div class="detail-section">
+          <h4>
+            <i class="fa-solid fa-shield-heart"></i>
+            App y protección
+          </h4>
+          <div class="detail-grid">
+            <div class="detail-item" *ngIf="dispositivoSeleccionado!.deviceName">
+              <label>Nombre del celular</label>
+              <p>{{ dispositivoSeleccionado!.deviceName }}</p>
+            </div>
+            <div class="detail-item">
+              <label>Versión de la app</label>
+              <p>{{ dispositivoSeleccionado!.appVersion || 'Sin informar' }}</p>
+            </div>
+            <div class="detail-item">
+              <label>GPS</label>
+              <p>{{ textoGps(dispositivoSeleccionado!.gpsStatus) }}</p>
+            </div>
+            <div class="detail-item">
+              <label>Recibe alarmas (push)</label>
+              <p>{{ dispositivoSeleccionado!.pushTokenRegistered ? 'Sí, registrado' : 'No: no recibirá las alarmas de sus contactos' }}</p>
+            </div>
+            <div class="detail-item">
+              <label>Registrado</label>
+              <p>{{ dispositivoSeleccionado!.registrado }}</p>
+            </div>
+          </div>
+
+          <div class="permisos-dispositivo" *ngIf="dispositivoSeleccionado!.permisos as permisos; else sinPermisos">
+            <p class="permisos-dispositivo__resumen">
+              Listo para una emergencia: <strong>{{ permisosListos(permisos) }} de {{ permisos.length }}</strong>
+              <span *ngIf="dispositivoSeleccionado!.permisosActualizados"> · informado {{ dispositivoSeleccionado!.permisosActualizados }}</span>
+            </p>
+            <div class="permisos-dispositivo__chips">
+              <span *ngFor="let p of permisos" class="permiso-chip" [class.permiso-chip--listo]="p.listo">
+                <i class="fa-solid" [class.fa-check]="p.listo" [class.fa-xmark]="!p.listo"></i> {{ p.etiqueta }}
+              </span>
+            </div>
+          </div>
+          <ng-template #sinPermisos>
+            <p class="permisos-dispositivo__vacio">La app de este celular todavía no informó sus permisos (se actualiza al abrir "Permisos y protección").</p>
+          </ng-template>
+        </div>
+
         <!-- Sección de información del usuario -->
         <div class="detail-section">
           <h4>

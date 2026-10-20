@@ -1141,3 +1141,47 @@ $shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
     opacity: 1;
   }
 }
+
+// Permisos que informa la app (detalle del dispositivo)
+.permisos-dispositivo {
+  margin-top: 14px;
+
+  &__resumen {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #6b5b95);
+
+    strong { color: var(--text-primary, #2e1065); }
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__vacio {
+    margin: 12px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #6b5b95);
+  }
+}
+
+.permiso-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px dashed #a855f7;
+  color: #7e22ce;
+
+  &--listo {
+    border-style: solid;
+    border-color: #7c3aed;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: #fff;
+  }
+}

@@ -146,30 +146,67 @@
   <!-- Detalle -->
   @if (seleccionado(); as r) {
     <div class="overlay" (click)="cerrarDetalle()">
-      <div class="dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-        <header class="dialog__header">
-          <h2>Registro #{{ r.id }}</h2>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="registro-titulo" (click)="$event.stopPropagation()">
+        <header class="registro__cabecera">
+          <span class="registro__icono" [ngClass]="claseAccion(r)"><i class="fa-solid" [ngClass]="iconoAccion(r)"></i></span>
+          <div class="registro__titulos">
+            <h2 id="registro-titulo">{{ accion(r) }} · {{ objeto(r) }}</h2>
+            <p>{{ fechaLarga(r.fecha) }}</p>
+          </div>
           <button class="icon-btn" (click)="cerrarDetalle()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </header>
-        <dl class="dialog__grid">
-          <dt>Fecha</dt><dd>{{ r.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</dd>
-          <dt>Responsable</dt>
-          <dd>
+
+        <!-- Quién -->
+        <section class="registro__bloque">
+          <h3>Responsable</h3>
+          <div class="registro__persona">
             @if (r.responsable) {
-              {{ r.responsable }} ({{ r.responsableCorreo }}){{ r.rol ? ' · ' + r.rol : '' }}
+              <span class="registro__avatar">{{ r.responsable.charAt(0).toUpperCase() }}</span>
+              <div>
+                <strong>{{ r.responsable }}</strong>
+                <small>{{ r.responsableCorreo }}{{ r.rol ? ' · ' + r.rol : '' }}</small>
+              </div>
             } @else {
-              {{ sinResponsable(r).texto }} — <small>{{ sinResponsable(r).ayuda }}</small>
+              <span class="registro__avatar registro__avatar--sistema"><i class="fa-solid" [ngClass]="sinResponsable(r).icono"></i></span>
+              <div>
+                <strong>{{ sinResponsable(r).texto }}</strong>
+                <small>{{ sinResponsable(r).ayuda }}</small>
+              </div>
             }
-          </dd>
-          <dt>Origen</dt><dd>{{ r.origen || 'No registrado' }}</dd>
-          <dt>Acción</dt><dd><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></dd>
-          <dt>Sobre</dt><dd>{{ objeto(r) }}</dd>
-          <dt>Detalle</dt>
-          <dd>
-            @for (linea of detalle(r); track $index) { <div>{{ linea }}</div> } @empty { — }
-          </dd>
-          <dt>IP</dt><dd>{{ r.ip || '—' }}</dd>
-        </dl>
+          </div>
+        </section>
+
+        <!-- Qué cambió -->
+        <section class="registro__bloque">
+          <h3>Qué pasó</h3>
+          @if (cambios(r); as lista) {
+            @if (lista.length && lista[0].antes !== null) {
+              <table class="registro__cambios">
+                <thead><tr><th>Dato</th><th>Antes</th><th>Después</th></tr></thead>
+                <tbody>
+                  @for (c of lista; track $index) {
+                    <tr>
+                      <td>{{ c.campo }}</td>
+                      <td class="registro__antes">{{ c.antes }}</td>
+                      <td class="registro__despues">{{ c.despues }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            } @else {
+              <ul class="registro__lineas">
+                @for (c of lista; track $index) { <li>{{ c.campo }}</li> } @empty { <li>Sin detalle registrado.</li> }
+              </ul>
+            }
+          }
+        </section>
+
+        <!-- Datos técnicos -->
+        <footer class="registro__tecnico">
+          <span><i class="fa-solid" [ngClass]="iconoOrigen(r.origen)"></i> {{ r.origen || 'Origen no registrado' }}</span>
+          <span><i class="fa-solid fa-network-wired"></i> IP {{ r.ip || '—' }}</span>
+          <span><i class="fa-solid fa-hashtag"></i> Registro {{ r.id }}</span>
+        </footer>
       </div>
     </div>
   }

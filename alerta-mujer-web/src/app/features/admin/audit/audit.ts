@@ -201,6 +201,36 @@ export class AuditComponent implements OnInit {
     return 'badge--info';
   }
 
+  /** "lunes, 20 de octubre de 2026, 10:32:15 a. m." (la app no registra el locale de Angular). */
+  fechaLarga(fecha: Date | string | null): string {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    return isNaN(d.getTime()) ? '' : d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'medium' });
+  }
+
+  /** Ícono del tipo de acción (cabecera del detalle). */
+  iconoAccion(r: RegistroAuditoria): string {
+    const iconos: Record<string, string> = {
+      INSERT: 'fa-plus', UPDATE: 'fa-pen', DELETE: 'fa-trash',
+      LOGIN_SUCCESS: 'fa-right-to-bracket', LOGIN_FAILED: 'fa-triangle-exclamation', LOGOUT: 'fa-right-from-bracket',
+    };
+    return iconos[r.accion] ?? 'fa-clipboard-list';
+  }
+
+  /** Cambios como filas "dato / antes / después"; si el registro no los trae, antes y después son null. */
+  cambios(r: RegistroAuditoria): { campo: string; antes: string | null; despues: string | null }[] {
+    return this.detalle(r).map((linea) => {
+      const flecha = linea.indexOf(' → ');
+      const dosPuntos = linea.indexOf(': ');
+      if (flecha < 0 || dosPuntos < 0 || dosPuntos > flecha) return { campo: linea, antes: null, despues: null };
+      return {
+        campo: linea.slice(0, dosPuntos),
+        antes: linea.slice(dosPuntos + 2, flecha),
+        despues: linea.slice(flecha + 3),
+      };
+    });
+  }
+
   /** Detalle legible: valores "antes → después", columnas cambiadas o el dispositivo de la sesión. */
   detalle(r: RegistroAuditoria): string[] {
     const d = r.descripcion;

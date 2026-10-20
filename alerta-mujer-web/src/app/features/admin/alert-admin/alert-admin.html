@@ -32,6 +32,8 @@
       <!-- ── TAB ALERTAS ── -->
       <ng-container *ngIf="tabActivo === 'alertas'">
         <div class="panel-filters">
+          <input class="panel-search" type="search" placeholder="Buscar por nombre, lugar o #número"
+            aria-label="Buscar alertas" [(ngModel)]="busquedaAlerta" (input)="filtrarAlertas()" />
           <select class="panel-select" [(ngModel)]="filtroMedio" (change)="filtrarAlertas()">
             <option value="Todos">Todos los modos</option>
             <option value="Botón de pánico">Botón de pánico</option>
@@ -278,14 +280,19 @@
                 class="toggle__slider"></span></label>
           </div>
           <div class="filtro-row">
-            <span class="filtro-label">CAIs</span>
+            <span class="filtro-label">Policía y CAI</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="capas.cais" (change)="toggleCapa('cais')"><span
                 class="toggle__slider"></span></label>
           </div>
           <div class="filtro-row">
-            <span class="filtro-label">Hospitales</span>
+            <span class="filtro-label">Salud</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="capas.hospitales"
                 (change)="toggleCapa('hospitales')"><span class="toggle__slider"></span></label>
+          </div>
+          <div class="filtro-row">
+            <span class="filtro-label">Bomberos y apoyo</span>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="capas.apoyo"
+                (change)="toggleCapa('apoyo')"><span class="toggle__slider"></span></label>
           </div>
           <div class="filtro-row">
             <span class="filtro-label">Calor</span>
@@ -363,8 +370,9 @@
 <!-- ══════════════════════════════════════════════════════
      MODAL: Nueva zona de peligro (PIN o ÁREA)
      ══════════════════════════════════════════════════════ -->
+<!-- Mientras se elige el lugar en el mapa el modal se oculta: su fondo tapaba el mapa y el clic no llegaba -->
 <app-modal
-  *ngIf="modalZona"
+  *ngIf="modalZona && !esperandoClickZona"
   tamano="zona"
   [titulo]="modoZona === 'pin' ? '📍 Pin de zona peligrosa' : '⭕ Área de riesgo'"
   (cerrar)="cancelarModalZona()">
@@ -469,26 +477,26 @@
      MODAL: Agregar CAI / Hospital
      ══════════════════════════════════════════════════════ -->
 <app-modal
-  *ngIf="modalPunto"
-  titulo="Agregar punto al mapa"
+  *ngIf="modalPunto && !esperandoClickPunto"
+  titulo="Agregar punto de apoyo"
   (cerrar)="modalPunto = false">
 
   <div modal-body>
     <div class="form-group">
       <label class="form-label">Tipo</label>
-      <div class="nivel-options">
-        <button class="nivel-btn" [class.nivel-btn--active]="nuevoPunto.tipo === 'CAI'"
-          (click)="nuevoPunto.tipo = 'CAI'">🚔 CAI</button>
-        <button class="nivel-btn" [class.nivel-btn--active]="nuevoPunto.tipo === 'Hospital'"
-          (click)="nuevoPunto.tipo = 'Hospital'">🏥 Hospital</button>
+      <div class="nivel-options nivel-options--tipos">
+        <button *ngFor="let t of tiposPunto" class="nivel-btn" [class.nivel-btn--active]="nuevoPunto.tipo === t[0]"
+          (click)="nuevoPunto.tipo = t[0]">{{ t[1].emoji }} {{ t[1].etiqueta }}</button>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Nombre</label>
       <input class="form-input" type="text" [(ngModel)]="nuevoPunto.nombre" placeholder="Ej: CAI Centro" />
     </div>
+    <button class="btn-click-mapa" (click)="esperandoClickPunto = true">
+      📍 {{ nuevoPunto.lat !== 0 ? 'Cambiar la ubicación en el mapa' : 'Elegir la ubicación en el mapa' }}
+    </button>
     <p class="form-hint">
-      💡 Haz click en el mapa para elegir la ubicación exacta.
       <span *ngIf="nuevoPunto.lat !== 0"> ✓ {{ nuevoPunto.lat | number:'1.5-5' }}, {{ nuevoPunto.lng | number:'1.5-5'
         }}</span>
       <span *ngIf="nuevoPunto.lat === 0"> Coordenadas: —</span>

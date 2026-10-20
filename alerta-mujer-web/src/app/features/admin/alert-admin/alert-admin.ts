@@ -7,7 +7,7 @@ import { AlertsService, DetalleAdminAlerta } from '../../../core/services/alerts
 import { GeocodingService } from '../../../core/services/geocoding.service';
 import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../../core/services/risk-zones.services';
 import { Alerta, MedioActivacion } from '../../../core/models/alert.model';
-import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
+import { ZonaManual, ZonaCaliente, PuntoMapa, TipoPunto, TIPOS_PUNTO, CapaPunto } from '../../../core/models/zona.model';
 import { Modal } from '../../../shared/components/modal/modal';
 import { Chip } from '../../../shared/components/chip/chip';
 
@@ -35,7 +35,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   // ── Mapa ─────────────────────────────────────────────────────
   private mapa: any;
   private marcadoresAlertas: Map<number, any> = new Map();
-  private marcadoresPuntos: { marker: any; tipo: string }[] = [];
+  private marcadoresPuntos: { marker: any; capa: CapaPunto }[] = [];
   private capasZonas: Map<number, any> = new Map();
   private circulosCalor: any[] = [];
 
@@ -58,7 +58,9 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   filtroNivel  = 'Todos';
   alertasFiltradas: Alerta[] = [];
 
-  capas = { alertas: true, zonas: true, cais: true, hospitales: true, calor: true };
+  capas = { alertas: true, zonas: true, cais: true, hospitales: true, apoyo: true, calor: true };
+  busquedaAlerta = '';
+  readonly tiposPunto = Object.entries(TIPOS_PUNTO) as [TipoPunto, (typeof TIPOS_PUNTO)[TipoPunto]][];
 
   // ── Modal zona ───────────────────────────────────────────────
   modoZona: 'pin' | 'area' = 'area';
@@ -86,7 +88,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   ];
 
   // ── Modal punto CAI/Hospital ──────────────────────────────────
-  nuevoPunto = { tipo: 'CAI', nombre: '', lat: 0, lng: 0 };
+  nuevoPunto: { tipo: TipoPunto; nombre: string; lat: number; lng: number } = { tipo: 'police_post', nombre: '', lat: 0, lng: 0 };
   esperandoClickPunto = false;
 
   // ── Datos — vienen vía API ─────────────────────
@@ -96,10 +98,14 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   // ── Filtros ──────────────────────────────────────────────────
   filtrarAlertas(): void {
+    const termino = this.busquedaAlerta.trim().toLowerCase();
     this.alertasFiltradas = this.alertas.filter(a => {
       const m = this.filtroMedio  === 'Todos' || a.medioActivacion === this.filtroMedio;
       const e = this.filtroEstado === 'Todos' || a.estado          === this.filtroEstado;
-      return m && e;
+      // Búsqueda por nombre, descripción, lugar o número de alerta
+      const b = !termino || [a.nombre, a.descripcion, a.ubicacion, `#${a.id}`]
+        .some(t => (t ?? '').toString().toLowerCase().includes(termino));
+      return m && e && b;
     });
   }
 
@@ -191,7 +197,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.alertas = alertas;
         this.zonasManuales = contarAlertasEnZonas(zonas, alertas);
         this.puntosMapa = puntos;
-        this.alertasFiltradas = [...this.alertas];
+        this.filtrarAlertas();
 
         this.pintarAlertas();
         this.pintarPuntos();
@@ -243,9 +249,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private pintarUnPunto(p: PuntoMapa): void {
     if (!this.coordsValidas(p.lat, p.lng)) return;
 
-    const esCAI = p.tipo === 'CAI';
-    const emoji = esCAI ? '🚔' : '🏥';
-    const fondo = esCAI ? '#ede9fe' : '#fce7f3';
+    const { emoji, fondo, etiqueta, capa } = TIPOS_PUNTO[p.tipo];
 
     const icon = L.divIcon({
       html: `<div style="width:30px;height:30px;border-radius:50%;background:${fondo};
@@ -256,11 +260,10 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       iconAnchor: [15, 15],
     });
 
-    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.nombre}`);
-    this.marcadoresPuntos.push({ marker, tipo: p.tipo });
+    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.nombre} · ${etiqueta}`);
+    this.marcadoresPuntos.push({ marker, capa });
 
-    const visible = esCAI ? this.capas.cais : this.capas.hospitales;
-    if (visible) marker.addTo(this.mapa);
+    if (this.capas[capa]) marker.addTo(this.mapa);
   }
 
   private pintarCalor(): void {
@@ -291,7 +294,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   }
 
   // ── Capas (toggle) ────────────────────────────────────────────
-  toggleCapa(capa: 'alertas' | 'zonas' | 'cais' | 'hospitales' | 'calor'): void {
+  toggleCapa(capa: 'alertas' | 'zonas' | 'calor' | CapaPunto): void {
     if (!this.mapa) return;
     const visible = this.capas[capa];
     const alternar = (layer: any) => visible ? layer.addTo(this.mapa) : this.mapa.removeLayer(layer);
@@ -304,10 +307,9 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.capasZonas.forEach(alternar);
         break;
       case 'cais':
-        this.marcadoresPuntos.filter(p => p.tipo === 'CAI').forEach(p => alternar(p.marker));
-        break;
       case 'hospitales':
-        this.marcadoresPuntos.filter(p => p.tipo === 'Hospital').forEach(p => alternar(p.marker));
+      case 'apoyo':
+        this.marcadoresPuntos.filter(p => p.capa === capa).forEach(p => alternar(p.marker));
         break;
       case 'calor':
         this.circulosCalor.forEach(alternar);
@@ -412,6 +414,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     if (this.modalPunto && this.esperandoClickPunto) {
       this.nuevoPunto.lat = parseFloat(lat.toFixed(6));
       this.nuevoPunto.lng = parseFloat(lng.toFixed(6));
+      this.esperandoClickPunto = false; // vuelve a mostrarse el modal con la ubicación elegida
       this.refrescar();
     }
   }
@@ -555,7 +558,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   // ── CAI / Hospital ───────────────────────────────────────────
   agregarPuntoCAI(): void {
     this.fabOpen = false;
-    this.nuevoPunto = { tipo: 'CAI', nombre: '', lat: 0, lng: 0 };
+    this.nuevoPunto = { tipo: 'police_post', nombre: '', lat: 0, lng: 0 };
     this.esperandoClickPunto = true;
     this.modalPunto = true;
   }
@@ -565,7 +568,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     if (!this.nuevoPunto.nombre) return;
 
     const payload: Omit<PuntoMapa, 'id'> = {
-      tipo: this.nuevoPunto.tipo as 'CAI' | 'Hospital',
+      tipo: this.nuevoPunto.tipo,
       nombre: this.nuevoPunto.nombre,
       lat: this.nuevoPunto.lat || this.centroInicial[0],
       lng: this.nuevoPunto.lng || this.centroInicial[1],
@@ -595,17 +598,19 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private pintarZonaEnMapa(zona: ZonaManual): any {
     const color = this.colorPorNivel(zona.nivel);
 
+    const icon = L.divIcon({ html: this.crearSvgPin(color), className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
+    const pin = L.marker([zona.centroLat, zona.centroLng], { icon }).bindTooltip(`⚠️ ${zona.nombre} (${zona.nivel})`);
+
     if (zona.metodo === 'area') {
-      return L.circle(
+      // El área lleva también el pin de peligro en su centro, para verla aunque el mapa esté alejado
+      const circulo = L.circle(
         [zona.centroLat, zona.centroLng],
         { radius: zona.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
-      ).bindTooltip(`${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
+      ).bindTooltip(`${zona.nombre} (${zona.nivel})`);
+      return L.layerGroup([circulo, pin]).addTo(this.mapa);
     }
 
-    const svg = this.crearSvgPin(color);
-    const icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
-    return L.marker([zona.centroLat, zona.centroLng], { icon })
-      .bindTooltip(`⚠️ ${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
+    return pin.addTo(this.mapa);
   }
 
   private crearSvgPin(color: string): string {

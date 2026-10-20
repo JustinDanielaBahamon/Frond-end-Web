@@ -2,13 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ZonaManual, PuntoMapa } from '../models/zona.model';
+import { ZonaManual, PuntoMapa, TipoPunto, TIPOS_PUNTO } from '../models/zona.model';
 
 @Injectable({ providedIn: 'root' })
 export class RiskZonesService {
   private http = inject(HttpClient);
   private zonasUrl = `${environment.apiUrl}/api/zones`;
-  // Los puntos CAI / Hospital del mapa son recursos de emergencia del backend.
+  // Los puntos de apoyo del mapa (CAI, hospitales, bomberos...) son recursos de emergencia del backend.
   private recursosUrl = `${environment.apiUrl}/api/resources`;
 
   /** Zonas de riesgo para el mapa de alertas (los puntos de apoyo no se dibujan como riesgo). */
@@ -29,11 +29,10 @@ export class RiskZonesService {
   getPuntos(): Observable<PuntoMapa[]> {
     return this.http.get<RecursoApi[]>(this.recursosUrl).pipe(
       map(recursos => recursos
-        .map(r => ({ r, tipo: TIPO_PUNTO[r.resourceType] }))
-        .filter(({ r, tipo }) => tipo && r.latitude != null && r.longitude != null)
-        .map(({ r, tipo }) => ({
+        .filter(r => r.resourceType in TIPOS_PUNTO && r.latitude != null && r.longitude != null)
+        .map(r => ({
           id: r.id,
-          tipo: tipo!,
+          tipo: r.resourceType as TipoPunto,
           nombre: r.name,
           lat: Number(r.latitude),
           lng: Number(r.longitude),
@@ -44,7 +43,7 @@ export class RiskZonesService {
   createPunto(punto: Omit<PuntoMapa, 'id'>): Observable<PuntoMapa> {
     const recurso = {
       name: punto.nombre,
-      resourceType: punto.tipo === 'CAI' ? 'police_post' : 'hospital',
+      resourceType: punto.tipo,
       city: 'Sin especificar',
       latitude: punto.lat,
       longitude: punto.lng,
@@ -64,12 +63,6 @@ interface RecursoApi {
   longitude: number | null;
 }
 
-const TIPO_PUNTO: Record<string, PuntoMapa['tipo'] | undefined> = {
-  police_post: 'CAI',
-  police_station: 'CAI',
-  hospital: 'Hospital',
-  health_center: 'Hospital',
-};
 
 /** Campos de /api/zones que usa el mapa de alertas. */
 interface ZonaApi {

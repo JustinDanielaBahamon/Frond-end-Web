@@ -30,6 +30,8 @@ export interface RegistroUsuaria {
   fechaNacimiento: string; // DD/MM/AAAA
   correo: string;
   password: string;
+  /** Marcó términos y privacidad: el backend guarda cuándo y qué versión aceptó. */
+  aceptaTerminos: boolean;
 }
 
 const STORAGE_KEY = 'alerta_session';
@@ -69,7 +71,8 @@ export class AuthService {
       telefono: data.telefono.trim(),
       tipoDocumento: data.tipoDocumento,
       numeroDocumento: data.numeroDocumento.trim(),
-      fechaNacimiento: data.fechaNacimiento
+      fechaNacimiento: data.fechaNacimiento,
+      aceptaTerminos: data.aceptaTerminos
     }).pipe(
       map((response) => {
         const backendUser = response.user;

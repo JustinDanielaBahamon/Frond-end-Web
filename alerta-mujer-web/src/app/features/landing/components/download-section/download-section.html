@@ -1,6 +1,33 @@
-<div class="container-Image">
-    <a href="https://play.google.com/store/apps/details?id=com.alerta.mujer.app" target="_blank">
-        <img src="./logoDonwload.png" alt="download-section" class="img-download-light">
-        <img src="./logoDonwloadoscuro.png" alt="download-section" class="img-download-dark">
-    </a>
+<div class="descarga">
+    <div class="descarga-texto">
+        <span class="descarga-chip"><i class="fa-brands fa-android"></i> Disponible para Android</span>
+        <h2>Lleva AlertaMujer en tu celular</h2>
+        <p class="descarga-sub">
+            Pide ayuda en segundos con el botón de alerta o agitando el teléfono, comparte tu ubicación en
+            tiempo real y graba evidencias automáticamente.
+        </p>
+
+        <a class="descarga-btn" [href]="urlApk" download="AlertaMujer.apk" rel="noopener">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>
+                <strong>Descargar app</strong>
+                <small>Archivo APK · Android</small>
+            </span>
+        </a>
+
+        <ol class="descarga-pasos">
+            @for (paso of pasos; track paso.texto; let i = $index) {
+                <li>
+                    <span class="paso-numero">{{ i + 1 }}</span>
+                    <i [class]="paso.icono"></i>
+                    <span>{{ paso.texto }}</span>
+                </li>
+            }
+        </ol>
+    </div>
+
+    <div class="descarga-imagen">
+        <img src="./logoDonwload.png" alt="AlertaMujer en el celular" class="img-download-light">
+        <img src="./logoDonwloadoscuro.png" alt="AlertaMujer en el celular" class="img-download-dark">
+    </div>
 </div>

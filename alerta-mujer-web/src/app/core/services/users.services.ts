@@ -258,9 +258,4 @@ export class UsersService {
   getAlertasByUsuaria(usuarioId: string | number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${usuarioId}`);
   }
-
-  // user_profile_id coincide con el id de la usuaria
-  getContactos(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/contacts/user/${usuarioId}`);
-  }
 }

@@ -50,13 +50,6 @@ export class PhoneLocationService {
     );
   }
 
-  // Usado por ADMIN: todas las ubicaciones
-  getAll(): Observable<UbicacionEntry[]> {
-    return this.http.get<LocationLogApi[]>(this.url).pipe(
-      map(logs => logs.map(log => this.mapLocationLogToEntry(log)))
-    );
-  }
-
   // Usado por USUARIA: solo su propio historial de ubicaciones
   getByUsuario(usuarioId: number): Observable<UbicacionEntry[]> {
     return this.http.get<LocationLogApi[]>(`${this.url}/user/${usuarioId}`).pipe(

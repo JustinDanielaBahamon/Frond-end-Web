@@ -651,7 +651,9 @@ $yellow: #c084fc;
   border-radius: $radius-sm;
   padding: 12px 38px 12px 13px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  min-width: 210px; max-width: 270px;
+  min-width: 230px; max-width: 300px;
+  max-height: calc(100% - 70px);
+  overflow-y: auto;
 
   &__close {
     position: absolute; top: 8px; right: 8px;
@@ -701,6 +703,59 @@ $yellow: #c084fc;
 
     &:hover { background: $purple-deep; color: #fff; }
   }
+
+  &__detalle {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid $border;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__cargando, &__nota { margin: 0; font-size: 0.72rem; color: $text-dim; }
+
+  &__dato {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.72rem;
+
+    span { color: $text-dim; }
+    strong { color: $text-primary; font-weight: 600; }
+    small { font-weight: 400; color: $text-dim; }
+  }
+
+  &__envios {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.72rem;
+
+    > span { color: $text-dim; }
+  }
+
+  &__envio {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+
+    em { font-style: normal; font-weight: 600; color: $text-primary; margin-right: 2px; }
+  }
+}
+
+.envio-chip {
+  padding: 1px 7px;
+  border-radius: 100px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  background: $purple-pale;
+  color: $text-muted;
+  border: 1px solid $border;
+
+  &--ok { background: $purple-deep; color: #fff; border-color: $purple-deep; }
+  &--fallo { background: transparent; color: $purple-deep; border: 1px dashed $purple-deep; }
 }
 
 // =============================================

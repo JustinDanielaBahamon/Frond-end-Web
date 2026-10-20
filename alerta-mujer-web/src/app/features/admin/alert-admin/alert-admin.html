@@ -321,6 +321,36 @@
           </svg>
           {{ alertaActiva.tiempo }}
         </div>
+
+        <!-- Detalle: dirección, última ubicación y envío a cada contacto (sin sus datos) -->
+        <div class="mapa-popup__detalle">
+          <p class="mapa-popup__cargando" *ngIf="cargandoDetalle">Cargando detalle…</p>
+          <ng-container *ngIf="detalle as d">
+            <div class="mapa-popup__dato" *ngIf="direccionAlerta">
+              <span>Lugar</span><strong>{{ direccionAlerta }}</strong>
+            </div>
+            <div class="mapa-popup__dato" *ngIf="d.ubicacionVisible; else sinUbicacion">
+              <span>Última ubicación</span>
+              <strong>{{ d.ultimaUbicacion ? haceCuanto(d.ultimaUbicacion.hora) : 'No envió ubicaciones' }}
+                <small *ngIf="d.puntos > 1"> · {{ d.puntos }} puntos</small></strong>
+            </div>
+            <ng-template #sinUbicacion>
+              <p class="mapa-popup__nota">Alerta cancelada o vencida: su ubicación no se muestra.</p>
+            </ng-template>
+            <div class="mapa-popup__envios" *ngIf="d.envios.length; else sinEnvios">
+              <span>Avisos a contactos</span>
+              <div class="mapa-popup__envio" *ngFor="let e of d.envios">
+                <em>Contacto {{ e.contacto }}<ng-container *ngIf="e.parentesco"> ({{ e.parentesco }})</ng-container></em>
+                <span *ngFor="let c of e.canales" class="envio-chip" [class.envio-chip--ok]="c.estado === 'sent' || c.estado === 'delivered'"
+                      [class.envio-chip--fallo]="c.estado === 'failed'">{{ textoCanal(c.canal, c.estado) }}</span>
+              </div>
+            </div>
+            <ng-template #sinEnvios>
+              <p class="mapa-popup__nota">No se registraron avisos a contactos.</p>
+            </ng-template>
+          </ng-container>
+        </div>
+
         <button class="mapa-popup__atender" (click)="atenderAlerta(alertaActiva)">
           {{ alertaActiva.estado === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' }}
         </button>

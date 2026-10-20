@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { aServicio } from '../api/servicios';
 import { environment } from '../../../environments/environment';
 
 export interface PuntoSeguimiento {
@@ -72,7 +73,7 @@ export class TrackingService {
           tipo: e.mediaType,
           contentType: e.contentType,
           creada: e.createdAt ? new Date(e.createdAt) : null,
-          url: `${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/evidence/${e.id}`
+          url: aServicio(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/evidence/${e.id}`)
         }))
       }))
     );

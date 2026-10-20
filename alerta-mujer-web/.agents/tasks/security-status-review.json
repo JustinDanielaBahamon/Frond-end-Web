@@ -1,26 +1,13 @@
 {
   "verdict": "CHANGES_REQUESTED",
   "findings": [
-    {
-      "issue": "Private field access",
-      "description": "Replace `authService['_currentUser$'].value` with a public getter in AuthService (e.g., `getCurrentUser()`) to avoid breaking on refactor.",
-      "severity": "medium"
-    },
-    {
-      "issue": "Activation method stub",
-      "description": "`checkActivationMethod()` always returns `'Movimiento'`. Until the backend endpoint exists, return `null` and mark as not configured, or document that this is a temporary optimistic default and must be replaced.",
-      "severity": "high"
-    },
-    {
-      "issue": "Subscription leak",
-      "description": "`cargarEstadoSeguridad()` subscribes in `ngOnInit` with no cleanup. Use `takeUntilDestroyed()` or store the subscription and unsubscribe in `ngOnDestroy()`.",
-      "severity": "high"
-    },
-    {
-      "issue": "Hardcoded userId in zones",
-      "description": "`cargarZonasPeligrosas()` calls `getByUser(1)` instead of the authenticated user's ID. Use the same user object from AuthService.",
-      "severity": "medium"
-    }
+    "takeUntilDestroyed called outside injection context — The operator requires injection context but is invoked in ngOnInit. Move the subscription to the constructor or switch to Subject + takeUntil + ngOnDestroy.",
+    "Geolocation permission degrades to false instead of unknown — When navigator.permissions is unavailable, the service returns false, making it indistinguishable from explicit denial. Return a third state or document the assumption.",
+    "Color equality check is fragile — The template uses estadoGeneral?.color === 'rojo' and 'amarillo' string checks. If a new level is added or color values change, the checks silently break. Use enum or typed accessor.",
+    "Mock location refresh with random drift — refrescarUbicacion() adds random coordinate noise instead of fetching real device location. The TODO is present but the mock could mislead users into thinking the feature is implemented.",
+    "No error state distinction for contact service failure — If EmergencyContactService.getByUsuario() fails (404, 500, network), the service catches it and returns 0 contacts, which triggers red status. A service error looks identical to zero configured contacts in the UI.",
+    "Private user/zone markers could leak on fast navigation — userMarker, zoneCircles, and zoneMarkers are cleaned up in ngOnDestroy, but if the component is destroyed before cargarZonasPeligrosas() completes, the async callback could add markers to a destroyed map.",
+    "Missing CSS for new color classes — The template references home-seguridad-item__check--peligro and home-seguridad-item__check--advertencia, and estado-dot--rojo, estado-dot--amarillo, estado-dot--verde. Verify these classes exist in home.scss or the indicators won't render correctly."
   ],
-  "reviewDoc": "/home/maicol/Documentos/proyecto /Frond-end-Web/alerta-mujer-web/.agents/tasks/2026-10-15-022614-review.md"
+  "reviewDoc": "/home/maicol/Documentos/proyecto /Frond-end-Web/alerta-mujer-web/.agents/tasks/2026-10-15-035200-review.md"
 }

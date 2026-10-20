@@ -1522,3 +1522,66 @@ body {
   justify-content: center;
   padding: 16px 24px 24px;
 }
+
+// Explicación de la sección
+.ayuda-informes {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px 44px 16px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(124, 58, 237, 0.04));
+
+  &__icono {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+  }
+
+  &__texto {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #4b5563);
+
+    h2 { margin: 0 0 4px; font-size: 1rem; color: var(--text-primary, #1e1b4b); }
+    p { margin: 0 0 6px; }
+    ol { margin: 4px 0 8px; padding-left: 18px; }
+    li + li { margin-top: 3px; }
+  }
+
+  &__aviso {
+    font-size: 0.8rem;
+    i { color: #7c3aed; margin-right: 4px; }
+  }
+
+  &__cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary, #6b5b95);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  &__mostrar {
+    margin-bottom: 16px;
+    border: 0;
+    background: transparent;
+    color: #7c3aed;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+
+    i { margin-right: 4px; }
+  }
+}

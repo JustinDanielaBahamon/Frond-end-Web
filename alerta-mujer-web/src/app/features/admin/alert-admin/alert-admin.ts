@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
-import { AlertsService } from '../../../core/services/alerts.services';
+import { AlertsService, DetalleAdminAlerta } from '../../../core/services/alerts.services';
+import { GeocodingService } from '../../../core/services/geocoding.service';
 import { RiskZonesService, contarAlertasEnZonas, estaDentroDeZona } from '../../../core/services/risk-zones.services';
 import { Alerta, MedioActivacion } from '../../../core/models/alert.model';
 import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
@@ -22,6 +23,12 @@ declare const L: any;
 export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   private alertsService = inject(AlertsService);
+  private geocoding = inject(GeocodingService);
+
+  // Detalle de la alerta elegida: última ubicación, dirección y envío a cada contacto
+  detalle: DetalleAdminAlerta | null = null;
+  cargandoDetalle = false;
+  direccionAlerta: string | null = null;
   private riskZonesService = inject(RiskZonesService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -314,6 +321,50 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     if (this.coordsValidas(alerta.lat, alerta.lng)) {
       this.mapa?.flyTo([alerta.lat, alerta.lng], 16, { duration: 0.6 });
     }
+    this.cargarDetalle(alerta);
+  }
+
+  private cargarDetalle(alerta: Alerta): void {
+    this.detalle = null;
+    this.direccionAlerta = null;
+    this.cargandoDetalle = true;
+    this.alertsService.detalleAdmin(alerta.id).subscribe({
+      next: (d) => {
+        if (this.alertaActiva?.id !== alerta.id) return;
+        this.detalle = d;
+        this.cargandoDetalle = false;
+        // La dirección es la de la última ubicación conocida o, si no hay, la de la activación
+        const punto = d.ultimaUbicacion ?? (d.ubicacionVisible && this.coordsValidas(alerta.lat, alerta.lng) ? alerta : null);
+        if (punto) {
+          this.geocoding.obtener(punto.lat, punto.lng).then((l) => {
+            if (this.alertaActiva?.id !== alerta.id || !l) return;
+            this.direccionAlerta = [l.barrio, l.direccion].filter(Boolean).join(' · ') || l.ciudad;
+            this.refrescar();
+          });
+        }
+        this.refrescar();
+      },
+      error: () => {
+        this.cargandoDetalle = false;
+        this.refrescar();
+      },
+    });
+  }
+
+  /** "Correo · enviado", "Push · falló"... */
+  textoCanal(canal: string, estado: string): string {
+    const nombre = canal === 'email' ? 'Correo' : canal === 'push' ? 'Notificación' : canal;
+    const estados: Record<string, string> = { sent: 'enviado', delivered: 'entregado', failed: 'falló', pending: 'pendiente' };
+    return `${nombre} · ${estados[estado] ?? estado}`;
+  }
+
+  haceCuanto(fecha: Date | null): string {
+    if (!fecha) return '—';
+    const min = Math.round((Date.now() - fecha.getTime()) / 60000);
+    if (min < 1) return 'hace un momento';
+    if (min < 60) return `hace ${min} min`;
+    if (min < 1440) return `hace ${Math.floor(min / 60)} h`;
+    return fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
   }
 
   cerrarPopup(): void {

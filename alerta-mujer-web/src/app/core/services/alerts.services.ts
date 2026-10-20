@@ -62,6 +62,30 @@ export class AlertsService {
     );
   }
 
+  /** Detalle del panel: última ubicación y envío a cada contacto (sin nombre ni correo). */
+  detalleAdmin(id: number): Observable<DetalleAdminAlerta> {
+    const fecha = (iso: string | null) => (iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null);
+    return this.http.get<any>(`${this.url}/${id}/admin-detail`).pipe(
+      map((d) => ({
+        ubicacionVisible: !!d.ubicacionVisible,
+        puntos: d.puntos ?? 0,
+        ultimaUbicacion: d.ultimaUbicacion
+          ? {
+              lat: Number(d.ultimaUbicacion.latitude),
+              lng: Number(d.ultimaUbicacion.longitude),
+              precision: d.ultimaUbicacion.accuracy != null ? Number(d.ultimaUbicacion.accuracy) : null,
+              hora: fecha(d.ultimaUbicacion.recordedAt),
+            }
+          : null,
+        envios: (d.envios ?? []).map((e: any) => ({
+          contacto: e.contacto,
+          parentesco: e.relationship ?? null,
+          canales: (e.channels ?? []).map((c: any) => ({ canal: c.channel, estado: c.status, enviado: fecha(c.sentAt) })),
+        })),
+      })),
+    );
+  }
+
   // ── Normalización ──────────────────────────────────────────────
   // Convierte la alerta del backend (campos en inglés) al modelo Alerta del panel.
   // En administración el backend agrega userId, userName y userEmail.
@@ -113,4 +137,13 @@ export class AlertsService {
     if (min < 1440) return `Hace ${Math.round(min / 60)} h`;
     return `Hace ${Math.round(min / 1440)} d`;
   }
+}
+
+/** Datos extra de una alerta para el panel (GET /api/alerts/{id}/admin-detail). */
+export interface DetalleAdminAlerta {
+  /** false: alerta cancelada o vencida, la administración no ve su ubicación (auditoría S2). */
+  ubicacionVisible: boolean;
+  puntos: number;
+  ultimaUbicacion: { lat: number; lng: number; precision: number | null; hora: Date | null } | null;
+  envios: { contacto: number; parentesco: string | null; canales: { canal: string; estado: string; enviado: Date | null }[] }[];
 }

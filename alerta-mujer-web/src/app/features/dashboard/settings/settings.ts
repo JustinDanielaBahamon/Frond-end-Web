@@ -2,6 +2,7 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PasswordChangeComponent } from '../../../shared/components/password-change/password-change';
+import { EliminarCuentaComponent } from '../../../shared/components/eliminar-cuenta/eliminar-cuenta';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -22,7 +23,7 @@ interface ToggleSetting {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, RouterLink, PasswordChangeComponent],
+  imports: [CommonModule, RouterLink, PasswordChangeComponent, EliminarCuentaComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
@@ -79,6 +80,7 @@ export class Settings implements OnInit {
 
   // --- Cambio de contraseña ---
   readonly cambiandoContrasena = signal(false);
+  readonly eliminandoCuenta = signal(false);
 
   toggleTheme(mode: Theme): void {
     this.themeService.setTheme(mode);

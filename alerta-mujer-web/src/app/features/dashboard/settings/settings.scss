@@ -412,3 +412,17 @@ a.setting-row {
     margin-top: 1px;
   }
 }
+
+// Eliminar la cuenta: mismo renglón, en el color de acento para que se distinga
+.setting-row--peligro {
+  justify-content: space-between;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--am-accent);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+  }
+}

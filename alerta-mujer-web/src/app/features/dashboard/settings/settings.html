@@ -120,6 +120,10 @@
         <span>Leer la política de privacidad</span>
         <i class="ti ti-chevron-right"></i>
       </a>
+      <button type="button" class="setting-row setting-row--link setting-row--peligro" (click)="eliminandoCuenta.set(true)">
+        <span><i class="ti ti-trash"></i> Eliminar mi cuenta y mis datos</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
     </article>
 
     <!-- EMERGENCIA -->
@@ -214,5 +218,8 @@
 
   @if (cambiandoContrasena()) {
     <app-password-change (cerrar)="cambiandoContrasena.set(false)" />
+  }
+  @if (eliminandoCuenta()) {
+    <app-eliminar-cuenta (cerrar)="eliminandoCuenta.set(false)" />
   }
 </section>

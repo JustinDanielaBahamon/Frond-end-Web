@@ -234,7 +234,8 @@ export class RegisterComponent {
       numeroDocumento: v.numeroDocumento,
       fechaNacimiento: v.fechaNacimiento,
       correo: v.correo,
-      password: v.password
+      password: v.password,
+      aceptaTerminos: this.aceptaTerminos() && this.aceptaPrivacidad()
     }).subscribe({
       next: () => {
         this.cargando.set(false);

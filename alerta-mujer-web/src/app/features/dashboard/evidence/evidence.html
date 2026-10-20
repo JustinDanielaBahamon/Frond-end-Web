@@ -114,6 +114,28 @@
               }
             </div>
 
+            <!-- La app graba por partes de ~45 s: aquí se ven seguidas, como una sola grabación -->
+            @if (conteo().video > 1 || conteo().audio > 1) {
+              <div class="ev-continua">
+                <span class="ev-continua-texto">
+                  <strong>Grabación completa</strong>
+                  <small>La app graba por partes. Aquí puedes verlas seguidas, sin abrir una por una.</small>
+                </span>
+                <span class="ev-continua-botones">
+                  @if (conteo().video > 1) {
+                    <button class="ev-btn ev-btn--primary" [disabled]="cargandoContinua()" (click)="verContinua('video')">
+                      Ver video completo ({{ conteo().video }} partes)
+                    </button>
+                  }
+                  @if (conteo().audio > 1) {
+                    <button class="ev-btn ev-btn--ghost" [disabled]="cargandoContinua()" (click)="verContinua('audio')">
+                      Escuchar audio completo ({{ conteo().audio }} partes)
+                    </button>
+                  }
+                </span>
+              </div>
+            }
+
             <div class="ev-tiles">
               @for (e of filtradas(); track e.id) {
                 <button class="ev-tile" [class.ev-tile--selected]="seleccionada()?.id === e.id" (click)="ver(e)" [title]="e.nombreArchivo">
@@ -141,7 +163,15 @@
 
     <!-- ══════════ DETALLE ══════════ -->
     <section class="ev-card ev-detail">
-      @if (seleccionada(); as e) {
+      @if (cargandoContinua()) {
+        <p class="ev-muted">Juntando las partes de la grabación…</p>
+      } @else if (continua(); as c) {
+        <div class="ev-detail-head">
+          <h2 class="ev-detail-title">{{ c.tipo === 'video' ? 'Video completo' : 'Audio completo' }} · {{ c.partes.length }} partes</h2>
+        </div>
+        <app-reproductor-continuo [tipo]="c.tipo" [partes]="c.partes" />
+        <p class="ev-muted">Para descargar o ver la huella de una parte, elígela en la lista.</p>
+      } @else if (seleccionada(); as e) {
         <div class="ev-viewer ev-viewer--{{ e.tipo }}">
           @if (cargandoVisor()) {
             <p class="ev-muted">Cargando archivo…</p>

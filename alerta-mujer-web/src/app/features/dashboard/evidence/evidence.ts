@@ -1,6 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { ParteGrabacion, ReproductorContinuoComponent } from '../../../shared/components/reproductor-continuo/reproductor-continuo';
 import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
@@ -39,7 +41,7 @@ interface AlertaConEvidencias extends MiAlerta {
 @Component({
   selector: 'app-evidence',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReproductorContinuoComponent],
   templateUrl: './evidence.html',
   styleUrl: './evidence.scss',
 })
@@ -74,6 +76,12 @@ export class Evidence implements OnInit, OnDestroy {
   cargandoVisor = signal(false);
   errorVisor = signal('');
   private miniaturas = signal<Record<number, string>>({});
+  /** Archivo ya descargado de cada evidencia (para no pedirlo dos veces). */
+  private archivos: Record<number, string> = {};
+
+  // ── Grabación completa (partes seguidas) ───────
+  continua = signal<{ tipo: 'video' | 'audio'; partes: ParteGrabacion[] } | null>(null);
+  cargandoContinua = signal(false);
   private urlsCreadas = new Set<string>();
 
   // ── Renombrar ──────────────────────────────────
@@ -179,6 +187,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   elegirAlerta(id: number): void {
     this.alertaId.set(id);
+    this.continua.set(null);
     this.filtro.set('todas');
     this.cerrarEdicion();
     const primera = this.filtradas()[0];
@@ -216,8 +225,38 @@ export class Evidence implements OnInit, OnDestroy {
     });
   }
 
+  /** Descarga todas las partes de un tipo y las muestra en el reproductor continuo. */
+  verContinua(tipo: 'video' | 'audio'): void {
+    const partes = this.deLaAlerta()
+      .filter((e) => e.tipo === tipo && e.tieneArchivo)
+      .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+    if (partes.length === 0) return;
+    this.seleccionada.set(null);
+    this.cerrarEdicion();
+    this.cargandoContinua.set(true);
+    const alerta = this.alertaId();
+    forkJoin(partes.map((e) => this.service.archivo(e.id))).subscribe({
+      next: (blobs) => {
+        if (this.alertaId() !== alerta) return;
+        this.continua.set({
+          tipo,
+          partes: partes.map((e, i) => {
+            this.archivos[e.id] ??= this.crearUrl(blobs[i]);
+            return { id: e.id, url: this.archivos[e.id], creada: e.fecha };
+          }),
+        });
+        this.cargandoContinua.set(false);
+      },
+      error: () => {
+        this.cargandoContinua.set(false);
+        this.mostrarAviso('No se pudieron cargar todas las partes de la grabación.');
+      },
+    });
+  }
+
   // ── Visor ──────────────────────────────────────
   ver(e: MiEvidencia): void {
+    this.continua.set(null);
     this.seleccionada.set(e);
     this.cerrarEdicion();
     this.errorVisor.set('');

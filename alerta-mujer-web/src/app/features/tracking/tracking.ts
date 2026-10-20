@@ -1,4 +1,5 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ReproductorContinuoComponent } from '../../shared/components/reproductor-continuo/reproductor-continuo';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,7 +48,7 @@ const duracionTexto = (ms: number): string => {
 @Component({
   selector: 'app-tracking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReproductorContinuoComponent],
   templateUrl: './tracking.html',
   styleUrl: './tracking.scss',
 })

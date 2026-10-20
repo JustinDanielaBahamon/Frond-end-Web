@@ -198,16 +198,17 @@
             <i class="ti ti-photo-video" aria-hidden="true"></i> Grabaciones de la alerta
           </h2>
           <p class="tarjeta__sub">Pueden ayudar a ubicarla o a saber qué está pasando. No las compartas.</p>
-          @for (v of videos(); track v.id) {
+          <!-- La app graba por partes: aquí se reproducen seguidas, como una sola grabación -->
+          @if (videos().length) {
             <figure class="evidencia">
-              <video [src]="v.url" controls preload="metadata" playsinline></video>
-              <figcaption>Video · {{ v.creada | date: 'h:mm:ss a' }}</figcaption>
+              <app-reproductor-continuo tipo="video" [partes]="videos()" />
+              <figcaption>Video{{ videos().length > 1 ? ' · ' + videos().length + ' partes' : '' }}</figcaption>
             </figure>
           }
-          @for (a of audios(); track a.id) {
+          @if (audios().length) {
             <figure class="evidencia">
-              <audio [src]="a.url" controls preload="none"></audio>
-              <figcaption>Audio · {{ a.creada | date: 'h:mm:ss a' }}</figcaption>
+              <app-reproductor-continuo tipo="audio" [partes]="audios()" />
+              <figcaption>Audio{{ audios().length > 1 ? ' · ' + audios().length + ' partes' : '' }}</figcaption>
             </figure>
           }
         </section>

@@ -4,11 +4,12 @@
 // Actualizar cuando el backend esté desplegado en Render.
 export const environment = {
   production: true,
-  apiUrl: 'https://alerta-mujer-backend.onrender.com',
+  // Auth Service (también atiende todo lo que no es de Alert ni de Evidence)
+  apiUrl: 'https://alerta-mujer-auth.onrender.com',
   // Microservicios: dirección de Alert y Evidence (vacía = todo va a apiUrl, que es Auth).
   // Ver core/api/servicios.ts para saber qué rutas atiende cada uno.
-  alertApiUrl: '',
-  evidenceApiUrl: '',
+  alertApiUrl: 'https://alerta-mujer-alert.onrender.com',
+  evidenceApiUrl: 'https://alerta-mujer-evidence.onrender.com',
   // Firebase (inicio de sesión con Google). Datos públicos de la "app web" del proyecto
   // en Firebase Console -> Configuración del proyecto -> Tus apps. No son secretos.
   firebase: {

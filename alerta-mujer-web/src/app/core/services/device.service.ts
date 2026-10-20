@@ -26,6 +26,38 @@ export interface Device {
   gpsStatus?: string | null;
   pushTokenRegistered?: boolean;
   lastAccessIso?: string | null;
+  /** Nombre que le puso la usuaria al celular (p. ej. "Celular de Ana"). */
+  deviceName?: string | null;
+  registrado?: string;
+  /** Lo que la app informa que está listo para una emergencia (null si nunca lo informó). */
+  permisos?: PermisoDispositivo[] | null;
+  permisosActualizados?: string | null;
+}
+
+export interface PermisoDispositivo {
+  etiqueta: string;
+  listo: boolean;
+}
+
+/** Permisos que informa la app, en el orden en que importan para una emergencia. */
+const PERMISOS_APP: [string, string][] = [
+  ['ubicacion', 'Ubicación'],
+  ['notificaciones', 'Notificaciones'],
+  ['agitar', 'Alerta al agitar'],
+  ['bateria', 'Batería sin restricciones'],
+  ['pantallaCompleta', 'Alarma a pantalla completa'],
+  ['microfono', 'Micrófono'],
+  ['camara', 'Cámara'],
+];
+
+function leerPermisos(json: string | null): PermisoDispositivo[] | null {
+  if (!json) return null;
+  try {
+    const p = JSON.parse(json) as Record<string, unknown>;
+    return PERMISOS_APP.filter(([clave]) => clave in p).map(([clave, etiqueta]) => ({ etiqueta, listo: p[clave] === true }));
+  } catch {
+    return null;
+  }
 }
 
 /** Dispositivo tal como lo devuelve el backend al panel de administración. */
@@ -47,6 +79,9 @@ interface AdminDeviceApi {
   lastAccess: string | null;
   createdAt: string | null;
   pushTokenRegistered: boolean;
+  deviceName: string | null;
+  permissions: string | null;
+  permissionsUpdatedAt: string | null;
 }
 
 const ESTADO_DESDE_API: Record<string, Device['status']> = {
@@ -83,6 +118,10 @@ function desdeApi(d: AdminDeviceApi): Device {
     gpsStatus: d.gpsStatus,
     pushTokenRegistered: d.pushTokenRegistered,
     lastAccessIso: d.lastAccess,
+    deviceName: d.deviceName,
+    registrado: formatearUltimoAcceso(d.createdAt),
+    permisos: leerPermisos(d.permissions),
+    permisosActualizados: d.permissionsUpdatedAt ? formatearUltimoAcceso(d.permissionsUpdatedAt) : null,
   };
 }
 

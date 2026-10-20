@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DeviceService, Device, DeviceStats } from '../../../core/services/device.service';
+import { DeviceService, Device, DeviceStats, PermisoDispositivo } from '../../../core/services/device.service';
 import { Observable, Subject } from 'rxjs';
 
 @Component({
@@ -63,6 +63,18 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarDatos();
+  }
+
+  permisosListos(permisos: PermisoDispositivo[]): number {
+    return permisos.filter((p) => p.listo).length;
+  }
+
+  textoGps(estado?: string | null): string {
+    // Valores de identity.device.gps_status
+    const textos: Record<string, string> = {
+      active: 'Encendido', inactive: 'Apagado', denied: 'Sin permiso', unknown: 'Desconocido',
+    };
+    return estado ? textos[estado] ?? estado : 'Sin informar';
   }
 
   ngOnDestroy(): void {

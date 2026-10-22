@@ -49,12 +49,6 @@ export class AlertsService {
     );
   }
 
-  update(alert: Alert): Observable<Alert> {
-    // No enviamos userId/userProfileId, el backend lo establece automáticamente
-    const { userId, ...alertData } = alert as any;
-    return this.http.put<Alert>(`${this.url}/${alert.id}`, alertData);
-  }
-
   // Cambio de estado desde administración (PATCH /api/alerts/{id}/status, solo ADMIN)
   updateStatus(id: number, estado: AlertStatus): Observable<Alert> {
     return this.http.patch<any>(`${this.url}/${id}/status`, { status: API_STATUS[estado] }).pipe(

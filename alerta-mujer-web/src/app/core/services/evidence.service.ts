@@ -133,20 +133,6 @@ export class EvidenceService {
   }
 
   /**
-   * Crear nueva evidencia
-   */
-  create(evidence: Omit<Evidence, 'id'>): Observable<Evidence> {
-    return this.http.post<Evidence>(this.url, evidence);
-  }
-
-  /**
-   * Actualizar evidencia
-   */
-  update(id: number, evidence: Evidence): Observable<Evidence> {
-    return this.http.put<Evidence>(`${this.url}/${id}`, evidence);
-  }
-
-  /**
    * Eliminar evidencia
    */
   delete(id: number): Observable<void> {

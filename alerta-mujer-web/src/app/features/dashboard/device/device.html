@@ -21,7 +21,7 @@
     </h2>
     @if (phonePermissions(); as pc) {
       @if (pc.missing > 0) {
-        <div class="device-perm-aviso" role="alert">
+        <div class="device-perm-notice" role="alert">
           <i class="ti ti-alert-circle"></i>
           <div>
             <strong>Por favor otorga los permisos a AlertaMujer para que pueda funcionar correctamente.</strong>
@@ -40,16 +40,16 @@
                [attr.aria-label]="perm.title + ': ' + (perm.granted ? 'listo' : 'falta')">
             <span class="device-perm__icon"><i class="ti" [ngClass]="perm.icon"></i></span>
             <span class="device-perm__body">
-              <span class="device-perm__titulo">{{ perm.title }}</span>
+              <span class="device-perm__title">{{ perm.title }}</span>
               <span class="device-perm__desc">{{ perm.description }}</span>
             </span>
-            <span class="device-perm__estado">
+            <span class="device-perm__status">
               <i class="ti" [ngClass]="perm.granted ? 'ti-check' : 'ti-x'"></i> {{ perm.granted ? 'Listo' : 'Falta' }}
             </span>
           </div>
         }
       </div>
-      <p class="device-perm__fecha">Informado por {{ pc.phone }} · {{ pc.updated }}</p>
+      <p class="device-perm__date">Informado por {{ pc.phone }} · {{ pc.updated }}</p>
     } @else {
       <p class="device-permissions-note">
         <i class="ti ti-info-circle"></i>
@@ -73,7 +73,7 @@
             <span class="device-list-item__label">Tiempo restante de la sesión</span>
             <span class="device-list-item__details">Cuando llegue a cero tendrás que volver a iniciar sesión en la web. En el celular la sesión se renueva sola mientras uses la app.</span>
           </div>
-          <span class="device-badge" [ngClass]="sessionExpiring() ? 'device-badge--advertencia' : 'device-badge--exito'">{{ sessionRemaining() }}</span>
+          <span class="device-badge" [ngClass]="sessionExpiring() ? 'device-badge--warning' : 'device-badge--success'">{{ sessionRemaining() }}</span>
         </div>
         @for (service of services(); track service.name) {
           <div class="device-list-item">
@@ -84,7 +84,7 @@
                 <span class="device-list-item__details">{{ service.details }}</span>
               }
             </div>
-            <span class="device-badge" [ngClass]="service.enabled ? 'device-badge--exito' : 'device-badge--peligro'">
+            <span class="device-badge" [ngClass]="service.enabled ? 'device-badge--success' : 'device-badge--danger'">
               {{ service.enabled ? 'Activo' : 'Inactivo' }}
             </span>
           </div>
@@ -97,7 +97,7 @@
             <span class="device-list-item__label">Estado de conexión</span>
             <span class="device-list-item__details">{{ isOnline() ? 'En línea' : 'Sin conexión' }} • Calidad: {{ connectionQuality() }}</span>
           </div>
-          <span class="device-badge" [ngClass]="isOnline() ? 'device-badge--exito' : 'device-badge--peligro'">
+          <span class="device-badge" [ngClass]="isOnline() ? 'device-badge--success' : 'device-badge--danger'">
             {{ isOnline() ? 'Conectado' : 'Desconectado' }}
           </span>
         </div>
@@ -126,7 +126,7 @@
                 </span>
                 <span class="device-phone__meta">Última conexión: {{ lastConnection(d) }}</span>
               </span>
-              <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--exito' : 'device-badge--advertencia'">
+              <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--success' : 'device-badge--warning'">
                 {{ d.fcmToken ? 'Recibe alertas' : 'Sin notificaciones' }}
               </span>
               <i class="ti ti-chevron-right device-phone__chevron"></i>
@@ -170,7 +170,7 @@
     @if (criticalFeatures(); as features) {
       <div class="device-grid device-grid--4col">
         <div class="device-feature-item" role="status" aria-label="Estado de la sesión" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--peligro'">
+          <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--success' : 'device-feature-item__icon--danger'">
             <i class="ti ti-login"></i>
           </div>
           <div class="device-feature-item__body">
@@ -180,7 +180,7 @@
         </div>
 
         <div class="device-feature-item" role="status" aria-label="Estado de ubicación" aria-live="polite">
-          <div class="device-feature-item__icon device-feature-item__icon--acento">
+          <div class="device-feature-item__icon device-feature-item__icon--accent">
             <i class="ti ti-map-pin"></i>
           </div>
           <div class="device-feature-item__body">
@@ -190,7 +190,7 @@
         </div>
 
         <div class="device-feature-item" role="status" aria-label="Estado de notificaciones" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.pushTokenRegistered ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+          <div class="device-feature-item__icon" [ngClass]="features.pushTokenRegistered ? 'device-feature-item__icon--success' : 'device-feature-item__icon--warning'">
             <i class="ti ti-bell"></i>
           </div>
           <div class="device-feature-item__body">
@@ -200,7 +200,7 @@
         </div>
 
         <div class="device-feature-item" role="status" aria-label="Estado de contactos de emergencia" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.emergencyContactsCount ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+          <div class="device-feature-item__icon" [ngClass]="features.emergencyContactsCount ? 'device-feature-item__icon--success' : 'device-feature-item__icon--warning'">
             <i class="ti ti-users"></i>
           </div>
           <div class="device-feature-item__body">
@@ -309,13 +309,13 @@
         }
       </dl>
       @if (det.note) {
-        <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.note }}</p>
+        <p class="dd-note"><i class="ti ti-info-circle"></i> {{ det.note }}</p>
       }
       @if (det.link) {
         @if (det.link.route) {
-          <a class="dd-enlace" [routerLink]="det.link.route">{{ det.link.text }} <i class="ti ti-map-2"></i></a>
+          <a class="dd-link" [routerLink]="det.link.route">{{ det.link.text }} <i class="ti ti-map-2"></i></a>
         } @else {
-          <a class="dd-enlace" [href]="det.link.url" target="_blank" rel="noopener">{{ det.link.text }} <i class="ti ti-external-link"></i></a>
+          <a class="dd-link" [href]="det.link.url" target="_blank" rel="noopener">{{ det.link.text }} <i class="ti ti-external-link"></i></a>
         }
       }
       <button type="button" class="dd-ok" (click)="closeDetail()">Entendido</button>

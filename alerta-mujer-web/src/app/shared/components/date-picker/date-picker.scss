@@ -4,7 +4,7 @@
   min-width: 170px;
 }
 
-.sf-campo {
+.sf-field {
   width: 100%;
   display: flex;
   align-items: center;
@@ -22,29 +22,29 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 
   &:hover,
-  &--abierto {
+  &--open {
     border-color: var(--purple-mid, #7c3aed);
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
   }
 }
 
-.sf-icono {
+.sf-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
   color: var(--purple-mid, #7c3aed);
 }
 
-.sf-texto {
+.sf-text {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
-  &--vacio { color: var(--text-muted, #8b7bac); font-weight: 500; }
+  &--empty { color: var(--text-muted, #8b7bac); font-weight: 500; }
 }
 
-.sf-limpiar {
+.sf-clear {
   color: var(--text-muted, #8b7bac);
   font-size: 0.75rem;
   padding: 2px 4px;
@@ -72,7 +72,7 @@
   to { opacity: 1; transform: none; }
 }
 
-.sf-cabecera {
+.sf-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -106,7 +106,7 @@
   gap: 2px;
 }
 
-.sf-dia-semana {
+.sf-day-week {
   padding: 4px 0;
   text-align: center;
   font-size: 0.68rem;
@@ -114,7 +114,7 @@
   color: var(--text-muted, #8b7bac);
 }
 
-.sf-dia {
+.sf-day {
   aspect-ratio: 1;
   border: none;
   border-radius: 10px;
@@ -126,11 +126,11 @@
   cursor: pointer;
 
   &:hover:not(:disabled) { background: rgba(124, 58, 237, 0.14); }
-  &--fuera { color: var(--text-muted, #8b7bac); opacity: 0.55; }
-  &--hoy { box-shadow: inset 0 0 0 1.5px var(--purple-mid, #7c3aed); }
+  &--outside { color: var(--text-muted, #8b7bac); opacity: 0.55; }
+  &--today { box-shadow: inset 0 0 0 1.5px var(--purple-mid, #7c3aed); }
 
-  &--elegido,
-  &--elegido:hover:not(:disabled) {
+  &--chosen,
+  &--chosen:hover:not(:disabled) {
     background: linear-gradient(135deg, #7c3aed, #5b21b6);
     color: #fff;
     opacity: 1;
@@ -139,7 +139,7 @@
   &:disabled { opacity: 0.25; cursor: not-allowed; }
 }
 
-.sf-pie {
+.sf-footer {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
@@ -147,7 +147,7 @@
   border-top: 1px solid var(--border, #c4b5fd);
 }
 
-.sf-accion {
+.sf-action {
   padding: 6px 12px;
   border: none;
   border-radius: 10px;

@@ -3,12 +3,12 @@ $adm: 'html:not([data-theme=\"dark\"]) app-admin-layout .layout__main';
 app-admin-layout .layout__main {
 
   .panel-filters   { border-bottom-color: var(--border) !important; }
-  .zonas-section,
-  .zona-add-row    { border-bottom-color: var(--border) !important; }
-  .filtros-body    { border-top-color: var(--border) !important; }
+  .zones-section,
+  .zone-add-row    { border-bottom-color: var(--border) !important; }
+  .filters-body    { border-top-color: var(--border) !important; }
 
-  .zona-auto-card,
-  .zona-manual-card { border-color: var(--border) !important; }
+  .zone-auto-card,
+  .zone-manual-card { border-color: var(--border) !important; }
 
   app-user table tbody tr { border-bottom-color: var(--border) !important; }
 
@@ -25,7 +25,7 @@ app-admin-layout .layout__main {
   }
 
   .fab-main,
-  .modo-dibujo-banner {
+  .mode-drawing-banner {
     box-shadow: 0 4px 16px color-mix(in srgb, var(--purple-deep) 40%, transparent) !important;
   }
 
@@ -38,12 +38,12 @@ app-admin-layout .layout__main {
 
   /* Alertas / zonas */
   .panel-filters   { border-bottom: 1px solid #9d8fd6 !important; }
-  .zonas-section,
-  .zona-add-row    { border-bottom: 1px solid #9d8fd6 !important; }
-  .filtros-body    { border-top: 1px solid #9d8fd6 !important; }
+  .zones-section,
+  .zone-add-row    { border-bottom: 1px solid #9d8fd6 !important; }
+  .filters-body    { border-top: 1px solid #9d8fd6 !important; }
 
-  .zona-auto-card,
-  .zona-manual-card { border: 1.5px solid #9d8fd6 !important; }
+  .zone-auto-card,
+  .zone-manual-card { border: 1.5px solid #9d8fd6 !important; }
 
   /* Usuarios */
   app-user {
@@ -84,7 +84,7 @@ app-admin-layout .layout__main {
   --red        : #a21caf;
 
   app-dashboard {
-    .badge-robo   { color: #4c1d95 !important; }
+    .badge-theft   { color: #4c1d95 !important; }
     .badge-medica { color: #6d28d9 !important; }
   }
 }
@@ -107,13 +107,13 @@ app-admin-layout .layout__main {
   .page-header p,
   .stat-info span,
   .stat-info p,
-  .stat-change .vs-ayer,
+  .stat-change .vs-yesterday,
   .table-card table tbody tr td,
   .user-email,
   .os-version,
   .evidence-id-size,
-  .alerta-ubicacion,
-  .alerta-fecha,
+  .alert-location,
+  .alert-date,
   .table-footer .table-info,
   .table-footer .page-ellipsis,
   .detail-item label,
@@ -122,8 +122,8 @@ app-admin-layout .layout__main {
   .no-data,
   .modal-close,
   .modal-impresora-body p,
-  .loading-alertas,
-  .no-alertas { color: #374151 !important; }
+  .loading-alerts,
+  .no-alerts { color: #374151 !important; }
 
   .toolbar .search-box {
     i { color: #4b5563 !important; }
@@ -192,7 +192,7 @@ app-admin-layout .layout__main {
   .device-icon,
   .report-icon,
   .id-badge,
-  .alertas-count,
+  .alerts-count,
   .report-icon-large,
   .error-message {
     background: #e9defb !important;
@@ -243,9 +243,9 @@ app-admin-layout .layout__main {
   /* ── Detalle ────────────────────────────────── */
   .detail-section h4 { border-bottom-color: #cfc7ee !important; }
 
-  .alertas-selector {
-    .alertas-list,
-    .alerta-item,
+  .alerts-selector {
+    .alerts-list,
+    .alert-item,
     .btn-small { border-color: #a39bc9 !important; }
   }
 }

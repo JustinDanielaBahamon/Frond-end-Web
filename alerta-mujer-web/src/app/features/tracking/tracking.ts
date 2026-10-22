@@ -340,7 +340,7 @@ export class TrackingComponent implements OnInit {
       const isLast = i === d.route.length - 1;
       const icon = L.divIcon({
         className: '',
-        html: `<span class="pin-ruta${isLast ? ' pin-ruta--actual' : i === 0 ? ' pin-ruta--inicio' : ''}">${i + 1}</span>`,
+        html: `<span class="pin-route${isLast ? ' pin-route--actual' : i === 0 ? ' pin-route--start' : ''}">${i + 1}</span>`,
         iconSize: isLast ? [34, 34] : [24, 24],
         iconAnchor: isLast ? [17, 17] : [12, 12],
       });

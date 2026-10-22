@@ -509,9 +509,9 @@ export class UserComponent implements OnInit {
   // ── Helpers de estilo ────────────────────────────────────────
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      'Activa':               'estado--activa',
-      'Inactiva':             'estado--inactiva',
-      'Bloqueada por Fraude': 'estado--bloqueada',
+      'Activa':               'state--active',
+      'Inactiva':             'state--inactiva',
+      'Bloqueada por Fraude': 'state--blocked',
     };
     return map[status] ?? '';
   }

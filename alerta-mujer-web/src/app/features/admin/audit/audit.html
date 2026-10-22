@@ -151,9 +151,9 @@
   @if (selected(); as r) {
     <div class="overlay" (click)="closeDetail()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="registro-titulo" (click)="$event.stopPropagation()">
-        <header class="registro__cabecera">
-          <span class="registro__icono" [ngClass]="actionClass(r)"><i class="fa-solid" [ngClass]="actionIcon(r)"></i></span>
-          <div class="registro__titulos">
+        <header class="record__header">
+          <span class="record__icon" [ngClass]="actionClass(r)"><i class="fa-solid" [ngClass]="actionIcon(r)"></i></span>
+          <div class="record__titles">
             <h2 id="registro-titulo">{{ action(r) }} · {{ object(r) }}</h2>
             <p>{{ longDate(r.date) }}</p>
           </div>
@@ -161,17 +161,17 @@
         </header>
 
         <!-- Who -->
-        <section class="registro__bloque">
+        <section class="record__block">
           <h3>Responsable</h3>
-          <div class="registro__persona">
+          <div class="record__persona">
             @if (r.actor) {
-              <span class="registro__avatar">{{ r.actor.charAt(0).toUpperCase() }}</span>
+              <span class="record__avatar">{{ r.actor.charAt(0).toUpperCase() }}</span>
               <div>
                 <strong>{{ r.actor }}</strong>
                 <small>{{ r.actorEmail }}{{ r.role ? ' · ' + r.role : '' }}</small>
               </div>
             } @else {
-              <span class="registro__avatar registro__avatar--sistema"><i class="fa-solid" [ngClass]="withoutActor(r).icon"></i></span>
+              <span class="record__avatar record__avatar--system"><i class="fa-solid" [ngClass]="withoutActor(r).icon"></i></span>
               <div>
                 <strong>{{ withoutActor(r).text }}</strong>
                 <small>{{ withoutActor(r).help }}</small>
@@ -181,24 +181,24 @@
         </section>
 
         <!-- What changed -->
-        <section class="registro__bloque">
+        <section class="record__block">
           <h3>Qué pasó</h3>
           @if (changes(r); as list) {
             @if (list.length && list[0].before !== null) {
-              <table class="registro__cambios">
+              <table class="record__changes">
                 <thead><tr><th>Dato</th><th>Antes</th><th>Después</th></tr></thead>
                 <tbody>
                   @for (c of list; track $index) {
                     <tr>
                       <td>{{ c.field }}</td>
-                      <td class="registro__antes">{{ c.before }}</td>
-                      <td class="registro__despues">{{ c.after }}</td>
+                      <td class="record__antes">{{ c.before }}</td>
+                      <td class="record__after">{{ c.after }}</td>
                     </tr>
                   }
                 </tbody>
               </table>
             } @else {
-              <ul class="registro__lineas">
+              <ul class="record__lines">
                 @for (c of list; track $index) { <li>{{ c.field }}</li> } @empty { <li>Sin detalle registrado.</li> }
               </ul>
             }
@@ -206,7 +206,7 @@
         </section>
 
         <!-- Technical data -->
-        <footer class="registro__tecnico">
+        <footer class="record__technical">
           <span><i class="fa-solid" [ngClass]="sourceIcon(r.source)"></i> {{ r.source || 'Origen no registrado' }}</span>
           <span><i class="fa-solid fa-network-wired"></i> IP {{ r.ip || '—' }}</span>
           <span><i class="fa-solid fa-hashtag"></i> Registro {{ r.id }}</span>

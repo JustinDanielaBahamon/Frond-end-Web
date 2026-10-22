@@ -147,7 +147,7 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
           color: $badge-purple-text;
         }
 
-        .vs-ayer {
+        .vs-yesterday {
           color: $color-text-light;
           font-weight: 500;
         }
@@ -1541,5 +1541,5 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
     display: none;
   }
 }
-.caso-extra { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; p { margin: 0; } }
-.caso-evidencia { max-width: 100%; border-radius: 10px; border: 1px solid #c4b5fd; }
+.case-extra { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; p { margin: 0; } }
+.case-evidence { max-width: 100%; border-radius: 10px; border: 1px solid #c4b5fd; }

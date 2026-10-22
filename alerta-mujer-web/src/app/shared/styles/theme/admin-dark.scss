@@ -54,7 +54,7 @@
     .stat-change {
       &.positive { color: var(--green) !important; }
       &.negative { color: var(--red) !important; }
-      .vs-ayer   { color: var(--text-muted) !important; }
+      .vs-yesterday   { color: var(--text-muted) !important; }
     }
   }
 
@@ -441,15 +441,15 @@
   }
 
   /* ── Form alert selector ─────── */
-  .alertas-selector {
+  .alerts-selector {
     label { color: var(--purple-mid) !important; }
 
-    .alertas-count {
+    .alerts-count {
       background: var(--purple-pale) !important;
       color: var(--purple-mid) !important;
     }
 
-    .alertas-actions .btn-small {
+    .alerts-actions .btn-small {
       background: var(--bg-base) !important;
       border-color: var(--border) !important;
       color: var(--purple-mid) !important;
@@ -460,16 +460,16 @@
       }
     }
 
-    .loading-alertas,
-    .no-alertas {
+    .loading-alerts,
+    .no-alerts {
       background: var(--bg-base) !important;
       color: var(--text-muted) !important;
     }
 
-    .alertas-list {
+    .alerts-list {
       border-color: var(--border) !important;
 
-      .alerta-item {
+      .alert-item {
         background: var(--bg-base) !important;
         border-color: var(--border) !important;
 
@@ -481,9 +481,9 @@
 
         &.selected { box-shadow: 0 0 0 2px rgba(183, 155, 245, 0.18) !important; }
 
-        .alerta-tipo      { color: var(--text-primary) !important; }
-        .alerta-ubicacion,
-        .alerta-fecha     { color: var(--text-muted) !important; }
+        .alert-type      { color: var(--text-primary) !important; }
+        .alert-location,
+        .alert-date     { color: var(--text-muted) !important; }
       }
     }
   }
@@ -491,5 +491,5 @@
   /* ── "No printer found" modal ───────── */
   .modal-impresora-header h2 { color: var(--text-primary) !important; }
   .modal-impresora-body p    { color: var(--text-muted) !important; }
-  .modal-impresora-body .mensaje-final { color: var(--purple-mid) !important; }
+  .modal-impresora-body .message-final { color: var(--purple-mid) !important; }
 }

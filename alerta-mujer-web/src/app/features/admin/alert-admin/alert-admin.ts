@@ -178,7 +178,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.map = L.map('mapa-leaflet', { center: this.initialCenter, zoom: 14 });
+    this.map = L.map('map-leaflet', { center: this.initialCenter, zoom: 14 });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap', maxZoom: 19,

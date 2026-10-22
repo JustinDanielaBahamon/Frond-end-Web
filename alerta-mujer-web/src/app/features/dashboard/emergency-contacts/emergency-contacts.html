@@ -48,12 +48,12 @@
             <tr>
               <td>
                 @if (c.photo) {
-                  <img class="ec-avatar ec-avatar--foto" [src]="c.photo" [alt]="'Foto de ' + c.name" />
+                  <img class="ec-avatar ec-avatar--photo" [src]="c.photo" [alt]="'Foto de ' + c.name" />
                 } @else {
                   <span class="ec-avatar">{{ initials(c.name) }}</span>
                 }
               </td>
-              <td class="ec-nombre">{{ c.name }}</td>
+              <td class="ec-name">{{ c.name }}</td>
               <td>{{ c.telephone }}</td>
               <td class="ec-email">{{ c.email || '-' }}</td>
               <td>{{ c.relationship }}</td>
@@ -109,21 +109,21 @@
       </div>
 
       <div class="ec-modal-body">
-        <div class="ec-foto">
+        <div class="ec-photo">
           @if (addForm.photo) {
-            <img class="ec-foto-img" [src]="addForm.photo" alt="Foto del contacto" />
+            <img class="ec-photo-img" [src]="addForm.photo" alt="Foto del contacto" />
           } @else {
-            <span class="ec-foto-vacia">{{ initials(addForm.name) || '?' }}</span>
+            <span class="ec-photo-vacia">{{ initials(addForm.name) || '?' }}</span>
           }
-          <div class="ec-foto-acciones">
-            <label class="ec-foto-boton">
+          <div class="ec-photo-actions">
+            <label class="ec-photo-button">
               <i class="ti ti-camera" aria-hidden="true"></i> {{ addForm.photo ? 'Cambiar foto' : 'Poner foto' }}
               <input type="file" accept="image/*" hidden (change)="choosePhoto($event, addForm)" />
             </label>
             @if (addForm.photo) {
-              <button type="button" class="ec-foto-quitar" (click)="removePhoto(addForm)">Quitar</button>
+              <button type="button" class="ec-photo-remove" (click)="removePhoto(addForm)">Quitar</button>
             }
-            @if (photoError) { <span class="ec-foto-error">{{ photoError }}</span> }
+            @if (photoError) { <span class="ec-photo-error">{{ photoError }}</span> }
           </div>
         </div>
 
@@ -187,21 +187,21 @@
       </div>
 
       <div class="ec-modal-body">
-        <div class="ec-foto">
+        <div class="ec-photo">
           @if (editForm.photo) {
-            <img class="ec-foto-img" [src]="editForm.photo" alt="Foto del contacto" />
+            <img class="ec-photo-img" [src]="editForm.photo" alt="Foto del contacto" />
           } @else {
-            <span class="ec-foto-vacia">{{ initials(editForm.name) || '?' }}</span>
+            <span class="ec-photo-vacia">{{ initials(editForm.name) || '?' }}</span>
           }
-          <div class="ec-foto-acciones">
-            <label class="ec-foto-boton">
+          <div class="ec-photo-actions">
+            <label class="ec-photo-button">
               <i class="ti ti-camera" aria-hidden="true"></i> {{ editForm.photo ? 'Cambiar foto' : 'Poner foto' }}
               <input type="file" accept="image/*" hidden (change)="choosePhoto($event, editForm)" />
             </label>
             @if (editForm.photo) {
-              <button type="button" class="ec-foto-quitar" (click)="removePhoto(editForm)">Quitar</button>
+              <button type="button" class="ec-photo-remove" (click)="removePhoto(editForm)">Quitar</button>
             }
-            @if (photoError) { <span class="ec-foto-error">{{ photoError }}</span> }
+            @if (photoError) { <span class="ec-photo-error">{{ photoError }}</span> }
           </div>
         </div>
 

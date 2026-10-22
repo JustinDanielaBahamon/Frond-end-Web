@@ -24,14 +24,14 @@
 }
 
 /* ── Encabezado ── */
-.banda {
+.band {
   padding: 16px 18px 20px;
   color: #fff;
   background: linear-gradient(135deg, #6d28d9 0%, #a21caf 100%);
 
-  &--terminada { background: linear-gradient(135deg, #4c1d95 0%, #5b5677 100%); }
+  &--ended { background: linear-gradient(135deg, #4c1d95 0%, #5b5677 100%); }
 
-  &__marca {
+  &__brand {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -42,7 +42,7 @@
     img { border-radius: 8px; background: rgba(255, 255, 255, 0.15); }
   }
 
-  &__volver {
+  &__back {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -60,11 +60,11 @@
     &:hover { background: rgba(255, 255, 255, 0.28); }
   }
 
-  &__titulo { margin: 10px 0 4px; font-size: 1.5rem; line-height: 1.25; font-weight: 600; }
-  &__texto { margin: 0; font-size: 0.98rem; opacity: 0.92; }
+  &__title { margin: 10px 0 4px; font-size: 1.5rem; line-height: 1.25; font-weight: 600; }
+  &__text { margin: 0; font-size: 0.98rem; opacity: 0.92; }
 }
 
-.pildora {
+.pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -74,10 +74,10 @@
   font-weight: 800;
   background: rgba(255, 255, 255, 0.18);
 
-  &--activa { background: rgba(255, 255, 255, 0.26); }
+  &--active { background: rgba(255, 255, 255, 0.26); }
 }
 
-.pulso {
+.pulse {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -91,14 +91,14 @@
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-@media (prefers-reduced-motion: reduce) { .pulso { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
 
 /* ── Mapa ── */
-.mapa-wrap { position: relative; }
+.map-wrap { position: relative; }
 
-.mapa { height: 46vh; min-height: 260px; width: 100%; }
+.map { height: 46vh; min-height: 260px; width: 100%; }
 
-.mapa-controles {
+.map-controls {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -109,7 +109,7 @@
   gap: 8px;
 }
 
-.btn-mapa {
+.btn-map {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -128,7 +128,7 @@
   }
 }
 
-.leyenda {
+.legend {
   position: absolute;
   left: 12px;
   bottom: 12px;
@@ -143,7 +143,7 @@
   color: var(--texto);
 }
 
-.punto {
+.point {
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -151,31 +151,31 @@
   margin-right: 4px;
   vertical-align: -1px;
 
-  &--inicio { background: var(--violeta); }
-  &--medio { background: #a78bfa; }
+  &--start { background: var(--violeta); }
+  &--medium { background: #a78bfa; }
   &--actual { background: var(--neon); }
 }
 
-.sin-ubicacion { margin: 0; padding: 16px 18px; color: var(--suave); background: #f6f2ff; }
+.sin-location { margin: 0; padding: 16px 18px; color: var(--suave); background: #f6f2ff; }
 
 /* ── Contenido ── */
-.contenido { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.content { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
 
-.tarjeta {
+.panel {
   border: 1px solid var(--borde);
   border-radius: 16px;
   padding: 14px 16px;
   background: #fff;
 
-  &--lugar { display: flex; gap: 12px; align-items: flex-start; }
-  &--guia { background: #faf7ff; }
+  &--place { display: flex; gap: 12px; align-items: flex-start; }
+  &--guide { background: #faf7ff; }
 
-  &__icono { font-size: 28px; color: var(--neon); margin-top: 2px; }
-  &__etiqueta { margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--suave); }
+  &__icon { font-size: 28px; color: var(--neon); margin-top: 2px; }
+  &__label { margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--suave); }
   &__valor { margin: 4px 0 2px; font-size: 1.1rem; font-weight: 800; line-height: 1.3; }
   &__sub { margin: 2px 0 0; font-size: 0.86rem; color: var(--suave); }
-  &__vivo { margin: 8px 0 0; font-size: 0.8rem; font-weight: 700; color: var(--violeta); }
-  &__titulo {
+  &__live { margin: 8px 0 0; font-size: 0.8rem; font-weight: 700; color: var(--violeta); }
+  &__title {
     margin: 0 0 6px;
     font-size: 1.05rem;
     font-weight: 800;
@@ -186,7 +186,7 @@
   }
 }
 
-.acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .btn {
   display: inline-flex;
@@ -202,7 +202,7 @@
   border: 0;
   cursor: pointer;
 
-  &--llamar {
+  &--call {
     grid-column: 1 / -1;
     color: #fff;
     background: linear-gradient(135deg, #7c3aed, #c026d3);
@@ -210,35 +210,35 @@
     font-size: 1.08rem;
   }
 
-  &--secundario { color: var(--violeta-oscuro); background: #efe7ff; }
+  &--secondary { color: var(--violeta-oscuro); background: #efe7ff; }
 }
 
-.datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.data { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
-.dato {
+.item {
   text-align: center;
   padding: 12px 6px;
   border-radius: 14px;
   background: #f6f2ff;
   .ti { color: var(--violeta); }
   &__valor { margin: 4px 0 0; font-size: 1.05rem; font-weight: 800; }
-  &__etiqueta { margin: 2px 0 0; font-size: 0.75rem; color: var(--suave); }
+  &__label { margin: 2px 0 0; font-size: 0.75rem; color: var(--suave); }
 }
 
-.evidencia {
+.evidence {
   margin: 12px 0 0;
   video { width: 100%; max-height: 360px; border-radius: 12px; background: #1e1a3c; }
   audio { width: 100%; }
   figcaption { margin-top: 4px; font-size: 0.8rem; color: var(--suave); }
 }
 
-.pasos {
+.steps {
   margin: 4px 0 0;
   padding-left: 20px;
   li { margin: 6px 0; line-height: 1.4; }
 }
 
-.nota {
+.note {
   margin-top: 4px;
   padding: 12px 4px 20px;
   font-size: 0.8rem;
@@ -248,7 +248,7 @@
 }
 
 /* ── Estados (cargando / error) ── */
-.estado {
+.state {
   min-height: 70vh;
   display: flex;
   flex-direction: column;
@@ -262,7 +262,7 @@
   .sub { font-size: 0.88rem; }
 }
 
-.icono-grande { font-size: 48px; color: var(--violeta); }
+.icon-large { font-size: 48px; color: var(--violeta); }
 
 .spinner {
   width: 40px;
@@ -276,13 +276,13 @@
 @keyframes girar { to { transform: rotate(360deg); } }
 
 @media (max-width: 380px) {
-  .acciones { grid-template-columns: 1fr; }
-  .datos { grid-template-columns: 1fr 1fr; }
+  .action-bar { grid-template-columns: 1fr; }
+  .data { grid-template-columns: 1fr 1fr; }
 }
 
 
 /* ── Numbered route pins (Leaflet creates them outside the template) ── */
-:host ::ng-deep .pin-ruta {
+:host ::ng-deep .pin-route {
   display: grid;
   place-items: center;
   width: 24px;
@@ -294,7 +294,7 @@
   font: 800 11px/1 'Nunito', Arial, sans-serif;
   box-shadow: 0 1px 4px rgba(30, 26, 60, 0.35);
 
-  &--inicio { background: var(--violeta); }
+  &--start { background: var(--violeta); }
 
   &--actual {
     width: 34px;
@@ -307,9 +307,9 @@
 }
 
 /* ── Route timeline ── */
-.tarjeta__conteo { margin-left: auto; font-size: 0.8rem; font-weight: 700; color: var(--suave); }
+.panel__count { margin-left: auto; font-size: 0.8rem; font-weight: 700; color: var(--suave); }
 
-.linea-tiempo {
+.line-time {
   list-style: none;
   margin: 8px 0 0;
   padding: 0;
@@ -317,7 +317,7 @@
   overflow-y: auto;
 }
 
-.linea-tiempo__item {
+.line-time__item {
   position: relative;
   display: flex;
   gap: 12px;
@@ -334,7 +334,7 @@
   }
 }
 
-.linea-tiempo__nodo {
+.line-time__node {
   flex-shrink: 0;
   display: grid;
   place-items: center;
@@ -346,14 +346,14 @@
   font-weight: 800;
   font-size: 0.8rem;
 
-  .linea-tiempo__item--actual & { background: var(--neon); color: #fff; }
+  .line-time__item--actual & { background: var(--neon); color: #fff; }
 }
 
-.linea-tiempo__hora { margin: 3px 0 0; font-weight: 800; }
-.linea-tiempo__lugar { margin: 2px 0 0; font-size: 0.86rem; color: var(--texto); }
-.linea-tiempo__coords { margin: 2px 0 0; font-size: 0.78rem; color: var(--suave); }
+.line-time__hour { margin: 3px 0 0; font-weight: 800; }
+.line-time__place { margin: 2px 0 0; font-size: 0.86rem; color: var(--texto); }
+.line-time__coords { margin: 2px 0 0; font-size: 0.78rem; color: var(--suave); }
 
-.etiqueta-reciente {
+.label-recent {
   margin-left: 6px;
   padding: 2px 8px;
   border-radius: 999px;
@@ -366,24 +366,24 @@
 @media (min-width: 960px) {
   .tracking { max-width: 1280px; }
 
-  .banda { padding: 20px 32px 24px; }
-  .banda__titulo { font-size: 1.9rem; }
+  .band { padding: 20px 32px 24px; }
+  .band__title { font-size: 1.9rem; }
 
-  .cuerpo {
+  .body {
     display: grid;
     grid-template-columns: minmax(0, 1.5fr) minmax(380px, 1fr);
     align-items: start;
   }
 
-  .mapa-wrap { position: sticky; top: 0; }
-  .mapa { height: calc(100vh - 140px); min-height: 520px; }
+  .map-wrap { position: sticky; top: 0; }
+  .map { height: calc(100vh - 140px); min-height: 520px; }
 
-  .contenido { padding: 20px 24px; }
+  .content { padding: 20px 24px; }
 }
 
 
 /* ── Alert chat ── */
-.chat__lista {
+.chat__list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -404,13 +404,13 @@
     border-radius: 14px 14px 14px 4px;
     color: #fff;
     background: linear-gradient(135deg, #7c3aed, #a21caf);
-    .chat__autor { color: rgba(255, 255, 255, 0.85); }
+    .chat__author { color: rgba(255, 255, 255, 0.85); }
   }
 }
 
-.chat__autor { margin: 0; font-size: 0.74rem; font-weight: 700; color: var(--suave); }
-.chat__texto { margin: 2px 0 0; line-height: 1.35; overflow-wrap: anywhere; }
-.chat__vacio { margin: 6px 0; font-size: 0.88rem; color: var(--suave); }
+.chat__author { margin: 0; font-size: 0.74rem; font-weight: 700; color: var(--suave); }
+.chat__text { margin: 2px 0 0; line-height: 1.35; overflow-wrap: anywhere; }
+.chat__empty { margin: 6px 0; font-size: 0.88rem; color: var(--suave); }
 
 .chat__rapidas { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 8px; }
 
@@ -425,7 +425,7 @@
   &:disabled { opacity: 0.6; }
 }
 
-.chat__fila {
+.chat__row {
   display: flex;
   gap: 8px;
   input {
@@ -439,7 +439,7 @@
   }
 }
 
-.chat__enviar {
+.chat__send {
   flex-shrink: 0;
   min-width: 44px;
   padding: 0 14px;
@@ -452,6 +452,6 @@
   &:disabled { opacity: 0.5; cursor: default; }
 }
 
-.chat__nombre label { display: block; margin: 8px 0 6px; font-size: 0.88rem; font-weight: 700; }
+.chat__name label { display: block; margin: 8px 0 6px; font-size: 0.88rem; font-weight: 700; }
 .chat__como { margin: 6px 0 0; font-size: 0.78rem; color: var(--suave); }
 .chat__error { margin: 6px 0 0; font-size: 0.85rem; font-weight: 700; color: #a21caf; }

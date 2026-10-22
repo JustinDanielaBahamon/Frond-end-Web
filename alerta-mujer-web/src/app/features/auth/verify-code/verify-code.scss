@@ -464,14 +464,14 @@
   
 
 .code-error,
-.code-aviso {
+.code-notice {
   margin: 4px 0 0;
   text-align: center;
   font-size: 13px;
 }
 
 .code-error { color: #c026d3; }
-.code-aviso { color: #7c3aed; }
+.code-notice { color: #7c3aed; }
 
 // The global dark mode rule paints <strong> almost white, but this card stays light
 .verify-code-page .card__subtitle strong {

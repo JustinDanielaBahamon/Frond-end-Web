@@ -703,8 +703,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   statusClass(status: string): string {
-    if (status === 'Atendida') return 'estado-badge--atendida';
-    if (status === 'Cancelada') return 'estado-badge--cancelada';
-    return 'estado-badge--pendiente';
+    if (status === 'Atendida') return 'state-badge--atendida';
+    if (status === 'Cancelada') return 'state-badge--cancelled';
+    return 'state-badge--pending';
   }
 }

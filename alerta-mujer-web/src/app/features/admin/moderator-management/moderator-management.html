@@ -297,12 +297,12 @@
               <p class="user-email">{{ selectedReport!.userEmail }}</p>
             </div>
           </div>
-          <div class="caso-extra">
+          <div class="case-extra">
             <p *ngIf="selectedReport!.reporterName"><strong>Registrado por:</strong> {{ selectedReport!.reporterName }}</p>
             <p *ngIf="selectedReport!.resolutionNotes"><strong>Resolución:</strong> {{ selectedReport!.resolutionNotes }}</p>
             <button type="button" class="btn-secondary" *ngIf="selectedReport!.hasEvidence && !caseEvidence"
                     (click)="viewCaseEvidence(selectedReport!); $event.stopPropagation()">Ver evidencia adjunta</button>
-            <img *ngIf="caseEvidence" [src]="caseEvidence" alt="Evidencia del caso" class="caso-evidencia" />
+            <img *ngIf="caseEvidence" [src]="caseEvidence" alt="Evidencia del caso" class="case-evidence" />
           </div>
         </div>
       </div>

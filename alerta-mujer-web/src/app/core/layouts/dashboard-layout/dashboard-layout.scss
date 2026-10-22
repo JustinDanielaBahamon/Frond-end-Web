@@ -94,7 +94,7 @@
  */
 
 /* Notice: a contact of the user activated an alert (visible across the whole panel) */
-.aviso-contacto {
+.notice-contact {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -106,7 +106,7 @@
   background: linear-gradient(135deg, #6d28d9, #c026d3);
   box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
 
-  &__pulso {
+  &__pulse {
     width: 12px;
     height: 12px;
     flex-shrink: 0;
@@ -115,8 +115,8 @@
     animation: aviso-pulso 1.6s infinite;
   }
 
-  &__texto { flex: 1; }
-  &__accion { font-weight: 800; white-space: nowrap; }
+  &__text { flex: 1; }
+  &__action { font-weight: 800; white-space: nowrap; }
 }
 
 @keyframes aviso-pulso {
@@ -125,10 +125,10 @@
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-@media (prefers-reduced-motion: reduce) { .aviso-contacto__pulso { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .notice-contact__pulse { animation: none; } }
 
 // ── "Your phone changed places" notice ──────────────
-.aviso-movimiento {
+.notice-movement {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -141,7 +141,7 @@
 
   > i { font-size: 1.4rem; }
 
-  &__texto {
+  &__text {
     flex: 1;
     font-size: 0.9rem;
     line-height: 1.4;
@@ -149,7 +149,7 @@
     small { display: block; opacity: 0.8; font-size: 0.75rem; }
   }
 
-  &__accion {
+  &__action {
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.2);
@@ -160,7 +160,7 @@
     white-space: nowrap;
   }
 
-  &__cerrar {
+  &__close {
     border: none;
     background: transparent;
     color: #fff;

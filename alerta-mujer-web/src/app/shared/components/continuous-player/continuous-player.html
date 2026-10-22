@@ -5,24 +5,24 @@
              (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
              (pause)="onPause()" (ended)="onEnd()"></video>
     } @else {
-      <div class="rc-audio-icono"><i class="ti ti-wave-sine" aria-hidden="true"></i></div>
+      <div class="rc-audio-icon"><i class="ti ti-wave-sine" aria-hidden="true"></i></div>
       <audio #method [src]="part.url" controls preload="metadata"
              (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
              (pause)="onPause()" (ended)="onEnd()"></audio>
     }
 
     @if (parts.length > 1) {
-      <div class="rc-barra" role="group" aria-label="Partes de la grabación">
+      <div class="rc-bar" role="group" aria-label="Partes de la grabación">
         @for (p of parts; track p.id; let i = $index) {
-          <button type="button" class="rc-segmento" [class.rc-segmento--actual]="i === index()"
+          <button type="button" class="rc-segment" [class.rc-segment--actual]="i === index()"
                   (click)="irA(i)" [attr.aria-label]="'Parte ' + (i + 1) + ', ' + (p.created | date: 'h:mm:ss a')">
-            <span class="rc-relleno" [style.width.%]="fill(i)"></span>
+            <span class="rc-fill" [style.width.%]="fill(i)"></span>
           </button>
         }
       </div>
     }
 
-    <p class="rc-pie">
+    <p class="rc-footer">
       <span>
         @if (parts.length > 1) { Parte {{ index() + 1 }} de {{ parts.length }} · }
         {{ part.created | date: 'h:mm:ss a' }}

@@ -169,7 +169,7 @@
   }
 
   /* ── 2. Botones ────────────────────────────────── */
-  .home-btn--primario {
+  .home-btn--primary {
     // mismo degradado del login / sidebar activo
     background: linear-gradient(135deg, #7630D9, #D948B2) !important;
     color: #fff !important;
@@ -191,13 +191,13 @@
   }
 
   /* ── 3. Badge "Conectado" / "Atendida" ─────────── */
-  .home-badge--exito {
+  .home-badge--success {
     background: rgba(89, 16, 185, 0.2) !important;
     color: #782dda !important;
   }
 
   /* ── 4. Estado de seguridad (5 fichas) ─────────── */
-  .home-seguridad-item {
+  .home-security-item {
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--border, #2e2657) !important;
 
@@ -207,11 +207,11 @@
     }
 
     &__valor { color: var(--text-primary, #f3efff) !important; }
-    &__descripcion { color: var(--text-muted, #a79cc8) !important; }
+    &__description { color: var(--text-muted, #a79cc8) !important; }
   }
 
   /* ── 5. Mi dispositivo ─────────────────────────── */
-  .home-dispositivo-icon {
+  .home-device-icon {
     background: rgba(124, 58, 237, 0.18) !important;
     color: #a78bfa !important;
   }
@@ -222,16 +222,16 @@
  *         with the light icon on top.
  */
   .home-activity-item__icon,
-  .home-acceso__icon {
+  .home-access__icon {
 
-    &--peligro     { background: var(--pink) !important; color: #fff !important; }
+    &--danger     { background: var(--pink) !important; color: #fff !important; }
     &--principal   { background: #7c3aed !important; color: #ede9fe !important; }
-    &--exito       { background: #5910b9 !important; color: #ecfdf5 !important; }
-    &--acento      { background: #5b21b6 !important; color: #ecfeff !important; }
-    &--advertencia { background: #9306d9 !important; color: #fffbeb !important; }
+    &--success       { background: #5910b9 !important; color: #ecfdf5 !important; }
+    &--accent      { background: #5b21b6 !important; color: #ecfeff !important; }
+    &--warning { background: #9306d9 !important; color: #fffbeb !important; }
   }
 
-  .home-emergencia__icon {
+  .home-emergency__icon {
     background: var(--pink) !important;
     color: #fff !important;
   }
@@ -243,7 +243,7 @@
   }
 
   /* ── 8. Última emergencia ──────────────────────── */
-  .home-emergencia__detalle {
+  .home-emergency__detail {
     border-top-color: var(--border, #2e2657) !important;
 
     i { color: var(--purple-mid, #a78bfa) !important; }
@@ -259,12 +259,12 @@
   }
 
   /* ── 10. Shortcuts and quick actions ────────────── */
-  .home-acceso:hover,
-  .home-accion-item:hover {
+  .home-access:hover,
+  .home-action-item:hover {
     background: rgba(124, 58, 237, 0.12) !important;
   }
 
-  .home-accion-item__chevron {
+  .home-action-item__chevron {
     color: var(--text-dim, #7d739e) !important;
   }
 }
@@ -495,16 +495,16 @@
     }
   }
 
-  .ev-card-tipo { color: var(--text-primary) !important; }
-  .ev-card-fecha,
-  .ev-card-ubicacion { color: var(--text-muted) !important; }
+  .ev-card-type { color: var(--text-primary) !important; }
+  .ev-card-date,
+  .ev-card-location { color: var(--text-muted) !important; }
 
-  .ev-card-alerta { color: var(--pink) !important; }
-  .ev-card-detalle { color: var(--purple-mid) !important; }
+  .ev-card-alert { color: var(--pink) !important; }
+  .ev-card-detail { color: var(--purple-mid) !important; }
 
-  .tipo-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
-  .tipo-foto  { background: linear-gradient(135deg, var(--amber-pale, #3b0764), #660e92) !important; color: #b324fb !important; }
-  .tipo-audio { background: linear-gradient(135deg, #2a0f6a, #350e90) !important; color: #a667f9 !important; }
+  .type-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
+  .type-photo  { background: linear-gradient(135deg, var(--amber-pale, #3b0764), #660e92) !important; color: #b324fb !important; }
+  .type-audio { background: linear-gradient(135deg, #2a0f6a, #350e90) !important; color: #a667f9 !important; }
 
   .ev-empty,
   .ev-muted { color: var(--text-dim) !important; }
@@ -602,8 +602,8 @@
     }
   }
 
-  .ah-filtro-fecha,
-  .ah-filtro-tipo {
+  .ah-filter-date,
+  .ah-filter-type {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
     color: var(--text-primary) !important;
@@ -611,7 +611,7 @@
     &-icon { color: var(--purple-mid) !important; }
   }
 
-  .ah-filtro-fecha-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+  .ah-filter-date-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
 
   .ah-view-toggle {
     background: var(--bg-card) !important;
@@ -627,7 +627,7 @@
 
     &--total      { border-left-color: #560c79 !important; }
     &--atendidas  { border-left-color: #2e1065 !important; }
-    &--canceladas { border-left-color: #c90fe6 !important; }
+    &--cancelled { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -654,21 +654,21 @@
     }
 
     .ah-id { color: var(--pink) !important; }
-    .ah-fecha { color: var(--text-primary) !important; }
-    .ah-hora { color: var(--text-muted) !important; }
-    .ah-ubicacion { color: var(--text-primary) !important; }
+    .ah-date { color: var(--text-primary) !important; }
+    .ah-hour { color: var(--text-muted) !important; }
+    .ah-location { color: var(--text-primary) !important; }
   }
 
   /* ── Badges — activation method and status ────── */
   .ah-badge {
-    &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
+    &.badge-button      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
-    &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-movement { background: var(--amber-pale) !important; color: var(--amber) !important; }
     &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
 
     &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
-    &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
+    &.badge-pending { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-false     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
   /* ── Actions (eye / menu) ───────────────────── */
@@ -700,7 +700,7 @@
     color: var(--purple-mid) !important;
   }
 
-  .ah-expand-head-modo { color: var(--text-muted) !important; }
+  .ah-expand-head-mode { color: var(--text-muted) !important; }
   .ah-expand-col-title { color: var(--text-muted) !important; }
 
   .ah-mini-timeline-item:not(:last-child)::after {
@@ -802,15 +802,15 @@
     td { color: var(--text-primary) !important; }
   }
 
-  .ec-nombre { color: var(--text-primary) !important; }
+  .ec-name { color: var(--text-primary) !important; }
 
-  .ec-prioridad {
+  .ec-priority {
     background: var(--purple-pale) !important;
     color: var(--purple-mid) !important;
   }
 
   .ec-badge {
-    &--activo   { background: rgba(83, 22, 163, 0.22) !important; color: #8a49df !important; }
+    &--active   { background: rgba(83, 22, 163, 0.22) !important; color: #8a49df !important; }
     &--inactivo { background: rgba(203, 28, 230, 0.22) !important; color: #e671f8 !important; }
   }
 
@@ -936,13 +936,13 @@
   .as-empty { color: var(--text-dim) !important; }
 
   /* ── Help lines ──────────────────────────────── */
-  .as-linea-card {
+  .as-line-card {
     border-color: var(--border) !important;
   }
 
-  .as-linea-nombre { color: var(--text-muted) !important; }
-  .as-linea-numero { color: var(--text-primary) !important; }
-  .as-linea-desc { color: var(--text-dim) !important; }
+  .as-line-name { color: var(--text-muted) !important; }
+  .as-line-number { color: var(--text-primary) !important; }
+  .as-line-desc { color: var(--text-dim) !important; }
 
   .as-btn--ghost {
     background: var(--bg-base) !important;
@@ -985,20 +985,20 @@
     background: var(--bg-base) !important;
   }
 
-  .as-centro-item {
+  .as-center-item {
     border-bottom-color: var(--border) !important;
   }
 
-  .as-centro-nombre { color: var(--text-primary) !important; }
-  .as-centro-desc { color: var(--text-dim) !important; }
-  .as-centro-meta { color: var(--text-muted) !important; }
+  .as-center-name { color: var(--text-primary) !important; }
+  .as-center-desc { color: var(--text-dim) !important; }
+  .as-center-meta { color: var(--text-muted) !important; }
 
   .as-icon-btn {
     background: var(--bg-base) !important;
     border-color: var(--border) !important;
     color: var(--text-dim) !important;
     &:hover { background: var(--purple-pale) !important; }
-    &--activo { color: var(--purple-mid) !important; border-color: var(--purple-mid) !important; }
+    &--active { color: var(--purple-mid) !important; border-color: var(--purple-mid) !important; }
   }
 
   .as-pill-btn {
@@ -1019,13 +1019,13 @@
     color: var(--purple-mid) !important;
   }
 
-  .as-recurso-nombre { color: var(--text-primary) !important; }
+  .as-recurso-name { color: var(--text-primary) !important; }
   .as-recurso-sub { color: var(--text-dim) !important; }
 
   /* ── Sidebar derecho (tarjetas) ───────────────────── */
   .as-info-card,
   .as-tip-card,
-  .as-guardados-card,
+  .as-saved-card,
   .as-app-card {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
@@ -1045,20 +1045,20 @@
     p { color: var(--text-muted) !important; }
   }
 
-  .as-guardados-head h3 { color: var(--text-primary) !important; }
+  .as-saved-head h3 { color: var(--text-primary) !important; }
 
-  .as-guardado-item {
+  .as-saved-item {
     border-bottom-color: var(--border) !important;
   }
 
-  .as-guardado-icon {
+  .as-saved-icon {
     background: var(--purple-pale) !important;
     color: var(--purple-mid) !important;
   }
 
-  .as-guardado-nombre { color: var(--text-primary) !important; }
-  .as-guardado-sub { color: var(--text-dim) !important; }
-  .as-guardados-empty { color: var(--text-dim) !important; }
+  .as-saved-name { color: var(--text-primary) !important; }
+  .as-saved-sub { color: var(--text-dim) !important; }
+  .as-saved-empty { color: var(--text-dim) !important; }
 
   .as-app-card {
     background: linear-gradient(135deg, var(--purple-pale), var(--bg-card)) !important;

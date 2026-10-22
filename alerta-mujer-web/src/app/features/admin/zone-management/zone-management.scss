@@ -357,7 +357,7 @@ $yellow: #c084fc;
   color: $text-primary;
 }
 
-.form-opcional {
+.form-optional {
   font-weight: 500;
   color: $text-dim;
 }
@@ -395,15 +395,15 @@ $yellow: #c084fc;
 }
 
 // Option buttons (type / status / quick radii)
-.opciones {
+.options {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 
-  &--chicas { margin-top: 8px; }
+  &--girls { margin-top: 8px; }
 }
 
-.opcion {
+.option {
   padding: 8px 12px;
   border: 1.5px solid $border;
   border-radius: $radius-sm;
@@ -424,22 +424,22 @@ $yellow: #c084fc;
     &:hover { color: #fff; }
   }
 
-  &--activa.opcion--red     { background: $red; }
-  &--activa.opcion--orange  { background: $orange; }
-  &--activa.opcion--yellow  { background: $yellow; color: #3b0764; }
-  &--activa.opcion--green   { background: $green; }
-  &--activa.opcion--neutral { background: $purple-deep; }
+  &--activa.option--red     { background: $red; }
+  &--activa.option--orange  { background: $orange; }
+  &--activa.option--yellow  { background: $yellow; color: #3b0764; }
+  &--activa.option--green   { background: $green; }
+  &--activa.option--neutral { background: $purple-deep; }
 }
 
 // Mapa dentro del modal
-.zona-mapa {
+.zone-map {
   height: 260px;
   border: 1.5px solid $border;
   border-radius: $radius-sm;
   overflow: hidden;
 }
 
-.zona-mapa-info {
+.zone-map-info {
   margin: 6px 0 0;
   font-size: 0.78rem;
   color: $text-muted;
@@ -466,7 +466,7 @@ $yellow: #c084fc;
 }
 
 // Detalle (ojo)
-.zona-detalle__head {
+.zone-detail__head {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -476,7 +476,7 @@ $yellow: #c084fc;
   p  { margin: 2px 0 0; font-size: 0.82rem; color: $text-muted; }
 }
 
-.zona-detalle__grid {
+.zone-detail__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
@@ -498,13 +498,13 @@ $yellow: #c084fc;
   }
 }
 
-.zona-detalle__fecha {
+.zone-detail__date {
   display: block;
   margin-top: 2px;
   color: $text-dim;
 }
 
-.zona-sin-ubicacion {
+.zone-sin-location {
   margin: 0;
   padding: 14px;
   border: 1.5px dashed $border;
@@ -514,7 +514,7 @@ $yellow: #c084fc;
 }
 
 // Map in dark mode: darkens the OpenStreetMap tiles
-:host-context([data-theme='dark']) .zona-mapa ::ng-deep {
+:host-context([data-theme='dark']) .zone-map ::ng-deep {
   .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
   .leaflet-control-attribution { background: rgba(36, 29, 61, 0.8); color: #a8a0c4; a { color: #b79bf5; } }
   .leaflet-control-zoom a { background: #241d3d; color: #ede9fe; border-color: #4c3a80; }
@@ -620,7 +620,7 @@ $yellow: #c084fc;
     }
 
     // Zone name as the card header
-    td.cell-zona {
+    td.cell-zone {
       justify-content: flex-start;
       text-align: left;
       padding-bottom: 10px;
@@ -698,7 +698,7 @@ $yellow: #c084fc;
 
   // Modales
   .form-input { font-size: 16px; }
-  .opcion { padding: 10px 14px; }
+  .option { padding: 10px 14px; }
 
   .btn-secondary,
   .btn-primary.btn-modal {
@@ -709,8 +709,8 @@ $yellow: #c084fc;
 
 // ── Small mobile ≤ 480px ────────────────────
 @media (max-width: 480px) {
-  .zona-detalle__grid { grid-template-columns: 1fr; }
-  .zona-mapa { height: 220px; }
+  .zone-detail__grid { grid-template-columns: 1fr; }
+  .zone-map { height: 220px; }
 }
 
 // ── Very small mobile ≤ 380px ────────────────

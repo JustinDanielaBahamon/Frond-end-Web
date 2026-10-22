@@ -1,6 +1,6 @@
 <main class="tracking">
   @if (loading()) {
-    <section class="estado">
+    <section class="state">
       <div class="spinner" aria-hidden="true"></div>
       <p>Cargando la alerta…</p>
       @if (wakingUp()) {
@@ -8,112 +8,112 @@
       }
     </section>
   } @else if (error()) {
-    <section class="estado estado--error">
-      <i class="ti ti-link-off icono-grande" aria-hidden="true"></i>
+    <section class="state estado--error">
+      <i class="ti ti-link-off icon-large" aria-hidden="true"></i>
       <p>{{ error() }}</p>
-      <button class="btn btn--secundario" (click)="retry()">Intentar de nuevo</button>
+      <button class="btn btn--secondary" (click)="retry()">Intentar de nuevo</button>
       @if (fromPanel) {
-        <button class="btn btn--secundario" (click)="backToPanel()"><i class="ti ti-arrow-left"></i> Volver a mis contactos</button>
+        <button class="btn btn--secondary" (click)="backToPanel()"><i class="ti ti-arrow-left"></i> Volver a mis contactos</button>
       }
     </section>
   } @else if (data(); as d) {
     <!-- Header: who and in what status the alert is -->
-    <header class="banda" [class.banda--terminada]="!d.active">
-      <div class="banda__marca">
+    <header class="band" [class.band--ended]="!d.active">
+      <div class="band__brand">
         @if (fromPanel) {
-          <button type="button" class="banda__volver" (click)="backToPanel()" aria-label="Volver a Alertas de mis contactos">
+          <button type="button" class="band__back" (click)="backToPanel()" aria-label="Volver a Alertas de mis contactos">
             <i class="ti ti-arrow-left" aria-hidden="true"></i> Volver
           </button>
         }
         <img src="logo.png" alt="" width="28" height="28" />
         <span>AlertaMujer</span>
       </div>
-      <span class="pildora" [class.pildora--activa]="d.active">
-        @if (d.active) { <span class="pulso" aria-hidden="true"></span> Alerta activa } @else { La alerta terminó }
+      <span class="pill" [class.pill--active]="d.active">
+        @if (d.active) { <span class="pulse" aria-hidden="true"></span> Alerta activa } @else { La alerta terminó }
       </span>
-      <h1 class="banda__titulo">
+      <h1 class="band__title">
         <strong>{{ d.name }}</strong>
         {{ d.active ? 'necesita ayuda' : 'tuvo una alerta de emergencia' }}
       </h1>
-      <p class="banda__texto">
+      <p class="band__text">
         @if (d.start) { Activó la alerta a las {{ d.start | date: 'h:mm a' }} · }
         {{ d.active ? 'lleva' : 'duró' }} {{ duration() }}
       </p>
     </header>
 
-    <div class="cuerpo">
+    <div class="body">
     <!-- Map with the route -->
     @if (last()) {
-      <section class="mapa-wrap">
-        <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Recorrido de ' + d.name"></div>
-        <div class="mapa-controles">
-          <button class="btn-mapa btn-mapa--principal" type="button" (click)="centerOnPerson()">
+      <section class="map-wrap">
+        <div id="mapa-seguimiento" class="map" role="img" [attr.aria-label]="'Recorrido de ' + d.name"></div>
+        <div class="map-controls">
+          <button class="btn-map btn-map--principal" type="button" (click)="centerOnPerson()">
             <i class="ti ti-current-location" aria-hidden="true"></i> Centrar en {{ d.name }}
           </button>
           @if (d.route.length > 1) {
-            <button class="btn-mapa" type="button" (click)="center()">
+            <button class="btn-map" type="button" (click)="center()">
               <i class="ti ti-route" aria-hidden="true"></i> Ver recorrido
             </button>
           }
         </div>
-        <div class="leyenda" aria-hidden="true">
-          <span><i class="punto punto--inicio"></i> Inicio</span>
-          <span><i class="punto punto--medio"></i> Recorrido</span>
-          <span><i class="punto punto--actual"></i> Ahora</span>
+        <div class="legend" aria-hidden="true">
+          <span><i class="point point--start"></i> Inicio</span>
+          <span><i class="point point--medium"></i> Recorrido</span>
+          <span><i class="point point--actual"></i> Ahora</span>
         </div>
       </section>
     } @else {
-      <p class="sin-ubicacion">Todavía no hay una ubicación registrada. Esta pantalla se actualiza sola.</p>
+      <p class="sin-location">Todavía no hay una ubicación registrada. Esta pantalla se actualiza sola.</p>
     }
 
-    <div class="contenido">
+    <div class="content">
       <!-- Where she is now -->
       @if (last(); as u) {
-        <section class="tarjeta tarjeta--lugar">
-          <i class="ti ti-map-pin tarjeta__icono" aria-hidden="true"></i>
+        <section class="panel panel--place">
+          <i class="ti ti-map-pin panel__icon" aria-hidden="true"></i>
           <div>
-            <p class="tarjeta__etiqueta">Última ubicación · {{ howLongAgo() }}</p>
-            <p class="tarjeta__valor">
+            <p class="panel__label">Última ubicación · {{ howLongAgo() }}</p>
+            <p class="panel__valor">
               {{ place()?.address || 'Buscando la dirección…' }}
             </p>
             @if (zone()) {
-              <p class="tarjeta__sub">{{ zone() }}</p>
+              <p class="panel__sub">{{ zone() }}</p>
             }
-            <p class="tarjeta__sub">
+            <p class="panel__sub">
               {{ u.lat.toFixed(5) }}, {{ u.lng.toFixed(5) }}
               @if (u.precision) { · precisión ±{{ u.precision | number: '1.0-0' }} m }
             </p>
-            @if (d.active) { <p class="tarjeta__vivo">Se actualiza sola cada 10 segundos</p> }
+            @if (d.active) { <p class="panel__live">Se actualiza sola cada 10 segundos</p> }
           </div>
         </section>
       }
 
       <!-- Alert chat: messages from her and her contacts -->
       @if (d.active || messages().length) {
-        <section class="tarjeta chat">
-          <h2 class="tarjeta__titulo">
+        <section class="panel chat">
+          <h2 class="panel__title">
             <i class="ti ti-messages" aria-hidden="true"></i> Mensajes con {{ d.name }}
           </h2>
 
-          <div id="chat-lista" class="chat__lista" aria-live="polite">
+          <div id="chat-lista" class="chat__list" aria-live="polite">
             @for (m of messages(); track m.id) {
               <div class="chat__msg" [class.chat__msg--ella]="m.deElla">
-                <p class="chat__autor">{{ m.deElla ? d.name : m.name }} · {{ m.time | date: 'h:mm a' }}</p>
-                <p class="chat__texto">{{ m.text }}</p>
+                <p class="chat__author">{{ m.deElla ? d.name : m.name }} · {{ m.time | date: 'h:mm a' }}</p>
+                <p class="chat__text">{{ m.text }}</p>
               </div>
             } @empty {
-              <p class="chat__vacio">Aún no hay mensajes. Escríbele para que sepa que la estás ayudando.</p>
+              <p class="chat__empty">Aún no hay mensajes. Escríbele para que sepa que la estás ayudando.</p>
             }
           </div>
 
           @if (d.active) {
             @if (!contactName()) {
-              <form class="chat__nombre" (submit)="$event.preventDefault(); saveName()">
+              <form class="chat__name" (submit)="$event.preventDefault(); saveName()">
                 <label for="nombre-contacto">¿Cómo te llamas? Así sabrá quién le escribe.</label>
-                <div class="chat__fila">
+                <div class="chat__row">
                   <input id="nombre-contacto" maxlength="60" autocomplete="name" placeholder="Tu nombre"
                          [value]="draftName()" (input)="draftName.set($any($event.target).value)" />
-                  <button type="submit" class="chat__enviar">Continuar</button>
+                  <button type="submit" class="chat__send">Continuar</button>
                 </div>
               </form>
             } @else {
@@ -122,10 +122,10 @@
                   <button type="button" class="chat__rapida" [disabled]="sending()" (click)="send(r)">{{ r }}</button>
                 }
               </div>
-              <form class="chat__fila" (submit)="$event.preventDefault(); send(messageText())">
+              <form class="chat__row" (submit)="$event.preventDefault(); send(messageText())">
                 <input maxlength="500" placeholder="Escribe un mensaje…" aria-label="Mensaje"
                        [value]="messageText()" (input)="messageText.set($any($event.target).value)" />
-                <button type="submit" class="chat__enviar" [disabled]="sending() || !messageText().trim()">
+                <button type="submit" class="chat__send" [disabled]="sending() || !messageText().trim()">
                   <i class="ti ti-send" aria-hidden="true"></i>
                 </button>
               </form>
@@ -133,31 +133,31 @@
             }
             @if (errorChat()) { <p class="chat__error" role="alert">{{ errorChat() }}</p> }
           } @else {
-            <p class="chat__vacio">El chat se cerró cuando terminó la alerta.</p>
+            <p class="chat__empty">El chat se cerró cuando terminó la alerta.</p>
           }
         </section>
       }
 
       <!-- Route, as in the app: each sent location with its time and place -->
       @if (routeList().length > 1) {
-        <section class="tarjeta">
-          <h2 class="tarjeta__titulo">
+        <section class="panel">
+          <h2 class="panel__title">
             <i class="ti ti-timeline-event" aria-hidden="true"></i> Recorrido
-            <span class="tarjeta__conteo">{{ d.route.length }} ubicaciones</span>
+            <span class="panel__count">{{ d.route.length }} ubicaciones</span>
           </h2>
-          <ol class="linea-tiempo">
+          <ol class="line-time">
             @for (p of routeList(); track p.number) {
-              <li class="linea-tiempo__item" [class.linea-tiempo__item--actual]="p.isCurrent">
-                <span class="linea-tiempo__nodo">{{ p.number }}</span>
+              <li class="line-time__item" [class.line-time__item--actual]="p.isCurrent">
+                <span class="line-time__node">{{ p.number }}</span>
                 <div>
-                  <p class="linea-tiempo__hora">
+                  <p class="line-time__hour">
                     {{ p.time | date: 'h:mm:ss a' }}
-                    @if (p.isCurrent) { <span class="etiqueta-reciente">Reciente</span> }
+                    @if (p.isCurrent) { <span class="label-recent">Reciente</span> }
                   </p>
                   @if (pointPlaces()[keyOf(p)]) {
-                    <p class="linea-tiempo__lugar"><i class="ti ti-map-pin" aria-hidden="true"></i> {{ pointPlaces()[keyOf(p)] }}</p>
+                    <p class="line-time__place"><i class="ti ti-map-pin" aria-hidden="true"></i> {{ pointPlaces()[keyOf(p)] }}</p>
                   }
-                  <p class="linea-tiempo__coords">{{ p.lat.toFixed(5) }}, {{ p.lng.toFixed(5) }}</p>
+                  <p class="line-time__coords">{{ p.lat.toFixed(5) }}, {{ p.lng.toFixed(5) }}</p>
                 </div>
               </li>
             }
@@ -166,55 +166,55 @@
       }
 
       <!-- Acciones -->
-      <section class="acciones">
-        <a class="btn btn--llamar" [href]="'tel:' + d.emergencyNumber">
+      <section class="action-bar">
+        <a class="btn btn--call" [href]="'tel:' + d.emergencyNumber">
           <i class="ti ti-phone" aria-hidden="true"></i> Llamar al {{ d.emergencyNumber }}
         </a>
         @if (directionsUrl()) {
-          <a class="btn btn--secundario" [href]="directionsUrl()" target="_blank" rel="noopener">
+          <a class="btn btn--secondary" [href]="directionsUrl()" target="_blank" rel="noopener">
             <i class="ti ti-directions" aria-hidden="true"></i> Cómo llegar
           </a>
-          <a class="btn btn--secundario" [href]="mapsUrl()" target="_blank" rel="noopener">
+          <a class="btn btn--secondary" [href]="mapsUrl()" target="_blank" rel="noopener">
             <i class="ti ti-map" aria-hidden="true"></i> Ver en Google Maps
           </a>
         }
       </section>
 
       <!-- Resumen -->
-      <section class="datos">
-        <div class="dato">
+      <section class="data">
+        <div class="item">
           <i class="ti ti-clock" aria-hidden="true"></i>
-          <p class="dato__valor">{{ duration() }}</p>
-          <p class="dato__etiqueta">{{ d.active ? 'Activa desde hace' : 'Duración' }}</p>
+          <p class="item__valor">{{ duration() }}</p>
+          <p class="item__label">{{ d.active ? 'Activa desde hace' : 'Duración' }}</p>
         </div>
-        <div class="dato">
+        <div class="item">
           <i class="ti ti-current-location" aria-hidden="true"></i>
-          <p class="dato__valor">{{ d.route.length }}</p>
-          <p class="dato__etiqueta">Ubicaciones enviadas</p>
+          <p class="item__valor">{{ d.route.length }}</p>
+          <p class="item__label">Ubicaciones enviadas</p>
         </div>
-        <div class="dato">
+        <div class="item">
           <i class="ti ti-route" aria-hidden="true"></i>
-          <p class="dato__valor">{{ routeKm() | number: '1.1-1' }} km</p>
-          <p class="dato__etiqueta">Recorrido</p>
+          <p class="item__valor">{{ routeKm() | number: '1.1-1' }} km</p>
+          <p class="item__label">Recorrido</p>
         </div>
       </section>
 
       <!-- Evidencias grabadas durante la alerta -->
       @if (videos().length || audios().length) {
-        <section class="tarjeta">
-          <h2 class="tarjeta__titulo">
+        <section class="panel">
+          <h2 class="panel__title">
             <i class="ti ti-photo-video" aria-hidden="true"></i> Grabaciones de la alerta
           </h2>
-          <p class="tarjeta__sub">Pueden ayudar a ubicarla o a saber qué está pasando. No las compartas.</p>
+          <p class="panel__sub">Pueden ayudar a ubicarla o a saber qué está pasando. No las compartas.</p>
           <!-- The app records in parts: here they are played in a row, as a single recording -->
           @if (videos().length) {
-            <figure class="evidencia">
+            <figure class="evidence">
               <app-continuous-player type="video" [parts]="videos()" />
               <figcaption>Video{{ videos().length > 1 ? ' · ' + videos().length + ' partes' : '' }}</figcaption>
             </figure>
           }
           @if (audios().length) {
-            <figure class="evidencia">
+            <figure class="evidence">
               <app-continuous-player type="audio" [parts]="audios()" />
               <figcaption>Audio{{ audios().length > 1 ? ' · ' + audios().length + ' partes' : '' }}</figcaption>
             </figure>
@@ -224,11 +224,11 @@
 
       <!-- What to do -->
       @if (d.active) {
-        <section class="tarjeta tarjeta--guia">
-          <h2 class="tarjeta__titulo">
+        <section class="panel panel--guide">
+          <h2 class="panel__title">
             <i class="ti ti-list-check" aria-hidden="true"></i> Qué hacer ahora
           </h2>
-          <ol class="pasos">
+          <ol class="steps">
             <li>Intenta llamarla o escribirle. Si no responde, no esperes.</li>
             <li>Llama al {{ d.emergencyNumber }} y da la dirección que aparece arriba.</li>
             <li>Si vas al lugar, no vayas sola o solo y avisa a alguien de confianza.</li>
@@ -237,7 +237,7 @@
         </section>
       }
 
-      <footer class="nota">
+      <footer class="note">
         Estás viendo esto porque te registraron como contacto de emergencia en AlertaMujer.
         El enlace es personal y deja de funcionar 2 horas después de que termina la alerta.
         No lo compartas en redes sociales.

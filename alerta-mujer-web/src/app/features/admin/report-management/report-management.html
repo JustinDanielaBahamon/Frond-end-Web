@@ -17,9 +17,9 @@
   
     <!-- What this section is (can be hidden) -->
     @if (showHelp) {
-      <section class="ayuda-informes" aria-label="Cómo funcionan los informes">
-        <div class="ayuda-informes__icono"><i class="fa-solid fa-circle-info"></i></div>
-        <div class="ayuda-informes__texto">
+      <section class="help-reports" aria-label="Cómo funcionan los informes">
+        <div class="help-reports__icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="help-reports__text">
           <h2>¿Para qué sirven los informes?</h2>
           <p>Un informe junta alertas para revisarlas o entregarlas, por ejemplo en una revisión mensual o a una entidad aliada.
             Puedes elegirlas una por una o usar filtros de fechas y estado; con filtros, cada descarga trae las alertas que los
@@ -29,15 +29,15 @@
             <li><strong>PDF:</strong> para leer o imprimir. Trae un resumen por estado y por forma de activación, y la lista de alertas.</li>
             <li><strong>Excel (CSV):</strong> para filtrar, ordenar o hacer gráficas. Se abre directamente en Excel.</li>
           </ol>
-          <p class="ayuda-informes__aviso"><i class="fa-solid fa-lock"></i> Los informes contienen datos personales: compártelos
+          <p class="help-reports__notice"><i class="fa-solid fa-lock"></i> Los informes contienen datos personales: compártelos
             solo con quien deba verlos y bórralos cuando ya no se necesiten.</p>
         </div>
-        <button class="ayuda-informes__cerrar" (click)="hideHelp()" aria-label="Ocultar la explicación">
+        <button class="help-reports__close" (click)="hideHelp()" aria-label="Ocultar la explicación">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </section>
     } @else {
-      <button class="ayuda-informes__mostrar" (click)="showHelpAgain()">
+      <button class="help-reports__show" (click)="showHelpAgain()">
         <i class="fa-solid fa-circle-info"></i> ¿Cómo funcionan los informes?
       </button>
     }
@@ -301,12 +301,12 @@
             </div>
 
             <!-- Selector de Alertas -->
-            <div class="form-group alertas-selector">
+            <div class="form-group alerts-selector">
               <label>
                 Seleccionar Alertas 
-                <span class="alertas-count">({{ selectedAlertsCount }} seleccionadas)</span>
+                <span class="alerts-count">({{ selectedAlertsCount }} seleccionadas)</span>
               </label>
-              <div class="alertas-actions">
+              <div class="alerts-actions">
                 <button type="button" class="btn-small" (click)="selectAllAlerts()">
                   Seleccionar todas
                 </button>
@@ -316,32 +316,32 @@
               </div>
               
               @if (loadingAlerts) {
-                <div class="loading-alertas">
+                <div class="loading-alerts">
                   <i class="fa-solid fa-spinner fa-spin"></i>
                   Cargando alertas...
                 </div>
               } @else if (availableAlerts.length === 0) {
-                <div class="no-alertas">
+                <div class="no-alerts">
                   <i class="fa-solid fa-folder-open"></i>
                   <p>No hay alertas disponibles</p>
                 </div>
               } @else {
-                <div class="alertas-list">
+                <div class="alerts-list">
                   @for (alert of availableAlerts; track alert.id) {
-                    <div class="alerta-item" [class.selected]="isAlertSelected(alert.id)">
+                    <div class="alert-item" [class.selected]="isAlertSelected(alert.id)">
                       <input 
                         type="checkbox" 
                         [id]="'alerta-' + alert.id"
                         [checked]="isAlertSelected(alert.id)"
                         (change)="toggleAlertSelected(alert.id)"
                       >
-                      <label [for]="'alerta-' + alert.id" class="alerta-label">
-                        <div class="alerta-info">
-                          <span class="alerta-tipo">{{ typeLabel(alert.type) }} · {{ alert.name }}</span>
-                          <span class="alerta-ubicacion">{{ alert.location }}</span>
-                          <span class="alerta-fecha">{{ alert.time }}</span>
+                      <label [for]="'alerta-' + alert.id" class="alert-label">
+                        <div class="alert-data">
+                          <span class="alert-type">{{ typeLabel(alert.type) }} · {{ alert.name }}</span>
+                          <span class="alert-location">{{ alert.location }}</span>
+                          <span class="alert-date">{{ alert.time }}</span>
                         </div>
-                        <span class="alerta-estado status {{ getStatusClass(alert.status) }}">
+                        <span class="alert-status status {{ getStatusClass(alert.status) }}">
                           {{ alert.status }}
                         </span>
                       </label>
@@ -544,7 +544,7 @@
         </div>
         <div class="modal-body modal-impresora-body">
           <p>No se ha encontrado dispositivos para imprimir. Conecta tu impresora e inténtalo de nuevo.</p>
-          <p class="mensaje-final">¡Ten lindo día!!</p>
+          <p class="message-final">¡Ten lindo día!!</p>
         </div>
         <div class="modal-footer modal-impresora-footer">
           <button class="btn-primary" (click)="closePrinterModal()">

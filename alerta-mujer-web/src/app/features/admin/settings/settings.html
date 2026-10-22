@@ -184,8 +184,8 @@
         <ul class="diff">
           @for (c of changes; track c.field) {
             <li>
-              <span class="diff__campo">{{ c.field }}</span>
-              <span class="diff__valores"><del>{{ c.before }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.after }}</strong></span>
+              <span class="diff__field">{{ c.field }}</span>
+              <span class="diff__values"><del>{{ c.before }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.after }}</strong></span>
             </li>
           }
         </ul>

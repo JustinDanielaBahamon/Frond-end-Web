@@ -614,7 +614,7 @@ body {
 }
 
 /* Selector de Alertas */
-.alertas-selector {
+.alerts-selector {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -627,7 +627,7 @@ body {
     font-weight: 600;
     color: $color-text-medium;
 
-    .alertas-count {
+    .alerts-count {
       background: $color-primary-light;
       color: $color-primary;
       padding: 2px 8px;
@@ -637,7 +637,7 @@ body {
     }
   }
 
-  .alertas-actions {
+  .alerts-actions {
     display: flex;
     gap: 8px;
 
@@ -660,8 +660,8 @@ body {
     }
   }
 
-  .loading-alertas,
-  .no-alertas {
+  .loading-alerts,
+  .no-alerts {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -678,7 +678,7 @@ body {
     }
   }
 
-  .alertas-list {
+  .alerts-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -688,7 +688,7 @@ body {
     border-radius: 10px;
     padding: 8px;
 
-    .alerta-item {
+    .alert-item {
       display: flex;
       align-items: center;
       padding: 10px;
@@ -717,7 +717,7 @@ body {
         accent-color: $color-primary;
       }
 
-      .alerta-label {
+      .alert-label {
         flex: 1;
         display: flex;
         justify-content: space-between;
@@ -725,29 +725,29 @@ body {
         cursor: pointer;
         margin: 0;
 
-        .alerta-info {
+        .alert-data {
           display: flex;
           flex-direction: column;
           gap: 4px;
 
-          .alerta-tipo {
+          .alert-type {
             font-weight: 600;
             color: $color-text-dark;
             font-size: 0.9rem;
           }
 
-          .alerta-ubicacion {
+          .alert-location {
             font-size: 0.8rem;
             color: $color-text-light;
           }
 
-          .alerta-fecha {
+          .alert-date {
             font-size: 0.75rem;
             color: $color-text-light;
           }
         }
 
-        .alerta-estado {
+        .alert-status {
           font-size: 0.75rem;
           padding: 4px 8px;
           border-radius: 12px;
@@ -1385,7 +1385,7 @@ body {
         font-size: 0.9rem;
       }
 
-      .mensaje-final {
+      .message-final {
         font-size: 1rem;
       }
     }
@@ -1510,7 +1510,7 @@ body {
     line-height: 1.6;
   }
 
-  .mensaje-final {
+  .message-final {
     font-weight: 700;
     color: $color-primary;
     font-size: 1.1rem;
@@ -1524,7 +1524,7 @@ body {
 }
 
 // Explanation of the section
-.ayuda-informes {
+.help-reports {
   position: relative;
   display: flex;
   gap: 14px;
@@ -1534,7 +1534,7 @@ body {
   border: 1px solid rgba(124, 58, 237, 0.25);
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(124, 58, 237, 0.04));
 
-  &__icono {
+  &__icon {
     flex-shrink: 0;
     width: 38px;
     height: 38px;
@@ -1545,7 +1545,7 @@ body {
     background: linear-gradient(135deg, #a855f7, #7c3aed);
   }
 
-  &__texto {
+  &__text {
     font-size: 0.86rem;
     line-height: 1.5;
     color: var(--text-secondary, #4b5563);
@@ -1556,12 +1556,12 @@ body {
     li + li { margin-top: 3px; }
   }
 
-  &__aviso {
+  &__notice {
     font-size: 0.8rem;
     i { color: #7c3aed; margin-right: 4px; }
   }
 
-  &__cerrar {
+  &__close {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -1572,7 +1572,7 @@ body {
     font-size: 1rem;
   }
 
-  &__mostrar {
+  &__show {
     margin-bottom: 16px;
     border: 0;
     background: transparent;

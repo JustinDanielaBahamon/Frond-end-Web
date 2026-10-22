@@ -384,10 +384,10 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
 
 
 // ── Lista de alertas (izquierda) ──────────────────
-.ev-alertas-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.ev-alerts-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
 .ev-check { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; color: $muted; cursor: pointer; }
 
-.ev-alertas {
+.ev-alerts {
   list-style: none;
   margin: 0.6rem 0 0;
   padding: 0;
@@ -398,9 +398,9 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   overflow-y: auto;
 }
 
-.ev-alertas-vacio { padding: 0.75rem 0.25rem; }
+.ev-alerts-empty { padding: 0.75rem 0.25rem; }
 
-.ev-alerta {
+.ev-alert-item {
   width: 100%;
   display: flex;
   align-items: center;
@@ -414,10 +414,10 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   cursor: pointer;
 
   &:hover { border-color: $border; }
-  &--activa { border-color: $accent-strong; background: color-mix(in srgb, #{$accent-strong} 16%, transparent); }
+  &--active { border-color: $accent-strong; background: color-mix(in srgb, #{$accent-strong} 16%, transparent); }
 }
 
-.ev-alerta-fecha {
+.ev-alert-item-date {
   width: 2.6rem;
   flex-shrink: 0;
   display: flex;
@@ -433,11 +433,11 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   small { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; }
 }
 
-.ev-alerta-texto { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
-.ev-alerta-titulo { font-size: 0.8rem; font-weight: 800; }
-.ev-alerta-lugar { font-size: 0.72rem; color: $muted; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ev-alerta-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; flex-shrink: 0; }
-.ev-alerta-cantidad { font-size: 0.68rem; font-weight: 700; color: $muted; }
+.ev-alert-item-text { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+.ev-alert-item-title { font-size: 0.8rem; font-weight: 800; }
+.ev-alert-item-place { font-size: 0.72rem; color: $muted; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-alert-item-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; flex-shrink: 0; }
+.ev-alert-item-count { font-size: 0.68rem; font-weight: 700; color: $muted; }
 
 .ev-chip {
   padding: 0.1rem 0.5rem;
@@ -451,7 +451,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
 }
 
 // ── Evidence of the chosen alert ───────────────
-.ev-de-alerta { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid $border; display: flex; flex-direction: column; gap: 0.75rem; }
+.ev-de-alert { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid $border; display: flex; flex-direction: column; gap: 0.75rem; }
 
 .ev-tiles {
   display: grid;
@@ -483,7 +483,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
 .ev-tile-name { font-size: 0.72rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ev-tile-meta { font-size: 0.64rem; color: $muted; }
 
-.ev-empty--compacto { grid-column: 1 / -1; padding: 1rem 0; }
+.ev-empty--compact { grid-column: 1 / -1; padding: 1rem 0; }
 
 // ── Renombrar ─────────────────────────────────────
 .ev-detail-head { display: flex; align-items: center; gap: 0.5rem; }
@@ -501,7 +501,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   font-size: 0.85rem;
 }
 
-.ev-destino {
+.ev-destination {
   margin: 0;
   font-size: 0.82rem;
   color: $text;
@@ -510,11 +510,11 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
 }
 
 // ── Alert map ─────────────────────────────
-.ev-modal--mapa { width: min(720px, 100%); }
-.ev-mapa { height: min(60vh, 460px); border-radius: 0.8rem; overflow: hidden; }
+.ev-modal--map { width: min(720px, 100%); }
+.ev-map { height: min(60vh, 460px); border-radius: 0.8rem; overflow: hidden; }
 
 // ── Conservar evidencias ──────────────────────────
-.ev-conservar {
+.ev-keep {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -525,7 +525,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   &--on { border-style: solid; border-color: $accent-strong; background: color-mix(in srgb, #{$accent-strong} 12%, transparent); }
 }
 
-.ev-conservar-texto {
+.ev-keep-text {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -550,7 +550,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   background: color-mix(in srgb, #{$accent-strong} 8%, transparent);
 }
 
-.ev-continua-texto {
+.ev-continua-text {
   flex: 1 1 14rem;
   display: flex;
   flex-direction: column;
@@ -561,7 +561,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   small { font-size: 0.72rem; color: $muted; }
 }
 
-.ev-continua-botones {
+.ev-continua-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;

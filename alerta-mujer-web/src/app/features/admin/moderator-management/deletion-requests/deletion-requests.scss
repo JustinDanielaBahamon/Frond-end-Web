@@ -1,13 +1,13 @@
 :host { display: block; }
 
-.solicitudes { margin-bottom: 20px; padding: 16px; border: 1px solid #c4b5fd; border-radius: 16px; background: rgba(124, 58, 237, 0.05);
+.requests { margin-bottom: 20px; padding: 16px; border: 1px solid #c4b5fd; border-radius: 16px; background: rgba(124, 58, 237, 0.05);
   h2 { margin: 0 0 4px; font-size: 1.05rem; i { color: #a21caf; margin-right: 6px; } }
   details { margin-top: 10px; font-size: 0.85rem; ul { margin: 6px 0 0; padding-left: 18px; } } }
-.solicitudes__ayuda { margin: 0 0 10px; font-size: 0.82rem; opacity: 0.8; }
-.solicitudes__error { color: #a21caf; font-weight: 700; font-size: 0.85rem; }
-.solicitud { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: 12px; background: var(--bg-card, #fff); border: 1px solid #ddd6fe; }
-.solicitud__info { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; p { margin: 4px 0; font-style: italic; } small { opacity: 0.75; } }
-.solicitud__acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+.requests__help { margin: 0 0 10px; font-size: 0.82rem; opacity: 0.8; }
+.requests__error { color: #a21caf; font-weight: 700; font-size: 0.85rem; }
+.request { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: 12px; background: var(--bg-card, #fff); border: 1px solid #ddd6fe; }
+.request__info { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; p { margin: 4px 0; font-style: italic; } small { opacity: 0.75; } }
+.request__actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
   input { padding: 8px 10px; border: 1px solid #c4b5fd; border-radius: 10px; background: transparent; color: inherit; } }
 .btn-danger { padding: 9px 14px; border: none; border-radius: 10px; background: linear-gradient(135deg, #a21caf, #6d28d9); color: #fff; font-weight: 700; cursor: pointer;
   &:disabled { opacity: 0.45; cursor: not-allowed; } }

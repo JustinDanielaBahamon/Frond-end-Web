@@ -1143,10 +1143,10 @@ $shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
 }
 
 // Permissions the app reports (device detail)
-.permisos-dispositivo {
+.permissions-device {
   margin-top: 14px;
 
-  &__resumen {
+  &__summary {
     margin: 0 0 8px;
     font-size: 0.85rem;
     color: var(--text-secondary, #6b5b95);
@@ -1160,14 +1160,14 @@ $shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
     gap: 6px;
   }
 
-  &__vacio {
+  &__empty {
     margin: 12px 0 0;
     font-size: 0.82rem;
     color: var(--text-secondary, #6b5b95);
   }
 }
 
-.permiso-chip {
+.permission-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1178,7 +1178,7 @@ $shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
   border: 1px dashed #a855f7;
   color: #7e22ce;
 
-  &--listo {
+  &--ready {
     border-style: solid;
     border-color: #7c3aed;
     background: linear-gradient(135deg, #a855f7, #7c3aed);

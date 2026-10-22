@@ -58,18 +58,18 @@ export class AlertHistory implements OnInit, OnDestroy {
   cancelledAlerts = 0;
 
   methodBadge: Record<string, string> = {
-    'Botón de pánico': 'badge-boton',
+    'Botón de pánico': 'badge-button',
     'Contacto': 'badge-manual',
     'Widget': 'badge-widget',
-    'Movimiento sospechoso': 'badge-movimiento',
-    'Botón de encendido': 'badge-movimiento',
+    'Movimiento sospechoso': 'badge-movement',
+    'Botón de encendido': 'badge-movement',
     'Manual': 'badge-manual',
   };
 
   statusBadge: Record<string, string> = {
     'Atendida': 'badge-ok',
-    'Pendiente': 'badge-pendiente',
-    'Cancelada': 'badge-falsa',
+    'Pendiente': 'badge-pending',
+    'Cancelada': 'badge-false',
   };
 
   // Row expanded inline (replaces the modal). Only one at a time.

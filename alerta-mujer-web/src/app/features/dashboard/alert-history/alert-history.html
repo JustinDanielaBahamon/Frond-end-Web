@@ -29,8 +29,8 @@
     <app-date-picker class="ah-filtro-fecha-selector" label="Filtrar historial por día" placeholder="Todas las fechas"
                         [value]="dateFilter" (valueChange)="onDate($event)" />
 
-    <div class="ah-filtro-tipo">
-      <svg class="ah-filtro-tipo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="ah-filter-type">
+      <svg class="ah-filter-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
       </svg>
       <select [value]="typeFilter" (change)="onTypeChange($event)" aria-label="Filtrar por medio de activación">
@@ -90,7 +90,7 @@
         <span class="ah-stat-chevron">›</span>
       </div>
 
-      <div class="ah-stat ah-stat--canceladas">
+      <div class="ah-stat ah-stat--cancelled">
         <span class="ah-stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
@@ -124,21 +124,21 @@
             <tr class="ah-row" [class.ah-row--expanded]="expandedAlertId === alert.id" (click)="toggleExpand(alert)">
               <td class="ah-id">#{{ alert.id }}</td>
               <td>
-                <span class="ah-fecha">{{ formatDateTime(alert.time).date }}</span>
-                <span class="ah-hora">{{ formatDateTime(alert.time).time }}</span>
+                <span class="ah-date">{{ formatDateTime(alert.time).date }}</span>
+                <span class="ah-hour">{{ formatDateTime(alert.time).time }}</span>
               </td>
               <td>
                 <span class="ah-badge" [ngClass]="methodBadge[alert.activationMethod]">
                   {{ alert.activationMethod }}
                 </span>
               </td>
-              <td class="ah-ubicacion">{{ alert.location || 'Sin ubicación' }}</td>
+              <td class="ah-location">{{ alert.location || 'Sin ubicación' }}</td>
               <td>
                 <span class="ah-badge" [ngClass]="statusBadge[alert.status]">
                   {{ alert.status }}
                 </span>
               </td>
-              <td class="ah-acciones" (click)="$event.stopPropagation()">
+              <td class="ah-actions" (click)="$event.stopPropagation()">
                 <button class="ah-icon-btn" title="Ver detalle" (click)="toggleExpand(alert)">👁</button>
                 <div class="ah-menu-wrap">
                   <button class="ah-icon-btn" title="Más acciones" (click)="toggleMenu(alert.id, $event)">⋮</button>
@@ -168,7 +168,7 @@
                         </svg>
                         Información de la alerta
                       </span>
-                      <span class="ah-expand-head-modo">Medio de activación: {{ alert.activationMethod || 'No registrado' }}</span>
+                      <span class="ah-expand-head-mode">Medio de activación: {{ alert.activationMethod || 'No registrado' }}</span>
                     </div>
 
                     <div class="ah-expand-grid">

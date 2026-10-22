@@ -1,34 +1,34 @@
-<button type="button" class="sf-campo" [class.sf-campo--abierto]="open()" [attr.aria-label]="label() + ': ' + (text() || 'sin elegir')"
+<button type="button" class="sf-field" [class.sf-field--open]="open()" [attr.aria-label]="label() + ': ' + (text() || 'sin elegir')"
         aria-haspopup="dialog" [attr.aria-expanded]="open()" (click)="toggle()">
-  <svg class="sf-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <svg class="sf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
   </svg>
-  <span class="sf-texto" [class.sf-texto--vacio]="!text()">{{ text() || placeholder() }}</span>
+  <span class="sf-text" [class.sf-text--empty]="!text()">{{ text() || placeholder() }}</span>
   @if (clearable() && selection()) {
-    <span class="sf-limpiar" role="button" tabindex="0" aria-label="Quitar la fecha" (click)="clear($event)" (keydown.enter)="clear($event)">✕</span>
+    <span class="sf-clear" role="button" tabindex="0" aria-label="Quitar la fecha" (click)="clear($event)" (keydown.enter)="clear($event)">✕</span>
   }
 </button>
 
 @if (open()) {
   <div class="sf-panel" role="dialog" [attr.aria-label]="label()">
-    <div class="sf-cabecera">
+    <div class="sf-header">
       <button type="button" class="sf-nav" aria-label="Mes anterior" (click)="moveMonth(-1)">‹</button>
       <span class="sf-mes">{{ monthTitle() }}</span>
       <button type="button" class="sf-nav" aria-label="Mes siguiente" (click)="moveMonth(1)">›</button>
     </div>
     <div class="sf-grilla">
-      @for (d of days; track $index) { <span class="sf-dia-semana">{{ d }}</span> }
+      @for (d of days; track $index) { <span class="sf-day-week">{{ d }}</span> }
       @for (c of cells(); track c.iso) {
-        <button type="button" class="sf-dia"
-                [class.sf-dia--fuera]="!c.ofMonth" [class.sf-dia--hoy]="c.today" [class.sf-dia--elegido]="c.iso === selection()"
+        <button type="button" class="sf-day"
+                [class.sf-day--outside]="!c.ofMonth" [class.sf-day--today]="c.today" [class.sf-day--chosen]="c.iso === selection()"
                 [disabled]="c.disabled" [attr.aria-label]="c.iso" [attr.aria-pressed]="c.iso === selection()"
                 (click)="choose(c)">{{ c.day }}</button>
       }
     </div>
-    <div class="sf-pie">
-      <button type="button" class="sf-accion" (click)="today()">Hoy</button>
+    <div class="sf-footer">
+      <button type="button" class="sf-action" (click)="today()">Hoy</button>
       @if (clearable()) {
-        <button type="button" class="sf-accion sf-accion--suave" (click)="clear()">Quitar</button>
+        <button type="button" class="sf-action sf-action--suave" (click)="clear()">Quitar</button>
       }
     </div>
   </div>

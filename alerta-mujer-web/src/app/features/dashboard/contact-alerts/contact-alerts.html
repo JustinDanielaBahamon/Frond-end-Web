@@ -1,7 +1,7 @@
 <section class="ac">
   <header class="ac__header">
     <div>
-      <h1 class="ac__titulo">Alertas de mis contactos</h1>
+      <h1 class="ac__title">Alertas de mis contactos</h1>
       <p class="ac__sub">Alertas de las personas que te registraron como contacto de emergencia (últimos 30 días).</p>
     </div>
   </header>
@@ -9,7 +9,7 @@
   <!-- Avisos del navegador -->
   @switch (service.notificationPermission()) {
     @case ('default') {
-      <div class="ac__aviso">
+      <div class="ac__notice">
         <i class="ti ti-bell-ringing" aria-hidden="true"></i>
         <p>
           Activa los avisos del navegador para enterarte al instante cuando alguien active una alerta
@@ -19,7 +19,7 @@
       </div>
     }
     @case ('denied') {
-      <div class="ac__aviso ac__aviso--suave">
+      <div class="ac__notice ac__notice--suave">
         <i class="ti ti-bell-off" aria-hidden="true"></i>
         <p>Los avisos del navegador están bloqueados. Puedes permitirlos en la configuración del sitio (candado junto a la dirección).</p>
       </div>
@@ -31,21 +31,21 @@
   }
 
   @if (service.received().length === 0) {
-    <div class="ac__vacio">
+    <div class="ac__empty">
       <i class="ti ti-shield-check" aria-hidden="true"></i>
       <p>{{ service.loading() ? 'Buscando alertas…' : 'Ningún contacto ha activado una alerta en los últimos 30 días.' }}</p>
     </div>
   } @else {
-    <ul class="ac__lista">
+    <ul class="ac__list">
       @for (a of service.received(); track a.id) {
-        <li class="ac__item" [class.ac__item--activa]="a.active">
-          <div class="ac__icono"><i class="ti" [class.ti-urgent]="a.active" [class.ti-history]="!a.active" aria-hidden="true"></i></div>
+        <li class="ac__item" [class.ac__item--active]="a.active">
+          <div class="ac__icon"><i class="ti" [class.ti-urgent]="a.active" [class.ti-history]="!a.active" aria-hidden="true"></i></div>
           <div class="ac__info">
-            <p class="ac__nombre">
+            <p class="ac__name">
               <strong>{{ a.name }}</strong>
               {{ a.active ? 'activó una alerta de emergencia' : (a.status === 'cancelled' ? 'canceló su alerta' : 'tuvo una alerta') }}
             </p>
-            <p class="ac__fecha">
+            <p class="ac__date">
               {{ a.start | date: 'd MMM y, h:mm a' }}
               @if (a.end) { · terminó {{ a.end | date: 'h:mm a' }} }
             </p>
@@ -56,7 +56,7 @@
               {{ opening() === a.id ? 'Abriendo…' : 'Ver seguimiento' }}
             </button>
           } @else {
-            <span class="ac__estado">Terminada</span>
+            <span class="ac__status">Terminada</span>
           }
         </li>
       }

@@ -21,19 +21,19 @@
   }
 }
 
-.rc-audio-icono {
+.rc-audio-icon {
   display: grid;
   place-items: center;
   font-size: 40px;
   color: #a855f7;
 }
 
-.rc-barra {
+.rc-bar {
   display: flex;
   gap: 4px;
 }
 
-.rc-segmento {
+.rc-segment {
   position: relative;
   flex: 1;
   height: 8px;
@@ -49,14 +49,14 @@
   &:hover { background: rgba(168, 85, 247, 0.35); }
 }
 
-.rc-relleno {
+.rc-fill {
   position: absolute;
   inset: 0 auto 0 0;
   background: linear-gradient(90deg, #a855f7, #7c3aed);
   transition: width 0.25s linear;
 }
 
-.rc-pie {
+.rc-footer {
   margin: 0;
   display: flex;
   justify-content: space-between;

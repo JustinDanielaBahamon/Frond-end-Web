@@ -19,14 +19,14 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
   --border: #{$line};
   .mini-stat, .search-input, .filter-select, .chip, .action-btn,
   .bulk-btn, .page-btn, .per-page-select, .btn-secondary,
-  .btn-clear-filter, .btn-clear-filters, .alertas-count,
-  .panel-select, .btn-atender, .zona-auto-card, .zona-manual-card,
-  .btn-add-zona, .btn-marcar-zona, .mapa-container, .fab-option,
-  .filtros-capas, .radio-preset-btn, .nivel-btn, .search-box,
-  .form-input, .form-control, .opcion, .zona-mapa, .stat-card,
+  .btn-clear-filter, .btn-clear-filters, .alerts-count,
+  .panel-select, .btn-attend, .zone-auto-card, .zone-manual-card,
+  .btn-add-zone, .btn-mark-zone, .map-box, .fab-option,
+  .filters-layers, .radio-preset-btn, .level-btn, .search-box,
+  .form-input, .form-control, .option, .zone-map, .stat-card,
   .dash-card, .toolbar, .modal-content, .select-selected,
   .select-items, .date-range-picker, .os-badge, .btn-action,
-  .btn-small, .alertas-list, .alerta-item, .description-box,
+  .btn-small, .alerts-list, .alert-item, .description-box,
   .user-card, .table-card {
     border-width: 2px !important;
   }
@@ -41,7 +41,7 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
 
   /* Cards with a thick top stripe: the 3px on top is kept */
   app-user .table-card,
-  app-alert-admin .alertas-panel { border-width: 2px !important; border-top-width: 3px !important; }
+  app-alert-admin .alerts-panel { border-width: 2px !important; border-top-width: 3px !important; }
 
   #{$mods} {
     .stat-card, .toolbar, .table-card, .modal-content {
@@ -51,7 +51,7 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
     .search-box:not(:focus-within),
     .select-selected, .select-items, .date-range-picker, .os-badge,
     .btn-clear-filters, .btn-action, .btn-small,
-    .alertas-list, .alerta-item,
+    .alerts-list, .alert-item,
     .toolbar select:not(:focus),
     .toolbar input[type='date']:not(:focus),
     .form-group input:not(:focus),
@@ -64,7 +64,7 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
 
   .table-footer,
   .modal-footer,
-  .filtros-body { border-top: 2px solid $line !important; }
+  .filters-body { border-top: 2px solid $line !important; }
 
   /* This line only existed in Moderators and Reports (filters in another row) */
   :is(app-moderator-management, app-report-management) .filter-group {
@@ -77,8 +77,8 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
   .modal-header,
   .panel-tabs,
   .panel-filters,
-  .zonas-section,
-  .zona-add-row,
+  .zones-section,
+  .zone-add-row,
   .detail-hero { border-bottom: 2px solid $line !important; }
 
   .detail-section h4 { border-bottom: 2px solid $line !important; }

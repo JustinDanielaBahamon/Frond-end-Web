@@ -8,9 +8,9 @@
         <p class="dash-sub">Información general del sistema y estado actual de la plataforma. Actualizado a las {{ updatedAt | date:'HH:mm:ss' }}.</p>
       </div>
 
-      <div class="filtros" role="group" aria-label="Periodo">
+      <div class="filters" role="group" aria-label="Periodo">
         @for (p of periods; track p.value) {
-          <button type="button" class="filtro-btn" [class.activo]="period === p.value" (click)="setPeriod(p.value)">
+          <button type="button" class="filter-button" [class.is-active]="period === p.value" (click)="setPeriod(p.value)">
             {{ p.label }}
           </button>
         }
@@ -18,11 +18,11 @@
     </div>
 
     @if (period === 'custom') {
-      <div class="filtros filtros--fechas">
-        <label class="fecha-label">Desde
+      <div class="filters filters--dates">
+        <label class="date-label">Desde
           <app-date-picker label="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
         </label>
-        <label class="fecha-label">Hasta
+        <label class="date-label">Hasta
           <app-date-picker label="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
         </label>
       </div>
@@ -99,7 +99,7 @@
 
     <!-- ===== SHORTCUTS TO ENTER URGENTLY ===== -->
     <nav class="atajos" aria-label="Atajos">
-      <a class="atajo" [class.atajo--urgente]="pendingAlerts > 0" routerLink="/admin/alertas">
+      <a class="atajo" [class.atajo--urgent]="pendingAlerts > 0" routerLink="/admin/alertas">
         <i class="ti ti-urgent" aria-hidden="true"></i>
         <span>{{ pendingAlerts > 0 ? pendingAlerts + (pendingAlerts === 1 ? ' alerta activa' : ' alertas activas') : 'Alertas' }}</span>
       </a>
@@ -122,7 +122,7 @@
         </div>
       </div>
 
-      <div class="horas-stats">
+      <div class="hours-stats">
         <div class="mini-stat">
           <span class="mini-stat__label">Hora pico</span>
           <span class="mini-stat__value">{{ peakHourText }}</span>
@@ -141,13 +141,13 @@
       </div>
 
       @if (hasHourData) {
-        <div class="horas-scroll">
-          <svg class="horas-svg" viewBox="0 0 1000 275" role="img"
+        <div class="hours-scroll">
+          <svg class="hours-svg" viewBox="0 0 1000 275" role="img"
                aria-label="Barras de alertas por hora del día, agrupadas en madrugada, mañana, tarde y noche">
             @for (f of chartBands; track f.name; let i = $index) {
-              <rect class="franja-bg" [class.franja-bg--alt]="i % 2 === 1" [class.franja-bg--noche]="f.name === 'Noche'"
+              <rect class="band-bg" [class.band-bg--alt]="i % 2 === 1" [class.band-bg--night]="f.name === 'Noche'"
                     [attr.x]="f.x" y="30" [attr.width]="f.w" height="210" />
-              <text class="franja-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.name }} · {{ f.range }}</text>
+              <text class="band-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.name }} · {{ f.range }}</text>
             }
             @for (t of hourTicks; track t.label) {
               <line class="grid-line" x1="50" [attr.y1]="t.y" x2="980" [attr.y2]="t.y" />
@@ -155,15 +155,15 @@
             }
             @for (b of hourBars; track b.time) {
               @if (b.value > 0) {
-                <rect class="hora-bar" [class.hora-bar--pico]="b.peak" [attr.x]="b.x" [attr.y]="b.y"
+                <rect class="hour-bar" [class.hour-bar--peak]="b.peak" [attr.x]="b.x" [attr.y]="b.y"
                       width="26" [attr.height]="b.h" rx="4" />
-                <text class="hora-valor" [attr.x]="b.cx" [attr.y]="b.y - 6" text-anchor="middle">{{ b.value }}</text>
+                <text class="hour-valor" [attr.x]="b.cx" [attr.y]="b.y - 6" text-anchor="middle">{{ b.value }}</text>
               }
               <text class="axis-text" [attr.x]="b.cx" y="260" text-anchor="middle">{{ b.time }}h</text>
             }
           </svg>
         </div>
-        <p class="nota">Eje vertical: número de alertas. En rojo, las horas con más alertas.</p>
+        <p class="note">Eje vertical: número de alertas. En rojo, las horas con más alertas.</p>
       } @else {
         <p class="empty">No hay alertas con fecha en este periodo.</p>
       }
@@ -183,41 +183,41 @@
         </div>
       </div>
 
-      <div class="zonas-body">
-        <div class="zona-mapa-wrap">
-          <div class="zona-mapa">
-            <div #zonesMap class="mapa-leaflet"></div>
+      <div class="zones-body">
+        <div class="zone-map-wrap">
+          <div class="zone-map">
+            <div #zonesMap class="map-leaflet"></div>
           </div>
 
           @if (currentZone; as z) {
-            <div class="zona-detalle">
-              <span class="zona-detalle__label">Punto seleccionado</span>
-              <span class="zona-detalle__nombre">{{ z.name }}</span>
-              <span class="zona-detalle__meta">
+            <div class="zone-detail">
+              <span class="zone-detail__label">Punto seleccionado</span>
+              <span class="zone-detail__name">{{ z.name }}</span>
+              <span class="zone-detail__meta">
                 {{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}
                 · {{ z.count }} {{ z.count === 1 ? 'alerta' : 'alertas' }}
                 · {{ z.lat | number:'1.4-4' }}, {{ z.lng | number:'1.4-4' }}
               </span>
               @if (z.riskZone) {
-                <span class="zona-detalle__meta">Dentro de la zona de riesgo: {{ z.riskZone }}</span>
+                <span class="zone-detail__meta">Dentro de la zona de riesgo: {{ z.riskZone }}</span>
               }
             </div>
           }
         </div>
 
-        <ul class="zona-lista">
+        <ul class="zone-list">
           @for (z of incidentZones; track z.rank; let i = $index) {
             <li>
-              <button type="button" class="zona-item" [class.activo]="i === selectedZone" (click)="selectZone(i)">
+              <button type="button" class="zone-item" [class.is-active]="i === selectedZone" (click)="selectZone(i)">
                 <span class="rank" [ngClass]="'rank--' + z.rank">{{ z.rank }}</span>
-                <span class="zona-item__texto">
-                  <span class="zona-item__nombre">{{ z.name }}</span>
-                  <span class="zona-item__dir">{{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}</span>
-                  <span class="zona-item__bar">
-                    <span class="zona-item__fill" [class.zona-item__fill--top]="i === 0" [style.width.%]="z.bar"></span>
+                <span class="zone-item__text">
+                  <span class="zone-item__name">{{ z.name }}</span>
+                  <span class="zone-item__address">{{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}</span>
+                  <span class="zone-item__bar">
+                    <span class="zone-item__fill" [class.zone-item__fill--top]="i === 0" [style.width.%]="z.bar"></span>
                   </span>
                 </span>
-                <span class="zona-item__cant">{{ z.count }} · {{ z.percentage }}%</span>
+                <span class="zone-item__cant">{{ z.count }} · {{ z.percentage }}%</span>
               </button>
             </li>
           } @empty {
@@ -229,7 +229,7 @@
 
     <!-- ===== TREND: THIS WEEK VS. LAST WEEK ===== -->
     <div class="dash-card">
-      <div class="dash-card__header dash-card__header--filtros">
+      <div class="dash-card__header dash-card__header--filters">
         <span class="dash-card__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
@@ -245,22 +245,22 @@
           }
         </div>
         <div class="trend-vista" role="group" aria-label="Ver la tendencia por">
-          <button type="button" class="filtro-btn" [class.activo]="trendView === 'semana'" [attr.aria-pressed]="trendView === 'semana'" (click)="changeTrendView('semana')">Semana</button>
-          <button type="button" class="filtro-btn" [class.activo]="trendView === 'mes'" [attr.aria-pressed]="trendView === 'mes'" (click)="changeTrendView('mes')">Mes</button>
+          <button type="button" class="filter-button" [class.is-active]="trendView === 'semana'" [attr.aria-pressed]="trendView === 'semana'" (click)="changeTrendView('semana')">Semana</button>
+          <button type="button" class="filter-button" [class.is-active]="trendView === 'mes'" [attr.aria-pressed]="trendView === 'mes'" (click)="changeTrendView('mes')">Mes</button>
         </div>
       </div>
 
       @if (currentTrendTotal + previousTrendTotal > 0) {
-        <div class="trend-resumen">
-          <div class="trend-resumen__dato">
-            <span class="trend-resumen__valor">{{ currentTrendTotal }}</span>
-            <span class="trend-resumen__etiqueta">{{ trendView === 'mes' ? 'este mes' : 'esta semana' }} (hasta hoy)</span>
+        <div class="trend-summary">
+          <div class="trend-summary__item">
+            <span class="trend-summary__valor">{{ currentTrendTotal }}</span>
+            <span class="trend-summary__label">{{ trendView === 'mes' ? 'este mes' : 'esta semana' }} (hasta hoy)</span>
           </div>
-          <div class="trend-resumen__dato">
-            <span class="trend-resumen__valor trend-resumen__valor--previa">{{ previousTrendUntilToday }}</span>
-            <span class="trend-resumen__etiqueta">{{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}, mismos días</span>
+          <div class="trend-summary__item">
+            <span class="trend-summary__valor trend-summary__valor--previa">{{ previousTrendUntilToday }}</span>
+            <span class="trend-summary__label">{{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}, mismos días</span>
           </div>
-          <p class="trend-resumen__frase">{{ trendSentence }}</p>
+          <p class="trend-summary__sentence">{{ trendSentence }}</p>
         </div>
 
         <svg class="trend-svg" viewBox="0 0 640 230" role="img"
@@ -270,7 +270,7 @@
             <text class="axis-text" x="30" [attr.y]="t.y + 3" text-anchor="end">{{ t.label }}</text>
           }
           @for (b of trendBars; track b.day) {
-            <g class="trend-dia" [class.trend-dia--hoy]="b.isToday">
+            <g class="trend-day" [class.trend-dia--hoy]="b.isToday">
               <title>{{ b.longDay }}: {{ b.current === null ? 'aún no llega' : b.current + (trendView === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previous }} {{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
               <rect class="trend-hit" [attr.x]="b.groupX" y="20" [attr.width]="b.groupWidth" height="170" />
               @if (b.previous > 0) {
@@ -281,14 +281,14 @@
                 <path class="trend-bar" [attr.d]="b.currentPath" />
                 <text class="trend-valor trend-valor--actual" [attr.x]="b.currentX + b.barWidth / 2" [attr.y]="b.currentY - 6" text-anchor="middle">{{ b.current }}</text>
               }
-              <text class="axis-text" [class.axis-text--hoy]="b.isToday" [attr.x]="b.groupX + b.groupWidth / 2" y="210" text-anchor="middle">{{ b.isToday ? (trendView === 'mes' ? 'Esta sem.' : 'Hoy') : b.day }}</text>
+              <text class="axis-text" [class.axis-text--today]="b.isToday" [attr.x]="b.groupX + b.groupWidth / 2" y="210" text-anchor="middle">{{ b.isToday ? (trendView === 'mes' ? 'Esta sem.' : 'Hoy') : b.day }}</text>
             </g>
           }
         </svg>
-        <div class="leyenda">
-          <span><span class="leyenda__barra"></span>{{ trendView === 'mes' ? 'Este mes' : 'Esta semana' }}</span>
-          <span><span class="leyenda__barra leyenda__barra--previa"></span>{{ trendView === 'mes' ? 'Mes anterior' : 'Semana anterior' }}</span>
-          <span class="leyenda__nota">Pasa el cursor sobre {{ trendView === 'mes' ? 'una semana' : 'un día' }} para ver el detalle.</span>
+        <div class="legend">
+          <span><span class="legend__bar"></span>{{ trendView === 'mes' ? 'Este mes' : 'Esta semana' }}</span>
+          <span><span class="legend__bar legend__bar--previa"></span>{{ trendView === 'mes' ? 'Mes anterior' : 'Semana anterior' }}</span>
+          <span class="legend__note">Pasa el cursor sobre {{ trendView === 'mes' ? 'una semana' : 'un día' }} para ver el detalle.</span>
         </div>
       } @else {
         <p class="empty">Aún no hay alertas con fecha en {{ trendView === 'mes' ? 'estos dos meses' : 'estas dos semanas' }}.</p>
@@ -297,7 +297,7 @@
 
     <!-- ===== ALERTAS RECIENTES ===== -->
     <div class="dash-card table-card">
-      <div class="dash-card__header dash-card__header--filtros">
+      <div class="dash-card__header dash-card__header--filters">
         <span class="dash-card__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -308,9 +308,9 @@
           <p>Últimas alertas registradas en la plataforma</p>
         </div>
 
-        <div class="filtros filtros--tabla" role="group" aria-label="Estado de la alerta">
+        <div class="filters filters--table" role="group" aria-label="Estado de la alerta">
           @for (f of statusFilters; track f.value) {
-            <button type="button" class="filtro-btn" [class.activo]="statusFilter === f.value" (click)="setStatusFilter(f.value)">
+            <button type="button" class="filter-button" [class.is-active]="statusFilter === f.value" (click)="setStatusFilter(f.value)">
               {{ f.label }}
             </button>
           }
@@ -334,8 +334,8 @@
                 <td>{{ a.time }}</td>
                 <td>{{ a.name }}</td>
                 <td>
-                  <span class="estado-badge" [ngClass]="statusClass(a.status)">
-                    <span class="estado-badge__icono"></span>{{ a.status }}
+                  <span class="state-badge" [ngClass]="statusClass(a.status)">
+                    <span class="state-badge__icon"></span>{{ a.status }}
                   </span>
                 </td>
                 <td>

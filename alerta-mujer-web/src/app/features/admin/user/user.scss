@@ -265,12 +265,12 @@ table {
 
   // Anchos fijos por columna
   col.col-check   { width: 40px; }
-  col.col-nombre  { width: 22%; }
+  col.col-name  { width: 22%; }
   col.col-email   { width: 22%; }
-  col.col-fecha   { width: 11%; }
-  col.col-alertas { width: 9%; }
+  col.col-date   { width: 11%; }
+  col.col-alerts { width: 9%; }
   col.col-activ   { width: 14%; }
-  col.col-estado  { width: 13%; }
+  col.col-status  { width: 13%; }
   col.col-acc     { width: 9%; }
 
   thead tr th {
@@ -386,7 +386,7 @@ table {
 .muted { color: $text-dim; font-size: 0.78rem; }
 
 // ── Estado badges ────────────────────────────
-.estado-badge {
+.state-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -396,17 +396,17 @@ table {
   font-weight: 600;
   white-space: nowrap;
 
-  &.estado--activa {
+  &.state--active {
     background: $green-pale;
     color: $green;
   }
 
-  &.estado--inactiva {
+  &.state--inactiva {
     background: $amber-pale;
     color: $amber;
   }
 
-  &.estado--bloqueada {
+  &.state--blocked {
     background: $red-pale;
     color: $red;
   }
@@ -970,7 +970,7 @@ table {
       }
 
       // Name + avatar as the card header
-      td.cell-nombre {
+      td.cell-name {
         justify-content: flex-start;
         text-align: left;
         padding: 0 34px 10px 0;
@@ -1056,20 +1056,20 @@ table {
   }
 }
 // ── Moderation and extended detail ─────────────────────
-.aviso-panel { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
-.celular { margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
-.celular__cabecera { display: flex; flex-direction: column; gap: 2px; font-size: 13px; span { color: var(--text-muted); font-size: 12px; } }
-.celular__permisos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.permiso { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(192, 38, 211, 0.12); color: #a21caf; }
-.permiso--ok { background: rgba(124, 58, 237, 0.15); color: #6d28d9; }
-.historial { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
+.notice-panel { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
+.phone { margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
+.phone__header { display: flex; flex-direction: column; gap: 2px; font-size: 13px; span { color: var(--text-muted); font-size: 12px; } }
+.phone__permissions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.permission { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(192, 38, 211, 0.12); color: #a21caf; }
+.permission--ok { background: rgba(124, 58, 237, 0.15); color: #6d28d9; }
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
   li { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-left: 3px solid #7c3aed; border-radius: 8px; background: rgba(124, 58, 237, 0.06); font-size: 13px; }
   span { font-size: 12px; color: var(--text-muted); } }
-.historial__nota { font-style: italic; }
+.history__note { font-style: italic; }
 .link-btn { align-self: flex-start; padding: 0; border: none; background: none; color: #7c3aed; font-weight: 700; cursor: pointer; }
-.evidencia-img { max-width: 100%; margin-top: 8px; border-radius: 10px; border: 1px solid var(--border); }
-.evidencia { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0;
+.evidence-img { max-width: 100%; margin-top: 8px; border-radius: 10px; border: 1px solid var(--border); }
+.evidence { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0;
   img { width: 90px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); } }
-.evidencia__boton { cursor: pointer; }
-.form-ayuda { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
+.evidence__button { cursor: pointer; }
+.form-help { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
 .btn-danger-outline { margin-right: auto; padding: 9px 14px; border: 1.5px solid #a21caf; border-radius: 10px; background: transparent; color: #a21caf; font-weight: 700; cursor: pointer; }

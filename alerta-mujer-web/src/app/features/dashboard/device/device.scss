@@ -100,7 +100,7 @@
     cursor: not-allowed;
   }
   
-  &--primario {
+  &--primary {
     background: var(--color-acento);
     color: #fff;
   }
@@ -123,9 +123,9 @@
   border-radius: 50px;
   white-space: nowrap;
 
-  &--exito { background: rgba(89, 16, 185, 0.15); color: #440596; }
-  &--advertencia { background: rgba(147, 6, 217, 0.15); color: #7b09b4; }
-  &--peligro { background: rgba(192, 38, 211, 0.15); color: #cb1ce6; }
+  &--success { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--warning { background: rgba(147, 6, 217, 0.15); color: #7b09b4; }
+  &--danger { background: rgba(192, 38, 211, 0.15); color: #cb1ce6; }
   &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
 }
 
@@ -208,9 +208,9 @@
   font-size: 1.2rem;
   flex-shrink: 0;
   
-  &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
-  &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
-  &--peligro { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--danger { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
   &--neutral { background: rgba(107, 114, 128, 0.12); color: #6b7280; }
 }
 
@@ -300,10 +300,10 @@
   font-size: 1.2rem;
   flex-shrink: 0;
 
-  &--exito { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
-  &--advertencia { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
-  &--peligro { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
-  &--acento { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--danger { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
+  &--accent { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
 }
 
 .device-feature-item__body {
@@ -642,7 +642,7 @@
   dd { margin: 0; font-weight: 600; text-align: right; }
 }
 
-.dd-nota {
+.dd-note {
   margin: 4px 20px 20px;
   display: flex;
   gap: 8px;
@@ -655,7 +655,7 @@
 }
 
 // ── PHONE PERMISSIONS (reported by the app) ───────
-.device-perm-aviso {
+.device-perm-notice {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -695,10 +695,10 @@
   }
 
   &__body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-  &__titulo { font-weight: 700; font-size: var(--font-size-sm); color: var(--color-texto-principal); }
+  &__title { font-weight: 700; font-size: var(--font-size-sm); color: var(--color-texto-principal); }
   &__desc { font-size: var(--font-size-xs); color: var(--color-texto-secundario); }
 
-  &__estado {
+  &__status {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -716,12 +716,12 @@
     background: linear-gradient(135deg, #7c3aed, #5b21b6);
 
     .device-perm__icon { background: rgba(255, 255, 255, 0.18); color: #fff; }
-    .device-perm__titulo { color: #fff; }
+    .device-perm__title { color: #fff; }
     .device-perm__desc { color: rgba(255, 255, 255, 0.8); }
-    .device-perm__estado { background: rgba(255, 255, 255, 0.2); color: #fff; }
+    .device-perm__status { background: rgba(255, 255, 255, 0.2); color: #fff; }
   }
 
-  &__fecha {
+  &__date {
     margin: 12px 0 0;
     font-size: var(--font-size-xs);
     color: var(--color-texto-secundario);
@@ -733,7 +733,7 @@
 .dd-modal--aviso .dd-head__icon { background: linear-gradient(135deg, #c026d3, #7e22ce); }
 .dd-modal--error .dd-head__icon { background: linear-gradient(135deg, #a21caf, #4c1d95); }
 
-.dd-enlace {
+.dd-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;

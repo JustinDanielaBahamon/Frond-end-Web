@@ -93,8 +93,8 @@
   }
 }
 
-.ah-filtro-fecha,
-.ah-filtro-tipo {
+.ah-filter-date,
+.ah-filter-type {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -110,7 +110,7 @@
   cursor: pointer;
 }
 
-.ah-filtro-fecha {
+.ah-filter-date {
   &-icon {
     width: 16px;
     height: 16px;
@@ -143,7 +143,7 @@
   }
 }
 
-.ah-filtro-tipo {
+.ah-filter-type {
   &-icon {
     width: 15px;
     height: 15px;
@@ -200,7 +200,7 @@
 
     &--total      { border-left-color:  #560c79; }
     &--atendidas  { border-left-color: #2e1065; }
-    &--canceladas { border-left-color: #c90fe6 }
+    &--cancelled { border-left-color: #c90fe6 }
 
     .ah-stat-icon {
       width: 40px;
@@ -217,7 +217,7 @@
 
     &--total .ah-stat-icon      { background: linear-gradient(135deg, #560c79, #9236ad); }
     &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #2e1065, #5506bd); }
-    &--canceladas .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
+    &--cancelled .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
 
     .ah-stat-body { min-width: 0; }
 
@@ -293,10 +293,10 @@
   }
 
   .ah-id    { color: var(--pink,  #c90fe6); font-weight: 700; }
-  .ah-fecha { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
+  .ah-date { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
   // before 0.75rem with an almost black color on already black text: contrast raised with a readable mid grey
-  .ah-hora  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
-  .ah-ubicacion { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
+  .ah-hour  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
+  .ah-location { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
 }
 
 
@@ -310,19 +310,19 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
 
-  &.badge-boton      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
+  &.badge-button      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
   &.badge-widget     { background: var(--purple-pale, #e6dbfe); color: var(--purple-deep, #481ab3); }
-  &.badge-movimiento { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
+  &.badge-movement { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
   &.badge-manual     { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
 
   // BADGES — estado
   &.badge-ok        { background: rgb(5 141 50 / 98%); color: #ffffff; }
-  &.badge-pendiente { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
-  &.badge-falsa     { background: rgba(89, 16, 185, 0.18); color: #360478; }
+  &.badge-pending { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
+  &.badge-false     { background: rgba(89, 16, 185, 0.18); color: #360478; }
 }
 
 // Actions (eye + three-dot menu)
-.ah-acciones {
+.ah-actions {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -404,7 +404,7 @@
   }
 
   // antes 0.78rem / #4b4b55: ligero refuerzo de contraste
-  &-modo {
+  &-mode {
     font-size: var(--font-size-xs);
     font-weight: 700;
     color: var(--text-muted, #374151);
@@ -642,8 +642,8 @@
     }
   }
 
-  .ah-filtro-fecha,
-  .ah-filtro-tipo {
+  .ah-filter-date,
+  .ah-filter-type {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
     color: var(--text-primary) !important;
@@ -651,7 +651,7 @@
     &-icon { color: var(--purple-mid) !important; }
   }
 
-  .ah-filtro-fecha-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+  .ah-filter-date-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
 
   .ah-view-toggle {
     background: var(--bg-card) !important;
@@ -667,7 +667,7 @@
 
     &--total      { border-left-color: #560c79 !important; }
     &--atendidas  { border-left-color: #2e1065 !important; }
-    &--canceladas { border-left-color: #c90fe6 !important; }
+    &--cancelled { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -690,21 +690,21 @@
     }
 
     .ah-id { color: var(--pink) !important; }
-    .ah-fecha { color: var(--text-primary) !important; }
-    .ah-hora { color: var(--text-muted) !important; }
-    .ah-ubicacion { color: var(--text-primary) !important; }
+    .ah-date { color: var(--text-primary) !important; }
+    .ah-hour { color: var(--text-muted) !important; }
+    .ah-location { color: var(--text-primary) !important; }
   }
 
   /* Badges */
   .ah-badge {
-    &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
+    &.badge-button      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
-    &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-movement { background: var(--amber-pale) !important; color: var(--amber) !important; }
     &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
 
     &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
-    &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
+    &.badge-pending { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-false     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
   /* Action icons */
@@ -733,7 +733,7 @@
   }
 
   .ah-expand-head-title { color: var(--purple-mid) !important; }
-  .ah-expand-head-modo { color: var(--text-muted) !important; }
+  .ah-expand-head-mode { color: var(--text-muted) !important; }
   .ah-expand-col-title { color: var(--text-muted) !important; }
 
   .ah-mini-timeline-item:not(:last-child)::after { background: var(--border) !important; }

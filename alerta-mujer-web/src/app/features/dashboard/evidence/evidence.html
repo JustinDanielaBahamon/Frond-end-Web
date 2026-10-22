@@ -37,7 +37,7 @@
   <div class="ev-grid">
     <!-- ══════════ ALERTAS Y SUS EVIDENCIAS ══════════ -->
     <section class="ev-card ev-list-card">
-      <div class="ev-alertas-head">
+      <div class="ev-alerts-head">
         <span class="ev-label">Tus alertas</span>
         <label class="ev-check">
           <input type="checkbox" [ngModel]="onlyWithEvidence()" (ngModelChange)="onlyWithEvidence.set($event); resolveAddresses()" />
@@ -53,37 +53,37 @@
       @if (loading()) {
         <p class="ev-muted">Cargando evidencias…</p>
       } @else {
-        <ul class="ev-alertas" role="listbox" aria-label="Alertas">
+        <ul class="ev-alerts" role="listbox" aria-label="Alertas">
           @for (a of filteredAlerts(); track a.id) {
             <li>
-              <button class="ev-alerta" role="option" [attr.aria-selected]="alertId() === a.id"
-                      [class.ev-alerta--activa]="alertId() === a.id" (click)="chooseAlert(a.id)">
-                <span class="ev-alerta-fecha">
+              <button class="ev-alert-item" role="option" [attr.aria-selected]="alertId() === a.id"
+                      [class.ev-alert-item--active]="alertId() === a.id" (click)="chooseAlert(a.id)">
+                <span class="ev-alert-item-date">
                   <strong>{{ a.start | date: 'd' }}</strong>
                   <small>{{ a.start | date: 'MMM' }}</small>
                 </span>
-                <span class="ev-alerta-texto">
-                  <span class="ev-alerta-titulo">{{ shortDate(a.start) }} · {{ time(a.start) }}</span>
-                  <span class="ev-alerta-lugar">{{ addresses()[a.id] || (a.lat != null ? 'Buscando la dirección…' : 'Sin ubicación') }}</span>
+                <span class="ev-alert-item-text">
+                  <span class="ev-alert-item-title">{{ shortDate(a.start) }} · {{ time(a.start) }}</span>
+                  <span class="ev-alert-item-place">{{ addresses()[a.id] || (a.lat != null ? 'Buscando la dirección…' : 'Sin ubicación') }}</span>
                 </span>
-                <span class="ev-alerta-meta">
+                <span class="ev-alert-item-meta">
                   <span class="ev-chip ev-chip--{{ a.status }}">{{ status(a.status) }}</span>
                   @if (a.keep) { <span class="ev-chip ev-chip--conservada" title="Evidencias conservadas">Conservada</span> }
-                  <span class="ev-alerta-cantidad">{{ a.count }} {{ a.count === 1 ? 'archivo' : 'archivos' }}</span>
+                  <span class="ev-alert-item-count">{{ a.count }} {{ a.count === 1 ? 'archivo' : 'archivos' }}</span>
                 </span>
               </button>
             </li>
           } @empty {
-            <li class="ev-muted ev-alertas-vacio">
+            <li class="ev-muted ev-alerts-empty">
               {{ alertList().length === 0 ? 'Aún no tienes alertas. Cuando actives una, aquí aparecerán sus grabaciones.' : 'Ninguna alerta coincide con la búsqueda.' }}
             </li>
           }
         </ul>
 
         @if (currentAlert(); as alert) {
-          <div class="ev-de-alerta">
-            <div class="ev-conservar" [class.ev-conservar--on]="alert.keep">
-              <span class="ev-conservar-texto">
+          <div class="ev-de-alert">
+            <div class="ev-keep" [class.ev-keep--on]="alert.keep">
+              <span class="ev-keep-text">
                 @if (alert.keep) {
                   <strong>Evidencias conservadas</strong>
                   <small>No se borran hasta que tú lo hagas · {{ totalKept() }} de {{ maxKept }} alertas conservadas.</small>
@@ -117,11 +117,11 @@
             <!-- The app records in ~45 s parts: here they are played in a row, as a single recording -->
             @if (count().video > 1 || count().audio > 1) {
               <div class="ev-continua">
-                <span class="ev-continua-texto">
+                <span class="ev-continua-text">
                   <strong>Grabación completa</strong>
                   <small>La app graba por partes. Aquí puedes verlas seguidas, sin abrir una por una.</small>
                 </span>
-                <span class="ev-continua-botones">
+                <span class="ev-continua-buttons">
                   @if (count().video > 1) {
                     <button class="ev-btn ev-btn--primary" [disabled]="loadingContinuous()" (click)="showContinuous('video')">
                       Ver video completo ({{ count().video }} partes)
@@ -150,7 +150,7 @@
                   <span class="ev-tile-meta">{{ types[e.type].label }} · {{ time(e.date) }}</span>
                 </button>
               } @empty {
-                <div class="ev-empty ev-empty--compacto">
+                <div class="ev-empty ev-empty--compact">
                   <p>Esta alerta no tiene evidencias</p>
                   <button class="ev-btn ev-btn--ghost" (click)="openUpload()">Agregar una</button>
                 </div>
@@ -270,7 +270,7 @@
       </header>
 
       @if (currentAlert(); as alert) {
-        <p class="ev-destino">
+        <p class="ev-destination">
           Se agregará a la alerta del <strong>{{ longDate(alert.start) }}</strong>
           @if (addresses()[alert.id]; as place) { en {{ place }} }.
           <span>Para otra alerta, elígela primero en la lista.</span>
@@ -313,7 +313,7 @@
 <!-- ══════════ ALERT MAP ══════════ -->
 @if (mapVisible()) {
   <div class="ev-modal-overlay" (click)="closeMap()">
-    <div class="ev-modal ev-modal--mapa" role="dialog" aria-modal="true" aria-labelledby="ev-mapa-titulo" (click)="$event.stopPropagation()">
+    <div class="ev-modal ev-modal--map" role="dialog" aria-modal="true" aria-labelledby="ev-mapa-titulo" (click)="$event.stopPropagation()">
       <header class="ev-modal-header">
         <div>
           <h3 id="ev-mapa-titulo">Lugar de la alerta</h3>
@@ -323,7 +323,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </header>
-      <div #alertMap class="ev-mapa"></div>
+      <div #alertMap class="ev-map"></div>
     </div>
   </div>
 }

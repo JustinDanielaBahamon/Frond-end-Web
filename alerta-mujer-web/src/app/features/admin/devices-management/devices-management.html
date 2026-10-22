@@ -294,19 +294,19 @@
             </div>
           </div>
 
-          <div class="permisos-dispositivo" *ngIf="selectedDevice!.permissions as permissions; else withoutPermissions">
-            <p class="permisos-dispositivo__resumen">
+          <div class="permissions-device" *ngIf="selectedDevice!.permissions as permissions; else withoutPermissions">
+            <p class="permissions-device__summary">
               Listo para una emergencia: <strong>{{ permissionsReady(permissions) }} de {{ permissions.length }}</strong>
               <span *ngIf="selectedDevice!.permissionsUpdated"> · informado {{ selectedDevice!.permissionsUpdated }}</span>
             </p>
-            <div class="permisos-dispositivo__chips">
-              <span *ngFor="let p of permissions" class="permiso-chip" [class.permiso-chip--listo]="p.ready">
+            <div class="permissions-device__chips">
+              <span *ngFor="let p of permissions" class="permission-chip" [class.permission-chip--ready]="p.ready">
                 <i class="fa-solid" [class.fa-check]="p.ready" [class.fa-xmark]="!p.ready"></i> {{ p.label }}
               </span>
             </div>
           </div>
           <ng-template #withoutPermissions>
-            <p class="permisos-dispositivo__vacio">La app de este celular todavía no informó sus permisos (se actualiza al abrir "Permisos y protección").</p>
+            <p class="permissions-device__empty">La app de este celular todavía no informó sus permisos (se actualiza al abrir "Permisos y protección").</p>
           </ng-template>
         </div>
 

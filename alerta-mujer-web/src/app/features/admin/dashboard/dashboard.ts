@@ -60,6 +60,8 @@ const DIA_MS = 86400000;
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const DIAS_LARGOS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
+type VistaTendencia = 'semana' | 'mes';
+
 interface BarraDia {
   dia: string;
   diaLargo: string;
@@ -74,6 +76,7 @@ interface BarraDia {
   xActual: number;
   yActual: number;
   dActual: string;
+  anchoBarra: number;
 }
 
 /** Barra con las esquinas de arriba redondeadas (4 px) apoyada en la línea base. */
@@ -85,14 +88,20 @@ function barraRedondeada(x: number, y: number, ancho: number, base: number): str
 }
 
 /** "3 alertas menos que la semana pasada a esta altura (−50 %)". */
-function fraseTendencia(actual: number, previa: number): string {
-  if (actual === previa) return actual === 0 ? 'Sin alertas en ninguna de las dos semanas hasta hoy.' : 'Igual que la semana pasada a esta altura.';
+function fraseTendencia(actual: number, previa: number, vista: VistaTendencia = 'semana'): string {
+  const anterior = vista === 'mes' ? 'el mes pasado' : 'la semana pasada';
+  if (actual === previa) {
+    if (actual === 0) return vista === 'mes' ? 'Sin alertas en ninguno de los dos meses hasta hoy.' : 'Sin alertas en ninguna de las dos semanas hasta hoy.';
+    return `Igual que ${anterior} a esta altura.`;
+  }
   const diff = actual - previa;
   const n = Math.abs(diff);
   const palabra = n === 1 ? 'alerta' : 'alertas';
   const pct = previa > 0 ? ` (${diff > 0 ? '+' : '−'}${Math.round((n / previa) * 100)} %)` : '';
-  return `${n} ${palabra} ${diff > 0 ? 'más' : 'menos'} que la semana pasada a esta altura${pct}.`;
+  return `${n} ${palabra} ${diff > 0 ? 'más' : 'menos'} que ${anterior} a esta altura${pct}.`;
 }
+
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
 const FRANJAS = [
   { nombre: 'Madrugada', rango: '0h – 5h', ini: 0, fin: 5 },
@@ -175,7 +184,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   zonasIncidentes: ZonaIncidente[] = [];
   zonaSeleccionada = 0;
 
-  // --- Tendencia (esta semana vs. la anterior) ---
+  // --- Tendencia (esta semana vs. la anterior, o este mes por semanas vs. el anterior) ---
+  vistaTendencia: VistaTendencia = 'semana';
+  tendenciaMes = '';
   tendenciaActualTotal = 0;
   tendenciaPreviaTotal = 0;
   tendenciaPreviaHastaHoy = 0;
@@ -536,8 +547,18 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return texto.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
   }
 
+  cambiarVistaTendencia(vista: VistaTendencia): void {
+    if (vista === this.vistaTendencia) return;
+    this.vistaTendencia = vista;
+    this.calcularTendencia(this.todas);
+  }
+
   // ── Tendencia: esta semana vs. la anterior ─────────────────────
   private calcularTendencia(lista: AlertaVM[]): void {
+    if (this.vistaTendencia === 'mes') {
+      this.calcularTendenciaMes(lista);
+      return;
+    }
     const ahora = new Date();
     const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
     const diaHoy = (ahora.getDay() + 6) % 7; // lunes = 0
@@ -563,8 +584,81 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.tendenciaPreviaHastaHoy = previa.slice(0, diaHoy + 1).reduce((s, v) => s + v, 0);
     this.tendenciaFrase = fraseTendencia(this.tendenciaActualTotal, this.tendenciaPreviaHastaHoy);
 
+    this.dibujarTendencia(
+      actual.map((v, i) => (i <= diaHoy ? v : null)),
+      previa,
+      DIAS_SEMANA,
+      DIAS_LARGOS,
+      diaHoy,
+      22,
+    );
+  }
+
+  /**
+   * Este mes por semanas (días 1–7, 8–14, 15–21, 22–28 y 29 en adelante) contra las mismas semanas
+   * del mes anterior. Así se ve en qué parte del mes se concentran las alertas.
+   */
+  private calcularTendenciaMes(lista: AlertaVM[]): void {
+    const ahora = new Date();
+    const anio = ahora.getFullYear();
+    const mes = ahora.getMonth();
+    const diasMes = new Date(anio, mes + 1, 0).getDate();
+    const diasMesPrevio = new Date(anio, mes, 0).getDate();
+    const semanas = Math.max(Math.ceil(diasMes / 7), Math.ceil(diasMesPrevio / 7));
+    const semanaHoy = Math.floor((ahora.getDate() - 1) / 7);
+    const inicioMes = new Date(anio, mes, 1).getTime();
+    const inicioPrevio = new Date(anio, mes - 1, 1).getTime();
+    const finMes = new Date(anio, mes + 1, 1).getTime();
+
+    const actual = new Array<number>(semanas).fill(0);
+    const previa = new Array<number>(semanas).fill(0);
+    let previaHastaHoy = 0;
+
+    lista.forEach(a => {
+      const d = this.fechaDe(a);
+      if (!d) return;
+      const t = d.getTime();
+      const semana = Math.floor((d.getDate() - 1) / 7);
+      if (t >= inicioMes && t < finMes) actual[semana]++;
+      else if (t >= inicioPrevio && t < inicioMes) {
+        previa[semana]++;
+        // Comparación justa: el mes pasado solo hasta el mismo día del mes
+        if (d.getDate() <= ahora.getDate()) previaHastaHoy++;
+      }
+    });
+
+    this.tendenciaMes = MESES[mes];
+    this.tendenciaActualTotal = actual.reduce((s, v) => s + v, 0);
+    this.tendenciaPreviaTotal = previa.reduce((s, v) => s + v, 0);
+    this.tendenciaPreviaHastaHoy = previaHastaHoy;
+    this.tendenciaFrase = fraseTendencia(this.tendenciaActualTotal, previaHastaHoy, 'mes');
+
+    const rango = (i: number) => {
+      const ini = i * 7 + 1;
+      const fin = Math.min(ini + 6, Math.max(diasMes, diasMesPrevio));
+      return `días ${ini} al ${i === semanas - 1 ? 'fin de mes' : fin}`;
+    };
+    this.dibujarTendencia(
+      // Las semanas que aún no llegan (o que este mes no tiene) no se dibujan
+      actual.map((v, i) => (i <= semanaHoy && i * 7 < diasMes ? v : null)),
+      previa,
+      actual.map((_, i) => `Sem ${i + 1}`),
+      actual.map((_, i) => `Semana ${i + 1} (${rango(i)})`),
+      semanaHoy,
+      34,
+    );
+  }
+
+  private dibujarTendencia(
+    actual: (number | null)[],
+    previa: number[],
+    etiquetas: string[],
+    etiquetasLargas: string[],
+    indiceHoy: number,
+    ancho: number,
+  ): void {
     const { izq, der, arriba, abajo } = this.graf;
-    const maximo = Math.max(...actual, ...previa, 1);
+    const maximo = Math.max(...actual.map(v => v ?? 0), ...previa, 1);
     const escala = Math.max(4, Math.ceil(maximo / 4) * 4);
     const yDe = (v: number) => abajo - (v / Math.max(escala, 1)) * (abajo - arriba);
 
@@ -573,18 +667,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       return { y: yDe(valor), label: valor };
     });
 
-    const anchoGrupo = (der - izq) / 7;
-    const ancho = 22;
-    this.tendenciaBarras = DIAS_SEMANA.map((dia, i) => {
+    const anchoGrupo = (der - izq) / etiquetas.length;
+    this.tendenciaBarras = etiquetas.map((dia, i) => {
       const xGrupo = izq + i * anchoGrupo;
       const xPrevia = xGrupo + anchoGrupo / 2 - ancho - 1;
       const xActual = xGrupo + anchoGrupo / 2 + 1;
       // Los días que aún no llegan no son "cero alertas": no se dibujan
-      const valorActual = i <= diaHoy ? actual[i] : null;
+      const valorActual = actual[i];
       return {
         dia,
-        diaLargo: DIAS_LARGOS[i],
-        esHoy: i === diaHoy,
+        diaLargo: etiquetasLargas[i],
+        esHoy: i === indiceHoy,
         xGrupo,
         anchoGrupo,
         previa: previa[i],
@@ -595,6 +688,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         xActual,
         yActual: yDe(valorActual ?? 0),
         dActual: barraRedondeada(xActual, yDe(valorActual ?? 0), ancho, abajo),
+        anchoBarra: ancho,
       };
     });
   }

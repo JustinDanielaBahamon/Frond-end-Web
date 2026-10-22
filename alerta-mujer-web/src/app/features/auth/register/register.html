@@ -143,7 +143,7 @@
             <div class="field field--password">
               <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
               <input
-                [type]="verPassword() ? 'text' : 'password'"
+                [type]="showPassword() ? 'text' : 'password'"
                 formControlName="password"
                 class="field__input"
                 [class.is-invalid]="invalid('password')"
@@ -153,8 +153,8 @@
                 type="button"
                 class="field__eye"
                 aria-label="Mostrar u ocultar contraseña"
-                (click)="verPassword.set(!verPassword())">
-                <i [class]="verPassword() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+                (click)="showPassword.set(!showPassword())">
+                <i [class]="showPassword() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
               </button>
             </div>
             @if (invalid('password')) {

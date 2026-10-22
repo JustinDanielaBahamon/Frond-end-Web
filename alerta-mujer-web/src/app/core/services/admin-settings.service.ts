@@ -83,9 +83,9 @@ export class AdminSettingsService {
     return this.http.put<ContactData>(`${this.api}/api/users/me`, data);
   }
 
-  changePassword(actual: string, newOne: string): Observable<void> {
+  changePassword(current: string, newOne: string): Observable<void> {
     return this.http.put<void>(`${this.api}/api/users/me/password`, {
-      currentPassword: actual,
+      currentPassword: current,
       newPassword: newOne
     });
   }

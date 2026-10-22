@@ -69,21 +69,21 @@ interface DayBar {
   groupX: number;
   groupWidth: number;
   previous: number;
-  actual: number | null;
+  current: number | null;
   previousX: number;
   previousY: number;
   previousPath: string;
-  xActual: number;
-  yActual: number;
-  dActual: string;
+  currentX: number;
+  currentY: number;
+  currentPath: string;
   barWidth: number;
 }
 
 /** Barra con las esquinas de arriba redondeadas (4 px) apoyada en la línea base. */
 function roundedBar(x: number, y: number, width: number, base: number): string {
-  const alto = base - y;
-  if (alto <= 0) return '';
-  const r = Math.min(4, alto, width / 2);
+  const height = base - y;
+  if (height <= 0) return '';
+  const r = Math.min(4, height, width / 2);
   return `M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + width - r} Q${x + width},${y} ${x + width},${y + r} V${base} Z`;
 }
 
@@ -210,7 +210,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private zonesVersion = 0;
 
   // Geometría del gráfico de tendencia (coincide con el viewBox 640x230 del HTML)
-  private readonly chart = { left: 40, der: 620, up: 20, down: 190 };
+  private readonly chart = { left: 40, right: 620, up: 20, down: 190 };
 
   ngOnInit(): void {
     this.loadData();
@@ -368,15 +368,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const total = count.reduce((s, v) => s + v, 0);
     const max = Math.max(...count);
     const axis = Math.max(4, Math.ceil(max / 4) * 4);
-    const alto = H_BASE - H_TOP;
+    const height = H_BASE - H_TOP;
 
     this.hourTicks = [0, 1, 2, 3, 4].map(i => {
       const value = (axis / 4) * i;
-      return { y: H_BASE - (value / axis) * alto, label: value };
+      return { y: H_BASE - (value / axis) * height, label: value };
     });
 
     this.hourBars = count.map((value, time) => {
-      const h = (value / axis) * alto;
+      const h = (value / axis) * height;
       const x = H_X0 + time * H_SLOT + (H_SLOT - BAR_H) / 2;
       return { time, value, x, cx: x + BAR_H / 2, y: H_BASE - h, h, peak: value > 0 && value === max };
     });
@@ -443,7 +443,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    const maxCant = top.length ? top[0].count : 1;
+    const maxCount = top.length ? top[0].count : 1;
 
     this.incidentZones = top.map((z, i) => {
       const riskZone = this.riskZones.find(zr => isInsideZone(zr, z.lat, z.lng))?.nombre ?? null;
@@ -455,7 +455,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         riskZone,
         count: z.count,
         percentage: this.pct(z.count, withLocation.length),
-        bar: Math.max(8, Math.round((z.count / maxCant) * 100)),
+        bar: Math.max(8, Math.round((z.count / maxCount) * 100)),
         lat: z.lat,
         lng: z.lng,
       };
@@ -565,7 +565,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const monday = todayStart - today * DAY_MS;
     const previousMonday = monday - 7 * DAY_MS;
 
-    const actual = new Array<number>(7).fill(0);
+    const current = new Array<number>(7).fill(0);
     const previous = new Array<number>(7).fill(0);
 
     list.forEach(a => {
@@ -573,11 +573,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (!d) return;
       const t = d.getTime();
       const day = (d.getDay() + 6) % 7;
-      if (t >= monday && t < monday + 7 * DAY_MS) actual[day]++;
+      if (t >= monday && t < monday + 7 * DAY_MS) current[day]++;
       else if (t >= previousMonday && t < monday) previous[day]++;
     });
 
-    this.currentTrendTotal = actual.reduce((s, v) => s + v, 0);
+    this.currentTrendTotal = current.reduce((s, v) => s + v, 0);
     this.previousTrendTotal = previous.reduce((s, v) => s + v, 0);
 
     // Comparación justa: la semana pasada solo hasta el mismo día de hoy
@@ -585,7 +585,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.trendSentence = trendSentence(this.currentTrendTotal, this.previousTrendUntilToday);
 
     this.drawTrend(
-      actual.map((v, i) => (i <= today ? v : null)),
+      current.map((v, i) => (i <= today ? v : null)),
       previous,
       WEEK_DAYS,
       LONG_DAYS,
@@ -610,7 +610,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const previousStart = new Date(year, month - 1, 1).getTime();
     const monthEnd = new Date(year, month + 1, 1).getTime();
 
-    const actual = new Array<number>(weeks).fill(0);
+    const current = new Array<number>(weeks).fill(0);
     const previous = new Array<number>(weeks).fill(0);
     let previousUntilToday = 0;
 
@@ -619,7 +619,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (!d) return;
       const t = d.getTime();
       const week = Math.floor((d.getDate() - 1) / 7);
-      if (t >= monthStart && t < monthEnd) actual[week]++;
+      if (t >= monthStart && t < monthEnd) current[week]++;
       else if (t >= previousStart && t < monthStart) {
         previous[week]++;
         // Comparación justa: el mes pasado solo hasta el mismo día del mes
@@ -628,7 +628,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.monthTrend = MONTHS[month];
-    this.currentTrendTotal = actual.reduce((s, v) => s + v, 0);
+    this.currentTrendTotal = current.reduce((s, v) => s + v, 0);
     this.previousTrendTotal = previous.reduce((s, v) => s + v, 0);
     this.previousTrendUntilToday = previousUntilToday;
     this.trendSentence = trendSentence(this.currentTrendTotal, previousUntilToday, 'mes');
@@ -640,40 +640,40 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     };
     this.drawTrend(
       // Las semanas que aún no llegan (o que este mes no tiene) no se dibujan
-      actual.map((v, i) => (i <= currentWeek && i * 7 < monthDays ? v : null)),
+      current.map((v, i) => (i <= currentWeek && i * 7 < monthDays ? v : null)),
       previous,
-      actual.map((_, i) => `Sem ${i + 1}`),
-      actual.map((_, i) => `Semana ${i + 1} (${range(i)})`),
+      current.map((_, i) => `Sem ${i + 1}`),
+      current.map((_, i) => `Semana ${i + 1} (${range(i)})`),
       currentWeek,
       34,
     );
   }
 
   private drawTrend(
-    actual: (number | null)[],
+    current: (number | null)[],
     previous: number[],
     labels: string[],
     longLabels: string[],
     todayIndex: number,
     width: number,
   ): void {
-    const { left, der, up, down } = this.chart;
-    const max = Math.max(...actual.map(v => v ?? 0), ...previous, 1);
+    const { left, right, up, down } = this.chart;
+    const max = Math.max(...current.map(v => v ?? 0), ...previous, 1);
     const scale = Math.max(4, Math.ceil(max / 4) * 4);
-    const yDe = (v: number) => down - (v / Math.max(scale, 1)) * (down - up);
+    const yOf = (v: number) => down - (v / Math.max(scale, 1)) * (down - up);
 
     this.trendTicks = [0, 1, 2, 3, 4].map(i => {
       const value = (scale / 4) * i;
-      return { y: yDe(value), label: value };
+      return { y: yOf(value), label: value };
     });
 
-    const groupWidth = (der - left) / labels.length;
+    const groupWidth = (right - left) / labels.length;
     this.trendBars = labels.map((day, i) => {
       const groupX = left + i * groupWidth;
       const previousX = groupX + groupWidth / 2 - width - 1;
-      const xActual = groupX + groupWidth / 2 + 1;
+      const currentX = groupX + groupWidth / 2 + 1;
       // Los días que aún no llegan no son "cero alertas": no se dibujan
-      const currentValue = actual[i];
+      const currentValue = current[i];
       return {
         day,
         longDay: longLabels[i],
@@ -681,13 +681,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         groupX,
         groupWidth,
         previous: previous[i],
-        actual: currentValue,
+        current: currentValue,
         previousX,
-        previousY: yDe(previous[i]),
-        previousPath: roundedBar(previousX, yDe(previous[i]), width, down),
-        xActual,
-        yActual: yDe(currentValue ?? 0),
-        dActual: roundedBar(xActual, yDe(currentValue ?? 0), width, down),
+        previousY: yOf(previous[i]),
+        previousPath: roundedBar(previousX, yOf(previous[i]), width, down),
+        currentX,
+        currentY: yOf(currentValue ?? 0),
+        currentPath: roundedBar(currentX, yOf(currentValue ?? 0), width, down),
         barWidth: width,
       };
     });

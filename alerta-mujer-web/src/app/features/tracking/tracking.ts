@@ -22,7 +22,7 @@ export const QUICK_REPLIES = [
 ];
 
 const START_COLOR = '#7c3aed';
-const COLOR_ACTUAL = '#d946ef';
+const CURRENT_COLOR = '#d946ef';
 
 /** Distancia en km entre dos puntos (Haversine). */
 function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
@@ -115,7 +115,7 @@ export class TrackingComponent implements OnInit {
   readonly routeList = computed(() => {
     const r = this.data()?.route ?? [];
     return r
-      .map((p, i) => ({ ...p, number: i + 1, esActual: i === r.length - 1 }))
+      .map((p, i) => ({ ...p, number: i + 1, isCurrent: i === r.length - 1 }))
       .reverse()
       .slice(0, 20);
   });
@@ -267,7 +267,7 @@ export class TrackingComponent implements OnInit {
 
   private addMessages(newOnes: AlertMessage[]): void {
     const ids = new Set(this.messages().map((m) => m.id));
-    this.messages.update((actuales) => [...actuales, ...newOnes.filter((m) => !ids.has(m.id))]);
+    this.messages.update((currentOnes) => [...currentOnes, ...newOnes.filter((m) => !ids.has(m.id))]);
     setTimeout(() => document.getElementById('chat-lista')?.scrollTo({ top: 1e6, behavior: 'smooth' }));
   }
 
@@ -334,7 +334,7 @@ export class TrackingComponent implements OnInit {
     const u = puntos[puntos.length - 1];
     const precision = d.route[d.route.length - 1].precision;
     if (precision && precision > 0) {
-      L.circle(u, { radius: precision, color: COLOR_ACTUAL, weight: 1, fillOpacity: 0.12 }).addTo(this.layer!);
+      L.circle(u, { radius: precision, color: CURRENT_COLOR, weight: 1, fillOpacity: 0.12 }).addTo(this.layer!);
     }
     d.route.forEach((p, i) => {
       const isLast = i === d.route.length - 1;

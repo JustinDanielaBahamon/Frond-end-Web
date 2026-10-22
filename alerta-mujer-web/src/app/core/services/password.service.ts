@@ -9,8 +9,8 @@ export class PasswordService {
   private http = inject(HttpClient);
   private api = environment.apiUrl;
 
-  change(actual: string, newOne: string): Observable<void> {
-    return this.http.put<void>(`${this.api}/api/users/me/password`, { currentPassword: actual, newPassword: newOne });
+  change(current: string, newOne: string): Observable<void> {
+    return this.http.put<void>(`${this.api}/api/users/me/password`, { currentPassword: current, newPassword: newOne });
   }
 
   requestCode(email: string): Observable<{ message: string }> {

@@ -89,9 +89,9 @@ export class ZonesService {
   private apiUrl = environment.apiUrl;
 
   // Última versión de cada zona según el backend, para no perder campos al editar.
-  private originales = new Map<string, ZoneApi>();
+  private originals = new Map<string, ZoneApi>();
 
-  private remember = (z: ZoneApi) => { this.originales.set(String(z.id), z); };
+  private remember = (z: ZoneApi) => { this.originals.set(String(z.id), z); };
 
   getAll(): Observable<Zone[]> {
     return this.http.get<ZoneApi[]>(`${this.apiUrl}/api/zones`).pipe(
@@ -108,7 +108,7 @@ export class ZonesService {
   }
 
   update(id: string, changes: Partial<Omit<Zone, 'id'>>): Observable<Zone> {
-    return this.http.put<ZoneApi>(`${this.apiUrl}/api/zones/${id}`, toApi(changes, this.originales.get(id))).pipe(
+    return this.http.put<ZoneApi>(`${this.apiUrl}/api/zones/${id}`, toApi(changes, this.originals.get(id))).pipe(
       tap(this.remember),
       map(fromApi),
     );
@@ -116,7 +116,7 @@ export class ZonesService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/api/zones/${id}`).pipe(
-      tap(() => this.originales.delete(id)),
+      tap(() => this.originals.delete(id)),
     );
   }
 }

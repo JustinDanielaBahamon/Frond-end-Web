@@ -41,7 +41,7 @@ export class AdminProfileComponent implements AfterViewInit {
   readonly isDark = computed(() => this.theme() === 'dark');
 
   data = { firstName: '', lastName: '', telephone: '' };
-  password = { actual: '', newOne: '', confirm: '' };
+  password = { current: '', newOne: '', confirm: '' };
   readonly loadingData = signal(true);
   readonly savingData = signal(false);
   readonly savingPassword = signal(false);
@@ -117,8 +117,8 @@ export class AdminProfileComponent implements AfterViewInit {
   }
 
   changePassword(): void {
-    const { actual, newOne, confirm } = this.password;
-    if (!actual || !newOne) {
+    const { current, newOne, confirm } = this.password;
+    if (!current || !newOne) {
       this.notify('Completa la contraseña actual y la nueva', true);
       return;
     }
@@ -131,10 +131,10 @@ export class AdminProfileComponent implements AfterViewInit {
       return;
     }
     this.savingPassword.set(true);
-    this.settingsService.changePassword(actual, newOne).subscribe({
+    this.settingsService.changePassword(current, newOne).subscribe({
       next: () => {
         this.savingPassword.set(false);
-        this.password = { actual: '', newOne: '', confirm: '' };
+        this.password = { current: '', newOne: '', confirm: '' };
         this.notify('Contraseña actualizada');
         this.loadActivity();
       },

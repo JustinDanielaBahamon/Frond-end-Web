@@ -147,12 +147,12 @@
           </h2>
           <ol class="linea-tiempo">
             @for (p of routeList(); track p.number) {
-              <li class="linea-tiempo__item" [class.linea-tiempo__item--actual]="p.esActual">
+              <li class="linea-tiempo__item" [class.linea-tiempo__item--actual]="p.isCurrent">
                 <span class="linea-tiempo__nodo">{{ p.number }}</span>
                 <div>
                   <p class="linea-tiempo__hora">
                     {{ p.time | date: 'h:mm:ss a' }}
-                    @if (p.esActual) { <span class="etiqueta-reciente">Reciente</span> }
+                    @if (p.isCurrent) { <span class="etiqueta-reciente">Reciente</span> }
                   </p>
                   @if (pointPlaces()[keyOf(p)]) {
                     <p class="linea-tiempo__lugar"><i class="ti ti-map-pin" aria-hidden="true"></i> {{ pointPlaces()[keyOf(p)] }}</p>

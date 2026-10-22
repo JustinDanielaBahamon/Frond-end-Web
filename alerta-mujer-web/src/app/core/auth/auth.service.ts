@@ -167,11 +167,11 @@ export class AuthService {
 
   /** Actualiza los datos de la usuaria en sesión (p. ej. tras editar su nombre) sin tocar el token. */
   updateCurrentUser(changes: Partial<User>): void {
-    const actual = this._currentUser$.value;
+    const current = this._currentUser$.value;
     const token = this._token$.value;
-    if (!actual || !token) return;
-    const user: User = { ...actual, ...changes };
-    user.nombre = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || actual.nombre;
+    if (!current || !token) return;
+    const user: User = { ...current, ...changes };
+    user.nombre = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || current.nombre;
     this.saveSession(user, token);
     this._currentUser$.next(user);
   }

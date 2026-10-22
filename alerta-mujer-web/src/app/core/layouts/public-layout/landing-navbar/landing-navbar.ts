@@ -14,7 +14,7 @@ export class LandingNavbarComponent {
   menuOpened = false;
   menuOpendSession = false;
   languageMenuOpen = false;
-  idiomActual = 'ES';
+  currentLanguage = 'ES';
   menuMobileOpen = false;
   languageMenuOpenMobile = false;
 
@@ -36,7 +36,7 @@ export class LandingNavbarComponent {
   }
 
   changeIdiom(idiom: string) {
-    this.idiomActual = idiom;
+    this.currentLanguage = idiom;
     this.languageMenuOpen = false;
   }
 

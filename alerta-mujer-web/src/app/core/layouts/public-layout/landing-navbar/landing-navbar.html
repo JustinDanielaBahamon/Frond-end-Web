@@ -48,20 +48,20 @@
                 class="language-btn"
                 (click)="toggleIdiomsMenu()">
 
-                @if (idiomActual === 'ES') {
+                @if (currentLanguage === 'ES') {
                     <img src="https://flagcdn.com/es.svg" class="flag-nav" alt="">
                 }
 
-                @if (idiomActual === 'EN') {
+                @if (currentLanguage === 'EN') {
                     <img src="https://flagcdn.com/us.svg" class="flag-nav" alt="">
                 }
 
-                @if (idiomActual === 'FR') {
+                @if (currentLanguage === 'FR') {
                     <img src="https://flagcdn.com/fr.svg" class="flag-nav" alt="">
                 }
 
                 <span>
-                    {{ idiomActual }}
+                    {{ currentLanguage }}
                     <i class="fa-solid fa-caret-down"></i>
                 </span>
 

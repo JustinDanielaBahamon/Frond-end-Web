@@ -25,7 +25,7 @@ const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 // Velocidad a pie usada por el móvil para estimar el tiempo
 const SPEED_KMH = 5;
 // Un color por recorrido (máximo 4)
-const COLORES = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
+const COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 @Component({
   selector: 'app-guardar-recorrido',
@@ -242,7 +242,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   colorDe(r: SavedRoute, list = this.routes()): string {
     const i = list.findIndex((x) => x.id === r.id);
-    return COLORES[(i < 0 ? 0 : i) % COLORES.length];
+    return COLORS[(i < 0 ? 0 : i) % COLORS.length];
   }
 
   // ── Selección de puntos ────────────────────────

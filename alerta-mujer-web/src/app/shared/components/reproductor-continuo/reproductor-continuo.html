@@ -1,4 +1,4 @@
-@if (actual(); as part) {
+@if (current(); as part) {
   <div class="rc" [class.rc--audio]="tipo === 'audio'">
     @if (tipo === 'video') {
       <video #method [src]="part.url" controls playsinline preload="metadata"

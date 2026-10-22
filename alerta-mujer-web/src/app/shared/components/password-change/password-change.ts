@@ -15,7 +15,7 @@ export class PasswordChangeComponent {
   private service = inject(PasswordService);
   readonly close = output<void>();
 
-  actual = signal('');
+  current = signal('');
   newOne = signal('');
   confirm = signal('');
   show = signal({ current: false, newPassword: false, confirm: false });
@@ -26,7 +26,7 @@ export class PasswordChangeComponent {
   readonly evaluation = computed(() => evaluatePassword(this.newOne()));
   readonly match = computed(() => this.confirm().length > 0 && this.confirm() === this.newOne());
   readonly canSave = computed(
-    () => !!this.actual() && this.evaluation().valid && this.match() && this.newOne() !== this.actual() && !this.sending(),
+    () => !!this.current() && this.evaluation().valid && this.match() && this.newOne() !== this.current() && !this.sending(),
   );
 
   toggle(field: 'current' | 'newPassword' | 'confirm'): void {
@@ -37,7 +37,7 @@ export class PasswordChangeComponent {
     if (!this.canSave()) return;
     this.sending.set(true);
     this.error.set(null);
-    this.service.change(this.actual(), this.newOne()).subscribe({
+    this.service.change(this.current(), this.newOne()).subscribe({
       next: () => {
         this.sending.set(false);
         this.ready.set(true);

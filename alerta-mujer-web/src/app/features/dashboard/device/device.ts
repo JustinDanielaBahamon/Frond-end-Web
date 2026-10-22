@@ -262,8 +262,8 @@ export class Device implements OnInit, OnDestroy {
     this.geocoding.get(entry.lat, entry.lng).then((place) => {
       const text = place ? [place.neighborhood, place.address].filter(Boolean).join(' · ') || place.city : null;
       this.lastAddress = text ?? `${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}`;
-      const actual = this.criticalFeatures();
-      if (actual) this.criticalFeatures.set({ ...actual, lastLocationCaptured: this.formatLocation(entry) });
+      const current = this.criticalFeatures();
+      if (current) this.criticalFeatures.set({ ...current, lastLocationCaptured: this.formatLocation(entry) });
     });
   }
 
@@ -511,17 +511,17 @@ export class Device implements OnInit, OnDestroy {
     fetch(`${environment.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(90000) })
       .then(response => {
         const duration = Date.now() - startTime;
-        const segundos = (duration / 1000).toFixed(1);
+        const seconds = (duration / 1000).toFixed(1);
         if (response.ok) {
           this.showResult({
             title: 'Conexión correcta',
             subtitle: 'El servidor de AlertaMujer responde',
             icon: 'ti-wifi',
             tone: 'ok',
-            rows: [{ label: 'Tiempo de respuesta', value: `${segundos} s` }],
+            rows: [{ label: 'Tiempo de respuesta', value: `${seconds} s` }],
             nota: duration > 10000 ? 'El servidor estaba en reposo y tardó en despertar.' : undefined,
           });
-          this.addActivityLog('success', `Conexión con el servidor correcta (${segundos} s)`);
+          this.addActivityLog('success', `Conexión con el servidor correcta (${seconds} s)`);
         } else {
           this.showResult({
             title: 'El servidor tiene un problema',

@@ -35,7 +35,7 @@ describe('AdminDashboardComponent · tendencia por mes', () => {
 
     expect(c.monthTrend).toBe('octubre');
     expect(c.trendBars.map(b => b.day)).toEqual(['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5']);
-    expect(c.trendBars.map(b => b.actual)).toEqual([2, 0, 1, null, null]);
+    expect(c.trendBars.map(b => b.current)).toEqual([2, 0, 1, null, null]);
     expect(c.trendBars.map(b => b.previous)).toEqual([0, 1, 0, 1, 0]);
     expect(c.trendBars[2].isToday).toBe(true);
     expect(c.currentTrendTotal).toBe(3);

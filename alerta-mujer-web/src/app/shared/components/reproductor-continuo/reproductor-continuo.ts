@@ -32,7 +32,7 @@ export class ContinuousPlayerComponent implements OnChanges {
   readonly durations = signal<Record<number, number>>({});
   private playing = false;
 
-  readonly actual = computed(() => this.parts[this.index()] ?? null);
+  readonly current = computed(() => this.parts[this.index()] ?? null);
   readonly totalDuration = computed(() => {
     const d = this.durations();
     const known = this.parts.filter((p) => d[p.id] != null);
@@ -45,9 +45,9 @@ export class ContinuousPlayerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     // El seguimiento se refresca cada pocos segundos y puede traer partes nuevas: si la que suena
     // sigue en la lista, se continúa con ella sin reiniciar el reproductor
-    const anteriores: RecordingPart[] = changes['partes']?.previousValue ?? [];
-    const idActual = anteriores[this.index()]?.id;
-    const samePart = idActual != null ? this.parts.findIndex((p) => p.id === idActual) : -1;
+    const previousOnes: RecordingPart[] = changes['partes']?.previousValue ?? [];
+    const currentId = previousOnes[this.index()]?.id;
+    const samePart = currentId != null ? this.parts.findIndex((p) => p.id === currentId) : -1;
     if (samePart >= 0 && !changes['tipo']) {
       this.index.set(samePart);
       return;
@@ -60,7 +60,7 @@ export class ContinuousPlayerComponent implements OnChanges {
 
   onLoad(): void {
     const el = this.method?.nativeElement;
-    const part = this.actual();
+    const part = this.current();
     if (el && part && Number.isFinite(el.duration)) {
       this.durations.update((d) => ({ ...d, [part.id]: el.duration }));
     }
@@ -104,9 +104,9 @@ export class ContinuousPlayerComponent implements OnChanges {
     return Math.round(this.progress() * 100);
   }
 
-  minutos(segundos: number): string {
-    const m = Math.floor(segundos / 60);
-    const s = Math.round(segundos % 60);
+  minutos(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60);
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 }

@@ -21,13 +21,13 @@ type GpsStatus = 'buscando' | 'activo' | 'denegado' | 'no-disponible';
 /** Capas que la usuaria puede prender/apagar (se recuerdan en este navegador). */
 interface Layers {
   routes: boolean;
-  soloImportantes: boolean;
+  onlyImportant: boolean;
   locations: boolean;
   zones: boolean;
 }
 
 const LAYERS_KEY = 'alerta_mujer_capas_mapa';
-const DEFAULT_LAYERS: Layers = { routes: true, soloImportantes: false, locations: true, zones: true };
+const DEFAULT_LAYERS: Layers = { routes: true, onlyImportant: false, locations: true, zones: true };
 // Neiva (Huila): mismo centro por defecto que la app móvil
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 const ROUTE_COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
@@ -133,7 +133,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   routesOnMap = computed(() => {
     const c = this.layers();
     if (!c.routes) return [];
-    return c.soloImportantes ? this.starredCount() : this.routes();
+    return c.onlyImportant ? this.starredCount() : this.routes();
   });
 
   currentZone = computed(() => {
@@ -185,7 +185,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.layers.update((c) => {
       const newOne = { ...c, [layer]: !c[layer] };
       // "Solo importantes" depende de que los recorridos estén visibles
-      if (layer === 'routes' && !newOne.routes) newOne.soloImportantes = false;
+      if (layer === 'routes' && !newOne.routes) newOne.onlyImportant = false;
       return newOne;
     });
     try {
@@ -404,11 +404,11 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private drawLocations(): void {
-    const visibles = this.layers().locations;
+    const visible = this.layers().locations;
     const places = this.locations();
     if (!this.map) return;
     this.locationsLayer.clearLayers();
-    if (!visibles) return;
+    if (!visible) return;
 
     for (const l of places) {
       if (!Number.isFinite(l.lat) || !Number.isFinite(l.lng)) continue;
@@ -423,11 +423,11 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private drawZones(): void {
-    const visibles = this.layers().zones;
+    const visible = this.layers().zones;
     const zones = this.zones();
     if (!this.map) return;
     this.zonesLayer.clearLayers();
-    if (!visibles) return;
+    if (!visible) return;
 
     for (const z of zones) {
       if (!Number.isFinite(z.lat) || !Number.isFinite(z.lng)) continue;

@@ -191,7 +191,7 @@ export class Evidence implements OnInit, OnDestroy {
     this.filter.set('todas');
     this.closeEdit();
     const first = this.filtered()[0];
-    if (first) this.ver(first);
+    if (first) this.show(first);
     else {
       this.selected.set(null);
       this.urlVisor.set(null);
@@ -226,7 +226,7 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   /** Descarga todas las partes de un tipo y las muestra en el reproductor continuo. */
-  verContinua(tipo: 'video' | 'audio'): void {
+  showContinuous(tipo: 'video' | 'audio'): void {
     const parts = this.ofTheAlert()
       .filter((e) => e.tipo === tipo && e.hasFile)
       .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
@@ -255,7 +255,7 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   // ── Visor ──────────────────────────────────────
-  ver(e: MyEvidence): void {
+  show(e: MyEvidence): void {
     this.continua.set(null);
     this.selected.set(e);
     this.closeEdit();
@@ -305,7 +305,7 @@ export class Evidence implements OnInit, OnDestroy {
           this.selected.set(null);
           this.urlVisor.set(null);
           const next = this.filtered()[0];
-          if (next) this.ver(next);
+          if (next) this.show(next);
         }
         this.showNotice('Evidencia eliminada.');
       },
@@ -455,7 +455,7 @@ export class Evidence implements OnInit, OnDestroy {
           this.progress.set(null);
           this.uploadVisible.set(false);
           this.filter.set('todas');
-          this.ver(newOne);
+          this.show(newOne);
           this.showNotice('Evidencia subida y protegida con su huella SHA-256.');
         }
       },

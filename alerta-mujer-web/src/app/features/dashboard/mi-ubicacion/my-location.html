@@ -139,8 +139,8 @@
             <span class="mu-switch-title">Solo importantes</span>
             <span class="mu-switch-sub">{{ starredCount().length }}/{{ MAX_STARRED }} importantes</span>
           </span>
-          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().soloImportantes"
-                 [disabled]="!layers().routes" (change)="toggleLayer('soloImportantes')" />
+          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().onlyImportant"
+                 [disabled]="!layers().routes" (change)="toggleLayer('onlyImportant')" />
         </label>
 
         <label class="mu-switch-row">

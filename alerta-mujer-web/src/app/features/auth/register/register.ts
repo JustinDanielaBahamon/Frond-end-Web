@@ -62,7 +62,7 @@ export class RegisterComponent {
   });
 
   /* ═══════════ ESTADO DE LA PANTALLA ═══════════ */
-  verPassword      = signal(false);
+  showPassword      = signal(false);
   showConfirm     = signal(false);
   attempted        = signal(false);   // true cuando ya presionó "Continuar"
   loading         = signal(false);
@@ -119,11 +119,11 @@ export class RegisterComponent {
 
   /* Texto del error de este campo */
   message(field: string): string {
-    const errores = this.form.get(field)?.errors;
-    if (!errores) return '';
-    const key = Object.keys(errores)[0];
+    const errors = this.form.get(field)?.errors;
+    if (!errors) return '';
+    const key = Object.keys(errors)[0];
     // Los avisos del servidor (dato ya registrado) traen su propio texto
-    if (typeof errores[key] === 'string') return errores[key];
+    if (typeof errors[key] === 'string') return errors[key];
     return this.messages[field]?.[key] ?? '';
   }
 
@@ -253,14 +253,14 @@ export class RegisterComponent {
 
   /* Datos que ya usa otra cuenta: el aviso queda debajo de su campo hasta que se edite */
   private markRepeated(campos: Record<string, string>): boolean {
-    const controles: Record<string, AbstractControl> = {
+    const controls: Record<string, AbstractControl> = {
       email: this.form.controls.email,
       telefono: this.form.controls.telefono,
       numeroDocumento: this.form.controls.numeroDocumento,
     };
     let checked = 0;
     for (const [field, notice] of Object.entries(campos)) {
-      const control = controles[field];
+      const control = controls[field];
       if (!control) continue;
       control.setErrors({ repetido: notice });
       control.markAsTouched();

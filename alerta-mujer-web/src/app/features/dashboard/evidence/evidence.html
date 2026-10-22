@@ -123,12 +123,12 @@
                 </span>
                 <span class="ev-continua-botones">
                   @if (count().video > 1) {
-                    <button class="ev-btn ev-btn--primary" [disabled]="loadingContinuous()" (click)="verContinua('video')">
+                    <button class="ev-btn ev-btn--primary" [disabled]="loadingContinuous()" (click)="showContinuous('video')">
                       Ver video completo ({{ count().video }} partes)
                     </button>
                   }
                   @if (count().audio > 1) {
-                    <button class="ev-btn ev-btn--ghost" [disabled]="loadingContinuous()" (click)="verContinua('audio')">
+                    <button class="ev-btn ev-btn--ghost" [disabled]="loadingContinuous()" (click)="showContinuous('audio')">
                       Escuchar audio completo ({{ count().audio }} partes)
                     </button>
                   }
@@ -138,7 +138,7 @@
 
             <div class="ev-tiles">
               @for (e of filtered(); track e.id) {
-                <button class="ev-tile" [class.ev-tile--selected]="selected()?.id === e.id" (click)="ver(e)" [title]="e.fileName">
+                <button class="ev-tile" [class.ev-tile--selected]="selected()?.id === e.id" (click)="show(e)" [title]="e.fileName">
                   <span class="ev-thumb ev-thumb--{{ e.tipo }}">
                     @if (thumbnail(e); as src) {
                       <img [src]="src" alt="" />

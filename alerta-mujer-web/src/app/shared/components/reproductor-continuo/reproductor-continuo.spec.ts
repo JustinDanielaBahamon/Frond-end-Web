@@ -27,17 +27,17 @@ describe('ReproductorContinuoComponent', () => {
 
   it('si llegan partes nuevas mientras suena una, sigue con la misma', () => {
     c.irA(1);
-    const anteriores = c.parts;
+    const previousOnes = c.parts;
     c.parts = [part(1), part(2), part(3), part(4)];
-    c.ngOnChanges({ partes: new SimpleChange(anteriores, c.parts, false) });
+    c.ngOnChanges({ partes: new SimpleChange(previousOnes, c.parts, false) });
     expect(c.index()).toBe(1);
   });
 
   it('con otra grabación vuelve al inicio', () => {
     c.irA(2);
-    const anteriores = c.parts;
+    const previousOnes = c.parts;
     c.parts = [part(7), part(8)];
-    c.ngOnChanges({ partes: new SimpleChange(anteriores, c.parts, false) });
+    c.ngOnChanges({ partes: new SimpleChange(previousOnes, c.parts, false) });
     expect(c.index()).toBe(0);
   });
 

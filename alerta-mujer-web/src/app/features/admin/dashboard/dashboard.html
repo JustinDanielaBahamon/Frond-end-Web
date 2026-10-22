@@ -271,15 +271,15 @@
           }
           @for (b of trendBars; track b.day) {
             <g class="trend-dia" [class.trend-dia--hoy]="b.isToday">
-              <title>{{ b.longDay }}: {{ b.actual === null ? 'aún no llega' : b.actual + (trendView === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previous }} {{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
+              <title>{{ b.longDay }}: {{ b.current === null ? 'aún no llega' : b.current + (trendView === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previous }} {{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
               <rect class="trend-hit" [attr.x]="b.groupX" y="20" [attr.width]="b.groupWidth" height="170" />
               @if (b.previous > 0) {
                 <path class="trend-bar trend-bar--previa" [attr.d]="b.previousPath" />
                 <text class="trend-valor" [attr.x]="b.previousX + b.barWidth / 2" [attr.y]="b.previousY - 6" text-anchor="middle">{{ b.previous }}</text>
               }
-              @if (b.actual) {
-                <path class="trend-bar" [attr.d]="b.dActual" />
-                <text class="trend-valor trend-valor--actual" [attr.x]="b.xActual + b.barWidth / 2" [attr.y]="b.yActual - 6" text-anchor="middle">{{ b.actual }}</text>
+              @if (b.current) {
+                <path class="trend-bar" [attr.d]="b.currentPath" />
+                <text class="trend-valor trend-valor--actual" [attr.x]="b.currentX + b.barWidth / 2" [attr.y]="b.currentY - 6" text-anchor="middle">{{ b.current }}</text>
               }
               <text class="axis-text" [class.axis-text--hoy]="b.isToday" [attr.x]="b.groupX + b.groupWidth / 2" y="210" text-anchor="middle">{{ b.isToday ? (trendView === 'mes' ? 'Esta sem.' : 'Hoy') : b.day }}</text>
             </g>

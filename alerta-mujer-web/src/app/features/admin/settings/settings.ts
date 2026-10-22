@@ -87,13 +87,13 @@ export class AdminSettingsComponent {
   /** Muestra los cambios (antes → después) y pide confirmarlos: afectan a todas las usuarias. */
   checkChanges(): void {
     this.settingsError.set('');
-    const actual = this.settings();
-    if (!actual) return;
+    const current = this.settings();
+    if (!current) return;
     const newOne = this.normalized();
     const value = (v: string | number) => (v === '' ? '(sin definir)' : String(v));
     const changes = (Object.keys(LABELS) as (keyof SettingsForm)[])
-      .filter((k) => String(actual[k]) !== String(newOne[k]))
-      .map((k) => ({ field: LABELS[k], before: value(actual[k]), after: value(newOne[k]) }));
+      .filter((k) => String(current[k]) !== String(newOne[k]))
+      .map((k) => ({ field: LABELS[k], before: value(current[k]), after: value(newOne[k]) }));
     if (changes.length === 0) {
       this.notify('No hay cambios para guardar');
       return;

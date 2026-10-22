@@ -30,12 +30,12 @@
               type="text"
               formControlName="name"
               class="field__input"
-              [class.is-invalid]="invalid('nombre')"
+              [class.is-invalid]="invalid('name')"
               placeholder="Nombre completo"
               autocomplete="name">
           </div>
-          @if (invalid('nombre')) {
-            <p class="field__error">{{ message('nombre') }}</p>
+          @if (invalid('name')) {
+            <p class="field__error">{{ message('name') }}</p>
           }
         </div>
 
@@ -49,12 +49,12 @@
                 type="tel"
                 formControlName="telephone"
                 class="field__input"
-                [class.is-invalid]="invalid('telefono')"
+                [class.is-invalid]="invalid('telephone')"
                 placeholder="Teléfono"
                 autocomplete="tel">
             </div>
-            @if (invalid('telefono')) {
-              <p class="field__error">{{ message('telefono') }}</p>
+            @if (invalid('telephone')) {
+              <p class="field__error">{{ message('telephone') }}</p>
             }
           </div>
 
@@ -65,15 +65,15 @@
                 type="text"
                 formControlName="birthDate"
                 class="field__input"
-                [class.is-invalid]="invalid('fechaNacimiento')"
+                [class.is-invalid]="invalid('birthDate')"
                 placeholder="DD/MM/AAAA"
                 maxlength="10"
                 inputmode="numeric"
                 autocomplete="bday"
                 (input)="onDateInput($event)">
             </div>
-            @if (invalid('fechaNacimiento')) {
-              <p class="field__error">{{ message('fechaNacimiento') }}</p>
+            @if (invalid('birthDate')) {
+              <p class="field__error">{{ message('birthDate') }}</p>
             }
           </div>
 
@@ -89,7 +89,7 @@
                 formControlName="documentType"
                 class="field__input field__input--select"
                 [class.is-empty]="!form.controls.documentType.value"
-                [class.is-invalid]="invalid('tipoDocumento')">
+                [class.is-invalid]="invalid('documentType')">
                 <option value="" disabled>Tipo de documento</option>
                 @for (type of documentTypes; track type) {
                   <option [value]="type">{{ type }}</option>
@@ -97,8 +97,8 @@
               </select>
               <span class="field__chevron"><i class="fa-solid fa-chevron-down"></i></span>
             </div>
-            @if (invalid('tipoDocumento')) {
-              <p class="field__error">{{ message('tipoDocumento') }}</p>
+            @if (invalid('documentType')) {
+              <p class="field__error">{{ message('documentType') }}</p>
             }
           </div>
 
@@ -109,11 +109,11 @@
                 type="text"
                 formControlName="documentNumber"
                 class="field__input"
-                [class.is-invalid]="invalid('numeroDocumento')"
+                [class.is-invalid]="invalid('documentNumber')"
                 placeholder="Número de documento">
             </div>
-            @if (invalid('numeroDocumento')) {
-              <p class="field__error">{{ message('numeroDocumento') }}</p>
+            @if (invalid('documentNumber')) {
+              <p class="field__error">{{ message('documentNumber') }}</p>
             }
           </div>
 
@@ -127,12 +127,12 @@
               type="email"
               formControlName="email"
               class="field__input"
-              [class.is-invalid]="invalid('correo')"
+              [class.is-invalid]="invalid('email')"
               placeholder="Correo electrónico"
               autocomplete="email">
           </div>
-          @if (invalid('correo')) {
-            <p class="field__error">{{ message('correo') }}</p>
+          @if (invalid('email')) {
+            <p class="field__error">{{ message('email') }}</p>
           }
         </div>
 
@@ -169,7 +169,7 @@
                 [type]="showConfirm() ? 'text' : 'password'"
                 formControlName="confirmPassword"
                 class="field__input"
-                [class.is-invalid]="invalid('confirmarPassword')"
+                [class.is-invalid]="invalid('confirmPassword')"
                 placeholder="Confirmar contraseña"
                 autocomplete="new-password">
               <button
@@ -180,8 +180,8 @@
                 <i [class]="showConfirm() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
               </button>
             </div>
-            @if (invalid('confirmarPassword')) {
-              <p class="field__error">{{ message('confirmarPassword') }}</p>
+            @if (invalid('confirmPassword')) {
+              <p class="field__error">{{ message('confirmPassword') }}</p>
             }
           </div>
 

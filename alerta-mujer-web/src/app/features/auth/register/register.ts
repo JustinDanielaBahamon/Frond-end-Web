@@ -23,13 +23,13 @@ const required: ValidatorFn = (control: AbstractControl): ValidationErrors | nul
 /* The email must contain "@" (if empty, "required" catches it) */
 const containsAt: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = String(control.value ?? '');
-  return !value || value.includes('@') ? null : { sinArroba: true };
+  return !value || value.includes('@') ? null : { missingAt: true };
 };
 
 /* The confirmation must match the password */
-const coincideConPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+const matchesPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.parent?.get('password')?.value ?? '';
-  return control.value === password ? null : { noCoincide: true };
+  return control.value === password ? null : { mismatch: true };
 };
 
 @Component({
@@ -58,7 +58,7 @@ export class RegisterComponent {
     birthDate:   ['', [Validators.required, Validators.minLength(10)]],
     email:            ['', [Validators.required, containsAt]],
     password:          ['', [Validators.required, Validators.minLength(8)]],
-    confirmPassword: ['', [coincideConPassword]],
+    confirmPassword: ['', [matchesPassword]],
   });
 
   /* ═══════════ SCREEN STATE ═══════════ */
@@ -76,23 +76,23 @@ export class RegisterComponent {
 
   /* Error messages of each field */
   private readonly messages: Record<string, Record<string, string>> = {
-    nombre:            { required: 'El nombre es obligatorio' },
-    telefono:          { required: 'El teléfono es obligatorio' },
-    tipoDocumento:     { required: 'El tipo de documento es obligatorio' },
-    numeroDocumento:   { required: 'El número de documento es obligatorio' },
-    fechaNacimiento:   {
+    name:            { required: 'El nombre es obligatorio' },
+    telephone:       { required: 'El teléfono es obligatorio' },
+    documentType:    { required: 'El tipo de documento es obligatorio' },
+    documentNumber:  { required: 'El número de documento es obligatorio' },
+    birthDate:       {
       required: 'La fecha de nacimiento es obligatoria',
       minlength: 'Ingresa una fecha completa DD/MM/AAAA'
     },
-    correo:            {
+    email:           {
       required: 'El correo es obligatorio',
-      sinArroba: 'Correo inválido'
+      missingAt: 'Correo inválido'
     },
     password:          {
       required: 'La contraseña es obligatoria',
       minlength: 'Mínimo 8 caracteres'
     },
-    confirmarPassword: { noCoincide: 'Las contraseñas no coinciden' },
+    confirmPassword: { mismatch: 'Las contraseñas no coinciden' },
   };
 
   constructor() {
@@ -229,7 +229,7 @@ export class RegisterComponent {
     this.loading.set(true);
     const v = this.form.getRawValue();
 
-    this.auth.registrar({
+    this.auth.register({
       name: v.name,
       telephone: v.telephone,
       documentType: v.documentType,
@@ -245,26 +245,26 @@ export class RegisterComponent {
         this.draft.clear();
         setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       },
-      error: (e: { campos?: Record<string, string> }) => {
+      error: (e: { fields?: Record<string, string> }) => {
         this.loading.set(false);
-        if (e.campos && this.markRepeated(e.campos)) return;
+        if (e.fields && this.markRepeated(e.fields)) return;
         this.serverError.set('No se pudo completar el registro. Intenta de nuevo.');
       }
     });
   }
 
   /* Data already used by another account: the notice stays under its field until it is edited */
-  private markRepeated(campos: Record<string, string>): boolean {
+  private markRepeated(fields: Record<string, string>): boolean {
     const controls: Record<string, AbstractControl> = {
       email: this.form.controls.email,
-      telefono: this.form.controls.telephone,
-      numeroDocumento: this.form.controls.documentNumber,
+      telephone: this.form.controls.telephone,
+      documentNumber: this.form.controls.documentNumber,
     };
     let checked = 0;
-    for (const [field, notice] of Object.entries(campos)) {
+    for (const [field, notice] of Object.entries(fields)) {
       const control = controls[field];
       if (!control) continue;
-      control.setErrors({ repetido: notice });
+      control.setErrors({ duplicate: notice });
       control.markAsTouched();
       checked++;
     }

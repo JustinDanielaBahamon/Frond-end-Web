@@ -133,13 +133,6 @@ export class EvidenceService {
   }
 
   /**
-   * Usado por USUARIA: solo sus propias evidencias
-   */
-  getByUsuario(usuarioId: number): Observable<Evidencia[]> {
-    return this.http.get<Evidencia[]>(`${this.url}/user/${usuarioId}`);
-  }
-
-  /**
    * Crear nueva evidencia
    */
   create(evidencia: Omit<Evidencia, 'id'>): Observable<Evidencia> {

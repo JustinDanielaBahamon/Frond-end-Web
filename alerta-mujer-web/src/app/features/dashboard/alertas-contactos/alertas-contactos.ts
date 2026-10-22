@@ -27,7 +27,8 @@ export class AlertasContactosComponent implements OnInit {
     this.abriendo.set(id);
     try {
       const codigo = await this.servicio.codigoSeguimiento(id);
-      await this.router.navigate(['/seguimiento', codigo]);
+      // La marca deja volver al panel; quien llega desde el correo no la tiene
+      await this.router.navigate(['/seguimiento', codigo], { state: { desdePanel: true } });
     } catch {
       this.error.set('No se pudo abrir el seguimiento. Puede que la alerta ya haya terminado.');
     } finally {

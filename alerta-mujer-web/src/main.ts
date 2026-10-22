@@ -4,7 +4,7 @@ import { App } from './app/app';
 
 import { register } from 'swiper/element/bundle';
 
-// Registrar los componentes de Swiper
+// Register the Swiper components
 register();
 
 bootstrapApplication(App, appConfig)

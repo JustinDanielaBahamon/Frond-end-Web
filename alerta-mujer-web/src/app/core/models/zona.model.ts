@@ -17,12 +17,12 @@ export interface HotZone {
   level: 'Alto' | 'Medio' | 'Bajo';
 }
 
-/** Tipos de punto de apoyo: los mismos resource_type que acepta el backend (con ubicación). */
+/** Support point types: the same resource_type values the backend accepts (with location). */
 export type PointType =
   | 'police_post' | 'police_station' | 'hospital' | 'health_center'
   | 'ambulance' | 'fire_station' | 'support_organization';
 
-/** Capa del mapa en la que se muestra cada tipo. */
+/** Map layer in which each type is shown. */
 export type PointLayer = 'cais' | 'hospitals' | 'support';
 
 export const POINT_TYPES: Record<PointType, { label: string; emoji: string; background: string; layer: PointLayer }> = {

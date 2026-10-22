@@ -33,7 +33,7 @@ export class Settings implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly movement = inject(PhoneMovementService);
 
-  // --- Cuenta (conectar con el usuario autenticado real) ---
+  // --- Account (connect with the real authenticated user) ---
   readonly user = signal({
     name: '',
     email: '',
@@ -56,11 +56,11 @@ export class Settings implements OnInit {
     });
   }
 
-  // --- Apariencia: tema (global, vía ThemeService) ---
+  // --- Appearance: theme (global, through ThemeService) ---
   readonly theme = this.themeService.currentTheme; // 'light' | 'dark'
   readonly isDark = computed(() => this.theme() === 'dark');
 
-  // --- Apariencia: color de acento (global, vía AccentColorService) ---
+  // --- Appearance: accent color (global, through AccentColorService) ---
   readonly accentColors: AccentColor[] = [
     { name: 'Violeta', value: '#7c3aed' },
     { name: 'Índigo profundo', value: '#130253' },
@@ -78,7 +78,7 @@ export class Settings implements OnInit {
     { key: 'soundVibration', label: 'Sonidos y vibración', description: 'Vibración y sonido en alertas.', enabled: true }
   ]);
 
-  // --- Cambio de contraseña ---
+  // --- Password change ---
   readonly changingPassword = signal(false);
   readonly deletingAccount = signal(false);
 

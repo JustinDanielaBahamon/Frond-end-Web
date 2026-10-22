@@ -9,7 +9,7 @@ import { Zone, ZoneType, ZoneStatus } from '../../../core/models/zone-management
 import { Modal } from '../../../shared/components/modal/modal';
 import { compactPages } from '../../../shared/utils/paginacion';
 
-// Leaflet se carga por CDN en index.html (igual que en el módulo de Alertas)
+// Leaflet is loaded from a CDN in index.html (same as in the Alerts module)
 declare const L: any;
 
 interface FilterChip {
@@ -82,7 +82,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   private map: any = null;
   private zoneLayer: any = null;
 
-  private readonly initialCenter: [number, number] = [4.7110, -74.0721]; // Bogotá (igual que Alertas)
+  private readonly initialCenter: [number, number] = [4.7110, -74.0721]; // Bogotá (same as Alerts)
   private readonly cityCenters: Record<string, [number, number]> = {
     'neiva':        [2.9273, -75.2819],
     'bogota':       [4.7110, -74.0721],
@@ -91,13 +91,13 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     'barranquilla': [10.9685, -74.7813],
   };
 
-  // ── Estadísticas ─────────────────────────────────────────────
+  // ── Stats ─────────────────────────────────────────────
   get totalZones()       { return this.allZones.length; }
   get highRiskZones()  { return this.allZones.filter(z => z.type === 'Riesgo Alto').length; }
   get safeZones()     { return this.allZones.filter(z => z.type === 'Segura').length; }
   get zonesInReview()  { return this.allZones.filter(z => z.status === 'Revisión').length; }
 
-  // ── Texto de paginación ──────────────────────────────────────
+  // ── Pagination text ──────────────────────────────────────
   get from(): number {
     return this.totalFiltered === 0 ? 0 : (this.currentPage - 1) * this.perPage + 1;
   }
@@ -109,8 +109,8 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   // ── Formulario ───────────────────────────────────────────────
   get formValid(): boolean {
     const dataOk = this.form.name.trim().length > 0 && this.form.city.trim().length > 0;
-    // Al crear, la ubicación en el mapa es obligatoria. Al editar es opcional
-    // (las zonas antiguas todavía no tienen coordenadas).
+    // When creating, the location on the map is required. When editing it is optional
+    // (old zones do not have coordinates yet).
     const locationOk = this.modal === 'editar' || this.form.lat !== null;
     return dataOk && locationOk;
   }
@@ -150,7 +150,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Filtros y paginación ─────────────────────────────────────
+  // ── Filters and pagination ─────────────────────────────────────
   applyFilters(): void {
     let result = [...this.allZones];
 
@@ -219,7 +219,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     this.openModalWithMap(true);
   }
 
-  /** Desde el modal "ver" pasa directo a editar la misma zona */
+  /** From the "ver" modal it goes straight to editing the same zone */
   editFromView(): void {
     if (this.selectedZone) this.editZone(this.selectedZone);
   }
@@ -271,7 +271,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
       next: (created) => {
         this.allZones = [...this.allZones, created];
 
-        // Limpia filtros y salta a la última página para que la zona nueva se vea
+        // Clears the filters and jumps to the last page so the new zone is visible
         this.searchTerm = '';
         this.typeFilter = 'Todas';
         this.currentPage = Math.ceil(this.allZones.length / this.perPage) || 1;
@@ -308,7 +308,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   // ── Formulario: cambios de campos ────────────────────────────
   setType(type: ZoneType): void {
     this.form.type = type;
-    this.drawZone(); // cambia el color en el mapa
+    this.drawZone(); // changes the color on the map
   }
 
   setStatus(status: ZoneStatus): void {
@@ -320,7 +320,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     this.drawZone();
   }
 
-  /** Si todavía no hay punto marcado, centra el mapa en la ciudad escrita */
+  /** If no point is marked yet, centers the map on the typed city */
   onCityChange(): void {
     if (!this.map || this.formHasLocation) return;
     const center = this.cityCenters[this.normalize(this.form.city)];
@@ -333,7 +333,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
   // ── Mapa ─────────────────────────────────────────────────────
   private openModalWithMap(editable: boolean): void {
-    // Renderiza el modal ya mismo para que exista el contenedor del mapa
+    // Renders the modal right away so the map container exists
     this.cdr.detectChanges();
     this.mountMap(editable);
   }
@@ -345,7 +345,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
       console.warn('Leaflet no cargado — agrega el CDN en index.html');
       return;
     }
-    if (!this.modalMap) return; // p. ej. modal "ver" de una zona sin ubicación
+    if (!this.modalMap) return; // e.g. the "ver" modal of a zone without location
 
     const center = this.mapCenter();
 
@@ -369,7 +369,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
     this.drawZone();
 
-    // El modal acaba de aparecer: Leaflet necesita recalcular su tamaño
+    // The modal just appeared: Leaflet needs to recompute its size
     setTimeout(() => this.map?.invalidateSize(), 200);
   }
 
@@ -378,7 +378,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     return this.cityCenters[this.normalize(this.form.city)] ?? this.initialCenter;
   }
 
-  /** Pinta (o repinta) el círculo + centro de la zona del formulario */
+  /** Paints (or repaints) the circle + center of the form zone */
   private drawZone(): void {
     if (!this.map) return;
 
@@ -436,7 +436,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     };
   }
 
-  /** "Bogotá " → "bogota" (para buscar la ciudad sin tildes ni mayúsculas) */
+  /** "Bogotá " → "bogota" (to search the city without accents or capitals) */
   private normalize(text: string): string {
     return text.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
@@ -471,7 +471,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     return map[status] ?? '';
   }
 
-  // "Hace 2 horas", "Hace 1 día", etc. a partir de la fecha ISO
+  // "Hace 2 horas", "Hace 1 día", etc. from the ISO date
   relativeTime(iso: string): string {
     const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
 

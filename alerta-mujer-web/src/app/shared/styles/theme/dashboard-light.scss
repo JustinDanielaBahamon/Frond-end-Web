@@ -16,7 +16,7 @@ $light: 'html:not([data-theme=\"dark\"])';
 }
 #{$light} app-dashboard-layout {
 
-  /* Las pantallas que usan var(--border, ...) quedan más oscuras */
+  /* Screens that use var(--border, ...) become darker */
   --border: #9d8fd6;
 
   .layout__main {
@@ -53,7 +53,7 @@ $light: 'html:not([data-theme=\"dark\"])';
     /* ── Historial de alertas ───────────────────── */
     .ah-search { border-color: #9d8fd6 !important; }
 
-    /* ── Botones que usaban --purple-pale como borde ── */
+    /* ── Buttons that used --purple-pale as a border ── */
     .lf-add-btn,
     .mu-btn,
     .load-more-btn,

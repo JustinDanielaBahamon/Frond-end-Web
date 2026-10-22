@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-/** Parámetros globales de la app que edita la administración. */
+/** Global app parameters edited by the administration. */
 export interface AppSettings {
   maxAlertDurationMin: number;
   emergencyNumber: string;
   supportEmail: string;
   maxContacts: number;
-  /** '' = no se exige versión mínima de la app móvil */
+  /** '' = no minimum mobile app version is required */
   versionMinimaApp: string;
   updated: Date | null;
 }
@@ -78,7 +78,7 @@ export class AdminSettingsService {
   }
 
 
-  /** Datos de la cuenta en sesión (nombre y teléfono). */
+  /** Data of the signed-in account (name and phone). */
   updateMyData(data: ContactData): Observable<ContactData> {
     return this.http.put<ContactData>(`${this.api}/api/users/me`, data);
   }

@@ -10,8 +10,8 @@ import { CommonModule } from '@angular/common';
 })
 export class PeriodBadge {
   @Input() period = '';
-  @Input() options: string[] = [];           // si viene vacío, no muestra dropdown (modo compacto)
-  @Input() conDropdown = false;                 // true solo en el selector principal del header
+  @Input() options: string[] = [];           // if empty, the dropdown is not shown (compact mode)
+  @Input() conDropdown = false;                 // true only in the main header selector
 
   @Output() periodChange = new EventEmitter<string>();
 
@@ -31,7 +31,7 @@ export class PeriodBadge {
     this.menuOpen = false;
   }
 
-  // Cierra el dropdown si se hace click fuera del componente
+  // Closes the dropdown when clicking outside the component
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     if (!this.elRef.nativeElement.contains(event.target)) {

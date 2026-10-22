@@ -21,7 +21,7 @@
     </app-topbar>
 
     <main class="layout__main">
-      <!-- Alerta activa de un contacto: aviso en todo el panel hasta que termine -->
+      <!-- Active alert of a contact: notice across the whole panel until it ends -->
       @for (a of receivedAlerts.active(); track a.id) {
         <a class="aviso-contacto" routerLink="/dashboard/alertas-contactos" role="alert">
           <span class="aviso-contacto__pulso" aria-hidden="true"></span>

@@ -61,7 +61,7 @@
   <!-- TABLE -->
   <div class="table-card">
 
-    <!-- Seleccionar todas (solo visible en móvil, donde el thead se oculta) -->
+    <!-- Select all (only visible on mobile, where the thead is hidden) -->
     <label class="select-all-mobile">
       <input type="checkbox" (change)="toggleAll($event)" [checked]="allSelected" />
       Seleccionar todas
@@ -135,7 +135,7 @@
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 </button>
-                <!-- Restablecer contraseña -->
+                <!-- Reset password -->
                 <button class="action-btn action-btn--reset" title="Restablecer contraseña"
                   (click)="resetPassword(u)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -177,7 +177,7 @@
       </table>
     </div>
 
-    <!-- FOOTER: acciones masivas + paginación -->
+    <!-- FOOTER: bulk actions + pagination -->
     <div class="table-footer">
       <div class="bulk-actions" *ngIf="selectedCount > 0">
         <span class="bulk-label">{{ selectedCount }} seleccionada(s)</span>
@@ -270,7 +270,7 @@
       </div>
     </div>
 
-    <!-- Celulares y permisos (los informa la app) -->
+    <!-- Phones and permissions (reported by the app) -->
     <h4 class="detail-section">Celulares y permisos</h4>
     <p class="detail-empty" *ngIf="phoneDetails.length === 0">No tiene la app móvil instalada o aún no ha entrado.</p>
     <div class="celular" *ngFor="let c of phoneDetails">
@@ -285,7 +285,7 @@
       <ng-template #withoutPermissions><span class="detail-empty">Su versión de la app aún no informa los permisos.</span></ng-template>
     </div>
 
-    <!-- Historial de moderación -->
+    <!-- Moderation history -->
     <h4 class="detail-section">Historial de moderación</h4>
     <p class="detail-empty" *ngIf="historyDetail.length === 0">Sin bloqueos ni solicitudes.</p>
     <ul class="historial" *ngIf="historyDetail.length > 0">

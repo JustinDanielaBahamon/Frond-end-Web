@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 import { ZoneType, Zone } from '../models/zone-management-model';
 
-/** Zona tal como la devuelve y la recibe el backend (/api/zones). */
+/** Zone as the backend returns and receives it (/api/zones). */
 interface ZoneApi {
   id: number;
   name: string;
@@ -24,9 +24,9 @@ interface ZoneApi {
 
 const DEFAULT_RADIUS = 150;
 
-/** zoneType + riskLevel del backend → tipo que muestra el panel. */
+/** Backend zoneType + riskLevel → type the panel shows. */
 function typeFromApi(z: ZoneApi): ZoneType {
-  if (z.zoneType !== 'risk') return 'Segura';  // safe, help, policia y asistencia son puntos de apoyo
+  if (z.zoneType !== 'risk') return 'Segura';  // safe, help, policia and asistencia are support points
   if (z.riskLevel === 'high') return 'Riesgo Alto';
   if (z.riskLevel === 'medium') return 'Riesgo Medio';
   return 'Riesgo Bajo';
@@ -48,7 +48,7 @@ function fromApi(z: ZoneApi): Zone {
     city: z.city,
     type: typeFromApi(z),
     alerts: 0,
-    // El backend solo guarda activa/inactiva; "Revisión" se guarda como inactiva.
+    // The backend only stores active/inactive; "Revisión" is stored as inactive.
     status: z.isActive ? 'Activa' : 'Inactiva',
     updated_at: z.updatedAt ?? z.createdAt ?? '',
     lat: z.latitude != null ? Number(z.latitude) : undefined,
@@ -58,8 +58,8 @@ function fromApi(z: ZoneApi): Zone {
 }
 
 /**
- * Cuerpo para POST/PUT. El PUT del backend reemplaza todos los campos, así que se parte de la
- * zona original (descripción, dirección y tipo exacto como "policia") y se aplican los cambios.
+ * Body for POST/PUT. The backend PUT replaces every field, so it starts from the
+ * original zone (description, address and exact type like "policia") and applies the changes.
  */
 function toApi(changes: Partial<Zone>, original?: ZoneApi): Omit<ZoneApi, 'id'> {
   const { id: _id, ...base }: ZoneApi = original ?? {
@@ -88,7 +88,7 @@ export class ZonesService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  // Última versión de cada zona según el backend, para no perder campos al editar.
+  // Latest version of each zone according to the backend, so no fields are lost when editing.
   private originals = new Map<string, ZoneApi>();
 
   private remember = (z: ZoneApi) => { this.originals.set(String(z.id), z); };

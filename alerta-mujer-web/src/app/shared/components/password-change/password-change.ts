@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { PasswordService, evaluatePassword } from '../../../core/services/password.service';
 import { PasswordStrengthComponent } from '../password-strength/password-strength';
 
-/** Ventana para cambiar la contraseña de la cuenta en sesión (pide la actual). */
+/** Window to change the password of the signed-in account (asks for the current one). */
 @Component({
   selector: 'app-password-change',
   standalone: true,

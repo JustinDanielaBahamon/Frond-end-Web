@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, computed, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-/** Una parte de la grabación (la app sube el video y el audio en trozos de ~45 s). */
+/** A part of the recording (the app uploads video and audio in ~45 s chunks). */
 export interface RecordingPart {
   id: number;
   url: string;
@@ -9,8 +9,8 @@ export interface RecordingPart {
 }
 
 /**
- * Reproduce las partes de una grabación una tras otra, como si fueran un solo archivo: al terminar
- * una empieza la siguiente. La barra muestra todas las partes y permite saltar a cualquiera.
+ * Plays the parts of a recording one after another, as if they were a single file: when one
+ * ends the next starts. The bar shows every part and allows jumping to any of them.
  */
 @Component({
   selector: 'app-reproductor-continuo',
@@ -26,9 +26,9 @@ export class ContinuousPlayerComponent implements OnChanges {
   @ViewChild('medio') private method?: ElementRef<HTMLMediaElement>;
 
   readonly index = signal(0);
-  /** Avance de la parte actual, de 0 a 1. */
+  /** Progress of the current part, from 0 to 1. */
   readonly progress = signal(0);
-  /** Duración de cada parte en segundos (se conoce al cargar cada una). */
+  /** Duration of each part in seconds (known when each one loads). */
   readonly durations = signal<Record<number, number>>({});
   private playing = false;
 
@@ -38,13 +38,13 @@ export class ContinuousPlayerComponent implements OnChanges {
     const known = this.parts.filter((p) => d[p.id] != null);
     if (known.length === 0) return null;
     const sum = known.reduce((s, p) => s + d[p.id], 0);
-    // Las que aún no cargan se estiman con el promedio de las conocidas
+    // Those not loaded yet are estimated with the average of the known ones
     return Math.round((sum / known.length) * this.parts.length);
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    // El seguimiento se refresca cada pocos segundos y puede traer partes nuevas: si la que suena
-    // sigue en la lista, se continúa con ella sin reiniciar el reproductor
+    // Tracking refreshes every few seconds and may bring new parts: if the playing one
+    // is still in the list, it continues with it without restarting the player
     const previousOnes: RecordingPart[] = changes['partes']?.previousValue ?? [];
     const currentId = previousOnes[this.index()]?.id;
     const samePart = currentId != null ? this.parts.findIndex((p) => p.id === currentId) : -1;
@@ -64,7 +64,7 @@ export class ContinuousPlayerComponent implements OnChanges {
     if (el && part && Number.isFinite(el.duration)) {
       this.durations.update((d) => ({ ...d, [part.id]: el.duration }));
     }
-    // Al pasar de una parte a la siguiente se sigue reproduciendo sin que la usuaria toque nada
+    // When moving from one part to the next it keeps playing without the user touching anything
     if (this.playing) el?.play().catch(() => {});
   }
 
@@ -79,7 +79,7 @@ export class ContinuousPlayerComponent implements OnChanges {
 
   onPause(): void {
     const el = this.method?.nativeElement;
-    // "pause" también llega justo antes de "ended": ahí no se considera una pausa de la usuaria
+    // "pause" also arrives right before "ended": that is not considered a user pause
     if (el && !el.ended) this.playing = false;
   }
 

@@ -50,7 +50,7 @@ interface QuickAccess {
   route: string;
 }
 
-// Mientras no haya ubicación del celular, el mapa muestra Neiva
+// While there is no phone location, the map shows Neiva
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 
 const longDate = (d: Date) => d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -84,11 +84,11 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   securityStatus = signal<SecurityItem[]>([]);
   overallStatus = signal<{ level: string; color: string; percentage: number } | null>(null);
 
-  // ── MI DISPOSITIVO (celular más reciente) ─────────
+  // ── MY DEVICE (most recent phone) ─────────
   myPhone = signal<UserDevice | null>(null);
   phonesLoaded = signal(false);
 
-  // ── ÚLTIMA UBICACIÓN (enviada por el celular) ─────
+  // ── LAST LOCATION (sent by the phone) ─────
   lastLocation = signal<LastLocation | null>(null);
   isRefreshing = signal(false);
   locationNotice = signal<string | null>(null);
@@ -119,7 +119,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
-  /** Estado de seguridad calculado con los datos reales de la cuenta y del celular */
+  /** Security status computed with the real account and phone data */
   private loadSecurityStatus(): void {
     this.isLoadingStatus.set(true);
     this.securityStatusService.getSecurityStatus()
@@ -204,7 +204,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  // ── Ubicación del celular ─────────────────────────
+  // ── Phone location ─────────────────────────
 
   private loadLastLocation(): void {
     this.phoneLocation.getLatest()
@@ -233,8 +233,8 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Pide al celular su ubicación actual (push silencioso) y espera hasta 20 s el punto nuevo.
-   * Si no responde, se queda la última que envió.
+   * Asks the phone for its current location (silent push) and waits up to 20 s for the new point.
+   * If it does not answer, the last one it sent stays.
    */
   refreshLocation(): void {
     if (this.isRefreshing()) return;
@@ -272,7 +272,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
       center: DEFAULT_CENTER,
       zoom: 13,
       zoomControl: true,
-      // La rueda del mouse desplaza la página; el mapa se acerca con los botones + y -
+      // The mouse wheel scrolls the page; the map zooms with the + and - buttons
       scrollWheelZoom: false,
       attributionControl: true,
     });
@@ -300,7 +300,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.map.setView([u.lat, u.lng], 16);
   }
 
-  /** Lleva el mapa a la última ubicación del celular y abre su información. */
+  /** Takes the map to the last phone location and opens its information. */
   centerOnPhone(): void {
     const u = this.lastLocation();
     if (!this.map || !u) return;
@@ -329,7 +329,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** Cargar y mostrar las zonas del backend (sin datos inventados: si no hay, el mapa queda sin zonas) */
+  /** Load and show the backend zones (no made-up data: if there are none, the map has no zones) */
   private loadDangerZones(): void {
     if (!this.map) return;
 
@@ -349,7 +349,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** Dibujar zonas en el mapa con colores según el tipo */
+  /** Draw zones on the map with colors by type */
   private drawZonesOnMap(): void {
     if (!this.map) return;
 
@@ -364,7 +364,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
       const config = this.getZoneConfig(zone.type);
       
-      // Si tiene radio, dibujar círculo
+      // If it has a radius, draw a circle
       if (zone.radiusMeters) {
         const circle = L.circle([zone.lat, zone.lng], {
           radius: zone.radiusMeters,
@@ -386,7 +386,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         this.zoneCircles.push(circle);
       }
 
-      // Mismo marcador con emoji que el resto de mapas (core/utils/icono-zona)
+      // Same emoji marker as the other maps (core/utils/icono-zona)
       const icon = zoneIcon(zone.type, config.fillColor);
 
       const marker = L.marker([zone.lat, zone.lng], { icon })
@@ -404,11 +404,11 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
       this.zoneMarkers.push(marker);
     });
 
-    // Calcular distancias desde la ubicación del usuario
+    // Compute distances from the user location
     this.computeDistances();
   }
 
-  /** Calcular distancias de zonas desde la última ubicación del celular */
+  /** Compute zone distances from the last phone location */
   private computeDistances(): void {
     const u = this.lastLocation();
     if (!u) return;
@@ -418,9 +418,9 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     })).sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
   }
 
-  /** Calcular distancia entre dos puntos en km (fórmula de Haversine) */
+  /** Compute the distance between two points in km (Haversine formula) */
   private computeDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Radio de la Tierra en km
+    const R = 6371; // Earth radius in km
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
     const a =
@@ -435,7 +435,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     return deg * (Math.PI / 180);
   }
 
-  /** Obtener configuración de color e icono según el tipo de zona */
+  /** Get the color and icon configuration by zone type */
   private getZoneConfig(type: NearbyZone['type']): { 
     fillColor: string; 
     borderColor: string; 

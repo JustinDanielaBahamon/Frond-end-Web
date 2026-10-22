@@ -10,7 +10,7 @@ export interface Zone {
   status: ZoneStatus;
   updated_at: string;
 
-  // Ubicación en el mapa (opcional: las zonas antiguas no la tienen)
+  // Location on the map (optional: old zones do not have it)
   lat?: number;
   lng?: number;
   radio?: number; // metros

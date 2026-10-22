@@ -1528,14 +1528,14 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
   }
 }
 
-/* Tablet/móvil: las cajas de búsqueda respetan su alto de 50px */
+/* Tablet/mobile: the search boxes keep their 50px height */
 @media (max-width: 1024px) {
   .toolbar .search-box {
     flex: 0 0 auto;
   }
 }
 
-/* Móvil pequeño: se oculta el avatar para que el correo no se parta */
+/* Small mobile: the avatar is hidden so the email does not wrap */
 @media (max-width: 480px) {
   .table-card table tbody tr td .user-info .user-avatar {
     display: none;

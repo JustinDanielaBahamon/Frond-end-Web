@@ -12,7 +12,7 @@ import { Alert } from '../../../core/models/alert.model';
 import { ManualZone } from '../../../core/models/zona.model';
 import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
 
-// Campos extra que vienen en db.json; opcionales para no depender del modelo
+// Extra fields that come in db.json; optional so as not to depend on the model
 type AlertVM = Alert & {
   name?: string;
   activationMethod?: string;
@@ -79,7 +79,7 @@ interface DayBar {
   barWidth: number;
 }
 
-/** Barra con las esquinas de arriba redondeadas (4 px) apoyada en la línea base. */
+/** Bar with rounded top corners (4 px) resting on the baseline. */
 function roundedBar(x: number, y: number, width: number, base: number): string {
   const height = base - y;
   if (height <= 0) return '';
@@ -110,7 +110,7 @@ const TIME_BANDS = [
   { name: 'Noche', range: '18h – 23h', start: 18, end: 23 },
 ];
 
-// Geometría del gráfico por hora (coincide con el viewBox 1000x275 del HTML)
+// Geometry of the hourly chart (matches the 1000x275 viewBox in the HTML)
 const H_X0 = 50;
 const H_SLOT = 38.75;
 const BAR_H = 26;
@@ -168,7 +168,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   attendedPercentage = 0;
   cancelledPercentage = 0;
 
-  // --- Alertas por hora del día ---
+  // --- Alerts by hour of the day ---
   hourBars: HourBar[] = [];
   hourTicks: { y: number; label: number }[] = [];
   chartBands: ChartBand[] = [];
@@ -180,11 +180,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   calmBandText = '—';
   calmBandDetail = 'Sin alertas en este periodo';
 
-  // --- Zonas con más incidentes ---
+  // --- Zones with the most incidents ---
   incidentZones: IncidentZone[] = [];
   selectedZone = 0;
 
-  // --- Tendencia (esta semana vs. la anterior, o este mes por semanas vs. el anterior) ---
+  // --- Trend (this week vs. last week, or this month by weeks vs. last month) ---
   trendView: TrendView = 'semana';
   monthTrend = '';
   currentTrendTotal = 0;
@@ -197,7 +197,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // --- Tabla ---
   recentAlerts: AlertVM[] = [];
 
-  // Datos en memoria (se cargan una sola vez; los filtros no vuelven a llamar al backend)
+  // In-memory data (loaded only once; the filters do not call the backend again)
   private all: AlertVM[] = [];
   private apiZones: ManualZone[] = [];
   private riskZones: ManualZone[] = [];
@@ -209,7 +209,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private alertMarker?: L.CircleMarker;
   private zonesVersion = 0;
 
-  // Geometría del gráfico de tendencia (coincide con el viewBox 640x230 del HTML)
+  // Geometry of the trend chart (matches the 640x230 viewBox in the HTML)
   private readonly chart = { left: 40, right: 620, up: 20, down: 190 };
 
   ngOnInit(): void {
@@ -312,7 +312,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return t >= r.start && t <= r.end;
   }
 
-  // ── Recalcula todo con el periodo elegido ──────────────────────
+  // ── Recomputes everything with the chosen period ──────────────────────
   private recompute(): void {
     const r = this.range();
     this.periodList = this.all.filter(a => this.inPeriod(a, r));
@@ -327,7 +327,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.alertMarker?.remove();
     this.alertMarker = undefined;
 
-    this.cdr.detectChanges();      // pinta el HTML (y deja listo el contenedor del mapa)
+    this.cdr.detectChanges();      // paints the HTML (and leaves the map container ready)
     this.paintMap(true);
     void this.resolvePlaces(this.zonesVersion);
   }
@@ -338,7 +338,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── Stat cards ─────────────────────────────────────────────────
   private computeKpis(list: AlertVM[]): void {
-    // "Pendientes ahora" ignora el periodo: una alerta sin atender sigue importando aunque sea vieja
+    // "Pendientes ahora" ignores the period: an unattended alert still matters even if it is old
     const pending = this.all.filter(a => a.status === 'Pendiente');
     this.pendingAlerts = pending.length;
 
@@ -357,7 +357,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.cancelledPercentage = this.pct(this.cancelledAlerts, list.length);
   }
 
-  // ── Alertas por hora del día ───────────────────────────────────
+  // ── Alerts by hour of the day ───────────────────────────────────
   private computeHours(list: AlertVM[]): void {
     const count = new Array<number>(24).fill(0);
     list.forEach(a => {
@@ -404,7 +404,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.peakHourText = peaks.slice(0, 3).map(h => `${h}h`).join(', ') + (peaks.length > 3 ? '…' : '');
     this.peakHourDetail = `${max} ${plural(max)}${peaks.length > 1 ? ' en cada hora' : ''}`;
 
-    // Franja más riesgosa
+    // Riskiest time band
     const maxTot = Math.max(...totals);
     const risky = TIME_BANDS.filter((_, i) => totals[i] === maxTot);
     this.riskyBandText = risky.length === 1
@@ -412,14 +412,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       : risky.map(f => f.name).join(' y ');
     this.riskyBandDetail = `${maxTot} de ${total} alertas · ${this.pct(maxTot, total)}%`;
 
-    // Franja más tranquila
+    // Calmest time band
     const minTot = Math.min(...totals);
     const calm = TIME_BANDS.filter((_, i) => totals[i] === minTot);
     this.calmBandText = calm.map(f => f.name).join(' y ');
     this.calmBandDetail = `${minTot} ${plural(minTot)}${calm.length > 1 ? ' en cada una' : ''}`;
   }
 
-  // ── Zonas con más incidentes (agrupa por cercanía ~450 m) ──────
+  // ── Zones with the most incidents (grouped by proximity ~450 m) ──────
   private computeZones(list: AlertVM[]): void {
     this.zonesVersion++;
     this.selectedZone = 0;
@@ -427,7 +427,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const cell = 0.004;
     const groups = new Map<string, { count: number; lat: number; lng: number }>();
 
-    // Las alertas sin ubicación (0,0) no se pueden ubicar en el mapa
+    // Alerts without location (0,0) cannot be placed on the map
     const withLocation = list.filter(a => a.lat || a.lng);
     withLocation.forEach(a => {
       const key = `${Math.round(Number(a.lat) / cell)}|${Math.round(Number(a.lng) / cell)}`;
@@ -462,11 +462,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Barrio y dirección reales (OpenStreetMap), uno por uno para respetar el límite de Nominatim
+  // Real neighborhood and address (OpenStreetMap), one by one to respect the Nominatim limit
   private async resolvePlaces(version: number): Promise<void> {
     for (const z of this.incidentZones) {
       const place = await this.geocoding.get(z.lat, z.lng);
-      if (version !== this.zonesVersion) return; // cambió el filtro mientras se consultaba
+      if (version !== this.zonesVersion) return; // the filter changed while querying
 
       if (place) {
         const name = place.neighborhood ?? place.address ?? place.city;
@@ -553,7 +553,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.computeTrend(this.all);
   }
 
-  // ── Tendencia: esta semana vs. la anterior ─────────────────────
+  // ── Trend: this week vs. last week ─────────────────────
   private computeTrend(list: AlertVM[]): void {
     if (this.trendView === 'mes') {
       this.computeMonthTrend(list);
@@ -580,7 +580,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.currentTrendTotal = current.reduce((s, v) => s + v, 0);
     this.previousTrendTotal = previous.reduce((s, v) => s + v, 0);
 
-    // Comparación justa: la semana pasada solo hasta el mismo día de hoy
+    // Fair comparison: last week only up to the same day as today
     this.previousTrendUntilToday = previous.slice(0, today + 1).reduce((s, v) => s + v, 0);
     this.trendSentence = trendSentence(this.currentTrendTotal, this.previousTrendUntilToday);
 
@@ -595,8 +595,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Este mes por semanas (días 1–7, 8–14, 15–21, 22–28 y 29 en adelante) contra las mismas semanas
-   * del mes anterior. Así se ve en qué parte del mes se concentran las alertas.
+   * This month by weeks (days 1–7, 8–14, 15–21, 22–28 and 29 onwards) against the same weeks
+   * of the previous month. This shows in which part of the month the alerts concentrate.
    */
   private computeMonthTrend(list: AlertVM[]): void {
     const now = new Date();
@@ -622,7 +622,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (t >= monthStart && t < monthEnd) current[week]++;
       else if (t >= previousStart && t < monthStart) {
         previous[week]++;
-        // Comparación justa: el mes pasado solo hasta el mismo día del mes
+        // Fair comparison: last month only up to the same day of the month
         if (d.getDate() <= now.getDate()) previousUntilToday++;
       }
     });
@@ -639,7 +639,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       return `días ${start} al ${i === weeks - 1 ? 'fin de mes' : end}`;
     };
     this.drawTrend(
-      // Las semanas que aún no llegan (o que este mes no tiene) no se dibujan
+      // Weeks that have not come yet (or that this month does not have) are not drawn
       current.map((v, i) => (i <= currentWeek && i * 7 < monthDays ? v : null)),
       previous,
       current.map((_, i) => `Sem ${i + 1}`),
@@ -672,7 +672,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       const groupX = left + i * groupWidth;
       const previousX = groupX + groupWidth / 2 - width - 1;
       const currentX = groupX + groupWidth / 2 + 1;
-      // Los días que aún no llegan no son "cero alertas": no se dibujan
+      // Days that have not come yet are not "zero alerts": they are not drawn
       const currentValue = current[i];
       return {
         day,
@@ -695,7 +695,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── Tabla de alertas recientes ─────────────────────────────────
   private updateRecent(): void {
-    // El backend las envía de la más reciente a la más antigua
+    // The backend sends them newest to oldest
     const base = this.statusFilter === 'Todas'
       ? this.periodList
       : this.periodList.filter(a => a.status === this.statusFilter);

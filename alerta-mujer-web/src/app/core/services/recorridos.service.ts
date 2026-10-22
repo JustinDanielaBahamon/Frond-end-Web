@@ -9,7 +9,7 @@ export interface GpsPoint {
   timestamp: string;
 }
 
-/** Recorrido tal como lo usa la UI (misma forma que en la app móvil). */
+/** Route as the UI uses it (same shape as in the mobile app). */
 export interface SavedRoute {
   id: number;
   date: string;
@@ -61,11 +61,11 @@ interface SavedRouteApi {
   createdAt: string;
 }
 
-// Reglas de negocio (iguales en móvil y backend; el backend es quien las garantiza)
+// Business rules (same on mobile and backend; the backend enforces them)
 const MAX_ROUTES = 4;
 const MAX_STARRED = 2;
 
-// Versión anterior: los recorridos vivían solo en este navegador
+// Previous version: routes lived only in this browser
 const LEGACY_STORAGE_KEY = 'alerta_mujer_recorridos';
 
 @Injectable({ providedIn: 'root' })
@@ -88,7 +88,7 @@ export class RoutesService {
     return MAX_STARRED;
   }
 
-  /** Carga los recorridos de la usuaria y sube (una sola vez) los que hubiera en localStorage. */
+  /** Loads the user's routes and uploads (only once) those that were in localStorage. */
   async load(): Promise<ServiceResult> {
     this.loading.set(true);
     try {
@@ -153,7 +153,7 @@ export class RoutesService {
     this.routes.update((prev) => prev.map((r) => (r.id === route.id ? route : r)));
   }
 
-  /** Sube al backend los recorridos guardados por la versión anterior y limpia localStorage. */
+  /** Uploads to the backend the routes saved by the previous version and clears localStorage. */
   private async migrateLocal(): Promise<void> {
     let locales: Array<Partial<SavedRoute>> = [];
     try {
@@ -180,7 +180,7 @@ export class RoutesService {
           })
         );
       } catch (err) {
-        // Límite de 4 alcanzado: el resto no cabe
+        // Limit of 4 reached: the rest does not fit
         if (err instanceof HttpErrorResponse && err.status === 409) break;
       }
     }

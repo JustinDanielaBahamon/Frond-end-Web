@@ -4,7 +4,7 @@ import { Observable, of, BehaviorSubject, delay, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Evidence, EvidenceFilters, EvidenceStats } from '../models/evidence.model';
 
-/** Evidencia tal como la devuelve el backend al panel de administración. */
+/** Evidence as the backend returns it to the admin panel. */
 interface AdminEvidenceApi {
   id: number;
   alertId: number;
@@ -88,7 +88,7 @@ export class EvidenceService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/evidences`;
 
-  // Sin datos mock - se cargarán desde el backend
+  // No mock data - it is loaded from the backend
   private evidencesSubject = new BehaviorSubject<Evidence[]>([]);
   evidences$ = this.evidencesSubject.asObservable();
 
@@ -101,11 +101,11 @@ export class EvidenceService {
   });
   stats$ = this.statsSubject.asObservable();
 
-  // Variable para el contador de descargas
+  // Variable for the download counter
   private downloadCounter: number = 0;
 
   // ========================================
-  // MÉTODOS API (Conectar al backend)
+  // API METHODS (connect to the backend)
   // ========================================
 
   /**
@@ -114,7 +114,7 @@ export class EvidenceService {
   getAll(): Observable<Evidence[]> {
     return this.http.get<AdminEvidenceApi[]>(this.url).pipe(
       map(list => list.map(fromApi)),
-      // La lista local alimenta los filtros y las estadísticas
+      // The local list feeds the filters and the stats
       tap(evidences => {
         this.evidencesSubject.next(evidences);
         this.updateStats();
@@ -140,15 +140,15 @@ export class EvidenceService {
   }
 
   /**
-   * Obtener estadísticas
+   * Get stats
    */
-  // Se actualiza cada vez que cambia la lista
+  // Updated every time the list changes
   getStats(): Observable<EvidenceStats> {
     return this.stats$;
   }
 
   /**
-   * Calcular estadísticas dinámicamente desde las evidencias
+   * Compute stats dynamically from the evidence
    */
   private computeStats(): EvidenceStats {
     const evidences = this.evidencesSubject.value;
@@ -167,7 +167,7 @@ export class EvidenceService {
   }
 
   /**
-   * Actualizar estadísticas y notificar a los suscriptores
+   * Update stats and notify the subscribers
    */
   private updateStats(): void {
     const stats = this.computeStats();
@@ -188,16 +188,16 @@ export class EvidenceService {
   }
 
   // ========================================
-  // MÉTODOS DE FILTRADO
+  // FILTER METHODS
   // ========================================
 
   /**
-   * Filtrar evidencias según criterios
+   * Filter evidence by criteria
    */
   filterEvidences(filters: EvidenceFilters): Observable<Evidence[]> {
     let filteredEvidences = [...this.evidencesSubject.value];
 
-    // Filtro de búsqueda
+    // Search filter
     if (filters.search && filters.search.trim() !== '') {
       const searchLower = filters.search.toLowerCase().trim();
       filteredEvidences = filteredEvidences.filter(evidence => {
@@ -230,7 +230,7 @@ export class EvidenceService {
       );
     }
 
-    // Filtro por rango de fechas
+    // Date range filter
     if (filters.startDate) {
       filteredEvidences = filteredEvidences.filter(evidence =>
         new Date(evidence.date) >= filters.startDate!
@@ -249,7 +249,7 @@ export class EvidenceService {
   /**
    * Cambiar estado de evidencia
    */
-  // Guarda la revisión en el backend (PATCH /api/evidences/{id}/review)
+  // Saves the review in the backend (PATCH /api/evidences/{id}/review)
   changeStatus(id: number, newStatus: 'Verificada' | 'Pendiente' | 'Rechazada'): Observable<Evidence> {
     const reviewStatus = { Verificada: 'verified', Pendiente: 'pending', Rechazada: 'rejected' }[newStatus];
     return this.http.patch<AdminEvidenceApi>(`${this.url}/${id}/review`, { reviewStatus }).pipe(

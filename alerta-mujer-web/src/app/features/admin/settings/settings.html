@@ -16,7 +16,7 @@
 
   <section class="settings-grid">
 
-    <!-- ═════════ PARÁMETROS DE LA APP ═════════ -->
+    <!-- ═════════ APP PARAMETERS ═════════ -->
     <article class="card card--wide">
       <h2 class="card__title"><i class="fa-solid fa-sliders"></i> Parámetros de la app</h2>
       <div class="warning">
@@ -175,7 +175,7 @@
 
   </section>
 
-  <!-- CONFIRMACIÓN DE CAMBIOS -->
+  <!-- CHANGE CONFIRMATION -->
   @if (pendingChanges(); as changes) {
     <div class="overlay" (click)="cancelChanges()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirmar-titulo" (click)="$event.stopPropagation()">

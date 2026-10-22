@@ -25,15 +25,15 @@ const STATUSES: Record<string, string> = {
 };
 
 const MAX_MB = 50;
-// Solo lo que sirve como evidencia de una emergencia (los documentos ya subidos se siguen viendo)
+// Only what serves as evidence of an emergency (already uploaded documents are still shown)
 const ACCEPTED = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-/** Días que se guardan las evidencias si la alerta no se marca para conservar (backend). */
+/** Days the evidence is kept if the alert is not marked to keep (backend). */
 export const RETENTION_DAYS = 60;
-/** Máximo de alertas que se pueden conservar (backend: AlertService.MAX_ALERTAS_CONSERVADAS). */
+/** Maximum alerts that can be kept (backend: AlertService.MAX_KEPT_ALERTS). */
 export const MAX_KEPT = 5;
 
-/** Alerta de la lista de la izquierda, con cuántas evidencias tiene. */
+/** Alert of the left list, with how many evidence items it has. */
 interface AlertWithEvidence extends MyAlert {
   count: number;
 }
@@ -62,12 +62,12 @@ export class Evidence implements OnInit, OnDestroy {
   error = signal('');
   notice = signal('');
 
-  /** Alerta elegida en la lista: solo se muestran sus evidencias. */
+  /** Alert chosen in the list: only its evidence is shown. */
   alertId = signal<number | null>(null);
   searchAlert = signal('');
   onlyWithEvidence = signal(true);
   filter = signal<Filter>('todas');
-  /** Barrio y dirección de cada alerta (se resuelven al mostrarse). */
+  /** Neighborhood and address of each alert (resolved when shown). */
   addresses = signal<Record<number, string>>({});
 
   // ── Visor ──────────────────────────────────────
@@ -76,10 +76,10 @@ export class Evidence implements OnInit, OnDestroy {
   loadingViewer = signal(false);
   errorVisor = signal('');
   private thumbnails = signal<Record<number, string>>({});
-  /** Archivo ya descargado de cada evidencia (para no pedirlo dos veces). */
+  /** Already downloaded file of each evidence (so it is not requested twice). */
   private files: Record<number, string> = {};
 
-  // ── Grabación completa (partes seguidas) ───────
+  // ── Full recording (parts in a row) ───────
   continua = signal<{ type: 'video' | 'audio'; parts: RecordingPart[] } | null>(null);
   loadingContinuous = signal(false);
   private createdUrls = new Set<string>();
@@ -89,7 +89,7 @@ export class Evidence implements OnInit, OnDestroy {
   newName = signal('');
   savingName = signal(false);
 
-  // ── Mapa de la alerta ──────────────────────────
+  // ── Alert map ──────────────────────────
   mapVisible = signal(false);
   @ViewChild('mapaAlerta') private mapRef?: ElementRef<HTMLDivElement>;
   private map: L.Map | null = null;
@@ -101,11 +101,11 @@ export class Evidence implements OnInit, OnDestroy {
   uploadError = signal('');
   dragging = signal(false);
 
-  /** Todas las alertas de la usuaria (más recientes primero) con su número de evidencias. */
+  /** All the user's alerts (newest first) with their evidence count. */
   alertList = computed<AlertWithEvidence[]>(() => {
     const count = new Map<number, number>();
     for (const e of this.evidences()) count.set(e.alertId, (count.get(e.alertId) ?? 0) + 1);
-    // Alertas con evidencias que no vinieron en la lista de alertas
+    // Alerts with evidence that did not come in the alerts list
     const known = new Map<number, MyAlert>(this.alerts().map((a) => [a.id, a]));
     for (const e of this.evidences()) {
       if (!known.has(e.alertId) && e.alert) {
@@ -140,7 +140,7 @@ export class Evidence implements OnInit, OnDestroy {
     return c;
   });
 
-  /** Pestañas visibles: solo los tipos que tiene la alerta. */
+  /** Visible tabs: only the types the alert has. */
   visibleTypes = computed(() => (Object.keys(TYPES) as EvidenceType[]).filter((t) => this.count()[t] > 0));
 
   filtered = computed(() => {
@@ -162,7 +162,7 @@ export class Evidence implements OnInit, OnDestroy {
   load(): void {
     this.loading.set(true);
     this.error.set('');
-    // "Mis emergencias" abre este módulo con ?alertaId=ID
+    // "Mis emergencias" opens this module with ?alertaId=ID
     const requested = Number(this.route.snapshot.queryParamMap.get('alertaId')) || null;
     this.service.myAlerts().subscribe({
       next: (a) => {
@@ -202,7 +202,7 @@ export class Evidence implements OnInit, OnDestroy {
     this.resolveAddresses();
   }
 
-  /** Barrio y dirección de las alertas de la lista (OpenStreetMap, de a una por segundo). */
+  /** Neighborhood and address of the alerts in the list (OpenStreetMap, one per second). */
   resolveAddresses(): void {
     for (const a of this.filteredAlerts().slice(0, 15)) {
       if (a.lat == null || a.lng == null || this.addresses()[a.id]) continue;
@@ -225,7 +225,7 @@ export class Evidence implements OnInit, OnDestroy {
     });
   }
 
-  /** Descarga todas las partes de un tipo y las muestra en el reproductor continuo. */
+  /** Downloads all the parts of a type and shows them in the continuous player. */
   showContinuous(type: 'video' | 'audio'): void {
     const parts = this.ofTheAlert()
       .filter((e) => e.type === type && e.hasFile)
@@ -322,7 +322,7 @@ export class Evidence implements OnInit, OnDestroy {
   savingKeep = signal(false);
   totalKept = computed(() => this.alertList().filter((a) => a.keep).length);
 
-  /** Fecha en que se borrará la evidencia (si su alerta no está marcada para conservar). */
+  /** Date when the evidence will be deleted (if its alert is not marked to keep). */
   deletionDate(e: MyEvidence): Date {
     return new Date(e.date.getTime() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
   }
@@ -347,7 +347,7 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   // ── Renombrar ──────────────────────────────────
-  /** Se edita el nombre sin la extensión; el servidor se la vuelve a poner. */
+  /** The name is edited without the extension; the server adds it back. */
   editName(e: MyEvidence): void {
     this.newName.set(e.fileName.replace(/\.[a-z0-9]{1,5}$/i, ''));
     this.editingName.set(true);
@@ -376,7 +376,7 @@ export class Evidence implements OnInit, OnDestroy {
     });
   }
 
-  // ── Mapa de la alerta (dentro de la app, con zoom) ─────
+  // ── Alert map (inside the app, with zoom) ─────
   openMap(): void {
     const a = this.currentAlert();
     if (a?.lat == null || a?.lng == null) return;
@@ -409,7 +409,7 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   closeUpload(): void {
-    if (this.progress() !== null) return; // no cerrar a mitad de la subida
+    if (this.progress() !== null) return; // do not close in the middle of the upload
     this.uploadVisible.set(false);
   }
 

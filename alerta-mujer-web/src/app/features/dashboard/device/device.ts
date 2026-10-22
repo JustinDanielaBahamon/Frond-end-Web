@@ -25,13 +25,13 @@ interface DeviceDetail {
   icon: string;
   rows: { label: string; value: string }[];
   note?: string;
-  /** Color del encabezado en los resultados de las pruebas. */
+  /** Header color in the test results. */
   tone?: 'ok' | 'aviso' | 'error';
-  /** url: enlace externo; ruta: pantalla de esta misma web (se abre aquí, sin pestaña nueva). */
+  /** url: external link; route: screen of this same web (opens here, without a new tab). */
   link?: { url?: string; route?: string; text: string };
 }
 
-/** Permisos que informa la app (ver reportarPermisos en la app móvil). */
+/** Permissions the app reports (see reportarPermisos in the mobile app). */
 const PHONE_PERMISSIONS = [
   { id: 'ubicacion', title: 'Ubicación', description: 'Para enviar dónde estás en una alerta', icon: 'ti-map-pin' },
   { id: 'notificaciones', title: 'Notificaciones', description: 'Para recibir las alertas de tus contactos', icon: 'ti-bell' },
@@ -73,12 +73,12 @@ export class Device implements OnInit, OnDestroy {
   connectionQuality = signal<string>('Desconocida');
   criticalFeatures = signal<CriticalFeatureStatus | null>(null);
   activityLog = signal<ActivityLog[]>([]);
-  /** Celulares en los que la usuaria inició sesión con la app móvil. */
+  /** Phones where the user signed in with the mobile app. */
   myPhones = signal<UserDevice[]>([]);
-  /** Ventana con el detalle de un dispositivo (celular o este computador). */
+  /** Window with the detail of a device (phone or this computer). */
   detail = signal<DeviceDetail | null>(null);
 
-  /** Permisos del celular usado más recientemente, tal como los informó la app. */
+  /** Permissions of the most recently used phone, as the app reported them. */
   phonePermissions = computed(() => {
     const phone = [...this.myPhones()]
       .filter((d) => !!d.permissions)
@@ -101,14 +101,14 @@ export class Device implements OnInit, OnDestroy {
     };
   });
 
-  /** Celular usado más recientemente: de él se toma la ubicación del día a día. */
+  /** Most recently used phone: the day-to-day location is taken from it. */
   principalId = computed(() => {
     const phones = this.myPhones().filter((d) => d.osName !== 'web');
     if (phones.length === 0) return null;
     return [...phones].sort((a, b) => (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0].id;
   });
 
-  /** Tiempo que le queda a la sesión de la web ("5 h 20 min"). */
+  /** Time left in the web session ("5 h 20 min"). */
   sessionRemaining = signal('');
   sessionExpiring = signal(false);
   private sessionClock?: ReturnType<typeof setInterval>;
@@ -200,8 +200,8 @@ export class Device implements OnInit, OnDestroy {
   }
 
   /**
-   * Consulta en el backend los contactos, los celulares vinculados y la última
-   * ubicación enviada por la app móvil. Emite false si alguna consulta falló.
+   * Queries the backend for the contacts, linked phones and the last
+   * location sent by the mobile app. Emits false if any query failed.
    */
   private fetchCriticalFeatures(): Observable<boolean> {
     const userId = this.currentUserId;
@@ -220,7 +220,7 @@ export class Device implements OnInit, OnDestroy {
     }
     this.featuresLoading.set(true);
 
-    // Cada consulta falla por separado: null = error (204 de "sin ubicación" llega como null válido)
+    // Each query fails separately: null = error (204 "no location" arrives as a valid null)
     const FAILED = 'failed' as const;
     return forkJoin({
       contacts: this.contactService.getByUser(userId).pipe(catchError(() => of(null))),
@@ -245,7 +245,7 @@ export class Device implements OnInit, OnDestroy {
     );
   }
 
-  /** Última ubicación que envió la app del celular (no la del computador). */
+  /** Last location sent by the phone app (not the computer one). */
   private lastLocation: LocationEntry | null = null;
   private lastAddress: string | null = null;
 
@@ -257,7 +257,7 @@ export class Device implements OnInit, OnDestroy {
     return `${this.lastAddress ?? 'Buscando la dirección…'} · ${this.locationDate(entry)}`;
   }
 
-  /** Cambia las coordenadas por barrio y dirección (OpenStreetMap, igual que en la app). */
+  /** Replaces the coordinates with neighborhood and address (OpenStreetMap, same as in the app). */
   private resolveAddress(entry: LocationEntry): void {
     this.geocoding.get(entry.lat, entry.lng).then((place) => {
       const text = place ? [place.neighborhood, place.address].filter(Boolean).join(' · ') || place.city : null;
@@ -403,7 +403,7 @@ export class Device implements OnInit, OnDestroy {
     }));
   }
 
-  // ─── PRUEBAS DE FUNCIONALIDAD (el resultado sale en una tarjeta, no en el aviso del navegador) ───
+  // ─── FEATURE TESTS (the result shows in a card, not in the browser alert) ───
 
   private showResult(r: Omit<DeviceDetail, 'rows'> & { rows?: DeviceDetail['rows'] }): void {
     this.detail.set({ rows: [], ...r });
@@ -430,7 +430,7 @@ export class Device implements OnInit, OnDestroy {
         { label: 'Dirección', value: this.lastAddress ?? 'Buscando la dirección…' },
         { label: 'Fecha y hora', value: this.locationDate(u) },
       ],
-      // Se abre en el mapa de AlertaMujer (Mi ubicación), no en Google Maps
+      // Opens in the AlertaMujer map (Mi ubicación), not in Google Maps
       link: { route: '/dashboard/ubicacion/my-location', text: 'Ver en mi mapa' },
     });
   }
@@ -506,7 +506,7 @@ export class Device implements OnInit, OnDestroy {
     const startTime = Date.now();
     this.loading.set(true);
 
-    // /health es público. En el plan gratis de Render la primera petición despierta el servidor y
+    // /health is public. On the free Render plan the first request wakes the server and
     // puede tardar; se espera hasta 90 s.
     fetch(`${environment.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(90000) })
       .then(response => {
@@ -587,7 +587,7 @@ export class Device implements OnInit, OnDestroy {
     const confirmClear = confirm('¿Limpiar los datos temporales de la web? No se cierra tu sesión ni se borran tus contactos.');
     if (!confirmClear) return;
     try {
-      // Se conservan la sesión (AuthService usa 'alerta_session') y los datos de la usuaria
+      // The session (AuthService uses 'alerta_session') and the user data are kept
       const keysToKeep = [
         'alerta_session',
         'user_data',
@@ -617,7 +617,7 @@ export class Device implements OnInit, OnDestroy {
     }
   }
 
-  /** Vuelve a consultar los permisos que informó el celular y el estado de los servicios. */
+  /** Queries again the permissions the phone reported and the service status. */
   refreshPermissions(): void {
     this.loading.set(true);
     this.loadServices();

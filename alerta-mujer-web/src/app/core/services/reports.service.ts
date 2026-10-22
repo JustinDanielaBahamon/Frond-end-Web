@@ -4,7 +4,7 @@ import { Observable, of, BehaviorSubject, map, tap } from 'rxjs';
 import { AlertReport, ReportFilters, ReportStats } from '../models/report.model';
 import { environment } from '../../../environments/environment';
 
-/** Informe tal como lo devuelve /api/admin/reports. */
+/** Report as /api/admin/reports returns it. */
 interface ReportApi {
   id: number;
   name: string;
@@ -50,7 +50,7 @@ export class ReportsService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/admin/reports`;
 
-  // Última lista recibida del backend; los filtros se aplican sobre ella
+  // Last list received from the backend; the filters are applied on it
   private reportsSubject = new BehaviorSubject<AlertReport[]>([]);
   reports$ = this.reportsSubject.asObservable();
 
@@ -89,7 +89,7 @@ export class ReportsService {
   }
 
   // ========================================
-  // MÉTODOS DE FILTRADO
+  // FILTER METHODS
   // ========================================
 
   filterReports(filters: ReportFilters): Observable<AlertReport[]> {
@@ -104,7 +104,7 @@ export class ReportsService {
       );
     }
 
-    // Los <input type="date"> entregan 'yyyy-MM-dd'; se compara por día local
+    // <input type="date"> gives 'yyyy-MM-dd'; compared by local day
     if (filters.startDate) {
       const from = this.startOfDay(filters.startDate);
       filteredReports = filteredReports.filter(report => report.date >= from);
@@ -128,14 +128,14 @@ export class ReportsService {
   }
 
   // ========================================
-  // MÉTODOS DE EXPORTACIÓN
+  // EXPORT METHODS
   // ========================================
 
   downloadPdf(id: number): Observable<Blob> {
     return this.export(id, 'pdf');
   }
 
-  /** Excel recibe un CSV (separado por ';' y en UTF-8) que abre directamente. */
+  /** Excel receives a CSV (separated by ';' and in UTF-8) that it opens directly. */
   downloadExcel(id: number): Observable<Blob> {
     return this.export(id, 'csv');
   }

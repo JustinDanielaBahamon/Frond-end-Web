@@ -29,7 +29,7 @@
   }
 }
 
-/* ── Títulos de la card ─────────────────────────── */
+/* ── Card titles ─────────────────────────── */
 .card__title {
   font-size              : 2rem;
   font-weight            : 900;
@@ -241,7 +241,7 @@
   }
 }
 
-/* ── Botón principal ────────────────────────────── */
+/* ── Main button ────────────────────────────── */
 .btn-submit {
   display        : flex;
   align-items    : center;
@@ -276,7 +276,7 @@
   }
 }
 
-/* ── Wrapper páginas auth ───────────────────────── */
+/* ── Auth pages wrapper ───────────────────────── */
 .login-page,
 .register-page {
   min-height     : 100vh;
@@ -286,7 +286,7 @@
   padding        : 40px 0;
   position       : relative;
   overflow       : hidden;
-  background     : var(--gradient-bg); // el gradiente vive aquí, no en html/body global
+  background     : var(--gradient-bg); // the gradient lives here, not in the global html/body
 
   &__wrapper {
     position        : relative;

@@ -11,8 +11,8 @@ import { CommonModule } from '@angular/common';
 export class Chip {
   @Input() label = '';
   @Input() active = false;
-  @Input() dotColor?: string;   // opcional: si no viene, no muestra el punto de color
-  @Input() count?: number;       // opcional: si no viene, no muestra el contador
+  @Input() dotColor?: string;   // optional: if not given, the color dot is not shown
+  @Input() count?: number;       // optional: if not given, the counter is not shown
 
   @Output() chipClick = new EventEmitter<void>();
 }

@@ -14,18 +14,18 @@ import { compactPages } from '../../../shared/utils/paginacion';
 })
 export class DeviceManagementComponent implements OnInit, OnDestroy {
 
-  // Propiedades para la visualización de datos
+  // Properties for data display
   devices: Device[] = [];
   filteredDevices: Device[] = [];
 
-  // Propiedades para filtros y paginación
+  // Properties for filters and pagination
   searchTerm: string = '';
   filterStatus: string = 'all';
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
 
-  // Estadísticas
+  // Stats
   stats$: Observable<DeviceStats>;
   stats: DeviceStats = {
     totalDevices: 0,
@@ -47,7 +47,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   isEditTypeDropdownOpen = false;
   isEditStatusDropdownOpen = false;
   
-  // Handler para cerrar dropdowns al hacer clic fuera
+  // Handler to close dropdowns when clicking outside
   private clickHandler: (() => void) | null = null;
 
   private destroy$ = new Subject<void>();
@@ -55,7 +55,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   constructor(private deviceService: DeviceService, private cdr: ChangeDetectorRef) {
     this.stats$ = this.deviceService.stats$;
     
-    // Cerrar dropdowns al hacer clic fuera de ellos
+    // Close dropdowns when clicking outside them
     this.clickHandler = () => {
       this.isStatusDropdownOpen = false;
     };
@@ -81,7 +81,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Remover listener de clic para evitar memory leaks
+    // Remove the click listener to avoid memory leaks
     if (this.clickHandler) {
       document.removeEventListener('click', this.clickHandler);
     }
@@ -119,11 +119,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplica los filtros de búsqueda y estado a la lista
+   * Applies the search and status filters to the list
    */
   applyFilters(): void {
     this.loading = true;
-    this.currentPage = 1; // Resetear a primera página
+    this.currentPage = 1; // Reset to the first page
 
     const filters = {
       search: this.searchTerm,
@@ -156,7 +156,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Lógica de paginación
+  // Pagination logic
   get paginatedDevices(): Device[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredDevices.slice(startIndex, startIndex + this.itemsPerPage);
@@ -189,7 +189,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Helper para asignar la clase CSS correcta al badge de estado del dispositivo
+   * Helper that assigns the right CSS class to the device status badge
    */
   getDeviceStatusBadgeClass(status: Device['status']): string {
     switch (status) {
@@ -206,14 +206,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Helper para asignar la clase CSS correcta al badge de tipo de dispositivo
+   * Helper that assigns the right CSS class to the device type badge
    */
   getDeviceTypeBadgeClass(type: 'Android'): string {
     return 'badge-android';
   }
 
   /**
-   * Función trackBy para optimizar el rendimiento de las listas de Angular
+   * trackBy function to optimize the performance of Angular lists
    */
   trackByIndex(index: number): number {
     return index;
@@ -224,7 +224,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   /**
-   * Ver detalles de un dispositivo
+   * View the details of a device
    */
   viewDevice(id: number): void {
     this.deviceService.getById(id).subscribe({
@@ -241,7 +241,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Abrir modal para editar un dispositivo
+   * Open the modal to edit a device
    */
   openEditModal(id: number): void {
     this.deviceService.getById(id).subscribe({
@@ -299,7 +299,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cambiar estado de un dispositivo
+   * Change the status of a device
    */
   changeDeviceStatus(id: number, newStatus: Device['status']): void {
     this.loading = true;

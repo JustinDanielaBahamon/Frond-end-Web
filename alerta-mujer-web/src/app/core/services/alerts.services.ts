@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Alert, AlertStatus, ActivationMethod } from '../models/alert.model';
 
-// Estado del panel → estado del backend
+// Panel status → backend status
 const API_STATUS: Record<AlertStatus, string> = {
   Pendiente: 'active',
   Atendida: 'resolved',
@@ -17,28 +17,28 @@ export class AlertsService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/alerts`;
 
-  // Usado por ADMIN: todas las alertas
+  // Used by ADMIN: all alerts
   getAll(): Observable<Alert[]> {
     return this.http.get<any[]>(this.url).pipe(
       map(list => list.map(a => this.normalize(a)))
     );
   }
 
-  // Usado por USUARIA: solo sus propias alertas
+  // Used by USER: only her own alerts
   getByUser(userId: number): Observable<Alert[]> {
     return this.http.get<any[]>(`${this.url}/user/${userId}`).pipe(
       map(list => list.map(a => this.normalize(a)))
     );
   }
 
-  // Usado por USUARIA: sus alertas, de la más reciente a la más antigua
+  // Used by USER: her alerts, newest to oldest
   getMine(): Observable<Alert[]> {
     return this.http.get<any[]>(`${this.url}/me`).pipe(
       map(list => list.map(a => this.normalize(a)))
     );
   }
 
-  /** Cuántos contactos recibieron el aviso de una alerta. */
+  /** How many contacts received the notice of an alert. */
   countNotifiedContacts(id: number): Observable<number> {
     return this.http.get<unknown[]>(`${this.url}/${id}/contacts`).pipe(map(l => l.length));
   }
@@ -49,14 +49,14 @@ export class AlertsService {
     );
   }
 
-  // Cambio de estado desde administración (PATCH /api/alerts/{id}/status, solo ADMIN)
+  // Status change from administration (PATCH /api/alerts/{id}/status, ADMIN only)
   updateStatus(id: number, status: AlertStatus): Observable<Alert> {
     return this.http.patch<any>(`${this.url}/${id}/status`, { status: API_STATUS[status] }).pipe(
       map(a => this.normalize(a))
     );
   }
 
-  /** Detalle del panel: última ubicación y envío a cada contacto (sin nombre ni correo). */
+  /** Panel detail: last location and delivery to each contact (without name or email). */
   adminDetail(id: number): Observable<AdminAlertDetail> {
     const date = (iso: string | null) => (iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null);
     return this.http.get<any>(`${this.url}/${id}/admin-detail`).pipe(
@@ -80,9 +80,9 @@ export class AlertsService {
     );
   }
 
-  // ── Normalización ──────────────────────────────────────────────
-  // Convierte la alerta del backend (campos en inglés) al modelo Alerta del panel.
-  // En administración el backend agrega userId, userName y userEmail.
+  // ── Normalization ──────────────────────────────────────────────
+  // Converts the backend alert (English fields) to the panel Alert model.
+  // In administration the backend adds userId, userName and userEmail.
   private normalize(a: any): Alert {
     const lat = a.latitude != null ? Number(a.latitude) : 0;
     const lng = a.longitude != null ? Number(a.longitude) : 0;
@@ -117,7 +117,7 @@ export class AlertsService {
   private normalizeStatus(value: unknown): AlertStatus {
     const v = String(value ?? '').toLowerCase();
     if (v === 'resolved') return 'Atendida';
-    // "expired" (tiempo agotado sin atención) se agrupa con las canceladas
+    // "expired" (timed out without attention) is grouped with the cancelled ones
     if (v === 'cancelled' || v === 'expired') return 'Cancelada';
     return 'Pendiente';
   }
@@ -134,9 +134,9 @@ export class AlertsService {
   }
 }
 
-/** Datos extra de una alerta para el panel (GET /api/alerts/{id}/admin-detail). */
+/** Extra alert data for the panel (GET /api/alerts/{id}/admin-detail). */
 export interface AdminAlertDetail {
-  /** false: alerta cancelada o vencida, la administración no ve su ubicación (auditoría S2). */
+  /** false: cancelled or expired alert, the administration does not see its location (audit S2). */
   locationVisible: boolean;
   points: number;
   lastLocation: { lat: number; lng: number; precision: number | null; time: Date | null } | null;

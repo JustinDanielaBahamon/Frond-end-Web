@@ -32,14 +32,14 @@ export interface TopbarAccountLink {
 export class TopbarComponent {
   @Input() brand: string = 'Alerta Mujer';
   @Input() avatarLetter: string = 'U';
-  // TODO: pásalo desde el layout (dashboard-layout.ts) con el nombre real del usuario logueado
+  // TODO: pass it from the layout (dashboard-layout.ts) with the real name of the signed-in user
   @Input() userName: string = 'Usuario';
-  // TODO: pásalo desde cada página, o autogénéralo con router.data['title'] en NavigationEnd
+  // TODO: pass it from each page, or generate it with router.data['title'] on NavigationEnd
   @Input() pageTitle: string = '';
-  // Lista de notificaciones que le pasa cada layout. Si no pasa nada, el panel sale vacío.
+  // List of notifications each layout passes. If nothing is passed, the panel is empty.
   @Input() notifications: TopbarNotification[] = [];
 
-  /** Menú de cuenta (arriba a la derecha). Solo se muestra si hay profileRoute. */
+  /** Account menu (top right). Only shown if there is a profileRoute. */
   @Input() userEmail: string = '';
   @Input() userRole: string = '';
   @Input() profileRoute: string | null = null;
@@ -52,15 +52,15 @@ export class TopbarComponent {
   settings = inject(SettingsService);
   private themeService = inject(ThemeService);
 
-  // el icono de luna/sol sigue el tema real, no un booleano local
+  // the moon/sun icon follows the real theme, not a local boolean
   get isDark(): boolean {
     return this.themeService.currentTheme() === 'dark';
   }
 
-  // Menú de idioma
+  // Language menu
   menuOpen = false;
 
-  // Menú de cuenta
+  // Account menu
   accountOpen = false;
 
   get initials(): string {
@@ -162,7 +162,7 @@ export class TopbarComponent {
     try {
       localStorage.setItem(READ_KEY, JSON.stringify(Array.from(this.readIds)));
     } catch {
-      /* si localStorage falla, simplemente no se recuerdan las leídas */
+      /* if localStorage fails, the read ones are simply not remembered */
     }
   }
 }

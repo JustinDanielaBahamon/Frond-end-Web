@@ -16,10 +16,10 @@ export interface Evidence {
   // Campos opcionales para futuro
   location?: string;        // ej. 'Neiva, Huila'
   activationMethod?: string; // ej. 'Movimiento brusco'
-  fileUrl?: string;       // imagen/miniatura real. Sin esto, se usa el ícono por tipo.
+  fileUrl?: string;       // real image/thumbnail. Without it, the icon by type is used.
   duration?: string;         // solo video/audio, ej. '01:23'
 
-  // Información completa de alerta asociada
+  // Full information of the linked alert
   linkedAlert?: LinkedAlert;
 }
 

@@ -2,7 +2,7 @@
 //=            MODELOS DE REPORTE
 //======================================
 
-// Datos de la alerta
+// Alert data
 export interface AlertData {
   id: number;
   type: 'main' | 'mini' | 'reminder';
@@ -13,12 +13,12 @@ export interface AlertData {
   totalDuration: number; // en segundos
 }
 
-// Quién activó la alerta
+// Who activated the alert
 export interface AlertActivator {
   user: {
     id: number;
     name: string;
-    privateName?: string; // Solo visible para admin
+    privateName?: string; // Only visible to admin
   };
   device: {
     brand: string;
@@ -28,7 +28,7 @@ export interface AlertActivator {
   };
 }
 
-// Ubicación durante la alerta
+// Location during the alert
 export interface AlertLocation {
   coordinates: {
     latitude: number;
@@ -45,7 +45,7 @@ export interface AlertLocation {
     longitude: number;
     time: Date;
   };
-  mapImageUrl?: string; // URL de imagen estática del mapa
+  mapImageUrl?: string; // Static map image URL
 }
 
 // Contactos notificados
@@ -75,20 +75,20 @@ export interface AlertEvidence {
   fileName: string;
   fileSize: string;
   captureDate: Date;
-  thumbnailUrl?: string; // Para miniaturas en PDF
+  thumbnailUrl?: string; // For thumbnails in the PDF
 }
 
 // Llamadas a recursos de emergencia
 export interface ResourceCall {
   id: number;
-  resource: string; // hospital, policía, línea de ayuda, etc.
+  resource: string; // hospital, police, help line, etc.
   number: string;
   callTime: Date;
   duration: number; // en segundos
   status: 'completada' | 'no_respondida' | 'fallida';
 }
 
-// Qué pasó durante la alerta
+// What happened during the alert
 export interface AlertEvents {
   location: AlertLocation;
   notifiedContacts: AlertContact[];
@@ -123,20 +123,20 @@ export interface AlertReport {
   description?: string;
   
   // Referencia a alertas del sistema
-  alertIdList?: number[]; // IDs de las alertas incluidas en este reporte
-  // Sin alertas elegidas, el informe cubre las alertas iniciadas en este rango
+  alertIdList?: number[]; // IDs of the alerts included in this report
+  // Without chosen alerts, the report covers the alerts started in this range
   from?: Date | null;
   to?: Date | null;
   exports?: number;
   
-  // Datos detallados de la alerta
+  // Detailed alert data
   alertData?: AlertData;
   activator?: AlertActivator;
   events?: AlertEvents;
   metadata?: ReportMetadata;
 }
 
-// Filtros de búsqueda
+// Search filters
 export interface ReportFilters {
   search: string;
   startDate: Date | null;

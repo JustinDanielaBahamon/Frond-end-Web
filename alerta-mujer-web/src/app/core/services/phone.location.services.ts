@@ -9,8 +9,8 @@ export class PhoneLocationService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/location-logs`;
 
-  // Transforma LocationLogApi del backend a UbicacionEntry del frontend.
-  // El backend guarda recordedAt en UTC sin zona ("2026-10-13T04:40:07"), así que se marca como UTC.
+  // Transforms the backend LocationLogApi into the frontend LocationEntry.
+  // The backend stores recordedAt in UTC without a zone ("2026-10-13T04:40:07"), so it is marked as UTC.
   private mapLocationLogToEntry(log: LocationLogApi): LocationEntry {
     const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(log.recordedAt) ? log.recordedAt : `${log.recordedAt}Z`;
     const date = new Date(iso);
@@ -20,39 +20,39 @@ export class PhoneLocationService {
       userId: log.userProfileId,
       time: date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
       address: '',
-      gpsSignal: 'Fuerte', // El backend no tiene señal GPS, valor por defecto
-      battery: 100, // El backend no tiene batería, valor por defecto
+      gpsSignal: 'Fuerte', // The backend has no GPS signal, default value
+      battery: 100, // The backend has no battery, default value
       lat: Number(log.latitude),
       lng: Number(log.longitude),
-      // Fecha local (toISOString daría la fecha UTC y cambiaría de día por la noche)
+      // Local date (toISOString would give the UTC date and change the day at night)
       date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
       recordedAt: date.toISOString(),
       accuracy: log.accuracy != null ? Number(log.accuracy) : undefined,
     };
   }
 
-  /** Historial de la usuaria autenticada (más reciente primero). */
+  /** History of the authenticated user (newest first). */
   getMine(limit = 50): Observable<LocationEntry[]> {
     return this.http.get<LocationLogApi[]>(`${this.url}/me`, { params: { limit } }).pipe(
       map(logs => logs.map(log => this.mapLocationLogToEntry(log)))
     );
   }
 
-  /** Pide al celular (push silencioso) que envíe su ubicación actual. */
+  /** Asks the phone (silent push) to send its current location. */
   requestFromPhone(): Observable<{ phones: number; requestedAt: string }> {
     return this.http
       .post<{ celulares: number; solicitadoEn: string }>(`${this.url}/me/request`, {})
       .pipe(map((r) => ({ phones: r.celulares, requestedAt: r.solicitadoEn })));
   }
 
-  /** Última ubicación que envió el celular (null si nunca ha enviado). */
+  /** Last location the phone sent (null if it never sent one). */
   getLatest(): Observable<LocationEntry | null> {
     return this.http.get<LocationLogApi | null>(`${this.url}/me/latest`).pipe(
       map(log => (log ? this.mapLocationLogToEntry(log) : null))
     );
   }
 
-  // Usado por USUARIA: solo su propio historial de ubicaciones
+  // Used by USER: only her own location history
   getByUser(userId: number): Observable<LocationEntry[]> {
     return this.http.get<LocationLogApi[]>(`${this.url}/user/${userId}`).pipe(
       map(logs => logs.map(log => this.mapLocationLogToEntry(log)))

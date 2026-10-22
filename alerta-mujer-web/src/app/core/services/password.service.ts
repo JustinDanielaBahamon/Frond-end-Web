@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-/** Cambio y recuperación de contraseña (la recuperación usa un código de 6 dígitos enviado al correo). */
+/** Password change and recovery (recovery uses a 6-digit code sent by email). */
 @Injectable({ providedIn: 'root' })
 export class PasswordService {
   private http = inject(HttpClient);
@@ -28,7 +28,7 @@ export class PasswordService {
 
 export type Requirement = { text: string; meets: boolean };
 
-/** Requisitos visibles y nivel de seguridad (0 a 4) de una contraseña. */
+/** Visible requirements and strength level (0 to 4) of a password. */
 export function evaluatePassword(key: string): { requirements: Requirement[]; level: number; label: string; valid: boolean } {
   const requirements: Requirement[] = [
     { text: 'Al menos 8 caracteres', meets: key.length >= 8 },
@@ -39,6 +39,6 @@ export function evaluatePassword(key: string): { requirements: Requirement[]; le
   const met = requirements.filter((r) => r.meets).length;
   const level = key.length === 0 ? 0 : Math.max(1, met);
   const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
-  // El backend solo exige 8 caracteres; el resto se recomienda
+  // The backend only requires 8 characters; the rest is recommended
   return { requirements, level, label: labels[level], valid: key.length >= 8 && key.length <= 100 };
 }

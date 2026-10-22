@@ -14,7 +14,7 @@ import { EmergencyResourceApi } from '../../../core/models/resource.model';
 
 type Category = 'riesgo' | 'segura' | 'policia' | 'salud' | 'apoyo' | 'linea';
 
-/** Zona o recurso de emergencia, unificados para la lista y el mapa. */
+/** Emergency zone or resource, unified for the list and the map. */
 interface Point {
   key: string;
   source: 'zona' | 'recurso';
@@ -30,7 +30,7 @@ interface Point {
   telephone2?: string;
 }
 
-// Colores alineados con "Mi ubicación" y la app móvil
+// Colors aligned with "Mi ubicación" and the mobile app
 export const CATEGORIES: Record<Category, { label: string; color: string }> = {
   riesgo: { label: 'Zona de riesgo', color: '#cb1ce6' },
   segura: { label: 'Zona segura', color: '#5316a3' },
@@ -99,7 +99,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   myPosition = signal<{ lat: number; lng: number } | null>(null);
   locationStatus = signal<'sin-pedir' | 'buscando' | 'ok' | 'denegada'>('sin-pedir');
 
-  /** Líneas para llamar sin buscar (se muestran siempre arriba). */
+  /** Lines to call without searching (always shown on top). */
   lines = computed(() => this.points().filter((p) => p.category === 'linea' && p.telephone));
 
   count = computed(() => {
@@ -108,7 +108,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
     return c;
   });
 
-  /** Lista filtrada y ordenada por cercanía (si se conoce la ubicación). */
+  /** List filtered and sorted by proximity (if the location is known). */
   filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
     const filter = this.filter();
@@ -122,7 +122,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
     return [...list].sort((a, b) => (this.distance(a) ?? Infinity) - (this.distance(b) ?? Infinity));
   });
 
-  /** Zonas de riesgo / seguras en las que la usuaria está ahora mismo. */
+  /** Risk / safe zones the user is in right now. */
   currentZones = computed(() =>
     this.points().filter((p) => p.radio && (this.distance(p) ?? Infinity) <= p.radio)
   );
@@ -137,7 +137,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loading.set(false);
     });
 
-    // Si ya dio permiso de ubicación antes, se usa sin volver a preguntar
+    // If she already gave location permission before, it is used without asking again
     navigator.permissions?.query({ name: 'geolocation' as PermissionName })
       .then((p) => { if (p.state === 'granted') this.useMyLocation(); })
       .catch(() => {});
@@ -155,7 +155,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map = null;
   }
 
-  // ── Ubicación de la usuaria ────────────────────
+  // ── User location ────────────────────
   useMyLocation(): void {
     if (!navigator.geolocation) {
       this.locationStatus.set('denegada');

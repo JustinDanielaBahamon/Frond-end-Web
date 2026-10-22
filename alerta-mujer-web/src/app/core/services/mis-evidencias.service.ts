@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 export type EvidenceType = 'photo' | 'video' | 'audio' | 'document';
 
-/** Evidencia de la usuaria autenticada (GET /api/evidences/me). */
+/** Evidence of the authenticated user (GET /api/evidences/me). */
 export interface MyEvidence {
   id: number;
   alertId: number;
@@ -34,7 +34,7 @@ export interface MyAlert {
   start: Date;
   lat: number | null;
   lng: number | null;
-  /** La usuaria la marcó para que sus evidencias no se borren a los 60 días. */
+  /** The user marked it so its evidence is not deleted after 60 days. */
   keep: boolean;
 }
 
@@ -54,7 +54,7 @@ interface EvidenceViewApi {
   } | null;
 }
 
-// El backend envía LocalDateTime en UTC sin zona
+// The backend sends LocalDateTime in UTC without a zone
 const utcDate = (iso: string | null | undefined): Date | null =>
   iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null;
 
@@ -67,7 +67,7 @@ export class MyEvidenceService {
     return this.http.get<EvidenceViewApi[]>(`${this.url}/me`).pipe(map((l) => l.map(fromApi)));
   }
 
-  /** El archivo se pide con el token y se muestra como blob: nunca hay una URL pública. */
+  /** The file is requested with the token and shown as a blob: there is never a public URL. */
   file(id: number): Observable<Blob> {
     return this.http.get(`${this.url}/${id}/file`, { responseType: 'blob' });
   }
@@ -100,14 +100,14 @@ export class MyEvidenceService {
       }))));
   }
 
-  /** Conservar (o no) las evidencias de una alerta más allá de los 60 días. */
+  /** Keep (or not) the evidence of an alert beyond 60 days. */
   keep(alertId: number, keep: boolean): Observable<void> {
     return this.http
       .patch(`${environment.apiUrl}/api/alerts/${alertId}/keep-evidence`, { keep })
       .pipe(map(() => undefined));
   }
 
-  /** Cambia el nombre que se muestra (el archivo y su huella no cambian). */
+  /** Changes the displayed name (the file and its fingerprint do not change). */
   rename(id: number, name: string): Observable<MyEvidence> {
     return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: name }).pipe(map(fromApi));
   }

@@ -16,8 +16,8 @@ export class AccentColorService {
   readonly currentAccent = this.accent.asReadonly();
 
   constructor() {
-    // se re-ejecuta si cambia el color O si cambia claro/oscuro,
-    // para recalcular la rampa con luminosidades correctas
+    // runs again if the color OR light/dark changes,
+    // to recompute the ramp with the right lightness values
     effect(() => {
       const hex = this.accent();
       const theme = this.themeService.currentTheme();
@@ -32,7 +32,7 @@ export class AccentColorService {
 
   private getInitialAccent(): string {
     const saved = localStorage.getItem(STORAGE_KEY);
-    // Colores que ya no se ofrecen: quien los tenía elegidos vuelve al violeta de la app
+    // Colors no longer offered: whoever had them chosen goes back to the app violet
     if (!saved || RETIRED_COLORS.includes(saved.toLowerCase())) return DEFAULT_ACCENT;
     return saved;
   }

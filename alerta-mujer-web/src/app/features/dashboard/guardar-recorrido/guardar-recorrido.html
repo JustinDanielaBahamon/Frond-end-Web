@@ -1,4 +1,4 @@
-<!-- Sub-pestañas internas: Recorridos / Historial (mismo patrón que "Mi ubicación") -->
+<!-- Inner sub-tabs: Routes / History (same pattern as "Mi ubicación") -->
 <div class="gr-subtabs" role="tablist">
   <button class="gr-subtab" role="tab" [class.gr-subtab--active]="activeTab() === 'recorridos'"
           [attr.aria-selected]="activeTab() === 'recorridos'" (click)="setTab('recorridos')">
@@ -191,7 +191,7 @@
             @for (r of routes(); track r.id) {
               <button class="gr-history-item" [class.gr-history-item--selected]="selected()?.id === r.id" (click)="viewDetail(r)">
                 <span class="gr-swatch gr-swatch--lg" [style.background]="colorDe(r)">
-                  <!-- El ícono va siempre: antes solo aparecía la estrella y al quitarla la tarjeta quedaba vacía -->
+                  <!-- The icon is always there: before only the star appeared and removing it left the card empty -->
                   <svg class="gr-swatch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>
                   </svg>

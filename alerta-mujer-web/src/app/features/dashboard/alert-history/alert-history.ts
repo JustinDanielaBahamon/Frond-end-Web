@@ -17,8 +17,8 @@ const iconDefault = L.icon({
   iconAnchor: [12, 41],
 });
 
-// Teselas de OpenStreetMap (las de CARTO ahora exigen clave y salían con "API KEY REQUIRED").
-// En modo oscuro se oscurecen con un filtro CSS (clase tiles-oscuras en la capa).
+// OpenStreetMap tiles (CARTO ones now require a key and showed "API KEY REQUIRED").
+// In dark mode they are darkened with a CSS filter (tiles-oscuras class on the layer).
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_ATTRIBUTION = '© OpenStreetMap contributors';
 
@@ -40,15 +40,15 @@ export class AlertHistory implements OnInit, OnDestroy {
   filteredAlerts: Alert[] = [];
   error = false;
 
-  // Fecha elegida en el selector (formato 'YYYY-MM-DD' del <input type="date">), o null si no hay filtro.
+  // Date chosen in the picker ('YYYY-MM-DD' format of <input type="date">), or null without a filter.
   dateFilter: string | null = null;
 
-  // Filtro por medio de activación ('Todas' = sin filtro).
+  // Filter by activation method ('Todas' = no filter).
   typeFilter = 'Todas';
   searchTerm = '';
 
-  // NOTA: estos 4 valores deben coincidir exactamente con los que envía el backend
-  // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
+  // NOTE: these 4 values must exactly match the ones the backend sends
+  // in Alert.activationMethod. Adjust the list if your real names are different.
   availableMethods = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Botón de encendido', 'Manual'];
 
 
@@ -72,19 +72,19 @@ export class AlertHistory implements OnInit, OnDestroy {
     'Cancelada': 'badge-falsa',
   };
 
-  // Fila expandida in-line (reemplaza al modal). Solo una a la vez.
+  // Row expanded inline (replaces the modal). Only one at a time.
   expandedAlertId: number | null = null;
   openMenuId: number | null = null;
 
-  // Paginación
+  // Pagination
   currentPage = 1;
   pageSize = 7;
 
   private map: L.Map | null = null;
   private tileLayer: L.TileLayer | null = null;
   private currentMapElId: string | null = null;
-  // Vigila cambios de tema (clase/atributo en <html> o <body>) mientras el mini-mapa está abierto,
-  // para repintar las teselas sin tener que recargar la página.
+  // Watches theme changes (class/attribute on <html> or <body>) while the mini map is open,
+  // to repaint the tiles without reloading the page.
   private themeObserver: MutationObserver | null = null;
 
   ngOnInit() {
@@ -112,8 +112,8 @@ export class AlertHistory implements OnInit, OnDestroy {
     this.attendedAlerts = alerts.filter(a => a.status === 'Atendida').length;
     this.cancelledAlerts = alerts.filter(a => a.status === 'Cancelada').length;
 
-    // 👇 asume que 'tiempo' es parseable como fecha (ej. "2026-06-13T10:32:00").
-    // Si tu formato es distinto (ej. "13 jun 2026, 10:32 AM"), dime el formato exacto
+    // 👇 assumes 'time' can be parsed as a date (e.g. "2026-06-13T10:32:00").
+    // If your format is different (e.g. "13 jun 2026, 10:32 AM"), tell me the exact format
     // y ajusto el parseo.
     const today = new Date();
     this.alertsThisMonth = alerts.filter(a => {
@@ -124,7 +124,7 @@ export class AlertHistory implements OnInit, OnDestroy {
     }).length;
   }
 
-  /** Click en una fila: expande/colapsa el detalle justo debajo, sin modal. */
+  /** Click on a row: expands/collapses the detail right below, without a modal. */
   toggleExpand(alert: Alert) {
     if (this.expandedAlertId === alert.id) {
       this.destroyMap();
@@ -132,7 +132,7 @@ export class AlertHistory implements OnInit, OnDestroy {
       return;
     }
 
-    this.destroyMap(); // por si había otra fila abierta con su mini-mapa
+    this.destroyMap(); // in case another row was open with its mini map
     this.expandedAlertId = alert.id;
 
     const elId = `mini-map-${alert.id}`;
@@ -157,12 +157,12 @@ closeMenu() {
   }
 
   /**
-   * Detecta si el tema activo de la app es oscuro.
+   * Detects whether the active app theme is dark.
    *
-   * 👇 Ajusta esto según cómo tu ThemeService marca el modo oscuro. Por defecto
-   * revisa si <html> o <body> tienen la clase "dark". Si en tu app en vez de
-   * eso usas, por ejemplo, un atributo `data-theme="dark"` en <html>, cambia
-   * la condición de abajo por:
+   * 👇 Adjust this to how your ThemeService marks dark mode. By default
+   * it checks whether <html> or <body> have the "dark" class. If your app uses,
+   * for example, a `data-theme="dark"` attribute on <html> instead, change
+   * the condition below to:
    *   document.documentElement.getAttribute('data-theme') === 'dark'
    */
   private isDarkMode(): boolean {
@@ -170,7 +170,7 @@ closeMenu() {
            document.body.classList.contains('dark');
   }
 
-  /** Agrega (o reemplaza) la capa de teselas según el tema actual. */
+  /** Adds (or replaces) the tile layer according to the current theme. */
   private addLayerForTheme() {
     if (!this.map) return;
 
@@ -203,7 +203,7 @@ closeMenu() {
       .bindPopup(this.alerts.find((a) => a.lat === lat && a.lng === lng)?.location || 'Ubicación de la alerta')
       .openPopup();
 
-    // Si el usuario cambia de tema con el mini-mapa abierto, repintamos las teselas.
+    // If the user changes the theme with the mini map open, we repaint the tiles.
     this.themeObserver = new MutationObserver(() => this.addLayerForTheme());
     this.themeObserver.observe(document.documentElement, {
       attributes: true,
@@ -241,13 +241,13 @@ closeMenu() {
     setTimeout(() => this.map?.invalidateSize(), 300);
   }
 
-  /** La usuaria eligió (o quitó) un día en el calendario. */
+  /** The user chose (or removed) a day in the calendar. */
   onDate(value: string | null) {
     this.dateFilter = value || null;
     this.applyFilters();
   }
 
-  /** Quita el filtro de fecha y vuelve a mostrar todo el historial. */
+  /** Removes the date filter and shows the whole history again. */
   clearDateFilter() {
     this.dateFilter = null;
     this.applyFilters();
@@ -263,7 +263,7 @@ closeMenu() {
     this.applyFilters();
   }
 
-  /** Aplica fecha + medio de activación + búsqueda de texto sobre this.alertas y reinicia la paginación. */
+  /** Applies date + activation method + text search over this.alerts and resets the pagination. */
   private applyFilters() {
     let result = this.alerts;
 
@@ -294,7 +294,7 @@ closeMenu() {
     this.resolveAddresses();
   }
 
-  /** Convierte una fecha a 'YYYY-MM-DD' usando la hora local (evita el corrimiento de un día que da toISOString con UTC). */
+  /** Converts a date to 'YYYY-MM-DD' using local time (avoids the one-day shift toISOString gives with UTC). */
   private toLocalIsoDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -302,14 +302,14 @@ closeMenu() {
     return `${year}-${month}-${day}`;
   }
 
-  /** Muestra la fecha elegida en formato legible, ej. "13 jun 2026". */
+  /** Shows the chosen date in a readable format, e.g. "13 jun 2026". */
   formatDate(isoDate: string): string {
     const [year, month, day] = isoDate.split('-').map(Number);
     const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  /** Divide alerta.tiempo en fecha y hora legibles para las dos líneas de la tabla. */
+  /** Splits alert.time into a readable date and time for the two lines of the table. */
   formatDateTime(time: string): { date: string; time: string } {
     const date = new Date(time);
     if (isNaN(date.getTime())) return { date: time, time: '' };
@@ -319,7 +319,7 @@ closeMenu() {
     };
   }
 
-  // --- Paginación ---
+  // --- Pagination ---
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.filteredAlerts.length / this.pageSize));
   }
@@ -357,8 +357,8 @@ closeMenu() {
   }
 
   /**
-   * Cambia las coordenadas por barrio y dirección (OpenStreetMap, como en la app). Solo las de la
-   * página visible: el servicio consulta de a una por segundo y guarda lo ya resuelto.
+   * Replaces the coordinates with neighborhood and address (OpenStreetMap, as in the app). Only those of the
+   * visible page: the service queries one per second and keeps what is already resolved.
    */
   private resolveAddresses() {
     for (const alert of this.alertsPage) {
@@ -379,8 +379,8 @@ closeMenu() {
   }
 
   /**
-   * Lleva al módulo de Evidencias, pasando el id de la alerta por query param
-   * para que esa pantalla pueda filtrar y mostrar solo las evidencias de esta alerta.
+   * Goes to the Evidence module, passing the alert id as a query param
+   * so that screen can filter and show only the evidence of this alert.
    */
   viewEvidences(alert: Alert) {
     this.router.navigate(['/dashboard/evidence'], {
@@ -389,8 +389,8 @@ closeMenu() {
   }
 
   /**
-   * TODO: reemplazar por la llamada real a tu backend (alertsService.marcarCancelada(alerta.id)).
-   * Por ahora actualiza el estado localmente para que la UI responda de inmediato.
+   * TODO: replace with the real call to your backend (alertsService.markCancelled(alert.id)).
+   * For now it updates the status locally so the UI responds right away.
    */
   markCancelled(alert: Alert) {
     alert.status = 'Cancelada';

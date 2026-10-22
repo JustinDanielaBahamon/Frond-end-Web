@@ -20,11 +20,11 @@ type SelectionMethod = 'mapa' | 'ubicaciones';
 type SubTab = 'recorridos' | 'historial';
 type VisibilityFilter = 'todos' | 'estrellas' | 'ocultar';
 
-// Neiva (Huila): mismo centro por defecto que la app móvil
+// Neiva (Huila): same default center as the mobile app
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
-// Velocidad a pie usada por el móvil para estimar el tiempo
+// Walking speed used by mobile to estimate the time
 const SPEED_KMH = 5;
-// Un color por recorrido (máximo 4)
+// One color per route (at most 4)
 const COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 @Component({
@@ -119,7 +119,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initMap();
 
-    // Redibuja el mapa cuando cambian los recorridos, el filtro, la selección o los lugares
+    // Redraws the map when the routes, the filter, the selection or the places change
     effect(() => this.drawRoutes(), { injector: this.injector });
     effect(() => this.drawSelection(), { injector: this.injector });
     effect(() => this.drawPlaces(), { injector: this.injector });
@@ -151,8 +151,8 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.setPoint(point, { latitude: e.latlng.lat, longitude: e.latlng.lng });
     });
 
-    // El contenedor puede cambiar de tamaño al montar la vista
-    // Recalcula el tamaño cuando cambia el ancho (sidebar, ventana, pestañas)
+    // The container may change size when the view mounts
+    // Recomputes the size when the width changes (sidebar, window, tabs)
     this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
     this.resizeObserver.observe(this.mapContainer.nativeElement);
   }
@@ -192,7 +192,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
       latlngs.forEach((ll) => bounds.extend(ll));
     }
 
-    // Encuadra los recorridos la primera vez que hay datos
+    // Frames the routes the first time there is data
     if (!this.fittedView && bounds.isValid() && !this.pointA() && !this.pointB()) {
       this.map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16 });
       this.fittedView = true;
@@ -230,7 +230,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
       })
         .bindTooltip(escapeHtml(place.name))
         .on('click', (e: L.LeafletMouseEvent) => {
-          // Si se está eligiendo un punto, el lugar guardado lo fija con su nombre
+          // If a point is being chosen, the saved place sets it with its name
           const point = this.selectingPoint();
           if (!point) return;
           L.DomEvent.stopPropagation(e);
@@ -245,7 +245,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     return COLORS[(i < 0 ? 0 : i) % COLORS.length];
   }
 
-  // ── Selección de puntos ────────────────────────
+  // ── Point selection ────────────────────────
   setMethod(method: SelectionMethod): void {
     this.selectionMethod.set(method);
     this.selectingPoint.set(null);
@@ -360,7 +360,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selected.set(this.selected()?.id === r.id ? null : r);
     if (!this.selected() || !this.map || r.points.length < 2) return;
 
-    // Si el filtro lo esconde, mostrarlo
+    // If the filter hides it, show it
     if (this.visibilityFilter() === 'ocultar' || (this.visibilityFilter() === 'estrellas' && !r.important)) {
       this.visibilityFilter.set('todos');
     }
@@ -401,7 +401,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${p.latitude.toFixed(5)}, ${p.longitude.toFixed(5)}`;
   }
 
-  // Mantiene los objetos seleccionados apuntando a la versión actualizada del recorrido
+  // Keeps the selected objects pointing to the updated version of the route
   private syncSelection(): void {
     const search = (r: SavedRoute | null) => (r ? this.routes().find((x) => x.id === r.id) ?? null : null);
     this.selected.set(search(this.selected()));

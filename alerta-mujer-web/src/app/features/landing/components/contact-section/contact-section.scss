@@ -279,7 +279,7 @@ MOBILE
     gap: 19px;
 }
 
-/* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+/* 🌟 We make the last item (the third one) span 2 columns */
 .contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
     grid-column: span 2; 
 }
@@ -301,7 +301,7 @@ MOBILE
         gap: 19px;
     }
 
-    /* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+    /* 🌟 We make the last item (the third one) span 2 columns */
 .contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
     grid-column: span 1; 
 }

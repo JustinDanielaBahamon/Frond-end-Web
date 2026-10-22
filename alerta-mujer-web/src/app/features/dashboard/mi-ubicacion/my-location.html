@@ -1,4 +1,4 @@
-<!-- Sub-pestañas internas: Mapa / Historial -->
+<!-- Inner sub-tabs: Map / History -->
 <div class="mu-subtabs" role="tablist">
   <button class="mu-subtab" role="tab" [class.mu-subtab--active]="activeTab() === 'mapa'"
           [attr.aria-selected]="activeTab() === 'mapa'" (click)="setTab('mapa')">
@@ -19,11 +19,11 @@
   </button>
 </div>
 
-<!-- El mapa se mantiene montado (solo se oculta) para no perder el seguimiento en vivo -->
+<!-- The map stays mounted (only hidden) so live tracking is not lost -->
 <div class="mu-grid" [hidden]="activeTab() !== 'mapa'">
   <div class="mu-left">
 
-    <!-- Ubicación en vivo -->
+    <!-- Live location -->
     <section class="mu-card">
       <header class="mu-card-header">
         <h2 class="mu-card-title">Mi ubicación</h2>
@@ -76,7 +76,7 @@
       }
     </section>
 
-    <!-- Ubicación del celular -->
+    <!-- Phone location -->
     <section class="mu-card">
       <header class="mu-card-header">
         <h2 class="mu-card-title">Mi celular</h2>
@@ -199,7 +199,7 @@
 </div>
 
 @if (activeTab() === 'historial') {
-  <!-- Historial: ubicaciones que el móvil reportó al backend -->
+  <!-- History: locations the phone reported to the backend -->
   <section class="mu-card mu-history">
     <header class="mu-card-header">
       <h2 class="mu-card-title">Historial de ubicaciones del móvil</h2>

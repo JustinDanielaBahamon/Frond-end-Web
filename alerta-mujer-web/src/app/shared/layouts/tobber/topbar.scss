@@ -235,7 +235,7 @@
   .profile-menu__item--danger i { color: #aa15c1; }
 }
 
-// En pantallas angostas solo se ve la inicial
+// On narrow screens only the initial is shown
 @media (max-width: 700px) {
   .account-btn { padding: 2px; }
   .account-btn__text,
@@ -287,7 +287,7 @@
 }
 
 // ── NOTIFICACIONES ──────────────────────────────
-// Usa los tokens globales (--bg-card, --text-primary...), así que
+// It uses the global tokens (--bg-card, --text-primary...), so
 // cambia solo entre modo claro y oscuro.
 .topbar__notif {
   position: relative;
@@ -441,12 +441,12 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-// El modo oscuro real de este componente vive en
+// The real dark mode of this component lives in
 // src/app/shared/styles/theme/dashboard-dark.scss bajo [data-theme="dark"] { .topbar { ... } }
-// (tu app pone el atributo data-theme, no una clase body.dark-mode, así que
-// un bloque :host-context(body.dark-mode) aquí nunca se activaría).
+// (your app sets the data-theme attribute, not a body.dark-mode class, so
+// a :host-context(body.dark-mode) block here would never activate).
 
-// Móvil
+// Mobile
 @media (max-width: 768px) {
   .topbar {
     padding: 0.75rem 1rem;
@@ -454,7 +454,7 @@
     &__greeting-page { display: none; }
   }
 
-  // En pantallas angostas el panel ocupa casi todo el ancho para no salirse
+  // On narrow screens the panel takes almost the whole width so it does not overflow
   .notif-menu {
     position: fixed;
     top: 64px;

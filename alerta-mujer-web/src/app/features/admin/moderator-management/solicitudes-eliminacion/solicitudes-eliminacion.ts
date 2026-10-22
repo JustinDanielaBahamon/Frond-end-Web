@@ -5,8 +5,8 @@ import { DeletionRequest, UsersService } from '../../../../core/services/users.s
 import { AuthService } from '../../../../core/auth/auth.service';
 
 /**
- * Solicitudes para eliminar cuentas (se piden en Gestión de usuarios). Eliminar borra los datos
- * personales y no se puede deshacer, por eso la aprueba una administradora distinta de quien la pidió.
+ * Requests to delete accounts (requested from User management). Deleting erases the personal
+ * data and cannot be undone, so an admin other than the requester approves it.
  */
 @Component({
   selector: 'app-solicitudes-eliminacion',

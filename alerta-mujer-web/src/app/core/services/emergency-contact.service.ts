@@ -9,7 +9,7 @@ export class EmergencyContactService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/contacts`;
 
-  // Transforma EmergencyContactApi del backend a ContactoEmergencia del frontend
+  // Transforms the backend EmergencyContactApi into the frontend EmergencyContact
   private mapApiToContact(api: EmergencyContactApi): EmergencyContact {
     return {
       id: api.id,
@@ -22,13 +22,13 @@ export class EmergencyContactService {
     };
   }
 
-  // Transforma ContactoEmergencia del frontend al formato del backend
+  // Transforms the frontend EmergencyContact into the backend format
   private mapContactToApi(contact: Omit<EmergencyContact, 'id'>): any {
     return {
-      // No enviamos userProfileId, el backend lo establece automáticamente
+      // We do not send userProfileId, the backend sets it automatically
       contactName: contact.name,
       telephone: contact.telephone,
-      // El correo es el canal por el que el contacto recibe el aviso cuando se activa una alerta
+      // The email is the channel through which the contact receives the notice when an alert is activated
       email: contact.email?.trim() || null,
       relationship: contact.relationship,
       photo: contact.photo || undefined,
@@ -54,9 +54,9 @@ export class EmergencyContactService {
     if (contact.telephone !== undefined) apiData.telephone = contact.telephone;
     if (contact.relationship !== undefined) apiData.relationship = contact.relationship;
     if (contact.email !== undefined) apiData.email = contact.email?.trim() || null;
-    // "" quita la foto; sin el campo no se toca
+    // "" removes the photo; without the field it is left untouched
     if (contact.photo !== undefined) apiData.photo = contact.photo ?? '';
-    // El backend expone PUT (no PATCH) y solo cambia los campos enviados
+    // The backend exposes PUT (not PATCH) and only changes the sent fields
     return this.http.put<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
       map(api => this.mapApiToContact(api))
     );

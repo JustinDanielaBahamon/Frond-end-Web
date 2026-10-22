@@ -1,5 +1,5 @@
-// Zonas auxiliares — mismo lenguaje visual que el resto del módulo de ubicación
-// (tokens del tema: sirve en claro y oscuro)
+// Help zones — same visual language as the rest of the location module
+// (theme tokens: works in light and dark)
 
 $card: var(--bg-card, #241d3d);
 $soft: var(--purple-pale, #30293d);
@@ -88,7 +88,7 @@ $sos: #a70bf5;
   &--primary { border: none; background: $grad; color: #fff; &:hover { filter: brightness(1.08); } }
 }
 
-// ── Llamada rápida ────────────────────────────────
+// ── Quick call ────────────────────────────────
 .za-lines { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; }
 
 .za-line {
@@ -143,7 +143,7 @@ $sos: #a70bf5;
   strong { color: var(--cat); }
 }
 
-// ── Búsqueda y filtros ────────────────────────────
+// ── Search and filters ────────────────────────────
 .za-search {
   display: flex;
   align-items: center;
@@ -214,7 +214,7 @@ $sos: #a70bf5;
 
 .za-item {
   --cat: #{$accent};
-  flex-shrink: 0; // dentro de una lista con scroll no debe aplastarse
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
   display: flex;
   flex-direction: column;
   border: 1px solid $border;

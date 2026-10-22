@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { WebPushService } from './web-push.service';
 
-/** Alerta de otra persona que tiene a la usuaria como contacto de emergencia. */
+/** Alert of another person who has the user as an emergency contact. */
 export interface ReceivedAlert {
   id: number;
   name: string;
@@ -19,9 +19,9 @@ const REFRESH_MS = 30_000;
 const NOTIFIED_KEY = 'alerta-mujer-alertas-avisadas';
 
 /**
- * Alertas recibidas como contacto de emergencia. Mientras el panel está abierto se consultan cada
- * 30 s: si llega una alerta activa nueva aparece el aviso en el panel y, si la usuaria lo
- * permitió, una notificación del navegador.
+ * Alerts received as an emergency contact. While the panel is open they are queried every
+ * 30 s: if a new active alert arrives the notice appears in the panel and, if the user
+ * allowed it, a browser notification.
  */
 @Injectable({ providedIn: 'root' })
 export class ReceivedAlertsService {
@@ -36,11 +36,11 @@ export class ReceivedAlertsService {
     typeof Notification === 'undefined' ? 'no-soportado' : Notification.permission,
   );
 
-  /** Empieza a consultar (lo llama el panel al abrirse). */
+  /** Starts querying (called by the panel when it opens). */
   start(): void {
     if (this.timer) return;
     this.query();
-    // Con permiso ya concedido, se (re)registra el navegador para recibir avisos con la pestaña cerrada
+    // With permission already granted, the browser is (re)registered to receive notices with the tab closed
     if (this.notificationPermission() === 'granted') this.webPush.activate(() => this.query());
     this.timer = setInterval(() => this.query(), REFRESH_MS);
   }
@@ -66,13 +66,13 @@ export class ReceivedAlertsService {
       this.received.set(list);
       this.notifyNew(list.filter((a) => a.active));
     } catch {
-      // Sin conexión o sesión vencida: se reintenta en la siguiente consulta
+      // Offline or expired session: retried on the next query
     } finally {
       this.loading.set(false);
     }
   }
 
-  /** Código para abrir /seguimiento/{codigo} de una alerta recibida. */
+  /** Code to open /seguimiento/{code} of a received alert. */
   async trackingCode(id: number): Promise<string> {
     const r = await firstValueFrom(
       this.http.post<{ code: string }>(`${environment.apiUrl}/api/received-alerts/${id}/tracking`, {}),
@@ -87,12 +87,12 @@ export class ReceivedAlertsService {
     if (permission === 'granted') await this.webPush.activate(() => this.query());
   }
 
-  /** true si los avisos llegan aunque se cierre la pestaña (falta la clave VAPID si es false). */
+  /** true if the notices arrive even when the tab is closed (the VAPID key is missing if false). */
   get noticesWithTabClosed(): boolean {
     return this.webPush.configured;
   }
 
-  // Notificación del navegador una sola vez por alerta (se recuerda entre recargas)
+  // Browser notification only once per alert (remembered between reloads)
   private notifyNew(active: ReceivedAlert[]): void {
     const notified = new Set<number>(this.readNotified());
     const newOnes = active.filter((a) => !notified.has(a.id));
@@ -125,7 +125,7 @@ export class ReceivedAlertsService {
     try {
       localStorage.setItem(NOTIFIED_KEY, JSON.stringify(ids));
     } catch {
-      // modo privado: no pasa nada, solo podría repetirse el aviso
+      // private mode: nothing happens, the notice could only repeat
     }
   }
 }

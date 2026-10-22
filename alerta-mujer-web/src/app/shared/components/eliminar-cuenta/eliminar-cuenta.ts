@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/auth.service';
 
-/** Palabra que hay que escribir para confirmar (la misma que exige el backend). */
+/** Word that must be typed to confirm (the same one the backend requires). */
 const CONFIRMATION = 'ELIMINAR';
 
 /**
- * Ventana para que la usuaria elimine su cuenta: explica qué se borra y pide escribir ELIMINAR.
- * Al terminar cierra la sesión (el backend ya revocó todas las sesiones).
+ * Window for the user to delete her account: explains what is erased and asks to type ELIMINAR.
+ * When done it signs out (the backend already revoked all sessions).
  */
 @Component({
   selector: 'app-eliminar-cuenta',

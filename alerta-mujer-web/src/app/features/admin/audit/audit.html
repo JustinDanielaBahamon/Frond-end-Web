@@ -11,7 +11,7 @@
     </button>
   </header>
 
-  <!-- Accesos rápidos -->
+  <!-- Quick access -->
   <div class="quick">
     <button class="chip" [class.chip--active]="!filters.type && !filters.action" (click)="clearFilters()">Todo</button>
     <button class="chip" [class.chip--active]="filters.type === 'SESSION' && !filters.action" (click)="viewSessions()">
@@ -160,7 +160,7 @@
           <button class="icon-btn" (click)="closeDetail()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </header>
 
-        <!-- Quién -->
+        <!-- Who -->
         <section class="registro__bloque">
           <h3>Responsable</h3>
           <div class="registro__persona">
@@ -180,7 +180,7 @@
           </div>
         </section>
 
-        <!-- Qué cambió -->
+        <!-- What changed -->
         <section class="registro__bloque">
           <h3>Qué pasó</h3>
           @if (changes(r); as list) {
@@ -205,7 +205,7 @@
           }
         </section>
 
-        <!-- Datos técnicos -->
+        <!-- Technical data -->
         <footer class="registro__tecnico">
           <span><i class="fa-solid" [ngClass]="sourceIcon(r.source)"></i> {{ r.source || 'Origen no registrado' }}</span>
           <span><i class="fa-solid fa-network-wired"></i> IP {{ r.ip || '—' }}</span>

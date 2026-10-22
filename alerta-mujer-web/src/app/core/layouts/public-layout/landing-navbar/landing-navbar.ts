@@ -20,7 +20,7 @@ export class LandingNavbarComponent {
 
   constructor(
     private elementRef: ElementRef,
-    public themeService: ThemeService   // público para poder usarlo en el HTML
+    public themeService: ThemeService   // public so it can be used in the HTML
   ) {}
 
   toggleMenu() {

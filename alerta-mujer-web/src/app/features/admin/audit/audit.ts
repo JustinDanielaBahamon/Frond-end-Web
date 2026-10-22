@@ -9,7 +9,7 @@ import { compactPages } from '../../../shared/utils/paginacion';
 
 const PER_PAGE = 10;
 
-/** Nombres legibles de los tipos de registro auditados. */
+/** Readable names of the audited record types. */
 export const TYPES: Record<string, string> = {
   SESSION: 'Sesión',
   SYSTEM_CONFIGURATION: 'Parámetros del sistema',
@@ -32,7 +32,7 @@ const ACTIONS: Record<string, string> = {
   DELETE: 'Eliminó',
 };
 
-// Columnas que aparecen en el detalle, con su nombre para el panel
+// Columns that appear in the detail, with their name for the panel
 const CAMPOS: Record<string, string> = {
   status: 'estado',
   ended_at: 'fin',
@@ -150,7 +150,7 @@ export class AuditComponent implements OnInit {
     });
   }
 
-  // ── Presentación ─────────────────────────────────────────────
+  // ── Presentation ─────────────────────────────────────────────
   action(r: AuditRecord): string {
     return ACTIONS[r.action] ?? r.action;
   }
@@ -164,7 +164,7 @@ export class AuditComponent implements OnInit {
     return `${this.type(r)}${r.recordId != null ? ' #' + r.recordId : ''}`;
   }
 
-  /** Quién hizo el cambio cuando no hubo una persona con sesión. */
+  /** Who made the change when there was no person with a session. */
   withoutActor(r: AuditRecord): { text: string; help: string; icon: string } {
     if (r.source?.startsWith('Tarea automática')) {
       return { text: r.source.replace('Tarea automática · ', ''), help: 'Proceso automático del servidor', icon: 'fa-gears' };
@@ -194,14 +194,14 @@ export class AuditComponent implements OnInit {
     return 'badge--info';
   }
 
-  /** "lunes, 20 de octubre de 2026, 10:32:15 a. m." (la app no registra el locale de Angular). */
+  /** "lunes, 20 de octubre de 2026, 10:32:15 a. m." (the app does not register the Angular locale). */
   longDate(date: Date | string | null): string {
     if (!date) return '';
     const d = new Date(date);
     return isNaN(d.getTime()) ? '' : d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'medium' });
   }
 
-  /** Ícono del tipo de acción (cabecera del detalle). */
+  /** Icon of the action type (detail header). */
   actionIcon(r: AuditRecord): string {
     const icons: Record<string, string> = {
       INSERT: 'fa-plus', UPDATE: 'fa-pen', DELETE: 'fa-trash',
@@ -210,7 +210,7 @@ export class AuditComponent implements OnInit {
     return icons[r.action] ?? 'fa-clipboard-list';
   }
 
-  /** Cambios como filas "dato / antes / después"; si el registro no los trae, antes y después son null. */
+  /** Changes as "field / before / after" rows; if the record does not carry them, before and after are null. */
   changes(r: AuditRecord): { field: string; before: string | null; after: string | null }[] {
     return this.detail(r).map((line) => {
       const arrow = line.indexOf(' → ');
@@ -224,7 +224,7 @@ export class AuditComponent implements OnInit {
     });
   }
 
-  /** Detalle legible: valores "antes → después", columnas cambiadas o el dispositivo de la sesión. */
+  /** Readable detail: "before → after" values, changed columns or the session device. */
   detail(r: AuditRecord): string[] {
     const d = r.description;
     if (d.startsWith('Valores: ')) {

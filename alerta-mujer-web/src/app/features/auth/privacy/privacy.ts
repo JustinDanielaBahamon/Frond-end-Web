@@ -14,7 +14,7 @@ export class PrivacyComponent {
   private draft  = inject(RegisterDraftService);
   private auth   = inject(AuthService);
 
-  /** Con sesión iniciada se llegó desde Ajustes; si no, desde el registro. */
+  /** With a session it came from Settings; otherwise, from the registration. */
   readonly withSession = this.auth.isLoggedIn();
   readonly backText = this.withSession ? 'Volver a Ajustes' : 'Volver al registro';
   readonly understoodText = this.withSession ? 'Entendido, volver a Ajustes' : 'Entendido, volver al registro';
@@ -25,7 +25,7 @@ export class PrivacyComponent {
       this.router.navigate([admin ? '/admin/settings' : '/dashboard/settings']);
       return;
     }
-    this.draft.privacyRead = true;   // habilita el checkbox en el registro
+    this.draft.privacyRead = true;   // enables the checkbox in the registration
     this.router.navigate(['/auth/register']);
   }
 }

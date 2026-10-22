@@ -14,7 +14,7 @@ export interface AuditRecord {
   actorEmail: string | null;
   /** 'Administración' | 'Usuaria' | null */
   role: string | null;
-  /** Desde dónde se hizo: 'Panel web · Chrome · Linux', 'App móvil · Android', 'Tarea automática · …' */
+  /** Where it was done from: 'Panel web · Chrome · Linux', 'App móvil · Android', 'Tarea automática · …' */
   source: string | null;
   ip: string | null;
   date: Date;
@@ -33,7 +33,7 @@ export interface AuditActor {
   email: string;
 }
 
-/** Filtros del módulo de Auditoría; responsableId 0 = cambios del sistema. Fechas en 'yyyy-MM-dd'. */
+/** Filters of the Audit module; actorId 0 = system changes. Dates in 'yyyy-MM-dd'. */
 export interface AuditFilters {
   actorId: number | null;
   type: string;

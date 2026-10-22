@@ -32,7 +32,7 @@ export class LoginComponent {
   validPassword = true;
 
   // ------------------------
-  // Mostrar/Ocultar contraseña
+  // Show/Hide password
   // ------------------------
 
   showpassword() {
@@ -40,7 +40,7 @@ export class LoginComponent {
   }
 
   // ------------------------
-  // Validación correo
+  // Email validation
   // ------------------------
 
   validateEmail() {
@@ -57,18 +57,18 @@ export class LoginComponent {
   }
 
   // ------------------------
-  // Validación contraseña
+  // Password validation
   // ------------------------
 
   validatePassword() {
 
-    // Al iniciar sesión no se exigen reglas de formato: las cuentas creadas en la app o con
-    // recuperación solo piden 8 caracteres, y el backend es quien valida la contraseña.
+    // No format rules are required when signing in: accounts created in the app or through
+    // recovery only require 8 characters, and the backend is the one that validates the password.
     this.validPassword = true;
   }
 
   // ------------------------
-  // Navegación
+  // Navigation
   // ------------------------
 
   goToRegister() {
@@ -110,7 +110,7 @@ export class LoginComponent {
       });
     } catch (e: any) {
       this.loadingGoogle = false;
-      // Cerrar la ventana de Google no es un error que haya que mostrar
+      // Closing the Google window is not an error that needs to be shown
       if (e?.code === 'auth/popup-closed-by-user' || e?.code === 'auth/cancelled-popup-request') return;
       this.error = e?.code === 'auth/popup-blocked'
         ? 'Tu navegador bloqueó la ventana de Google. Permite ventanas emergentes e intenta de nuevo.'

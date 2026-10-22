@@ -5,11 +5,11 @@ export interface EmergencyContact {
   telephone: string;
   email?: string;
   relationship: string;
-  /** Data URI de la foto (la misma que se pone desde la app). */
+  /** Photo data URI (the same one set from the app). */
   photo?: string | null;
 }
 
-// Modelo que devuelve el backend EmergencyContact
+// Model returned by the backend EmergencyContact
 export interface EmergencyContactApi {
   id: number;
   userProfileId: number;

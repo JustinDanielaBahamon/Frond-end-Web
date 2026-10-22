@@ -31,7 +31,7 @@ export interface AlertSummary {
   createdAt: string;
 }
 
-/** Lo que se ha hecho con una cuenta (bloqueos, desbloqueos, solicitudes de eliminación). */
+/** What has been done with an account (blocks, unblocks, deletion requests). */
 export interface ModerationHistory {
   date: string;
   type: string;
@@ -53,7 +53,7 @@ interface ModerationHistoryApi {
   tieneEvidencia: boolean;
 }
 
-/** Celular de la usuaria tal como lo ve el panel (GET /api/devices, solo admin). */
+/** The user's phone as the panel sees it (GET /api/devices, admin only). */
 export interface AdminPhone {
   id: number;
   userId: number | null;
@@ -112,7 +112,7 @@ export class UsersService {
     );
   }
 
-  // Crea la usuaria usando el endpoint de registro del backend
+  // Creates the user through the backend registration endpoint
   createUser(data: Record<string, any>): Observable<ManagedUser> {
     return this.http.post<any>(`${this.apiUrl}/api/auth/register`, {
       nombre: data['nombre'],
@@ -121,7 +121,7 @@ export class UsersService {
       telefono: data['telefono']
     }).pipe(
       map(response => {
-        // El registro devuelve un formato diferente, mapearlo
+        // Registration returns a different format, map it
         const user = response.user;
         return {
           id: user.id.toString(),
@@ -233,7 +233,7 @@ export class UsersService {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  // ── Moderación ───────────────────────────────────────────────
+  // ── Moderation ───────────────────────────────────────────────
   block(id: string | number, reason: string, description: string, evidence: string | null): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/block`, {
       reason: reason, description, evidence,
@@ -280,7 +280,7 @@ export class UsersService {
       `${this.apiUrl}/api/admin/deletion-requests/${id}/${approve ? 'approve' : 'reject'}`, { note: note });
   }
 
-  /** Envía a la usuaria el correo con el código para crear una contraseña nueva. */
+  /** Sends the user the email with the code to create a new password. */
   sendRecovery(email: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/auth/forgot-password`, { email });
   }

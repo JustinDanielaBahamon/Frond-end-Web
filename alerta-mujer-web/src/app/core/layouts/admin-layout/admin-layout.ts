@@ -10,10 +10,10 @@ import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AlertsService } from '../../../core/services/alerts.services';
 
-// Debe coincidir con el breakpoint del drawer en sidebar.scss
+// Must match the drawer breakpoint in sidebar.scss
 const DRAWER_BREAKPOINT = 1024;
 
-// Cada cuánto se revisan las alertas nuevas (milisegundos)
+// How often new alerts are checked (milliseconds)
 const NOTIF_REFRESH_MS = 30000;
 
 @Component({
@@ -31,13 +31,13 @@ export class AdminLayoutComponent implements OnInit {
   private alertsService = inject(AlertsService);
   private inactivity = inject(InactivityService);
 
-  // En pantallas angostas el sidebar es un drawer y empieza cerrado
+  // On narrow screens the sidebar is a drawer and starts closed
   private isDrawerMode = window.innerWidth <= DRAWER_BREAKPOINT;
   sidebarCollapsed = this.isDrawerMode;
   currentUser: SidebarUser | null = null;
 
   // Notificaciones del topbar (alertas pendientes)
-  // Signal: la app no usa zone.js, así que la campana solo se actualiza si la lista avisa del cambio.
+  // Signal: the app does not use zone.js, so the bell only updates if the list reports the change.
   notifications = signal<TopbarNotification[]>([]);
 
   links: SidebarLink[] = [
@@ -54,7 +54,7 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Mi perfil', route: '/admin/perfil' },
   ];
 
-  // Accesos del menú de cuenta (arriba a la derecha), además de "Mi perfil"
+  // Account menu links (top right), besides "Mi perfil"
   readonly accountLinks: TopbarAccountLink[] = [
     { label: 'Cambiar contraseña', route: '/admin/perfil', fragment: 'contrasena', icon: 'fa-solid fa-key' },
     { label: 'Configuración del sistema', route: '/admin/settings', icon: 'fa-solid fa-sliders' },
@@ -62,18 +62,18 @@ export class AdminLayoutComponent implements OnInit {
   ];
 
   ngOnInit() {
-    // Cierre de sesión por inactividad, solo mientras se está dentro del panel
+    // Sign-out due to inactivity, only while inside the panel
     this.inactivity.start();
     this.destroyRef.onDestroy(() => this.inactivity.stop());
 
-    // Perfil que se muestra abajo del sidebar (antes faltaba el [user], por eso no aparecía)
+    // Profile shown at the bottom of the sidebar (the [user] was missing before, that is why it did not show)
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user
         ? { name: user.name, email: user.email }
         : null;
     });
 
-    // En modo drawer, cierra el menú al navegar a otro módulo
+    // In drawer mode, closes the menu when navigating to another module
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),
@@ -86,7 +86,7 @@ export class AdminLayoutComponent implements OnInit {
       });
 
     // Notificaciones: alertas pendientes, se refrescan cada 30 segundos.
-    // Si una consulta falla, se dejan las notificaciones que ya había.
+    // If a query fails, the existing notifications are kept.
     timer(0, NOTIF_REFRESH_MS)
       .pipe(
         switchMap(() => this.alertsService.getAll().pipe(catchError(() => of(null)))),
@@ -109,7 +109,7 @@ export class AdminLayoutComponent implements OnInit {
       });
   }
 
-  // Al cruzar el breakpoint: cerrado en pantallas angostas, abierto en escritorio
+  // When crossing the breakpoint: closed on narrow screens, open on desktop
   @HostListener('window:resize')
   onResize() {
     const drawerMode = window.innerWidth <= DRAWER_BREAKPOINT;
@@ -124,8 +124,8 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   toggleTheme() {
-    // Único punto de verdad del tema: ThemeService. Así AccentColorService
-    // recalcula la paleta (--purple-pale, --purple-deep, etc.) al cambiar.
+    // Single source of truth for the theme: ThemeService. That way AccentColorService
+    // recomputes the palette (--purple-pale, --purple-deep, etc.) when it changes.
     this.themeService.toggleTheme();
   }
 

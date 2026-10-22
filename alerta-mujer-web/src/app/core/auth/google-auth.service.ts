@@ -4,9 +4,9 @@ import { GoogleAuthProvider, getAuth, signInWithPopup, signOut } from 'firebase/
 import { environment } from '../../../environments/environment';
 
 /**
- * Abre la ventana de Google (Firebase Authentication) y devuelve el ID token de Firebase.
- * Ese token se envía al backend (/api/auth/google), que lo valida y entrega el JWT de la app.
- * La sesión de la app es la del backend: la de Firebase se cierra enseguida.
+ * Opens the Google window (Firebase Authentication) and returns the Firebase ID token.
+ * That token is sent to the backend (/api/auth/google), which validates it and returns the app JWT.
+ * The app session is the backend one: the Firebase one is closed right away.
  */
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {

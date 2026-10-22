@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 
 export interface Place {
   neighborhood: string | null;
-  address: string | null; // vía y número, o nombre del sitio (sin la ciudad)
+  address: string | null; // street and number, or name of the place (without the city)
   city: string | null;
 }
 
-// OpenStreetMap (Nominatim): gratis y sin clave, misma fuente que la app móvil.
-// Su política pide máximo 1 consulta por segundo, así que las consultas van en cola.
+// OpenStreetMap (Nominatim): free and keyless, same source as the mobile app.
+// Its policy asks for at most 1 request per second, so requests are queued.
 const NOMINATIM = 'https://nominatim.openstreetmap.org/reverse';
 const WAIT_MS = 1100;
 
@@ -16,17 +16,17 @@ export class GeocodingService {
   private cache = new Map<string, Promise<Place | null>>();
   private cola: Promise<unknown> = Promise.resolve();
 
-  /** Barrio y dirección de un punto. Se cachea por coordenada redondeada (~11 m). */
+  /** Neighborhood and address of a point. Cached by rounded coordinate (~11 m). */
   get(lat: number, lng: number): Promise<Place | null> {
     const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
     const enCache = this.cache.get(key);
     if (enCache) return enCache;
 
     const query = this.cola.then(() => this.query(lat, lng));
-    // La siguiente consulta espera a que esta termine y a que pase el intervalo
+    // The next request waits for this one to finish and for the interval to pass
     this.cola = query.catch(() => null).then(() => new Promise((r) => setTimeout(r, WAIT_MS)));
     this.cache.set(key, query);
-    // Si falla, se olvida para poder reintentar más tarde
+    // If it fails, it is forgotten so it can be retried later
     query.then((r) => { if (!r) this.cache.delete(key); });
     return query;
   }
@@ -46,11 +46,11 @@ export class GeocodingService {
       const via = clear(a.road);
       const streetWithNumber = via ? (a.house_number ? `${via} # ${a.house_number}` : via) : null;
       const name = clear(data?.name);
-      // Si el punto cae sobre un sitio con nombre (colegio, almacén...), se muestra ese nombre
+      // If the point falls on a named place (school, store...), that name is shown
       const address = name && name !== via && name !== neighborhood
         ? (streetWithNumber ? `${name}, ${streetWithNumber}` : name)
         : streetWithNumber;
-      // OSM a veces nombra la ciudad como "Perímetro Urbano Neiva"
+      // OSM sometimes names the city "Perímetro Urbano Neiva"
       const city = (clear(a.city) ?? clear(a.town) ?? clear(a.village) ?? clear(a.municipality))
         ?.replace(/^Perímetro Urbano\s+/i, '') ?? null;
 

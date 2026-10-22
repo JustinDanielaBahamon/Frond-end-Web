@@ -8,10 +8,10 @@ import { ManualZone, MapPoint, PointType, POINT_TYPES } from '../models/zona.mod
 export class RiskZonesService {
   private http = inject(HttpClient);
   private zonesUrl = `${environment.apiUrl}/api/zones`;
-  // Los puntos de apoyo del mapa (CAI, hospitales, bomberos...) son recursos de emergencia del backend.
+  // The map support points (CAI, hospitals, firefighters...) are backend emergency resources.
   private resourcesUrl = `${environment.apiUrl}/api/resources`;
 
-  /** Zonas de riesgo para el mapa de alertas (los puntos de apoyo no se dibujan como riesgo). */
+  /** Risk zones for the alerts map (support points are not drawn as risk). */
   getZones(): Observable<ManualZone[]> {
     return this.http.get<ZoneApi[]>(this.zonesUrl).pipe(
       map(zones => zones.filter(z => z.zoneType === 'risk' && z.isActive !== false).map(zoneFromApi))
@@ -54,7 +54,7 @@ export class RiskZonesService {
   }
 }
 
-/** Campos de /api/resources que usa el mapa. */
+/** Fields of /api/resources the map uses. */
 interface ResourceApi {
   id: number;
   name: string;
@@ -64,7 +64,7 @@ interface ResourceApi {
 }
 
 
-/** Campos de /api/zones que usa el mapa de alertas. */
+/** Fields of /api/zones the alerts map uses. */
 interface ZoneApi {
   id: number;
   name: string;
@@ -77,7 +77,7 @@ interface ZoneApi {
   isActive?: boolean;
 }
 
-// Una zona "pin" se guarda con un radio pequeño, porque el backend exige radio.
+// A "pin" zone is stored with a small radius, because the backend requires a radius.
 const RADIO_PIN = 50;
 
 const LEVEL_FROM_API: Record<string, ManualZone['level']> = { high: 'Alto', medium: 'Medio', low: 'Bajo' };
@@ -102,7 +102,7 @@ function zoneToApi(z: Omit<ManualZone, 'id'>): Omit<ZoneApi, 'id'> {
     name: z.name,
     zoneType: 'risk',
     riskLevel: LEVEL_TO_API[z.level] ?? 'medium',
-    // El mapa no pide ciudad; se puede corregir luego en Gestión de zonas.
+    // The map does not ask for a city; it can be fixed later in Zone management.
     city: 'Sin especificar',
     latitude: z.centerLat,
     longitude: z.centerLng,
@@ -111,7 +111,7 @@ function zoneToApi(z: Omit<ManualZone, 'id'>): Omit<ZoneApi, 'id'> {
   };
 }
 
-/** Distancia en metros entre dos coordenadas (fórmula del haversine). */
+/** Distance in meters between two coordinates (haversine formula). */
 function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000;
   const rad = (g: number) => (g * Math.PI) / 180;
@@ -121,13 +121,13 @@ function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number):
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/** True si la coordenada cae dentro del radio de la zona. Las coordenadas 0,0 se consideran "sin ubicación". */
+/** True if the coordinate falls inside the zone radius. Coordinates 0,0 are considered "no location". */
 export function isInsideZone(z: ManualZone, lat: number, lng: number): boolean {
   if (!lat && !lng) return false;
   return distanceMeters(z.centerLat, z.centerLng, lat, lng) <= (z.radio ?? RADIO_PIN);
 }
 
-/** Llena alertasEnZona de cada zona con las alertas que caen dentro de su radio. */
+/** Fills alertsInZone of each zone with the alerts that fall inside its radius. */
 export function countAlertsInZones(zones: ManualZone[], alerts: { lat: number; lng: number }[]): ManualZone[] {
   return zones.map(z => ({ ...z, alertsInZone: alerts.filter(a => isInsideZone(z, a.lat, a.lng)).length }));
 }

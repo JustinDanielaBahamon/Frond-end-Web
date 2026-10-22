@@ -34,7 +34,7 @@ const EMPTY_FORM = (): ContactForm => ({
 export class EmergencyContacts implements OnInit {
   private contactService = inject(EmergencyContactService);
   private authService = inject(AuthService);
-  // La app no usa zone.js: tras cada respuesta del servidor hay que avisar que cambió la vista
+  // The app does not use zone.js: after each server response the view change must be signaled
   private cdr = inject(ChangeDetectorRef);
 
   private userId = 0;
@@ -241,7 +241,7 @@ export class EmergencyContacts implements OnInit {
     });
   }
 
-  // --- Acciones rápidas desde el menú ---
+  // --- Quick actions from the menu ---
 
   deleteFromMenu(contact: EmergencyContact) {
     this.openEditModal(contact);

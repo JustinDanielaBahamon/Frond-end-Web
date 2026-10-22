@@ -161,8 +161,8 @@
   app-dashboard {
     --color-principal: var(--purple-mid, #a78bfa);      // textos e iconos morados (legibles en oscuro)
     --color-principal-claro: var(--purple-mid, #a78bfa);
-    --color-fondo: rgba(124, 58, 237, 0.08);            // fichas internas, hover, círculo del dispositivo
-    --color-superficie: var(--bg-card, #15112b);        // fondo de las tarjetas
+    --color-fondo: rgba(124, 58, 237, 0.08);            // inner tiles, hover, device circle
+    --color-superficie: var(--bg-card, #15112b);        // card background
     --color-borde: var(--border, #2e2657);
     --color-texto-principal: var(--text-primary, #f3efff);
     --color-texto-secundario: var(--text-muted, #a79cc8);
@@ -216,9 +216,11 @@
     color: #a78bfa !important;
   }
 
-    /* ── 6. Iconos sólidos (actividad, emergencia, accesos) ─
-        Mismo estilo de la imagen: cuadro de color sólido
-        con el icono claro encima.                       */
+    /*
+ * ── 6. Solid icons (activity, emergency, shortcuts) ─
+ *         Same style as the image: solid color box
+ *         with the light icon on top.
+ */
   .home-activity-item__icon,
   .home-acceso__icon {
 
@@ -256,7 +258,7 @@
     color: #a78bfa !important;
   }
 
-  /* ── 10. Accesos y acciones rápidas ────────────── */
+  /* ── 10. Shortcuts and quick actions ────────────── */
   .home-acceso:hover,
   .home-accion-item:hover {
     background: rgba(124, 58, 237, 0.12) !important;
@@ -267,17 +269,19 @@
   }
 }
 
-/*==================================================
-=       MODO OSCURO — UBICACIÓN DEL TELÉFONO        =
-   (escopado con .pl-page para no chocar con .card,
-   .dropdown-menu, etc. de otros módulos)
-==================================================*/
+/*
+ * ==================================================
+ * =       DARK MODE — PHONE LOCATION        =
+ *    (scoped with .pl-page so it does not clash with .card,
+ *    .dropdown-menu, etc. of other modules)
+ * ==================================================
+ */
 
 [data-theme="dark"] {
 
   .pl-page {
 
-    /* ── Tailwind utilities usadas inline en el template ─ */
+    /* ── Tailwind utilities used inline in the template ─ */
     .text-gray-800 { color: var(--text-primary) !important; }
     .text-gray-500 { color: var(--text-muted) !important; }
     .text-gray-400 { color: var(--text-dim) !important; }
@@ -373,12 +377,14 @@
   }
 }
 
-/*==================================================
-=   MODO OSCURO — MAPA (filtro sobre tiles OSM)     =
-   Solo afecta .leaflet-tile-pane; markers, popups,
-   polylines y controles NO se ven afectados porque
-   viven en otro pane del DOM de Leaflet.
-==================================================*/
+/*
+ * ==================================================
+ * =   DARK MODE — MAP (filter over OSM tiles)     =
+ *    Only affects .leaflet-tile-pane; markers, popups,
+ *    polylines and controls are NOT affected because
+ *    they live in another pane of the Leaflet DOM.
+ * ==================================================
+ */
 
 [data-theme="dark"] {
 
@@ -399,7 +405,7 @@
       }
     }
 
-    /* Popups al hacer click en un marker */
+    /* Popups when clicking a marker */
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
       background: var(--bg-card) !important;
@@ -412,15 +418,17 @@
   }
 }
 
-/*==================================================
-=            MODO OSCURO — EVIDENCIAS (ev-*)        =
-   Reemplaza por completo el bloque anterior de
-   "MODO OSCURO — EVIDENCIAS": ese usaba selectores
-   de una versión anterior del componente (.ev-stats,
-   .ev-banner, .ev-pill, .ev-card__nombre, .ev-modal)
-   que ya no existen en el .scss actual (ev-toolbar,
-   ev-tabs, ev-search, ev-card-thumb, ev-detail, etc.).
-==================================================*/
+/*
+ * ==================================================
+ * =            DARK MODE — EVIDENCE (ev-*)        =
+ *    Fully replaces the previous
+ *    "MODO OSCURO — EVIDENCIAS" block: that one used selectors
+ *    from a previous version of the component (.ev-stats,
+ *    .ev-banner, .ev-pill, .ev-card__nombre, .ev-modal)
+ *    that no longer exist in the current .scss (ev-toolbar,
+ *    ev-tabs, ev-search, ev-card-thumb, ev-detail, etc.).
+ * ==================================================
+ */
 
 [data-theme="dark"] {
 
@@ -428,7 +436,7 @@
     color: var(--red, #e671f8) !important;
   }
 
-  /* ── Toolbar: tabs + búsqueda + filtro ───────── */
+  /* ── Toolbar: tabs + search + filter ───────── */
   .ev-tabs {
     background: var(--bg-card) !important;
   }
@@ -462,7 +470,7 @@
     &:hover { background: var(--purple-pale) !important; }
   }
 
-  /* ── Encabezado de sección ────────────────────── */
+  /* ── Section header ────────────────────── */
   .ev-section-title { color: var(--text-primary) !important; }
   .ev-section-sub { color: var(--text-muted) !important; }
 
@@ -472,7 +480,7 @@
     color: var(--text-primary) !important;
   }
 
-  /* ── Galería de tarjetas ──────────────────────── */
+  /* ── Card gallery ──────────────────────── */
   .ev-card {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
@@ -559,7 +567,7 @@
     color: var(--text-primary) !important;
   }
 
-  /* ── Lightbox (ya es oscuro por diseño, sin cambios) ─ */
+  /* ── Lightbox (already dark by design, unchanged) ─ */
 }
 /*==================================================
 =            MODO OSCURO — MIS EMERGENCIAS (ah-*)    =
@@ -567,7 +575,7 @@
 
 [data-theme="dark"] {
 
-  /* Icono del título */
+  /* Title icon */
   .ah-titlebar-icon {
     background: var(--purple-mid, #7c3aed) !important;
     color: #ffffff !important;
@@ -651,7 +659,7 @@
     .ah-ubicacion { color: var(--text-primary) !important; }
   }
 
-  /* ── Badges — medio de activación y estado ────── */
+  /* ── Badges — activation method and status ────── */
   .ah-badge {
     &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
@@ -663,7 +671,7 @@
     &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
-  /* ── Acciones (ojo / menú) ───────────────────── */
+  /* ── Actions (eye / menu) ───────────────────── */
   .ah-icon-btn {
     color: var(--text-muted) !important;
     &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
@@ -730,7 +738,7 @@
     &:hover { background: var(--purple-pale) !important; }
   }
 
-  /* ── Paginación ──────────────────────────────── */
+  /* ── Pagination ──────────────────────────────── */
   .ah-pagination {
     border-top-color: var(--border) !important;
 
@@ -914,7 +922,7 @@
     }
   }
 
-  /* ── Panels (contenedor de cada pestaña) ─────────── */
+  /* ── Panels (container of each tab) ─────────── */
   .as-panel {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
@@ -927,7 +935,7 @@
   .as-muted,
   .as-empty { color: var(--text-dim) !important; }
 
-  /* ── Líneas de ayuda ──────────────────────────────── */
+  /* ── Help lines ──────────────────────────────── */
   .as-linea-card {
     border-color: var(--border) !important;
   }

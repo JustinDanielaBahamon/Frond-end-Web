@@ -1,8 +1,8 @@
-// ── PALETA REDUCIDA DEL PANEL DE USUARIA ────────────
-// Rojo (peligro) queda reservado solo para lo relacionado
-// con emergencias/SOS; el resto de la interfaz se apoya en
-// principal/acento/éxito. Si ya tienes variables globales de
-// tema, estas se pueden sustituir por var(--global, fallback).
+// ── REDUCED PALETTE OF THE USER PANEL ────────────
+// Red (danger) is reserved only for what relates
+// to emergencies/SOS; the rest of the interface relies on
+// primary/accent/success. If you already have global theme
+// variables, these can be replaced with var(--global, fallback).
 :host {
   --color-principal: #6d28d9;
   --color-principal-claro: #7c3aed;
@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  font-family: 'Nunito', sans-serif; // 🔤 fuente consistente en todo el módulo
+  font-family: 'Nunito', sans-serif; // 🔤 consistent font across the whole module
 }
 
 // ── PANEL BASE (reutilizable) ──────────────────────
@@ -168,7 +168,7 @@
   }
 
   &--primario {
-    // 🎨 Color de los botones (antes: degradado var(--color-principal))
+    // 🎨 Button color (before: var(--color-principal) gradient)
     background: #380759;
     color: #fff;
   }
@@ -244,7 +244,7 @@
   }
 }
 
-// ── ESTADO DE SEGURIDAD (grid de 4 items) ───────────
+// ── SECURITY STATUS (grid of 4 items) ───────────
 .home-seguridad-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -493,7 +493,7 @@
   margin: 1px 0 0;
 }
 
-// ── ÚLTIMA UBICACIÓN (mapa de ancho completo) ─────────────────────
+// ── LAST LOCATION (full-width map) ─────────────────────
 .home-panel--mapa {
   display: flex;
   flex-direction: column;
@@ -564,7 +564,7 @@
   }
 }
 
-// ── ÚLTIMA UBICACIÓN (mini-mapa - LEGACY, por si acaso) ─────────────────────
+// ── LAST LOCATION (mini map - LEGACY, just in case) ─────────────────────
 .home-mini-map {
   width: 100%;
   height: 150px;
@@ -790,13 +790,13 @@
   }
 }
 
-// El modo oscuro de este componente vive en
+// The dark mode of this component lives in
 // src/app/shared/styles/theme/home-dark.scss
 // bajo [data-theme="dark"] { ... } redefiniendo las
 // variables --color-* declaradas arriba en :host.
 
 
-// ── ANIMACIONES GLOBALES PARA EL MAPA ─────────────────
+// ── GLOBAL MAP ANIMATIONS ─────────────────
 :global {
   @keyframes pulse {
     0% {

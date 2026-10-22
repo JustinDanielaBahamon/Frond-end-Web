@@ -1,5 +1,5 @@
-// Ubicaciones guardadas — mismo lenguaje visual que "Mi ubicación" y "Guardar recorrido"
-// (tokens del tema: sirve en claro y oscuro)
+// Saved locations — same visual language as "Mi ubicación" and "Guardar recorrido"
+// (theme tokens: works in light and dark)
 
 $card: var(--bg-card, #241d3d);
 $soft: var(--purple-pale, #30293d);
@@ -64,7 +64,7 @@ $danger: #e671f8;
 .ug-help { margin: 0; font-size: 0.72rem; color: $muted; text-align: center; }
 .ug-error { margin: 0; font-size: 0.8rem; font-weight: 600; color: $danger; }
 
-// ── Botón "Nueva ubicación" ───────────────────────
+// ── "Nueva ubicación" button ───────────────────────
 .ug-cta {
   display: flex;
   align-items: center;
@@ -243,7 +243,7 @@ $danger: #e671f8;
   &--sm { flex: none; padding: 0.5rem 0.8rem; font-size: 0.78rem; margin-top: -0.3rem; }
 }
 
-// ── Búsqueda y filtros ────────────────────────────
+// ── Search and filters ────────────────────────────
 .ug-search {
   display: flex;
   align-items: center;
@@ -307,7 +307,7 @@ $danger: #e671f8;
 
 .ug-item {
   --nivel: #{$accent};
-  flex-shrink: 0; // dentro de una lista con scroll no debe aplastarse
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
   display: flex;
   align-items: stretch;
   gap: 0.25rem;
@@ -379,7 +379,7 @@ $danger: #e671f8;
   border-radius: 1rem;
   overflow: hidden;
 
-  // En pantallas angostas el mapa va primero: es donde se elige el punto
+  // On narrow screens the map goes first: it is where the point is chosen
   @media (max-width: 960px) { position: relative; top: 0; order: -1; }
 }
 

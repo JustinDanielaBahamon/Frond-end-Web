@@ -6,7 +6,7 @@ import { PasswordStrengthComponent } from '../../../shared/components/password-s
 import { PasswordService, evaluatePassword } from '../../../core/services/password.service';
 import { RecoveryStateService } from '../../../core/services/recovery-state.service';
 
-/** Último paso de "olvidé mi contraseña": la nueva contraseña con el código ya verificado. */
+/** Last step of "forgot my password": the new password with the already verified code. */
 @Component({
   selector: 'app-reset-password',
   standalone: true,

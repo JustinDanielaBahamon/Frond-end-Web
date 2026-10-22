@@ -5,7 +5,7 @@
   font-family: 'Nunito', sans-serif;
 }
 
-// Body: columna con topbar fija arriba + main con scroll propio
+// Body: column with a fixed topbar on top + main with its own scroll
 .layout__body {
   flex: 1;
   display: flex;
@@ -15,7 +15,7 @@
   background: #f3eeff;
 }
 
-// Único elemento que scrollea
+// The only scrolling element
 .layout__main {
   flex: 1;
   overflow-y: auto;
@@ -50,7 +50,7 @@
   }
 }
 
-// ── BOTTOM NAV (solo móvil)
+// ── BOTTOM NAV (mobile only)
 .bottom-nav {
   display: none;
   background: #2d1457;
@@ -79,19 +79,21 @@
   }
 }
 
-/* El modo oscuro de este layout ya NO vive aquí.
-   Vive en app/shared/styles/theme/dashboard-dark.scss,
-   bajo el bloque:
-   [data-theme="dark"] {
-     .layout__body,
-     .layout__main { background: var(--bg-base) !important; }
-     .bottom-nav { ... }
-   }
-   No agregues aquí ningún bloque "body.dark-mode" ni
-   "[data-theme='dark']" — todo el dark mode del dashboard
-   se centraliza en ese único archivo de tema. */
+/*
+ * The dark mode of this layout NO longer lives here.
+ *    It lives in app/shared/styles/theme/dashboard-dark.scss,
+ *    under the block:
+ *    [data-theme="dark"] {
+ *      .layout__body,
+ *      .layout__main { background: var(--bg-base) !important; }
+ *      .bottom-nav { ... }
+ *    }
+ *    Do not add any "body.dark-mode" or
+ *    "[data-theme='dark']" block here — all the dashboard dark mode
+ *    is centralized in that single theme file.
+ */
 
-/* Aviso: un contacto de la usuaria activó una alerta (visible en todo el panel) */
+/* Notice: a contact of the user activated an alert (visible across the whole panel) */
 .aviso-contacto {
   display: flex;
   align-items: center;
@@ -125,7 +127,7 @@
 
 @media (prefers-reduced-motion: reduce) { .aviso-contacto__pulso { animation: none; } }
 
-// ── Aviso "tu celular cambió de lugar" ──────────────
+// ── "Your phone changed places" notice ──────────────
 .aviso-movimiento {
   display: flex;
   align-items: center;

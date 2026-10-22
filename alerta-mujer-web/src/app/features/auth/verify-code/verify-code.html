@@ -7,7 +7,7 @@
   
     <div class="verify-code-page__wrapper">
   
-      <!-- Sección Visual Izquierda con Elementos Decorativos -->
+      <!-- Left visual section with decorative elements -->
       <div class="verify-code-page__visual">
         <div class="halo halo--1"></div>
         <div class="halo halo--2"></div>
@@ -38,10 +38,10 @@
         <span class="spark spark--4">✦</span>
       </div>
   
-      <!-- Tarjeta Principal de Verificación -->
+      <!-- Main verification card -->
       <app-card class="card">
   
-        <!-- Sección de Marca (Logo y Nombre) -->
+        <!-- Brand section (logo and name) -->
         <div class="brand">
           <div class="brand__icon">
             <img src="logo.png" alt="Logo Alerta Mujer">
@@ -58,12 +58,12 @@
           </div>
         </div>
   
-        <!-- Icono de Característica (Escudo) -->
+        <!-- Feature icon (shield) -->
         <div class="feature-icon">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
   
-        <!-- Título y Subtítulo de la Tarjeta -->
+        <!-- Card title and subtitle -->
         <h1 class="card__title">
           Verifica tu <span class="card__title--accent">código</span>
         </h1>
@@ -72,10 +72,10 @@
           Si no lo ves, revisa la carpeta de spam.
         </p>
   
-        <!-- Formulario de Verificación de Código -->
+        <!-- Code verification form -->
         <form class="form" (ngSubmit)="verifyCode()">
   
-          <!-- Campos de Entrada para el Código OTP -->
+          <!-- Input fields for the OTP code -->
           <div class="code-inputs">
             @for (digit of code(); track $index) {
               <input
@@ -99,7 +99,7 @@
             <p class="code-aviso" role="status">{{ notice() }}</p>
           }
 
-          <!-- Sección de Temporizador y Reenvío de Código -->
+          <!-- Timer and code resend section -->
           <div class="timer-section">
             <span class="timer">
               {{ canResend() ? '¿No te llegó?' : 'Reenviar en ' + formattedTime() }}
@@ -113,7 +113,7 @@
               Reenviar código
             </button>
           </div>
-          <!-- Botón de Verificación -->
+          <!-- Verification button -->
           <button
             class="btn-submit"
             type="submit"
@@ -123,7 +123,7 @@
           </button>
         </form>
   
-        <!-- Pie de Tarjeta (Cambiar Método de Recuperación) -->
+        <!-- Card footer (change recovery method) -->
         <p class="card__footer">
           <span
             class="form__link"

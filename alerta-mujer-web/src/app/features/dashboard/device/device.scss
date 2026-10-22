@@ -266,7 +266,7 @@
   color: var(--color-texto-secundario);
 }
 
-// ── INFORMACIÓN DEL DISPOSITIVO ─────────────────────
+// ── DEVICE INFORMATION ─────────────────────
 
 
 .device-info-item__label {
@@ -568,7 +568,7 @@
 }
 
 
-// ── Detalle de un dispositivo ──────────────────
+// ── Device detail ──────────────────
 .dd-backdrop {
   position: fixed;
   inset: 0;
@@ -654,7 +654,7 @@
   color: var(--text-primary, #1f1535);
 }
 
-// ── PERMISOS DEL CELULAR (informados por la app) ───────
+// ── PHONE PERMISSIONS (reported by the app) ───────
 .device-perm-aviso {
   display: flex;
   align-items: flex-start;
@@ -728,7 +728,7 @@
   }
 }
 
-// ── RESULTADO DE LAS PRUEBAS (misma ventana del detalle) ───
+// ── TEST RESULT (same window as the detail) ───
 .dd-modal--ok .dd-head__icon { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
 .dd-modal--aviso .dd-head__icon { background: linear-gradient(135deg, #c026d3, #7e22ce); }
 .dd-modal--error .dd-head__icon { background: linear-gradient(135deg, #a21caf, #4c1d95); }

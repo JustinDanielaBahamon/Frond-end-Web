@@ -24,7 +24,7 @@ const CATEGORY: Record<string, ResourceCategory> = {
   support_organization: 'apoyo',
 };
 
-// El backend envía LocalDateTime en UTC sin zona
+// The backend sends LocalDateTime in UTC without a zone
 const utcDate = (iso: string) => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`);
 
 @Injectable({ providedIn: 'root' })
@@ -32,7 +32,7 @@ export class AssistanceService {
   private http = inject(HttpClient);
   private base = environment.apiUrl;
 
-  /** Todos los recursos activos: líneas (con teléfono) y centros (con ubicación). */
+  /** All active resources: lines (with phone) and centers (with location). */
   getResources(): Observable<HelpResource[]> {
     return this.http.get<EmergencyResourceApi[]>(`${this.base}/api/resources`).pipe(
       map((list) =>
@@ -55,7 +55,7 @@ export class AssistanceService {
     );
   }
 
-  /** Llamadas que la usuaria hizo desde la app, de la más reciente a la más antigua. */
+  /** Calls the user made from the app, newest to oldest. */
   getMyCalls(): Observable<RecordedCall[]> {
     return this.http.get<ResourceCallApi[]>(`${this.base}/api/resource-calls/me`).pipe(
       map((list) =>
@@ -70,7 +70,7 @@ export class AssistanceService {
     );
   }
 
-  /** Registra que la usuaria marcó a un recurso (la dueña la pone el backend). */
+  /** Records that the user called a resource (the owner is set by the backend). */
   recordCall(resourceId: number, telephone: string): Observable<RecordedCall> {
     return this.http
       .post<ResourceCallApi>(`${this.base}/api/resource-calls`, {

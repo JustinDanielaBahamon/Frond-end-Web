@@ -28,13 +28,13 @@ export class SidebarComponent {
 
   @Input() brandName: string = 'Alerta Mujer';
   @Input() brandTagline: string = 'Tu seguridad, siempre';
-  @Input() brandLogo: string = '/logo.png'; // ⚠️ confirma el nombre real del archivo
+  @Input() brandLogo: string = '/logo.png'; // ⚠️ confirm the real file name
 
   @Input() showMobileAppButton: boolean = false;
   @Input() mobileAppUrl: string = '';
 
   @Input() user: SidebarUser | null = null;
-  /** Si se indica, el nombre de abajo abre esta ruta (p. ej. Mi perfil). */
+  /** If given, the name below opens this route (e.g. My profile). */
   @Input() profileRoute: string | null = null;
   @Output() logout = new EventEmitter<void>();
 }

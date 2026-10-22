@@ -26,5 +26,5 @@ export const userGuard: CanActivateFn = () => {
   const role = auth.getRole();
   if (role === 'Usuaria' || role === 'usuaria' || role === 'operador') return true;
   if (role === 'Admin' || role === 'admin') return router.createUrlTree(['/admin/dashboard']);
-  return router.createUrlTree(['/auth/login']); // ← si no hay sesión
+  return router.createUrlTree(['/auth/login']); // ← if there is no session
 };

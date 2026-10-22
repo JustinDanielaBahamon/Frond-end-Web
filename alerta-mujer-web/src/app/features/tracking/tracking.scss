@@ -1,4 +1,4 @@
-/* Pantalla pública de seguimiento: clara y legible al sol, pensada para el celular. Paleta violeta. */
+/* Public tracking screen: clear and readable in the sun, designed for phones. Violet palette. */
 :host {
   --violeta: #7c3aed;
   --violeta-oscuro: #4c1d95;
@@ -281,7 +281,7 @@
 }
 
 
-/* ── Pines numerados del recorrido (los crea Leaflet fuera de la plantilla) ── */
+/* ── Numbered route pins (Leaflet creates them outside the template) ── */
 :host ::ng-deep .pin-ruta {
   display: grid;
   place-items: center;
@@ -306,7 +306,7 @@
   }
 }
 
-/* ── Línea de tiempo del recorrido ── */
+/* ── Route timeline ── */
 .tarjeta__conteo { margin-left: auto; font-size: 0.8rem; font-weight: 700; color: var(--suave); }
 
 .linea-tiempo {
@@ -362,7 +362,7 @@
   background: var(--neon);
 }
 
-/* ── Computador: mapa grande a la izquierda e información a la derecha ── */
+/* ── Computer: big map on the left and information on the right ── */
 @media (min-width: 960px) {
   .tracking { max-width: 1280px; }
 
@@ -382,7 +382,7 @@
 }
 
 
-/* ── Chat de la alerta ── */
+/* ── Alert chat ── */
 .chat__lista {
   display: flex;
   flex-direction: column;

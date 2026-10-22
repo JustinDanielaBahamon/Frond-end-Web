@@ -1,4 +1,4 @@
-// Evidencias — tokens del tema (claro y oscuro), mismo lenguaje visual que el módulo de ubicación
+// Evidence — theme tokens (light and dark), same visual language as the location module
 
 $card: var(--bg-card, #241d3d);
 $soft: var(--purple-pale, #30293d);
@@ -91,7 +91,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   min-width: 0;
 }
 
-// ── Filtros y búsqueda ────────────────────────────
+// ── Filters and search ────────────────────────────
 .ev-filters { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 
 .ev-filter {
@@ -450,7 +450,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   &--active { background: $grad; color: #fff; }
 }
 
-// ── Evidencias de la alerta elegida ───────────────
+// ── Evidence of the chosen alert ───────────────
 .ev-de-alerta { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid $border; display: flex; flex-direction: column; gap: 0.75rem; }
 
 .ev-tiles {
@@ -509,7 +509,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   span { display: block; margin-top: 0.2rem; font-size: 0.74rem; color: $muted; }
 }
 
-// ── Mapa de la alerta ─────────────────────────────
+// ── Alert map ─────────────────────────────
 .ev-modal--mapa { width: min(720px, 100%); }
 .ev-mapa { height: min(60vh, 460px); border-radius: 0.8rem; overflow: hidden; }
 
@@ -538,7 +538,7 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
 
 .ev-chip--conservada { background: $grad; color: #fff; }
 
-// Grabación completa: las partes de video o audio seguidas
+// Full recording: the video or audio parts in a row
 .ev-continua {
   display: flex;
   flex-wrap: wrap;

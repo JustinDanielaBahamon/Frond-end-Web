@@ -21,7 +21,7 @@ export interface LoginCredentials {
   password: string;
 }
 
-/* Datos que llegan desde el formulario de registro */
+/* Data coming from the registration form */
 export interface UserRecord {
   name: string;
   telephone: string;
@@ -30,7 +30,7 @@ export interface UserRecord {
   birthDate: string; // DD/MM/AAAA
   email: string;
   password: string;
-  /** Marcó términos y privacidad: el backend guarda cuándo y qué versión aceptó. */
+  /** Checked terms and privacy: the backend stores when and which version she accepted. */
   acceptsTerms: boolean;
 }
 
@@ -61,8 +61,10 @@ export class AuthService {
     );
   }
 
-  /* Registro completo: guarda a la usuaria con todos sus datos.
-     No inicia sesión: después del registro se va al login. */
+  /*
+ * Full registration: saves the user with all her data.
+ *      Does not sign in: after registering she goes to the login.
+ */
   registrar(data: UserRecord): Observable<User> {
     return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.name.trim(),
@@ -90,7 +92,7 @@ export class AuthService {
       }),
       catchError((error) => {
         console.error('Error en registro:', error?.status);
-        // 409 con fieldErrors: correo, teléfono o documento que ya usa otra cuenta
+        // 409 with fieldErrors: email, phone or document already used by another account
         const campos: Record<string, string> | undefined = error?.status === 409 ? error?.error?.fieldErrors : undefined;
         return throwError(() => Object.assign(new Error('No se pudo completar el registro'), { campos }));
       })
@@ -98,8 +100,8 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión. Antes avisa al backend para que quede en la auditoría
-   * (voluntario o por inactividad); si el aviso falla, la sesión se cierra igual.
+   * Signs out. It first tells the backend so it is audited
+   * (voluntary or due to inactivity); if that call fails, the session is closed anyway.
    */
   logout(reason: 'voluntario' | 'inactividad' = 'voluntario'): void {
     const token = this.getToken();
@@ -125,7 +127,7 @@ export class AuthService {
     return user?.role ?? '';
   }
 
-  /** Hay sesión solo si existe un token y todavía no ha vencido. */
+  /** There is a session only if a token exists and has not expired yet. */
   isLoggedIn(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -136,7 +138,7 @@ export class AuthService {
     return true;
   }
 
-  /** Milisegundos que le quedan a la sesión de la web (el token vence a las 24 h), o null sin sesión. */
+  /** Milliseconds left in the web session (the token expires after 24 h), or null without a session. */
   remainingTimeMs(): number | null {
     const token = this.getToken();
     if (!token) return null;
@@ -148,7 +150,7 @@ export class AuthService {
     }
   }
 
-  /** Lee el campo exp del JWT (segundos). Un token ilegible se trata como vencido. */
+  /** Reads the JWT exp field (seconds). An unreadable token is treated as expired. */
   private tokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
@@ -158,14 +160,14 @@ export class AuthService {
     }
   }
 
-  /** Borra la sesión sin navegar (lo usan el guard y el interceptor). */
+  /** Clears the session without navigating (used by the guard and the interceptor). */
   signOutLocally(): void {
     localStorage.removeItem(STORAGE_KEY);
     this._currentUser$.next(null);
     this._token$.next(null);
   }
 
-  /** Actualiza los datos de la usuaria en sesión (p. ej. tras editar su nombre) sin tocar el token. */
+  /** Updates the signed-in user's data (e.g. after editing her name) without touching the token. */
   updateCurrentUser(changes: Partial<User>): void {
     const current = this._currentUser$.value;
     const token = this._token$.value;
@@ -176,7 +178,7 @@ export class AuthService {
     this._currentUser$.next(user);
   }
 
-  /** Inicio de sesión con Google: el backend valida el token de Firebase y entrega el JWT. */
+  /** Google sign-in: the backend validates the Firebase token and returns the JWT. */
   loginWithGoogle(idToken: string): Observable<User> {
     return this.http
       .post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, { idToken })
@@ -191,7 +193,7 @@ export class AuthService {
       );
   }
 
-  /** Adapta la respuesta del backend al modelo User de Angular y guarda la sesión. */
+  /** Adapts the backend response to the Angular User model and stores the session. */
   private signIn(response: { token: string; user: any }): User {
     const backendUser = response.user;
     const user: User = {

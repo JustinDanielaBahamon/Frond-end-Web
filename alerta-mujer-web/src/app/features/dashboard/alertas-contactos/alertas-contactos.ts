@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReceivedAlertsService } from '../../../core/services/received-alerts.service';
 
-/** "Alertas de mis contactos": las alertas de las personas que me tienen como contacto de emergencia. */
+/** "Alertas de mis contactos": the alerts of the people who have me as an emergency contact. */
 @Component({
   selector: 'app-alertas-contactos',
   standalone: true,
@@ -27,7 +27,7 @@ export class AlertContactsComponent implements OnInit {
     this.opening.set(id);
     try {
       const code = await this.service.trackingCode(id);
-      // La marca deja volver al panel; quien llega desde el correo no la tiene
+      // The flag allows going back to the panel; whoever arrives from the email does not have it
       await this.router.navigate(['/seguimiento', code], { state: { desdePanel: true } });
     } catch {
       this.error.set('No se pudo abrir el seguimiento. Puede que la alerta ya haya terminado.');

@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use '../../../shared/styles/variables.scss' as *;
 
-// Variables propias de esta pantalla (no están en el set compartido)
+// Variables of this screen (not in the shared set)
 $blue:   #6d28d9;
 $orange: #a855f7;
 $yellow: #c084fc;
@@ -294,7 +294,7 @@ $yellow: #c084fc;
   font-weight: 400;
 }
 
-// ── Zona automática ───────────────────────────
+// ── Automatic zone ───────────────────────────
 .zona-auto-card {
   display: flex;
   align-items: center;
@@ -342,7 +342,7 @@ $yellow: #c084fc;
   color: $text-muted;
 }
 
-// ── Botón agregar zona (fila superior del tab) ─
+// ── Add zone button (top row of the tab) ─
 .zona-add-row {
   display: flex;
   gap: 6px;
@@ -774,7 +774,7 @@ $yellow: #c084fc;
 
 // =============================================
 // FORMULARIOS DE MODALES
-// (los estilos del contenedor del modal en sí
+// (the styles of the modal container itself
 // ahora viven en shared/components/modal/modal.scss)
 // =============================================
 .form-group { margin-bottom: 14px; }
@@ -911,7 +911,7 @@ $yellow: #c084fc;
   display: flex;
   gap: 8px;
 
-  // Tipos de punto de apoyo: varios, en dos columnas
+  // Support point types: several, in two columns
   &--tipos {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

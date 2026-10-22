@@ -10,10 +10,10 @@ import { Chip } from '../../../shared/components/chip/chip';
 import { Modal } from '../../../shared/components/modal/modal';
 import { compactPages } from '../../../shared/utils/paginacion';
 
-// Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
+// We extend the real model only with the UI selection flag (it does not live in the API)
 type UserUI = ManagedUser & { selected?: boolean };
 
-/** Motivos para bloquear una cuenta (quedan en el caso de moderación). */
+/** Reasons to block an account (they stay in the moderation case). */
 export const BLOCK_REASONS = [
   'Falsas alarmas reiteradas',
   'Fraude o suplantación de identidad',
@@ -40,7 +40,7 @@ interface ChipData {
   count: number;
 }
 
-// Datos que vienen de otras tablas del db.json
+// Data that comes from other db.json tables
 export interface EmergencyContact {
   id: string;
   user_profile_id: number | string;
@@ -96,7 +96,7 @@ export class UserComponent implements OnInit {
   selectedUser: UserUI | null = null;
   blockAction: 'bloquear' | 'desbloquear' = 'bloquear';
   readonly blockReasons = BLOCK_REASONS;
-  /** Una o varias (bloqueo masivo) usuarias del modal de bloqueo. */
+  /** One or several (bulk block) users of the block modal. */
   usersToBlock: UserUI[] = [];
   blockReason = '';
   blockDescription = '';
@@ -104,12 +104,12 @@ export class UserComponent implements OnInit {
   blockError = '';
   savingBlock = false;
 
-  // Detalle: celulares, permisos e historial de moderación
+  // Detail: phones, permissions and moderation history
   phoneDetails: AdminPhone[] = [];
   historyDetail: ModerationHistory[] = [];
   openEvidence: string | null = null;
 
-  // Eliminación (la aprueba otra administradora)
+  // Deletion (approved by another admin)
   deleteModal = false;
   deleteReason = '';
   deleteError = '';
@@ -157,7 +157,7 @@ export class UserComponent implements OnInit {
   private loadUsers(): void {
     this.loading = true;
 
-    // El DTO ya trae el contador de alertas calculado por el backend
+    // The DTO already carries the alert count computed by the backend
     this.usersService.getAll().subscribe({
       next: (users) => {
         this.allUsers = users;
@@ -173,7 +173,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // ── Filtros y paginación ─────────────────────────────────────
+  // ── Filters and pagination ─────────────────────────────────────
   applyFilters(): void {
     let result = [...this.allUsers];
 
@@ -223,7 +223,7 @@ export class UserComponent implements OnInit {
     this.applyFilters();
   }
 
-  // ── Selección ────────────────────────────────────────────────
+  // ── Selection ────────────────────────────────────────────────
   toggleAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this.filteredUsers.forEach(u => u.selected = checked);
@@ -240,14 +240,14 @@ export class UserComponent implements OnInit {
     this.updateSelection();
   }
 
-  // ── Bloqueo masivo vía API ────────────────────────────────────
+  // ── Bulk block through the API ────────────────────────────────────
   blockSelected(): void {
     const selected = this.filteredUsers.filter(u => u.selected && u.status !== 'Bloqueada por Fraude');
     if (selected.length === 0) return;
     this.openBlock(selected, 'bloquear');
   }
 
-  // ── Ver detalle: carga las últimas alertas reales ────────────
+  // ── View detail: loads the real latest alerts ────────────
   viewDetail(u: UserUI): void {
     this.selectedUser = u;
     this.alertDetails = [];
@@ -273,7 +273,7 @@ export class UserComponent implements OnInit {
     // GET /api/alerts/user/{usersId} acepta users.id para admin
     this.usersService.getAlertsByUser(u.id).subscribe({
       next: (alerts) => {
-        // Las más recientes primero, máximo 5
+        // Newest first, at most 5
         this.alertDetails = [...alerts]
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .slice(0, 5);
@@ -288,7 +288,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  /** La contraseña solo la cambia la usuaria: se le envía el correo con el código. */
+  /** Only the user changes the password: she is sent the email with the code. */
   resetPassword(u: UserUI): void {
     this.usersService.sendRecovery(u.email).subscribe({
       next: () => this.showNotice(`Enviamos a ${u.email} un código para que cree una contraseña nueva.`),
@@ -318,7 +318,7 @@ export class UserComponent implements OnInit {
     input.value = '';
     if (!file) return;
     try {
-      // Captura legible pero liviana (el servidor acepta hasta ~300 KB)
+      // Readable but light screenshot (the server accepts up to ~300 KB)
       this.blockEvidence = await shrinkPhoto(file, 1100);
       this.blockError = '';
     } catch (e) {

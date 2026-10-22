@@ -1,4 +1,4 @@
-$line:      #6d5bb8;   // bordes y líneas principales
+$line:      #6d5bb8;   // main borders and lines
 $line-soft: #8878c6;   // separadores entre filas
 
 $adm: 'html:not([data-theme=\"dark\"]):not(#_) app-admin-layout .layout__main';
@@ -39,7 +39,7 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
   .toolbar input[type='date'],
   textarea { border-width: 2px !important; }
 
-  /* Tarjetas con franja superior gruesa: se conserva el 3px de arriba */
+  /* Cards with a thick top stripe: the 3px on top is kept */
   app-user .table-card,
   app-alert-admin .alertas-panel { border-width: 2px !important; border-top-width: 3px !important; }
 
@@ -66,12 +66,12 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
   .modal-footer,
   .filtros-body { border-top: 2px solid $line !important; }
 
-  /* Esta línea solo existía en Moderadores y Reportes (filtros en otra fila) */
+  /* This line only existed in Moderators and Reports (filters in another row) */
   :is(app-moderator-management, app-report-management) .filter-group {
     border-top: 2px solid $line !important;
   }
 
-  /* Tabla sin filas: no repetir la línea entre el encabezado y el pie */
+  /* Table without rows: do not repeat the line between the header and the footer */
   .table-card:not(:has(tbody tr)) .table-footer { border-top: none !important; }
 
   .modal-header,
@@ -83,8 +83,10 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
 
   .detail-section h4 { border-bottom: 2px solid $line !important; }
 
-  /* Separadores entre filas: solo en escritorio
-     (en móvil la tabla se convierte en tarjetas) */
+  /*
+ * Row separators: desktop only
+ *      (on mobile the table turns into cards)
+ */
   @media (min-width: 769px) {
     table tbody tr {
       border-bottom: 2px solid $line-soft !important;
@@ -97,7 +99,7 @@ html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
     table tbody tr:first-child td { border-top-color: $line !important; }
   }
 
-  /* Dashboard: listas (el último ítem de cada lista no lleva línea) */
+  /* Dashboard: lists (the last item of each list has no line) */
   app-dashboard li { border-bottom: 2px solid $line-soft !important; }
   app-dashboard li:last-child { border-bottom: none !important; }
 }

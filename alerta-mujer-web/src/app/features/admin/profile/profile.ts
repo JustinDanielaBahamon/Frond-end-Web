@@ -17,7 +17,7 @@ const SESSION_ACTIONS: Record<string, string> = {
   PASSWORD_CHANGED: 'Cambio de contraseña',
 };
 
-/** Mi perfil: lo que cada admin ajusta para sí misma (no afecta al resto del sistema). */
+/** My profile: what each admin adjusts for herself (does not affect the rest of the system). */
 @Component({
   selector: 'app-admin-profile',
   standalone: true,
@@ -102,7 +102,7 @@ export class AdminProfileComponent implements AfterViewInit {
     });
   }
 
-  // ── Contraseña ───────────────────────────────────────────────
+  // ── Password ───────────────────────────────────────────────
   get fortaleza(): { level: number; text: string } {
     const c = this.password.newOne;
     if (!c) return { level: 0, text: '' };
@@ -145,7 +145,7 @@ export class AdminProfileComponent implements AfterViewInit {
     });
   }
 
-  // ── Sesión y apariencia ──────────────────────────────────────
+  // ── Session and appearance ──────────────────────────────────────
   changeInactivity(value: string | number): void {
     this.inactivity.change(Number(value));
     this.notify('Preferencia guardada en este navegador');

@@ -12,8 +12,8 @@ import {
 } from '../models/security-status.model';
 
 /**
- * "Estado de tu seguridad" del panel: lo que de verdad hace que una alerta llegue.
- * Se mide con la cuenta y el celular (no con el navegador, que no envía alertas).
+ * Panel "Estado de tu seguridad": what really makes an alert arrive.
+ * It is measured with the account and the phone (not with the browser, which sends no alerts).
  */
 @Injectable({ providedIn: 'root' })
 export class UserSecurityStatusService {

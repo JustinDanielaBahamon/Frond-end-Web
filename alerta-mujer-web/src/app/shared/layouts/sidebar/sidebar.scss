@@ -10,7 +10,7 @@
   overflow: hidden;
   transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
 
-  // 🎨 Color principal del sidebar (sigue el color de acento elegido)
+  // 🎨 Main sidebar color (follows the chosen accent color)
   background: var(--sidebar-bg, #380759);
 
   &--collapsed {
@@ -60,7 +60,7 @@
     font-size: 0.7rem;
   }
 
-  // ── Sección / divisor ──────────────────
+  // ── Section / divider ──────────────────
   &__header {
     margin-bottom: 1.25rem;
     flex-shrink: 0;
@@ -81,7 +81,7 @@
     margin: 0 0 0.75rem;
   }
 
-  // ── Nav (única zona que scrollea si hay muchos links) ──
+  // ── Nav (the only area that scrolls if there are many links) ──
   &__nav {
     display: flex;
     flex-direction: column;
@@ -89,7 +89,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    // La barra delgada y violeta viene de styles.scss
+    // The thin violet bar comes from styles.scss
   }
 
   &__link {
@@ -109,7 +109,7 @@
       color: #fff;
     }
 
-    // Sin el contorno blanco del navegador al hacer clic; con teclado, un anillo violeta
+    // Without the browser white outline on click; with the keyboard, a violet ring
     &:focus {
       outline: none;
     }
@@ -120,7 +120,7 @@
     }
 
     &--active {
-      // 🎨 Indicador de módulo activo — degradado con el color de acento
+      // 🎨 Active module indicator — gradient with the accent color
       background: linear-gradient(135deg, var(--accent-grad-from, #7630D9), var(--accent-grad-to, #D948B2));
       color: #fff;
       box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #D948B2) 35%, transparent);
@@ -142,7 +142,7 @@
     height: 1rem;
   }
 
-  // ── Botón app móvil ─────────────────────
+  // ── Mobile app button ─────────────────────
   &__mobile-btn {
     display: flex;
     align-items: center;
@@ -258,27 +258,29 @@
     }
   }
 
-  // Móvil
+  // Mobile
   @media (max-width: 768px) {
     display: none;
   }
 
-  /*==================================================
-  =        VARIANTE ADMIN — paleta cálida             =
-     Se activa agregando la clase "sidebar--admin"
-     junto a "sidebar" en el <aside>, sin tocar nada
-     de la paleta de usuaria de arriba.
-  ==================================================*/
+  /*
+ * ==================================================
+ *   =        ADMIN VARIANT — warm palette             =
+ *      Enabled by adding the "sidebar--admin" class
+ *      next to "sidebar" on the <aside>, without touching
+ *      the user palette above.
+ *   ==================================================
+ */
 
   &--admin {
-    background: #3b0764; // marrón cálido oscuro, en vez del morado de usuaria
+    background: #3b0764; // dark warm brown, instead of the user purple
 
     .sidebar__divider {
       background: linear-gradient(90deg, #b324fb, #a00cea, transparent);
     }
 
     .sidebar__link--active {
-      background: linear-gradient(135deg, #9306d9, #a00cea); // ámbar → naranja
+      background: linear-gradient(135deg, #9306d9, #a00cea); // amber → orange
       box-shadow: 0 4px 14px rgba(160, 12, 234, 0.35);
 
       .sidebar__link-icon { color: #fff7ed; }
@@ -295,11 +297,13 @@
   }
 }
 
-/*==================================================
-=   ADMIN: sidebar como drawer (off-canvas)         =
-=   ≤ 1024px. Solo aplica con class="sidebar--admin" =
-=   en <app-sidebar>, el de usuaria no cambia.      =
-==================================================*/
+/*
+ * ==================================================
+ * =   ADMIN: sidebar as a drawer (off-canvas)         =
+ * =   ≤ 1024px. Only applies with class="sidebar--admin" =
+ * =   on <app-sidebar>, the user one does not change.      =
+ * ==================================================
+ */
 @media (max-width: 1024px) {
   :host(.sidebar--admin) .sidebar {
     display: flex;
@@ -310,7 +314,7 @@
     height: 100vh;
     height: 100dvh;
     width: 280px;
-    min-width: 0; // antes 280px: le ganaba al max-width y el drawer se salía de la pantalla
+    min-width: 0; // before 280px: it beat max-width and the drawer overflowed the screen
     max-width: 85vw;
     padding: 1.5rem 1rem;
     z-index: 1000;
@@ -319,7 +323,7 @@
     visibility: visible;
     transition: transform 0.3s ease, visibility 0s linear 0s;
 
-    // Cerrado: se desliza fuera de la pantalla
+    // Closed: slides off the screen
     &.sidebar--collapsed {
       width: 280px;
       min-width: 0;
@@ -331,7 +335,7 @@
     }
   }
 
-  // Deshace las reglas de "barra angosta" de tablet para que se vea completo
+  // Undoes the tablet "narrow bar" rules so it shows fully
   :host(.sidebar--admin) .sidebar__brand-text {
     display: block;
     min-width: 0;
@@ -341,7 +345,7 @@
     display: block;
   }
 
-  // Los textos de marca saltan de línea en vez de cortarse
+  // Brand texts wrap instead of being cut
   :host(.sidebar--admin) .sidebar__brand-name,
   :host(.sidebar--admin) .sidebar__brand-tagline {
     overflow-wrap: anywhere;
@@ -351,12 +355,12 @@
     font-size: 0.7rem;
   }
 
-  // Sin scroll horizontal en la lista de módulos
+  // No horizontal scroll in the module list
   :host(.sidebar--admin) .sidebar__nav {
     overflow-x: hidden;
   }
 
-  // Los nombres de módulo se acomodan en varias líneas si no caben
+  // Module names wrap onto several lines if they do not fit
   :host(.sidebar--admin) .sidebar__link {
     justify-content: flex-start;
     text-align: left;

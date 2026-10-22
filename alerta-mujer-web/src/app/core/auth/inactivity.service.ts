@@ -7,8 +7,8 @@ const EVENTS = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'] as 
 const CHECK_MS = 15000;
 
 /**
- * Cierra la sesión del panel tras X minutos sin uso (el panel muestra datos sensibles y
- * puede quedar abierto en un equipo compartido). 0 = desactivado. Se guarda por navegador.
+ * Signs out of the panel after X minutes without use (the panel shows sensitive data and
+ * may stay open on a shared computer). 0 = disabled. Stored per browser.
  */
 @Injectable({ providedIn: 'root' })
 export class InactivityService {
@@ -40,7 +40,7 @@ export class InactivityService {
     try {
       localStorage.setItem(STORAGE_KEY, String(minutes));
     } catch {
-      // Sin almacenamiento: el valor vale solo para esta pestaña
+      // Without storage: the value only applies to this tab
     }
   }
 

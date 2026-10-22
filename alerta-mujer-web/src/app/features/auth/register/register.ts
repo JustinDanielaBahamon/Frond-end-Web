@@ -16,17 +16,17 @@ import { RegisterDraftService } from '../../../core/services/register-draft.serv
 
 /* ═══════════ VALIDADORES PERSONALIZADOS ═══════════ */
 
-/* Campo obligatorio que no acepta solo espacios en blanco */
+/* Required field that does not accept only blank spaces */
 const required: ValidatorFn = (control: AbstractControl): ValidationErrors | null =>
   String(control.value ?? '').trim() ? null : { required: true };
 
-/* El correo debe contener "@" (si está vacío, lo atrapa "required") */
+/* The email must contain "@" (if empty, "required" catches it) */
 const containsAt: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = String(control.value ?? '');
   return !value || value.includes('@') ? null : { sinArroba: true };
 };
 
-/* La confirmación debe ser igual a la contraseña */
+/* The confirmation must match the password */
 const coincideConPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.parent?.get('password')?.value ?? '';
   return control.value === password ? null : { noCoincide: true };
@@ -46,7 +46,7 @@ export class RegisterComponent {
   private auth   = inject(AuthService);
   private draft  = inject(RegisterDraftService);
 
-  /* Opciones exactas de la lista desplegable */
+  /* Exact dropdown options */
   readonly documentTypes = ['T.I', 'C.C', 'Documento extranjero'];
 
   /* ═══════════ FORMULARIO REACTIVO ═══════════ */
@@ -61,10 +61,10 @@ export class RegisterComponent {
     confirmPassword: ['', [coincideConPassword]],
   });
 
-  /* ═══════════ ESTADO DE LA PANTALLA ═══════════ */
+  /* ═══════════ SCREEN STATE ═══════════ */
   showPassword      = signal(false);
   showConfirm     = signal(false);
-  attempted        = signal(false);   // true cuando ya presionó "Continuar"
+  attempted        = signal(false);   // true once "Continuar" was pressed
   loading         = signal(false);
   success            = signal(false);
   serverError    = signal('');
@@ -74,7 +74,7 @@ export class RegisterComponent {
   acceptsTerms   = signal(false);
   acceptsPrivacy = signal(false);
 
-  /* Mensajes de error de cada campo */
+  /* Error messages of each field */
   private readonly messages: Record<string, Record<string, string>> = {
     nombre:            { required: 'El nombre es obligatorio' },
     telefono:          { required: 'El teléfono es obligatorio' },
@@ -96,41 +96,43 @@ export class RegisterComponent {
   };
 
   constructor() {
-    /* Si volvió de leer los términos, recuperamos lo que ya había escrito */
+    /* If she came back from reading the terms, we restore what she had typed */
     if (this.draft.values) {
       this.form.patchValue(this.draft.values);
     }
     this.acceptsTerms.set(this.draft.acceptsTerms);
     this.acceptsPrivacy.set(this.draft.acceptsPrivacy);
 
-    /* Si cambia la contraseña, se vuelve a revisar la confirmación */
+    /* If the password changes, the confirmation is checked again */
     this.form.controls.password.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.form.controls.confirmPassword.updateValueAndValidity());
   }
 
-  /* ═══════════ AYUDAS PARA EL HTML ═══════════ */
+  /* ═══════════ HTML HELPERS ═══════════ */
 
-  /* ¿Mostrar el error de este campo? (después de tocarlo o de enviar) */
+  /* Show the error of this field? (after touching it or submitting) */
   invalid(field: string): boolean {
     const control = this.form.get(field);
     return !!control && control.invalid && (control.touched || this.attempted());
   }
 
-  /* Texto del error de este campo */
+  /* Error text of this field */
   message(field: string): string {
     const errors = this.form.get(field)?.errors;
     if (!errors) return '';
     const key = Object.keys(errors)[0];
-    // Los avisos del servidor (dato ya registrado) traen su propio texto
+    // Server notices (data already registered) carry their own text
     if (typeof errors[key] === 'string') return errors[key];
     return this.messages[field]?.[key] ?? '';
   }
 
-  /* ═══════════ FECHA DD/MM/AAAA ═══════════
-     Deja solo números (máximo 8) y pone las "/" solas.
-     La primera "/" aparece al escribir el 3.er dígito y la segunda al
-     escribir el 5.º; así se puede borrar con la tecla de retroceso. */
+  /*
+ * ═══════════ DATE DD/MM/YYYY ═══════════
+ *      Keeps only digits (at most 8) and inserts the "/" by itself.
+ *      The first "/" appears when typing the 3rd digit and the second when
+ *      typing the 5th; that way it can be deleted with backspace.
+ */
   onDateInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const digits = input.value.replace(/\D/g, '').slice(0, 8);
@@ -146,11 +148,11 @@ export class RegisterComponent {
     this.form.controls.birthDate.setValue(text);
   }
 
-  /* ═══════════ CASILLAS (solo después de leer) ═══════════ */
+  /* ═══════════ CHECKBOXES (only after reading) ═══════════ */
 
   onTermsClick(event: Event): void {
     if (!this.draft.termsRead) {
-      event.preventDefault();          // la casilla no se marca
+      event.preventDefault();          // the checkbox is not checked
       this.termsNotice.set(true);
       return;
     }
@@ -196,7 +198,7 @@ export class RegisterComponent {
     this.router.navigate(['/auth/login']);
   }
 
-  /* Guarda lo escrito antes de salir a leer los textos */
+  /* Saves what was typed before leaving to read the texts */
   private saveDraft(): void {
     this.draft.values = this.form.getRawValue();
     this.draft.acceptsTerms = this.acceptsTerms();
@@ -209,21 +211,21 @@ export class RegisterComponent {
     if (this.loading() || this.success()) return;
     this.serverError.set('');
 
-    /* 1) Verificar que estén aceptados los términos y la privacidad */
+    /* 1) Check that the terms and privacy are accepted */
     if (!this.acceptsTerms() || !this.acceptsPrivacy()) {
       this.acceptanceError.set(true);
       return;
     }
     this.acceptanceError.set(false);
 
-    /* 2) Validar todos los campos (cada error sale bajo su campo) */
+    /* 2) Validate every field (each error shows under its field) */
     this.attempted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    /* 3) Todo bien: registrar, mostrar éxito y redirigir al login */
+    /* 3) All good: register, show success and redirect to the login */
     this.loading.set(true);
     const v = this.form.getRawValue();
 
@@ -251,7 +253,7 @@ export class RegisterComponent {
     });
   }
 
-  /* Datos que ya usa otra cuenta: el aviso queda debajo de su campo hasta que se edite */
+  /* Data already used by another account: the notice stays under its field until it is edited */
   private markRepeated(campos: Record<string, string>): boolean {
     const controls: Record<string, AbstractControl> = {
       email: this.form.controls.email,

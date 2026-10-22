@@ -8,14 +8,14 @@ export interface Alert {
   activationMethod: ActivationMethod;
   time: string;
   location: string;
-  /** true cuando ubicacion ya es barrio y dirección (no coordenadas). */
+  /** true when location is already neighborhood and address (not coordinates). */
   resolvedAddress?: boolean;
   lat: number;
   lng: number;
   status: AlertStatus;
-  userId?: number; // opcional: admin no lo usa, usuaria sí lo necesita para filtrar
+  userId?: number; // optional: admin does not use it, the user needs it to filter
 
-  // Campos extra que pueden venir en db.json (los usa el dashboard)
+  // Extra fields that may come in db.json (used by the dashboard)
   type: string;
   created_at?: string;
   started_at?: string;

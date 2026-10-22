@@ -15,7 +15,7 @@ import { compactPages } from '../../../shared/utils/paginacion';
 })
 export class ModeratorManagementComponent implements OnInit, OnDestroy {
   reports: Report[] = [];
-  allReports: Report[] = []; // Guardar todos los reportes para filtrado
+  allReports: Report[] = []; // Keep all the reports for filtering
   filteredReports: Report[] = []; // Reportes filtrados actuales
   stats = {
     pendingReports: 0,
@@ -46,12 +46,12 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   filterStatus = '';
   filterDate = '';
 
-  // Estados de dropdowns personalizados (filtros del toolbar)
+  // Custom dropdown states (toolbar filters)
   isReasonDropdownOpen = false;
   isSeverityDropdownOpen = false;
   isStatusDropdownOpen = false;
 
-  // Estados de dropdowns del modal de editar
+  // Edit modal dropdown states
   isEditReasonDropdownOpen = false;
   isEditSeverityDropdownOpen = false;
   isEditStatusDropdownOpen = false;
@@ -119,7 +119,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.stats = {
       pendingReports: reports.filter(r => r.status === 'Pendiente').length,
       resolvedCases: reports.filter(r => r.status === 'Resuelto').length,
-      // Usuarias distintas con al menos un reporte resuelto
+      // Distinct users with at least one resolved report
       sanctionedUsers: new Set(reports.filter(r => r.status === 'Resuelto').map(r => r.userEmail)).size
     };
   }
@@ -191,7 +191,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Métodos para editar reporte seleccionado
+  // Methods to edit the selected report
   toggleEditReasonDropdown(event: Event): void {
     event.stopPropagation();
     this.isEditReasonDropdownOpen = !this.isEditReasonDropdownOpen;
@@ -256,7 +256,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   applyFilters(): void {
 
     this.filteredReports = this.allReports.filter(report => {
-      // Filtrar por término de búsqueda (ID, usuario, motivo, gravedad, estado)
+      // Filter by search term (ID, user, reason, severity, status)
       if (this.searchTerm) {
         const searchLower = this.searchTerm.toLowerCase();
         const matchesSearch =
@@ -313,10 +313,10 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       return true;
     });
 
-    // Actualizar reportes visibles con paginación
+    // Update the visible reports with pagination
     this.totalItems = this.filteredReports.length;
     this.totalPages = Math.ceil(this.filteredReports.length / this.itemsPerPage);
-    this.currentPage = 1; // Resetear a primera página
+    this.currentPage = 1; // Reset to the first page
     this.updatePaginatedReports();
 
   }
@@ -409,7 +409,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   }
 
   openEditModal(reportId: string): void {
-    // Se edita una copia: al cancelar, la tabla no debe cambiar
+    // A copy is edited: when cancelling, the table must not change
     const report = this.reports.find(r => r.id === reportId);
     this.selectedReport = report ? { ...report } : null;
     if (this.selectedReport) {

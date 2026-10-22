@@ -11,7 +11,7 @@ export interface TrackingPoint {
   time: Date;
 }
 
-/** Video, audio o foto grabado durante la alerta (se abre con un enlace que vence en minutos). */
+/** Video, audio or photo recorded during the alert (opened with a link that expires in minutes). */
 export interface TrackingEvidence {
   id: number;
   type: 'video' | 'audio' | 'photo' | 'document';
@@ -20,7 +20,7 @@ export interface TrackingEvidence {
   url: string;
 }
 
-/** Lo que ve un contacto de emergencia desde el enlace del correo (sin iniciar sesión). */
+/** What an emergency contact sees from the email link (without signing in). */
 export interface Tracking {
   name: string;
   active: boolean;
@@ -32,7 +32,7 @@ export interface Tracking {
   evidences: TrackingEvidence[];
 }
 
-/** Mensaje del chat de la alerta. deElla: lo escribió quien activó la alerta. */
+/** Alert chat message. fromOwner: written by whoever activated the alert. */
 export interface AlertMessage {
   id: number;
   deElla: boolean;
@@ -54,7 +54,7 @@ export class TrackingService {
   private http = inject(HttpClient);
 
   query(code: string): Observable<Tracking> {
-    // v: identificador anónimo de este navegador, para que la usuaria sepa que alguien abrió su alerta
+    // v: anonymous identifier of this browser, so the user knows someone opened her alert
     return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(code)}`, {
       params: { v: visitor() },
     }).pipe(
@@ -103,7 +103,7 @@ export class TrackingService {
 
 const VISITOR_KEY = 'alerta-mujer-visitante';
 
-/** Identificador anónimo y estable de este navegador (no contiene datos personales). */
+/** Anonymous and stable identifier of this browser (contains no personal data). */
 function visitor(): string {
   try {
     let id = localStorage.getItem(VISITOR_KEY);

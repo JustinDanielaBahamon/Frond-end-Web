@@ -5,7 +5,7 @@ import { delay, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 /**
- * Interfaz para definir la estructura de un dispositivo
+ * Interface that defines the structure of a device
  */
 export interface Device {
   id: number;
@@ -15,21 +15,21 @@ export interface Device {
     name: string;
     email: string;
   };
-  type: 'Android';  // la app solo existe para Android
+  type: 'Android';  // the app only exists for Android
   imei: string;
   phone: string;
   status: 'Activo' | 'Inactivo' | 'Bloqueado' | 'Perdido';
   lastSync: string;
   icon: string;
-  // Datos extra del backend (solo lectura)
+  // Extra backend data (read only)
   appVersion?: string | null;
   gpsStatus?: string | null;
   pushTokenRegistered?: boolean;
   lastAccessIso?: string | null;
-  /** Nombre que le puso la usuaria al celular (p. ej. "Celular de Ana"). */
+  /** Name the user gave the phone (e.g. "Celular de Ana"). */
   deviceName?: string | null;
   registered?: string;
-  /** Lo que la app informa que está listo para una emergencia (null si nunca lo informó). */
+  /** What the app reports as ready for an emergency (null if it never reported it). */
   permissions?: DevicePermission[] | null;
   permissionsUpdated?: string | null;
 }
@@ -39,7 +39,7 @@ export interface DevicePermission {
   ready: boolean;
 }
 
-/** Permisos que informa la app, en el orden en que importan para una emergencia. */
+/** Permissions the app reports, in the order they matter for an emergency. */
 const APP_PERMISSIONS: [string, string][] = [
   ['ubicacion', 'Ubicación'],
   ['notificaciones', 'Notificaciones'],
@@ -60,7 +60,7 @@ function readPermissions(json: string | null): DevicePermission[] | null {
   }
 }
 
-/** Dispositivo tal como lo devuelve el backend al panel de administración. */
+/** Device as the backend returns it to the admin panel. */
 interface AdminDeviceApi {
   id: number;
   accountId: number;
@@ -126,7 +126,7 @@ function fromApi(d: AdminDeviceApi): Device {
 }
 
 /**
- * Interfaz para estadísticas de dispositivos
+ * Interface for device stats
  */
 export interface DeviceStats {
   totalDevices: number;
@@ -137,7 +137,7 @@ export interface DeviceStats {
 }
 
 /**
- * Celular que la app móvil registró para la usuaria (GET /api/devices/user)
+ * Phone the mobile app registered for the user (GET /api/devices/user)
  */
 export interface UserDevice {
   id: number;
@@ -153,13 +153,13 @@ export interface UserDevice {
   status: string;
   lastAccess: string | null;
   fcmToken: string | null;
-  /** JSON con los permisos que informa la app, p. ej. {"ubicacion":true,"agitar":false}. */
+  /** JSON with the permissions the app reports, e.g. {"ubicacion":true,"agitar":false}. */
   permissions?: string | null;
   permissionsUpdatedAt?: string | null;
 }
 
 /**
- * Interfaz para filtros de dispositivos
+ * Interface for device filters
  */
 export interface DeviceFilters {
   search: string;
@@ -175,7 +175,7 @@ export class DeviceService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/devices`;
 
-  // Sin datos mock - se cargarán desde el backend
+  // No mock data - it is loaded from the backend
   private devicesSubject = new BehaviorSubject<Device[]>([]);
   devices$ = this.devicesSubject.asObservable();
 
@@ -189,7 +189,7 @@ export class DeviceService {
   stats$ = this.statsSubject.asObservable();
 
   // ========================================
-  // MÉTODOS API (Conectar al backend)
+  // API METHODS (connect to the backend)
   // ========================================
 
   /**
@@ -198,7 +198,7 @@ export class DeviceService {
   getAll(): Observable<Device[]> {
     return this.http.get<AdminDeviceApi[]>(this.url).pipe(
       map(list => list.map(fromApi)),
-      // La lista local alimenta los filtros y las estadísticas
+      // The local list feeds the filters and the stats
       tap(devices => {
         this.devicesSubject.next(devices);
         this.updateStats();
@@ -207,10 +207,10 @@ export class DeviceService {
   }
 
   /**
-   * Celulares de la usuaria autenticada
+   * Phones of the authenticated user
    */
   getMyDevices(): Observable<UserDevice[]> {
-    // El panel web se registra como dispositivo "web" (notificaciones del navegador): no es un celular
+    // The web panel registers as a "web" device (browser notifications): it is not a phone
     return this.http.get<UserDevice[]>(`${this.url}/user`).pipe(
       map(list => list.filter(d => (d.osName || '').toLowerCase() !== 'web')),
     );
@@ -230,7 +230,7 @@ export class DeviceService {
   /**
    * Actualizar dispositivo
    */
-  // Desde el panel solo se edita el estado; el resto lo registra la app móvil.
+  // From the panel only the status is edited; the rest is registered by the mobile app.
   update(id: number, device: Device): Observable<Device> {
     return this.changeStatus(id, device.status);
   }
@@ -243,7 +243,7 @@ export class DeviceService {
   }
 
   /**
-   * Obtener estadísticas
+   * Get stats
    */
   getStats(): Observable<DeviceStats> {
     // TODO: Conectar al backend
@@ -253,7 +253,7 @@ export class DeviceService {
   }
 
   /**
-   * Calcular estadísticas dinámicamente desde los dispositivos
+   * Compute stats dynamically from the devices
    */
   private computeStats(): DeviceStats {
     const devices = this.devicesSubject.value;
@@ -273,7 +273,7 @@ export class DeviceService {
   }
 
   /**
-   * Actualizar estadísticas y notificar a los suscriptores
+   * Update stats and notify the subscribers
    */
   private updateStats(): void {
     const stats = this.computeStats();
@@ -296,7 +296,7 @@ export class DeviceService {
   filterDevices(filters: DeviceFilters): Observable<Device[]> {
     let filteredDevices = [...this.devicesSubject.value];
 
-    // Filtro por búsqueda
+    // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filteredDevices = filteredDevices.filter(device => {

@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { PhoneLocationService } from './phone.location.services';
 import { GeocodingService, Place } from './geocoding.service';
 
-/** Lugar de referencia contra el que se compara la ubicación del celular. */
+/** Reference place against which the phone location is compared. */
 interface Reference {
   lat: number;
   lng: number;
@@ -19,15 +19,15 @@ export interface MovementNotice {
 const ACTIVE_KEY = 'alerta-mujer-aviso-desplazamiento';
 const REFERENCE_KEY = 'alerta-mujer-referencia-celular';
 const CHECK_EVERY_MS = 5 * 60 * 1000;
-// Un desplazamiento menor se considera el mismo sitio (el GPS se mueve unos metros solo)
+// A smaller movement counts as the same place (the GPS drifts a few meters by itself)
 const MIN_DISTANCE_M = 300;
-// Como mucho un aviso cada 30 minutos aunque siga moviéndose
+// At most one notice every 30 minutes even if it keeps moving
 const NOTICE_EVERY_MS = 30 * 60 * 1000;
 
 /**
- * "Notificaciones de ubicación": mientras la web está abierta, revisa la ubicación que envía el
- * celular y avisa a la propia usuaria (nunca a sus contactos) cuando se desplazó a otro lugar:
- * aviso en el panel, notificación del navegador y un sonido corto (un computador no vibra).
+ * "Location notifications": while the web is open, it checks the location the
+ * phone sends and warns the user herself (never her contacts) when it moved to another place:
+ * notice in the panel, browser notification and a short sound (a computer does not vibrate).
  */
 @Injectable({ providedIn: 'root' })
 export class PhoneMovementService {
@@ -125,11 +125,11 @@ function save(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
   } catch {
-    // Sin almacenamiento el aviso funciona igual, solo se pierde al recargar
+    // Without storage the notice still works, it is just lost when reloading
   }
 }
 
-/** Distancia en metros entre dos puntos (fórmula de Haversine). */
+/** Distance in meters between two points (Haversine formula). */
 export function distanceM(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const rad = (g: number) => (g * Math.PI) / 180;
   const a = Math.sin(rad(lat2 - lat1) / 2) ** 2
@@ -137,7 +137,7 @@ export function distanceM(lat1: number, lng1: number, lat2: number, lng2: number
   return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/** Dos tonos cortos (Web Audio: no necesita archivos de sonido). */
+/** Two short tones (Web Audio: needs no sound files). */
 function sonar(): void {
   try {
     const ctx = new AudioContext();
@@ -154,6 +154,6 @@ function sonar(): void {
     });
     setTimeout(() => ctx.close(), 800);
   } catch {
-    // El navegador puede bloquear el sonido hasta que la usuaria toque la página
+    // The browser may block the sound until the user touches the page
   }
 }

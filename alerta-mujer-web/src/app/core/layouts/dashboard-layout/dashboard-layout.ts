@@ -18,9 +18,9 @@ import { PhoneMovementService } from '../../../core/services/movimiento-celular.
 export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
-  /** Alertas de las personas que tienen a la usuaria como contacto (aviso en todo el panel). */
+  /** Alerts of the people who have the user as a contact (notice across the whole panel). */
   readonly receivedAlerts = inject(ReceivedAlertsService);
-  /** "Tu celular cambió de lugar" (solo para la usuaria; se activa en Configuración). */
+  /** "Your phone changed places" (user only; enabled in Settings). */
   readonly movement = inject(PhoneMovementService);
 
   sidebarCollapsed = false;

@@ -24,8 +24,8 @@ const fromIso = (iso: string | null | undefined): Date | null => {
 };
 
 /**
- * Selector de fecha propio (el del navegador se ve distinto en cada uno y no sigue el tema).
- * Trabaja con fechas 'AAAA-MM-DD' como <input type="date">: sirve con [(ngModel)] o con
+ * Own date picker (the browser one looks different in each browser and does not follow the theme).
+ * Works with 'YYYY-MM-DD' dates like <input type="date">: works with [(ngModel)] or with
  * [value] + (valueChange).
  */
 @Component({
@@ -44,7 +44,7 @@ export class DatePicker implements ControlValueAccessor {
   readonly max = input<string | null>(null);
   readonly placeholder = input('Elegir fecha');
   readonly label = input('Fecha');
-  /** Muestra la "x" para quitar la fecha. */
+  /** Shows the "x" to remove the date. */
   readonly clearable = input(true);
   readonly valueChange = output<string | null>();
 
@@ -53,7 +53,7 @@ export class DatePicker implements ControlValueAccessor {
   readonly selection = computed(() => (this.touchedByNgModel() ? this.internal() : (this.value() ?? this.internal())) || null);
 
   open = signal(false);
-  /** Primer día del mes que se está mirando. */
+  /** First day of the month being viewed. */
   month = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   readonly days = DAYS;
 
@@ -66,7 +66,7 @@ export class DatePicker implements ControlValueAccessor {
 
   readonly cells = computed<Cell[]>(() => {
     const start = this.month();
-    const offset = (start.getDay() + 6) % 7; // la semana empieza el lunes
+    const offset = (start.getDay() + 6) % 7; // the week starts on Monday
     const first = new Date(start.getFullYear(), start.getMonth(), 1 - offset);
     const today = aIso(new Date());
     const min = this.min();

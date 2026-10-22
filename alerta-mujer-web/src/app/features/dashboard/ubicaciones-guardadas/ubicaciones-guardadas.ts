@@ -12,10 +12,10 @@ import { FrequentPlace } from '../../../core/models/frequent-place.model';
 
 type RiskLevel = 'muy_segura' | 'moderada' | 'muy_insegura';
 
-// Neiva (Huila): mismo centro por defecto que la app móvil
+// Neiva (Huila): same default center as the mobile app
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 
-// Mismos niveles y colores que la app móvil
+// Same levels and colors as the mobile app
 export const LEVELS: Record<RiskLevel, { label: string; color: string }> = {
   muy_segura: { label: 'Muy segura', color: '#5316a3' },
   moderada: { label: 'Moderada', color: '#a70bf5' },
@@ -147,7 +147,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
     this.placesLayer.addTo(this.map);
     this.pointLayer.addTo(this.map);
 
-    // Clic en el mapa: elige el punto de una ubicación nueva (o el nuevo punto de la que se edita)
+    // Click on the map: chooses the point of a new location (or the new point of the one being edited)
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       if (!this.formVisible()) this.newOne();
       else if (this.editingId() && !this.choosingPoint()) return;
@@ -254,7 +254,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
     this.choosingPoint.set(false);
     this.errorForm.set('');
 
-    // Dirección y ciudad automáticas (la usuaria puede corregirlas)
+    // Automatic address and city (the user can correct them)
     this.searchingAddress.set(true);
     this.geocoding.get(lat, lng).then((place) => {
       if (!this.point() || this.point()!.lat !== lat || this.point()!.lng !== lng) return;

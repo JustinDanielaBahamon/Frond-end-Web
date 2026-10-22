@@ -1,7 +1,7 @@
-/** Categoría de un recurso de ayuda, derivada del resourceType del backend. */
+/** Category of a help resource, derived from the backend resourceType. */
 export type ResourceCategory = 'linea' | 'policia' | 'salud' | 'apoyo' | 'bomberos';
 
-/** Recurso de ayuda (GET /api/resources) adaptado para la UI. */
+/** Help resource (GET /api/resources) adapted for the UI. */
 export interface HelpResource {
   id: number;
   name: string;
@@ -16,7 +16,7 @@ export interface HelpResource {
   lng: number | null;
 }
 
-/** Llamada registrada por la usuaria (GET /api/resource-calls/me). */
+/** Call recorded by the user (GET /api/resource-calls/me). */
 export interface RecordedCall {
   id: number;
   resourceId: number;

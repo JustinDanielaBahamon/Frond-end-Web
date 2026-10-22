@@ -10,8 +10,8 @@ export const jwtInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  // El seguimiento público (enlace del correo a los contactos) no usa sesión: nunca se le manda el
-  // token ni se envía al login por un error, aunque el navegador tenga una sesión vieja guardada
+  // Public tracking (link in the email to the contacts) uses no session: the token is never sent
+  // and an error never sends it to the login, even if the browser has an old stored session
   if (req.url.includes('/api/public/')) return next(req);
 
   const token = authService.getToken();
@@ -22,8 +22,8 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((error: unknown) => {
-      // Token vencido o inválido: se cierra la sesión y se vuelve al login.
-      // Las peticiones de /api/auth (login, registro, Google) manejan su propio 401.
+      // Expired or invalid token: the session is closed and it goes back to the login.
+      // /api/auth requests (login, registration, Google) handle their own 401.
       if (error instanceof HttpErrorResponse && error.status === 401
           && token && !req.url.includes('/api/auth/')) {
         authService.signOutLocally();

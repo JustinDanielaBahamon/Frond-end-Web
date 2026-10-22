@@ -6,7 +6,7 @@ import { PasswordService } from '../../../core/services/password.service';
 import { RecoveryStateService } from '../../../core/services/recovery-state.service';
 
 const DIGITS = 6;
-const RESEND_WAIT = 60; // el backend acepta un código por minuto
+const RESEND_WAIT = 60; // the backend accepts one code per minute
 
 @Component({
   selector: 'app-verify-code',
@@ -33,7 +33,7 @@ export class VerifyCodeComponent implements OnInit, OnDestroy {
     const t = this.remainingTime();
     return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
   });
-  /** a***@correo.com: se muestra a dónde se envió sin exponer todo el correo. */
+  /** a***@correo.com: shows where it was sent without exposing the whole email. */
   readonly maskedEmail = computed(() => {
     const e = this.email() ?? '';
     const [u, d] = e.split('@');
@@ -58,7 +58,7 @@ export class VerifyCodeComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const digits = input.value.replace(/\D/g, '');
     this.error.set(null);
-    // Varios dígitos a la vez (autocompletado del navegador o pegar en una casilla): se reparten
+    // Several digits at once (browser autofill or pasting into a box): they are spread
     if (digits.length > 1) {
       this.distribute(digits, index);
       return;

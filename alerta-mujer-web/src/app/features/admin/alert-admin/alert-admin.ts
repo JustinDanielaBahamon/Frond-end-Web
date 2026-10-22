@@ -25,7 +25,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private alertsService = inject(AlertsService);
   private geocoding = inject(GeocodingService);
 
-  // Detalle de la alerta elegida: última ubicación, dirección y envío a cada contacto
+  // Detail of the chosen alert: last location, address and delivery to each contact
   detail: AdminAlertDetail | null = null;
   loadingDetail = false;
   alertAddress: string | null = null;
@@ -91,7 +91,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   newPoint: { type: PointType; name: string; lat: number; lng: number } = { type: 'police_post', name: '', lat: 0, lng: 0 };
   waitingPointClick = false;
 
-  // ── Datos — vienen vía API ─────────────────────
+  // ── Data — comes from the API ─────────────────────
   alerts: Alert[] = [];
   manualZones: ManualZone[] = [];
   mapPoints: MapPoint[] = [];
@@ -102,7 +102,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.filteredAlerts = this.alerts.filter(a => {
       const m = this.methodFilter  === 'Todos' || a.activationMethod === this.methodFilter;
       const e = this.statusFilter === 'Todos' || a.status          === this.statusFilter;
-      // Búsqueda por nombre, descripción, lugar o número de alerta
+      // Search by name, description, place or alert number
       const b = !term || [a.name, a.description, a.location, `#${a.id}`]
         .some(t => (t ?? '').toString().toLowerCase().includes(term));
       return m && e && b;
@@ -152,12 +152,12 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void { if (this.map) this.map.remove(); }
 
-  /** Fuerza refresco de la vista (útil para callbacks de Leaflet y HTTP) */
+  /** Forces a view refresh (useful for Leaflet and HTTP callbacks) */
   private refresh(): void {
     this.cdr.detectChanges();
   }
 
-  // ── Medio de activación ──────────────────────────────────────
+  // ── Activation method ──────────────────────────────────────
   /** Clase CSS segura (sin tildes ni espacios) */
   methodClass(method: ActivationMethod): string {
     const map: Record<ActivationMethod, string> = {
@@ -193,7 +193,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       points: this.riskZonesService.getPoints(),
     }).subscribe({
       next: ({ alerts, zones, points }) => {
-        // DEBUG: quítalo cuando ya veas bien los datos
+        // DEBUG: remove it once the data looks right
 
         this.alerts = alerts;
         this.manualZones = countAlertsInZones(zones, alerts);
@@ -318,7 +318,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // ── Selección / atención de alertas ───────────────────────────
+  // ── Alert selection / handling ───────────────────────────
   selectAlert(alert: Alert): void {
     this.activeAlert = alert;
     if (this.validCoords(alert.lat, alert.lng)) {
@@ -336,7 +336,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         if (this.activeAlert?.id !== alert.id) return;
         this.detail = d;
         this.loadingDetail = false;
-        // La dirección es la de la última ubicación conocida o, si no hay, la de la activación
+        // The address is the one of the last known location or, if none, the activation one
         const point = d.lastLocation ?? (d.locationVisible && this.validCoords(alert.lat, alert.lng) ? alert : null);
         if (point) {
           this.geocoding.get(point.lat, point.lng).then((l) => {
@@ -415,12 +415,12 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     if (this.pointModal && this.waitingPointClick) {
       this.newPoint.lat = parseFloat(lat.toFixed(6));
       this.newPoint.lng = parseFloat(lng.toFixed(6));
-      this.waitingPointClick = false; // vuelve a mostrarse el modal con la ubicación elegida
+      this.waitingPointClick = false; // the modal is shown again with the chosen location
       this.refresh();
     }
   }
 
-  // ── Preview círculo en mapa al elegir área ────────────────────
+  // ── Circle preview on the map when choosing an area ────────────────────
   updateZonePreview(): void {
     if (!this.map || this.newZone.lat === 0) return;
 
@@ -478,7 +478,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
   }
 
-  // ── Guardar zona vía API ────────────────────────────────────
+  // ── Save zone through the API ────────────────────────────────────
   saveZone(): void {
     if (!this.newZone.name || this.newZone.lat === 0) return;
 
@@ -515,7 +515,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Marcar zona caliente directamente desde el panel — vía API ──
+  // ── Mark hot zone directly from the panel — through the API ──
   markHotZone(z: HotZone): void {
     const radio = z.alerts >= 5 ? 400 : z.alerts >= 3 ? 280 : 180;
 
@@ -542,7 +542,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Eliminar zona vía API ────────────────────────────────────
+  // ── Delete zone through the API ────────────────────────────────────
   deleteZone(id: number): void {
     this.riskZonesService.deleteZone(id).subscribe({
       next: () => {
@@ -564,7 +564,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.pointModal = true;
   }
 
-  // ── Guardar punto vía API ────────────────────────────────────
+  // ── Save point through the API ────────────────────────────────────
   savePoint(): void {
     if (!this.newPoint.name) return;
 
@@ -593,8 +593,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Único punto de verdad para pintar una ZonaManual en el mapa
-   * (se usaba duplicado en repintarZonasGuardadas, guardarZona y marcarZonaCaliente)
+   * Single source of truth to paint a ManualZone on the map
+   * (it was duplicated in repaintSavedZones, saveZone and markHotZone)
    */
   private paintZoneOnMap(zone: ManualZone): any {
     const color = this.colorByLevel(zone.level);
@@ -603,7 +603,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const pin = L.marker([zone.centerLat, zone.centerLng], { icon }).bindTooltip(`⚠️ ${zone.name} (${zone.level})`);
 
     if (zone.method === 'area') {
-      // El área lleva también el pin de peligro en su centro, para verla aunque el mapa esté alejado
+      // The area also carries the danger pin at its center, so it can be seen even when the map is zoomed out
       const circle = L.circle(
         [zone.centerLat, zone.centerLng],
         { radius: zone.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
@@ -624,7 +624,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     </svg>`;
   }
 
-  // Color del pin según el medio de activación (gris si ya fue atendida)
+  // Pin color by activation method (grey if already attended)
   private createPinIcon(method: ActivationMethod, attended = false): any {
     const colors: Record<ActivationMethod, string> = {
       'Botón de pánico':       '#d946ef',

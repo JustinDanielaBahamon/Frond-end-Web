@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { evaluatePassword } from '../../../core/services/password.service';
 
-/** Barra de seguridad y requisitos de una contraseña nueva. */
+/** Strength bar and requirements of a new password. */
 @Component({
   selector: 'app-password-strength',
   standalone: true,

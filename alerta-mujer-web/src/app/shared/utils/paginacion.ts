@@ -1,12 +1,12 @@
 /**
- * Botones de página abreviados: siempre la primera y la última, la actual con sus vecinas y `null`
- * donde van los puntos suspensivos. Ej.: página 9 de 24 → 1 … 8 9 10 … 24.
- * Con 7 páginas o menos se muestran todas.
+ * Abbreviated page buttons: always the first and the last, the current one with its neighbors and `null`
+ * where the ellipsis goes. E.g.: page 9 of 24 → 1 … 8 9 10 … 24.
+ * With 7 pages or fewer all are shown.
  */
 export function compactPages(current: number, total: number): (number | null)[] {
   if (total <= 7) return Array.from({ length: Math.max(1, total) }, (_, i) => i + 1);
   const page = Math.min(Math.max(1, current), total);
-  // Cerca de un extremo se muestran 5 seguidas para que el número de botones no salte
+  // Near an end 5 in a row are shown so the number of buttons does not jump
   let start = Math.max(2, page - 1);
   let end = Math.min(total - 1, page + 1);
   if (page <= 4) {

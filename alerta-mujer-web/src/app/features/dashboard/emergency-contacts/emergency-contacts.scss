@@ -82,7 +82,7 @@
     td:last-child  { border-bottom-right-radius: 12px; }
   }
 
-  // antes: var(--purple-pale, #f9f8ff) — casi blanco, sin contraste con la tarjeta
+  // before: var(--purple-pale, #f9f8ff) — almost white, no contrast with the card
   thead {
     background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
 
@@ -437,7 +437,7 @@
   .ec-table-wrap { overflow-x: auto; }
   .ec-table { min-width: 640px; }
 }
-// ── Fotos de los contactos ──────────────────────────────
+// ── Contact photos ──────────────────────────────
 .ec-avatar--foto {
   object-fit: cover;
   border: 2px solid #ede9fe;

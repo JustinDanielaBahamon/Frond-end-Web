@@ -55,7 +55,7 @@
             [class.alerta-card--active]="activeAlert?.id === alert.id"
             [class.alerta-card--atendida]="alert.status === 'Atendida'" (click)="selectAlert(alert)">
             <div class="alerta-icon" [ngClass]="'alerta-icon--' + methodClass(alert.activationMethod)">
-              <!-- Botón de pánico -->
+              <!-- Panic button -->
               <svg *ngIf="alert.activationMethod === 'Botón de pánico'" width="16" height="16" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2.5">
                 <circle cx="12" cy="12" r="9" />
@@ -74,7 +74,7 @@
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
               </svg>
-              <!-- Botón de encendido -->
+              <!-- Power button -->
               <svg *ngIf="alert.activationMethod === 'Botón de encendido'" width="16" height="16" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 2v10" />
@@ -137,7 +137,7 @@
           </button>
         </div>
 
-        <!-- Zonas automáticas por densidad -->
+        <!-- Automatic zones by density -->
         <div class="zonas-section">
           <div class="zonas-section__title">
             <span>🔥 Zonas calientes</span>
@@ -149,7 +149,7 @@
               <span class="zona-auto__nombre">{{ z.name }}</span>
               <span class="zona-auto__alertas">{{ z.alerts }} alertas en esta área</span>
             </div>
-            <!-- BOTÓN: marcar directamente esta zona caliente en el mapa -->
+            <!-- BUTTON: mark this hot zone directly on the map -->
             <button class="btn-marcar-zona" (click)="$event.stopPropagation(); markHotZone(z)"
               title="Marcar esta zona en el mapa">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -181,7 +181,7 @@
             (click)="goToZone(z.centerLat, z.centerLng)">
             <div class="zona-manual__header">
               <div class="zona-manual__nombre-row">
-                <!-- Ícono según método -->
+                <!-- Icon by method -->
                 <span class="zona-metodo-icon" *ngIf="z.method === 'pin'">📍</span>
                 <span class="zona-metodo-icon" *ngIf="z.method === 'area'">⭕</span>
                 <span class="zona-manual__nombre">{{ z.name }}</span>
@@ -336,7 +336,7 @@
           {{ activeAlert.time }}
         </div>
 
-        <!-- Detalle: dirección, última ubicación y envío a cada contacto (sin sus datos) -->
+        <!-- Detail: address, last location and delivery to each contact (without their data) -->
         <div class="mapa-popup__detalle">
           <p class="mapa-popup__cargando" *ngIf="loadingDetail">Cargando detalle…</p>
           <ng-container *ngIf="detail as d">
@@ -374,17 +374,15 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     MODAL: Nueva zona de peligro (PIN o ÁREA)
-     ══════════════════════════════════════════════════════ -->
-<!-- Mientras se elige el lugar en el mapa el modal se oculta: su fondo tapaba el mapa y el clic no llegaba -->
+<!-- ══════════════════════════════════════════════════════ MODAL: New danger zone (PIN or AREA) ══════════════════════════════════════════════════════ -->
+<!-- While the place is being chosen on the map the modal is hidden: its backdrop covered the map and the click did not get through -->
 <app-modal
   *ngIf="zoneModal && !waitingZoneClick"
   size="zona"
   [title]="zoneMode === 'pin' ? '📍 Pin de zona peligrosa' : '⭕ Área de riesgo'"
   (close)="cancelZoneModal()">
 
-  <!-- Selector de modo dentro del modal -->
+  <!-- Mode selector inside the modal -->
   <div modal-tabs class="modal__mode-tabs">
     <button class="modal__mode-tab" [class.modal__mode-tab--active]="zoneMode === 'pin'" (click)="zoneMode = 'pin'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -403,7 +401,7 @@
 
   <div modal-body>
 
-    <!-- PASO 1: Colocar en el mapa -->
+    <!-- STEP 1: Place it on the map -->
     <div class="form-step">
       <div class="form-step__num">1</div>
       <div class="form-step__content">
@@ -425,7 +423,7 @@
       </div>
     </div>
 
-    <!-- PASO 2: Radio (solo para área) -->
+    <!-- STEP 2: Radius (area only) -->
     <div class="form-step" *ngIf="zoneMode === 'area'">
       <div class="form-step__num">2</div>
       <div class="form-step__content">

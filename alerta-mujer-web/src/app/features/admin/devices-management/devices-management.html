@@ -223,7 +223,7 @@
     </div>
     <div class="modal-body">
       <div class="device-detail">
-        <!-- Header del dispositivo con icono -->
+        <!-- Device header with icon -->
         <div class="device-header">
           <div class="device-icon-large">
             <i [class]="selectedDevice!.icon"></i>
@@ -237,7 +237,7 @@
           </div>
         </div>
 
-        <!-- Sección de información del dispositivo -->
+        <!-- Device information section -->
         <div class="detail-section">
           <h4>
             <i class="fa-solid fa-mobile-screen"></i>
@@ -265,7 +265,7 @@
           </div>
         </div>
 
-        <!-- App y protección: lo que informa la app móvil -->
+        <!-- App and protection: what the mobile app reports -->
         <div class="detail-section">
           <h4>
             <i class="fa-solid fa-shield-heart"></i>
@@ -310,7 +310,7 @@
           </ng-template>
         </div>
 
-        <!-- Sección de información del usuario -->
+        <!-- User information section -->
         <div class="detail-section">
           <h4>
             <i class="fa-solid fa-user"></i>
@@ -345,7 +345,7 @@
     </div>
     <div class="modal-body">
       <form (ngSubmit)="updateDevice(selectedDevice!)">
-        <!-- Los datos del celular y de la usuaria vienen de la app móvil; aquí solo se cambia el estado. -->
+        <!-- The phone and user data come from the mobile app; here only the status is changed. -->
         <div class="form-group">
           <label>Nombre del dispositivo</label>
           <input type="text" name="name" readonly [ngModel]="selectedDevice!.name" required>

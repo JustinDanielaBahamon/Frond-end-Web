@@ -241,7 +241,7 @@
 }
 
 // =============================================
-// ALERTAS POR HORA DEL DÍA
+// ALERTS BY HOUR OF THE DAY
 // =============================================
 .horas-stats {
   display: grid;
@@ -343,7 +343,7 @@
 }
 
 // =============================================
-// ZONAS CON MÁS INCIDENTES
+// ZONES WITH THE MOST INCIDENTS
 // =============================================
 .zonas-body {
   display: grid;
@@ -357,7 +357,7 @@
 .zona-mapa {
   position: relative;
   z-index: 0;
-  isolation: isolate; // evita que el mapa se monte sobre la barra superior o los modales
+  isolation: isolate; // prevents the map from rendering over the top bar or the modals
   border-radius: $radius-sm;
   border: 1px solid $border;
   overflow: hidden;
@@ -518,7 +518,7 @@ table {
   }
 }
 
-// Estado: se distingue por forma y color (círculo, rombo, cuadrado)
+// Status: told apart by shape and color (circle, diamond, square)
 .estado-badge {
   display: inline-flex;
   align-items: center;
@@ -569,7 +569,7 @@ table {
   &:hover { text-decoration: underline; }
 }
 
-// ── Accesos Rápidos ───────────────────────────
+// ── Quick access ───────────────────────────
 
 
 
@@ -592,7 +592,7 @@ table {
 }
 
 // =============================================
-// TENDENCIA EN BARRAS (colores validados para CVD en claro y oscuro)
+// BAR TREND (colors validated for CVD in light and dark)
 // =============================================
 :host {
   --serie-actual: #6d28d9;
@@ -682,7 +682,7 @@ table {
   }
 }
 
-// Selector Semana / Mes del gráfico de tendencia
+// Week / Month selector of the trend chart
 .trend-vista {
   display: flex;
   gap: 6px;

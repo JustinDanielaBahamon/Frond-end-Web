@@ -38,7 +38,7 @@
     <div class="as-alert as-alert--info" role="status">{{ notice() }}</div>
   }
 
-  <!-- Pestañas -->
+  <!-- Tabs -->
   <div class="as-subtabs" role="tablist">
     <button role="tab" class="as-subtab" [class.as-subtab--active]="tab() === 'lineas'" [attr.aria-selected]="tab() === 'lineas'" (click)="setTab('lineas')">
       Líneas de ayuda <span class="as-count">{{ lines().length }}</span>

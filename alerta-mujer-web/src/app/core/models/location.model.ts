@@ -7,14 +7,14 @@ export interface LocationEntry {
   battery: number;
   lat: number;
   lng: number;
-  date?: string;           // 'YYYY-MM-DD' — agrégalo en el backend para que el calendario filtre de verdad
+  date?: string;           // 'YYYY-MM-DD' — add it in the backend so the calendar really filters
   connectionType?: string; // opcional
   deviceName?: string;     // opcional
-  recordedAt?: string;     // ISO con zona horaria (fuente de verdad para fecha/hora)
+  recordedAt?: string;     // ISO with time zone (source of truth for date/time)
   accuracy?: number;       // metros
 }
 
-// Modelo que devuelve el backend LocationLog
+// Model returned by the backend LocationLog
 export interface LocationLogApi {
   id: number;
   userProfileId: number;

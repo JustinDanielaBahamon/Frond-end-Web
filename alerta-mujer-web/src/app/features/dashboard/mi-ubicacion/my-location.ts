@@ -18,7 +18,7 @@ import { FrequentPlace } from '../../../core/models/frequent-place.model';
 type SubTab = 'mapa' | 'historial';
 type GpsStatus = 'buscando' | 'activo' | 'denegado' | 'no-disponible';
 
-/** Capas que la usuaria puede prender/apagar (se recuerdan en este navegador). */
+/** Layers the user can turn on/off (remembered in this browser). */
 interface Layers {
   routes: boolean;
   onlyImportant: boolean;
@@ -28,11 +28,11 @@ interface Layers {
 
 const LAYERS_KEY = 'alerta_mujer_capas_mapa';
 const DEFAULT_LAYERS: Layers = { routes: true, onlyImportant: false, locations: true, zones: true };
-// Neiva (Huila): mismo centro por defecto que la app móvil
+// Neiva (Huila): same default center as the mobile app
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 const ROUTE_COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
-// Colores alineados con la app móvil
+// Colors aligned with the mobile app
 export const ZONE_STYLE: Record<NearbyZone['type'], { color: string; label: string }> = {
   safe: { color: '#5316a3', label: 'Zona segura' },
   risk: { color: '#cb1ce6', label: 'Zona de riesgo' },
@@ -53,7 +53,7 @@ const phoneIcon = L.divIcon({
   iconAnchor: [17, 17],
 });
 
-// Solo se vuelve a pedir la dirección si la usuaria se movió más de esto
+// The address is only requested again if the user moved more than this
 const METERS_TO_REGEOCODE = 30;
 
 const youIcon = L.divIcon({
@@ -99,7 +99,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeTab = signal<SubTab>('mapa');
 
-  // ── Ubicación en vivo (GPS de este dispositivo) ─
+  // ── Live location (GPS of this device) ─
   gpsStatus = signal<GpsStatus>('buscando');
   position = signal<{ lat: number; lng: number; precision: number } | null>(null);
   updatedAt = signal<Date | null>(null);
@@ -107,7 +107,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   place = signal<Place | null>(null);
   searchingPlace = signal(false);
 
-  // ── Ubicación del celular (última que envió la app móvil) ─
+  // ── Phone location (last one the mobile app sent) ─
   phone = signal<LocationEntry | null>(null);
   phonePlace = signal<Place | null>(null);
   loadingPhone = signal(false);
@@ -121,7 +121,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   locations = signal<FrequentPlace[]>([]);
   zones = signal<NearbyZone[]>([]);
 
-  // ── Historial (ubicaciones reportadas por el móvil) ─
+  // ── History (locations reported by the phone) ─
   history = signal<LocationEntry[]>([]);
   historyPlaces = signal<Record<number, string>>({});
   loadingHistory = signal(true);
@@ -184,7 +184,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   toggleLayer(layer: keyof Layers): void {
     this.layers.update((c) => {
       const newOne = { ...c, [layer]: !c[layer] };
-      // "Solo importantes" depende de que los recorridos estén visibles
+      // "Solo importantes" depends on the routes being visible
       if (layer === 'routes' && !newOne.routes) newOne.onlyImportant = false;
       return newOne;
     });
@@ -231,11 +231,11 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Ubicación del celular ──────────────────────
+  // ── Phone location ──────────────────────
   /**
-   * Pide al celular su ubicación actual (push silencioso) y espera hasta 20 s a que llegue un punto
-   * nuevo. Si el celular no responde (sin internet, sin permiso de ubicación en segundo plano), se
-   * muestra la última ubicación que envió, con su antigüedad.
+   * Asks the phone for its current location (silent push) and waits up to 20 s for a new point
+   * to arrive. If the phone does not answer (no internet, no background location permission), the
+   * last location it sent is shown, with its age.
    */
   viewPhone(): void {
     this.loadingPhone.set(true);
@@ -244,7 +244,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.phoneLocationService.requestFromPhone().subscribe({
       next: (r) => this.waitForResponse(new Date(r.requestedAt).getTime() - 5000, Date.now() + 20000),
       error: (e) => {
-        // 409: sin celular con notificaciones o pedido muy seguido; igual se muestra el último punto
+        // 409: no phone with notifications or requested too often; the last point is shown anyway
         this.phoneNotice.set(e?.error?.message ?? null);
         this.showLatest();
       },
@@ -332,9 +332,9 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     // Orden de abajo hacia arriba: zonas, recorridos, ubicaciones, yo
     [this.zonesLayer, this.routesLayer, this.locationsLayer, this.phoneLayer, this.meLayer].forEach((c) => c.addTo(this.map!));
 
-    // Si la usuaria mueve el mapa, deja de seguirla hasta que pulse "Centrar"
+    // If the user moves the map, it stops following her until she presses "Centrar"
     this.map.on('dragstart', () => this.follow.set(false));
-    // Recalcula el tamaño cuando cambia el ancho (sidebar, ventana, pestañas)
+    // Recomputes the size when the width changes (sidebar, window, tabs)
     this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
     this.resizeObserver.observe(this.mapContainer.nativeElement);
   }
@@ -444,7 +444,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Historial ──────────────────────────────────
-  // Dirección de los registros más recientes, uno por uno (respeta el límite de Nominatim)
+  // Address of the most recent records, one by one (respects the Nominatim limit)
   private async geocodeHistory(entries: LocationEntry[]): Promise<void> {
     for (const e of entries) {
       const place = await this.geocoding.get(e.lat, e.lng);
@@ -457,7 +457,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingHistory.set(true);
     this.phoneLocationService.getMine(100).subscribe({
       next: (data) => {
-        this.history.set(data); // el backend ya las devuelve de la más reciente a la más antigua
+        this.history.set(data); // the backend already returns them newest to oldest
         this.loadingHistory.set(false);
         this.geocodeHistory(data.slice(0, 20));
       },

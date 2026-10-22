@@ -30,7 +30,7 @@
   .bg-orb--1 {
     width: 550px;
     height: 550px;
-    background: radial-gradient(circle, #8b5cf6, transparent); /* Púrpura */
+    background: radial-gradient(circle, #8b5cf6, transparent); /* Purple */
     top: -180px;
     left: -150px;
     animation-delay: 0s;
@@ -94,7 +94,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #8b5cf6; /* Fondo para la sección visual */
+    background-color: #8b5cf6; /* Background for the visual section */
   }
   
   .hero-image {
@@ -279,7 +279,7 @@
     gap: 20px;
   }
   
-  // Seis casillas que se reparten el ancho de la tarjeta (antes se salían por los lados)
+  // Six boxes that share the card width (before they overflowed on the sides)
   .code-inputs {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 52px));
@@ -330,7 +330,7 @@
   .resend-link {
     background: none;
     border: none;
-    color: #8b5cf6; /* Color primario para el enlace */
+    color: #8b5cf6; /* Primary color for the link */
     cursor: pointer;
     font-size: 0.95rem;
     font-weight: 600;
@@ -473,7 +473,7 @@
 .code-error { color: #c026d3; }
 .code-aviso { color: #7c3aed; }
 
-// La regla global del modo oscuro pinta el <strong> casi blanco, pero esta tarjeta sigue clara
+// The global dark mode rule paints <strong> almost white, but this card stays light
 .verify-code-page .card__subtitle strong {
   color: #7c3aed !important;
   font-weight: 700;

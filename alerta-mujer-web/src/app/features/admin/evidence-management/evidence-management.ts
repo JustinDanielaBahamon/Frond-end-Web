@@ -40,7 +40,7 @@ export class EvidencesManagementComponent implements OnInit {
     endDate: null
   };
 
-  // Paginación
+  // Pagination
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
@@ -55,16 +55,16 @@ export class EvidencesManagementComponent implements OnInit {
   isEvidenceTypeDropdownOpen = false;
   isStatusDropdownOpen = false;
   
-  // Handler para cerrar dropdowns al hacer clic fuera
+  // Handler to close dropdowns when clicking outside
   private clickHandler: (() => void) | null = null;
 
-  // Para búsqueda
+  // For search
   searchTermEvidence: string = '';
   filterEvidenceType: string = 'all';
   filterStatus: string = 'all';
 
   constructor() {
-    // Cerrar dropdowns al hacer clic fuera de ellos
+    // Close dropdowns when clicking outside them
     this.clickHandler = () => {
       this.isEvidenceTypeDropdownOpen = false;
       this.isStatusDropdownOpen = false;
@@ -79,7 +79,7 @@ export class EvidencesManagementComponent implements OnInit {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Remover listener de clic para evitar memory leaks
+    // Remove the click listener to avoid memory leaks
     if (this.clickHandler) {
       document.removeEventListener('click', this.clickHandler);
     }
@@ -121,7 +121,7 @@ export class EvidencesManagementComponent implements OnInit {
 
   applyFilters(): void {
     this.loading = true;
-    this.currentPage = 1; // Resetear a primera página
+    this.currentPage = 1; // Reset to the first page
 
     const filters: EvidenceFilters = {
       search: this.searchTermEvidence,
@@ -205,7 +205,7 @@ export class EvidencesManagementComponent implements OnInit {
         const evidence = this.selectedEvidence || this.filteredEvidences.find(e => e.id === id);
         const fileName = evidence?.name || `evidencia_${id}`;
         this.downloadFile(blob, fileName);
-        // Las estadísticas se actualizan automáticamente en el servicio
+        // The stats are updated automatically in the service
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -223,7 +223,7 @@ export class EvidencesManagementComponent implements OnInit {
       this.loading = true;
       this.evidenceService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
-          // Recargar datos para actualizar la tabla y estadísticas
+          // Reload data to update the table and the stats
           this.loadData();
           this.loading = false;
         },
@@ -241,11 +241,11 @@ export class EvidencesManagementComponent implements OnInit {
     this.loading = true;
     this.evidenceService.changeStatus(id, newStatus).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updatedEvidence) => {
-        // Actualizar la evidencia seleccionada en el modal
+        // Update the selected evidence in the modal
         if (this.selectedEvidence && this.selectedEvidence.id === id) {
           this.selectedEvidence = updatedEvidence;
         }
-        // Recargar datos para actualizar la tabla y estadísticas
+        // Reload data to update the table and the stats
         this.loadData();
         this.loading = false;
       },
@@ -258,7 +258,7 @@ export class EvidencesManagementComponent implements OnInit {
     });
   }
 
-  /** Descarga el archivo real. Si llega vacío es que ya no está en el servidor: se avisa, no se inventa. */
+  /** Downloads the real file. If it arrives empty it is no longer on the server: the user is told, nothing is made up. */
   private downloadFile(blob: Blob, name: string): void {
     if (blob.size === 0) {
       this.error = 'El archivo de esta evidencia está vacío o ya no existe en el servidor.';
@@ -303,14 +303,14 @@ export class EvidencesManagementComponent implements OnInit {
     event.stopPropagation();
     this.filterEvidenceType = type;
     this.isEvidenceTypeDropdownOpen = false;
-    // No aplicar filtros automáticamente, esperar al botón Buscar
+    // Do not apply filters automatically, wait for the Search button
   }
 
   selectStatus(status: string, event: Event): void {
     event.stopPropagation();
     this.filterStatus = status;
     this.isStatusDropdownOpen = false;
-    // No aplicar filtros automáticamente, esperar al botón Buscar
+    // Do not apply filters automatically, wait for the Search button
   }
 
   getEvidenceTypeLabel(type: string): string {
@@ -382,13 +382,13 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   /**
-   * Función trackBy para optimizar el rendimiento de las listas de Angular
+   * trackBy function to optimize the performance of Angular lists
    */
   trackByIndex(index: number): number {
     return index;
   }
 
-  // Getters para compatibilidad con template
+  // Getters for template compatibility
   get totalEvidences(): number {
     return this.stats.totalEvidenceCount;
   }

@@ -23,8 +23,8 @@ const LABELS: Record<keyof SettingsForm, string> = {
 };
 
 /**
- * Configuración del sistema: parámetros globales que afectan a todas las usuarias,
- * estado del servidor y exportación de datos. Lo personal de cada admin está en Mi perfil.
+ * System settings: global parameters that affect every user,
+ * server status and data export. Each admin's personal settings are in My profile.
  */
 @Component({
   selector: 'app-admin-settings',
@@ -38,7 +38,7 @@ export class AdminSettingsComponent {
   private alertsService = inject(AlertsService);
   private settingsService = inject(AdminSettingsService);
 
-  // ── Parámetros de la app (servidor) ──────────────────────────
+  // ── App parameters (server) ──────────────────────────
   readonly settings = signal<AppSettings | null>(null);
   form: SettingsForm = { maxAlertDurationMin: 30, emergencyNumber: '', supportEmail: '', maxContacts: 5, versionMinimaApp: '' };
   readonly loadingSettings = signal(true);
@@ -59,7 +59,7 @@ export class AdminSettingsComponent {
     this.loadStatus();
   }
 
-  // ── Parámetros ───────────────────────────────────────────────
+  // ── Parameters ───────────────────────────────────────────────
   private loadSettings(): void {
     this.loadingSettings.set(true);
     this.settingsService.getSettings().subscribe({
@@ -84,7 +84,7 @@ export class AdminSettingsComponent {
     };
   }
 
-  /** Muestra los cambios (antes → después) y pide confirmarlos: afectan a todas las usuarias. */
+  /** Shows the changes (before → after) and asks to confirm them: they affect every user. */
   checkChanges(): void {
     this.settingsError.set('');
     const current = this.settings();
@@ -159,7 +159,7 @@ export class AdminSettingsComponent {
     return email ? `mailto:${email}?subject=${encodeURIComponent('Ayuda panel Alerta Mujer')}` : '';
   }
 
-  // ── Descargas (CSV con ';', se abre directo en Excel en español) ──
+  // ── Downloads (CSV with ';', opens directly in Excel in Spanish) ──
   downloadUsers(): void {
     this.usersService.getAll().subscribe({
       next: (users) =>
@@ -198,7 +198,7 @@ export class AdminSettingsComponent {
 
     const escape = (value: unknown): string => {
       let text = value === null || value === undefined ? '' : String(value);
-      // Evita que Excel interprete un texto como fórmula
+      // Prevents Excel from interpreting a text as a formula
       if (/^[=+\-@]/.test(text) && !/^-?\d+(\.\d+)?$/.test(text)) text = `'${text}`;
       return `"${text.replace(/"/g, '""')}"`;
     };

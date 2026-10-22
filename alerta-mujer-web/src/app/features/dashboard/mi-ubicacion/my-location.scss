@@ -1,4 +1,4 @@
-// Mi ubicación — tokens del tema (sirve en claro y oscuro), mismo lenguaje que "Guardar recorrido"
+// My location — theme tokens (works in light and dark), same language as "Guardar recorrido"
 
 $card: var(--bg-card, #241d3d);
 $soft: var(--purple-pale, #30293d);
@@ -15,7 +15,7 @@ $star: #b324fb;
 .mu-error { color: #e671f8; font-size: 0.85rem; margin: 0; }
 .mu-muted { color: $muted; font-size: 0.82rem; margin: 0; line-height: 1.4; }
 
-// ── Sub-pestañas ──────────────────────────────────
+// ── Sub-tabs ──────────────────────────────────
 .mu-subtabs {
   display: inline-flex;
   gap: 0.35rem;
@@ -193,7 +193,7 @@ $star: #b324fb;
   cursor: pointer;
   transition: opacity 0.15s;
 
-  // "Solo importantes" cuelga de "Mostrar recorridos"
+  // "Solo importantes" hangs from "Mostrar recorridos"
   &--nested { margin-left: 1.4rem; position: relative;
     &::before { content: ''; position: absolute; left: -0.85rem; top: -0.4rem; bottom: 50%; width: 0.6rem;
       border-left: 2px solid $border; border-bottom: 2px solid $border; border-bottom-left-radius: 0.4rem; }
@@ -354,7 +354,7 @@ $star: #b324fb;
 .mu-history-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 560px; overflow-y: auto; }
 
 .mu-history-item {
-  flex-shrink: 0; // dentro de una lista con scroll no debe aplastarse
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
   display: flex;
   align-items: center;
   gap: 0.75rem;

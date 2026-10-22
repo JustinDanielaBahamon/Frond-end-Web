@@ -16,7 +16,7 @@ import { compactPages } from '../../../shared/utils/paginacion';
   styleUrl: './report-management.scss',
 })
 export class ReportManagementComponent implements OnInit, OnDestroy {
-  /** Explicación de la sección; se recuerda si la administradora la ocultó. */
+  /** Explanation of the section; remembered if the admin hid it. */
   showHelp = (() => {
     try {
       return localStorage.getItem('informes-ayuda-oculta') !== '1';
@@ -60,7 +60,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     status: ''
   };
 
-  // Paginación
+  // Pagination
   pagination: Pagination = {
     currentPage: 1,
     itemsPerPage: 5,
@@ -77,12 +77,12 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   selectedReport: AlertReport | null = null;
   editingReport: AlertReport | null = null;
 
-  // Alertas disponibles para selección
+  // Alerts available for selection
   availableAlerts: Alert[] = [];
   selectedAlerts: number[] = []; // IDs de alertas seleccionadas
   loadingAlerts = false;
 
-  // Para formulario de nuevo reporte
+  // For the new report form
   newReport: Partial<AlertReport> = {
     name: '',
     city: '',
@@ -159,7 +159,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.loading = true;
-    this.pagination.currentPage = 1; // Resetear a primera página
+    this.pagination.currentPage = 1; // Reset to the first page
 
     this.reportsService.filterReports(this.filters).pipe(takeUntil(this.destroy$)).subscribe({
       next: (reports) => {
@@ -184,12 +184,12 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       city: '',
       status: ''
     };
-    // Aplicar filtros con datos originales en lugar de filtrar con filtros vacíos
+    // Apply filters with the original data instead of filtering with empty filters
     this.loadData();
   }
 
   onSearchQueryChange(): void {
-    // Debounce simple para búsqueda
+    // Simple debounce for search
     setTimeout(() => this.applyFilters(), 300);
   }
 
@@ -240,7 +240,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.download(this.reportsService.downloadPdf(id), `informe-${id}.pdf`, 'Error al descargar PDF');
   }
 
-  /** El backend entrega un CSV que Excel abre directamente. */
+  /** The backend returns a CSV that Excel opens directly. */
   downloadExcel(id: number): void {
     this.download(this.reportsService.downloadExcel(id), `informe-${id}.csv`, 'Error al descargar Excel');
   }
@@ -250,7 +250,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     file$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
         this.downloadFile(blob, name);
-        this.loadStats(); // cada descarga suma una exportación
+        this.loadStats(); // each download adds one export
       },
       error: (err) => {
         this.error = errorMessage;
@@ -263,7 +263,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   generateFilteredReport(format: 'PDF' | 'Excel'): void {
     this.loading = true;
     
-    // Crear nombre del reporte basado en filtros
+    // Create the report name based on the filters
     const reportName = this.generateReportName();
     
     const reportToCreate: Omit<AlertReport, 'id'> = {
@@ -275,14 +275,14 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       format,
       size: '',
       description: `Reporte generado con filtros: ${this.filtersDescription()}`,
-      // Sin alertas elegidas, el backend incluye las del rango de fechas
+      // Without chosen alerts, the backend includes those in the date range
       from: this.filters.startDate ? new Date(`${this.filters.startDate}T00:00:00`) : null,
       to: this.filters.endDate ? new Date(`${this.filters.endDate}T23:59:59`) : null
     };
 
     this.reportsService.create(reportToCreate).pipe(takeUntil(this.destroy$)).subscribe({
       next: (report) => {
-        // Descargar el reporte recién creado
+        // Download the report just created
         if (format === 'PDF') {
           this.downloadPdf(report.id);
         } else {
@@ -318,7 +318,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   print(): void {
-    // Verificar si hay impresora conectada
+    // Check whether a printer is connected
     if (this.checkPrinter()) {
       window.print();
     } else {
@@ -327,9 +327,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   checkPrinter(): boolean {
-    // Simulación de verificación de impresora
-    // En un entorno real, esto podría usar la API de impresión del navegador
-    // Aquí simulamos que NO hay impresora conectada para mostrar el modal
+    // Printer check simulation
+    // In a real environment, this could use the browser print API
+    // Here we simulate that NO printer is connected to show the modal
     return false; // Cambiar a true para imprimir directamente
   }
 
@@ -421,7 +421,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   createReport(): void {
     this.loading = true;
     
-    // Si hay alertas seleccionadas, generar datos basados en ellas
+    // If there are selected alerts, generate data based on them
     let name = this.nameModel;
     let user = this.userModel;
     let incident = this.incidentModel;
@@ -434,14 +434,14 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       );
       
       if (selectedAlertsObj.length > 0) {
-        // Generar nombre automático basado en alertas si no hay nombre personalizado
+        // Generate an automatic name based on the alerts if there is no custom name
         if (!name) {
           const date = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
           const alertTypes = [...new Set(selectedAlertsObj.map(a => this.typeLabel(a.type)))].join(', ');
           name = `Reporte ${alertTypes} - ${date}`;
         }
         
-        // Usar datos de la primera alerta seleccionada como base
+        // Use the data of the first selected alert as the base
         if (!user) {
           user = [...new Set(selectedAlertsObj.map(a => a.name))].join(', ');
         }
@@ -497,7 +497,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       incident: '',
       description: ''
     };
-    this.selectedAlerts = []; // Resetear selección de alertas
+    this.selectedAlerts = []; // Reset the alert selection
     this.showNewModal = true;
   }
 
@@ -525,7 +525,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // UTILIDADES
   // ========================================
 
-  /** Nombre legible del tipo de alerta que envía la app móvil. */
+  /** Readable name of the alert type the mobile app sends. */
   typeLabel(type: string): string {
     const labels: Record<string, string> = { main: 'Alerta SOS', mini: 'Mini alerta', reminder: 'Recordatorio' };
     return labels[type] || type || 'Alerta';
@@ -564,7 +564,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     return Math.min(this.pagination.currentPage * this.pagination.itemsPerPage, this.pagination.totalElements);
   }
 
-  // Helpers para formularios en modales
+  // Helpers for forms in modals
   get nameModel(): string {
     return this.editingReport ? this.editingReport.name : this.newReport.name || '';
   }
@@ -638,7 +638,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   // ========================================
-  // GESTIÓN DE ALERTAS
+  // ALERT MANAGEMENT
   // ========================================
 
   toggleAlertSelected(alertId: number): void {

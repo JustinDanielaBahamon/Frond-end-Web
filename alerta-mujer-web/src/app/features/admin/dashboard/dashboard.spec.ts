@@ -13,7 +13,7 @@ describe('AdminDashboardComponent · tendencia por mes', () => {
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(2026, 9, 21, 12)); // 21 de octubre: semana 3 del mes
+    vi.setSystemTime(new Date(2026, 9, 21, 12)); // October 21: week 3 of the month
     TestBed.configureTestingModule({
       imports: [AdminDashboardComponent],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
@@ -29,7 +29,7 @@ describe('AdminDashboardComponent · tendencia por mes', () => {
       alert(new Date(2026, 9, 3)), // sem 1
       alert(new Date(2026, 9, 16)), // sem 3
       alert(new Date(2026, 8, 10)), // septiembre, sem 2
-      alert(new Date(2026, 8, 25)), // septiembre, sem 4: después del día 21
+      alert(new Date(2026, 8, 25)), // September, week 4: after day 21
     ];
     c.changeTrendView('mes');
 

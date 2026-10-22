@@ -1,4 +1,4 @@
-// Guardar recorrido — mismo lenguaje visual que "Mi ubicación" (tokens del tema; sirve en claro y oscuro)
+// Save route — same visual language as "Mi ubicación" (theme tokens; works in light and dark)
 
 $card: var(--bg-card, #241d3d);
 $soft: var(--purple-pale, #30293d);
@@ -13,7 +13,7 @@ $danger: #e671f8;
 
 :host { display: block; }
 
-// ── Sub-pestañas ──────────────────────────────────
+// ── Sub-tabs ──────────────────────────────────
 .gr-subtabs {
   display: inline-flex;
   gap: 0.35rem;
@@ -317,7 +317,7 @@ $danger: #e671f8;
   transition: border-color 0.15s, opacity 0.15s;
 
   &--selected { border-color: $accent; }
-  // Oculto en el mapa por el filtro: sigue en la lista pero atenuado
+  // Hidden on the map by the filter: still in the list but dimmed
   &--hidden { opacity: 0.5; }
 }
 
@@ -403,7 +403,7 @@ $danger: #e671f8;
 .gr-history { display: flex; flex-direction: column; gap: 0.5rem; max-height: 560px; overflow-y: auto; }
 
 .gr-history-item {
-  flex-shrink: 0; // dentro de una lista con scroll no debe aplastarse
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
   display: flex;
   align-items: center;
   gap: 0.75rem;

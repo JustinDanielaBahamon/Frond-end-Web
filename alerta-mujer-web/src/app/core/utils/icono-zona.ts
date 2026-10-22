@@ -1,8 +1,8 @@
 import * as L from 'leaflet';
 
 /**
- * Emojis de las zonas de auxilio, los mismos del mapa del inicio, para que todos los mapas se lean
- * igual. Sirven para los tipos de zona del backend y para las categorías de los recursos de ayuda.
+ * Emojis of the help zones, the same as the home map, so every map reads
+ * the same. They serve the backend zone types and the help resource categories.
  */
 const EMOJIS: Record<string, string> = {
   risk: '⚠️', riesgo: '⚠️',
@@ -18,7 +18,7 @@ export function zoneEmoji(type: string): string {
   return EMOJIS[type] ?? '📍';
 }
 
-/** Marcador redondo con el emoji del tipo, del color de su categoría. */
+/** Round marker with the type emoji, in its category color. */
 export function zoneIcon(type: string, color: string, active = false): L.DivIcon {
   const side = active ? 42 : 34;
   return L.divIcon({

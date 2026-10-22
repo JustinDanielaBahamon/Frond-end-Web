@@ -56,9 +56,9 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   tab = signal<Tab>('lineas');
   resources = signal<HelpResource[]>([]);
-  /** Zonas de auxilio del mapa del inicio (policía, centros de asistencia, puntos de ayuda). */
+  /** Help zones of the home map (police, assistance centers, help points). */
   helpZones = signal<HelpResource[]>([]);
-  /** Todo lo que se puede mostrar en el mapa de centros. */
+  /** Everything that can be shown on the centers map. */
   private points = computed(() => [...this.resources(), ...this.helpZones()]);
   calls = signal<RecordedCall[]>([]);
   loading = signal(true);
@@ -70,10 +70,10 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   selected = signal<number | null>(null);
   myPosition = signal<{ lat: number; lng: number } | null>(null);
 
-  /** Recursos a los que se puede llamar. */
+  /** Resources that can be called. */
   lines = computed(() => this.resources().filter((r) => r.telephone));
 
-  /** Recursos con ubicación, filtrados y ordenados por cercanía si se conoce. */
+  /** Resources with location, filtered and sorted by proximity when known. */
   centers = computed(() => {
     const term = this.search().trim().toLowerCase();
     const filter = this.filter();
@@ -112,7 +112,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
       error: () => {},
     });
     this.loadCalls();
-    // La distancia se mide desde el celular (la ubicación que envía la app), no desde el computador
+    // The distance is measured from the phone (the location the app sends), not from the computer
     this.useMyLocation(false);
   }
 
@@ -226,7 +226,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
         .addTo(this.layer);
       this.markers.set(r.id, marker);
     }
-    // Con la ubicación del celular se encuadran los más cercanos (la lista ya viene ordenada);
+    // With the phone location the nearest ones are framed (the list already comes sorted);
     // sin ella, todos
     for (const r of yo ? list.slice(0, 8) : list) bounds.extend([r.lat!, r.lng!]);
     if (yo) bounds.extend([yo.lat, yo.lng]);
@@ -265,14 +265,14 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }
 
-// Zonas de auxilio como centros (ids negativos para no chocar con los recursos)
+// Help zones as centers (negative ids so they do not clash with the resources)
 const ZONE_CATEGORY: Partial<Record<NearbyZone['type'], ResourceCategory>> = {
   policia: 'policia', asistencia: 'salud', help: 'apoyo',
 };
 
 function fromZone(z: NearbyZone): HelpResource | null {
   const category = ZONE_CATEGORY[z.type];
-  if (!category) return null; // las zonas de riesgo y seguras no son centros de atención
+  if (!category) return null; // risk and safe zones are not care centers
   return {
     id: -z.id,
     name: z.name,

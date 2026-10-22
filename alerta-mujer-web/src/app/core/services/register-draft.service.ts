@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
 
 /*
-  Guarda temporalmente el estado del formulario de registro
-  mientras la usuaria lee los Términos o la Política de privacidad.
-  Vive solo en memoria: si recarga la página, se pierde.
-*/
+ * Temporarily keeps the registration form state
+ *   while the user reads the Terms or the Privacy Policy.
+ *   It lives only in memory: reloading the page loses it.
+ */
 @Injectable({ providedIn: 'root' })
 export class RegisterDraftService {
 
-  /* Lo que la usuaria ya escribió en el formulario */
+  /* What the user already typed in the form */
   values: any = null;
 
-  /* Marcan si ya abrió cada texto (permiten marcar la casilla) */
+  /* Whether she already opened each text (allows checking the box) */
   termsRead = false;
   privacyRead = false;
 
-  /* Estado de las casillas */
+  /* Checkbox state */
   acceptsTerms = false;
   acceptsPrivacy = false;
 
-  /* Se llama cuando el registro termina bien */
+  /* Called when the registration finishes successfully */
   clear(): void {
     this.values = null;
     this.termsRead = false;

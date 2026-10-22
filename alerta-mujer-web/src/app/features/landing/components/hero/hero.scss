@@ -18,10 +18,12 @@
     transition: background-image 0.3s ease;
 }
 
-/* Ajuste de encuadre solo para el tema oscuro:
-   landingoscuro.png tiene proporción distinta a bannerHero.png,
-   así que "cover" recorta distinto. Empujamos el foco un poco
-   hacia arriba para no perder el teléfono/la mujer. */
+/*
+ * Framing adjustment for the dark theme only:
+ *    landingoscuro.png has a different ratio than bannerHero.png,
+ *    so "cover" crops differently. We push the focus a bit
+ *    up so the phone/the woman is not lost.
+ */
 [data-theme="dark"] .container-hero {
     background-position: center top;
 }

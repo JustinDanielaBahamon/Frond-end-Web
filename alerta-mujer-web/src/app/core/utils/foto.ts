@@ -2,8 +2,8 @@ const SIDE_PX = 400;
 const QUALITY = 0.7;
 
 /**
- * Reduce una foto elegida a ~400 px en JPEG y la devuelve como data URI (unas decenas de KB),
- * igual que la app móvil: así se guarda en el backend sin subir archivos grandes.
+ * Shrinks a chosen photo to ~400 px JPEG and returns it as a data URI (a few tens of KB),
+ * like the mobile app: that way it is stored in the backend without uploading large files.
  */
 export function shrinkPhoto(file: File, sidePx = SIDE_PX): Promise<string> {
   return new Promise((resolver, reject) => {

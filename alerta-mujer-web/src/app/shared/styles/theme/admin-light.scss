@@ -103,7 +103,7 @@ app-admin-layout .layout__main {
     box-shadow: 0 4px 14px rgba(45, 11, 94, 0.10) !important;
   }
 
-  /* ── Textos grises → más oscuros ────────────── */
+  /* ── Grey texts → darker ────────────── */
   .page-header p,
   .stat-info span,
   .stat-info p,
@@ -199,7 +199,7 @@ app-admin-layout .layout__main {
     color: #5b21b6 !important;
   }
 
-  /* ── Botones de acción de cada fila ─────────── */
+  /* ── Action buttons of each row ─────────── */
   .actions button,
   .actions-cell button {
     background: #e5e1f3 !important;
@@ -212,7 +212,7 @@ app-admin-layout .layout__main {
     }
   }
 
-  /* ── Paginación ─────────────────────────────── */
+  /* ── Pagination ─────────────────────────────── */
   .table-footer .pagination .page-btn {
     background: #e5e1f3 !important;
     color: #3b1580 !important;

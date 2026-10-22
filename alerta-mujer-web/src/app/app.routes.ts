@@ -23,7 +23,7 @@ import { DeviceManagementComponent } from './features/admin/devices-management/d
 export const routes: Routes = [
 
   // ─────────────────────────────────────────────────────────────
-  // Landing pública
+  // Public landing
   // ─────────────────────────────────────────────────────────────
 
   {
@@ -40,7 +40,7 @@ export const routes: Routes = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // Seguimiento público de una alerta (enlace del correo a los contactos)
+  // Public tracking of an alert (link in the email to the contacts)
   // ─────────────────────────────────────────────────────────────
 
   {
@@ -93,8 +93,8 @@ export const routes: Routes = [
 
     children: [
 
-      // ⬇️ ESTA ES LA RUTA QUE FALTABA. Sin ella, al entrar a "/dashboard"
-      // el router-outlet del layout no tiene qué mostrar y queda en blanco.
+      // ⬇️ THIS IS THE ROUTE THAT WAS MISSING. Without it, when entering "/dashboard"
+      // the layout router-outlet has nothing to show and stays blank.
       {
         path: '',
         loadComponent: () =>
@@ -163,7 +163,7 @@ export const routes: Routes = [
             .then(m => m.Evidence),
       },
 
-      // ── Módulos nuevos del panel de usuaria ─────────────────
+      // ── New modules of the user panel ─────────────────
       {
         path: 'emergency-contacts',
         loadComponent: () =>

@@ -12,7 +12,7 @@ const REFRESH_MS = 10000;
 const CHAT_REFRESH_MS = 5000;
 const NAME_KEY = 'alerta-mujer-nombre-contacto';
 
-/** Respuestas rápidas del contacto (un toque, como los mensajes rápidos de la app). */
+/** Contact quick replies (one tap, like the app quick messages). */
 export const QUICK_REPLIES = [
   'Voy en camino',
   'Ya llamé a la policía',
@@ -41,9 +41,9 @@ const durationText = (ms: number): string => {
 };
 
 /**
- * Pantalla pública que abre un contacto de emergencia desde el correo: estado de la alerta, mapa
- * con el recorrido, dirección de la última ubicación, evidencias grabadas, qué hacer y accesos
- * rápidos para llamar o llegar al lugar.
+ * Public screen an emergency contact opens from the email: alert status, map
+ * with the route, address of the last location, recorded evidence, what to do and quick
+ * links to call or get to the place.
  */
 @Component({
   selector: 'app-tracking',
@@ -57,8 +57,8 @@ export class TrackingComponent implements OnInit {
   private router = inject(Router);
 
   /**
-   * true si se llegó desde "Alertas de mis contactos" del panel con sesión iniciada: solo entonces
-   * se ofrece volver. Desde el enlace del correo no hay a dónde volver.
+   * true if it came from the panel "Alertas de mis contactos" with a session: only then
+   * is going back offered. From the email link there is nowhere to go back to.
    */
   readonly fromPanel = typeof history !== 'undefined' && history.state?.desdePanel === true;
 
@@ -91,12 +91,12 @@ export class TrackingComponent implements OnInit {
     const u = this.last();
     return u ? `https://www.google.com/maps/search/?api=1&query=${u.lat},${u.lng}` : '';
   });
-  /** Ruta en Google Maps desde donde está el contacto hasta la última ubicación. */
+  /** Google Maps route from where the contact is to the last location. */
   readonly directionsUrl = computed(() => {
     const u = this.last();
     return u ? `https://www.google.com/maps/dir/?api=1&destination=${u.lat},${u.lng}` : '';
   });
-  /** Dirección y barrio de la última ubicación (OpenStreetMap). */
+  /** Address and neighborhood of the last location (OpenStreetMap). */
   readonly place = signal<Place | null>(null);
   readonly zone = computed(() => [this.place()?.neighborhood, this.place()?.city].filter(Boolean).join(', '));
   readonly duration = computed(() => {
@@ -111,7 +111,7 @@ export class TrackingComponent implements OnInit {
     for (let i = 1; i < r.length; i++) total += distanceKm(r[i - 1], r[i]);
     return total;
   });
-  /** Recorrido para la línea de tiempo: del más reciente al primero (máx. 20). */
+  /** Route for the timeline: newest to first (at most 20). */
   readonly routeList = computed(() => {
     const r = this.data()?.route ?? [];
     return r
@@ -119,13 +119,13 @@ export class TrackingComponent implements OnInit {
       .reverse()
       .slice(0, 20);
   });
-  /** Barrio y dirección de cada punto ("lat,lng" redondeado -> texto). */
+  /** Neighborhood and address of each point (rounded "lat,lng" -> text). */
   readonly pointPlaces = signal<Record<string, string>>({});
   readonly videos = computed(() => (this.data()?.evidences ?? []).filter((e) => e.type === 'video'));
   readonly audios = computed(() => (this.data()?.evidences ?? []).filter((e) => e.type === 'audio'));
   private placeKey = '';
 
-  // ── Chat de la alerta ──
+  // ── Alert chat ──
   readonly quickReplies = QUICK_REPLIES;
   readonly messages = signal<AlertMessage[]>([]);
   readonly contactName = signal(this.readName());
@@ -143,7 +143,7 @@ export class TrackingComponent implements OnInit {
 
   ngOnInit(): void {
     this.code = this.route.snapshot.paramMap.get('codigo') ?? '';
-    // Si el servidor (Render gratis) estaba dormido, la primera respuesta puede tardar
+    // If the server (free Render) was asleep, the first response may take a while
     const notice = setTimeout(() => this.wakingUp.set(true), 4000);
     this.query(() => clearTimeout(notice));
     this.destroyRef.onDestroy(() => {
@@ -184,7 +184,7 @@ export class TrackingComponent implements OnInit {
         } else if (!this.data()) {
           this.error.set('No se pudo conectar con AlertaMujer. Revisa tu conexión e inténtalo de nuevo.');
         }
-        // Con datos ya mostrados, un fallo puntual no borra la pantalla: el siguiente intento la actualiza
+        // With data already shown, a one-off failure does not clear the screen: the next attempt updates it
       },
     });
   }
@@ -193,12 +193,12 @@ export class TrackingComponent implements OnInit {
     return `${p.lat.toFixed(4)},${p.lng.toFixed(4)}`;
   }
 
-  /** Para la plantilla. */
+  /** For the template. */
   keyOf(p: { lat: number; lng: number }): string {
     return TrackingComponent.keyOf(p);
   }
 
-  /** Dirección de los puntos más recientes (OpenStreetMap: una consulta por segundo, en caché). */
+  /** Address of the most recent points (OpenStreetMap: one query per second, cached). */
   private searchPointPlaces(): void {
     for (const p of this.routeList().slice(0, 8)) {
       const key = TrackingComponent.keyOf(p);
@@ -211,7 +211,7 @@ export class TrackingComponent implements OnInit {
     }
   }
 
-  /** Busca la dirección solo cuando la última ubicación cambió (~11 m). */
+  /** Looks up the address only when the last location changed (~11 m). */
   private searchPlace(): void {
     const u = this.last();
     if (!u) return;
@@ -223,7 +223,7 @@ export class TrackingComponent implements OnInit {
     });
   }
 
-  /** Lleva el mapa a la posición actual de la persona, con zoom de calle. */
+  /** Takes the map to the person's current position, with street zoom. */
   centerOnPerson(): void {
     const u = this.last();
     if (u && this.map) this.map.flyTo([u.lat, u.lng], 17, { duration: 0.8 });
@@ -242,7 +242,7 @@ export class TrackingComponent implements OnInit {
     else this.map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 17 });
   }
 
-  // Mensajes nuevos cada 5 s mientras la alerta está activa (al terminar, una última lectura)
+  // New messages every 5 s while the alert is active (when it ends, one last read)
   private refreshChat(active: boolean): void {
     this.readNewMessages();
     if (active && !this.chatTimer) {
@@ -260,7 +260,7 @@ export class TrackingComponent implements OnInit {
         if (newOnes.length) this.addMessages(newOnes);
       },
       error: () => {
-        // Un fallo puntual no borra el chat: se reintenta en la siguiente lectura
+        // A one-off failure does not clear the chat: retried on the next read
       },
     });
   }
@@ -278,7 +278,7 @@ export class TrackingComponent implements OnInit {
     try {
       localStorage.setItem(NAME_KEY, name);
     } catch {
-      // modo privado: se pedirá de nuevo la próxima vez
+      // private mode: it will be asked again next time
     }
   }
 
@@ -327,7 +327,7 @@ export class TrackingComponent implements OnInit {
     }
     this.layer!.clearLayers();
     const points = d.route.map((p) => L.latLng(p.lat, p.lng));
-    // Igual que en la app: línea punteada y un pin numerado por cada ubicación enviada
+    // Same as in the app: dotted line and a numbered pin for each sent location
     if (points.length > 1) {
       L.polyline(points, { color: START_COLOR, weight: 3, opacity: 0.85, dashArray: '6 8', lineCap: 'round' }).addTo(this.layer!);
     }
@@ -349,7 +349,7 @@ export class TrackingComponent implements OnInit {
         .bindTooltip(`${isLast ? 'Última ubicación' : i === 0 ? 'Inicio' : `Punto ${i + 1}`} · ${time}`)
         .addTo(this.layer!);
     });
-    // La primera vez se ve todo el recorrido; después solo se sigue la posición actual
+    // The first time the whole route is shown; afterwards only the current position is followed
     if (this.firstView) {
       this.frame(d);
       this.firstView = false;

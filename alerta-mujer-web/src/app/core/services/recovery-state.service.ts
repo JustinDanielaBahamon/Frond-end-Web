@@ -1,8 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 
 /**
- * Datos del flujo "olvidé mi contraseña" entre pantallas (correo → código → nueva contraseña).
- * Solo en memoria: si se recarga la página se vuelve a empezar.
+ * Data of the "forgot my password" flow between screens (email → code → new password).
+ * In memory only: reloading the page starts over.
  */
 @Injectable({ providedIn: 'root' })
 export class RecoveryStateService {

@@ -4,7 +4,7 @@
 
 // Define variables for consistent styling
 $color-primary:       #7e22ce; // Purple
-$color-primary-light: #f3e8ff; // 🌟 AÑADIDO: Faltaba esta variable y rompía el código
+$color-primary-light: #f3e8ff; // 🌟 ADDED: This variable was missing and broke the code
 $color-secondary:     #d946ef; // Pink
 $color-accent:        #7c3aed; // Blue
 $color-text-dark:     #2d0b5e;
@@ -12,7 +12,7 @@ $color-text-medium:   #4c1d95;
 $color-text-light:    #6b7280;
 $color-background:    #f8f7fc;
 $color-white:         #ffffff;
-$color-border:        #e2e8f0; // Un gris un poco más limpio
+$color-border:        #e2e8f0; // A slightly cleaner grey
 $color-table-header:  #faf7ff;
 
 // Specific colors for badges and status - Todos en moradito
@@ -30,7 +30,7 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
 // Mixin for common card styles
 @mixin card-base {
   background: $color-white;
-  border-radius: 20px; // Bordes un poco más modernos y suaves
+  border-radius: 20px; // Slightly more modern and softer borders
   box-shadow: $shadow-md;
   padding: 25px;
   border: 1px solid rgba($color-border, 0.5);
@@ -39,7 +39,7 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
 // Mixin for button styles
 @mixin button-base {
   border: none;
-  border-radius: 12px; // Alineado con la estética moderna de las tarjetas
+  border-radius: 12px; // Aligned with the modern look of the cards
   padding: 12px 24px;
   font-size: 0.9rem;
   font-weight: 700;
@@ -161,7 +161,7 @@ body {
 .toolbar {
   @include card-base;
   display: flex;
-  flex-direction: column; // 🌟 Estructura en filas internas para evitar desbordes cruzados
+  flex-direction: column; // 🌟 Structured in inner rows to avoid crossed overflows
   gap: 20px;
   margin-bottom: 35px;
   
@@ -233,7 +233,7 @@ body {
         }
       }
 
-      // Evitamos romper inputs tipo date con la flecha
+      // We avoid breaking date inputs with the arrow
       select + &::after {
         content: '\f078';
         font-family: 'Font Awesome 6 Free';
@@ -354,7 +354,7 @@ body {
     border-radius: 50%;
   }
 
-  // Corregido: Ajustados con coherencia semántica real basada en tus variables
+  // Fixed: Adjusted with real semantic consistency based on your variables
   &.pending  { color: $badge-purple-dark;    &::before { background: $badge-purple-dark; } }
   &.closed   { color: $color-text-light;   &::before { background: $color-text-light; } }
   &.attended { color: $badge-purple-text;  &::before { background: $badge-purple-text; } }
@@ -995,7 +995,7 @@ body {
   }
 }
 
-/* Estado de deshabilitado para paginación */
+/* Disabled state for pagination */
 .page-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -1007,7 +1007,7 @@ body {
   }
 }
 
-/* Estados de badge adicionales - Todos en moradito */
+/* Additional badge states - all in purple */
 .badge {
   padding: 6px 12px;
   border-radius: 20px;
@@ -1523,7 +1523,7 @@ body {
   padding: 16px 24px 24px;
 }
 
-// Explicación de la sección
+// Explanation of the section
 .ayuda-informes {
   position: relative;
   display: flex;

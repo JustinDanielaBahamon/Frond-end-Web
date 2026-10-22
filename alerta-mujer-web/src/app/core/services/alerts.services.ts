@@ -114,6 +114,7 @@ export class AlertsService {
     const v = String(valor ?? '').toLowerCase();
     if (v.includes('widget')) return 'Widget';
     if (v.includes('contact')) return 'Contacto';
+    if (v.includes('power')) return 'Botón de encendido';
     if (v.includes('shake') || v.includes('motion') || v.includes('mov')) return 'Movimiento sospechoso';
     if (v.includes('manual') || v.includes('lock')) return 'Manual';
     return 'Botón de pánico';

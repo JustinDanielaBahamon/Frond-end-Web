@@ -1,4 +1,4 @@
-export type MedioActivacion = 'Botón de pánico' | 'Contacto' | 'Widget' | 'Movimiento sospechoso' | 'Manual';
+export type MedioActivacion = 'Botón de pánico' | 'Contacto' | 'Widget' | 'Movimiento sospechoso' | 'Botón de encendido' | 'Manual';
 export type EstadoAlerta = 'Pendiente' | 'Atendida' | 'Cancelada';
 
 export interface Alerta {

@@ -165,6 +165,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       'Contacto':              'manual',
       'Widget':                'widget',
       'Movimiento sospechoso': 'movimiento',
+      'Botón de encendido':    'movimiento',
       'Manual':                'manual',
     };
     return map[medio] ?? 'boton';
@@ -630,6 +631,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       'Contacto':              '#d946ef',
       'Widget':                '#6d28d9',
       'Movimiento sospechoso': '#8b5cf6',
+      'Botón de encendido':    '#a855f7',
       'Manual':                '#9333ea',
     };
 

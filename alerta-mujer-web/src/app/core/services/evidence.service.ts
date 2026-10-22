@@ -36,7 +36,7 @@ const ESTADO_ALERTA: Record<string, string> = {
   active: 'Activa', resolved: 'Atendida', cancelled: 'Cancelada', expired: 'Expirada',
 };
 const METODO_ACTIVACION: Record<string, string> = {
-  panic_button: 'Botón de pánico', contact: 'Desde contactos', suspicious_movement: 'Movimiento sospechoso',
+  panic_button: 'Botón de pánico', contact: 'Desde contactos', power_button: 'Botón de encendido', widget: 'Widget', suspicious_movement: 'Movimiento sospechoso',
 };
 
 function tamanioLegible(bytes: number | null): string {

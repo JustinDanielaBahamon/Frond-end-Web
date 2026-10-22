@@ -40,6 +40,7 @@
             <option value="Widget">Widget</option>
             <option value="Contacto">Desde contactos</option>
             <option value="Movimiento sospechoso">Movimiento sospechoso</option>
+            <option value="Botón de encendido">Botón de encendido</option>
             <option value="Manual">Manual</option>
           </select>
           <select class="panel-select" [(ngModel)]="filtroEstado" (change)="filtrarAlertas()">
@@ -72,6 +73,12 @@
               <svg *ngIf="alerta.medioActivacion === 'Movimiento sospechoso'" width="16" height="16"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              <!-- Botón de encendido -->
+              <svg *ngIf="alerta.medioActivacion === 'Botón de encendido'" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 2v10" />
+                <path d="M18.4 6.6a9 9 0 1 1-12.77.04" />
               </svg>
               <!-- Manual -->
               <svg *ngIf="alerta.medioActivacion === 'Manual'" width="16" height="16" viewBox="0 0 24 24" fill="none"

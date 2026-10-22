@@ -49,7 +49,7 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   // NOTA: estos 4 valores deben coincidir exactamente con los que envía el backend
   // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
-  mediosDisponibles = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Manual'];
+  mediosDisponibles = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Botón de encendido', 'Manual'];
 
 
   totalAlertas = 0;
@@ -62,6 +62,7 @@ export class AlertHistory implements OnInit, OnDestroy {
     'Contacto': 'badge-manual',
     'Widget': 'badge-widget',
     'Movimiento sospechoso': 'badge-movimiento',
+    'Botón de encendido': 'badge-movimiento',
     'Manual': 'badge-manual',
   };
 

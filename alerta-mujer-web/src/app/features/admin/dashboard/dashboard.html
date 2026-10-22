@@ -229,15 +229,24 @@
 
     <!-- ===== TENDENCIA: ESTA SEMANA VS. LA ANTERIOR ===== -->
     <div class="dash-card">
-      <div class="dash-card__header">
+      <div class="dash-card__header dash-card__header--filtros">
         <span class="dash-card__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
           </svg>
         </span>
         <div>
-          <h3>¿Hay más o menos alertas que la semana pasada?</h3>
-          <p>Alertas de cada día de esta semana junto a las del mismo día de la semana anterior</p>
+          @if (vistaTendencia === 'semana') {
+            <h3>¿Hay más o menos alertas que la semana pasada?</h3>
+            <p>Alertas de cada día de esta semana junto a las del mismo día de la semana anterior</p>
+          } @else {
+            <h3>¿En qué semanas del mes hay más alertas?</h3>
+            <p>Alertas de cada semana de {{ tendenciaMes }} junto a las de la misma semana del mes anterior</p>
+          }
+        </div>
+        <div class="trend-vista" role="group" aria-label="Ver la tendencia por">
+          <button type="button" class="filtro-btn" [class.activo]="vistaTendencia === 'semana'" [attr.aria-pressed]="vistaTendencia === 'semana'" (click)="cambiarVistaTendencia('semana')">Semana</button>
+          <button type="button" class="filtro-btn" [class.activo]="vistaTendencia === 'mes'" [attr.aria-pressed]="vistaTendencia === 'mes'" (click)="cambiarVistaTendencia('mes')">Mes</button>
         </div>
       </div>
 
@@ -245,44 +254,44 @@
         <div class="trend-resumen">
           <div class="trend-resumen__dato">
             <span class="trend-resumen__valor">{{ tendenciaActualTotal }}</span>
-            <span class="trend-resumen__etiqueta">esta semana (hasta hoy)</span>
+            <span class="trend-resumen__etiqueta">{{ vistaTendencia === 'mes' ? 'este mes' : 'esta semana' }} (hasta hoy)</span>
           </div>
           <div class="trend-resumen__dato">
             <span class="trend-resumen__valor trend-resumen__valor--previa">{{ tendenciaPreviaHastaHoy }}</span>
-            <span class="trend-resumen__etiqueta">la semana pasada, mismos días</span>
+            <span class="trend-resumen__etiqueta">{{ vistaTendencia === 'mes' ? 'el mes pasado' : 'la semana pasada' }}, mismos días</span>
           </div>
           <p class="trend-resumen__frase">{{ tendenciaFrase }}</p>
         </div>
 
         <svg class="trend-svg" viewBox="0 0 640 230" role="img"
-             [attr.aria-label]="'Alertas por día. ' + tendenciaFrase">
+             [attr.aria-label]="(vistaTendencia === 'mes' ? 'Alertas por semana del mes. ' : 'Alertas por día. ') + tendenciaFrase">
           @for (t of tendenciaTicks; track t.label) {
             <line class="grid-line" x1="40" [attr.y1]="t.y" x2="620" [attr.y2]="t.y" />
             <text class="axis-text" x="30" [attr.y]="t.y + 3" text-anchor="end">{{ t.label }}</text>
           }
           @for (b of tendenciaBarras; track b.dia) {
             <g class="trend-dia" [class.trend-dia--hoy]="b.esHoy">
-              <title>{{ b.diaLargo }}: {{ b.actual === null ? 'aún no llega' : b.actual + ' esta semana' }} · {{ b.previa }} la semana pasada</title>
+              <title>{{ b.diaLargo }}: {{ b.actual === null ? 'aún no llega' : b.actual + (vistaTendencia === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previa }} {{ vistaTendencia === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
               <rect class="trend-hit" [attr.x]="b.xGrupo" y="20" [attr.width]="b.anchoGrupo" height="170" />
               @if (b.previa > 0) {
                 <path class="trend-bar trend-bar--previa" [attr.d]="b.dPrevia" />
-                <text class="trend-valor" [attr.x]="b.xPrevia + 11" [attr.y]="b.yPrevia - 6" text-anchor="middle">{{ b.previa }}</text>
+                <text class="trend-valor" [attr.x]="b.xPrevia + b.anchoBarra / 2" [attr.y]="b.yPrevia - 6" text-anchor="middle">{{ b.previa }}</text>
               }
               @if (b.actual) {
                 <path class="trend-bar" [attr.d]="b.dActual" />
-                <text class="trend-valor trend-valor--actual" [attr.x]="b.xActual + 11" [attr.y]="b.yActual - 6" text-anchor="middle">{{ b.actual }}</text>
+                <text class="trend-valor trend-valor--actual" [attr.x]="b.xActual + b.anchoBarra / 2" [attr.y]="b.yActual - 6" text-anchor="middle">{{ b.actual }}</text>
               }
-              <text class="axis-text" [class.axis-text--hoy]="b.esHoy" [attr.x]="b.xGrupo + b.anchoGrupo / 2" y="210" text-anchor="middle">{{ b.esHoy ? 'Hoy' : b.dia }}</text>
+              <text class="axis-text" [class.axis-text--hoy]="b.esHoy" [attr.x]="b.xGrupo + b.anchoGrupo / 2" y="210" text-anchor="middle">{{ b.esHoy ? (vistaTendencia === 'mes' ? 'Esta sem.' : 'Hoy') : b.dia }}</text>
             </g>
           }
         </svg>
         <div class="leyenda">
-          <span><span class="leyenda__barra"></span>Esta semana</span>
-          <span><span class="leyenda__barra leyenda__barra--previa"></span>Semana anterior</span>
-          <span class="leyenda__nota">Pasa el cursor sobre un día para ver el detalle.</span>
+          <span><span class="leyenda__barra"></span>{{ vistaTendencia === 'mes' ? 'Este mes' : 'Esta semana' }}</span>
+          <span><span class="leyenda__barra leyenda__barra--previa"></span>{{ vistaTendencia === 'mes' ? 'Mes anterior' : 'Semana anterior' }}</span>
+          <span class="leyenda__nota">Pasa el cursor sobre {{ vistaTendencia === 'mes' ? 'una semana' : 'un día' }} para ver el detalle.</span>
         </div>
       } @else {
-        <p class="empty">Aún no hay alertas con fecha en estas dos semanas.</p>
+        <p class="empty">Aún no hay alertas con fecha en {{ vistaTendencia === 'mes' ? 'estos dos meses' : 'estas dos semanas' }}.</p>
       }
     </div>
 

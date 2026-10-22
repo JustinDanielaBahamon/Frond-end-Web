@@ -681,3 +681,11 @@ table {
     i { color: #fff; }
   }
 }
+
+// Selector Semana / Mes del gráfico de tendencia
+.trend-vista {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}

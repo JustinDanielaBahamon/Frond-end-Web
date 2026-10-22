@@ -5,26 +5,26 @@ import { environment } from '../../../environments/environment';
  * servicio dueño según el inicio de la ruta. Si alertApiUrl o evidenceApiUrl están vacías, todo va a
  * apiUrl (el monolito o Auth), así la web funciona igual mientras se despliegan.
  */
-const RUTAS_EVIDENCE = ['/api/evidences'];
-const RUTAS_ALERT = [
+const EVIDENCE_PATHS = ['/api/evidences'];
+const ALERT_PATHS = [
   '/api/alerts', '/api/contacts', '/api/location-logs', '/api/zones', '/api/resources', '/api/saved-routes',
   '/api/frequent-locations', '/api/received-alerts', '/api/zone-reports', '/api/resource-calls', '/api/public/tracking',
 ];
 
-const empiezaCon = (ruta: string, prefijos: string[]) =>
-  prefijos.some((p) => ruta === p || ruta.startsWith(p + '/') || ruta.startsWith(p + '?'));
+const beginsWith = (route: string, prefixes: string[]) =>
+  prefixes.some((p) => route === p || route.startsWith(p + '/') || route.startsWith(p + '?'));
 
 /** Dirección base del servicio que atiende esa ruta (/api/...). */
-export function servicioPara(ruta: string): string {
+export function serviceFor(route: string): string {
   const env = environment as { apiUrl: string; alertApiUrl?: string; evidenceApiUrl?: string };
-  if (env.evidenceApiUrl && empiezaCon(ruta, RUTAS_EVIDENCE)) return env.evidenceApiUrl;
-  if (env.alertApiUrl && empiezaCon(ruta, RUTAS_ALERT)) return env.alertApiUrl;
+  if (env.evidenceApiUrl && beginsWith(route, EVIDENCE_PATHS)) return env.evidenceApiUrl;
+  if (env.alertApiUrl && beginsWith(route, ALERT_PATHS)) return env.alertApiUrl;
   return env.apiUrl;
 }
 
 /** Cambia la dirección del backend (apiUrl) por la del servicio dueño de la ruta. */
-export function aServicio(url: string): string {
+export function toService(url: string): string {
   if (!url.startsWith(environment.apiUrl)) return url;
-  const ruta = url.slice(environment.apiUrl.length);
-  return servicioPara(ruta) + ruta;
+  const route = url.slice(environment.apiUrl.length);
+  return serviceFor(route) + route;
 }

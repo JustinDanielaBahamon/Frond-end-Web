@@ -15,17 +15,17 @@ export class PrivacyComponent {
   private auth   = inject(AuthService);
 
   /** Con sesión iniciada se llegó desde Ajustes; si no, desde el registro. */
-  readonly conSesion = this.auth.isLoggedIn();
-  readonly textoVolver = this.conSesion ? 'Volver a Ajustes' : 'Volver al registro';
-  readonly textoEntendido = this.conSesion ? 'Entendido, volver a Ajustes' : 'Entendido, volver al registro';
+  readonly withSession = this.auth.isLoggedIn();
+  readonly backText = this.withSession ? 'Volver a Ajustes' : 'Volver al registro';
+  readonly understoodText = this.withSession ? 'Entendido, volver a Ajustes' : 'Entendido, volver al registro';
 
-  volver() {
-    if (this.conSesion) {
-      const admin = this.auth.getCurrentUser()?.rol === 'Admin';
+  back() {
+    if (this.withSession) {
+      const admin = this.auth.getCurrentUser()?.role === 'Admin';
       this.router.navigate([admin ? '/admin/settings' : '/dashboard/settings']);
       return;
     }
-    this.draft.privacidadLeida = true;   // habilita el checkbox en el registro
+    this.draft.privacyRead = true;   // habilita el checkbox en el registro
     this.router.navigate(['/auth/register']);
   }
 }

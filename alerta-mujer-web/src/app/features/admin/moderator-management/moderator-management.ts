@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ModeratorService, Report } from '../../../core/services/moderator.service';
 import { UsersService } from '../../../core/services/users.services';
-import { SolicitudesEliminacion } from './solicitudes-eliminacion/solicitudes-eliminacion';
-import { paginasCompactas } from '../../../shared/utils/paginacion';
+import { DeletionRequests } from './solicitudes-eliminacion/solicitudes-eliminacion';
+import { compactPages } from '../../../shared/utils/paginacion';
 
 @Component({
   selector: 'app-moderator-management',
-  imports: [CommonModule, FormsModule, SolicitudesEliminacion],
+  imports: [CommonModule, FormsModule, DeletionRequests],
   templateUrl: './moderator-management.html',
   styleUrl: './moderator-management.scss',
 })
@@ -28,16 +28,16 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   itemsPerPage = 7;
   totalItems = 0;
 
-  get paginas(): (number | null)[] {
-    return paginasCompactas(this.currentPage, this.totalPages);
+  get pages(): (number | null)[] {
+    return compactPages(this.currentPage, this.totalPages);
   }
 
   // Estados UI
-  mostrarModalVer = false;
-  mostrarModalEditar = false;
-  mostrarModalAgregar = false;
-  reporteSeleccionado: Report | null = null;
-  nuevoReporte: Partial<Report> | null = null;
+  showViewModal = false;
+  showEditModal = false;
+  showAddModal = false;
+  selectedReport: Report | null = null;
+  newReport: Partial<Report> | null = null;
 
   // Filtros
   searchTerm = '';
@@ -58,7 +58,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  evidenciaCaso: string | null = null;
+  caseEvidence: string | null = null;
 
   constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef,
               private usersService: UsersService) {
@@ -76,10 +76,10 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.loadStats();
   }
 
-  verEvidenciaCaso(r: Report): void {
-    this.usersService.evidenciaDeCaso(Number(r.id)).subscribe({
+  viewCaseEvidence(r: Report): void {
+    this.usersService.caseEvidenceOf(Number(r.id)).subscribe({
       next: (e) => {
-        this.evidenciaCaso = e;
+        this.caseEvidence = e;
         this.cdr.detectChanges();
       },
     });
@@ -215,24 +215,24 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   updateReportReason(reason: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.reason = reason;
+    if (this.selectedReport) {
+      this.selectedReport.reason = reason;
     }
     this.isEditReasonDropdownOpen = false;
   }
 
   updateReportSeverity(severity: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.severity = severity;
+    if (this.selectedReport) {
+      this.selectedReport.severity = severity;
     }
     this.isEditSeverityDropdownOpen = false;
   }
 
   updateReportStatus(status: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.status = status;
+    if (this.selectedReport) {
+      this.selectedReport.status = status;
     }
     this.isEditStatusDropdownOpen = false;
   }
@@ -340,8 +340,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   // ACCIONES DE REPORTES
   // ========================================
 
-  abrirModalAgregarReporte(): void {
-    this.nuevoReporte = {
+  openAddReportModal(): void {
+    this.newReport = {
       userName: '',
       userEmail: '',
       reason: '',
@@ -356,36 +356,36 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       status: 'Pendiente',
       description: ''
     };
-    this.mostrarModalAgregar = true;
+    this.showAddModal = true;
   }
 
-  cerrarModalAgregar(): void {
-    this.mostrarModalAgregar = false;
-    this.nuevoReporte = null;
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.newReport = null;
   }
 
-  guardarNuevoReporte(): void {
-    if (this.nuevoReporte && this.nuevoReporte.userName && this.nuevoReporte.userEmail && this.nuevoReporte.reason && this.nuevoReporte.severity && this.nuevoReporte.description) {
-      const reporteSinId: Omit<Report, 'id'> = {
-        userName: this.nuevoReporte.userName,
-        userEmail: this.nuevoReporte.userEmail,
-        reason: this.nuevoReporte.reason,
-        severity: this.nuevoReporte.severity,
-        date: this.nuevoReporte.date || new Date().toLocaleString('es-ES', {
+  saveNewReport(): void {
+    if (this.newReport && this.newReport.userName && this.newReport.userEmail && this.newReport.reason && this.newReport.severity && this.newReport.description) {
+      const reportWithoutId: Omit<Report, 'id'> = {
+        userName: this.newReport.userName,
+        userEmail: this.newReport.userEmail,
+        reason: this.newReport.reason,
+        severity: this.newReport.severity,
+        date: this.newReport.date || new Date().toLocaleString('es-ES', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
         }),
-        status: this.nuevoReporte.status || 'Pendiente',
-        description: this.nuevoReporte.description
+        status: this.newReport.status || 'Pendiente',
+        description: this.newReport.description
       };
 
-      this.moderatorService.create(reporteSinId).subscribe({
+      this.moderatorService.create(reportWithoutId).subscribe({
         next: () => {
           this.loadReports();
-          this.cerrarModalAgregar();
+          this.closeAddModal();
         },
         error: (err) => {
           console.error('Error creando reporte:', err);
@@ -395,38 +395,38 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  verReporte(reportId: string): void {
-    this.reporteSeleccionado = this.reports.find(r => r.id === reportId) || null;
-    if (this.reporteSeleccionado) {
-      this.mostrarModalVer = true;
+  viewReport(reportId: string): void {
+    this.selectedReport = this.reports.find(r => r.id === reportId) || null;
+    if (this.selectedReport) {
+      this.showViewModal = true;
     }
   }
 
-  cerrarModalVer(): void {
-    this.mostrarModalVer = false;
-    this.reporteSeleccionado = null;
-    this.evidenciaCaso = null;
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedReport = null;
+    this.caseEvidence = null;
   }
 
-  abrirModalEditar(reportId: string): void {
+  openEditModal(reportId: string): void {
     // Se edita una copia: al cancelar, la tabla no debe cambiar
-    const reporte = this.reports.find(r => r.id === reportId);
-    this.reporteSeleccionado = reporte ? { ...reporte } : null;
-    if (this.reporteSeleccionado) {
-      this.mostrarModalEditar = true;
+    const report = this.reports.find(r => r.id === reportId);
+    this.selectedReport = report ? { ...report } : null;
+    if (this.selectedReport) {
+      this.showEditModal = true;
     }
   }
 
-  cerrarModalEditar(): void {
-    this.mostrarModalEditar = false;
-    this.reporteSeleccionado = null;
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedReport = null;
   }
 
-  actualizarReporte(): void {
-    if (this.reporteSeleccionado) {
-      this.moderatorService.update(this.reporteSeleccionado.id, this.reporteSeleccionado).subscribe({
+  updateReport(): void {
+    if (this.selectedReport) {
+      this.moderatorService.update(this.selectedReport.id, this.selectedReport).subscribe({
         next: () => {
-          this.cerrarModalEditar();
+          this.closeEditModal();
           this.loadReports();
         },
         error: (err) => {
@@ -437,9 +437,6 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  viewReport(reportId: string): void {
-    this.verReporte(reportId);
-  }
 
   approveReport(reportId: string): void {
     const report = this.allReports.find(r => r.id === reportId);

@@ -6,7 +6,7 @@ import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/s
 import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { MovimientoCelularService } from '../../../core/services/movimiento-celular.service';
+import { PhoneMovementService } from '../../../core/services/movimiento-celular.service';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -19,9 +19,9 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
   /** Alertas de las personas que tienen a la usuaria como contacto (aviso en todo el panel). */
-  readonly alertasRecibidas = inject(ReceivedAlertsService);
+  readonly receivedAlerts = inject(ReceivedAlertsService);
   /** "Tu celular cambió de lugar" (solo para la usuaria; se activa en Configuración). */
-  readonly movimiento = inject(MovimientoCelularService);
+  readonly movement = inject(PhoneMovementService);
 
   sidebarCollapsed = false;
 
@@ -44,8 +44,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.alertasRecibidas.iniciar();
-    this.movimiento.iniciar();
+    this.receivedAlerts.start();
+    this.movement.start();
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
         this.user = {
@@ -57,8 +57,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alertasRecibidas.detener();
-    this.movimiento.detener();
+    this.receivedAlerts.stop();
+    this.movement.stop();
   }
 
   toggleTheme() {
@@ -70,8 +70,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    this.alertasRecibidas.detener();
-    this.movimiento.detener();
+    this.receivedAlerts.stop();
+    this.movement.stop();
     this.authService.logout();
   }
 }

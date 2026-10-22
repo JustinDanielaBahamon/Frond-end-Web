@@ -10,20 +10,20 @@ import { environment } from '../../../environments/environment';
  */
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
-  get configurado(): boolean {
+  get configured(): boolean {
     return !!environment.firebase?.apiKey;
   }
 
-  async obtenerIdToken(): Promise<string> {
-    if (!this.configurado) {
+  async getIdToken(): Promise<string> {
+    if (!this.configured) {
       throw new Error('El inicio de sesión con Google no está configurado.');
     }
     const auth = getAuth(this.app());
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    const resultado = await signInWithPopup(auth, provider);
-    const idToken = await resultado.user.getIdToken();
+    const result = await signInWithPopup(auth, provider);
+    const idToken = await result.user.getIdToken();
     await signOut(auth);
     return idToken;
   }

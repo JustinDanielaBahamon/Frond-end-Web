@@ -13,8 +13,8 @@
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
     </svg>
     <span>Historial</span>
-    @if (recorridos().length > 0) {
-      <span class="gr-subtab-count">{{ recorridos().length }}</span>
+    @if (routes().length > 0) {
+      <span class="gr-subtab-count">{{ routes().length }}</span>
     }
   </button>
 </div>
@@ -22,11 +22,11 @@
 @if (error()) {
   <div class="gr-alert gr-alert--error" role="alert">{{ error() }}</div>
 }
-@if (aviso()) {
-  <div class="gr-alert gr-alert--warning" role="status">{{ aviso() }}</div>
+@if (notice()) {
+  <div class="gr-alert gr-alert--warning" role="status">{{ notice() }}</div>
 }
-@if (exito()) {
-  <div class="gr-alert gr-alert--success" role="status">{{ exito() }}</div>
+@if (success()) {
+  <div class="gr-alert gr-alert--success" role="status">{{ success() }}</div>
 }
 
 <div class="gr-grid">
@@ -38,56 +38,56 @@
       <section class="gr-card">
         <header class="gr-card-header">
           <h2 class="gr-card-title">Nuevo recorrido</h2>
-          <span class="gr-chip" [class.gr-chip--full]="limiteAlcanzado()">{{ recorridos().length }}/{{ MAX_RECORRIDOS }}</span>
+          <span class="gr-chip" [class.gr-chip--full]="limitReached()">{{ routes().length }}/{{ MAX_ROUTES }}</span>
         </header>
 
-        @if (limiteAlcanzado()) {
+        @if (limitReached()) {
           <p class="gr-banner">
-            Llegaste al máximo de {{ MAX_RECORRIDOS }} recorridos. Elimina uno de la lista para guardar otro.
+            Llegaste al máximo de {{ MAX_ROUTES }} recorridos. Elimina uno de la lista para guardar otro.
           </p>
         } @else {
           <div class="gr-field">
             <span class="gr-label">Cómo elegir los puntos</span>
             <div class="gr-segmented">
-              <button [class.active]="metodoSeleccion() === 'mapa'" (click)="setMetodo('mapa')">Clic en el mapa</button>
-              <button [class.active]="metodoSeleccion() === 'ubicaciones'" (click)="setMetodo('ubicaciones')">Mis ubicaciones</button>
+              <button [class.active]="selectionMethod() === 'mapa'" (click)="setMethod('mapa')">Clic en el mapa</button>
+              <button [class.active]="selectionMethod() === 'ubicaciones'" (click)="setMethod('ubicaciones')">Mis ubicaciones</button>
             </div>
           </div>
 
-          @for (punto of puntosForm; track punto) {
-            @let valor = punto === 'A' ? puntoA() : puntoB();
-            @let eligiendo = puntoSeleccionando() === punto;
-            <div class="gr-point" [class.gr-point--active]="eligiendo" [class.gr-point--set]="!!valor">
-              <button class="gr-point-main" (click)="elegirPunto(punto)">
-                <span class="gr-point-badge" [class.gr-point-badge--b]="punto === 'B'">{{ punto }}</span>
+          @for (point of formPoints; track point) {
+            @let value = point === 'A' ? pointA() : pointB();
+            @let choosing = selectingPoint() === point;
+            <div class="gr-point" [class.gr-point--active]="choosing" [class.gr-point--set]="!!value">
+              <button class="gr-point-main" (click)="choosePoint(point)">
+                <span class="gr-point-badge" [class.gr-point-badge--b]="point === 'B'">{{ point }}</span>
                 <span class="gr-point-text">
-                  <span class="gr-point-label">{{ punto === 'A' ? 'Inicio' : 'Destino' }}</span>
-                  @if (eligiendo) {
+                  <span class="gr-point-label">{{ point === 'A' ? 'Inicio' : 'Destino' }}</span>
+                  @if (choosing) {
                     <span class="gr-point-hint">
-                      {{ metodoSeleccion() === 'mapa' ? 'Haz clic en el mapa…' : 'Elige una de tus ubicaciones' }}
+                      {{ selectionMethod() === 'mapa' ? 'Haz clic en el mapa…' : 'Elige una de tus ubicaciones' }}
                     </span>
-                  } @else if (valor) {
-                    <span class="gr-point-value">{{ valor.nombre || coordenadas(valor) }}</span>
+                  } @else if (value) {
+                    <span class="gr-point-value">{{ value.nombre || coordinates(value) }}</span>
                   } @else {
                     <span class="gr-point-placeholder">Sin definir</span>
                   }
                 </span>
-                <span class="gr-point-action">{{ eligiendo ? 'Cancelar' : (valor ? 'Cambiar' : 'Elegir') }}</span>
+                <span class="gr-point-action">{{ choosing ? 'Cancelar' : (value ? 'Cambiar' : 'Elegir') }}</span>
               </button>
               <button class="gr-icon-btn" title="Usar mi ubicación actual" aria-label="Usar mi ubicación actual"
-                      (click)="usarMiUbicacion(punto)">
+                      (click)="useMyLocation(point)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/>
                 </svg>
               </button>
             </div>
 
-            @if (eligiendo && metodoSeleccion() === 'ubicaciones') {
+            @if (choosing && selectionMethod() === 'ubicaciones') {
               <div class="gr-places">
-                @for (lugar of ubicacionesGuardadas(); track lugar.id) {
-                  <button class="gr-place" (click)="seleccionarUbicacion(lugar)">
-                    <span class="gr-place-name">{{ lugar.name }}</span>
-                    <span class="gr-place-addr">{{ lugar.address || lugar.city || 'Sin dirección' }}</span>
+                @for (place of savedLocations(); track place.id) {
+                  <button class="gr-place" (click)="selectLocation(place)">
+                    <span class="gr-place-name">{{ place.name }}</span>
+                    <span class="gr-place-addr">{{ place.address || place.city || 'Sin dirección' }}</span>
                   </button>
                 } @empty {
                   <p class="gr-muted">No tienes ubicaciones guardadas. Usa "Clic en el mapa" o guárdalas en "Ubicaciones guardadas".</p>
@@ -95,33 +95,33 @@
               </div>
             }
 
-            @if (valor) {
+            @if (value) {
               <input class="gr-input gr-input--sm" type="text" maxlength="150"
-                     [attr.aria-label]="punto === 'A' ? 'Nombre del inicio' : 'Nombre del destino'"
-                     [placeholder]="punto === 'A' ? 'Nombre del inicio (ej: Casa)' : 'Nombre del destino (ej: Universidad)'"
-                     [ngModel]="punto === 'A' ? nombrePuntoA() : nombrePuntoB()"
-                     (ngModelChange)="punto === 'A' ? nombrePuntoA.set($event) : nombrePuntoB.set($event)" />
+                     [attr.aria-label]="point === 'A' ? 'Nombre del inicio' : 'Nombre del destino'"
+                     [placeholder]="point === 'A' ? 'Nombre del inicio (ej: Casa)' : 'Nombre del destino (ej: Universidad)'"
+                     [ngModel]="point === 'A' ? pointAName() : pointBName()"
+                     (ngModelChange)="point === 'A' ? pointAName.set($event) : pointBName.set($event)" />
             }
           }
 
           <label class="gr-field">
             <span class="gr-label">Nombre del recorrido</span>
             <input class="gr-input" type="text" maxlength="150" placeholder="Ej: Casa → Universidad"
-                   [ngModel]="nombreRecorrido()" (ngModelChange)="nombreRecorrido.set($event)" />
+                   [ngModel]="routeName()" (ngModelChange)="routeName.set($event)" />
             <span class="gr-help">Si lo dejas vacío se genera con el nombre de los puntos.</span>
           </label>
 
-          @if (distanciaKm() !== null) {
+          @if (distanceKm() !== null) {
             <div class="gr-summary">
-              <div><span class="gr-summary-value">{{ distanciaKm()! | number:'1.2-2' }} km</span><span class="gr-summary-label">Distancia en línea recta</span></div>
-              <div><span class="gr-summary-value">{{ formatearMinutos(minutosEstimados()) }}</span><span class="gr-summary-label">Caminando (aprox.)</span></div>
+              <div><span class="gr-summary-value">{{ distanceKm()! | number:'1.2-2' }} km</span><span class="gr-summary-label">Distancia en línea recta</span></div>
+              <div><span class="gr-summary-value">{{ formatMinutes(estimatedMinutes()) }}</span><span class="gr-summary-label">Caminando (aprox.)</span></div>
             </div>
           }
 
           <div class="gr-actions">
-            <button class="gr-btn gr-btn--ghost" (click)="limpiarSeleccion()" [disabled]="!puntoA() && !puntoB()">Limpiar</button>
-            <button class="gr-btn gr-btn--primary" (click)="guardarRecorrido()" [disabled]="!puedeGuardar()">
-              {{ guardando() ? 'Guardando…' : 'Guardar recorrido' }}
+            <button class="gr-btn gr-btn--ghost" (click)="clearSelection()" [disabled]="!pointA() && !pointB()">Limpiar</button>
+            <button class="gr-btn gr-btn--primary" (click)="saveRoute()" [disabled]="!canSave()">
+              {{ saving() ? 'Guardando…' : 'Guardar recorrido' }}
             </button>
           </div>
         }
@@ -131,37 +131,37 @@
       <section class="gr-card">
         <header class="gr-card-header">
           <h2 class="gr-card-title">Tus recorridos</h2>
-          <span class="gr-chip gr-chip--star" [class.gr-chip--full]="estrellas().length >= MAX_ESTRELLAS"
-                title="Recorridos estrella">★ {{ estrellas().length }}/{{ MAX_ESTRELLAS }}</span>
+          <span class="gr-chip gr-chip--star" [class.gr-chip--full]="starredCount().length >= MAX_STARRED"
+                title="Recorridos estrella">★ {{ starredCount().length }}/{{ MAX_STARRED }}</span>
         </header>
 
         <div class="gr-field">
           <span class="gr-label">Mostrar en el mapa</span>
           <div class="gr-segmented gr-segmented--3">
-            <button [class.active]="filtroVisibilidad() === 'todos'" (click)="setVisibilidad('todos')">Todos</button>
-            <button [class.active]="filtroVisibilidad() === 'estrellas'" (click)="setVisibilidad('estrellas')">★ Estrella</button>
-            <button [class.active]="filtroVisibilidad() === 'ocultar'" (click)="setVisibilidad('ocultar')">Ocultar</button>
+            <button [class.active]="visibilityFilter() === 'todos'" (click)="setVisibility('todos')">Todos</button>
+            <button [class.active]="visibilityFilter() === 'estrellas'" (click)="setVisibility('estrellas')">★ Estrella</button>
+            <button [class.active]="visibilityFilter() === 'ocultar'" (click)="setVisibility('ocultar')">Ocultar</button>
           </div>
         </div>
 
-        @if (cargando()) {
+        @if (loading()) {
           <p class="gr-muted">Cargando recorridos…</p>
         } @else {
           <ul class="gr-list">
-            @for (r of recorridos(); track r.id) {
-              <li class="gr-row" [class.gr-row--selected]="seleccionado()?.id === r.id"
-                  [class.gr-row--hidden]="filtroVisibilidad() === 'ocultar' || (filtroVisibilidad() === 'estrellas' && !r.importante)">
-                <button class="gr-star" [class.gr-star--on]="r.importante"
-                        [attr.aria-label]="r.importante ? 'Quitar estrella' : 'Marcar como estrella'"
-                        [title]="r.importante ? 'Quitar estrella' : 'Marcar como estrella'" (click)="toggleEstrella(r, $event)">★</button>
-                <button class="gr-row-main" (click)="enfocar(r)">
+            @for (r of routes(); track r.id) {
+              <li class="gr-row" [class.gr-row--selected]="selected()?.id === r.id"
+                  [class.gr-row--hidden]="visibilityFilter() === 'ocultar' || (visibilityFilter() === 'estrellas' && !r.important)">
+                <button class="gr-star" [class.gr-star--on]="r.important"
+                        [attr.aria-label]="r.important ? 'Quitar estrella' : 'Marcar como estrella'"
+                        [title]="r.important ? 'Quitar estrella' : 'Marcar como estrella'" (click)="toggleStar(r, $event)">★</button>
+                <button class="gr-row-main" (click)="focus(r)">
                   <span class="gr-swatch" [style.background]="colorDe(r)"></span>
                   <span class="gr-row-text">
-                    <span class="gr-row-name">{{ r.nombrePersonalizado || 'Recorrido sin nombre' }}</span>
-                    <span class="gr-row-meta">{{ r.distanciaEstimada }} · {{ r.tiempoEstimado }}</span>
+                    <span class="gr-row-name">{{ r.customName || 'Recorrido sin nombre' }}</span>
+                    <span class="gr-row-meta">{{ r.estimatedDistance }} · {{ r.estimatedTime }}</span>
                   </span>
                 </button>
-                <button class="gr-icon-btn gr-icon-btn--danger" title="Eliminar" aria-label="Eliminar recorrido" (click)="eliminar(r, $event)">
+                <button class="gr-icon-btn gr-icon-btn--danger" title="Eliminar" aria-label="Eliminar recorrido" (click)="delete(r, $event)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                   </svg>
@@ -171,7 +171,7 @@
               <li class="gr-empty">Aún no tienes recorridos. Crea el primero arriba o desde la app móvil.</li>
             }
           </ul>
-          <p class="gr-help">Máximo {{ MAX_RECORRIDOS }} recorridos y {{ MAX_ESTRELLAS }} estrella. Se sincronizan con la app móvil.</p>
+          <p class="gr-help">Máximo {{ MAX_ROUTES }} recorridos y {{ MAX_STARRED }} estrella. Se sincronizan con la app móvil.</p>
         }
       </section>
 
@@ -181,26 +181,26 @@
       <section class="gr-card">
         <header class="gr-card-header">
           <h2 class="gr-card-title">Historial de recorridos</h2>
-          <span class="gr-muted">{{ recorridos().length }} guardados</span>
+          <span class="gr-muted">{{ routes().length }} guardados</span>
         </header>
 
-        @if (cargando()) {
+        @if (loading()) {
           <p class="gr-muted">Cargando historial…</p>
         } @else {
           <div class="gr-history">
-            @for (r of recorridos(); track r.id) {
-              <button class="gr-history-item" [class.gr-history-item--selected]="seleccionado()?.id === r.id" (click)="verDetalle(r)">
+            @for (r of routes(); track r.id) {
+              <button class="gr-history-item" [class.gr-history-item--selected]="selected()?.id === r.id" (click)="viewDetail(r)">
                 <span class="gr-swatch gr-swatch--lg" [style.background]="colorDe(r)">
                   <!-- El ícono va siempre: antes solo aparecía la estrella y al quitarla la tarjeta quedaba vacía -->
                   <svg class="gr-swatch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>
                   </svg>
-                  @if (r.importante) { <span class="gr-swatch-star" aria-label="Con estrella">★</span> }
+                  @if (r.important) { <span class="gr-swatch-star" aria-label="Con estrella">★</span> }
                 </span>
                 <span class="gr-row-text">
-                  <span class="gr-row-name">{{ r.nombrePersonalizado || 'Recorrido sin nombre' }}</span>
-                  <span class="gr-row-meta">{{ r.barrioInicio }} → {{ r.barrioFin }}</span>
-                  <span class="gr-row-meta">{{ formatearFecha(r.fecha) }} · {{ r.distanciaEstimada }} · {{ r.tiempoEstimado }}</span>
+                  <span class="gr-row-name">{{ r.customName || 'Recorrido sin nombre' }}</span>
+                  <span class="gr-row-meta">{{ r.startNeighborhood }} → {{ r.endNeighborhood }}</span>
+                  <span class="gr-row-meta">{{ formatDate(r.fecha) }} · {{ r.estimatedDistance }} · {{ r.estimatedTime }}</span>
                 </span>
                 <svg class="gr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
@@ -217,11 +217,11 @@
   </div>
 
   <!-- ══════════ COLUMNA DERECHA: MAPA ══════════ -->
-  <div class="gr-map-wrap" [class.gr-map-wrap--picking]="!!puntoSeleccionando() && metodoSeleccion() === 'mapa'">
+  <div class="gr-map-wrap" [class.gr-map-wrap--picking]="!!selectingPoint() && selectionMethod() === 'mapa'">
     <div class="gr-map" #mapContainer></div>
 
-    @if (puntoSeleccionando() && metodoSeleccion() === 'mapa') {
-      <div class="gr-map-hint">Haz clic en el mapa para fijar el punto {{ puntoSeleccionando() }}</div>
+    @if (selectingPoint() && selectionMethod() === 'mapa') {
+      <div class="gr-map-hint">Haz clic en el mapa para fijar el punto {{ selectingPoint() }}</div>
     }
 
     <div class="gr-legend">
@@ -235,30 +235,30 @@
 </div>
 
 <!-- Detalle -->
-@if (detalle(); as r) {
-  <div class="gr-modal-overlay" (click)="cerrarDetalle()">
-    <div class="gr-modal" role="dialog" aria-modal="true" [attr.aria-label]="r.nombrePersonalizado" (click)="$event.stopPropagation()">
+@if (detail(); as r) {
+  <div class="gr-modal-overlay" (click)="closeDetail()">
+    <div class="gr-modal" role="dialog" aria-modal="true" [attr.aria-label]="r.customName" (click)="$event.stopPropagation()">
       <header class="gr-modal-header">
-        <h3>{{ r.nombrePersonalizado || 'Recorrido' }}</h3>
-        <button class="gr-icon-btn" aria-label="Cerrar" (click)="cerrarDetalle()">
+        <h3>{{ r.customName || 'Recorrido' }}</h3>
+        <button class="gr-icon-btn" aria-label="Cerrar" (click)="closeDetail()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </header>
       <dl class="gr-detail">
-        <div><dt>Trayecto</dt><dd>{{ r.barrioInicio }} → {{ r.barrioFin }}</dd></div>
-        <div><dt>Guardado</dt><dd>{{ formatearFecha(r.fecha) }}</dd></div>
-        <div><dt>Distancia</dt><dd>{{ r.distanciaEstimada }}</dd></div>
-        <div><dt>Tiempo estimado</dt><dd>{{ r.tiempoEstimado }}</dd></div>
-        @if (r.municipio) {
-          <div><dt>Municipio</dt><dd>{{ r.municipio }}{{ r.departamento ? ', ' + r.departamento : '' }}</dd></div>
+        <div><dt>Trayecto</dt><dd>{{ r.startNeighborhood }} → {{ r.endNeighborhood }}</dd></div>
+        <div><dt>Guardado</dt><dd>{{ formatDate(r.fecha) }}</dd></div>
+        <div><dt>Distancia</dt><dd>{{ r.estimatedDistance }}</dd></div>
+        <div><dt>Tiempo estimado</dt><dd>{{ r.estimatedTime }}</dd></div>
+        @if (r.municipality) {
+          <div><dt>Municipio</dt><dd>{{ r.municipality }}{{ r.department ? ', ' + r.department : '' }}</dd></div>
         }
-        <div><dt>Puntos GPS</dt><dd>{{ r.cantidadPuntos }}</dd></div>
-        <div><dt>Estrella</dt><dd>{{ r.importante ? 'Sí' : 'No' }}</dd></div>
+        <div><dt>Puntos GPS</dt><dd>{{ r.pointCount }}</dd></div>
+        <div><dt>Estrella</dt><dd>{{ r.important ? 'Sí' : 'No' }}</dd></div>
       </dl>
       <footer class="gr-modal-footer">
-        <button class="gr-btn gr-btn--danger" (click)="eliminar(r)">Eliminar</button>
-        <button class="gr-btn gr-btn--ghost" (click)="toggleEstrella(r)">{{ r.importante ? 'Quitar estrella' : 'Marcar estrella' }}</button>
-        <button class="gr-btn gr-btn--primary" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="gr-btn gr-btn--danger" (click)="delete(r)">Eliminar</button>
+        <button class="gr-btn gr-btn--ghost" (click)="toggleStar(r)">{{ r.important ? 'Quitar estrella' : 'Marcar estrella' }}</button>
+        <button class="gr-btn gr-btn--primary" (click)="closeDetail()">Cerrar</button>
       </footer>
     </div>
   </div>

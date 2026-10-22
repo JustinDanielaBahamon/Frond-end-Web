@@ -23,20 +23,20 @@
         type="text"
         placeholder="Buscar por fecha, medio de activación o estado..."
         [value]="searchTerm"
-        (input)="onBuscarChange($event)" />
+        (input)="onSearchChange($event)" />
     </div>
 
     <app-selector-fecha class="ah-filtro-fecha-selector" etiqueta="Filtrar historial por día" placeholder="Todas las fechas"
-                        [value]="fechaFiltro" (valueChange)="onFecha($event)" />
+                        [value]="dateFilter" (valueChange)="onDate($event)" />
 
     <div class="ah-filtro-tipo">
       <svg class="ah-filtro-tipo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
       </svg>
-      <select [value]="tipoFiltro" (change)="onTipoChange($event)" aria-label="Filtrar por medio de activación">
+      <select [value]="typeFilter" (change)="onTypeChange($event)" aria-label="Filtrar por medio de activación">
         <option value="Todas">Medio</option>
-        @for (medio of mediosDisponibles; track medio) {
-          <option [value]="medio">{{ medio }}</option>
+        @for (method of availableMethods; track method) {
+          <option [value]="method">{{ method }}</option>
         }
       </select>
     </div>
@@ -69,7 +69,7 @@
         </span>
         <div class="ah-stat-body">
           <p class="ah-stat-label">Total de alertas</p>
-          <p class="ah-stat-val">{{ totalAlertas }}</p>
+          <p class="ah-stat-val">{{ totalAlertCount }}</p>
           <p class="ah-stat-sub">Este mes</p>
         </div>
         <span class="ah-stat-chevron">›</span>
@@ -84,7 +84,7 @@
         </span>
         <div class="ah-stat-body">
           <p class="ah-stat-label">Atendidas</p>
-          <p class="ah-stat-val">{{ alertasAtendidas }}</p>
+          <p class="ah-stat-val">{{ attendedAlerts }}</p>
           <p class="ah-stat-sub">Resueltas</p>
         </div>
         <span class="ah-stat-chevron">›</span>
@@ -99,7 +99,7 @@
         </span>
         <div class="ah-stat-body">
           <p class="ah-stat-label">Canceladas</p>
-          <p class="ah-stat-val">{{ alertasCanceladas }}</p>
+          <p class="ah-stat-val">{{ cancelledAlerts }}</p>
           <p class="ah-stat-sub">Marcadas</p>
         </div>
         <span class="ah-stat-chevron">›</span>
@@ -120,33 +120,33 @@
           </tr>
         </thead>
         <tbody>
-          @for (alerta of alertasPagina; track alerta.id) {
-            <tr class="ah-row" [class.ah-row--expanded]="expandedAlertaId === alerta.id" (click)="toggleExpand(alerta)">
-              <td class="ah-id">#{{ alerta.id }}</td>
+          @for (alert of alertsPage; track alert.id) {
+            <tr class="ah-row" [class.ah-row--expanded]="expandedAlertId === alert.id" (click)="toggleExpand(alert)">
+              <td class="ah-id">#{{ alert.id }}</td>
               <td>
-                <span class="ah-fecha">{{ formatearFechaHora(alerta.tiempo).fecha }}</span>
-                <span class="ah-hora">{{ formatearFechaHora(alerta.tiempo).hora }}</span>
+                <span class="ah-fecha">{{ formatDateTime(alert.time).fecha }}</span>
+                <span class="ah-hora">{{ formatDateTime(alert.time).time }}</span>
               </td>
               <td>
-                <span class="ah-badge" [ngClass]="medioBadge[alerta.medioActivacion]">
-                  {{ alerta.medioActivacion }}
+                <span class="ah-badge" [ngClass]="methodBadge[alert.activationMethod]">
+                  {{ alert.activationMethod }}
                 </span>
               </td>
-              <td class="ah-ubicacion">{{ alerta.ubicacion || 'Sin ubicación' }}</td>
+              <td class="ah-ubicacion">{{ alert.location || 'Sin ubicación' }}</td>
               <td>
-                <span class="ah-badge" [ngClass]="estadoBadge[alerta.estado]">
-                  {{ alerta.estado }}
+                <span class="ah-badge" [ngClass]="statusBadge[alert.estado]">
+                  {{ alert.estado }}
                 </span>
               </td>
               <td class="ah-acciones" (click)="$event.stopPropagation()">
-                <button class="ah-icon-btn" title="Ver detalle" (click)="toggleExpand(alerta)">👁</button>
+                <button class="ah-icon-btn" title="Ver detalle" (click)="toggleExpand(alert)">👁</button>
                 <div class="ah-menu-wrap">
-                  <button class="ah-icon-btn" title="Más acciones" (click)="toggleMenu(alerta.id, $event)">⋮</button>
-                  @if (menuAbiertoId === alerta.id) {
+                  <button class="ah-icon-btn" title="Más acciones" (click)="toggleMenu(alert.id, $event)">⋮</button>
+                  @if (openMenuId === alert.id) {
                     <div class="ah-menu">
-                      <button (click)="verEvidencias(alerta); menuAbiertoId = null">📂 Ver evidencias</button>
-                      @if (alerta.estado === 'Pendiente') {
-                        <button class="ah-menu-danger" (click)="marcarCancelada(alerta); menuAbiertoId = null">⚠️ Marcar como cancelada</button>
+                      <button (click)="viewEvidences(alert); openMenuId = null">📂 Ver evidencias</button>
+                      @if (alert.estado === 'Pendiente') {
+                        <button class="ah-menu-danger" (click)="markCancelled(alert); openMenuId = null">⚠️ Marcar como cancelada</button>
                       }
                     </div>
                   }
@@ -154,7 +154,7 @@
               </td>
             </tr>
 
-            @if (expandedAlertaId === alerta.id) {
+            @if (expandedAlertId === alert.id) {
               <tr class="ah-expand-row">
                 <td colspan="6">
                   <div class="ah-expand-panel">
@@ -168,7 +168,7 @@
                         </svg>
                         Información de la alerta
                       </span>
-                      <span class="ah-expand-head-modo">Medio de activación: {{ alerta.medioActivacion || 'No registrado' }}</span>
+                      <span class="ah-expand-head-modo">Medio de activación: {{ alert.activationMethod || 'No registrado' }}</span>
                     </div>
 
                     <div class="ah-expand-grid">
@@ -181,17 +181,17 @@
                             <span class="ah-mini-timeline-dot"></span>
                             <div>
                               <span class="ah-mini-timeline-label">Enviada</span>
-                              <span class="ah-mini-timeline-time">{{ formatearFechaHora(alerta.tiempo).hora }}</span>
+                              <span class="ah-mini-timeline-time">{{ formatDateTime(alert.time).time }}</span>
                             </div>
                           </li>
                           <li class="ah-mini-timeline-item"
-                              [class.ah-mini-timeline-item--done]="alerta.estado === 'Atendida'"
-                              [class.ah-mini-timeline-item--pending]="alerta.estado === 'Pendiente'">
+                              [class.ah-mini-timeline-item--done]="alert.estado === 'Atendida'"
+                              [class.ah-mini-timeline-item--pending]="alert.estado === 'Pendiente'">
                             <span class="ah-mini-timeline-dot"></span>
                             <div>
-                              <span class="ah-mini-timeline-label">{{ alerta.estado }}</span>
+                              <span class="ah-mini-timeline-label">{{ alert.estado }}</span>
                               <span class="ah-mini-timeline-time">
-                                {{ alerta.estado === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' }}
+                                {{ alert.estado === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' }}
                               </span>
                             </div>
                           </li>
@@ -202,10 +202,10 @@
                       <div class="ah-expand-col">
                         <span class="ah-expand-col-title">Ubicación enviada</span>
                         <div class="ah-mini-map-wrap">
-                          <div id="mini-map-{{ alerta.id }}" class="ah-mini-map"></div>
+                          <div id="mini-map-{{ alert.id }}" class="ah-mini-map"></div>
                           <button class="ah-mini-map-fullscreen" (click)="toggleFullscreen()">⛶</button>
                         </div>
-                        <a class="ah-mini-map-link" [href]="mapsUrl(alerta)" target="_blank" rel="noopener">
+                        <a class="ah-mini-map-link" [href]="mapsUrl(alert)" target="_blank" rel="noopener">
                           Ver en Google Maps ↗
                         </a>
                       </div>
@@ -215,22 +215,22 @@
                         <span class="ah-expand-col-title">Detalles</span>
                         <div class="ah-expand-item">
                           <span class="ah-expand-item-label">Medio de activación</span>
-                          <span class="ah-badge" [ngClass]="medioBadge[alerta.medioActivacion]">{{ alerta.medioActivacion }}</span>
+                          <span class="ah-badge" [ngClass]="methodBadge[alert.activationMethod]">{{ alert.activationMethod }}</span>
                         </div>
                         <div class="ah-expand-item">
                           <span class="ah-expand-item-label">Ubicación</span>
-                          <span class="ah-expand-item-value">{{ alerta.ubicacion }}</span>
+                          <span class="ah-expand-item-value">{{ alert.location }}</span>
                         </div>
                         <div class="ah-expand-item">
                           <span class="ah-expand-item-label">Descripción</span>
-                          <span class="ah-expand-item-value">{{ alerta.descripcion }}</span>
+                          <span class="ah-expand-item-value">{{ alert.description }}</span>
                         </div>
                       </div>
 
                       <!-- Evidencias -->
                       <div class="ah-expand-col">
                         <span class="ah-expand-col-title">Evidencias</span>
-                        <button class="ah-expand-action" (click)="verEvidencias(alerta)">
+                        <button class="ah-expand-action" (click)="viewEvidences(alert)">
                           📂 Ver evidencias
                         </button>
                       </div>
@@ -244,28 +244,28 @@
           @empty {
             <tr>
               <td colspan="6" class="ah-empty">
-                {{ fechaFiltro ? 'No hay alertas registradas ese día.' : 'Aún no tienes alertas registradas.' }}
+                {{ dateFilter ? 'No hay alertas registradas ese día.' : 'Aún no tienes alertas registradas.' }}
               </td>
             </tr>
           }
         </tbody>
       </table>
 
-      @if (alertasFiltradas.length > 0) {
+      @if (filteredAlerts.length > 0) {
         <div class="ah-pagination">
           <span class="ah-pagination-info">
-            Mostrando {{ rangoInicio }}-{{ rangoFin }} de {{ alertasFiltradas.length }} resultados
+            Mostrando {{ rangeStart }}-{{ rangeEnd }} de {{ filteredAlerts.length }} resultados
           </span>
           <div class="ah-pagination-controls">
-            <button (click)="paginaAnterior()" [disabled]="currentPage === 1">‹</button>
-            @for (p of paginasVisibles; track $index) {
+            <button (click)="previousPage()" [disabled]="currentPage === 1">‹</button>
+            @for (p of visiblePages; track $index) {
               @if (p === null) {
                 <span class="ah-ellipsis" aria-hidden="true">…</span>
               } @else {
-                <button [class.active]="p === currentPage" (click)="irAPagina(p)">{{ p }}</button>
+                <button [class.active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
               }
             }
-            <button (click)="paginaSiguiente()" [disabled]="currentPage === totalPages">›</button>
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
           </div>
         </div>
       }

@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Alerta, EstadoAlerta, MedioActivacion } from '../models/alert.model';
+import { Alert, AlertStatus, ActivationMethod } from '../models/alert.model';
 
 // Estado del panel → estado del backend
-const ESTADO_API: Record<EstadoAlerta, string> = {
+const API_STATUS: Record<AlertStatus, string> = {
   Pendiente: 'active',
   Atendida: 'resolved',
   Cancelada: 'cancelled',
@@ -18,52 +18,52 @@ export class AlertsService {
   private url = `${environment.apiUrl}/api/alerts`;
 
   // Usado por ADMIN: todas las alertas
-  getAll(): Observable<Alerta[]> {
+  getAll(): Observable<Alert[]> {
     return this.http.get<any[]>(this.url).pipe(
-      map(lista => lista.map(a => this.normalizar(a)))
+      map(list => list.map(a => this.normalize(a)))
     );
   }
 
   // Usado por USUARIA: solo sus propias alertas
-  getByUsuario(usuarioId: number): Observable<Alerta[]> {
-    return this.http.get<any[]>(`${this.url}/user/${usuarioId}`).pipe(
-      map(lista => lista.map(a => this.normalizar(a)))
+  getByUser(userId: number): Observable<Alert[]> {
+    return this.http.get<any[]>(`${this.url}/user/${userId}`).pipe(
+      map(list => list.map(a => this.normalize(a)))
     );
   }
 
   // Usado por USUARIA: sus alertas, de la más reciente a la más antigua
-  getMine(): Observable<Alerta[]> {
+  getMine(): Observable<Alert[]> {
     return this.http.get<any[]>(`${this.url}/me`).pipe(
-      map(lista => lista.map(a => this.normalizar(a)))
+      map(list => list.map(a => this.normalize(a)))
     );
   }
 
   /** Cuántos contactos recibieron el aviso de una alerta. */
-  contarContactosAvisados(id: number): Observable<number> {
+  countNotifiedContacts(id: number): Observable<number> {
     return this.http.get<unknown[]>(`${this.url}/${id}/contacts`).pipe(map(l => l.length));
   }
 
-  getById(id: number): Observable<Alerta> {
+  getById(id: number): Observable<Alert> {
     return this.http.get<any>(`${this.url}/${id}`).pipe(
-      map(a => this.normalizar(a))
+      map(a => this.normalize(a))
     );
   }
 
-  update(alerta: Alerta): Observable<Alerta> {
-    // No enviamos usuarioId/userProfileId, el backend lo establece automáticamente
-    const { usuarioId, ...alertaData } = alerta as any;
-    return this.http.put<Alerta>(`${this.url}/${alerta.id}`, alertaData);
+  update(alert: Alert): Observable<Alert> {
+    // No enviamos userId/userProfileId, el backend lo establece automáticamente
+    const { userId, ...alertData } = alert as any;
+    return this.http.put<Alert>(`${this.url}/${alert.id}`, alertData);
   }
 
   // Cambio de estado desde administración (PATCH /api/alerts/{id}/status, solo ADMIN)
-  updateEstado(id: number, estado: EstadoAlerta): Observable<Alerta> {
-    return this.http.patch<any>(`${this.url}/${id}/status`, { status: ESTADO_API[estado] }).pipe(
-      map(a => this.normalizar(a))
+  updateStatus(id: number, estado: AlertStatus): Observable<Alert> {
+    return this.http.patch<any>(`${this.url}/${id}/status`, { status: API_STATUS[estado] }).pipe(
+      map(a => this.normalize(a))
     );
   }
 
   /** Detalle del panel: última ubicación y envío a cada contacto (sin nombre ni correo). */
-  detalleAdmin(id: number): Observable<DetalleAdminAlerta> {
+  adminDetail(id: number): Observable<AdminAlertDetail> {
     const fecha = (iso: string | null) => (iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null);
     return this.http.get<any>(`${this.url}/${id}/admin-detail`).pipe(
       map((d) => ({
@@ -74,13 +74,13 @@ export class AlertsService {
               lat: Number(d.ultimaUbicacion.latitude),
               lng: Number(d.ultimaUbicacion.longitude),
               precision: d.ultimaUbicacion.accuracy != null ? Number(d.ultimaUbicacion.accuracy) : null,
-              hora: fecha(d.ultimaUbicacion.recordedAt),
+              time: fecha(d.ultimaUbicacion.recordedAt),
             }
           : null,
         envios: (d.envios ?? []).map((e: any) => ({
           contacto: e.contacto,
-          parentesco: e.relationship ?? null,
-          canales: (e.channels ?? []).map((c: any) => ({ canal: c.channel, estado: c.status, enviado: fecha(c.sentAt) })),
+          relationship: e.relationship ?? null,
+          channels: (e.channels ?? []).map((c: any) => ({ channel: c.channel, estado: c.status, sent: fecha(c.sentAt) })),
         })),
       })),
     );
@@ -89,29 +89,29 @@ export class AlertsService {
   // ── Normalización ──────────────────────────────────────────────
   // Convierte la alerta del backend (campos en inglés) al modelo Alerta del panel.
   // En administración el backend agrega userId, userName y userEmail.
-  private normalizar(a: any): Alerta {
+  private normalize(a: any): Alert {
     const lat = a.latitude != null ? Number(a.latitude) : 0;
     const lng = a.longitude != null ? Number(a.longitude) : 0;
-    const usuarioId = a.userId ?? a.userProfileId;
+    const userId = a.userId ?? a.userProfileId;
     return {
       id: a.id,
-      nombre: a.userName || (usuarioId != null ? `Usuaria #${usuarioId}` : 'Sin nombre'),
-      descripcion: a.message ?? '',
-      medioActivacion: this.normalizarMedio(a.activationMethod),
-      tiempo: this.haceCuanto(a.startedAt ?? a.createdAt),
-      ubicacion: lat || lng ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : '',
+      nombre: a.userName || (userId != null ? `Usuaria #${userId}` : 'Sin nombre'),
+      description: a.message ?? '',
+      activationMethod: this.normalizeMethod(a.activationMethod),
+      time: this.howLongAgo(a.startedAt ?? a.createdAt),
+      location: lat || lng ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : '',
       lat,
       lng,
-      estado: this.normalizarEstado(a.status),
-      usuarioId,
+      estado: this.normalizeStatus(a.status),
+      userId,
       tipo: a.alertType ?? '',
       created_at: a.createdAt,
       started_at: a.startedAt,
     };
   }
 
-  private normalizarMedio(valor: unknown): MedioActivacion {
-    const v = String(valor ?? '').toLowerCase();
+  private normalizeMethod(value: unknown): ActivationMethod {
+    const v = String(value ?? '').toLowerCase();
     if (v.includes('widget')) return 'Widget';
     if (v.includes('contact')) return 'Contacto';
     if (v.includes('power')) return 'Botón de encendido';
@@ -120,15 +120,15 @@ export class AlertsService {
     return 'Botón de pánico';
   }
 
-  private normalizarEstado(valor: unknown): EstadoAlerta {
-    const v = String(valor ?? '').toLowerCase();
+  private normalizeStatus(value: unknown): AlertStatus {
+    const v = String(value ?? '').toLowerCase();
     if (v === 'resolved') return 'Atendida';
     // "expired" (tiempo agotado sin atención) se agrupa con las canceladas
     if (v === 'cancelled' || v === 'expired') return 'Cancelada';
     return 'Pendiente';
   }
 
-  private haceCuanto(fecha?: string): string {
+  private howLongAgo(fecha?: string): string {
     if (!fecha) return '';
     const t = new Date(fecha).getTime();
     if (isNaN(t)) return '';
@@ -141,10 +141,10 @@ export class AlertsService {
 }
 
 /** Datos extra de una alerta para el panel (GET /api/alerts/{id}/admin-detail). */
-export interface DetalleAdminAlerta {
+export interface AdminAlertDetail {
   /** false: alerta cancelada o vencida, la administración no ve su ubicación (auditoría S2). */
   ubicacionVisible: boolean;
   puntos: number;
-  ultimaUbicacion: { lat: number; lng: number; precision: number | null; hora: Date | null } | null;
-  envios: { contacto: number; parentesco: string | null; canales: { canal: string; estado: string; enviado: Date | null }[] }[];
+  ultimaUbicacion: { lat: number; lng: number; precision: number | null; time: Date | null } | null;
+  envios: { contacto: number; relationship: string | null; channels: { channel: string; estado: string; sent: Date | null }[] }[];
 }

@@ -9,7 +9,7 @@ export class RecoveryStateService {
   readonly email = signal<string | null>(null);
   readonly codigo = signal<string | null>(null);
 
-  limpiar(): void {
+  clear(): void {
     this.email.set(null);
     this.codigo.set(null);
   }

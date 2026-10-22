@@ -2,9 +2,9 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Evidencia, EvidenciaFilters, EvidenciaStats } from '../../../core/models/evidence.model';
+import { Evidence, EvidenceFilters, EvidenceStats } from '../../../core/models/evidence.model';
 import { EvidenceService } from '../../../core/services/evidence.service';
-import { paginasCompactas } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/paginacion';
 
 @Component({
   selector: 'app-evidences-management',
@@ -19,26 +19,25 @@ export class EvidencesManagementComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // Datos
-  evidencias$: Observable<Evidencia[]> = this.evidenceService.evidencias$;
-  stats$: Observable<EvidenciaStats> = this.evidenceService.getStats();
+  evidences$: Observable<Evidence[]> = this.evidenceService.evidences$;
+  stats$: Observable<EvidenceStats> = this.evidenceService.getStats();
   
-  evidenciasFiltradas: Evidencia[] = [];
-  filteredEvidences: Evidencia[] = []; // Para compatibilidad con HTML
-  stats: EvidenciaStats = {
-    totalEvidencias: 0,
-    verificadas: 0,
-    pendientes: 0,
-    rechazadas: 0,
-    descargas: 0
+  filteredEvidences: Evidence[] = [];
+  stats: EvidenceStats = {
+    totalEvidenceCount: 0,
+    verified: 0,
+    pending: 0,
+    rejected: 0,
+    downloads: 0
   };
 
   // Filtros
-  filtros: EvidenciaFilters = {
-    busqueda: '',
+  filters: EvidenceFilters = {
+    search: '',
     tipo: '',
     estado: '',
-    fechaInicio: null,
-    fechaFin: null
+    startDate: null,
+    endDate: null
   };
 
   // Paginación
@@ -47,10 +46,10 @@ export class EvidencesManagementComponent implements OnInit {
   totalPages: number = 0;
 
   // Estados UI
-  cargando = false;
+  loading = false;
   error = '';
-  evidenciaSeleccionada: Evidencia | null = null;
-  mostrarModalVer = false;
+  selectedEvidence: Evidence | null = null;
+  showViewModal = false;
   
   // Estados de dropdowns personalizados
   isEvidenceTypeDropdownOpen = false;
@@ -74,7 +73,7 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarDatos();
+    this.loadData();
   }
 
   ngOnDestroy(): void {
@@ -90,20 +89,19 @@ export class EvidencesManagementComponent implements OnInit {
   // CARGA DE DATOS
   // ========================================
 
-  private cargarDatos(): void {
-    this.cargando = true;
+  private loadData(): void {
+    this.loading = true;
     
     this.evidenceService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (evidencias) => {
-        this.evidenciasFiltradas = evidencias;
-        this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
-        this.actualizarPaginacion();
-        this.cargando = false;
+      next: (evidences) => {
+        this.filteredEvidences = evidences;
+        this.updatePagination();
+        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar las evidencias';
-        this.cargando = false;
+        this.loading = false;
         console.error('Error cargando evidencias:', err);
         this.cdr.detectChanges();
       }
@@ -122,29 +120,28 @@ export class EvidencesManagementComponent implements OnInit {
   // ========================================
 
   applyFilters(): void {
-    this.cargando = true;
+    this.loading = true;
     this.currentPage = 1; // Resetear a primera página
 
-    const filtros: EvidenciaFilters = {
-      busqueda: this.searchTermEvidence,
+    const filters: EvidenceFilters = {
+      search: this.searchTermEvidence,
       tipo: this.filterEvidenceType,
       estado: this.filterStatus,
-      fechaInicio: null,
-      fechaFin: null
+      startDate: null,
+      endDate: null
     };
 
 
-    this.evidenceService.filtrarEvidencias(filtros).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (evidencias) => {
-        this.evidenciasFiltradas = evidencias;
-        this.filteredEvidences = evidencias; // Sincronizar para compatibilidad con HTML
-        this.actualizarPaginacion();
-        this.cargando = false;
+    this.evidenceService.filterEvidences(filters).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (evidences) => {
+        this.filteredEvidences = evidences;
+        this.updatePagination();
+        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar evidencias';
-        this.cargando = false;
+        this.loading = false;
         console.error('Error filtrando:', err);
       }
     });
@@ -154,20 +151,20 @@ export class EvidencesManagementComponent implements OnInit {
     this.searchTermEvidence = '';
     this.filterEvidenceType = 'all';
     this.filterStatus = 'all';
-    this.cargarDatos();
+    this.loadData();
   }
 
   // ========================================
   // PAGINACIÓN
   // ========================================
 
-  private actualizarPaginacion(): void {
-    this.totalPages = Math.ceil(this.evidenciasFiltradas.length / this.itemsPerPage);
+  private updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredEvidences.length / this.itemsPerPage);
   }
 
-  get paginatedEvidences(): Evidencia[] {
+  get paginatedEvidences(): Evidence[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.evidenciasFiltradas.slice(startIndex, startIndex + this.itemsPerPage);
+    return this.filteredEvidences.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   goToPage(page: number): void {
@@ -189,50 +186,50 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   getPagesArray(): (number | null)[] {
-    return paginasCompactas(this.currentPage, this.totalPages);
+    return compactPages(this.currentPage, this.totalPages);
   }
 
   // ========================================
   // ACCIONES CRUD
   // ========================================
 
-  verEvidencia(evidencia: Evidencia): void {
-    this.evidenciaSeleccionada = evidencia;
-    this.mostrarModalVer = true;
+  viewEvidence(evidence: Evidence): void {
+    this.selectedEvidence = evidence;
+    this.showViewModal = true;
   }
 
-  descargarEvidencia(id: number): void {
-    this.cargando = true;
-    this.evidenceService.descargar(id).pipe(takeUntil(this.destroy$)).subscribe({
+  downloadEvidence(id: number): void {
+    this.loading = true;
+    this.evidenceService.download(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
-        const evidencia = this.evidenciaSeleccionada || this.evidenciasFiltradas.find(e => e.id === id);
-        const nombreArchivo = evidencia?.nombre || `evidencia_${id}`;
-        this.descargarArchivo(blob, nombreArchivo);
+        const evidence = this.selectedEvidence || this.filteredEvidences.find(e => e.id === id);
+        const fileName = evidence?.nombre || `evidencia_${id}`;
+        this.downloadFile(blob, fileName);
         // Las estadísticas se actualizan automáticamente en el servicio
-        this.cargando = false;
+        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al descargar evidencia';
-        this.cargando = false;
+        this.loading = false;
         this.cdr.detectChanges();
         console.error('Error descargando:', err);
       }
     });
   }
 
-  eliminarEvidencia(id: number): void {
+  deleteEvidence(id: number): void {
     if (confirm('¿Estás seguro de eliminar esta evidencia?')) {
-      this.cargando = true;
+      this.loading = true;
       this.evidenceService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           // Recargar datos para actualizar la tabla y estadísticas
-          this.cargarDatos();
-          this.cargando = false;
+          this.loadData();
+          this.loading = false;
         },
         error: (err) => {
           this.error = 'Error al eliminar evidencia';
-          this.cargando = false;
+          this.loading = false;
           this.cdr.detectChanges();
           console.error('Error eliminando:', err);
         }
@@ -240,21 +237,21 @@ export class EvidencesManagementComponent implements OnInit {
     }
   }
 
-  cambiarEstadoEvidencia(id: number, nuevoEstado: 'Verificada' | 'Pendiente' | 'Rechazada'): void {
-    this.cargando = true;
-    this.evidenceService.cambiarEstado(id, nuevoEstado).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (evidenciaActualizada) => {
+  changeEvidenceStatus(id: number, newStatus: 'Verificada' | 'Pendiente' | 'Rechazada'): void {
+    this.loading = true;
+    this.evidenceService.changeStatus(id, newStatus).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (updatedEvidence) => {
         // Actualizar la evidencia seleccionada en el modal
-        if (this.evidenciaSeleccionada && this.evidenciaSeleccionada.id === id) {
-          this.evidenciaSeleccionada = evidenciaActualizada;
+        if (this.selectedEvidence && this.selectedEvidence.id === id) {
+          this.selectedEvidence = updatedEvidence;
         }
         // Recargar datos para actualizar la tabla y estadísticas
-        this.cargarDatos();
-        this.cargando = false;
+        this.loadData();
+        this.loading = false;
       },
       error: (err) => {
         this.error = 'Error al cambiar estado';
-        this.cargando = false;
+        this.loading = false;
         this.cdr.detectChanges();
         console.error('Error cambiando estado:', err);
       }
@@ -262,7 +259,7 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   /** Descarga el archivo real. Si llega vacío es que ya no está en el servidor: se avisa, no se inventa. */
-  private descargarArchivo(blob: Blob, nombre: string): void {
+  private downloadFile(blob: Blob, nombre: string): void {
     if (blob.size === 0) {
       this.error = 'El archivo de esta evidencia está vacío o ya no existe en el servidor.';
       return;
@@ -281,9 +278,9 @@ export class EvidencesManagementComponent implements OnInit {
   // MODALES
   // ========================================
 
-  cerrarModalVer(): void {
-    this.mostrarModalVer = false;
-    this.evidenciaSeleccionada = null;
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedEvidence = null;
   }
 
   // ========================================
@@ -393,22 +390,22 @@ export class EvidencesManagementComponent implements OnInit {
 
   // Getters para compatibilidad con template
   get totalEvidences(): number {
-    return this.stats.totalEvidencias;
+    return this.stats.totalEvidenceCount;
   }
 
   get verifiedEvidences(): number {
-    return this.stats.verificadas;
+    return this.stats.verified;
   }
 
   get pendingEvidences(): number {
-    return this.stats.pendientes;
+    return this.stats.pending;
   }
 
   get rejectedEvidences(): number {
-    return this.stats.rechazadas;
+    return this.stats.rejected;
   }
 
   get totalDownloads(): number {
-    return this.stats.descargas;
+    return this.stats.downloads;
   }
 }

@@ -3,23 +3,23 @@
  * donde van los puntos suspensivos. Ej.: página 9 de 24 → 1 … 8 9 10 … 24.
  * Con 7 páginas o menos se muestran todas.
  */
-export function paginasCompactas(actual: number, total: number): (number | null)[] {
+export function compactPages(actual: number, total: number): (number | null)[] {
   if (total <= 7) return Array.from({ length: Math.max(1, total) }, (_, i) => i + 1);
-  const pagina = Math.min(Math.max(1, actual), total);
+  const page = Math.min(Math.max(1, actual), total);
   // Cerca de un extremo se muestran 5 seguidas para que el número de botones no salte
-  let inicio = Math.max(2, pagina - 1);
-  let fin = Math.min(total - 1, pagina + 1);
-  if (pagina <= 4) {
-    inicio = 2;
-    fin = 5;
-  } else if (pagina >= total - 3) {
-    inicio = total - 4;
-    fin = total - 1;
+  let start = Math.max(2, page - 1);
+  let end = Math.min(total - 1, page + 1);
+  if (page <= 4) {
+    start = 2;
+    end = 5;
+  } else if (page >= total - 3) {
+    start = total - 4;
+    end = total - 1;
   }
-  const paginas: (number | null)[] = [1];
-  if (inicio > 2) paginas.push(null);
-  for (let p = inicio; p <= fin; p++) paginas.push(p);
-  if (fin < total - 1) paginas.push(null);
-  paginas.push(total);
-  return paginas;
+  const pages: (number | null)[] = [1];
+  if (start > 2) pages.push(null);
+  for (let p = start; p <= end; p++) pages.push(p);
+  if (end < total - 1) pages.push(null);
+  pages.push(total);
+  return pages;
 }

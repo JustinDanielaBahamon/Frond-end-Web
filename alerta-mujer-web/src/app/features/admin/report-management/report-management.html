@@ -9,14 +9,14 @@
         <h1>Gestión de Reportes</h1>
         <p>Visualiza, filtra y genera reportes del sistema.</p>
       </div>
-      <button class="btn-new-report" (click)="abrirModalNuevo()">
+      <button class="btn-new-report" (click)="openNewModal()">
         <i class="fa-solid fa-plus"></i>
         Nuevo Reporte
       </button>
     </header>
   
     <!-- Qué es esta sección (se puede ocultar) -->
-    @if (mostrarAyuda) {
+    @if (showHelp) {
       <section class="ayuda-informes" aria-label="Cómo funcionan los informes">
         <div class="ayuda-informes__icono"><i class="fa-solid fa-circle-info"></i></div>
         <div class="ayuda-informes__texto">
@@ -32,12 +32,12 @@
           <p class="ayuda-informes__aviso"><i class="fa-solid fa-lock"></i> Los informes contienen datos personales: compártelos
             solo con quien deba verlos y bórralos cuando ya no se necesiten.</p>
         </div>
-        <button class="ayuda-informes__cerrar" (click)="ocultarAyuda()" aria-label="Ocultar la explicación">
+        <button class="ayuda-informes__cerrar" (click)="hideHelp()" aria-label="Ocultar la explicación">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </section>
     } @else {
-      <button class="ayuda-informes__mostrar" (click)="mostrarAyudaDeNuevo()">
+      <button class="ayuda-informes__mostrar" (click)="showHelpAgain()">
         <i class="fa-solid fa-circle-info"></i> ¿Cómo funcionan los informes?
       </button>
     }
@@ -50,7 +50,7 @@
       <div class="stat-card purple">
         <div class="stat-info">
           <span>Total Reportes</span>
-          <h2>{{ stats.totalReportes }}</h2>
+          <h2>{{ stats.totalReportCount }}</h2>
           <p>Generados en total</p>
         </div>
         <div class="stat-icon">
@@ -61,7 +61,7 @@
       <div class="stat-card blue">
         <div class="stat-info">
           <span>Exportaciones</span>
-          <h2>{{ stats.exportaciones }}</h2>
+          <h2>{{ stats.exports }}</h2>
           <p>Reportes exportados</p>
         </div>
         <div class="stat-icon">
@@ -81,8 +81,8 @@
           type="text" 
           placeholder="Buscar reporte..." 
           aria-label="Buscar reporte"
-          [(ngModel)]="filtros.busqueda"
-          (input)="onBusquedaChange()"
+          [(ngModel)]="filters.search"
+          (input)="onSearchQueryChange()"
         />
       </div>
   
@@ -91,18 +91,18 @@
       <div class="filter-group">
         <div class="filter-item">
           <label>Fecha Inicial</label>
-          <app-selector-fecha etiqueta="Fecha inicial" [(ngModel)]="filtros.fechaInicio" (valueChange)="aplicarFiltros()" />
+          <app-selector-fecha etiqueta="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Fecha Final</label>
-          <app-selector-fecha etiqueta="Fecha final" [(ngModel)]="filtros.fechaFin" (valueChange)="aplicarFiltros()" />
+          <app-selector-fecha etiqueta="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Lugar de Alerta</label>
           <select 
             aria-label="Filtrar por Ciudad"
-            [(ngModel)]="filtros.ciudad"
-            (change)="aplicarFiltros()"
+            [(ngModel)]="filters.city"
+            (change)="applyFilters()"
           >
             <option value="">Todas</option>
             <option value="all">Todas</option>
@@ -117,8 +117,8 @@
           <label>Estado</label>
           <select 
             aria-label="Filtrar por Estado"
-            [(ngModel)]="filtros.estado"
-            (change)="aplicarFiltros()"
+            [(ngModel)]="filters.estado"
+            (change)="applyFilters()"
           >
             <option value="">Todos</option>
             <option value="all">Todos</option>
@@ -127,7 +127,7 @@
             <option value="Atendida">Atendida</option>
           </select>
         </div>
-        <button class="btn-clear-filters" (click)="limpiarFiltros()">
+        <button class="btn-clear-filters" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
           Limpiar filtros
         </button>
@@ -154,7 +154,7 @@
               </tr>
             </thead>
             <tbody>
-              @if (cargando) {
+              @if (loading) {
                 <tr>
                   <td colspan="7" style="text-align: center; padding: 40px;">
                     <div class="loading-spinner">
@@ -163,57 +163,57 @@
                     </div>
                   </td>
                 </tr>
-              } @else if (reportesPaginados.length === 0) {
+              } @else if (pagedReports.length === 0) {
                 <tr>
                   <td colspan="7" style="text-align: center; padding: 40px;">
                     <div class="no-data">
                       <i class="fa-solid fa-folder-open"></i>
                       <p>No se encontraron reportes</p>
-                      <button class="btn-clear-filters" (click)="limpiarFiltros()">
+                      <button class="btn-clear-filters" (click)="clearFilters()">
                         Limpiar filtros
                       </button>
                     </div>
                   </td>
                 </tr>
               } @else {
-                @for (reporte of reportesPaginados; track reporte.id) {
+                @for (report of pagedReports; track report.id) {
                   <tr>
                     <td>
                       <div class="report-name">
                         <div class="report-icon">
                           <i class="fa-solid fa-file-lines"></i>
                         </div>
-                        {{ reporte.nombre }}
+                        {{ report.nombre }}
                       </div>
                     </td>
-                    <td>{{ formatearFecha(reporte.fecha) }}</td>
-                    <td>{{ reporte.ciudad }}</td>
-                    <td>{{ reporte.usuaria || '-' }}</td>
-                    <td>{{ reporte.acontecimiento || '-' }}</td>
+                    <td>{{ formatDate(report.fecha) }}</td>
+                    <td>{{ report.city }}</td>
+                    <td>{{ report.user || '-' }}</td>
+                    <td>{{ report.incident || '-' }}</td>
                     <td>
-                      <span class="status {{ getStatusClass(reporte.estado) }}">{{ reporte.estado }}</span>
+                      <span class="status {{ getStatusClass(report.estado) }}">{{ report.estado }}</span>
                     </td>
-                    <td>{{ reporte.generadoPor }}</td>
+                    <td>{{ report.generatedBy }}</td>
                     <td>
                       <div class="actions">
                         <button 
                           class="view" 
                           aria-label="Ver reporte"
-                          (click)="verReporte(reporte)"
+                          (click)="viewReport(report)"
                         >
                           <i class="fa-solid fa-eye"></i>
                         </button>
                         <button 
                           class="edit" 
                           aria-label="Editar reporte"
-                          (click)="editarReporte(reporte)"
+                          (click)="editReport(report)"
                         >
                           <i class="fa-solid fa-pen"></i>
                         </button>
                         <button 
                           class="delete" 
                           aria-label="Eliminar reporte"
-                          (click)="eliminarReporte(reporte.id)"
+                          (click)="deleteReport(report.id)"
                         >
                           <i class="fa-solid fa-trash"></i>
                         </button>
@@ -232,34 +232,34 @@
           <div class="table-footer">
             <div class="table-info">
               Mostrando
-              <strong>{{ elementoInicio }} - {{ elementoFin }}</strong>
+              <strong>{{ startItem }} - {{ endItem }}</strong>
               de
-              <strong>{{ paginacion.totalElementos }}</strong>
+              <strong>{{ pagination.totalElements }}</strong>
               reportes
             </div>
             <div class="pagination">
               <button 
                 class="page-btn" 
                 aria-label="Página anterior"
-                (click)="paginaAnterior()"
-                [disabled]="paginacion.paginaActual === 1"
+                (click)="previousPage()"
+                [disabled]="pagination.currentPage === 1"
               >
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
               
-              @for (pagina of paginasVisibles; track $index) {
-                @if (pagina === null) {
+              @for (page of visiblePages; track $index) {
+                @if (page === null) {
                   <span class="page-ellipsis" aria-hidden="true">…</span>
                 } @else {
-                  <button class="page-btn" [class.active]="pagina === paginacion.paginaActual" (click)="cambiarPagina(pagina)">{{ pagina }}</button>
+                  <button class="page-btn" [class.active]="page === pagination.currentPage" (click)="changePage(page)">{{ page }}</button>
                 }
               }
 
               <button 
                 class="page-btn" 
                 aria-label="Página siguiente"
-                (click)="paginaSiguiente()"
-                [disabled]="paginacion.paginaActual === paginacion.totalPaginas"
+                (click)="nextPage()"
+                [disabled]="pagination.currentPage === pagination.totalPageCount"
               >
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
@@ -271,12 +271,12 @@
   </div>
 
   <!-- MODAL NUEVO/EDITAR REPORTE -->
-  @if (mostrarModalNuevo) {
-    <div class="modal-overlay" (click)="cerrarModalNuevo()">
+  @if (showNewModal) {
+    <div class="modal-overlay" (click)="closeNewModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>{{ reporteEditando ? 'Editar Reporte' : 'Nuevo Reporte' }}</h2>
-          <button class="modal-close" (click)="cerrarModalNuevo()">
+          <h2>{{ editingReport ? 'Editar Reporte' : 'Nuevo Reporte' }}</h2>
+          <button class="modal-close" (click)="closeNewModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -294,8 +294,8 @@
               <input 
                 type="text" 
                 name="nombre"
-                [(ngModel)]="modeloNombre"
-                (ngModelChange)="modeloNombre = $event"
+                [(ngModel)]="nameModel"
+                (ngModelChange)="nameModel = $event"
                 placeholder="Ej: Reporte de Alertas - Enero 2024"
               >
             </div>
@@ -304,45 +304,45 @@
             <div class="form-group alertas-selector">
               <label>
                 Seleccionar Alertas 
-                <span class="alertas-count">({{ alertasSeleccionadasCount }} seleccionadas)</span>
+                <span class="alertas-count">({{ selectedAlertsCount }} seleccionadas)</span>
               </label>
               <div class="alertas-actions">
-                <button type="button" class="btn-small" (click)="seleccionarTodasAlertas()">
+                <button type="button" class="btn-small" (click)="selectAllAlerts()">
                   Seleccionar todas
                 </button>
-                <button type="button" class="btn-small" (click)="deseleccionarTodasAlertas()">
+                <button type="button" class="btn-small" (click)="deselectAllAlerts()">
                   Deseleccionar todas
                 </button>
               </div>
               
-              @if (cargandoAlertas) {
+              @if (loadingAlerts) {
                 <div class="loading-alertas">
                   <i class="fa-solid fa-spinner fa-spin"></i>
                   Cargando alertas...
                 </div>
-              } @else if (alertasDisponibles.length === 0) {
+              } @else if (availableAlerts.length === 0) {
                 <div class="no-alertas">
                   <i class="fa-solid fa-folder-open"></i>
                   <p>No hay alertas disponibles</p>
                 </div>
               } @else {
                 <div class="alertas-list">
-                  @for (alerta of alertasDisponibles; track alerta.id) {
-                    <div class="alerta-item" [class.selected]="isAlertaSeleccionada(alerta.id)">
+                  @for (alert of availableAlerts; track alert.id) {
+                    <div class="alerta-item" [class.selected]="isAlertSelected(alert.id)">
                       <input 
                         type="checkbox" 
-                        [id]="'alerta-' + alerta.id"
-                        [checked]="isAlertaSeleccionada(alerta.id)"
-                        (change)="toggleAlertaSeleccionada(alerta.id)"
+                        [id]="'alerta-' + alert.id"
+                        [checked]="isAlertSelected(alert.id)"
+                        (change)="toggleAlertSelected(alert.id)"
                       >
-                      <label [for]="'alerta-' + alerta.id" class="alerta-label">
+                      <label [for]="'alerta-' + alert.id" class="alerta-label">
                         <div class="alerta-info">
-                          <span class="alerta-tipo">{{ etiquetaTipo(alerta.tipo) }} · {{ alerta.nombre }}</span>
-                          <span class="alerta-ubicacion">{{ alerta.ubicacion }}</span>
-                          <span class="alerta-fecha">{{ alerta.tiempo }}</span>
+                          <span class="alerta-tipo">{{ typeLabel(alert.tipo) }} · {{ alert.nombre }}</span>
+                          <span class="alerta-ubicacion">{{ alert.location }}</span>
+                          <span class="alerta-fecha">{{ alert.time }}</span>
                         </div>
-                        <span class="alerta-estado status {{ getStatusClass(alerta.estado) }}">
-                          {{ alerta.estado }}
+                        <span class="alerta-estado status {{ getStatusClass(alert.estado) }}">
+                          {{ alert.estado }}
                         </span>
                       </label>
                     </div>
@@ -356,8 +356,8 @@
                 <label>Ciudad</label>
                 <select 
                   name="ciudad"
-                  [(ngModel)]="modeloCiudad"
-                  (ngModelChange)="modeloCiudad = $event"
+                  [(ngModel)]="cityModel"
+                  (ngModelChange)="cityModel = $event"
                 >
                   <option value="">Seleccionar</option>
                   <option value="Neiva">Neiva</option>
@@ -372,8 +372,8 @@
                 <label>Estado</label>
                 <select 
                   name="estado"
-                  [(ngModel)]="modeloEstado"
-                  (ngModelChange)="modeloEstado = $event"
+                  [(ngModel)]="statusModel"
+                  (ngModelChange)="statusModel = $event"
                 >
                   <option value="Pendiente">Pendiente</option>
                   <option value="Cerrada">Cerrada</option>
@@ -388,8 +388,8 @@
                 <input 
                   type="text" 
                   name="usuaria"
-                  [(ngModel)]="modeloUsuaria"
-                  (ngModelChange)="modeloUsuaria = $event"
+                  [(ngModel)]="userModel"
+                  (ngModelChange)="userModel = $event"
                   placeholder="Nombre de la usuaria"
                 >
               </div>
@@ -399,8 +399,8 @@
                 <input 
                   type="text" 
                   name="acontecimiento"
-                  [(ngModel)]="modeloAcontecimiento"
-                  (ngModelChange)="modeloAcontecimiento = $event"
+                  [(ngModel)]="incidentModel"
+                  (ngModelChange)="incidentModel = $event"
                   placeholder="Descripción breve del acontecimiento"
                 >
               </div>
@@ -410,8 +410,8 @@
               <label>Descripción</label>
               <textarea 
                 name="descripcion"
-                [(ngModel)]="modeloDescripcion"
-                (ngModelChange)="modeloDescripcion = $event"
+                [(ngModel)]="descriptionModel"
+                (ngModelChange)="descriptionModel = $event"
                 placeholder="Descripción detallada del reporte..."
                 rows="3"
               ></textarea>
@@ -419,17 +419,17 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
+          <button type="button" class="btn-secondary" (click)="closeNewModal()">Cancelar</button>
           <button 
             type="button"
             class="btn-primary" 
-            (click)="reporteEditando ? actualizarReporte() : crearReporte()"
-            [disabled]="cargando"
+            (click)="editingReport ? updateReport() : createReport()"
+            [disabled]="loading"
           >
-            @if (cargando) {
+            @if (loading) {
               <i class="fa-solid fa-spinner fa-spin"></i>
             }
-            {{ reporteEditando ? 'Actualizar' : 'Agregar' }}
+            {{ editingReport ? 'Actualizar' : 'Agregar' }}
           </button>
         </div>
       </div>
@@ -437,12 +437,12 @@
   }
 
   <!-- MODAL VER REPORTE -->
-  @if (mostrarModalVer && reporteSeleccionado) {
-    <div class="modal-overlay" (click)="cerrarModalVer()">
+  @if (showViewModal && selectedReport) {
+    <div class="modal-overlay" (click)="closeViewModal()">
       <div class="modal-content modal-large" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>Detalle del Reporte</h2>
-          <button class="modal-close" (click)="cerrarModalVer()">
+          <button class="modal-close" (click)="closeViewModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -453,50 +453,50 @@
                 <i class="fa-solid fa-file-lines"></i>
               </div>
               <div class="detail-info">
-                <h3>{{ reporteSeleccionado.nombre }}</h3>
-                <span class="status {{ getStatusClass(reporteSeleccionado.estado) }}">{{ reporteSeleccionado.estado }}</span>
+                <h3>{{ selectedReport.nombre }}</h3>
+                <span class="status {{ getStatusClass(selectedReport.estado) }}">{{ selectedReport.estado }}</span>
               </div>
             </div>
             
             <div class="detail-grid">
               <div class="detail-item">
                 <label>ID</label>
-                <p>{{ reporteSeleccionado.id }}</p>
+                <p>{{ selectedReport.id }}</p>
               </div>
               <div class="detail-item">
                 <label>Fecha</label>
-                <p>{{ formatearFecha(reporteSeleccionado.fecha) }}</p>
+                <p>{{ formatDate(selectedReport.fecha) }}</p>
               </div>
               <div class="detail-item">
                 <label>Ciudad</label>
-                <p>{{ reporteSeleccionado.ciudad }}</p>
+                <p>{{ selectedReport.city }}</p>
               </div>
               <div class="detail-item">
                 <label>Usuaria</label>
-                <p>{{ reporteSeleccionado.usuaria || '-' }}</p>
+                <p>{{ selectedReport.user || '-' }}</p>
               </div>
               <div class="detail-item">
                 <label>Acontecimiento</label>
-                <p>{{ reporteSeleccionado.acontecimiento || '-' }}</p>
+                <p>{{ selectedReport.incident || '-' }}</p>
               </div>
               <div class="detail-item">
                 <label>Generado por</label>
-                <p>{{ reporteSeleccionado.generadoPor }}</p>
+                <p>{{ selectedReport.generatedBy }}</p>
               </div>
               <div class="detail-item">
                 <label>Formato</label>
-                <p>{{ reporteSeleccionado.formato }}</p>
+                <p>{{ selectedReport.format }}</p>
               </div>
               <div class="detail-item">
                 <label>Tamaño</label>
-                <p>{{ reporteSeleccionado.tamano }}</p>
+                <p>{{ selectedReport.size }}</p>
               </div>
             </div>
             
-            @if (reporteSeleccionado.descripcion) {
+            @if (selectedReport.description) {
               <div class="detail-description">
                 <label>Descripción</label>
-                <p>{{ reporteSeleccionado.descripcion }}</p>
+                <p>{{ selectedReport.description }}</p>
               </div>
             }
           </div>
@@ -504,41 +504,41 @@
         <div class="modal-footer">
           <button 
             class="btn-action pdf" 
-            (click)="descargarPDF(reporteSeleccionado.id)"
+            (click)="downloadPdf(selectedReport.id)"
           >
             <i class="fa-solid fa-file-pdf"></i>
             Descargar PDF
           </button>
           <button 
             class="btn-action excel" 
-            (click)="descargarExcel(reporteSeleccionado.id)"
+            (click)="downloadExcel(selectedReport.id)"
           >
             <i class="fa-solid fa-file-excel"></i>
             Descargar Excel
           </button>
           <button 
             class="btn-action print" 
-            (click)="imprimir()"
+            (click)="print()"
           >
             <i class="fa-solid fa-print"></i>
             Imprimir
           </button>
-          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+          <button class="btn-secondary" (click)="closeViewModal()">Cerrar</button>
         </div>
       </div>
     </div>
   }
 
   <!-- MODAL ALERTA IMPRESORA -->
-  @if (mostrarModalImpresora) {
-    <div class="modal-overlay modal-impresora" (click)="cerrarModalImpresora()">
+  @if (showPrinterModal) {
+    <div class="modal-overlay modal-impresora" (click)="closePrinterModal()">
       <div class="modal-content modal-impresora-content" (click)="$event.stopPropagation()">
         <div class="modal-header modal-impresora-header">
           <div class="impresora-icon">
             <i class="fa-solid fa-print"></i>
           </div>
           <h2>¡No se ha encontrado impresora!</h2>
-          <button class="modal-close" (click)="cerrarModalImpresora()">
+          <button class="modal-close" (click)="closePrinterModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -547,7 +547,7 @@
           <p class="mensaje-final">¡Ten lindo día!!</p>
         </div>
         <div class="modal-footer modal-impresora-footer">
-          <button class="btn-primary" (click)="cerrarModalImpresora()">
+          <button class="btn-primary" (click)="closePrinterModal()">
             Entendido
           </button>
         </div>

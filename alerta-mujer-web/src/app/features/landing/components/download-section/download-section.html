@@ -7,7 +7,7 @@
             tiempo real y graba evidencias automáticamente.
         </p>
 
-        <a class="descarga-btn" [href]="urlApk" download="AlertaMujer.apk" rel="noopener">
+        <a class="descarga-btn" [href]="apkUrl" download="AlertaMujer.apk" rel="noopener">
             <i class="fa-solid fa-mobile-screen-button"></i>
             <span>
                 <strong>Descargar app</strong>
@@ -16,11 +16,11 @@
         </a>
 
         <ol class="descarga-pasos">
-            @for (paso of pasos; track paso.texto; let i = $index) {
+            @for (step of steps; track step.text; let i = $index) {
                 <li>
                     <span class="paso-numero">{{ i + 1 }}</span>
-                    <i [class]="paso.icono"></i>
-                    <span>{{ paso.texto }}</span>
+                    <i [class]="step.icon"></i>
+                    <span>{{ step.text }}</span>
                 </li>
             }
         </ol>

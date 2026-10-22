@@ -5,7 +5,7 @@ import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 import { environment } from '../../../environments/environment';
 
-const CLAVE_UUID = 'alerta-mujer-dispositivo-web';
+const UUID_KEY = 'alerta-mujer-dispositivo-web';
 
 /**
  * Notificaciones del navegador con la pestaña cerrada (Firebase Cloud Messaging). El navegador se
@@ -16,9 +16,9 @@ const CLAVE_UUID = 'alerta-mujer-dispositivo-web';
 @Injectable({ providedIn: 'root' })
 export class WebPushService {
   private http = inject(HttpClient);
-  private escuchando = false;
+  private listening = false;
 
-  get configurado(): boolean {
+  get configured(): boolean {
     return !!environment.webPushVapidKey && !!environment.firebase?.apiKey;
   }
 
@@ -26,23 +26,23 @@ export class WebPushService {
    * Registra este navegador (requiere permiso de notificaciones ya concedido). alRecibir se llama
    * cuando llega un aviso con la pestaña abierta.
    */
-  async activar(alRecibir?: () => void): Promise<boolean> {
-    if (!this.configurado || typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+  async activate(onReceive?: () => void): Promise<boolean> {
+    if (!this.configured || typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
     if (!('serviceWorker' in navigator) || !(await isSupported())) return false;
     try {
       const app = getApps().length ? getApp() : initializeApp(environment.firebase);
-      const registro = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      const record = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
       const messaging = getMessaging(app);
       const token = await getToken(messaging, {
         vapidKey: environment.webPushVapidKey,
-        serviceWorkerRegistration: registro,
+        serviceWorkerRegistration: record,
       });
       if (!token) return false;
-      const id = await this.dispositivoWeb();
+      const id = await this.webDevice();
       await firstValueFrom(this.http.put(`${environment.apiUrl}/api/devices/${id}/push-token`, { token }));
-      if (!this.escuchando) {
-        this.escuchando = true;
-        onMessage(messaging, () => alRecibir?.());
+      if (!this.listening) {
+        this.listening = true;
+        onMessage(messaging, () => onReceive?.());
       }
       return true;
     } catch (e) {
@@ -52,46 +52,46 @@ export class WebPushService {
   }
 
   // Un dispositivo "web" por navegador (se recuerda su identificador)
-  private async dispositivoWeb(): Promise<number> {
+  private async webDevice(): Promise<number> {
     let uuid = this.leerUuid();
     if (uuid) {
-      const mios = await firstValueFrom(this.http.get<{ id: number; deviceUuid?: string }[]>(`${environment.apiUrl}/api/devices/user`));
-      const existente = mios.find((d) => d.deviceUuid === uuid);
-      if (existente) return existente.id;
+      const mine = await firstValueFrom(this.http.get<{ id: number; deviceUuid?: string }[]>(`${environment.apiUrl}/api/devices/user`));
+      const existing = mine.find((d) => d.deviceUuid === uuid);
+      if (existing) return existing.id;
     } else {
       uuid = crypto.randomUUID();
-      this.guardarUuid(uuid);
+      this.saveUuid(uuid);
     }
-    const creado = await firstValueFrom(
+    const created = await firstValueFrom(
       this.http.post<{ id: number }>(`${environment.apiUrl}/api/devices`, {
         deviceUuid: uuid,
         osName: 'web',
-        deviceName: this.nombreNavegador(),
+        deviceName: this.browserName(),
         osVersion: navigator.platform || null,
         gpsStatus: 'unknown',
         status: 'active',
       }),
     );
-    return creado.id;
+    return created.id;
   }
 
-  private nombreNavegador(): string {
+  private browserName(): string {
     const ua = navigator.userAgent;
-    const navegador = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Navegador';
-    return `Panel web (${navegador})`;
+    const browser = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Navegador';
+    return `Panel web (${browser})`;
   }
 
   private leerUuid(): string | null {
     try {
-      return localStorage.getItem(CLAVE_UUID);
+      return localStorage.getItem(UUID_KEY);
     } catch {
       return null;
     }
   }
 
-  private guardarUuid(uuid: string): void {
+  private saveUuid(uuid: string): void {
     try {
-      localStorage.setItem(CLAVE_UUID, uuid);
+      localStorage.setItem(UUID_KEY, uuid);
     } catch {
       // modo privado: se creará otro dispositivo la próxima vez
     }

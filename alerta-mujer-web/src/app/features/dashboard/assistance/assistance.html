@@ -1,4 +1,4 @@
-<ng-template #icono let-c>
+<ng-template #icon let-c>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     @switch (c) {
       @case ('policia') { <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/> }
@@ -12,7 +12,7 @@
 
 <div class="as-page">
   <header class="as-titlebar">
-    <span class="as-titlebar-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: 'apoyo' }" /></span>
+    <span class="as-titlebar-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: 'apoyo' }" /></span>
     <div>
       <h1 class="as-title">Asistencia</h1>
       <p class="as-sub">Líneas de ayuda y centros de atención. Llama directamente desde aquí.</p>
@@ -26,56 +26,56 @@
       <span>Llama desde tu celular a la línea de emergencias. Es gratuita y atiende las 24 horas.</span>
     </div>
     <div class="as-sos-btn" aria-label="Línea de emergencias">
-      <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'linea' }" />
-      {{ numeroEmergencia }}
+      <ng-container *ngTemplateOutlet="icon; context: { $implicit: 'linea' }" />
+      {{ emergencyNumber }}
     </div>
   </section>
 
   @if (error()) {
     <div class="as-alert as-alert--error" role="alert">{{ error() }}</div>
   }
-  @if (aviso()) {
-    <div class="as-alert as-alert--info" role="status">{{ aviso() }}</div>
+  @if (notice()) {
+    <div class="as-alert as-alert--info" role="status">{{ notice() }}</div>
   }
 
   <!-- Pestañas -->
   <div class="as-subtabs" role="tablist">
     <button role="tab" class="as-subtab" [class.as-subtab--active]="tab() === 'lineas'" [attr.aria-selected]="tab() === 'lineas'" (click)="setTab('lineas')">
-      Líneas de ayuda <span class="as-count">{{ lineas().length }}</span>
+      Líneas de ayuda <span class="as-count">{{ lines().length }}</span>
     </button>
     <button role="tab" class="as-subtab" [class.as-subtab--active]="tab() === 'centros'" [attr.aria-selected]="tab() === 'centros'" (click)="setTab('centros')">
-      Centros de atención <span class="as-count">{{ totalCentros() }}</span>
+      Centros de atención <span class="as-count">{{ totalCenters() }}</span>
     </button>
     <button role="tab" class="as-subtab" [class.as-subtab--active]="tab() === 'llamadas'" [attr.aria-selected]="tab() === 'llamadas'" (click)="setTab('llamadas')">
-      Mis llamadas <span class="as-count">{{ llamadas().length }}</span>
+      Mis llamadas <span class="as-count">{{ calls().length }}</span>
     </button>
   </div>
 
-  @if (cargando()) {
+  @if (loading()) {
     <p class="as-muted">Cargando recursos de ayuda…</p>
   }
 
   <!-- ══════════ LÍNEAS ══════════ -->
-  <section [hidden]="tab() !== 'lineas' || cargando()">
+  <section [hidden]="tab() !== 'lineas' || loading()">
     <div class="as-lines">
-      @for (r of lineas(); track r.id) {
-        <article class="as-line" [style.--cat]="categorias[r.categoria].color">
+      @for (r of lines(); track r.id) {
+        <article class="as-line" [style.--cat]="categories[r.category].color">
           <header class="as-line-head">
-            <span class="as-line-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: r.categoria }" /></span>
+            <span class="as-line-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r.category }" /></span>
             <div class="as-line-titles">
               <h2>{{ r.nombre }}</h2>
-              <span>{{ categorias[r.categoria].etiqueta }} · {{ r.ciudad }}</span>
+              <span>{{ categories[r.category].label }} · {{ r.city }}</span>
             </div>
           </header>
-          @if (r.descripcion) {
-            <p class="as-line-desc">{{ r.descripcion }}</p>
+          @if (r.description) {
+            <p class="as-line-desc">{{ r.description }}</p>
           }
           <div class="as-line-number">{{ r.telefono }}</div>
           <div class="as-line-actions">
-            <button class="as-btn as-btn--ghost" (click)="copiar(r.telefono!)" [attr.aria-label]="'Copiar número de ' + r.nombre">Copiar número</button>
+            <button class="as-btn as-btn--ghost" (click)="copy(r.telefono!)" [attr.aria-label]="'Copiar número de ' + r.nombre">Copiar número</button>
           </div>
-          @if (r.telefono2) {
-            <p class="as-line-desc">Otro número: {{ r.telefono2 }}</p>
+          @if (r.telephone2) {
+            <p class="as-line-desc">Otro número: {{ r.telephone2 }}</p>
           }
         </article>
       } @empty {
@@ -86,51 +86,51 @@
   </section>
 
   <!-- ══════════ CENTROS ══════════ -->
-  <section class="as-centers" [hidden]="tab() !== 'centros' || cargando()">
+  <section class="as-centers" [hidden]="tab() !== 'centros' || loading()">
     <div class="as-card as-centers-list">
       <div class="as-toolbar">
         <div class="as-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <input type="search" placeholder="Buscar centro, dirección o tipo" aria-label="Buscar centros"
-                 [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+                 [ngModel]="search()" (ngModelChange)="search.set($event)" />
         </div>
-        @if (!miPosicion()) {
-          <button class="as-btn as-btn--ghost as-btn--sm" (click)="usarMiUbicacion()">Cerca de mi celular</button>
+        @if (!myPosition()) {
+          <button class="as-btn as-btn--ghost as-btn--sm" (click)="useMyLocation()">Cerca de mi celular</button>
         }
       </div>
 
       <div class="as-filters">
-        <button class="as-filter" [class.active]="filtro() === null" (click)="filtro.set(null)">Todos <span>{{ totalCentros() }}</span></button>
-        @for (c of listaCategorias; track c) {
-          @if (conteoCentros()[c] > 0) {
-            <button class="as-filter" [class.active]="filtro() === c" [style.--cat]="categorias[c].color" (click)="filtro.set(filtro() === c ? null : c)">
-              <i class="as-dot"></i>{{ categorias[c].etiqueta }} <span>{{ conteoCentros()[c] }}</span>
+        <button class="as-filter" [class.active]="filter() === null" (click)="filter.set(null)">Todos <span>{{ totalCenters() }}</span></button>
+        @for (c of categoryList; track c) {
+          @if (centerCount()[c] > 0) {
+            <button class="as-filter" [class.active]="filter() === c" [style.--cat]="categories[c].color" (click)="filter.set(filter() === c ? null : c)">
+              <i class="as-dot"></i>{{ categories[c].label }} <span>{{ centerCount()[c] }}</span>
             </button>
           }
         }
       </div>
 
       <ul class="as-list">
-        @for (r of centros(); track r.id) {
-          <li class="as-item" [class.as-item--selected]="seleccionado() === r.id" [style.--cat]="categorias[r.categoria].color">
-            <button class="as-item-main" (click)="verEnMapa(r)">
-              <span class="as-item-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: r.categoria }" /></span>
+        @for (r of centers(); track r.id) {
+          <li class="as-item" [class.as-item--selected]="selected() === r.id" [style.--cat]="categories[r.category].color">
+            <button class="as-item-main" (click)="viewOnMap(r)">
+              <span class="as-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r.category }" /></span>
               <span class="as-item-text">
                 <span class="as-item-name">{{ r.nombre }}</span>
-                <span class="as-item-type">{{ categorias[r.categoria].etiqueta }}{{ formatoDistancia(r) ? ' · a ' + formatoDistancia(r) : '' }}</span>
-                @if (r.descripcion) { <span class="as-item-meta">{{ r.descripcion }}</span> }
-                <span class="as-item-meta">{{ r.direccion ? r.direccion + ', ' : '' }}{{ r.ciudad }}</span>
+                <span class="as-item-type">{{ categories[r.category].label }}{{ distanceFormat(r) ? ' · a ' + distanceFormat(r) : '' }}</span>
+                @if (r.description) { <span class="as-item-meta">{{ r.description }}</span> }
+                <span class="as-item-meta">{{ r.address ? r.address + ', ' : '' }}{{ r.city }}</span>
               </span>
             </button>
             <div class="as-item-actions">
-              <a class="as-btn as-btn--ghost as-btn--sm" [href]="comoLlegar(r)" target="_blank" rel="noopener">Cómo llegar</a>
+              <a class="as-btn as-btn--ghost as-btn--sm" [href]="directions(r)" target="_blank" rel="noopener">Cómo llegar</a>
               @if (r.telefono) {
                 <span class="as-item-meta">Tel. {{ r.telefono }}</span>
               }
             </div>
           </li>
         } @empty {
-          <li class="as-empty">{{ busqueda() || filtro() ? 'Nada coincide con la búsqueda.' : 'No hay centros con ubicación registrados.' }}</li>
+          <li class="as-empty">{{ search() || filter() ? 'Nada coincide con la búsqueda.' : 'No hay centros con ubicación registrados.' }}</li>
         }
       </ul>
     </div>
@@ -141,19 +141,19 @@
   </section>
 
   <!-- ══════════ MIS LLAMADAS ══════════ -->
-  <section class="as-card" [hidden]="tab() !== 'llamadas' || cargando()">
+  <section class="as-card" [hidden]="tab() !== 'llamadas' || loading()">
     <p class="as-muted">Llamadas que hiciste desde la app móvil de AlertaMujer. Solo tú puedes verlas.</p>
     <ul class="as-list">
-      @for (l of llamadas(); track l.id) {
-        @let r = recursoDe(l);
-        <li class="as-call" [style.--cat]="r ? categorias[r.categoria].color : null">
-          <span class="as-item-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: r?.categoria ?? 'linea' }" /></span>
+      @for (l of calls(); track l.id) {
+        @let r = resourceOf(l);
+        <li class="as-call" [style.--cat]="r ? categories[r.category].color : null">
+          <span class="as-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r?.category ?? 'linea' }" /></span>
           <span class="as-item-text">
             <span class="as-item-name">{{ r?.nombre ?? 'Recurso eliminado' }}</span>
             <span class="as-item-meta">{{ l.telefono }} · {{ fecha(l.fecha) }} · {{ estado(l.estado) }}</span>
           </span>
           <div class="as-item-actions">
-            <button class="as-icon-btn" title="Borrar del historial" aria-label="Borrar del historial" (click)="eliminarLlamada(l)">
+            <button class="as-icon-btn" title="Borrar del historial" aria-label="Borrar del historial" (click)="deleteCall(l)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>

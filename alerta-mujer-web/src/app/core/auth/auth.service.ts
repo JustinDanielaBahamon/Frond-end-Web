@@ -9,7 +9,7 @@ export interface User {
   id: number;
   nombre: string;
   email: string;
-  rol: string;
+  role: string;
   firstName?: string;
   lastName?: string;
   telephone?: string;
@@ -22,13 +22,13 @@ export interface LoginCredentials {
 }
 
 /* Datos que llegan desde el formulario de registro */
-export interface RegistroUsuaria {
+export interface UserRecord {
   nombre: string;
   telefono: string;
   tipoDocumento: string;
   numeroDocumento: string;
   fechaNacimiento: string; // DD/MM/AAAA
-  correo: string;
+  email: string;
   password: string;
   /** Marcó términos y privacidad: el backend guarda cuándo y qué versión aceptó. */
   aceptaTerminos: boolean;
@@ -53,7 +53,7 @@ export class AuthService {
       email: credentials.email,
       password: credentials.password
     }).pipe(
-      map((response) => this.iniciarSesion(response)),
+      map((response) => this.signIn(response)),
       catchError((error) => {
         console.error('Error en login:', error);
         return throwError(() => new Error('Credenciales incorrectas'));
@@ -63,10 +63,10 @@ export class AuthService {
 
   /* Registro completo: guarda a la usuaria con todos sus datos.
      No inicia sesión: después del registro se va al login. */
-  registrar(data: RegistroUsuaria): Observable<User> {
+  registrar(data: UserRecord): Observable<User> {
     return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.nombre.trim(),
-      email: data.correo.trim(),
+      email: data.email.trim(),
       password: data.password,
       telefono: data.telefono.trim(),
       tipoDocumento: data.tipoDocumento,
@@ -80,7 +80,7 @@ export class AuthService {
           id: backendUser.id,
           nombre: `${backendUser.firstName} ${backendUser.lastName}`,
           email: backendUser.email,
-          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+          role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
           firstName: backendUser.firstName,
           lastName: backendUser.lastName,
           telephone: backendUser.telephone,
@@ -108,7 +108,7 @@ export class AuthService {
         headers: { Authorization: `Bearer ${token}` }
       }).subscribe({ error: () => {} });
     }
-    this.cerrarSesionLocal();
+    this.signOutLocally();
     this.router.navigate(['/auth/login']);
   }
 
@@ -120,24 +120,24 @@ export class AuthService {
     return this._currentUser$.value;
   }
 
-  getRol(): string {
+  getRole(): string {
     const user = this._currentUser$.value;
-    return user?.rol ?? '';
+    return user?.role ?? '';
   }
 
   /** Hay sesión solo si existe un token y todavía no ha vencido. */
   isLoggedIn(): boolean {
     const token = this.getToken();
     if (!token) return false;
-    if (this.tokenVencido(token)) {
-      this.cerrarSesionLocal();
+    if (this.tokenExpired(token)) {
+      this.signOutLocally();
       return false;
     }
     return true;
   }
 
   /** Milisegundos que le quedan a la sesión de la web (el token vence a las 24 h), o null sin sesión. */
-  tiempoRestanteMs(): number | null {
+  remainingTimeMs(): number | null {
     const token = this.getToken();
     if (!token) return null;
     try {
@@ -149,7 +149,7 @@ export class AuthService {
   }
 
   /** Lee el campo exp del JWT (segundos). Un token ilegible se trata como vencido. */
-  private tokenVencido(token: string): boolean {
+  private tokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
@@ -159,18 +159,18 @@ export class AuthService {
   }
 
   /** Borra la sesión sin navegar (lo usan el guard y el interceptor). */
-  cerrarSesionLocal(): void {
+  signOutLocally(): void {
     localStorage.removeItem(STORAGE_KEY);
     this._currentUser$.next(null);
     this._token$.next(null);
   }
 
   /** Actualiza los datos de la usuaria en sesión (p. ej. tras editar su nombre) sin tocar el token. */
-  actualizarUsuarioActual(cambios: Partial<User>): void {
+  updateCurrentUser(changes: Partial<User>): void {
     const actual = this._currentUser$.value;
     const token = this._token$.value;
     if (!actual || !token) return;
-    const user: User = { ...actual, ...cambios };
+    const user: User = { ...actual, ...changes };
     user.nombre = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || actual.nombre;
     this.saveSession(user, token);
     this._currentUser$.next(user);
@@ -181,24 +181,24 @@ export class AuthService {
     return this.http
       .post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, { idToken })
       .pipe(
-        map((response) => this.iniciarSesion(response)),
+        map((response) => this.signIn(response)),
         catchError((error) => {
-          const mensaje = error?.error?.message === 'Account blocked'
+          const message = error?.error?.message === 'Account blocked'
             ? 'Tu cuenta está bloqueada. Contacta al administrador.'
             : 'No se pudo iniciar sesión con Google. Intenta de nuevo.';
-          return throwError(() => new Error(mensaje));
+          return throwError(() => new Error(message));
         })
       );
   }
 
   /** Adapta la respuesta del backend al modelo User de Angular y guarda la sesión. */
-  private iniciarSesion(response: { token: string; user: any }): User {
+  private signIn(response: { token: string; user: any }): User {
     const backendUser = response.user;
     const user: User = {
       id: backendUser.id,
       nombre: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
       email: backendUser.email,
-      rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+      role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
       firstName: backendUser.firstName,
       lastName: backendUser.lastName,
       telephone: backendUser.telephone,

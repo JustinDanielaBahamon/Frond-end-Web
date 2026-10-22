@@ -9,22 +9,22 @@ import { Injectable } from '@angular/core';
 export class RegisterDraftService {
 
   /* Lo que la usuaria ya escribió en el formulario */
-  valores: any = null;
+  values: any = null;
 
   /* Marcan si ya abrió cada texto (permiten marcar la casilla) */
-  terminosLeidos = false;
-  privacidadLeida = false;
+  termsRead = false;
+  privacyRead = false;
 
   /* Estado de las casillas */
   aceptaTerminos = false;
-  aceptaPrivacidad = false;
+  acceptsPrivacy = false;
 
   /* Se llama cuando el registro termina bien */
-  limpiar(): void {
-    this.valores = null;
-    this.terminosLeidos = false;
-    this.privacidadLeida = false;
+  clear(): void {
+    this.values = null;
+    this.termsRead = false;
+    this.privacyRead = false;
     this.aceptaTerminos = false;
-    this.aceptaPrivacidad = false;
+    this.acceptsPrivacy = false;
   }
 }

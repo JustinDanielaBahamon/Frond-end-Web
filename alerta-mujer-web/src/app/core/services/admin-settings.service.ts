@@ -4,28 +4,28 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 /** Parámetros globales de la app que edita la administración. */
-export interface ParametrosApp {
-  duracionMaximaAlertaMin: number;
-  numeroEmergencia: string;
-  correoSoporte: string;
-  maxContactos: number;
+export interface AppSettings {
+  maxAlertDurationMin: number;
+  emergencyNumber: string;
+  supportEmail: string;
+  maxContacts: number;
   /** '' = no se exige versión mínima de la app móvil */
   versionMinimaApp: string;
-  actualizado: Date | null;
+  updated: Date | null;
 }
 
-export interface EstadoSistema {
-  baseDatos: boolean;
-  latenciaMs: number;
-  notificacionesPush: boolean;
-  alertasActivas: number;
-  ultimaRevisionExpiracion: Date | null;
-  expiradasUltimaRevision: number;
-  enLineaDesde: Date;
+export interface SystemStatus {
+  database: boolean;
+  latencyMs: number;
+  pushNotifications: boolean;
+  activeAlerts: number;
+  lastExpirationRun: Date | null;
+  expiredLastRun: number;
+  onlineSince: Date;
 }
 
 
-export interface DatosContacto {
+export interface ContactData {
   firstName: string;
   lastName: string;
   telephone: string;
@@ -45,59 +45,59 @@ export class AdminSettingsService {
   private http = inject(HttpClient);
   private api = environment.apiUrl;
 
-  obtenerParametros(): Observable<ParametrosApp> {
-    return this.http.get<SettingsApi>(`${this.api}/api/admin/settings`).pipe(map(s => this.desdeApi(s)));
+  getSettings(): Observable<AppSettings> {
+    return this.http.get<SettingsApi>(`${this.api}/api/admin/settings`).pipe(map(s => this.fromApi(s)));
   }
 
-  guardarParametros(p: Omit<ParametrosApp, 'actualizado'>): Observable<ParametrosApp> {
+  saveSettings(p: Omit<AppSettings, 'updated'>): Observable<AppSettings> {
     return this.http.put<SettingsApi>(`${this.api}/api/admin/settings`, {
-      sosMaxDurationMinutes: p.duracionMaximaAlertaMin,
-      emergencyPhoneNumber: p.numeroEmergencia,
-      supportEmail: p.correoSoporte,
-      maxEmergencyContacts: p.maxContactos,
+      sosMaxDurationMinutes: p.maxAlertDurationMin,
+      emergencyPhoneNumber: p.emergencyNumber,
+      supportEmail: p.supportEmail,
+      maxEmergencyContacts: p.maxContacts,
       minAppVersion: p.versionMinimaApp
-    }).pipe(map(s => this.desdeApi(s)));
+    }).pipe(map(s => this.fromApi(s)));
   }
 
-  obtenerMisDatos(): Observable<DatosContacto> {
-    return this.http.get<DatosContacto>(`${this.api}/api/users/me`).pipe(
+  getMyData(): Observable<ContactData> {
+    return this.http.get<ContactData>(`${this.api}/api/users/me`).pipe(
       map(u => ({ firstName: u.firstName ?? '', lastName: u.lastName ?? '', telephone: u.telephone ?? '' }))
     );
   }
 
-  obtenerEstado(): Observable<EstadoSistema> {
+  getStatus(): Observable<SystemStatus> {
     return this.http.get<any>(`${this.api}/api/admin/system-status`).pipe(map(s => ({
-      baseDatos: s.database,
-      latenciaMs: s.databaseLatencyMs,
-      notificacionesPush: s.pushNotifications,
-      alertasActivas: s.activeAlerts,
-      ultimaRevisionExpiracion: s.lastExpirationCheck ? new Date(s.lastExpirationCheck) : null,
-      expiradasUltimaRevision: s.lastExpiredCount,
-      enLineaDesde: new Date(s.startedAt)
+      database: s.database,
+      latencyMs: s.databaseLatencyMs,
+      pushNotifications: s.pushNotifications,
+      activeAlerts: s.activeAlerts,
+      lastExpirationRun: s.lastExpirationCheck ? new Date(s.lastExpirationCheck) : null,
+      expiredLastRun: s.lastExpiredCount,
+      onlineSince: new Date(s.startedAt)
     })));
   }
 
 
   /** Datos de la cuenta en sesión (nombre y teléfono). */
-  actualizarMisDatos(datos: DatosContacto): Observable<DatosContacto> {
-    return this.http.put<DatosContacto>(`${this.api}/api/users/me`, datos);
+  updateMyData(data: ContactData): Observable<ContactData> {
+    return this.http.put<ContactData>(`${this.api}/api/users/me`, data);
   }
 
-  cambiarContrasena(actual: string, nueva: string): Observable<void> {
+  changePassword(actual: string, newOne: string): Observable<void> {
     return this.http.put<void>(`${this.api}/api/users/me/password`, {
       currentPassword: actual,
-      newPassword: nueva
+      newPassword: newOne
     });
   }
 
-  private desdeApi(s: SettingsApi): ParametrosApp {
+  private fromApi(s: SettingsApi): AppSettings {
     return {
-      duracionMaximaAlertaMin: s.sosMaxDurationMinutes,
-      numeroEmergencia: s.emergencyPhoneNumber,
-      correoSoporte: s.supportEmail,
-      maxContactos: s.maxEmergencyContacts,
+      maxAlertDurationMin: s.sosMaxDurationMinutes,
+      emergencyNumber: s.emergencyPhoneNumber,
+      supportEmail: s.supportEmail,
+      maxContacts: s.maxEmergencyContacts,
       versionMinimaApp: s.minAppVersion ?? '',
-      actualizado: s.updatedAt ? new Date(s.updatedAt) : null
+      updated: s.updatedAt ? new Date(s.updatedAt) : null
     };
   }
 }

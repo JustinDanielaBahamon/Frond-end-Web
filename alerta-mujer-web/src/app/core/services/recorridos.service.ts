@@ -3,40 +3,40 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface PuntoGPS {
+export interface GpsPoint {
   latitude: number;
   longitude: number;
   timestamp: string;
 }
 
 /** Recorrido tal como lo usa la UI (misma forma que en la app móvil). */
-export interface Recorrido {
+export interface SavedRoute {
   id: number;
   fecha: string;
-  tiempoEstimado: string;
-  distanciaEstimada: string;
-  barrioInicio: string;
-  barrioFin: string;
-  municipio: string;
-  departamento: string;
-  pais: string;
-  puntos: PuntoGPS[];
-  cantidadPuntos: number;
+  estimatedTime: string;
+  estimatedDistance: string;
+  startNeighborhood: string;
+  endNeighborhood: string;
+  municipality: string;
+  department: string;
+  country: string;
+  puntos: GpsPoint[];
+  pointCount: number;
   esManual: boolean;
-  nombrePersonalizado?: string;
-  importante: boolean;
+  customName?: string;
+  important: boolean;
 }
 
-export interface NuevoRecorrido {
+export interface NewRoute {
   nombre: string;
-  inicio: string;
-  fin: string;
-  puntos: PuntoGPS[];
-  distanciaKm: number;
-  minutosEstimados: number;
-  municipio?: string;
-  departamento?: string;
-  pais?: string;
+  start: string;
+  end: string;
+  puntos: GpsPoint[];
+  distanceKm: number;
+  estimatedMinutes: number;
+  municipality?: string;
+  department?: string;
+  country?: string;
 }
 
 export interface ServiceResult {
@@ -55,107 +55,107 @@ interface SavedRouteApi {
   country?: string;
   distanceKm?: number;
   estimatedMinutes?: number;
-  points: PuntoGPS[];
+  points: GpsPoint[];
   isStarred: boolean;
   isManual: boolean;
   createdAt: string;
 }
 
 // Reglas de negocio (iguales en móvil y backend; el backend es quien las garantiza)
-const MAX_RECORRIDOS = 4;
-const MAX_ESTRELLAS = 2;
+const MAX_ROUTES = 4;
+const MAX_STARRED = 2;
 
 // Versión anterior: los recorridos vivían solo en este navegador
 const LEGACY_STORAGE_KEY = 'alerta_mujer_recorridos';
 
 @Injectable({ providedIn: 'root' })
-export class RecorridosService {
+export class RoutesService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/api/saved-routes`;
 
-  private recorridos = signal<Recorrido[]>([]);
-  readonly cargando = signal(false);
+  private routes = signal<SavedRoute[]>([]);
+  readonly loading = signal(false);
 
-  get recorridos$() {
-    return this.recorridos;
+  get routes$() {
+    return this.routes;
   }
 
-  get limiteRecorridos(): number {
-    return MAX_RECORRIDOS;
+  get routeLimit(): number {
+    return MAX_ROUTES;
   }
 
-  get limiteEstrellas(): number {
-    return MAX_ESTRELLAS;
+  get starLimit(): number {
+    return MAX_STARRED;
   }
 
   /** Carga los recorridos de la usuaria y sube (una sola vez) los que hubiera en localStorage. */
-  async cargar(): Promise<ServiceResult> {
-    this.cargando.set(true);
+  async load(): Promise<ServiceResult> {
+    this.loading.set(true);
     try {
-      await this.migrarLocales();
-      await this.refrescar();
+      await this.migrateLocal();
+      await this.refresh();
       return { ok: true };
     } catch (err) {
-      return { ok: false, error: this.mensajeError(err, 'No se pudieron cargar tus recorridos.') };
+      return { ok: false, error: this.errorMessage(err, 'No se pudieron cargar tus recorridos.') };
     } finally {
-      this.cargando.set(false);
+      this.loading.set(false);
     }
   }
 
-  async agregarRecorrido(nuevo: NuevoRecorrido): Promise<ServiceResult> {
-    if (this.recorridos().length >= MAX_RECORRIDOS) {
-      return { ok: false, error: `Solo puedes tener ${MAX_RECORRIDOS} recorridos guardados. Elimina uno para crear otro.` };
+  async addRoute(newOne: NewRoute): Promise<ServiceResult> {
+    if (this.routes().length >= MAX_ROUTES) {
+      return { ok: false, error: `Solo puedes tener ${MAX_ROUTES} recorridos guardados. Elimina uno para crear otro.` };
     }
     try {
-      const creado = await firstValueFrom(this.http.post<SavedRouteApi>(this.baseUrl, this.toApi(nuevo)));
-      this.recorridos.update((prev) => [this.fromApi(creado), ...prev]);
+      const created = await firstValueFrom(this.http.post<SavedRouteApi>(this.baseUrl, this.toApi(newOne)));
+      this.routes.update((prev) => [this.fromApi(created), ...prev]);
       return { ok: true };
     } catch (err) {
-      return { ok: false, error: this.mensajeError(err, 'No se pudo guardar el recorrido.') };
+      return { ok: false, error: this.errorMessage(err, 'No se pudo guardar el recorrido.') };
     }
   }
 
-  async eliminarRecorrido(id: number): Promise<ServiceResult> {
+  async deleteRoute(id: number): Promise<ServiceResult> {
     try {
       await firstValueFrom(this.http.delete<void>(`${this.baseUrl}/${id}`));
-      this.recorridos.update((prev) => prev.filter((r) => r.id !== id));
+      this.routes.update((prev) => prev.filter((r) => r.id !== id));
       return { ok: true };
     } catch (err) {
-      return { ok: false, error: this.mensajeError(err, 'No se pudo eliminar el recorrido.') };
+      return { ok: false, error: this.errorMessage(err, 'No se pudo eliminar el recorrido.') };
     }
   }
 
-  async toggleImportante(id: number): Promise<ServiceResult> {
-    const objetivo = this.recorridos().find((r) => r.id === id);
-    if (!objetivo) {
+  async toggleImportant(id: number): Promise<ServiceResult> {
+    const target = this.routes().find((r) => r.id === id);
+    if (!target) {
       return { ok: false, error: 'Recorrido no encontrado.' };
     }
-    if (!objetivo.importante && this.recorridos().filter((r) => r.importante).length >= MAX_ESTRELLAS) {
-      return { ok: false, error: `Solo puedes tener ${MAX_ESTRELLAS} recorridos estrella. Quita la estrella a otro para marcar este.` };
+    if (!target.important && this.routes().filter((r) => r.important).length >= MAX_STARRED) {
+      return { ok: false, error: `Solo puedes tener ${MAX_STARRED} recorridos estrella. Quita la estrella a otro para marcar este.` };
     }
     try {
-      const actualizado = await firstValueFrom(
-        this.http.patch<SavedRouteApi>(`${this.baseUrl}/${id}`, { isStarred: !objetivo.importante })
+      const updated = await firstValueFrom(
+        this.http.patch<SavedRouteApi>(`${this.baseUrl}/${id}`, { isStarred: !target.important })
       );
-      this.reemplazar(this.fromApi(actualizado));
+      this.replace(this.fromApi(updated));
       return { ok: true };
     } catch (err) {
-      return { ok: false, error: this.mensajeError(err, 'No se pudo actualizar el recorrido.') };
+      return { ok: false, error: this.errorMessage(err, 'No se pudo actualizar el recorrido.') };
     }
   }
 
-  private async refrescar(): Promise<void> {
-    const lista = await firstValueFrom(this.http.get<SavedRouteApi[]>(`${this.baseUrl}/me`));
-    this.recorridos.set(lista.map((r) => this.fromApi(r)));
+  private async refresh(): Promise<void> {
+    const list = await firstValueFrom(this.http.get<SavedRouteApi[]>(`${this.baseUrl}/me`));
+    this.routes.set(list.map((r) => this.fromApi(r)));
   }
 
-  private reemplazar(recorrido: Recorrido): void {
-    this.recorridos.update((prev) => prev.map((r) => (r.id === recorrido.id ? recorrido : r)));
+  private replace(route: SavedRoute): void {
+    this.routes.update((prev) => prev.map((r) => (r.id === route.id ? route : r)));
   }
 
   /** Sube al backend los recorridos guardados por la versión anterior y limpia localStorage. */
-  private async migrarLocales(): Promise<void> {
-    let locales: Array<Partial<Recorrido>> = [];
+  private async migrateLocal(): Promise<void> {
+    let locales: Array<Partial<SavedRoute>> = [];
     try {
       locales = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) ?? '[]');
     } catch {
@@ -168,13 +168,13 @@ export class RecorridosService {
       try {
         await firstValueFrom(
           this.http.post(this.baseUrl, {
-            name: r.nombrePersonalizado || `Ruta ${r.barrioInicio ?? 'A'} → ${r.barrioFin ?? 'B'}`,
-            startLabel: r.barrioInicio,
-            endLabel: r.barrioFin,
-            city: r.municipio,
-            department: r.departamento,
-            country: r.pais,
-            distanceKm: parseFloat(String(r.distanciaEstimada ?? '')) || null,
+            name: r.customName || `Ruta ${r.startNeighborhood ?? 'A'} → ${r.endNeighborhood ?? 'B'}`,
+            startLabel: r.startNeighborhood,
+            endLabel: r.endNeighborhood,
+            city: r.municipality,
+            department: r.department,
+            country: r.country,
+            distanceKm: parseFloat(String(r.estimatedDistance ?? '')) || null,
             points: r.puntos,
             isManual: r.esManual ?? true,
           })
@@ -187,50 +187,50 @@ export class RecorridosService {
     localStorage.removeItem(LEGACY_STORAGE_KEY);
   }
 
-  private toApi(nuevo: NuevoRecorrido): Partial<SavedRouteApi> {
+  private toApi(newOne: NewRoute): Partial<SavedRouteApi> {
     return {
-      name: nuevo.nombre,
-      startLabel: nuevo.inicio,
-      endLabel: nuevo.fin,
-      city: nuevo.municipio,
-      department: nuevo.departamento,
-      country: nuevo.pais,
-      distanceKm: Math.round(nuevo.distanciaKm * 100) / 100,
-      estimatedMinutes: nuevo.minutosEstimados,
-      points: nuevo.puntos,
+      name: newOne.nombre,
+      startLabel: newOne.start,
+      endLabel: newOne.end,
+      city: newOne.municipality,
+      department: newOne.department,
+      country: newOne.country,
+      distanceKm: Math.round(newOne.distanceKm * 100) / 100,
+      estimatedMinutes: newOne.estimatedMinutes,
+      points: newOne.puntos,
       isManual: true,
     };
   }
 
-  private fromApi(api: SavedRouteApi): Recorrido {
+  private fromApi(api: SavedRouteApi): SavedRoute {
     return {
       id: api.id,
       fecha: api.createdAt,
-      tiempoEstimado: formatearMinutos(api.estimatedMinutes),
-      distanciaEstimada: api.distanceKm != null ? `${Number(api.distanceKm).toFixed(2)} km` : '—',
-      barrioInicio: api.startLabel ?? 'Inicio',
-      barrioFin: api.endLabel ?? 'Fin',
-      municipio: api.city ?? '',
-      departamento: api.department ?? '',
-      pais: api.country ?? '',
+      estimatedTime: formatMinutes(api.estimatedMinutes),
+      estimatedDistance: api.distanceKm != null ? `${Number(api.distanceKm).toFixed(2)} km` : '—',
+      startNeighborhood: api.startLabel ?? 'Inicio',
+      endNeighborhood: api.endLabel ?? 'Fin',
+      municipality: api.city ?? '',
+      department: api.department ?? '',
+      country: api.country ?? '',
       puntos: api.points ?? [],
-      cantidadPuntos: api.points?.length ?? 0,
+      pointCount: api.points?.length ?? 0,
       esManual: api.isManual,
-      nombrePersonalizado: api.name,
-      importante: api.isStarred,
+      customName: api.name,
+      important: api.isStarred,
     };
   }
 
-  private mensajeError(err: unknown, porDefecto: string): string {
+  private errorMessage(err: unknown, byDefault: string): string {
     if (err instanceof HttpErrorResponse) {
       if (err.status === 0) return 'No hay conexión con el servidor.';
       if ((err.status === 409 || err.status === 400) && err.error?.message) return err.error.message;
     }
-    return porDefecto;
+    return byDefault;
   }
 }
 
-function formatearMinutos(minutos?: number): string {
+function formatMinutes(minutos?: number): string {
   if (minutos == null) return '—';
   if (minutos < 60) return `${minutos} min`;
   return `${Math.floor(minutos / 60)}h ${minutos % 60}min`;

@@ -156,30 +156,30 @@
                     'document-icon': evidence.tipo === 'documento'
                   }"
                 >
-                  <img *ngIf="evidence.tipo === 'foto' && evidence.archivoUrl" [src]="evidence.archivoUrl" alt="Preview" />
+                  <img *ngIf="evidence.tipo === 'foto' && evidence.fileUrl" [src]="evidence.fileUrl" alt="Preview" />
                   <i *ngIf="evidence.tipo === 'video'" class="fa-solid fa-video"></i>
                   <i *ngIf="evidence.tipo === 'audio'" class="fa-solid fa-headphones"></i>
                   <i *ngIf="evidence.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
-                  <i *ngIf="evidence.tipo === 'foto' && !evidence.archivoUrl" class="fa-solid fa-image"></i>
+                  <i *ngIf="evidence.tipo === 'foto' && !evidence.fileUrl" class="fa-solid fa-image"></i>
                 </div>
               </div>
             </td>
             <td>
               <div class="evidence-details">
                 <span class="evidence-name">{{ evidence.nombre }}</span>
-                <span class="evidence-id-size">ID: {{ evidence.id }} - {{ evidence.tamanio }}</span>
+                <span class="evidence-id-size">ID: {{ evidence.id }} - {{ evidence.size }}</span>
               </div>
             </td>
             <td>
               <div class="user-info">
-                <span class="user-name">{{ evidence.usuarioNombre }}</span>
-                <span class="user-email">{{ evidence.usuarioEmail }}</span>
+                <span class="user-name">{{ evidence.userName }}</span>
+                <span class="user-email">{{ evidence.userEmail }}</span>
               </div>
             </td>
             <td>
               <div class="alert-related">
                 <span class="alert-id">{{ evidence.alertaId }}</span>
-                <span class="alert-type-city">{{ evidence.alertaTipo }}<ng-container *ngIf="evidence.alertaCiudad"> - {{ evidence.alertaCiudad }}</ng-container></span>
+                <span class="alert-type-city">{{ evidence.alertType }}<ng-container *ngIf="evidence.alertCity"> - {{ evidence.alertCity }}</ng-container></span>
               </div>
             </td>
             <td>
@@ -187,20 +187,20 @@
                 {{ getEvidenceTypeDisplay(evidence.tipo) }}
               </span>
             </td>
-            <td>{{ evidence.fecha | date:'dd/MM/yyyy' }}<br>{{ evidence.hora }}</td>
+            <td>{{ evidence.fecha | date:'dd/MM/yyyy' }}<br>{{ evidence.time }}</td>
             <td>
               <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.estado)">
                 {{ evidence.estado }}
               </span>
             </td>
             <td class="actions-cell">
-              <button class="view" (click)="verEvidencia(evidence)" aria-label="Ver evidencia">
+              <button class="view" (click)="viewEvidence(evidence)" aria-label="Ver evidencia">
                 <i class="fa-solid fa-eye"></i>
               </button>
-              <button class="download" (click)="descargarEvidencia(evidence.id)" aria-label="Descargar evidencia">
+              <button class="download" (click)="downloadEvidence(evidence.id)" aria-label="Descargar evidencia">
                 <i class="fa-solid fa-download"></i>
               </button>
-              <button class="delete" (click)="eliminarEvidencia(evidence.id)" aria-label="Eliminar evidencia">
+              <button class="delete" (click)="deleteEvidence(evidence.id)" aria-label="Eliminar evidencia">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
@@ -240,12 +240,12 @@
   </div>
 
   <!-- MODAL VER EVIDENCIA -->
-  @if (mostrarModalVer && evidenciaSeleccionada) {
-    <div class="modal-overlay" (click)="cerrarModalVer()">
+  @if (showViewModal && selectedEvidence) {
+    <div class="modal-overlay" (click)="closeViewModal()">
       <div class="modal-content modal-large" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>Detalle de Evidencia</h2>
-          <button class="modal-close" (click)="cerrarModalVer()">
+          <button class="modal-close" (click)="closeViewModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -256,26 +256,26 @@
               <div class="evidence-preview-large">
                 <div class="preview-thumbnail-large"
                   [ngClass]="{
-                    'video-icon': evidenciaSeleccionada.tipo === 'video',
-                    'audio-icon': evidenciaSeleccionada.tipo === 'audio',
-                    'document-icon': evidenciaSeleccionada.tipo === 'documento'
+                    'video-icon': selectedEvidence.tipo === 'video',
+                    'audio-icon': selectedEvidence.tipo === 'audio',
+                    'document-icon': selectedEvidence.tipo === 'documento'
                   }"
                 >
-                  <img *ngIf="evidenciaSeleccionada.tipo === 'foto' && evidenciaSeleccionada.archivoUrl" [src]="evidenciaSeleccionada.archivoUrl" alt="Preview" />
-                  <i *ngIf="evidenciaSeleccionada.tipo === 'video'" class="fa-solid fa-video"></i>
-                  <i *ngIf="evidenciaSeleccionada.tipo === 'audio'" class="fa-solid fa-headphones"></i>
-                  <i *ngIf="evidenciaSeleccionada.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
-                  <i *ngIf="evidenciaSeleccionada.tipo === 'foto' && !evidenciaSeleccionada.archivoUrl" class="fa-solid fa-image"></i>
+                  <img *ngIf="selectedEvidence.tipo === 'foto' && selectedEvidence.fileUrl" [src]="selectedEvidence.fileUrl" alt="Preview" />
+                  <i *ngIf="selectedEvidence.tipo === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="selectedEvidence.tipo === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="selectedEvidence.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="selectedEvidence.tipo === 'foto' && !selectedEvidence.fileUrl" class="fa-solid fa-image"></i>
                 </div>
               </div>
               <div class="detail-info">
-                <h3>{{ evidenciaSeleccionada.nombre }}</h3>
+                <h3>{{ selectedEvidence.nombre }}</h3>
                 <div class="detail-meta">
-                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidenciaSeleccionada.estado)">
-                    {{ evidenciaSeleccionada.estado }}
+                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(selectedEvidence.estado)">
+                    {{ selectedEvidence.estado }}
                   </span>
-                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidenciaSeleccionada.tipo)">
-                    {{ getEvidenceTypeDisplay(evidenciaSeleccionada.tipo) }}
+                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(selectedEvidence.tipo)">
+                    {{ getEvidenceTypeDisplay(selectedEvidence.tipo) }}
                   </span>
                 </div>
               </div>
@@ -287,19 +287,19 @@
               <div class="detail-grid">
                 <div class="detail-item">
                   <label>ID</label>
-                  <p>{{ evidenciaSeleccionada.id }}</p>
+                  <p>{{ selectedEvidence.id }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Fecha</label>
-                  <p>{{ evidenciaSeleccionada.fecha | date:'dd/MM/yyyy' }}</p>
+                  <p>{{ selectedEvidence.fecha | date:'dd/MM/yyyy' }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Hora</label>
-                  <p>{{ evidenciaSeleccionada.hora }}</p>
+                  <p>{{ selectedEvidence.time }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Tamaño</label>
-                  <p>{{ evidenciaSeleccionada.tamanio }}</p>
+                  <p>{{ selectedEvidence.size }}</p>
                 </div>
               </div>
             </div>
@@ -310,11 +310,11 @@
               <div class="detail-grid">
                 <div class="detail-item">
                   <label>Nombre</label>
-                  <p>{{ evidenciaSeleccionada.usuarioNombre }}</p>
+                  <p>{{ selectedEvidence.userName }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Email</label>
-                  <p>{{ evidenciaSeleccionada.usuarioEmail }}</p>
+                  <p>{{ selectedEvidence.userEmail }}</p>
                 </div>
               </div>
             </div>
@@ -325,40 +325,40 @@
               <div class="detail-grid">
                 <div class="detail-item">
                   <label>ID Alerta</label>
-                  <p>{{ evidenciaSeleccionada.alertaId }}</p>
+                  <p>{{ selectedEvidence.alertaId }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Tipo</label>
-                  <p>{{ evidenciaSeleccionada.alertaTipo }}</p>
+                  <p>{{ selectedEvidence.alertType }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Ubicación de la alerta</label>
-                  <p>{{ evidenciaSeleccionada.ubicacion || 'Sin ubicación' }}</p>
+                  <p>{{ selectedEvidence.location || 'Sin ubicación' }}</p>
                 </div>
               </div>
             </div>
 
             <!-- Información adicional -->
-            @if (evidenciaSeleccionada.ubicacion || evidenciaSeleccionada.metodoActivacion || evidenciaSeleccionada.duracion) {
+            @if (selectedEvidence.location || selectedEvidence.activationMethod || selectedEvidence.duration) {
               <div class="detail-section">
                 <h4>Información Adicional</h4>
                 <div class="detail-grid">
-                  @if (evidenciaSeleccionada.ubicacion) {
+                  @if (selectedEvidence.location) {
                     <div class="detail-item">
                       <label>Ubicación</label>
-                      <p>{{ evidenciaSeleccionada.ubicacion }}</p>
+                      <p>{{ selectedEvidence.location }}</p>
                     </div>
                   }
-                  @if (evidenciaSeleccionada.metodoActivacion) {
+                  @if (selectedEvidence.activationMethod) {
                     <div class="detail-item">
                       <label>Método de Activación</label>
-                      <p>{{ evidenciaSeleccionada.metodoActivacion }}</p>
+                      <p>{{ selectedEvidence.activationMethod }}</p>
                     </div>
                   }
-                  @if (evidenciaSeleccionada.duracion) {
+                  @if (selectedEvidence.duration) {
                     <div class="detail-item">
                       <label>Duración</label>
-                      <p>{{ evidenciaSeleccionada.duracion }}</p>
+                      <p>{{ selectedEvidence.duration }}</p>
                     </div>
                   }
                 </div>
@@ -369,28 +369,28 @@
         <div class="modal-footer">
           <button 
             class="btn-action download" 
-            (click)="descargarEvidencia(evidenciaSeleccionada.id)"
+            (click)="downloadEvidence(selectedEvidence.id)"
           >
             <i class="fa-solid fa-download"></i>
             Descargar
           </button>
           <button 
             class="btn-action verify" 
-            (click)="cambiarEstadoEvidencia(evidenciaSeleccionada.id, 'Verificada')"
-            [disabled]="evidenciaSeleccionada.estado === 'Verificada'"
+            (click)="changeEvidenceStatus(selectedEvidence.id, 'Verificada')"
+            [disabled]="selectedEvidence.estado === 'Verificada'"
           >
             <i class="fa-solid fa-check"></i>
             Verificar
           </button>
           <button 
             class="btn-action reject" 
-            (click)="cambiarEstadoEvidencia(evidenciaSeleccionada.id, 'Rechazada')"
-            [disabled]="evidenciaSeleccionada.estado === 'Rechazada'"
+            (click)="changeEvidenceStatus(selectedEvidence.id, 'Rechazada')"
+            [disabled]="selectedEvidence.estado === 'Rechazada'"
           >
             <i class="fa-solid fa-xmark"></i>
             Rechazar
           </button>
-          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+          <button class="btn-secondary" (click)="closeViewModal()">Cerrar</button>
         </div>
       </div>
     </div>

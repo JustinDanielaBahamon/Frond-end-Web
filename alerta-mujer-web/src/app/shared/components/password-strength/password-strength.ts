@@ -1,20 +1,20 @@
 import { Component, computed, input } from '@angular/core';
-import { evaluarContrasena } from '../../../core/services/password.service';
+import { evaluatePassword } from '../../../core/services/password.service';
 
 /** Barra de seguridad y requisitos de una contraseña nueva. */
 @Component({
   selector: 'app-password-strength',
   standalone: true,
   template: `
-    @if (clave()) {
-      <div class="ps-bar" [attr.data-nivel]="ev().nivel" aria-hidden="true">
+    @if (key()) {
+      <div class="ps-bar" [attr.data-nivel]="ev().level" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
-      <p class="ps-label">Seguridad: <strong>{{ ev().etiqueta }}</strong></p>
+      <p class="ps-label">Seguridad: <strong>{{ ev().label }}</strong></p>
     }
     <ul class="ps-reqs">
-      @for (r of ev().requisitos; track r.texto) {
-        <li [class.ok]="r.cumple"><i class="ti" [class.ti-circle-check]="r.cumple" [class.ti-circle]="!r.cumple"></i>{{ r.texto }}</li>
+      @for (r of ev().requirements; track r.text) {
+        <li [class.ok]="r.meets"><i class="ti" [class.ti-circle-check]="r.meets" [class.ti-circle]="!r.meets"></i>{{ r.text }}</li>
       }
     </ul>
   `,
@@ -35,6 +35,6 @@ import { evaluarContrasena } from '../../../core/services/password.service';
   `,
 })
 export class PasswordStrengthComponent {
-  readonly clave = input<string>('');
-  readonly ev = computed(() => evaluarContrasena(this.clave()));
+  readonly key = input<string>('');
+  readonly ev = computed(() => evaluatePassword(this.key()));
 }

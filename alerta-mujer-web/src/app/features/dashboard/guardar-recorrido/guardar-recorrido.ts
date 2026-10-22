@@ -5,25 +5,25 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
-import { RecorridosService, Recorrido } from '../../../core/services/recorridos.service';
+import { RoutesService, SavedRoute } from '../../../core/services/recorridos.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FrequentPlace } from '../../../core/models/frequent-place.model';
 
-type PuntoSeleccionado = {
+type SelectedPoint = {
   latitude: number;
   longitude: number;
   nombre?: string;
 };
 
-type MetodoSeleccion = 'mapa' | 'ubicaciones';
+type SelectionMethod = 'mapa' | 'ubicaciones';
 type SubTab = 'recorridos' | 'historial';
-type FiltroVisibilidad = 'todos' | 'estrellas' | 'ocultar';
+type VisibilityFilter = 'todos' | 'estrellas' | 'ocultar';
 
 // Neiva (Huila): mismo centro por defecto que la app móvil
-const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
+const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 // Velocidad a pie usada por el móvil para estimar el tiempo
-const VELOCIDAD_KMH = 5;
+const SPEED_KMH = 5;
 // Un color por recorrido (máximo 4)
 const COLORES = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
@@ -34,84 +34,84 @@ const COLORES = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
   templateUrl: './guardar-recorrido.html',
   styleUrl: './guardar-recorrido.scss',
 })
-export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
-  private recorridosService = inject(RecorridosService);
+  private routesService = inject(RoutesService);
   private frequentPlaceService = inject(FrequentPlaceService);
   private authService = inject(AuthService);
   private injector = inject(Injector);
 
   private map: L.Map | null = null;
   private resizeObserver?: ResizeObserver;
-  private capaRecorridos = L.layerGroup();
-  private capaSeleccion = L.layerGroup();
-  private capaLugares = L.layerGroup();
-  private vistaAjustada = false;
+  private routesLayer = L.layerGroup();
+  private selectionLayer = L.layerGroup();
+  private placesLayer = L.layerGroup();
+  private fittedView = false;
 
-  readonly MAX_RECORRIDOS = this.recorridosService.limiteRecorridos;
-  readonly MAX_ESTRELLAS = this.recorridosService.limiteEstrellas;
+  readonly MAX_ROUTES = this.routesService.routeLimit;
+  readonly MAX_STARRED = this.routesService.starLimit;
 
   // ── Estado general ─────────────────────────────
   activeTab = signal<SubTab>('recorridos');
-  cargando = this.recorridosService.cargando;
-  guardando = signal(false);
+  loading = this.routesService.loading;
+  saving = signal(false);
   error = signal('');
-  aviso = signal('');
-  exito = signal('');
+  notice = signal('');
+  success = signal('');
 
-  recorridos = this.recorridosService.recorridos$;
-  estrellas = computed(() => this.recorridos().filter((r) => r.importante));
-  limiteAlcanzado = computed(() => this.recorridos().length >= this.MAX_RECORRIDOS);
+  routes = this.routesService.routes$;
+  starredCount = computed(() => this.routes().filter((r) => r.important));
+  limitReached = computed(() => this.routes().length >= this.MAX_ROUTES);
 
-  filtroVisibilidad = signal<FiltroVisibilidad>('todos');
-  recorridosEnMapa = computed(() => {
-    switch (this.filtroVisibilidad()) {
+  visibilityFilter = signal<VisibilityFilter>('todos');
+  routesOnMap = computed(() => {
+    switch (this.visibilityFilter()) {
       case 'ocultar': return [];
-      case 'estrellas': return this.estrellas();
-      default: return this.recorridos();
+      case 'estrellas': return this.starredCount();
+      default: return this.routes();
     }
   });
 
-  seleccionado = signal<Recorrido | null>(null);
-  detalle = signal<Recorrido | null>(null);
+  selected = signal<SavedRoute | null>(null);
+  detail = signal<SavedRoute | null>(null);
 
   // ── Formulario de nuevo recorrido ──────────────
-  readonly puntosForm = ['A', 'B'] as const;
-  metodoSeleccion = signal<MetodoSeleccion>('mapa');
-  puntoSeleccionando = signal<'A' | 'B' | null>(null);
-  puntoA = signal<PuntoSeleccionado | null>(null);
-  puntoB = signal<PuntoSeleccionado | null>(null);
-  nombrePuntoA = signal('');
-  nombrePuntoB = signal('');
-  nombreRecorrido = signal('');
-  ubicacionesGuardadas = signal<FrequentPlace[]>([]);
+  readonly formPoints = ['A', 'B'] as const;
+  selectionMethod = signal<SelectionMethod>('mapa');
+  selectingPoint = signal<'A' | 'B' | null>(null);
+  pointA = signal<SelectedPoint | null>(null);
+  pointB = signal<SelectedPoint | null>(null);
+  pointAName = signal('');
+  pointBName = signal('');
+  routeName = signal('');
+  savedLocations = signal<FrequentPlace[]>([]);
 
-  distanciaKm = computed(() => {
-    const a = this.puntoA();
-    const b = this.puntoB();
+  distanceKm = computed(() => {
+    const a = this.pointA();
+    const b = this.pointB();
     return a && b ? haversineKm(a, b) : null;
   });
 
-  minutosEstimados = computed(() => {
-    const km = this.distanciaKm();
-    return km == null ? null : Math.round((km / VELOCIDAD_KMH) * 60);
+  estimatedMinutes = computed(() => {
+    const km = this.distanceKm();
+    return km == null ? null : Math.round((km / SPEED_KMH) * 60);
   });
 
-  puedeGuardar = computed(
-    () => !!this.puntoA() && !!this.puntoB() && !this.limiteAlcanzado() && !this.guardando()
+  canSave = computed(
+    () => !!this.pointA() && !!this.pointB() && !this.limitReached() && !this.saving()
   );
 
   ngOnInit(): void {
-    this.recorridosService.cargar().then((r) => {
+    this.routesService.load().then((r) => {
       if (!r.ok) this.error.set(r.error ?? '');
     });
 
     this.authService.currentUser$.subscribe((user: any) => {
       if (!user) return;
       this.frequentPlaceService.getByUser(user.id).subscribe({
-        next: (lugares) => this.ubicacionesGuardadas.set(lugares),
-        error: () => this.ubicacionesGuardadas.set([]),
+        next: (places) => this.savedLocations.set(places),
+        error: () => this.savedLocations.set([]),
       });
     });
   }
@@ -120,9 +120,9 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     this.initMap();
 
     // Redibuja el mapa cuando cambian los recorridos, el filtro, la selección o los lugares
-    effect(() => this.dibujarRecorridos(), { injector: this.injector });
-    effect(() => this.dibujarSeleccion(), { injector: this.injector });
-    effect(() => this.dibujarLugares(), { injector: this.injector });
+    effect(() => this.drawRoutes(), { injector: this.injector });
+    effect(() => this.drawSelection(), { injector: this.injector });
+    effect(() => this.drawPlaces(), { injector: this.injector });
   }
 
   ngOnDestroy(): void {
@@ -135,20 +135,20 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
   private initMap(): void {
     if (!this.mapContainer || this.map) return;
 
-    this.map = L.map(this.mapContainer.nativeElement, { center: CENTRO_POR_DEFECTO, zoom: 13 });
+    this.map = L.map(this.mapContainer.nativeElement, { center: DEFAULT_CENTER, zoom: 13 });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     }).addTo(this.map);
 
-    this.capaLugares.addTo(this.map);
-    this.capaRecorridos.addTo(this.map);
-    this.capaSeleccion.addTo(this.map);
+    this.placesLayer.addTo(this.map);
+    this.routesLayer.addTo(this.map);
+    this.selectionLayer.addTo(this.map);
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
-      const punto = this.puntoSeleccionando();
-      if (!punto) return;
-      this.fijarPunto(punto, { latitude: e.latlng.lat, longitude: e.latlng.lng });
+      const point = this.selectingPoint();
+      if (!point) return;
+      this.setPoint(point, { latitude: e.latlng.lat, longitude: e.latlng.lng });
     });
 
     // El contenedor puede cambiar de tamaño al montar la vista
@@ -157,60 +157,60 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     this.resizeObserver.observe(this.mapContainer.nativeElement);
   }
 
-  private dibujarRecorridos(): void {
-    const lista = this.recorridosEnMapa();
-    const seleccionado = this.seleccionado();
-    const todos = this.recorridos();
+  private drawRoutes(): void {
+    const list = this.routesOnMap();
+    const selected = this.selected();
+    const all = this.routes();
     if (!this.map) return;
 
-    this.capaRecorridos.clearLayers();
+    this.routesLayer.clearLayers();
     const bounds = L.latLngBounds([]);
 
-    for (const r of lista) {
+    for (const r of list) {
       if (!r.puntos || r.puntos.length < 2) continue;
       const latlngs = r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
-      const color = this.colorDe(r, todos);
-      const activo = seleccionado?.id === r.id;
+      const color = this.colorDe(r, all);
+      const active = selected?.id === r.id;
 
       L.polyline(latlngs, {
         color,
-        weight: activo ? 7 : r.importante ? 5 : 4,
-        opacity: seleccionado && !activo ? 0.45 : 0.95,
-        dashArray: r.importante ? undefined : '8 8',
+        weight: active ? 7 : r.important ? 5 : 4,
+        opacity: selected && !active ? 0.45 : 0.95,
+        dashArray: r.important ? undefined : '8 8',
       })
-        .bindTooltip(`${r.importante ? '★ ' : ''}${escapeHtml(r.nombrePersonalizado ?? 'Recorrido')}`, { sticky: true })
-        .on('click', () => this.enfocar(r))
-        .addTo(this.capaRecorridos);
+        .bindTooltip(`${r.important ? '★ ' : ''}${escapeHtml(r.customName ?? 'Recorrido')}`, { sticky: true })
+        .on('click', () => this.focus(r))
+        .addTo(this.routesLayer);
 
-      L.marker(latlngs[0], { icon: iconoPunto('A', color) })
-        .bindPopup(`<strong>${escapeHtml(r.nombrePersonalizado ?? 'Recorrido')}</strong><br>Inicio: ${escapeHtml(r.barrioInicio)}`)
-        .addTo(this.capaRecorridos);
-      L.marker(latlngs[latlngs.length - 1], { icon: iconoPunto('B', color) })
-        .bindPopup(`<strong>${escapeHtml(r.nombrePersonalizado ?? 'Recorrido')}</strong><br>Fin: ${escapeHtml(r.barrioFin)}`)
-        .addTo(this.capaRecorridos);
+      L.marker(latlngs[0], { icon: pointIcon('A', color) })
+        .bindPopup(`<strong>${escapeHtml(r.customName ?? 'Recorrido')}</strong><br>Inicio: ${escapeHtml(r.startNeighborhood)}`)
+        .addTo(this.routesLayer);
+      L.marker(latlngs[latlngs.length - 1], { icon: pointIcon('B', color) })
+        .bindPopup(`<strong>${escapeHtml(r.customName ?? 'Recorrido')}</strong><br>Fin: ${escapeHtml(r.endNeighborhood)}`)
+        .addTo(this.routesLayer);
 
       latlngs.forEach((ll) => bounds.extend(ll));
     }
 
     // Encuadra los recorridos la primera vez que hay datos
-    if (!this.vistaAjustada && bounds.isValid() && !this.puntoA() && !this.puntoB()) {
+    if (!this.fittedView && bounds.isValid() && !this.pointA() && !this.pointB()) {
       this.map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16 });
-      this.vistaAjustada = true;
+      this.fittedView = true;
     }
   }
 
-  private dibujarSeleccion(): void {
-    const a = this.puntoA();
-    const b = this.puntoB();
+  private drawSelection(): void {
+    const a = this.pointA();
+    const b = this.pointB();
     if (!this.map) return;
 
-    this.capaSeleccion.clearLayers();
-    if (a) L.marker([a.latitude, a.longitude], { icon: iconoPunto('A', '#6922c5', true) }).addTo(this.capaSeleccion);
-    if (b) L.marker([b.latitude, b.longitude], { icon: iconoPunto('B', '#c026d3', true) }).addTo(this.capaSeleccion);
+    this.selectionLayer.clearLayers();
+    if (a) L.marker([a.latitude, a.longitude], { icon: pointIcon('A', '#6922c5', true) }).addTo(this.selectionLayer);
+    if (b) L.marker([b.latitude, b.longitude], { icon: pointIcon('B', '#c026d3', true) }).addTo(this.selectionLayer);
     if (a && b) {
       L.polyline([[a.latitude, a.longitude], [b.latitude, b.longitude]], {
         color: '#f5f3ff', weight: 4, opacity: 0.95, dashArray: '2 8', lineCap: 'round',
-      }).addTo(this.capaSeleccion);
+      }).addTo(this.selectionLayer);
       this.map.fitBounds(
         [[a.latitude, a.longitude], [b.latitude, b.longitude]],
         { padding: [64, 64], maxZoom: 16 }
@@ -218,57 +218,57 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
-  private dibujarLugares(): void {
-    const lugares = this.ubicacionesGuardadas();
+  private drawPlaces(): void {
+    const places = this.savedLocations();
     if (!this.map) return;
 
-    this.capaLugares.clearLayers();
-    for (const lugar of lugares) {
-      if (!Number.isFinite(lugar.lat) || !Number.isFinite(lugar.lng)) continue;
-      L.circleMarker([lugar.lat, lugar.lng], {
+    this.placesLayer.clearLayers();
+    for (const place of places) {
+      if (!Number.isFinite(place.lat) || !Number.isFinite(place.lng)) continue;
+      L.circleMarker([place.lat, place.lng], {
         radius: 6, color: '#ffffff', weight: 2, fillColor: '#7c3aed', fillOpacity: 1,
       })
-        .bindTooltip(escapeHtml(lugar.name))
+        .bindTooltip(escapeHtml(place.name))
         .on('click', (e: L.LeafletMouseEvent) => {
           // Si se está eligiendo un punto, el lugar guardado lo fija con su nombre
-          const punto = this.puntoSeleccionando();
-          if (!punto) return;
+          const point = this.selectingPoint();
+          if (!point) return;
           L.DomEvent.stopPropagation(e);
-          this.seleccionarUbicacion(lugar);
+          this.selectLocation(place);
         })
-        .addTo(this.capaLugares);
+        .addTo(this.placesLayer);
     }
   }
 
-  colorDe(r: Recorrido, lista = this.recorridos()): string {
-    const i = lista.findIndex((x) => x.id === r.id);
+  colorDe(r: SavedRoute, list = this.routes()): string {
+    const i = list.findIndex((x) => x.id === r.id);
     return COLORES[(i < 0 ? 0 : i) % COLORES.length];
   }
 
   // ── Selección de puntos ────────────────────────
-  setMetodo(metodo: MetodoSeleccion): void {
-    this.metodoSeleccion.set(metodo);
-    this.puntoSeleccionando.set(null);
+  setMethod(method: SelectionMethod): void {
+    this.selectionMethod.set(method);
+    this.selectingPoint.set(null);
   }
 
-  elegirPunto(punto: 'A' | 'B'): void {
+  choosePoint(point: 'A' | 'B'): void {
     this.error.set('');
-    this.puntoSeleccionando.set(this.puntoSeleccionando() === punto ? null : punto);
+    this.selectingPoint.set(this.selectingPoint() === point ? null : point);
   }
 
-  seleccionarUbicacion(lugar: FrequentPlace): void {
-    const punto = this.puntoSeleccionando();
-    if (!punto) return;
-    this.fijarPunto(punto, { latitude: lugar.lat, longitude: lugar.lng, nombre: lugar.name });
+  selectLocation(place: FrequentPlace): void {
+    const point = this.selectingPoint();
+    if (!point) return;
+    this.setPoint(point, { latitude: place.lat, longitude: place.lng, nombre: place.name });
   }
 
-  usarMiUbicacion(punto: 'A' | 'B'): void {
+  useMyLocation(point: 'A' | 'B'): void {
     if (!navigator.geolocation) {
       this.error.set('Tu navegador no permite obtener la ubicación.');
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => this.fijarPunto(punto, {
+      (pos) => this.setPoint(point, {
         latitude: pos.coords.latitude, longitude: pos.coords.longitude, nombre: 'Mi ubicación',
       }),
       () => this.error.set('No se pudo obtener tu ubicación. Revisa los permisos del navegador.'),
@@ -276,93 +276,93 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     );
   }
 
-  private fijarPunto(punto: 'A' | 'B', valor: PuntoSeleccionado): void {
-    if (punto === 'A') {
-      this.puntoA.set(valor);
-      if (valor.nombre) this.nombrePuntoA.set(valor.nombre);
+  private setPoint(point: 'A' | 'B', value: SelectedPoint): void {
+    if (point === 'A') {
+      this.pointA.set(value);
+      if (value.nombre) this.pointAName.set(value.nombre);
     } else {
-      this.puntoB.set(valor);
-      if (valor.nombre) this.nombrePuntoB.set(valor.nombre);
+      this.pointB.set(value);
+      if (value.nombre) this.pointBName.set(value.nombre);
     }
     // Tras fijar A, pasa directo a elegir B
-    this.puntoSeleccionando.set(punto === 'A' && !this.puntoB() ? 'B' : null);
+    this.selectingPoint.set(point === 'A' && !this.pointB() ? 'B' : null);
   }
 
-  limpiarSeleccion(): void {
-    this.puntoA.set(null);
-    this.puntoB.set(null);
-    this.nombrePuntoA.set('');
-    this.nombrePuntoB.set('');
-    this.nombreRecorrido.set('');
-    this.puntoSeleccionando.set(null);
+  clearSelection(): void {
+    this.pointA.set(null);
+    this.pointB.set(null);
+    this.pointAName.set('');
+    this.pointBName.set('');
+    this.routeName.set('');
+    this.selectingPoint.set(null);
     this.error.set('');
   }
 
   // ── Acciones sobre recorridos ──────────────────
-  async guardarRecorrido(): Promise<void> {
-    const a = this.puntoA();
-    const b = this.puntoB();
-    if (!a || !b || this.guardando()) return;
+  async saveRoute(): Promise<void> {
+    const a = this.pointA();
+    const b = this.pointB();
+    if (!a || !b || this.saving()) return;
 
-    const inicio = this.nombrePuntoA().trim() || a.nombre || 'Punto A';
-    const fin = this.nombrePuntoB().trim() || b.nombre || 'Punto B';
+    const start = this.pointAName().trim() || a.nombre || 'Punto A';
+    const end = this.pointBName().trim() || b.nombre || 'Punto B';
 
-    this.guardando.set(true);
-    const resultado = await this.recorridosService.agregarRecorrido({
-      nombre: this.nombreRecorrido().trim() || `Ruta ${inicio} → ${fin}`,
-      inicio,
-      fin,
+    this.saving.set(true);
+    const result = await this.routesService.addRoute({
+      nombre: this.routeName().trim() || `Ruta ${start} → ${end}`,
+      start,
+      end,
       puntos: [
         { latitude: a.latitude, longitude: a.longitude, timestamp: '' },
         { latitude: b.latitude, longitude: b.longitude, timestamp: '' },
       ],
-      distanciaKm: this.distanciaKm() ?? 0,
-      minutosEstimados: this.minutosEstimados() ?? 0,
+      distanceKm: this.distanceKm() ?? 0,
+      estimatedMinutes: this.estimatedMinutes() ?? 0,
     });
-    this.guardando.set(false);
+    this.saving.set(false);
 
-    if (!resultado.ok) {
-      this.error.set(resultado.error ?? 'No se pudo guardar el recorrido.');
+    if (!result.ok) {
+      this.error.set(result.error ?? 'No se pudo guardar el recorrido.');
       return;
     }
-    this.limpiarSeleccion();
-    this.vistaAjustada = false;
-    this.mostrar(this.exito, 'Recorrido guardado. Ya aparece también en la app móvil.');
+    this.clearSelection();
+    this.fittedView = false;
+    this.show(this.success, 'Recorrido guardado. Ya aparece también en la app móvil.');
   }
 
-  async toggleEstrella(r: Recorrido, event?: Event): Promise<void> {
+  async toggleStar(r: SavedRoute, event?: Event): Promise<void> {
     event?.stopPropagation();
-    const resultado = await this.recorridosService.toggleImportante(r.id);
-    if (!resultado.ok) this.mostrar(this.aviso, resultado.error ?? '');
-    this.sincronizarSeleccion();
+    const result = await this.routesService.toggleImportant(r.id);
+    if (!result.ok) this.show(this.notice, result.error ?? '');
+    this.syncSelection();
   }
 
-  async eliminar(r: Recorrido, event?: Event): Promise<void> {
+  async delete(r: SavedRoute, event?: Event): Promise<void> {
     event?.stopPropagation();
-    if (!confirm(`¿Eliminar el recorrido "${r.nombrePersonalizado ?? 'sin nombre'}"? También se borrará de la app móvil.`)) {
+    if (!confirm(`¿Eliminar el recorrido "${r.customName ?? 'sin nombre'}"? También se borrará de la app móvil.`)) {
       return;
     }
-    const resultado = await this.recorridosService.eliminarRecorrido(r.id);
-    if (!resultado.ok) {
-      this.mostrar(this.aviso, resultado.error ?? '');
+    const result = await this.routesService.deleteRoute(r.id);
+    if (!result.ok) {
+      this.show(this.notice, result.error ?? '');
       return;
     }
-    if (this.seleccionado()?.id === r.id) this.seleccionado.set(null);
-    if (this.detalle()?.id === r.id) this.detalle.set(null);
+    if (this.selected()?.id === r.id) this.selected.set(null);
+    if (this.detail()?.id === r.id) this.detail.set(null);
   }
 
-  setVisibilidad(filtro: FiltroVisibilidad): void {
-    this.filtroVisibilidad.set(filtro);
-    if (filtro === 'ocultar') this.seleccionado.set(null);
+  setVisibility(filter: VisibilityFilter): void {
+    this.visibilityFilter.set(filter);
+    if (filter === 'ocultar') this.selected.set(null);
   }
 
-  enfocar(r: Recorrido): void {
-    this.seleccionado.set(this.seleccionado()?.id === r.id ? null : r);
-    if (!this.seleccionado() || !this.map || r.puntos.length < 2) return;
+  focus(r: SavedRoute): void {
+    this.selected.set(this.selected()?.id === r.id ? null : r);
+    if (!this.selected() || !this.map || r.puntos.length < 2) return;
 
     // Si el filtro lo esconde, mostrarlo
-    if (this.filtroVisibilidad() === 'ocultar' || (this.filtroVisibilidad() === 'estrellas' && !r.importante)) {
-      this.filtroVisibilidad.set('todos');
+    if (this.visibilityFilter() === 'ocultar' || (this.visibilityFilter() === 'estrellas' && !r.important)) {
+      this.visibilityFilter.set('todos');
     }
     this.map.flyToBounds(
       L.latLngBounds(r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple)),
@@ -370,53 +370,53 @@ export class GuardarRecorridoComponent implements OnInit, AfterViewInit, OnDestr
     );
   }
 
-  verDetalle(r: Recorrido): void {
-    this.detalle.set(r);
-    this.enfocar(r);
-    if (this.seleccionado()?.id !== r.id) this.seleccionado.set(r);
+  viewDetail(r: SavedRoute): void {
+    this.detail.set(r);
+    this.focus(r);
+    if (this.selected()?.id !== r.id) this.selected.set(r);
   }
 
-  cerrarDetalle(): void {
-    this.detalle.set(null);
+  closeDetail(): void {
+    this.detail.set(null);
   }
 
   setTab(tab: SubTab): void {
     this.activeTab.set(tab);
-    this.puntoSeleccionando.set(null);
+    this.selectingPoint.set(null);
   }
 
-  formatearFecha(fecha: string): string {
+  formatDate(fecha: string): string {
     const d = new Date(fecha);
     return isNaN(d.getTime())
       ? fecha
       : d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  formatearMinutos(min: number | null): string {
+  formatMinutes(min: number | null): string {
     if (min == null) return '—';
     return min < 60 ? `${min} min` : `${Math.floor(min / 60)}h ${min % 60}min`;
   }
 
-  coordenadas(p: PuntoSeleccionado): string {
+  coordinates(p: SelectedPoint): string {
     return `${p.latitude.toFixed(5)}, ${p.longitude.toFixed(5)}`;
   }
 
   // Mantiene los objetos seleccionados apuntando a la versión actualizada del recorrido
-  private sincronizarSeleccion(): void {
-    const buscar = (r: Recorrido | null) => (r ? this.recorridos().find((x) => x.id === r.id) ?? null : null);
-    this.seleccionado.set(buscar(this.seleccionado()));
-    this.detalle.set(buscar(this.detalle()));
+  private syncSelection(): void {
+    const search = (r: SavedRoute | null) => (r ? this.routes().find((x) => x.id === r.id) ?? null : null);
+    this.selected.set(search(this.selected()));
+    this.detail.set(search(this.detail()));
   }
 
-  private mostrar(senal: WritableSignal<string>, mensaje: string): void {
-    senal.set(mensaje);
+  private show(signalStrength: WritableSignal<string>, message: string): void {
+    signalStrength.set(message);
     setTimeout(() => {
-      if (senal() === mensaje) senal.set('');
+      if (signalStrength() === message) signalStrength.set('');
     }, 4000);
   }
 }
 
-function haversineKm(a: PuntoSeleccionado, b: PuntoSeleccionado): number {
+function haversineKm(a: SelectedPoint, b: SelectedPoint): number {
   const R = 6371;
   const rad = (g: number) => (g * Math.PI) / 180;
   const dLat = rad(b.latitude - a.latitude);
@@ -425,16 +425,16 @@ function haversineKm(a: PuntoSeleccionado, b: PuntoSeleccionado): number {
   return 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
-function iconoPunto(letra: string, color: string, grande = false): L.DivIcon {
-  const size = grande ? 34 : 26;
+function pointIcon(letter: string, color: string, large = false): L.DivIcon {
+  const size = large ? 34 : 26;
   return L.divIcon({
     className: 'gr-pin',
-    html: `<span class="gr-pin__dot${grande ? ' gr-pin__dot--lg' : ''}" style="background:${color}">${letra}</span>`,
+    html: `<span class="gr-pin__dot${large ? ' gr-pin__dot--lg' : ''}" style="background:${color}">${letter}</span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
 }
 
-function escapeHtml(texto: string): string {
-  return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }

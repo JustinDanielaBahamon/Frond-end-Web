@@ -2,37 +2,37 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ZonaManual, PuntoMapa, TipoPunto, TIPOS_PUNTO } from '../models/zona.model';
+import { ManualZone, MapPoint, PointType, POINT_TYPES } from '../models/zona.model';
 
 @Injectable({ providedIn: 'root' })
 export class RiskZonesService {
   private http = inject(HttpClient);
-  private zonasUrl = `${environment.apiUrl}/api/zones`;
+  private zonesUrl = `${environment.apiUrl}/api/zones`;
   // Los puntos de apoyo del mapa (CAI, hospitales, bomberos...) son recursos de emergencia del backend.
-  private recursosUrl = `${environment.apiUrl}/api/resources`;
+  private resourcesUrl = `${environment.apiUrl}/api/resources`;
 
   /** Zonas de riesgo para el mapa de alertas (los puntos de apoyo no se dibujan como riesgo). */
-  getZonas(): Observable<ZonaManual[]> {
-    return this.http.get<ZonaApi[]>(this.zonasUrl).pipe(
-      map(zonas => zonas.filter(z => z.zoneType === 'risk' && z.isActive !== false).map(zonaDesdeApi))
+  getZones(): Observable<ManualZone[]> {
+    return this.http.get<ZoneApi[]>(this.zonesUrl).pipe(
+      map(zones => zones.filter(z => z.zoneType === 'risk' && z.isActive !== false).map(zoneFromApi))
     );
   }
 
-  createZona(zona: Omit<ZonaManual, 'id'>): Observable<ZonaManual> {
-    return this.http.post<ZonaApi>(this.zonasUrl, zonaHaciaApi(zona)).pipe(map(zonaDesdeApi));
+  createZone(zone: Omit<ManualZone, 'id'>): Observable<ManualZone> {
+    return this.http.post<ZoneApi>(this.zonesUrl, zoneToApi(zone)).pipe(map(zoneFromApi));
   }
 
-  deleteZona(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.zonasUrl}/${id}`);
+  deleteZone(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.zonesUrl}/${id}`);
   }
 
-  getPuntos(): Observable<PuntoMapa[]> {
-    return this.http.get<RecursoApi[]>(this.recursosUrl).pipe(
-      map(recursos => recursos
-        .filter(r => r.resourceType in TIPOS_PUNTO && r.latitude != null && r.longitude != null)
+  getPoints(): Observable<MapPoint[]> {
+    return this.http.get<ResourceApi[]>(this.resourcesUrl).pipe(
+      map(resources => resources
+        .filter(r => r.resourceType in POINT_TYPES && r.latitude != null && r.longitude != null)
         .map(r => ({
           id: r.id,
-          tipo: r.resourceType as TipoPunto,
+          tipo: r.resourceType as PointType,
           nombre: r.name,
           lat: Number(r.latitude),
           lng: Number(r.longitude),
@@ -40,22 +40,22 @@ export class RiskZonesService {
     );
   }
 
-  createPunto(punto: Omit<PuntoMapa, 'id'>): Observable<PuntoMapa> {
-    const recurso = {
-      name: punto.nombre,
-      resourceType: punto.tipo,
+  createPoint(point: Omit<MapPoint, 'id'>): Observable<MapPoint> {
+    const resource = {
+      name: point.nombre,
+      resourceType: point.tipo,
       city: 'Sin especificar',
-      latitude: punto.lat,
-      longitude: punto.lng,
+      latitude: point.lat,
+      longitude: point.lng,
     };
-    return this.http.post<RecursoApi>(this.recursosUrl, recurso).pipe(
-      map(r => ({ id: r.id, tipo: punto.tipo, nombre: r.name, lat: Number(r.latitude), lng: Number(r.longitude) }))
+    return this.http.post<ResourceApi>(this.resourcesUrl, resource).pipe(
+      map(r => ({ id: r.id, tipo: point.tipo, nombre: r.name, lat: Number(r.latitude), lng: Number(r.longitude) }))
     );
   }
 }
 
 /** Campos de /api/resources que usa el mapa. */
-interface RecursoApi {
+interface ResourceApi {
   id: number;
   name: string;
   resourceType: string;
@@ -65,7 +65,7 @@ interface RecursoApi {
 
 
 /** Campos de /api/zones que usa el mapa de alertas. */
-interface ZonaApi {
+interface ZoneApi {
   id: number;
   name: string;
   zoneType: string;
@@ -80,39 +80,39 @@ interface ZonaApi {
 // Una zona "pin" se guarda con un radio pequeño, porque el backend exige radio.
 const RADIO_PIN = 50;
 
-const NIVEL_DESDE_API: Record<string, ZonaManual['nivel']> = { high: 'Alto', medium: 'Medio', low: 'Bajo' };
-const NIVEL_HACIA_API: Record<ZonaManual['nivel'], string> = { Alto: 'high', Medio: 'medium', Bajo: 'low' };
+const LEVEL_FROM_API: Record<string, ManualZone['level']> = { high: 'Alto', medium: 'Medio', low: 'Bajo' };
+const LEVEL_TO_API: Record<ManualZone['level'], string> = { Alto: 'high', Medio: 'medium', Bajo: 'low' };
 
-function zonaDesdeApi(z: ZonaApi): ZonaManual {
+function zoneFromApi(z: ZoneApi): ManualZone {
   const radio = Number(z.radiusMeters);
   return {
     id: z.id,
     nombre: z.name,
-    nivel: NIVEL_DESDE_API[z.riskLevel] ?? 'Medio',
-    metodo: radio > RADIO_PIN ? 'area' : 'pin',
+    level: LEVEL_FROM_API[z.riskLevel] ?? 'Medio',
+    method: radio > RADIO_PIN ? 'area' : 'pin',
     radio: radio > RADIO_PIN ? radio : undefined,
-    centroLat: Number(z.latitude),
-    centroLng: Number(z.longitude),
-    alertasEnZona: 0,
+    centerLat: Number(z.latitude),
+    centerLng: Number(z.longitude),
+    alertsInZone: 0,
   };
 }
 
-function zonaHaciaApi(z: Omit<ZonaManual, 'id'>): Omit<ZonaApi, 'id'> {
+function zoneToApi(z: Omit<ManualZone, 'id'>): Omit<ZoneApi, 'id'> {
   return {
     name: z.nombre,
     zoneType: 'risk',
-    riskLevel: NIVEL_HACIA_API[z.nivel] ?? 'medium',
+    riskLevel: LEVEL_TO_API[z.level] ?? 'medium',
     // El mapa no pide ciudad; se puede corregir luego en Gestión de zonas.
     city: 'Sin especificar',
-    latitude: z.centroLat,
-    longitude: z.centroLng,
-    radiusMeters: z.metodo === 'area' && z.radio ? z.radio : RADIO_PIN,
+    latitude: z.centerLat,
+    longitude: z.centerLng,
+    radiusMeters: z.method === 'area' && z.radio ? z.radio : RADIO_PIN,
     isActive: true,
   };
 }
 
 /** Distancia en metros entre dos coordenadas (fórmula del haversine). */
-function distanciaMetros(lat1: number, lng1: number, lat2: number, lng2: number): number {
+function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000;
   const rad = (g: number) => (g * Math.PI) / 180;
   const dLat = rad(lat2 - lat1);
@@ -122,12 +122,12 @@ function distanciaMetros(lat1: number, lng1: number, lat2: number, lng2: number)
 }
 
 /** True si la coordenada cae dentro del radio de la zona. Las coordenadas 0,0 se consideran "sin ubicación". */
-export function estaDentroDeZona(z: ZonaManual, lat: number, lng: number): boolean {
+export function isInsideZone(z: ManualZone, lat: number, lng: number): boolean {
   if (!lat && !lng) return false;
-  return distanciaMetros(z.centroLat, z.centroLng, lat, lng) <= (z.radio ?? RADIO_PIN);
+  return distanceMeters(z.centerLat, z.centerLng, lat, lng) <= (z.radio ?? RADIO_PIN);
 }
 
 /** Llena alertasEnZona de cada zona con las alertas que caen dentro de su radio. */
-export function contarAlertasEnZonas(zonas: ZonaManual[], alertas: { lat: number; lng: number }[]): ZonaManual[] {
-  return zonas.map(z => ({ ...z, alertasEnZona: alertas.filter(a => estaDentroDeZona(z, a.lat, a.lng)).length }));
+export function countAlertsInZones(zones: ManualZone[], alerts: { lat: number; lng: number }[]): ManualZone[] {
+  return zones.map(z => ({ ...z, alertsInZone: alerts.filter(a => isInsideZone(z, a.lat, a.lng)).length }));
 }

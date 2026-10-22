@@ -1,6 +1,6 @@
-export interface UbicacionEntry {
+export interface LocationEntry {
   id: number;
-  usuarioId: number;
+  userId: number;
   time: string;
   address: string;
   gpsSignal: 'Fuerte' | 'Moderada' | 'Débil';

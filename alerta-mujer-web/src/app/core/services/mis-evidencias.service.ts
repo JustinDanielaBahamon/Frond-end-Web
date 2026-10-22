@@ -3,45 +3,45 @@ import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export type TipoEvidencia = 'photo' | 'video' | 'audio' | 'document';
+export type EvidenceType = 'photo' | 'video' | 'audio' | 'document';
 
 /** Evidencia de la usuaria autenticada (GET /api/evidences/me). */
-export interface MiEvidencia {
+export interface MyEvidence {
   id: number;
   alertId: number;
-  tipo: TipoEvidencia;
-  nombreArchivo: string;
+  tipo: EvidenceType;
+  fileName: string;
   contentType: string;
-  tamanoBytes: number | null;
+  sizeBytes: number | null;
   sha256: string | null;
-  tieneArchivo: boolean;
+  hasFile: boolean;
   fecha: Date;
-  alerta: {
+  alert: {
     id: number;
     tipo: string;
-    metodo: string;
+    method: string;
     estado: string;
-    inicio: Date | null;
+    start: Date | null;
     lat: number | null;
     lng: number | null;
   } | null;
 }
 
-export interface MiAlerta {
+export interface MyAlert {
   id: number;
   estado: string;
-  metodo: string;
-  inicio: Date;
+  method: string;
+  start: Date;
   lat: number | null;
   lng: number | null;
   /** La usuaria la marcó para que sus evidencias no se borren a los 60 días. */
-  conservar: boolean;
+  keep: boolean;
 }
 
 interface EvidenceViewApi {
   id: number;
   alertId: number;
-  mediaType: TipoEvidencia;
+  mediaType: EvidenceType;
   fileName: string | null;
   contentType: string | null;
   sizeBytes: number | null;
@@ -55,35 +55,35 @@ interface EvidenceViewApi {
 }
 
 // El backend envía LocalDateTime en UTC sin zona
-const fechaUtc = (iso: string | null | undefined): Date | null =>
+const utcDate = (iso: string | null | undefined): Date | null =>
   iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null;
 
 @Injectable({ providedIn: 'root' })
-export class MisEvidenciasService {
+export class MyEvidenceService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/evidences`;
 
-  listar(): Observable<MiEvidencia[]> {
-    return this.http.get<EvidenceViewApi[]>(`${this.url}/me`).pipe(map((l) => l.map(desdeApi)));
+  list(): Observable<MyEvidence[]> {
+    return this.http.get<EvidenceViewApi[]>(`${this.url}/me`).pipe(map((l) => l.map(fromApi)));
   }
 
   /** El archivo se pide con el token y se muestra como blob: nunca hay una URL pública. */
-  archivo(id: number): Observable<Blob> {
+  file(id: number): Observable<Blob> {
     return this.http.get(`${this.url}/${id}/file`, { responseType: 'blob' });
   }
 
-  subir(archivo: File, alertId: number): Observable<HttpEvent<EvidenceViewApi>> {
+  upload(file: File, alertId: number): Observable<HttpEvent<EvidenceViewApi>> {
     const form = new FormData();
-    form.append('file', archivo);
+    form.append('file', file);
     form.append('alertId', String(alertId));
     return this.http.post<EvidenceViewApi>(`${this.url}/upload`, form, { reportProgress: true, observe: 'events' });
   }
 
-  eliminar(id: number): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
   }
 
-  misAlertas(): Observable<MiAlerta[]> {
+  myAlerts(): Observable<MyAlert[]> {
     return this.http
       .get<Array<{
         id: number; status: string; activationMethod: string; startedAt: string;
@@ -92,47 +92,47 @@ export class MisEvidenciasService {
       .pipe(map((l) => l.map((a) => ({
         id: a.id,
         estado: a.status,
-        metodo: a.activationMethod,
-        inicio: fechaUtc(a.startedAt)!,
+        method: a.activationMethod,
+        start: utcDate(a.startedAt)!,
         lat: a.latitude != null ? Number(a.latitude) : null,
         lng: a.longitude != null ? Number(a.longitude) : null,
-        conservar: !!a.keepEvidence,
+        keep: !!a.keepEvidence,
       }))));
   }
 
   /** Conservar (o no) las evidencias de una alerta más allá de los 60 días. */
-  conservar(alertId: number, conservar: boolean): Observable<void> {
+  keep(alertId: number, keep: boolean): Observable<void> {
     return this.http
-      .patch(`${environment.apiUrl}/api/alerts/${alertId}/keep-evidence`, { keep: conservar })
+      .patch(`${environment.apiUrl}/api/alerts/${alertId}/keep-evidence`, { keep })
       .pipe(map(() => undefined));
   }
 
   /** Cambia el nombre que se muestra (el archivo y su huella no cambian). */
-  renombrar(id: number, nombre: string): Observable<MiEvidencia> {
-    return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: nombre }).pipe(map(desdeApi));
+  rename(id: number, nombre: string): Observable<MyEvidence> {
+    return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: nombre }).pipe(map(fromApi));
   }
 
-  desdeApi = desdeApi;
+  fromApi = fromApi;
 }
 
-function desdeApi(e: EvidenceViewApi): MiEvidencia {
+function fromApi(e: EvidenceViewApi): MyEvidence {
   return {
     id: e.id,
     alertId: e.alertId,
     tipo: e.mediaType,
-    nombreArchivo: e.fileName ?? `evidencia-${e.id}`,
+    fileName: e.fileName ?? `evidencia-${e.id}`,
     contentType: e.contentType ?? '',
-    tamanoBytes: e.sizeBytes,
+    sizeBytes: e.sizeBytes,
     sha256: e.sha256,
-    tieneArchivo: e.hasFile,
-    fecha: fechaUtc(e.createdAt)!,
-    alerta: e.alert
+    hasFile: e.hasFile,
+    fecha: utcDate(e.createdAt)!,
+    alert: e.alert
       ? {
           id: e.alert.id,
           tipo: e.alert.alertType,
-          metodo: e.alert.activationMethod,
+          method: e.alert.activationMethod,
           estado: e.alert.status,
-          inicio: fechaUtc(e.alert.startedAt),
+          start: utcDate(e.alert.startedAt),
           lat: e.alert.latitude != null ? Number(e.alert.latitude) : null,
           lng: e.alert.longitude != null ? Number(e.alert.longitude) : null,
         }

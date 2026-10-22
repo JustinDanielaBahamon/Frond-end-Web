@@ -20,7 +20,7 @@ export class ResourcesService {
   getActiveResources(): Observable<EmergencyResourceApi[]> {
     return this.http
       .get<EmergencyResourceApi[]>(this.apiUrl)
-      .pipe(map((lista) => lista.filter((r) => r.isActive !== false)));
+      .pipe(map((list) => list.filter((r) => r.isActive !== false)));
   }
 
   /**

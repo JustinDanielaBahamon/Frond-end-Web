@@ -3,11 +3,11 @@ import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import * as L from 'leaflet';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { Alerta } from '../../../core/models/alert.model';
+import { Alert } from '../../../core/models/alert.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
-import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
-import { paginasCompactas } from '../../../shared/utils/paginacion';
+import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
+import { compactPages } from '../../../shared/utils/paginacion';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -20,11 +20,11 @@ const iconDefault = L.icon({
 // Teselas de OpenStreetMap (las de CARTO ahora exigen clave y salían con "API KEY REQUIRED").
 // En modo oscuro se oscurecen con un filtro CSS (clase tiles-oscuras en la capa).
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const ATRIBUCION_TILES = '© OpenStreetMap contributors';
+const TILE_ATTRIBUTION = '© OpenStreetMap contributors';
 
 @Component({
   selector: 'app-alert-history',
-  imports: [SelectorFecha, CommonModule, NgClass],
+  imports: [DatePicker, CommonModule, NgClass],
   templateUrl: './alert-history.html',
   styleUrl: './alert-history.scss',
 })
@@ -36,28 +36,28 @@ export class AlertHistory implements OnInit, OnDestroy {
   private geocoding = inject(GeocodingService);
   private cdr = inject(ChangeDetectorRef);
 
-  alertas: Alerta[] = [];
-  alertasFiltradas: Alerta[] = [];
+  alerts: Alert[] = [];
+  filteredAlerts: Alert[] = [];
   error = false;
 
   // Fecha elegida en el selector (formato 'YYYY-MM-DD' del <input type="date">), o null si no hay filtro.
-  fechaFiltro: string | null = null;
+  dateFilter: string | null = null;
 
   // Filtro por medio de activación ('Todas' = sin filtro).
-  tipoFiltro = 'Todas';
+  typeFilter = 'Todas';
   searchTerm = '';
 
   // NOTA: estos 4 valores deben coincidir exactamente con los que envía el backend
   // en Alerta.medioActivacion. Ajusta la lista si tus nombres reales son distintos.
-  mediosDisponibles = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Botón de encendido', 'Manual'];
+  availableMethods = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Botón de encendido', 'Manual'];
 
 
-  totalAlertas = 0;
-  alertasEsteMes = 0;
-  alertasAtendidas = 0;
-  alertasCanceladas = 0;
+  totalAlertCount = 0;
+  alertsThisMonth = 0;
+  attendedAlerts = 0;
+  cancelledAlerts = 0;
 
-  medioBadge: Record<string, string> = {
+  methodBadge: Record<string, string> = {
     'Botón de pánico': 'badge-boton',
     'Contacto': 'badge-manual',
     'Widget': 'badge-widget',
@@ -66,15 +66,15 @@ export class AlertHistory implements OnInit, OnDestroy {
     'Manual': 'badge-manual',
   };
 
-  estadoBadge: Record<string, string> = {
+  statusBadge: Record<string, string> = {
     'Atendida': 'badge-ok',
     'Pendiente': 'badge-pendiente',
     'Cancelada': 'badge-falsa',
   };
 
   // Fila expandida in-line (reemplaza al modal). Solo una a la vez.
-  expandedAlertaId: number | null = null;
-  menuAbiertoId: number | null = null;
+  expandedAlertId: number | null = null;
+  openMenuId: number | null = null;
 
   // Paginación
   currentPage = 1;
@@ -88,17 +88,17 @@ export class AlertHistory implements OnInit, OnDestroy {
   private themeObserver: MutationObserver | null = null;
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe((usuario) => {
-      if (!usuario) {
+    this.authService.currentUser$.subscribe((user) => {
+      if (!user) {
         this.error = true;
         return;
       }
 
-      this.alertsService.getByUsuario(usuario.id).subscribe({
+      this.alertsService.getByUser(user.id).subscribe({
         next: (data) => {
-          this.alertas = data;
-          this.calcularStats(data);
-          this.aplicarFiltros();
+          this.alerts = data;
+          this.computeStats(data);
+          this.applyFilters();
         },
         error: () => {
           this.error = true;
@@ -107,53 +107,53 @@ export class AlertHistory implements OnInit, OnDestroy {
     });
   }
 
-  private calcularStats(alertas: Alerta[]) {
-    this.totalAlertas = alertas.length;
-    this.alertasAtendidas = alertas.filter(a => a.estado === 'Atendida').length;
-    this.alertasCanceladas = alertas.filter(a => a.estado === 'Cancelada').length;
+  private computeStats(alerts: Alert[]) {
+    this.totalAlertCount = alerts.length;
+    this.attendedAlerts = alerts.filter(a => a.estado === 'Atendida').length;
+    this.cancelledAlerts = alerts.filter(a => a.estado === 'Cancelada').length;
 
     // 👇 asume que 'tiempo' es parseable como fecha (ej. "2026-06-13T10:32:00").
     // Si tu formato es distinto (ej. "13 jun 2026, 10:32 AM"), dime el formato exacto
     // y ajusto el parseo.
-    const hoy = new Date();
-    this.alertasEsteMes = alertas.filter(a => {
-      const fechaAlerta = new Date(a.tiempo);
-      if (isNaN(fechaAlerta.getTime())) return false;
-      return fechaAlerta.getMonth() === hoy.getMonth() &&
-             fechaAlerta.getFullYear() === hoy.getFullYear();
+    const today = new Date();
+    this.alertsThisMonth = alerts.filter(a => {
+      const alertDate = new Date(a.time);
+      if (isNaN(alertDate.getTime())) return false;
+      return alertDate.getMonth() === today.getMonth() &&
+             alertDate.getFullYear() === today.getFullYear();
     }).length;
   }
 
   /** Click en una fila: expande/colapsa el detalle justo debajo, sin modal. */
-  toggleExpand(alerta: Alerta) {
-    if (this.expandedAlertaId === alerta.id) {
-      this.destruirMapa();
-      this.expandedAlertaId = null;
+  toggleExpand(alert: Alert) {
+    if (this.expandedAlertId === alert.id) {
+      this.destroyMap();
+      this.expandedAlertId = null;
       return;
     }
 
-    this.destruirMapa(); // por si había otra fila abierta con su mini-mapa
-    this.expandedAlertaId = alerta.id;
+    this.destroyMap(); // por si había otra fila abierta con su mini-mapa
+    this.expandedAlertId = alert.id;
 
-    const elId = `mini-map-${alerta.id}`;
+    const elId = `mini-map-${alert.id}`;
     setTimeout(() => {
       const el = document.getElementById(elId);
-      if (el) this.inicializarMapa(alerta.lat, alerta.lng, elId);
+      if (el) this.initMap(alert.lat, alert.lng, elId);
     }, 50);
   }
 
   toggleMenu(id: number, event: Event) {
     event.stopPropagation();
-    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
+    this.openMenuId = this.openMenuId === id ? null : id;
   }
 
   @HostListener('document:click')
-cerrarMenu() {
-  this.menuAbiertoId = null;
+closeMenu() {
+  this.openMenuId = null;
 }
 
-  mapsUrl(alerta: Alerta): string {
-    return `https://www.google.com/maps?q=${alerta.lat},${alerta.lng}`;
+  mapsUrl(alert: Alert): string {
+    return `https://www.google.com/maps?q=${alert.lat},${alert.lng}`;
   }
 
   /**
@@ -165,13 +165,13 @@ cerrarMenu() {
    * la condición de abajo por:
    *   document.documentElement.getAttribute('data-theme') === 'dark'
    */
-  private esModoOscuro(): boolean {
+  private isDarkMode(): boolean {
     return document.documentElement.classList.contains('dark') ||
            document.body.classList.contains('dark');
   }
 
   /** Agrega (o reemplaza) la capa de teselas según el tema actual. */
-  private agregarCapaSegunTema() {
+  private addLayerForTheme() {
     if (!this.map) return;
 
     if (this.tileLayer) {
@@ -179,14 +179,14 @@ cerrarMenu() {
     }
 
     this.tileLayer = L.tileLayer(TILES, {
-      attribution: ATRIBUCION_TILES,
+      attribution: TILE_ATTRIBUTION,
       maxZoom: 19,
-      className: this.esModoOscuro() ? 'tiles-oscuras' : '',
+      className: this.isDarkMode() ? 'tiles-oscuras' : '',
     }).addTo(this.map);
   }
 
-  private inicializarMapa(lat: number, lng: number, elementId: string) {
-    this.destruirMapa();
+  private initMap(lat: number, lng: number, elementId: string) {
+    this.destroyMap();
     this.currentMapElId = elementId;
 
     this.map = L.map(elementId, {
@@ -196,15 +196,15 @@ cerrarMenu() {
       scrollWheelZoom: true,
     });
 
-    this.agregarCapaSegunTema();
+    this.addLayerForTheme();
 
     L.marker([lat, lng], { icon: iconDefault })
       .addTo(this.map)
-      .bindPopup(this.alertas.find((a) => a.lat === lat && a.lng === lng)?.ubicacion || 'Ubicación de la alerta')
+      .bindPopup(this.alerts.find((a) => a.lat === lat && a.lng === lng)?.location || 'Ubicación de la alerta')
       .openPopup();
 
     // Si el usuario cambia de tema con el mini-mapa abierto, repintamos las teselas.
-    this.themeObserver = new MutationObserver(() => this.agregarCapaSegunTema());
+    this.themeObserver = new MutationObserver(() => this.addLayerForTheme());
     this.themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class', 'data-theme'],
@@ -215,7 +215,7 @@ cerrarMenu() {
     });
   }
 
-  private destruirMapa() {
+  private destroyMap() {
     if (this.themeObserver) {
       this.themeObserver.disconnect();
       this.themeObserver = null;
@@ -242,136 +242,136 @@ cerrarMenu() {
   }
 
   /** La usuaria eligió (o quitó) un día en el calendario. */
-  onFecha(valor: string | null) {
-    this.fechaFiltro = valor || null;
-    this.aplicarFiltros();
+  onDate(value: string | null) {
+    this.dateFilter = value || null;
+    this.applyFilters();
   }
 
   /** Quita el filtro de fecha y vuelve a mostrar todo el historial. */
-  limpiarFiltroFecha() {
-    this.fechaFiltro = null;
-    this.aplicarFiltros();
+  clearDateFilter() {
+    this.dateFilter = null;
+    this.applyFilters();
   }
 
-  onTipoChange(event: Event) {
-    this.tipoFiltro = (event.target as HTMLSelectElement).value;
-    this.aplicarFiltros();
+  onTypeChange(event: Event) {
+    this.typeFilter = (event.target as HTMLSelectElement).value;
+    this.applyFilters();
   }
 
-  onBuscarChange(event: Event) {
+  onSearchChange(event: Event) {
     this.searchTerm = (event.target as HTMLInputElement).value;
-    this.aplicarFiltros();
+    this.applyFilters();
   }
 
   /** Aplica fecha + medio de activación + búsqueda de texto sobre this.alertas y reinicia la paginación. */
-  private aplicarFiltros() {
-    let resultado = this.alertas;
+  private applyFilters() {
+    let result = this.alerts;
 
-    if (this.fechaFiltro) {
-      resultado = resultado.filter(a => {
-        const fecha = new Date(a.tiempo);
+    if (this.dateFilter) {
+      result = result.filter(a => {
+        const fecha = new Date(a.time);
         if (isNaN(fecha.getTime())) return false;
-        return this.aFechaLocalISO(fecha) === this.fechaFiltro;
+        return this.toLocalIsoDate(fecha) === this.dateFilter;
       });
     }
 
-    if (this.tipoFiltro && this.tipoFiltro !== 'Todas') {
-      resultado = resultado.filter(a => a.medioActivacion === this.tipoFiltro);
+    if (this.typeFilter && this.typeFilter !== 'Todas') {
+      result = result.filter(a => a.activationMethod === this.typeFilter);
     }
 
     if (this.searchTerm.trim()) {
       const q = this.searchTerm.trim().toLowerCase();
-      resultado = resultado.filter(a =>
+      result = result.filter(a =>
         a.estado.toLowerCase().includes(q) ||
-        a.ubicacion.toLowerCase().includes(q) ||
-        (a.medioActivacion ?? '').toLowerCase().includes(q) ||
-        a.tiempo.toLowerCase().includes(q)
+        a.location.toLowerCase().includes(q) ||
+        (a.activationMethod ?? '').toLowerCase().includes(q) ||
+        a.time.toLowerCase().includes(q)
       );
     }
 
-    this.alertasFiltradas = resultado;
+    this.filteredAlerts = result;
     this.currentPage = 1;
-    this.resolverDirecciones();
+    this.resolveAddresses();
   }
 
   /** Convierte una fecha a 'YYYY-MM-DD' usando la hora local (evita el corrimiento de un día que da toISOString con UTC). */
-  private aFechaLocalISO(fecha: Date): string {
-    const anio = fecha.getFullYear();
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    return `${anio}-${mes}-${dia}`;
+  private toLocalIsoDate(fecha: Date): string {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   /** Muestra la fecha elegida en formato legible, ej. "13 jun 2026". */
-  formatearFecha(fechaISO: string): string {
-    const [anio, mes, dia] = fechaISO.split('-').map(Number);
-    const fecha = new Date(anio, mes - 1, dia);
+  formatDate(isoDate: string): string {
+    const [year, month, day] = isoDate.split('-').map(Number);
+    const fecha = new Date(year, month - 1, day);
     return fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   /** Divide alerta.tiempo en fecha y hora legibles para las dos líneas de la tabla. */
-  formatearFechaHora(tiempo: string): { fecha: string; hora: string } {
-    const fecha = new Date(tiempo);
-    if (isNaN(fecha.getTime())) return { fecha: tiempo, hora: '' };
+  formatDateTime(time: string): { fecha: string; time: string } {
+    const fecha = new Date(time);
+    if (isNaN(fecha.getTime())) return { fecha: time, time: '' };
     return {
       fecha: fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }),
-      hora: fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+      time: fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
     };
   }
 
   // --- Paginación ---
   get totalPages(): number {
-    return Math.max(1, Math.ceil(this.alertasFiltradas.length / this.pageSize));
+    return Math.max(1, Math.ceil(this.filteredAlerts.length / this.pageSize));
   }
 
-  get alertasPagina(): Alerta[] {
-    const inicio = (this.currentPage - 1) * this.pageSize;
-    return this.alertasFiltradas.slice(inicio, inicio + this.pageSize);
+  get alertsPage(): Alert[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredAlerts.slice(start, start + this.pageSize);
   }
 
-  get rangoInicio(): number {
-    return this.alertasFiltradas.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
+  get rangeStart(): number {
+    return this.filteredAlerts.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
   }
 
-  get rangoFin(): number {
-    return Math.min(this.currentPage * this.pageSize, this.alertasFiltradas.length);
+  get rangeEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredAlerts.length);
   }
 
-  get paginasVisibles(): (number | null)[] {
-    return paginasCompactas(this.currentPage, this.totalPages);
+  get visiblePages(): (number | null)[] {
+    return compactPages(this.currentPage, this.totalPages);
   }
 
-  irAPagina(p: number) {
+  goToPage(p: number) {
     this.currentPage = p;
-    this.resolverDirecciones();
+    this.resolveAddresses();
   }
 
-  paginaAnterior() {
+  previousPage() {
     if (this.currentPage > 1) this.currentPage--;
-    this.resolverDirecciones();
+    this.resolveAddresses();
   }
 
-  paginaSiguiente() {
+  nextPage() {
     if (this.currentPage < this.totalPages) this.currentPage++;
-    this.resolverDirecciones();
+    this.resolveAddresses();
   }
 
   /**
    * Cambia las coordenadas por barrio y dirección (OpenStreetMap, como en la app). Solo las de la
    * página visible: el servicio consulta de a una por segundo y guarda lo ya resuelto.
    */
-  private resolverDirecciones() {
-    for (const alerta of this.alertasPagina) {
-      if (!alerta.lat && !alerta.lng) continue;
-      if (alerta.direccionResuelta) continue;
-      this.geocoding.obtener(alerta.lat, alerta.lng).then((lugar) => {
-        if (!lugar) return;
-        const texto = [lugar.barrio, lugar.direccion].filter(Boolean).join(' · ') || lugar.ciudad;
-        if (!texto) return;
-        alerta.ubicacion = texto;
-        alerta.direccionResuelta = true;
-        if (this.expandedAlertaId === alerta.id) this.map?.eachLayer((capa) => {
-          if (capa instanceof L.Marker) capa.setPopupContent(texto);
+  private resolveAddresses() {
+    for (const alert of this.alertsPage) {
+      if (!alert.lat && !alert.lng) continue;
+      if (alert.resolvedAddress) continue;
+      this.geocoding.get(alert.lat, alert.lng).then((place) => {
+        if (!place) return;
+        const text = [place.neighborhood, place.address].filter(Boolean).join(' · ') || place.city;
+        if (!text) return;
+        alert.location = text;
+        alert.resolvedAddress = true;
+        if (this.expandedAlertId === alert.id) this.map?.eachLayer((layer) => {
+          if (layer instanceof L.Marker) layer.setPopupContent(text);
         });
         this.cdr.markForCheck();
       });
@@ -382,9 +382,9 @@ cerrarMenu() {
    * Lleva al módulo de Evidencias, pasando el id de la alerta por query param
    * para que esa pantalla pueda filtrar y mostrar solo las evidencias de esta alerta.
    */
-  verEvidencias(alerta: Alerta) {
+  viewEvidences(alert: Alert) {
     this.router.navigate(['/dashboard/evidence'], {
-      queryParams: { alertaId: alerta.id },
+      queryParams: { alertaId: alert.id },
     });
   }
 
@@ -392,12 +392,12 @@ cerrarMenu() {
    * TODO: reemplazar por la llamada real a tu backend (alertsService.marcarCancelada(alerta.id)).
    * Por ahora actualiza el estado localmente para que la UI responda de inmediato.
    */
-  marcarCancelada(alerta: Alerta) {
-    alerta.estado = 'Cancelada';
-    this.calcularStats(this.alertas);
+  markCancelled(alert: Alert) {
+    alert.estado = 'Cancelada';
+    this.computeStats(this.alerts);
   }
 
   ngOnDestroy() {
-    this.destruirMapa();
+    this.destroyMap();
   }
 }

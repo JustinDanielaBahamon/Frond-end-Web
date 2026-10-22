@@ -81,7 +81,7 @@ export class TopbarComponent {
 
   // Panel de notificaciones
   notifOpen = false;
-  private readIds = new Set<string>(this.cargarLeidas());
+  private readIds = new Set<string>(this.loadRead());
 
   get unreadCount(): number {
     return this.notifications.filter((n) => !this.readIds.has(String(n.id))).length;
@@ -137,19 +137,19 @@ export class TopbarComponent {
 
   markAllRead() {
     this.notifications.forEach((n) => this.readIds.add(String(n.id)));
-    this.guardarLeidas();
+    this.saveRead();
   }
 
   onNotificationClick(n: TopbarNotification) {
     this.readIds.add(String(n.id));
-    this.guardarLeidas();
+    this.saveRead();
     this.closeNotif();
     if (n.route) {
       this.router.navigateByUrl(n.route);
     }
   }
 
-  private cargarLeidas(): string[] {
+  private loadRead(): string[] {
     try {
       const raw = localStorage.getItem(READ_KEY);
       return raw ? JSON.parse(raw) : [];
@@ -158,7 +158,7 @@ export class TopbarComponent {
     }
   }
 
-  private guardarLeidas(): void {
+  private saveRead(): void {
     try {
       localStorage.setItem(READ_KEY, JSON.stringify(Array.from(this.readIds)));
     } catch {

@@ -1,4 +1,4 @@
-<div class="pc-backdrop" (click)="salir()">
+<div class="pc-backdrop" (click)="exit()">
   <section class="pc-modal" role="dialog" aria-modal="true" aria-labelledby="ec-titulo" (click)="$event.stopPropagation()">
     <header class="pc-head">
       <span class="pc-head__icon"><i class="ti ti-trash"></i></span>
@@ -6,22 +6,22 @@
         <h2 id="ec-titulo">¿Eliminar tu cuenta?</h2>
         <p>Se cerrará tu sesión en la web y en la app, en todos tus dispositivos.</p>
       </div>
-      <button type="button" class="pc-close" (click)="salir()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+      <button type="button" class="pc-close" (click)="exit()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
     </header>
 
-    <form class="pc-form" (ngSubmit)="eliminar()">
+    <form class="pc-form" (ngSubmit)="delete()">
       <ul class="ec-lista">
-        @for (linea of queSeBorra; track linea) {
-          <li><i class="ti ti-circle-x"></i><span>{{ linea }}</span></li>
+        @for (line of whatGetsDeleted; track line) {
+          <li><i class="ti ti-circle-x"></i><span>{{ line }}</span></li>
         }
       </ul>
       <p class="ec-aviso">Esto no se puede deshacer. Tus alertas quedan solo como un registro anónimo.</p>
 
       <label class="pc-field">
-        <span>Escribe <strong>{{ palabra }}</strong> para confirmar</span>
+        <span>Escribe <strong>{{ word }}</strong> para confirmar</span>
         <div class="pc-input">
-          <input name="confirmacion" autocomplete="off" [placeholder]="palabra" [disabled]="eliminando()"
-                 [ngModel]="texto()" (ngModelChange)="texto.set($event)" />
+          <input name="confirmacion" autocomplete="off" [placeholder]="word" [disabled]="deleting()"
+                 [ngModel]="text()" (ngModelChange)="text.set($event)" />
         </div>
       </label>
 
@@ -30,9 +30,9 @@
       }
 
       <div class="pc-actions">
-        <button type="button" class="pc-btn pc-btn--ghost" (click)="salir()" [disabled]="eliminando()">Cancelar</button>
-        <button type="submit" class="pc-btn pc-btn--primary" [disabled]="!listo() || eliminando()">
-          {{ eliminando() ? 'Eliminando…' : 'Eliminar definitivamente' }}
+        <button type="button" class="pc-btn pc-btn--ghost" (click)="exit()" [disabled]="deleting()">Cancelar</button>
+        <button type="submit" class="pc-btn pc-btn--primary" [disabled]="!ready() || deleting()">
+          {{ deleting() ? 'Eliminando…' : 'Eliminar definitivamente' }}
         </button>
       </div>
     </form>

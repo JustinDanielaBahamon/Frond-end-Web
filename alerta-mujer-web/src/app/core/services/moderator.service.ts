@@ -34,32 +34,32 @@ interface UserReportApi {
   hasEvidence?: boolean;
 }
 
-const GRAVEDAD_DESDE_API: Record<string, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' };
-const GRAVEDAD_HACIA_API: Record<string, string> = { Baja: 'low', Media: 'medium', Alta: 'high', 'Crítica': 'critical' };
-const ESTADO_DESDE_API: Record<string, string> = {
+const SEVERITY_FROM_API: Record<string, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' };
+const SEVERITY_TO_API: Record<string, string> = { Baja: 'low', Media: 'medium', Alta: 'high', 'Crítica': 'critical' };
+const STATUS_FROM_API: Record<string, string> = {
   pending: 'Pendiente', in_review: 'En revisión', reviewed: 'Resuelto', resolved: 'Resuelto',
   approved: 'Resuelto', rejected: 'Rechazado',
 };
-const ESTADO_HACIA_API: Record<string, string> = {
+const STATUS_TO_API: Record<string, string> = {
   Pendiente: 'pending', 'En revisión': 'in_review', Resuelto: 'resolved', Rechazado: 'rejected',
 };
 
-function fechaLegible(iso: string | null): string {
+function readableDate(iso: string | null): string {
   if (!iso) return '';
   return new Date(iso).toLocaleString('es-ES', {
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }
 
-function desdeApi(r: UserReportApi): Report {
+function fromApi(r: UserReportApi): Report {
   return {
     id: String(r.id),
     userName: r.reportedUserName ?? 'Usuaria sin nombre',
     userEmail: r.reportedUserEmail ?? '',
     reason: r.reason,
-    severity: GRAVEDAD_DESDE_API[r.severity] ?? 'Media',
-    date: fechaLegible(r.createdAt),
-    status: ESTADO_DESDE_API[r.status] ?? 'Pendiente',
+    severity: SEVERITY_FROM_API[r.severity] ?? 'Media',
+    date: readableDate(r.createdAt),
+    status: STATUS_FROM_API[r.status] ?? 'Pendiente',
     description: r.description,
     reporterName: r.reporterName ?? undefined,
     resolutionNotes: r.resolutionNotes ?? undefined,
@@ -68,13 +68,13 @@ function desdeApi(r: UserReportApi): Report {
 }
 
 /** Solo se envían los campos que el backend acepta; la usuaria reportada se identifica por su correo. */
-function haciaApi(r: Partial<Report>) {
+function toApi(r: Partial<Report>) {
   return {
     ...(r.userEmail !== undefined && { reportedUserEmail: r.userEmail }),
     ...(r.reason !== undefined && { reason: r.reason }),
     ...(r.description !== undefined && { description: r.description }),
-    ...(r.severity && GRAVEDAD_HACIA_API[r.severity] && { severity: GRAVEDAD_HACIA_API[r.severity] }),
-    ...(r.status && ESTADO_HACIA_API[r.status] && { status: ESTADO_HACIA_API[r.status] }),
+    ...(r.severity && SEVERITY_TO_API[r.severity] && { severity: SEVERITY_TO_API[r.severity] }),
+    ...(r.status && STATUS_TO_API[r.status] && { status: STATUS_TO_API[r.status] }),
   };
 }
 
@@ -113,23 +113,23 @@ export class ModeratorService {
   // ========================================
 
   getAll(): Observable<Report[]> {
-    return this.http.get<UserReportApi[]>(this.apiUrl).pipe(map(lista => lista.map(desdeApi)));
+    return this.http.get<UserReportApi[]>(this.apiUrl).pipe(map(list => list.map(fromApi)));
   }
 
   getById(id: string): Observable<Report> {
-    return this.http.get<UserReportApi>(`${this.apiUrl}/${id}`).pipe(map(desdeApi));
+    return this.http.get<UserReportApi>(`${this.apiUrl}/${id}`).pipe(map(fromApi));
   }
 
   create(report: Omit<Report, 'id'>): Observable<Report> {
     // El estado lo decide el backend: todo reporte nuevo empieza pendiente
-    const { status, ...datos } = report;
-    return this.http.post<UserReportApi>(this.apiUrl, haciaApi(datos)).pipe(map(desdeApi));
+    const { status, ...data } = report;
+    return this.http.post<UserReportApi>(this.apiUrl, toApi(data)).pipe(map(fromApi));
   }
 
   update(id: string, report: Partial<Report>): Observable<Report> {
     // La usuaria reportada no cambia al editar
-    const { userEmail, userName, ...cambios } = report;
-    return this.http.put<UserReportApi>(`${this.apiUrl}/${id}`, haciaApi(cambios)).pipe(map(desdeApi));
+    const { userEmail, userName, ...changes } = report;
+    return this.http.put<UserReportApi>(`${this.apiUrl}/${id}`, toApi(changes)).pipe(map(fromApi));
   }
 
   delete(id: string): Observable<void> {
@@ -140,7 +140,7 @@ export class ModeratorService {
   // MÉTODOS DE FILTRADO
   // ========================================
 
-  filtrarReportes(filtros: {
+  filterReports(filters: {
     searchTerm?: string;
     reason?: string;
     severity?: string;
@@ -164,7 +164,7 @@ export class ModeratorService {
     return this.stats$;
   }
 
-  actualizarStats(): void {
+  updateStats(): void {
     // TODO: Calcular estadísticas basadas en los reportes actuales
     const reports = this.reportsSubject.value;
     const stats = {

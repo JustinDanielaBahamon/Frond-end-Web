@@ -11,28 +11,28 @@ import { ReceivedAlertsService } from '../../../core/services/received-alerts.se
   templateUrl: './alertas-contactos.html',
   styleUrl: './alertas-contactos.scss',
 })
-export class AlertasContactosComponent implements OnInit {
-  readonly servicio = inject(ReceivedAlertsService);
+export class AlertContactsComponent implements OnInit {
+  readonly service = inject(ReceivedAlertsService);
   private router = inject(Router);
 
-  readonly abriendo = signal<number | null>(null);
+  readonly opening = signal<number | null>(null);
   readonly error = signal('');
 
   ngOnInit(): void {
-    this.servicio.consultar();
+    this.service.query();
   }
 
-  async verSeguimiento(id: number): Promise<void> {
+  async viewTracking(id: number): Promise<void> {
     this.error.set('');
-    this.abriendo.set(id);
+    this.opening.set(id);
     try {
-      const codigo = await this.servicio.codigoSeguimiento(id);
+      const codigo = await this.service.trackingCode(id);
       // La marca deja volver al panel; quien llega desde el correo no la tiene
       await this.router.navigate(['/seguimiento', codigo], { state: { desdePanel: true } });
     } catch {
       this.error.set('No se pudo abrir el seguimiento. Puede que la alerta ya haya terminado.');
     } finally {
-      this.abriendo.set(null);
+      this.opening.set(null);
     }
   }
 }

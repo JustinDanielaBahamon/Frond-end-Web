@@ -9,16 +9,16 @@ import { CommonModule } from '@angular/common';
   styleUrl: './modal.scss'
 })
 export class Modal {
-  @Input() titulo = '';
-  @Input() tamano: 'sm' | 'md' | 'lg' | 'zona' = 'md';
-  @Input() variante: 'default' | 'danger' = 'default';
-  @Input() cerrarAlClickFuera = true;
+  @Input() title = '';
+  @Input() size: 'sm' | 'md' | 'lg' | 'zona' = 'md';
+  @Input() variant: 'default' | 'danger' = 'default';
+  @Input() closeOnClickOutside = true;
 
-  @Output() cerrar = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
 
   onOverlayClick() {
-    if (this.cerrarAlClickFuera) {
-      this.cerrar.emit();
+    if (this.closeOnClickOutside) {
+      this.close.emit();
     }
   }
 }

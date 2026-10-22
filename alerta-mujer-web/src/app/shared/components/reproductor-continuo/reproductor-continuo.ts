@@ -2,10 +2,10 @@ import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, comp
 import { DatePipe } from '@angular/common';
 
 /** Una parte de la grabación (la app sube el video y el audio en trozos de ~45 s). */
-export interface ParteGrabacion {
+export interface RecordingPart {
   id: number;
   url: string;
-  creada: Date | null;
+  created: Date | null;
 }
 
 /**
@@ -19,89 +19,89 @@ export interface ParteGrabacion {
   templateUrl: './reproductor-continuo.html',
   styleUrl: './reproductor-continuo.scss',
 })
-export class ReproductorContinuoComponent implements OnChanges {
-  @Input({ required: true }) partes: ParteGrabacion[] = [];
+export class ContinuousPlayerComponent implements OnChanges {
+  @Input({ required: true }) parts: RecordingPart[] = [];
   @Input({ required: true }) tipo: 'video' | 'audio' = 'video';
 
-  @ViewChild('medio') private medio?: ElementRef<HTMLMediaElement>;
+  @ViewChild('medio') private method?: ElementRef<HTMLMediaElement>;
 
-  readonly indice = signal(0);
+  readonly index = signal(0);
   /** Avance de la parte actual, de 0 a 1. */
-  readonly avance = signal(0);
+  readonly progress = signal(0);
   /** Duración de cada parte en segundos (se conoce al cargar cada una). */
-  readonly duraciones = signal<Record<number, number>>({});
-  private reproduciendo = false;
+  readonly durations = signal<Record<number, number>>({});
+  private playing = false;
 
-  readonly actual = computed(() => this.partes[this.indice()] ?? null);
-  readonly duracionTotal = computed(() => {
-    const d = this.duraciones();
-    const conocidas = this.partes.filter((p) => d[p.id] != null);
-    if (conocidas.length === 0) return null;
-    const suma = conocidas.reduce((s, p) => s + d[p.id], 0);
+  readonly actual = computed(() => this.parts[this.index()] ?? null);
+  readonly totalDuration = computed(() => {
+    const d = this.durations();
+    const known = this.parts.filter((p) => d[p.id] != null);
+    if (known.length === 0) return null;
+    const sum = known.reduce((s, p) => s + d[p.id], 0);
     // Las que aún no cargan se estiman con el promedio de las conocidas
-    return Math.round((suma / conocidas.length) * this.partes.length);
+    return Math.round((sum / known.length) * this.parts.length);
   });
 
-  ngOnChanges(cambios: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void {
     // El seguimiento se refresca cada pocos segundos y puede traer partes nuevas: si la que suena
     // sigue en la lista, se continúa con ella sin reiniciar el reproductor
-    const anteriores: ParteGrabacion[] = cambios['partes']?.previousValue ?? [];
-    const idActual = anteriores[this.indice()]?.id;
-    const mismaParte = idActual != null ? this.partes.findIndex((p) => p.id === idActual) : -1;
-    if (mismaParte >= 0 && !cambios['tipo']) {
-      this.indice.set(mismaParte);
+    const anteriores: RecordingPart[] = changes['partes']?.previousValue ?? [];
+    const idActual = anteriores[this.index()]?.id;
+    const samePart = idActual != null ? this.parts.findIndex((p) => p.id === idActual) : -1;
+    if (samePart >= 0 && !changes['tipo']) {
+      this.index.set(samePart);
       return;
     }
-    this.indice.set(0);
-    this.avance.set(0);
-    this.duraciones.set({});
-    this.reproduciendo = false;
+    this.index.set(0);
+    this.progress.set(0);
+    this.durations.set({});
+    this.playing = false;
   }
 
-  alCargar(): void {
-    const el = this.medio?.nativeElement;
-    const parte = this.actual();
-    if (el && parte && Number.isFinite(el.duration)) {
-      this.duraciones.update((d) => ({ ...d, [parte.id]: el.duration }));
+  onLoad(): void {
+    const el = this.method?.nativeElement;
+    const part = this.actual();
+    if (el && part && Number.isFinite(el.duration)) {
+      this.durations.update((d) => ({ ...d, [part.id]: el.duration }));
     }
     // Al pasar de una parte a la siguiente se sigue reproduciendo sin que la usuaria toque nada
-    if (this.reproduciendo) el?.play().catch(() => {});
+    if (this.playing) el?.play().catch(() => {});
   }
 
-  alAvanzar(): void {
-    const el = this.medio?.nativeElement;
-    if (el && el.duration > 0) this.avance.set(el.currentTime / el.duration);
+  onAdvance(): void {
+    const el = this.method?.nativeElement;
+    if (el && el.duration > 0) this.progress.set(el.currentTime / el.duration);
   }
 
-  alReproducir(): void {
-    this.reproduciendo = true;
+  onPlay(): void {
+    this.playing = true;
   }
 
-  alPausar(): void {
-    const el = this.medio?.nativeElement;
+  onPause(): void {
+    const el = this.method?.nativeElement;
     // "pause" también llega justo antes de "ended": ahí no se considera una pausa de la usuaria
-    if (el && !el.ended) this.reproduciendo = false;
+    if (el && !el.ended) this.playing = false;
   }
 
-  alTerminar(): void {
-    if (this.indice() < this.partes.length - 1) {
-      this.reproduciendo = true;
-      this.irA(this.indice() + 1);
+  onEnd(): void {
+    if (this.index() < this.parts.length - 1) {
+      this.playing = true;
+      this.irA(this.index() + 1);
     } else {
-      this.reproduciendo = false;
+      this.playing = false;
     }
   }
 
   irA(i: number): void {
-    if (i === this.indice()) return;
-    this.indice.set(i);
-    this.avance.set(0);
+    if (i === this.index()) return;
+    this.index.set(i);
+    this.progress.set(0);
   }
 
-  relleno(i: number): number {
-    if (i < this.indice()) return 100;
-    if (i > this.indice()) return 0;
-    return Math.round(this.avance() * 100);
+  fill(i: number): number {
+    if (i < this.index()) return 100;
+    if (i > this.index()) return 0;
+    return Math.round(this.progress() * 100);
   }
 
   minutos(segundos: number): string {

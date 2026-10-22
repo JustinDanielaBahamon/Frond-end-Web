@@ -1,43 +1,43 @@
-export interface ZonaManual {
+export interface ManualZone {
   id: number;
   nombre: string;
-  nivel: 'Alto' | 'Medio' | 'Bajo';
-  metodo: 'pin' | 'area';
+  level: 'Alto' | 'Medio' | 'Bajo';
+  method: 'pin' | 'area';
   radio?: number;
-  centroLat: number;
-  centroLng: number;
-  alertasEnZona: number;
+  centerLat: number;
+  centerLng: number;
+  alertsInZone: number;
 }
 
-export interface ZonaCaliente {
+export interface HotZone {
   nombre: string;
   lat: number;
   lng: number;
-  alertas: number;
-  nivel: 'Alto' | 'Medio' | 'Bajo';
+  alerts: number;
+  level: 'Alto' | 'Medio' | 'Bajo';
 }
 
 /** Tipos de punto de apoyo: los mismos resource_type que acepta el backend (con ubicación). */
-export type TipoPunto =
+export type PointType =
   | 'police_post' | 'police_station' | 'hospital' | 'health_center'
   | 'ambulance' | 'fire_station' | 'support_organization';
 
 /** Capa del mapa en la que se muestra cada tipo. */
-export type CapaPunto = 'cais' | 'hospitales' | 'apoyo';
+export type PointLayer = 'cais' | 'hospitals' | 'support';
 
-export const TIPOS_PUNTO: Record<TipoPunto, { etiqueta: string; emoji: string; fondo: string; capa: CapaPunto }> = {
-  police_post:          { etiqueta: 'CAI',                    emoji: '🚔', fondo: '#ede9fe', capa: 'cais' },
-  police_station:       { etiqueta: 'Estación de policía',    emoji: '👮', fondo: '#ede9fe', capa: 'cais' },
-  hospital:             { etiqueta: 'Hospital',               emoji: '🏥', fondo: '#fae8ff', capa: 'hospitales' },
-  health_center:        { etiqueta: 'Centro de salud',        emoji: '🩺', fondo: '#fae8ff', capa: 'hospitales' },
-  ambulance:            { etiqueta: 'Base de ambulancias',    emoji: '🚑', fondo: '#fae8ff', capa: 'hospitales' },
-  fire_station:         { etiqueta: 'Bomberos',               emoji: '🚒', fondo: '#f3e8ff', capa: 'apoyo' },
-  support_organization: { etiqueta: 'Apoyo a mujeres',        emoji: '💜', fondo: '#f3e8ff', capa: 'apoyo' },
+export const POINT_TYPES: Record<PointType, { label: string; emoji: string; background: string; layer: PointLayer }> = {
+  police_post:          { label: 'CAI',                    emoji: '🚔', background: '#ede9fe', layer: 'cais' },
+  police_station:       { label: 'Estación de policía',    emoji: '👮', background: '#ede9fe', layer: 'cais' },
+  hospital:             { label: 'Hospital',               emoji: '🏥', background: '#fae8ff', layer: 'hospitals' },
+  health_center:        { label: 'Centro de salud',        emoji: '🩺', background: '#fae8ff', layer: 'hospitals' },
+  ambulance:            { label: 'Base de ambulancias',    emoji: '🚑', background: '#fae8ff', layer: 'hospitals' },
+  fire_station:         { label: 'Bomberos',               emoji: '🚒', background: '#f3e8ff', layer: 'support' },
+  support_organization: { label: 'Apoyo a mujeres',        emoji: '💜', background: '#f3e8ff', layer: 'support' },
 };
 
-export interface PuntoMapa {
+export interface MapPoint {
   id: number;
-  tipo: TipoPunto;
+  tipo: PointType;
   nombre: string;
   lat: number;
   lng: number;

@@ -9,7 +9,7 @@
         <h1>Moderación</h1>
         <p>Casos de usuarias reportadas, bloqueos hechos desde Gestión de usuarios (con su motivo y evidencia) y solicitudes para eliminar cuentas.</p>
       </div>
-      <button class="btn-add-report" (click)="abrirModalAgregarReporte(); $event.stopPropagation()">
+      <button class="btn-add-report" (click)="openAddReportModal(); $event.stopPropagation()">
         <i class="fa-solid fa-plus"></i>
         Agregar Reporte
       </button>
@@ -179,7 +179,7 @@
                     <button class="view" (click)="viewReport(report.id); $event.stopPropagation()" aria-label="Ver reporte">
                       <i class="fa-solid fa-eye"></i>
                     </button>
-                    <button class="edit" (click)="abrirModalEditar(report.id); $event.stopPropagation()" aria-label="Editar reporte">
+                    <button class="edit" (click)="openEditModal(report.id); $event.stopPropagation()" aria-label="Editar reporte">
                       <i class="fa-solid fa-pencil"></i>
                     </button>
                     <button class="reject" (click)="deleteReport(report.id); $event.stopPropagation()" aria-label="Eliminar reporte">
@@ -207,11 +207,11 @@
               <button class="page-btn" (click)="prevPage(); $event.stopPropagation()" [disabled]="currentPage === 1" aria-label="Página anterior">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              @for (pagina of paginas; track $index) {
-                @if (pagina === null) {
+              @for (page of pages; track $index) {
+                @if (page === null) {
                   <span class="page-ellipsis" aria-hidden="true">…</span>
                 } @else {
-                  <button class="page-btn" (click)="changePage(pagina); $event.stopPropagation()" [class.active]="currentPage === pagina" [attr.aria-label]="'Página ' + pagina">{{ pagina }}</button>
+                  <button class="page-btn" (click)="changePage(page); $event.stopPropagation()" [class.active]="currentPage === page" [attr.aria-label]="'Página ' + page">{{ page }}</button>
                 }
               }
               <button class="page-btn" (click)="nextPage(); $event.stopPropagation()" [disabled]="currentPage >= totalPages" aria-label="Página siguiente">
@@ -225,11 +225,11 @@
   </div>
 
 <!-- MODAL VER REPORTE -->
-<div class="modal-overlay" *ngIf="mostrarModalVer && reporteSeleccionado" (click)="cerrarModalVer()">
+<div class="modal-overlay" *ngIf="showViewModal && selectedReport" (click)="closeViewModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Ver Detalles del Reporte</h2>
-      <button class="modal-close" (click)="cerrarModalVer(); $event.stopPropagation()">
+      <button class="modal-close" (click)="closeViewModal(); $event.stopPropagation()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -241,10 +241,10 @@
             <i class="fa-solid fa-flag"></i>
           </div>
           <div class="report-header-info">
-            <h3>{{ reporteSeleccionado!.id }}</h3>
-            <span class="date-badge">{{ reporteSeleccionado!.date }}</span>
-            <span class="status-badge-large {{ getStatusClass(reporteSeleccionado!.status) }}">
-              {{ reporteSeleccionado!.status }}
+            <h3>{{ selectedReport!.id }}</h3>
+            <span class="date-badge">{{ selectedReport!.date }}</span>
+            <span class="status-badge-large {{ getStatusClass(selectedReport!.status) }}">
+              {{ selectedReport!.status }}
             </span>
           </div>
         </div>
@@ -258,14 +258,14 @@
           <div class="detail-grid">
             <div class="detail-item">
               <label>Motivo</label>
-              <span class="badge-large {{ getReasonClass(reporteSeleccionado!.reason) }}">
-                {{ reporteSeleccionado!.reason }}
+              <span class="badge-large {{ getReasonClass(selectedReport!.reason) }}">
+                {{ selectedReport!.reason }}
               </span>
             </div>
             <div class="detail-item">
               <label>Gravedad</label>
-              <span class="severity-badge-large {{ getSeverityClass(reporteSeleccionado!.severity) }}">
-                {{ reporteSeleccionado!.severity }}
+              <span class="severity-badge-large {{ getSeverityClass(selectedReport!.severity) }}">
+                {{ selectedReport!.severity }}
               </span>
             </div>
           </div>
@@ -278,7 +278,7 @@
             Descripción del Reporte
           </h4>
           <div class="description-box">
-            <p>{{ reporteSeleccionado!.description }}</p>
+            <p>{{ selectedReport!.description }}</p>
           </div>
         </div>
 
@@ -293,28 +293,28 @@
               <i class="fa-solid fa-user"></i>
             </div>
             <div class="user-details">
-              <p class="user-name">{{ reporteSeleccionado!.userName }}</p>
-              <p class="user-email">{{ reporteSeleccionado!.userEmail }}</p>
+              <p class="user-name">{{ selectedReport!.userName }}</p>
+              <p class="user-email">{{ selectedReport!.userEmail }}</p>
             </div>
           </div>
           <div class="caso-extra">
-            <p *ngIf="reporteSeleccionado!.reporterName"><strong>Registrado por:</strong> {{ reporteSeleccionado!.reporterName }}</p>
-            <p *ngIf="reporteSeleccionado!.resolutionNotes"><strong>Resolución:</strong> {{ reporteSeleccionado!.resolutionNotes }}</p>
-            <button type="button" class="btn-secondary" *ngIf="reporteSeleccionado!.hasEvidence && !evidenciaCaso"
-                    (click)="verEvidenciaCaso(reporteSeleccionado!); $event.stopPropagation()">Ver evidencia adjunta</button>
-            <img *ngIf="evidenciaCaso" [src]="evidenciaCaso" alt="Evidencia del caso" class="caso-evidencia" />
+            <p *ngIf="selectedReport!.reporterName"><strong>Registrado por:</strong> {{ selectedReport!.reporterName }}</p>
+            <p *ngIf="selectedReport!.resolutionNotes"><strong>Resolución:</strong> {{ selectedReport!.resolutionNotes }}</p>
+            <button type="button" class="btn-secondary" *ngIf="selectedReport!.hasEvidence && !caseEvidence"
+                    (click)="viewCaseEvidence(selectedReport!); $event.stopPropagation()">Ver evidencia adjunta</button>
+            <img *ngIf="caseEvidence" [src]="caseEvidence" alt="Evidencia del caso" class="caso-evidencia" />
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn-secondary" (click)="cerrarModalVer(); $event.stopPropagation()">Cerrar</button>
+      <button type="button" class="btn-secondary" (click)="closeViewModal(); $event.stopPropagation()">Cerrar</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL AGREGAR REPORTE -->
-<div class="modal-overlay" *ngIf="mostrarModalAgregar && nuevoReporte" (click)="cerrarModalAgregar()">
+<div class="modal-overlay" *ngIf="showAddModal && newReport" (click)="closeAddModal()">
   <div class="modal-content modal-large" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <div class="modal-header-icon">
@@ -324,12 +324,12 @@
         <h2>Agregar Nuevo Reporte</h2>
         <p>Registra un reporte manual de una usuaria</p>
       </div>
-      <button class="modal-close" (click)="cerrarModalAgregar(); $event.stopPropagation()">
+      <button class="modal-close" (click)="closeAddModal(); $event.stopPropagation()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="guardarNuevoReporte()">
+      <form (ngSubmit)="saveNewReport()">
         <div class="form-section">
           <h4>
             <i class="fa-solid fa-user"></i>
@@ -338,11 +338,11 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Nombre del Usuario *</label>
-              <input type="text" [(ngModel)]="nuevoReporte!.userName" name="userName" required placeholder="Nombre completo del usuario" />
+              <input type="text" [(ngModel)]="newReport!.userName" name="userName" required placeholder="Nombre completo del usuario" />
             </div>
             <div class="form-group">
               <label>Email del Usuario *</label>
-              <input type="email" [(ngModel)]="nuevoReporte!.userEmail" name="userEmail" required placeholder="email@ejemplo.com" />
+              <input type="email" [(ngModel)]="newReport!.userEmail" name="userEmail" required placeholder="email@ejemplo.com" />
             </div>
           </div>
         </div>
@@ -357,15 +357,15 @@
               <label>Motivo del Reporte *</label>
               <div class="custom-select" [class.open]="isReasonDropdownOpen">
                 <div class="select-selected" (click)="toggleReasonDropdown($event)">
-                  {{ nuevoReporte!.reason || 'Seleccionar motivo' }}
+                  {{ newReport!.reason || 'Seleccionar motivo' }}
                   <i class="fa-solid fa-chevron-down select-arrow"></i>
                 </div>
                 <div class="select-items" *ngIf="isReasonDropdownOpen">
-                  <div (click)="nuevoReporte!.reason = 'Spam'; isReasonDropdownOpen = false">Spam</div>
-                  <div (click)="nuevoReporte!.reason = 'Acoso'; isReasonDropdownOpen = false">Acoso</div>
-                  <div (click)="nuevoReporte!.reason = 'Contenido inapropiado'; isReasonDropdownOpen = false">Contenido inapropiado</div>
-                  <div (click)="nuevoReporte!.reason = 'Discurso de odio'; isReasonDropdownOpen = false">Discurso de odio</div>
-                  <div (click)="nuevoReporte!.reason = 'Falsificación'; isReasonDropdownOpen = false">Falsificación</div>
+                  <div (click)="newReport!.reason = 'Spam'; isReasonDropdownOpen = false">Spam</div>
+                  <div (click)="newReport!.reason = 'Acoso'; isReasonDropdownOpen = false">Acoso</div>
+                  <div (click)="newReport!.reason = 'Contenido inapropiado'; isReasonDropdownOpen = false">Contenido inapropiado</div>
+                  <div (click)="newReport!.reason = 'Discurso de odio'; isReasonDropdownOpen = false">Discurso de odio</div>
+                  <div (click)="newReport!.reason = 'Falsificación'; isReasonDropdownOpen = false">Falsificación</div>
                 </div>
               </div>
             </div>
@@ -373,14 +373,14 @@
               <label>Gravedad *</label>
               <div class="custom-select" [class.open]="isSeverityDropdownOpen">
                 <div class="select-selected" (click)="toggleSeverityDropdown($event)">
-                  {{ nuevoReporte!.severity || 'Seleccionar gravedad' }}
+                  {{ newReport!.severity || 'Seleccionar gravedad' }}
                   <i class="fa-solid fa-chevron-down select-arrow"></i>
                 </div>
                 <div class="select-items" *ngIf="isSeverityDropdownOpen">
-                  <div (click)="nuevoReporte!.severity = 'Baja'; isSeverityDropdownOpen = false">Baja</div>
-                  <div (click)="nuevoReporte!.severity = 'Media'; isSeverityDropdownOpen = false">Media</div>
-                  <div (click)="nuevoReporte!.severity = 'Alta'; isSeverityDropdownOpen = false">Alta</div>
-                  <div (click)="nuevoReporte!.severity = 'Crítica'; isSeverityDropdownOpen = false">Crítica</div>
+                  <div (click)="newReport!.severity = 'Baja'; isSeverityDropdownOpen = false">Baja</div>
+                  <div (click)="newReport!.severity = 'Media'; isSeverityDropdownOpen = false">Media</div>
+                  <div (click)="newReport!.severity = 'Alta'; isSeverityDropdownOpen = false">Alta</div>
+                  <div (click)="newReport!.severity = 'Crítica'; isSeverityDropdownOpen = false">Crítica</div>
                 </div>
               </div>
             </div>
@@ -395,7 +395,7 @@
           <div class="form-group">
             <label>Describe detalladamente el motivo de este reporte *</label>
             <textarea
-              [(ngModel)]="nuevoReporte!.description"
+              [(ngModel)]="newReport!.description"
               name="description"
               required
               rows="5"
@@ -405,7 +405,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalAgregar(); $event.stopPropagation()">
+          <button type="button" class="btn-secondary" (click)="closeAddModal(); $event.stopPropagation()">
             <i class="fa-solid fa-xmark"></i>
             Cancelar
           </button>
@@ -420,21 +420,21 @@
 </div>
 
 <!-- MODAL EDITAR REPORTE -->
-<div class="modal-overlay" *ngIf="mostrarModalEditar && reporteSeleccionado" (click)="cerrarModalEditar()">
+<div class="modal-overlay" *ngIf="showEditModal && selectedReport" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Editar Reporte</h2>
-      <button class="modal-close" (click)="cerrarModalEditar(); $event.stopPropagation()">
+      <button class="modal-close" (click)="closeEditModal(); $event.stopPropagation()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="actualizarReporte()">
+      <form (ngSubmit)="updateReport()">
         <div class="form-group">
           <label>Motivo</label>
           <div class="custom-select" [class.open]="isEditReasonDropdownOpen">
             <div class="select-selected" (click)="toggleEditReasonDropdown($event)">
-              {{ reporteSeleccionado!.reason }}
+              {{ selectedReport!.reason }}
               <i class="fa-solid fa-chevron-down select-arrow"></i>
             </div>
             <div class="select-items" *ngIf="isEditReasonDropdownOpen">
@@ -450,7 +450,7 @@
           <label>Gravedad</label>
           <div class="custom-select" [class.open]="isEditSeverityDropdownOpen">
             <div class="select-selected" (click)="toggleEditSeverityDropdown($event)">
-              {{ reporteSeleccionado!.severity }}
+              {{ selectedReport!.severity }}
               <i class="fa-solid fa-chevron-down select-arrow"></i>
             </div>
             <div class="select-items" *ngIf="isEditSeverityDropdownOpen">
@@ -465,7 +465,7 @@
           <label>Estado</label>
           <div class="custom-select" [class.open]="isEditStatusDropdownOpen">
             <div class="select-selected" (click)="toggleEditStatusDropdown($event)">
-              {{ reporteSeleccionado!.status }}
+              {{ selectedReport!.status }}
               <i class="fa-solid fa-chevron-down select-arrow"></i>
             </div>
             <div class="select-items" *ngIf="isEditStatusDropdownOpen">
@@ -479,14 +479,14 @@
         <div class="form-group">
           <label>Descripción del Reporte</label>
           <textarea
-            [(ngModel)]="reporteSeleccionado!.description"
+            [(ngModel)]="selectedReport!.description"
             name="description"
             rows="4"
             placeholder="Describe detalladamente el motivo de este reporte y la evidencia disponible..."
           ></textarea>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalEditar(); $event.stopPropagation()">Cancelar</button>
+          <button type="button" class="btn-secondary" (click)="closeEditModal(); $event.stopPropagation()">Cancelar</button>
           <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">Guardar Cambios</button>
         </div>
       </form>

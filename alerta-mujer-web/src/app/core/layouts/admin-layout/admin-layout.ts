@@ -34,11 +34,11 @@ export class AdminLayoutComponent implements OnInit {
   // En pantallas angostas el sidebar es un drawer y empieza cerrado
   private isDrawerMode = window.innerWidth <= DRAWER_BREAKPOINT;
   sidebarCollapsed = this.isDrawerMode;
-  usuarioActual: SidebarUser | null = null;
+  currentUser: SidebarUser | null = null;
 
   // Notificaciones del topbar (alertas pendientes)
   // Signal: la app no usa zone.js, así que la campana solo se actualiza si la lista avisa del cambio.
-  notificaciones = signal<TopbarNotification[]>([]);
+  notifications = signal<TopbarNotification[]>([]);
 
   links: SidebarLink[] = [
     { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
@@ -55,7 +55,7 @@ export class AdminLayoutComponent implements OnInit {
   ];
 
   // Accesos del menú de cuenta (arriba a la derecha), además de "Mi perfil"
-  readonly enlacesCuenta: TopbarAccountLink[] = [
+  readonly accountLinks: TopbarAccountLink[] = [
     { label: 'Cambiar contraseña', route: '/admin/perfil', fragment: 'contrasena', icon: 'fa-solid fa-key' },
     { label: 'Configuración del sistema', route: '/admin/settings', icon: 'fa-solid fa-sliders' },
     { label: 'Auditoría', route: '/admin/auditoria', icon: 'fa-solid fa-clock-rotate-left' },
@@ -63,13 +63,13 @@ export class AdminLayoutComponent implements OnInit {
 
   ngOnInit() {
     // Cierre de sesión por inactividad, solo mientras se está dentro del panel
-    this.inactivity.iniciar();
-    this.destroyRef.onDestroy(() => this.inactivity.detener());
+    this.inactivity.start();
+    this.destroyRef.onDestroy(() => this.inactivity.stop());
 
     // Perfil que se muestra abajo del sidebar (antes faltaba el [user], por eso no aparecía)
-    this.authService.currentUser$.subscribe((usuario) => {
-      this.usuarioActual = usuario
-        ? { name: usuario.nombre, email: usuario.email }
+    this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user
+        ? { name: user.nombre, email: user.email }
         : null;
     });
 
@@ -92,18 +92,18 @@ export class AdminLayoutComponent implements OnInit {
         switchMap(() => this.alertsService.getAll().pipe(catchError(() => of(null)))),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe((alertas) => {
-        if (!alertas) return;
+      .subscribe((alerts) => {
+        if (!alerts) return;
 
-        this.notificaciones.set(alertas
+        this.notifications.set(alerts
           .filter((a) => a.estado === 'Pendiente')
           .sort((a, b) => Number(b.id) - Number(a.id))
           .slice(0, 20)
           .map((a) => ({
             id: a.id,
-            title: `Alerta pendiente — ${a.medioActivacion}`,
-            message: a.ubicacion ? `${a.nombre} · ${a.ubicacion}` : a.nombre,
-            time: a.tiempo,
+            title: `Alerta pendiente — ${a.activationMethod}`,
+            message: a.location ? `${a.nombre} · ${a.location}` : a.nombre,
+            time: a.time,
             route: '/admin/alertas',
           })));
       });
@@ -119,7 +119,7 @@ export class AdminLayoutComponent implements OnInit {
     }
   }
 
-  cerrarSesion() {
+  signOut() {
     this.authService.logout();
   }
 

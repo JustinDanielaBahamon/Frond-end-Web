@@ -7,8 +7,8 @@ import { FeaturesSectionComponent } from '../../../features/landing/components/f
 import { ReviewComponent } from '../../../features/landing/components/review/review';
 import { DownloadSectionComponent } from '../../../features/landing/components/download-section/download-section';
 import { FaqSectionComponent } from '../../../features/landing/components/faq-section/faq-section';
-import {ContactSectionCompoent} from '../../../features/landing/components/contact-section/contact-section';
-import {FooterSectionComopent} from '../../../features/landing/components/footer-section/footer-section'
+import {ContactSectionComponent} from '../../../features/landing/components/contact-section/contact-section';
+import {FooterSectionComponent} from '../../../features/landing/components/footer-section/footer-section'
 
 @Component({
   selector: 'app-public-layout',
@@ -22,8 +22,8 @@ import {FooterSectionComopent} from '../../../features/landing/components/footer
     ReviewComponent,
     DownloadSectionComponent,
     FaqSectionComponent,
-    ContactSectionCompoent,
-    FooterSectionComopent
+    ContactSectionComponent,
+    FooterSectionComponent
   ],
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.scss',

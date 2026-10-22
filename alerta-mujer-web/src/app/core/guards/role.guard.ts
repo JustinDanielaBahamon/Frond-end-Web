@@ -15,7 +15,7 @@ export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.getRol() === 'Admin' || auth.getRol() === 'admin') return true;
+  if (auth.getRole() === 'Admin' || auth.getRole() === 'admin') return true;
   return router.createUrlTree(['/auth/login']); // ← manda a login, no a /dashboard
 };
 
@@ -23,8 +23,8 @@ export const userGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const rol = auth.getRol();
-  if (rol === 'Usuaria' || rol === 'usuaria' || rol === 'operador') return true;
-  if (rol === 'Admin' || rol === 'admin') return router.createUrlTree(['/admin/dashboard']);
+  const role = auth.getRole();
+  if (role === 'Usuaria' || role === 'usuaria' || role === 'operador') return true;
+  if (role === 'Admin' || role === 'admin') return router.createUrlTree(['/admin/dashboard']);
   return router.createUrlTree(['/auth/login']); // ← si no hay sesión
 };

@@ -5,18 +5,18 @@ import { environment } from '../../../environments/environment';
 import { WebPushService } from './web-push.service';
 
 /** Alerta de otra persona que tiene a la usuaria como contacto de emergencia. */
-export interface AlertaRecibida {
+export interface ReceivedAlert {
   id: number;
   nombre: string;
-  activa: boolean;
+  active: boolean;
   estado: string;
-  inicio: Date | null;
-  fin: Date | null;
-  seguimientoDisponible: boolean;
+  start: Date | null;
+  end: Date | null;
+  trackingAvailable: boolean;
 }
 
-const REFRESCO_MS = 30_000;
-const CLAVE_AVISADAS = 'alerta-mujer-alertas-avisadas';
+const REFRESH_MS = 30_000;
+const NOTIFIED_KEY = 'alerta-mujer-alertas-avisadas';
 
 /**
  * Alertas recibidas como contacto de emergencia. Mientras el panel está abierto se consultan cada
@@ -27,80 +27,80 @@ const CLAVE_AVISADAS = 'alerta-mujer-alertas-avisadas';
 export class ReceivedAlertsService {
   private http = inject(HttpClient);
   private webPush = inject(WebPushService);
-  private temporizador: ReturnType<typeof setInterval> | null = null;
+  private timer: ReturnType<typeof setInterval> | null = null;
 
-  readonly recibidas = signal<AlertaRecibida[]>([]);
-  readonly cargando = signal(false);
-  readonly activas = computed(() => this.recibidas().filter((a) => a.activa));
-  readonly permisoNotificaciones = signal<NotificationPermission | 'no-soportado'>(
+  readonly received = signal<ReceivedAlert[]>([]);
+  readonly loading = signal(false);
+  readonly active = computed(() => this.received().filter((a) => a.active));
+  readonly notificationPermission = signal<NotificationPermission | 'no-soportado'>(
     typeof Notification === 'undefined' ? 'no-soportado' : Notification.permission,
   );
 
   /** Empieza a consultar (lo llama el panel al abrirse). */
-  iniciar(): void {
-    if (this.temporizador) return;
-    this.consultar();
+  start(): void {
+    if (this.timer) return;
+    this.query();
     // Con permiso ya concedido, se (re)registra el navegador para recibir avisos con la pestaña cerrada
-    if (this.permisoNotificaciones() === 'granted') this.webPush.activar(() => this.consultar());
-    this.temporizador = setInterval(() => this.consultar(), REFRESCO_MS);
+    if (this.notificationPermission() === 'granted') this.webPush.activate(() => this.query());
+    this.timer = setInterval(() => this.query(), REFRESH_MS);
   }
 
-  detener(): void {
-    if (this.temporizador) clearInterval(this.temporizador);
-    this.temporizador = null;
+  stop(): void {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null;
   }
 
-  async consultar(): Promise<void> {
-    this.cargando.set(true);
+  async query(): Promise<void> {
+    this.loading.set(true);
     try {
-      const datos = await firstValueFrom(this.http.get<any[]>(`${environment.apiUrl}/api/received-alerts`));
-      const lista: AlertaRecibida[] = (datos ?? []).map((a) => ({
+      const data = await firstValueFrom(this.http.get<any[]>(`${environment.apiUrl}/api/received-alerts`));
+      const list: ReceivedAlert[] = (data ?? []).map((a) => ({
         id: a.alertId,
         nombre: a.firstName || 'Un contacto',
-        activa: !!a.active,
+        active: !!a.active,
         estado: a.status,
-        inicio: a.startedAt ? new Date(a.startedAt) : null,
-        fin: a.endedAt ? new Date(a.endedAt) : null,
-        seguimientoDisponible: !!a.trackingAvailable,
+        start: a.startedAt ? new Date(a.startedAt) : null,
+        end: a.endedAt ? new Date(a.endedAt) : null,
+        trackingAvailable: !!a.trackingAvailable,
       }));
-      this.recibidas.set(lista);
-      this.avisarNuevas(lista.filter((a) => a.activa));
+      this.received.set(list);
+      this.notifyNew(list.filter((a) => a.active));
     } catch {
       // Sin conexión o sesión vencida: se reintenta en la siguiente consulta
     } finally {
-      this.cargando.set(false);
+      this.loading.set(false);
     }
   }
 
   /** Código para abrir /seguimiento/{codigo} de una alerta recibida. */
-  async codigoSeguimiento(id: number): Promise<string> {
+  async trackingCode(id: number): Promise<string> {
     const r = await firstValueFrom(
       this.http.post<{ code: string }>(`${environment.apiUrl}/api/received-alerts/${id}/tracking`, {}),
     );
     return r.code;
   }
 
-  async pedirPermisoNotificaciones(): Promise<void> {
+  async requestNotificationPermission(): Promise<void> {
     if (typeof Notification === 'undefined') return;
-    const permiso = await Notification.requestPermission();
-    this.permisoNotificaciones.set(permiso);
-    if (permiso === 'granted') await this.webPush.activar(() => this.consultar());
+    const permission = await Notification.requestPermission();
+    this.notificationPermission.set(permission);
+    if (permission === 'granted') await this.webPush.activate(() => this.query());
   }
 
   /** true si los avisos llegan aunque se cierre la pestaña (falta la clave VAPID si es false). */
-  get avisosConPestanaCerrada(): boolean {
-    return this.webPush.configurado;
+  get noticesWithTabClosed(): boolean {
+    return this.webPush.configured;
   }
 
   // Notificación del navegador una sola vez por alerta (se recuerda entre recargas)
-  private avisarNuevas(activas: AlertaRecibida[]): void {
-    const avisadas = new Set<number>(this.leerAvisadas());
-    const nuevas = activas.filter((a) => !avisadas.has(a.id));
-    if (nuevas.length === 0) return;
-    nuevas.forEach((a) => avisadas.add(a.id));
-    this.guardarAvisadas([...avisadas].slice(-50));
-    if (this.permisoNotificaciones() !== 'granted') return;
-    for (const a of nuevas) {
+  private notifyNew(active: ReceivedAlert[]): void {
+    const notified = new Set<number>(this.readNotified());
+    const newOnes = active.filter((a) => !notified.has(a.id));
+    if (newOnes.length === 0) return;
+    newOnes.forEach((a) => notified.add(a.id));
+    this.saveNotified([...notified].slice(-50));
+    if (this.notificationPermission() !== 'granted') return;
+    for (const a of newOnes) {
       const n = new Notification(`🚨 ${a.nombre} activó una alerta de emergencia`, {
         body: 'Toca para ver dónde está y cómo ayudar.',
         tag: `alerta-${a.id}`,
@@ -113,17 +113,17 @@ export class ReceivedAlertsService {
     }
   }
 
-  private leerAvisadas(): number[] {
+  private readNotified(): number[] {
     try {
-      return JSON.parse(localStorage.getItem(CLAVE_AVISADAS) ?? '[]');
+      return JSON.parse(localStorage.getItem(NOTIFIED_KEY) ?? '[]');
     } catch {
       return [];
     }
   }
 
-  private guardarAvisadas(ids: number[]): void {
+  private saveNotified(ids: number[]): void {
     try {
-      localStorage.setItem(CLAVE_AVISADAS, JSON.stringify(ids));
+      localStorage.setItem(NOTIFIED_KEY, JSON.stringify(ids));
     } catch {
       // modo privado: no pasa nada, solo podría repetirse el aviso
     }

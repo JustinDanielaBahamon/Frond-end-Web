@@ -1,28 +1,28 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { PhoneLocationService } from './phone.location.services';
-import { GeocodingService, Lugar } from './geocoding.service';
+import { GeocodingService, Place } from './geocoding.service';
 
 /** Lugar de referencia contra el que se compara la ubicación del celular. */
-interface Referencia {
+interface Reference {
   lat: number;
   lng: number;
-  lugar: string;
-  avisadoEn: number;
+  place: string;
+  notifiedAt: number;
 }
 
-export interface AvisoMovimiento {
-  desde: string;
-  hasta: string;
-  hora: Date;
+export interface MovementNotice {
+  from: string;
+  to: string;
+  time: Date;
 }
 
-const CLAVE_ACTIVO = 'alerta-mujer-aviso-desplazamiento';
-const CLAVE_REFERENCIA = 'alerta-mujer-referencia-celular';
-const REVISAR_CADA_MS = 5 * 60 * 1000;
+const ACTIVE_KEY = 'alerta-mujer-aviso-desplazamiento';
+const REFERENCE_KEY = 'alerta-mujer-referencia-celular';
+const CHECK_EVERY_MS = 5 * 60 * 1000;
 // Un desplazamiento menor se considera el mismo sitio (el GPS se mueve unos metros solo)
-const DISTANCIA_MINIMA_M = 300;
+const MIN_DISTANCE_M = 300;
 // Como mucho un aviso cada 30 minutos aunque siga moviéndose
-const AVISO_CADA_MS = 30 * 60 * 1000;
+const NOTICE_EVERY_MS = 30 * 60 * 1000;
 
 /**
  * "Notificaciones de ubicación": mientras la web está abierta, revisa la ubicación que envía el
@@ -30,107 +30,107 @@ const AVISO_CADA_MS = 30 * 60 * 1000;
  * aviso en el panel, notificación del navegador y un sonido corto (un computador no vibra).
  */
 @Injectable({ providedIn: 'root' })
-export class MovimientoCelularService {
-  private ubicacion = inject(PhoneLocationService);
+export class PhoneMovementService {
+  private location = inject(PhoneLocationService);
   private geocoding = inject(GeocodingService);
 
-  readonly activo = signal(leer(CLAVE_ACTIVO) !== 'false');
-  readonly aviso = signal<AvisoMovimiento | null>(null);
-  private reloj?: ReturnType<typeof setInterval>;
+  readonly active = signal(leer(ACTIVE_KEY) !== 'false');
+  readonly notice = signal<MovementNotice | null>(null);
+  private clock?: ReturnType<typeof setInterval>;
 
-  iniciar(): void {
-    this.detener();
-    if (!this.activo()) return;
-    this.revisar();
-    this.reloj = setInterval(() => this.revisar(), REVISAR_CADA_MS);
+  start(): void {
+    this.stop();
+    if (!this.active()) return;
+    this.review();
+    this.clock = setInterval(() => this.review(), CHECK_EVERY_MS);
   }
 
-  detener(): void {
-    if (this.reloj) clearInterval(this.reloj);
-    this.reloj = undefined;
+  stop(): void {
+    if (this.clock) clearInterval(this.clock);
+    this.clock = undefined;
   }
 
-  cambiarActivo(valor: boolean): void {
-    this.activo.set(valor);
-    guardar(CLAVE_ACTIVO, String(valor));
-    if (valor) {
+  toggleActive(value: boolean): void {
+    this.active.set(value);
+    save(ACTIVE_KEY, String(value));
+    if (value) {
       if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-      this.iniciar();
+      this.start();
     } else {
-      this.detener();
-      this.aviso.set(null);
+      this.stop();
+      this.notice.set(null);
     }
   }
 
-  cerrarAviso(): void {
-    this.aviso.set(null);
+  closeNotice(): void {
+    this.notice.set(null);
   }
 
-  private revisar(): void {
-    this.ubicacion.getLatest().subscribe({
+  private review(): void {
+    this.location.getLatest().subscribe({
       next: async (u) => {
         if (!u) return;
-        const ref = this.referencia();
+        const ref = this.reference();
         if (!ref) {
-          this.guardarReferencia(u.lat, u.lng, await this.nombreLugar(u.lat, u.lng), 0);
+          this.saveReference(u.lat, u.lng, await this.placeName(u.lat, u.lng), 0);
           return;
         }
-        if (distanciaM(ref.lat, ref.lng, u.lat, u.lng) < DISTANCIA_MINIMA_M) return;
-        if (Date.now() - ref.avisadoEn < AVISO_CADA_MS) return;
-        const hasta = await this.nombreLugar(u.lat, u.lng);
-        this.guardarReferencia(u.lat, u.lng, hasta, Date.now());
-        this.avisar({ desde: ref.lugar, hasta, hora: u.recordedAt ? new Date(u.recordedAt) : new Date() });
+        if (distanceM(ref.lat, ref.lng, u.lat, u.lng) < MIN_DISTANCE_M) return;
+        if (Date.now() - ref.notifiedAt < NOTICE_EVERY_MS) return;
+        const to = await this.placeName(u.lat, u.lng);
+        this.saveReference(u.lat, u.lng, to, Date.now());
+        this.notify({ from: ref.place, to, time: u.recordedAt ? new Date(u.recordedAt) : new Date() });
       },
       error: () => {},
     });
   }
 
-  private avisar(aviso: AvisoMovimiento): void {
-    this.aviso.set(aviso);
-    const texto = `Tu celular se desplazó de ${aviso.desde} y ahora está cerca de ${aviso.hasta}.`;
+  private notify(notice: MovementNotice): void {
+    this.notice.set(notice);
+    const text = `Tu celular se desplazó de ${notice.from} y ahora está cerca de ${notice.to}.`;
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Tu celular cambió de lugar', { body: texto, icon: '/email/logo.png', tag: 'movimiento-celular' });
+      new Notification('Tu celular cambió de lugar', { body: text, icon: '/email/logo.png', tag: 'movimiento-celular' });
     }
     sonar();
   }
 
-  private async nombreLugar(lat: number, lng: number): Promise<string> {
-    const lugar: Lugar | null = await this.geocoding.obtener(lat, lng);
-    return (lugar && ([lugar.barrio, lugar.direccion].filter(Boolean).join(', ') || lugar.ciudad))
+  private async placeName(lat: number, lng: number): Promise<string> {
+    const place: Place | null = await this.geocoding.get(lat, lng);
+    return (place && ([place.neighborhood, place.address].filter(Boolean).join(', ') || place.city))
       || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   }
 
-  private referencia(): Referencia | null {
+  private reference(): Reference | null {
     try {
-      return JSON.parse(leer(CLAVE_REFERENCIA) ?? 'null');
+      return JSON.parse(leer(REFERENCE_KEY) ?? 'null');
     } catch {
       return null;
     }
   }
 
-  private guardarReferencia(lat: number, lng: number, lugar: string, avisadoEn: number): void {
-    guardar(CLAVE_REFERENCIA, JSON.stringify({ lat, lng, lugar, avisadoEn } satisfies Referencia));
+  private saveReference(lat: number, lng: number, place: string, notifiedAt: number): void {
+    save(REFERENCE_KEY, JSON.stringify({ lat, lng, place, notifiedAt } satisfies Reference));
   }
 }
 
-function leer(clave: string): string | null {
+function leer(key: string): string | null {
   try {
-    return localStorage.getItem(clave);
+    return localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function guardar(clave: string, valor: string): void {
+function save(key: string, value: string): void {
   try {
-    localStorage.setItem(clave, valor);
+    localStorage.setItem(key, value);
   } catch {
     // Sin almacenamiento el aviso funciona igual, solo se pierde al recargar
   }
 }
 
 /** Distancia en metros entre dos puntos (fórmula de Haversine). */
-export function distanciaM(lat1: number, lng1: number, lat2: number, lng2: number): number {
+export function distanceM(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const rad = (g: number) => (g * Math.PI) / 180;
   const a = Math.sin(rad(lat2 - lat1) / 2) ** 2
     + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(rad(lng2 - lng1) / 2) ** 2;
@@ -141,16 +141,16 @@ export function distanciaM(lat1: number, lng1: number, lat2: number, lng2: numbe
 function sonar(): void {
   try {
     const ctx = new AudioContext();
-    [0, 0.22].forEach((inicio, i) => {
-      const osc = ctx.createOscillator();
+    [0, 0.22].forEach((start, i) => {
+      const dark = ctx.createOscillator();
       const vol = ctx.createGain();
-      osc.frequency.value = i === 0 ? 880 : 1175;
-      vol.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
-      vol.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + inicio + 0.02);
-      vol.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + 0.2);
-      osc.connect(vol).connect(ctx.destination);
-      osc.start(ctx.currentTime + inicio);
-      osc.stop(ctx.currentTime + inicio + 0.21);
+      dark.frequency.value = i === 0 ? 880 : 1175;
+      vol.gain.setValueAtTime(0.0001, ctx.currentTime + start);
+      vol.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + start + 0.02);
+      vol.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + 0.2);
+      dark.connect(vol).connect(ctx.destination);
+      dark.start(ctx.currentTime + start);
+      dark.stop(ctx.currentTime + start + 0.21);
     });
     setTimeout(() => ctx.close(), 800);
   } catch {

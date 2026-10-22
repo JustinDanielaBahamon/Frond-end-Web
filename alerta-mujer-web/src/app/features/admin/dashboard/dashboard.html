@@ -5,25 +5,25 @@
     <div class="dash-top">
       <div>
         <h1 class="dash-title">Dashboard de un vistazo</h1>
-        <p class="dash-sub">Información general del sistema y estado actual de la plataforma. Actualizado a las {{ actualizadoEn | date:'HH:mm:ss' }}.</p>
+        <p class="dash-sub">Información general del sistema y estado actual de la plataforma. Actualizado a las {{ updatedAt | date:'HH:mm:ss' }}.</p>
       </div>
 
       <div class="filtros" role="group" aria-label="Periodo">
-        @for (p of periodos; track p.valor) {
-          <button type="button" class="filtro-btn" [class.activo]="periodo === p.valor" (click)="setPeriodo(p.valor)">
-            {{ p.etiqueta }}
+        @for (p of periods; track p.value) {
+          <button type="button" class="filtro-btn" [class.activo]="period === p.value" (click)="setPeriod(p.value)">
+            {{ p.label }}
           </button>
         }
       </div>
     </div>
 
-    @if (periodo === 'custom') {
+    @if (period === 'custom') {
       <div class="filtros filtros--fechas">
         <label class="fecha-label">Desde
-          <app-selector-fecha etiqueta="Desde" [value]="desde" [max]="hasta || null" [limpiable]="false" (valueChange)="onDesde($event)" />
+          <app-selector-fecha etiqueta="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
         </label>
         <label class="fecha-label">Hasta
-          <app-selector-fecha etiqueta="Hasta" [value]="hasta" [min]="desde || null" [limpiable]="false" (valueChange)="onHasta($event)" />
+          <app-selector-fecha etiqueta="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
         </label>
       </div>
     }
@@ -33,11 +33,11 @@
     <p class="dash-error">No se pudieron cargar los datos del dashboard.</p>
   }
 
-  @if (cargando) {
+  @if (loading) {
     <p class="dash-loading">Cargando datos...</p>
   }
 
-  @if (!cargando && !error) {
+  @if (!loading && !error) {
 
     <!-- ===== STATS ===== -->
     <div class="stats-row">
@@ -50,8 +50,8 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__label">Pendientes ahora</span>
-          <span class="stat-card__value">{{ alertasPendientes | number }}</span>
-          <span class="stat-card__sub">{{ pendienteMasAntigua }}</span>
+          <span class="stat-card__value">{{ pendingAlerts | number }}</span>
+          <span class="stat-card__sub">{{ oldestPending }}</span>
         </div>
       </div>
 
@@ -64,8 +64,8 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__label">Usuarias activas</span>
-          <span class="stat-card__value">{{ usuariasActivas | number }}</span>
-          <span class="stat-card__sub">{{ porcentajeActivas }}% del total</span>
+          <span class="stat-card__value">{{ activeUsers | number }}</span>
+          <span class="stat-card__sub">{{ activePercentage }}% del total</span>
         </div>
       </div>
 
@@ -77,8 +77,8 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__label">Atendidas</span>
-          <span class="stat-card__value">{{ alertasAtendidas | number }}</span>
-          <span class="stat-card__sub">{{ porcentajeAtendidas }}% de las alertas</span>
+          <span class="stat-card__value">{{ attendedAlerts | number }}</span>
+          <span class="stat-card__sub">{{ attendedPercentage }}% de las alertas</span>
         </div>
       </div>
 
@@ -90,8 +90,8 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__label">Canceladas</span>
-          <span class="stat-card__value">{{ alertasCanceladas | number }}</span>
-          <span class="stat-card__sub">{{ porcentajeCanceladas }}% · posibles falsas alarmas</span>
+          <span class="stat-card__value">{{ cancelledAlerts | number }}</span>
+          <span class="stat-card__sub">{{ cancelledPercentage }}% · posibles falsas alarmas</span>
         </div>
       </div>
 
@@ -99,9 +99,9 @@
 
     <!-- ===== ATAJOS PARA ENTRAR CON URGENCIA ===== -->
     <nav class="atajos" aria-label="Atajos">
-      <a class="atajo" [class.atajo--urgente]="alertasPendientes > 0" routerLink="/admin/alertas">
+      <a class="atajo" [class.atajo--urgente]="pendingAlerts > 0" routerLink="/admin/alertas">
         <i class="ti ti-urgent" aria-hidden="true"></i>
-        <span>{{ alertasPendientes > 0 ? alertasPendientes + (alertasPendientes === 1 ? ' alerta activa' : ' alertas activas') : 'Alertas' }}</span>
+        <span>{{ pendingAlerts > 0 ? pendingAlerts + (pendingAlerts === 1 ? ' alerta activa' : ' alertas activas') : 'Alertas' }}</span>
       </a>
       <a class="atajo" routerLink="/admin/usuarios"><i class="ti ti-user-off" aria-hidden="true"></i><span>Bloquear una cuenta</span></a>
       <a class="atajo" routerLink="/admin/zone-management"><i class="ti ti-map-pin-exclamation" aria-hidden="true"></i><span>Zonas de riesgo</span></a>
@@ -125,41 +125,41 @@
       <div class="horas-stats">
         <div class="mini-stat">
           <span class="mini-stat__label">Hora pico</span>
-          <span class="mini-stat__value">{{ horaPicoTexto }}</span>
-          <span class="mini-stat__sub">{{ horaPicoDetalle }}</span>
+          <span class="mini-stat__value">{{ peakHourText }}</span>
+          <span class="mini-stat__sub">{{ peakHourDetail }}</span>
         </div>
         <div class="mini-stat">
           <span class="mini-stat__label">Franja más riesgosa</span>
-          <span class="mini-stat__value">{{ franjaRiesgosaTexto }}</span>
-          <span class="mini-stat__sub">{{ franjaRiesgosaDetalle }}</span>
+          <span class="mini-stat__value">{{ riskyBandText }}</span>
+          <span class="mini-stat__sub">{{ riskyBandDetail }}</span>
         </div>
         <div class="mini-stat">
           <span class="mini-stat__label">Franja más tranquila</span>
-          <span class="mini-stat__value">{{ franjaTranquilaTexto }}</span>
-          <span class="mini-stat__sub">{{ franjaTranquilaDetalle }}</span>
+          <span class="mini-stat__value">{{ calmBandText }}</span>
+          <span class="mini-stat__sub">{{ calmBandDetail }}</span>
         </div>
       </div>
 
-      @if (hayDatosHoras) {
+      @if (hasHourData) {
         <div class="horas-scroll">
           <svg class="horas-svg" viewBox="0 0 1000 275" role="img"
                aria-label="Barras de alertas por hora del día, agrupadas en madrugada, mañana, tarde y noche">
-            @for (f of franjasGraf; track f.nombre; let i = $index) {
+            @for (f of chartBands; track f.nombre; let i = $index) {
               <rect class="franja-bg" [class.franja-bg--alt]="i % 2 === 1" [class.franja-bg--noche]="f.nombre === 'Noche'"
                     [attr.x]="f.x" y="30" [attr.width]="f.w" height="210" />
-              <text class="franja-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.nombre }} · {{ f.rango }}</text>
+              <text class="franja-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.nombre }} · {{ f.range }}</text>
             }
-            @for (t of horasTicks; track t.label) {
+            @for (t of hourTicks; track t.label) {
               <line class="grid-line" x1="50" [attr.y1]="t.y" x2="980" [attr.y2]="t.y" />
               <text class="axis-text" x="40" [attr.y]="t.y + 4" text-anchor="end">{{ t.label }}</text>
             }
-            @for (b of horasBarras; track b.hora) {
-              @if (b.valor > 0) {
-                <rect class="hora-bar" [class.hora-bar--pico]="b.pico" [attr.x]="b.x" [attr.y]="b.y"
+            @for (b of hourBars; track b.time) {
+              @if (b.value > 0) {
+                <rect class="hora-bar" [class.hora-bar--pico]="b.peak" [attr.x]="b.x" [attr.y]="b.y"
                       width="26" [attr.height]="b.h" rx="4" />
-                <text class="hora-valor" [attr.x]="b.cx" [attr.y]="b.y - 6" text-anchor="middle">{{ b.valor }}</text>
+                <text class="hora-valor" [attr.x]="b.cx" [attr.y]="b.y - 6" text-anchor="middle">{{ b.value }}</text>
               }
-              <text class="axis-text" [attr.x]="b.cx" y="260" text-anchor="middle">{{ b.hora }}h</text>
+              <text class="axis-text" [attr.x]="b.cx" y="260" text-anchor="middle">{{ b.time }}h</text>
             }
           </svg>
         </div>
@@ -186,38 +186,38 @@
       <div class="zonas-body">
         <div class="zona-mapa-wrap">
           <div class="zona-mapa">
-            <div #mapaZonas class="mapa-leaflet"></div>
+            <div #zonesMap class="mapa-leaflet"></div>
           </div>
 
-          @if (zonaActual; as z) {
+          @if (currentZone; as z) {
             <div class="zona-detalle">
               <span class="zona-detalle__label">Punto seleccionado</span>
               <span class="zona-detalle__nombre">{{ z.nombre }}</span>
               <span class="zona-detalle__meta">
-                {{ z.direccion || (z.buscando ? 'Buscando dirección…' : 'Dirección no disponible') }}
-                · {{ z.cantidad }} {{ z.cantidad === 1 ? 'alerta' : 'alertas' }}
+                {{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}
+                · {{ z.count }} {{ z.count === 1 ? 'alerta' : 'alertas' }}
                 · {{ z.lat | number:'1.4-4' }}, {{ z.lng | number:'1.4-4' }}
               </span>
-              @if (z.zonaRiesgo) {
-                <span class="zona-detalle__meta">Dentro de la zona de riesgo: {{ z.zonaRiesgo }}</span>
+              @if (z.riskZone) {
+                <span class="zona-detalle__meta">Dentro de la zona de riesgo: {{ z.riskZone }}</span>
               }
             </div>
           }
         </div>
 
         <ul class="zona-lista">
-          @for (z of zonasIncidentes; track z.rank; let i = $index) {
+          @for (z of incidentZones; track z.rank; let i = $index) {
             <li>
-              <button type="button" class="zona-item" [class.activo]="i === zonaSeleccionada" (click)="seleccionarZona(i)">
+              <button type="button" class="zona-item" [class.activo]="i === selectedZone" (click)="selectZone(i)">
                 <span class="rank" [ngClass]="'rank--' + z.rank">{{ z.rank }}</span>
                 <span class="zona-item__texto">
                   <span class="zona-item__nombre">{{ z.nombre }}</span>
-                  <span class="zona-item__dir">{{ z.direccion || (z.buscando ? 'Buscando dirección…' : 'Dirección no disponible') }}</span>
+                  <span class="zona-item__dir">{{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}</span>
                   <span class="zona-item__bar">
-                    <span class="zona-item__fill" [class.zona-item__fill--top]="i === 0" [style.width.%]="z.barra"></span>
+                    <span class="zona-item__fill" [class.zona-item__fill--top]="i === 0" [style.width.%]="z.bar"></span>
                   </span>
                 </span>
-                <span class="zona-item__cant">{{ z.cantidad }} · {{ z.porcentaje }}%</span>
+                <span class="zona-item__cant">{{ z.count }} · {{ z.percentage }}%</span>
               </button>
             </li>
           } @empty {
@@ -236,62 +236,62 @@
           </svg>
         </span>
         <div>
-          @if (vistaTendencia === 'semana') {
+          @if (trendView === 'semana') {
             <h3>¿Hay más o menos alertas que la semana pasada?</h3>
             <p>Alertas de cada día de esta semana junto a las del mismo día de la semana anterior</p>
           } @else {
             <h3>¿En qué semanas del mes hay más alertas?</h3>
-            <p>Alertas de cada semana de {{ tendenciaMes }} junto a las de la misma semana del mes anterior</p>
+            <p>Alertas de cada semana de {{ monthTrend }} junto a las de la misma semana del mes anterior</p>
           }
         </div>
         <div class="trend-vista" role="group" aria-label="Ver la tendencia por">
-          <button type="button" class="filtro-btn" [class.activo]="vistaTendencia === 'semana'" [attr.aria-pressed]="vistaTendencia === 'semana'" (click)="cambiarVistaTendencia('semana')">Semana</button>
-          <button type="button" class="filtro-btn" [class.activo]="vistaTendencia === 'mes'" [attr.aria-pressed]="vistaTendencia === 'mes'" (click)="cambiarVistaTendencia('mes')">Mes</button>
+          <button type="button" class="filtro-btn" [class.activo]="trendView === 'semana'" [attr.aria-pressed]="trendView === 'semana'" (click)="changeTrendView('semana')">Semana</button>
+          <button type="button" class="filtro-btn" [class.activo]="trendView === 'mes'" [attr.aria-pressed]="trendView === 'mes'" (click)="changeTrendView('mes')">Mes</button>
         </div>
       </div>
 
-      @if (tendenciaActualTotal + tendenciaPreviaTotal > 0) {
+      @if (currentTrendTotal + previousTrendTotal > 0) {
         <div class="trend-resumen">
           <div class="trend-resumen__dato">
-            <span class="trend-resumen__valor">{{ tendenciaActualTotal }}</span>
-            <span class="trend-resumen__etiqueta">{{ vistaTendencia === 'mes' ? 'este mes' : 'esta semana' }} (hasta hoy)</span>
+            <span class="trend-resumen__valor">{{ currentTrendTotal }}</span>
+            <span class="trend-resumen__etiqueta">{{ trendView === 'mes' ? 'este mes' : 'esta semana' }} (hasta hoy)</span>
           </div>
           <div class="trend-resumen__dato">
-            <span class="trend-resumen__valor trend-resumen__valor--previa">{{ tendenciaPreviaHastaHoy }}</span>
-            <span class="trend-resumen__etiqueta">{{ vistaTendencia === 'mes' ? 'el mes pasado' : 'la semana pasada' }}, mismos días</span>
+            <span class="trend-resumen__valor trend-resumen__valor--previa">{{ previousTrendUntilToday }}</span>
+            <span class="trend-resumen__etiqueta">{{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}, mismos días</span>
           </div>
-          <p class="trend-resumen__frase">{{ tendenciaFrase }}</p>
+          <p class="trend-resumen__frase">{{ trendSentence }}</p>
         </div>
 
         <svg class="trend-svg" viewBox="0 0 640 230" role="img"
-             [attr.aria-label]="(vistaTendencia === 'mes' ? 'Alertas por semana del mes. ' : 'Alertas por día. ') + tendenciaFrase">
-          @for (t of tendenciaTicks; track t.label) {
+             [attr.aria-label]="(trendView === 'mes' ? 'Alertas por semana del mes. ' : 'Alertas por día. ') + trendSentence">
+          @for (t of trendTicks; track t.label) {
             <line class="grid-line" x1="40" [attr.y1]="t.y" x2="620" [attr.y2]="t.y" />
             <text class="axis-text" x="30" [attr.y]="t.y + 3" text-anchor="end">{{ t.label }}</text>
           }
-          @for (b of tendenciaBarras; track b.dia) {
-            <g class="trend-dia" [class.trend-dia--hoy]="b.esHoy">
-              <title>{{ b.diaLargo }}: {{ b.actual === null ? 'aún no llega' : b.actual + (vistaTendencia === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previa }} {{ vistaTendencia === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
-              <rect class="trend-hit" [attr.x]="b.xGrupo" y="20" [attr.width]="b.anchoGrupo" height="170" />
-              @if (b.previa > 0) {
-                <path class="trend-bar trend-bar--previa" [attr.d]="b.dPrevia" />
-                <text class="trend-valor" [attr.x]="b.xPrevia + b.anchoBarra / 2" [attr.y]="b.yPrevia - 6" text-anchor="middle">{{ b.previa }}</text>
+          @for (b of trendBars; track b.day) {
+            <g class="trend-dia" [class.trend-dia--hoy]="b.isToday">
+              <title>{{ b.longDay }}: {{ b.actual === null ? 'aún no llega' : b.actual + (trendView === 'mes' ? ' este mes' : ' esta semana') }} · {{ b.previous }} {{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' }}</title>
+              <rect class="trend-hit" [attr.x]="b.groupX" y="20" [attr.width]="b.groupWidth" height="170" />
+              @if (b.previous > 0) {
+                <path class="trend-bar trend-bar--previa" [attr.d]="b.previousPath" />
+                <text class="trend-valor" [attr.x]="b.previousX + b.barWidth / 2" [attr.y]="b.previousY - 6" text-anchor="middle">{{ b.previous }}</text>
               }
               @if (b.actual) {
                 <path class="trend-bar" [attr.d]="b.dActual" />
-                <text class="trend-valor trend-valor--actual" [attr.x]="b.xActual + b.anchoBarra / 2" [attr.y]="b.yActual - 6" text-anchor="middle">{{ b.actual }}</text>
+                <text class="trend-valor trend-valor--actual" [attr.x]="b.xActual + b.barWidth / 2" [attr.y]="b.yActual - 6" text-anchor="middle">{{ b.actual }}</text>
               }
-              <text class="axis-text" [class.axis-text--hoy]="b.esHoy" [attr.x]="b.xGrupo + b.anchoGrupo / 2" y="210" text-anchor="middle">{{ b.esHoy ? (vistaTendencia === 'mes' ? 'Esta sem.' : 'Hoy') : b.dia }}</text>
+              <text class="axis-text" [class.axis-text--hoy]="b.isToday" [attr.x]="b.groupX + b.groupWidth / 2" y="210" text-anchor="middle">{{ b.isToday ? (trendView === 'mes' ? 'Esta sem.' : 'Hoy') : b.day }}</text>
             </g>
           }
         </svg>
         <div class="leyenda">
-          <span><span class="leyenda__barra"></span>{{ vistaTendencia === 'mes' ? 'Este mes' : 'Esta semana' }}</span>
-          <span><span class="leyenda__barra leyenda__barra--previa"></span>{{ vistaTendencia === 'mes' ? 'Mes anterior' : 'Semana anterior' }}</span>
-          <span class="leyenda__nota">Pasa el cursor sobre {{ vistaTendencia === 'mes' ? 'una semana' : 'un día' }} para ver el detalle.</span>
+          <span><span class="leyenda__barra"></span>{{ trendView === 'mes' ? 'Este mes' : 'Esta semana' }}</span>
+          <span><span class="leyenda__barra leyenda__barra--previa"></span>{{ trendView === 'mes' ? 'Mes anterior' : 'Semana anterior' }}</span>
+          <span class="leyenda__nota">Pasa el cursor sobre {{ trendView === 'mes' ? 'una semana' : 'un día' }} para ver el detalle.</span>
         </div>
       } @else {
-        <p class="empty">Aún no hay alertas con fecha en {{ vistaTendencia === 'mes' ? 'estos dos meses' : 'estas dos semanas' }}.</p>
+        <p class="empty">Aún no hay alertas con fecha en {{ trendView === 'mes' ? 'estos dos meses' : 'estas dos semanas' }}.</p>
       }
     </div>
 
@@ -309,9 +309,9 @@
         </div>
 
         <div class="filtros filtros--tabla" role="group" aria-label="Estado de la alerta">
-          @for (f of filtrosEstado; track f.valor) {
-            <button type="button" class="filtro-btn" [class.activo]="filtroEstado === f.valor" (click)="setFiltroEstado(f.valor)">
-              {{ f.etiqueta }}
+          @for (f of statusFilters; track f.value) {
+            <button type="button" class="filtro-btn" [class.activo]="statusFilter === f.value" (click)="setStatusFilter(f.value)">
+              {{ f.label }}
             </button>
           }
         </div>
@@ -329,18 +329,18 @@
             </tr>
           </thead>
           <tbody>
-            @for (a of alertasRecientes; track $index) {
+            @for (a of recentAlerts; track $index) {
               <tr>
-                <td>{{ a.tiempo }}</td>
+                <td>{{ a.time }}</td>
                 <td>{{ a.nombre }}</td>
                 <td>
-                  <span class="estado-badge" [ngClass]="claseEstado(a.estado)">
+                  <span class="estado-badge" [ngClass]="statusClass(a.estado)">
                     <span class="estado-badge__icono"></span>{{ a.estado }}
                   </span>
                 </td>
                 <td>
                   @if (a.lat || a.lng) {
-                    <button type="button" class="link-btn" (click)="verEnMapa(a)">Ver en mapa</button>
+                    <button type="button" class="link-btn" (click)="viewOnMap(a)">Ver en mapa</button>
                   } @else {
                     —
                   }

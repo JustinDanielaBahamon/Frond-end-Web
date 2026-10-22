@@ -26,56 +26,56 @@ export class LoginComponent {
   error = '';
   loading = false;
 
-  viewpassword = false;
+  viewPassword = false;
 
-  emailValido = true;
-  passwordValida = true;
+  validEmail = true;
+  validPassword = true;
 
   // ------------------------
   // Mostrar/Ocultar contraseña
   // ------------------------
 
   showpassword() {
-    this.viewpassword = !this.viewpassword;
+    this.viewPassword = !this.viewPassword;
   }
 
   // ------------------------
   // Validación correo
   // ------------------------
 
-  validarCorreo() {
+  validateEmail() {
 
     if (!this.email) {
-      this.emailValido = true;
+      this.validEmail = true;
       return;
     }
 
     const regex =
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
-    this.emailValido = regex.test(this.email);
+    this.validEmail = regex.test(this.email);
   }
 
   // ------------------------
   // Validación contraseña
   // ------------------------
 
-  validarPassword() {
+  validatePassword() {
 
     // Al iniciar sesión no se exigen reglas de formato: las cuentas creadas en la app o con
     // recuperación solo piden 8 caracteres, y el backend es quien valida la contraseña.
-    this.passwordValida = true;
+    this.validPassword = true;
   }
 
   // ------------------------
   // Navegación
   // ------------------------
 
-  irARegistro() {
+  goToRegister() {
     this.router.navigate(['/auth/register']);
   }
 
-  irAOlvidePassword() {
+  goToForgotPassword() {
     this.router.navigate(['/auth/forgot-password']);
   }
 
@@ -92,16 +92,16 @@ export class LoginComponent {
   // ------------------------
   // Login con Google (Firebase -> backend)
   // ------------------------
-  async continuarConGoogle() {
+  async continueWithGoogle() {
     if (this.loadingGoogle) return;
     this.error = '';
     this.loadingGoogle = true;
     try {
-      const idToken = await this.googleAuth.obtenerIdToken();
+      const idToken = await this.googleAuth.getIdToken();
       this.auth.loginWithGoogle(idToken).subscribe({
         next: (user) => {
           this.loadingGoogle = false;
-          this.router.navigate([user.rol === 'Admin' ? '/admin/dashboard' : '/dashboard']);
+          this.router.navigate([user.role === 'Admin' ? '/admin/dashboard' : '/dashboard']);
         },
         error: (err) => {
           this.loadingGoogle = false;
@@ -118,12 +118,12 @@ export class LoginComponent {
     }
   }
 
-  iniciarSesion() {
+  signIn() {
 
-    this.validarCorreo();
-    this.validarPassword();
+    this.validateEmail();
+    this.validatePassword();
 
-    if (!this.emailValido || !this.passwordValida) {
+    if (!this.validEmail || !this.validPassword) {
       this.error = 'Por favor verifica que el correo y la contraseña sean válidos';
       return;
     }
@@ -139,7 +139,7 @@ export class LoginComponent {
       next: (user) => {
         this.loading = false;
 
-        if (user.rol === 'Admin' || user.rol === 'admin') {
+        if (user.role === 'Admin' || user.role === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

@@ -14,20 +14,20 @@ const EMOJIS: Record<string, string> = {
   bomberos: '🚒',
 };
 
-export function emojiZona(tipo: string): string {
+export function zoneEmoji(tipo: string): string {
   return EMOJIS[tipo] ?? '📍';
 }
 
 /** Marcador redondo con el emoji del tipo, del color de su categoría. */
-export function iconoZona(tipo: string, color: string, activo = false): L.DivIcon {
-  const lado = activo ? 42 : 34;
+export function zoneIcon(tipo: string, color: string, active = false): L.DivIcon {
+  const side = active ? 42 : 34;
   return L.divIcon({
     className: '',
-    html: `<div style="width:${lado}px;height:${lado}px;border-radius:50%;display:flex;align-items:center;
-      justify-content:center;font-size:${activo ? 21 : 17}px;background:${color};border:${activo ? 3 : 2}px solid #fff;
-      box-shadow:0 2px 8px rgba(0,0,0,.35)">${emojiZona(tipo)}</div>`,
-    iconSize: [lado, lado],
-    iconAnchor: [lado / 2, lado / 2],
-    popupAnchor: [0, -lado / 2],
+    html: `<div style="width:${side}px;height:${side}px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:${active ? 21 : 17}px;background:${color};border:${active ? 3 : 2}px solid #fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.35)">${zoneEmoji(tipo)}</div>`,
+    iconSize: [side, side],
+    iconAnchor: [side / 2, side / 2],
+    popupAnchor: [0, -side / 2],
   });
 }

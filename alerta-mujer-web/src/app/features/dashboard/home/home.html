@@ -8,18 +8,18 @@
       <div class="home-panel__header">
         <div>
           <h2 class="home-panel__title">
-            @if (estadoGeneral(); as eg) {
+            @if (overallStatus(); as eg) {
               <span class="estado-dot" [ngClass]="'estado-dot--' + eg.color"></span>
             }
             Estado de tu seguridad
           </h2>
-          @if (estadoGeneral(); as eg) {
+          @if (overallStatus(); as eg) {
             <p class="home-panel__subtitle"
                [ngClass]="{
                  'home-panel__subtitle--advertencia': eg.color === 'amarillo',
                  'home-panel__subtitle--peligro': eg.color === 'rojo'
                }">
-              {{ eg.nivel }} • {{ eg.porcentaje }}% configurado
+              {{ eg.level }} • {{ eg.percentage }}% configurado
             </p>
           } @else {
             <p class="home-panel__subtitle">Cargando...</p>
@@ -44,14 +44,14 @@
         </div>
       } @else {
         <div class="home-seguridad-grid">
-          @for (item of estadoSeguridad(); track item.descripcion) {
+          @for (item of securityStatus(); track item.description) {
             <div class="home-seguridad-item" [title]="item.tooltip || ''">
               <div class="home-seguridad-item__icon">
                 <i class="ti {{ item.icon }}"></i>
               </div>
-              <p class="home-seguridad-item__valor">{{ item.valor }}</p>
-              <p class="home-seguridad-item__descripcion">{{ item.descripcion }}</p>
-              @if (item.configurado) {
+              <p class="home-seguridad-item__valor">{{ item.value }}</p>
+              <p class="home-seguridad-item__descripcion">{{ item.description }}</p>
+              @if (item.configured) {
                 <span class="home-seguridad-item__check home-seguridad-item__check--exito">
                   <i class="ti ti-check"></i>
                 </span>
@@ -75,24 +75,24 @@
       </div>
 
       <div class="home-dispositivo-body">
-        @if (miCelular(); as cel) {
+        @if (myPhone(); as phone) {
           <div class="home-dispositivo-info">
             <p class="home-dispositivo-row">
               <span class="home-dispositivo-label">Celular:</span>
-              <span class="home-dispositivo-value">{{ nombreCelular(cel) }}</span>
+              <span class="home-dispositivo-value">{{ phoneName(phone) }}</span>
             </p>
             <p class="home-dispositivo-row">
               <span class="home-dispositivo-label">Alertas:</span>
-              <span class="home-badge" [ngClass]="cel.fcmToken ? 'home-badge--exito' : 'home-badge--advertencia'">
-                {{ cel.fcmToken ? 'Las recibe' : 'Sin notificaciones' }}
+              <span class="home-badge" [ngClass]="phone.fcmToken ? 'home-badge--exito' : 'home-badge--advertencia'">
+                {{ phone.fcmToken ? 'Las recibe' : 'Sin notificaciones' }}
               </span>
             </p>
             <p class="home-dispositivo-row">
               <span class="home-dispositivo-label">Última conexión:</span>
-              <span class="home-dispositivo-value">{{ ultimaConexion(cel) }}</span>
+              <span class="home-dispositivo-value">{{ lastConnection(phone) }}</span>
             </p>
           </div>
-        } @else if (celularesCargados()) {
+        } @else if (phonesLoaded()) {
           <p class="home-dispositivo-value">No tienes un celular vinculado. Inicia sesión en la app móvil.</p>
         } @else {
           <p class="home-dispositivo-value">Cargando…</p>
@@ -119,14 +119,14 @@
         <div style="display: flex; gap: 10px; align-items: center;">
           <button 
             class="home-btn home-btn--refresh" 
-            (click)="refrescarUbicacion()"
+            (click)="refreshLocation()"
             [disabled]="isRefreshing()"
             title="Pedir al celular su ubicación actual">
             <i class="ti" [class.ti-loader-2]="isRefreshing()" [class.ti-refresh]="!isRefreshing()"></i>
             {{ isRefreshing() ? 'Preguntando al celular…' : 'Actualizar ubicación' }}
           </button>
           @if (ultimaUbicacion()) {
-            <button class="home-btn" type="button" (click)="centrarEnCelular()" title="Llevar el mapa a donde está el celular">
+            <button class="home-btn" type="button" (click)="centerOnPhone()" title="Llevar el mapa a donde está el celular">
               <i class="ti ti-current-location"></i> Centrar en mi celular
             </button>
           }
@@ -136,8 +136,8 @@
         </div>
       </div>
 
-      @if (avisoUbicacion()) {
-        <p class="home-aviso">{{ avisoUbicacion() }}</p>
+      @if (locationNotice()) {
+        <p class="home-aviso">{{ locationNotice() }}</p>
       }
       <div id="home-mini-map" class="home-full-map"></div>
 
@@ -213,7 +213,7 @@
             <i class="ti ti-map-pin"></i>
             <div>
               <p class="home-map-info__label">Dirección</p>
-              <p class="home-map-info__value">{{ u.direccion }}</p>
+              <p class="home-map-info__value">{{ u.address }}</p>
             </div>
           </div>
           <div class="home-map-info__item">
@@ -227,7 +227,7 @@
             <i class="ti ti-compass"></i>
             <div>
               <p class="home-map-info__label">Coordenadas</p>
-              <p class="home-map-info__value">{{ u.coordenadas }}</p>
+              <p class="home-map-info__value">{{ u.coordinates }}</p>
             </div>
           </div>
           <div class="home-map-info__item">
@@ -251,18 +251,18 @@
         <h2 class="home-panel__title-sm">
           <i class="ti ti-alert-octagon"></i> Última emergencia
         </h2>
-        @if (ultimaEmergencia(); as e) {
+        @if (lastEmergency(); as e) {
           <span class="home-badge home-badge--exito">{{ e.estado }}</span>
         }
       </div>
 
-      @if (ultimaEmergencia(); as e) {
+      @if (lastEmergency(); as e) {
         <div class="home-emergencia">
           <div class="home-emergencia__fecha-row">
             <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
             <div>
               <p class="home-emergencia__fecha">{{ e.fecha }}</p>
-              <p class="home-emergencia__hora">{{ e.hora }}</p>
+              <p class="home-emergencia__hora">{{ e.time }}</p>
             </div>
           </div>
 
@@ -270,7 +270,7 @@
             <i class="ti ti-map-pin"></i>
             <div>
               <p class="home-emergencia__detalle-label">Ubicación</p>
-              <p class="home-emergencia__detalle-valor">{{ e.ubicacion }}</p>
+              <p class="home-emergencia__detalle-valor">{{ e.location }}</p>
             </div>
           </div>
 
@@ -278,7 +278,7 @@
             <i class="ti ti-activity"></i>
             <div>
               <p class="home-emergencia__detalle-label">Activada mediante</p>
-              <p class="home-emergencia__detalle-valor">{{ e.activadaMediante }}</p>
+              <p class="home-emergencia__detalle-valor">{{ e.activatedBy }}</p>
             </div>
           </div>
 
@@ -287,7 +287,7 @@
             <div>
               <p class="home-emergencia__detalle-label">Contactos notificados</p>
               <p class="home-emergencia__detalle-valor">
-                {{ e.contactosNotificados === null ? '…' : e.contactosNotificados + (e.contactosNotificados === 1 ? ' contacto' : ' contactos') }}
+                {{ e.notifiedContacts === null ? '…' : e.notifiedContacts + (e.notifiedContacts === 1 ? ' contacto' : ' contactos') }}
               </p>
             </div>
           </div>
@@ -296,7 +296,7 @@
         <a class="home-btn home-btn--primario home-btn--block" routerLink="/dashboard/alert-history">
           Ver mis emergencias
         </a>
-      } @else if (alertasCargadas()) {
+      } @else if (loadedAlerts()) {
         <p class="home-aviso">No has activado ninguna alerta. Cuando lo hagas, aquí verás la más reciente.</p>
       } @else {
         <p class="home-aviso">Cargando…</p>
@@ -313,13 +313,13 @@
         <h2 class="home-panel__title-sm">Accesos rápidos</h2>
       </div>
       <div class="home-accesos-grid">
-        @for (acceso of accesosRapidos; track acceso.label) {
-          <a class="home-acceso" [routerLink]="acceso.route">
+        @for (access of quickAccess; track access.label) {
+          <a class="home-acceso" [routerLink]="access.route">
             <div class="home-acceso__icon home-acceso__icon--principal">
-              <i class="ti {{ acceso.icon }}"></i>
+              <i class="ti {{ access.icon }}"></i>
             </div>
-            <p class="home-acceso__label">{{ acceso.label }}</p>
-            <p class="home-acceso__sub">{{ acceso.sub }}</p>
+            <p class="home-acceso__label">{{ access.label }}</p>
+            <p class="home-acceso__sub">{{ access.sub }}</p>
           </a>
         }
       </div>

@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, map, tap } from 'rxjs';
-import { Reporte, ReporteFilters, ReporteStats } from '../models/report.model';
+import { AlertReport, ReportFilters, ReportStats } from '../models/report.model';
 import { environment } from '../../../environments/environment';
 
 /** Informe tal como lo devuelve /api/admin/reports. */
-interface ReporteApi {
+interface ReportApi {
   id: number;
   name: string;
   city: string | null;
@@ -32,12 +32,12 @@ interface StatsApi {
   exports: number;
 }
 
-const ESTADO_API: Record<Reporte['estado'], ReporteApi['status']> = {
+const API_STATUS: Record<AlertReport['estado'], ReportApi['status']> = {
   Pendiente: 'pending',
   Atendida: 'attended',
   Cerrada: 'closed'
 };
-const ESTADO_WEB: Record<ReporteApi['status'], Reporte['estado']> = {
+const WEB_STATUS: Record<ReportApi['status'], AlertReport['estado']> = {
   pending: 'Pendiente',
   attended: 'Atendida',
   closed: 'Cerrada'
@@ -51,39 +51,39 @@ export class ReportsService {
   private apiUrl = `${environment.apiUrl}/api/admin/reports`;
 
   // Última lista recibida del backend; los filtros se aplican sobre ella
-  private reportesSubject = new BehaviorSubject<Reporte[]>([]);
-  reportes$ = this.reportesSubject.asObservable();
+  private reportsSubject = new BehaviorSubject<AlertReport[]>([]);
+  reports$ = this.reportsSubject.asObservable();
 
-  getAll(): Observable<Reporte[]> {
-    return this.http.get<ReporteApi[]>(this.apiUrl).pipe(
-      map(lista => lista.map(r => this.desdeApi(r))),
-      tap(reportes => this.reportesSubject.next(reportes))
+  getAll(): Observable<AlertReport[]> {
+    return this.http.get<ReportApi[]>(this.apiUrl).pipe(
+      map(list => list.map(r => this.fromApi(r))),
+      tap(reports => this.reportsSubject.next(reports))
     );
   }
 
-  getById(id: number): Observable<Reporte> {
-    return this.http.get<ReporteApi>(`${this.apiUrl}/${id}`).pipe(map(r => this.desdeApi(r)));
+  getById(id: number): Observable<AlertReport> {
+    return this.http.get<ReportApi>(`${this.apiUrl}/${id}`).pipe(map(r => this.fromApi(r)));
   }
 
-  create(reporte: Omit<Reporte, 'id'>): Observable<Reporte> {
-    return this.http.post<ReporteApi>(this.apiUrl, this.haciaApi(reporte)).pipe(map(r => this.desdeApi(r)));
+  create(report: Omit<AlertReport, 'id'>): Observable<AlertReport> {
+    return this.http.post<ReportApi>(this.apiUrl, this.toApi(report)).pipe(map(r => this.fromApi(r)));
   }
 
-  update(id: number, reporte: Reporte): Observable<Reporte> {
-    return this.http.put<ReporteApi>(`${this.apiUrl}/${id}`, this.haciaApi(reporte)).pipe(map(r => this.desdeApi(r)));
+  update(id: number, report: AlertReport): Observable<AlertReport> {
+    return this.http.put<ReportApi>(`${this.apiUrl}/${id}`, this.toApi(report)).pipe(map(r => this.fromApi(r)));
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  getStats(): Observable<ReporteStats> {
+  getStats(): Observable<ReportStats> {
     return this.http.get<StatsApi>(`${this.apiUrl}/stats`).pipe(
       map(s => ({
-        totalReportes: s.totalReports,
-        totalAlertas: s.totalAlerts,
-        zonasActivas: s.activeZones,
-        exportaciones: s.exports
+        totalReportCount: s.totalReports,
+        totalAlertCount: s.totalAlerts,
+        activeZones: s.activeZones,
+        exports: s.exports
       }))
     );
   }
@@ -92,112 +92,112 @@ export class ReportsService {
   // MÉTODOS DE FILTRADO
   // ========================================
 
-  filtrarReportes(filtros: ReporteFilters): Observable<Reporte[]> {
-    let reportesFiltrados = [...this.reportesSubject.value];
+  filterReports(filters: ReportFilters): Observable<AlertReport[]> {
+    let filteredReports = [...this.reportsSubject.value];
 
-    if (filtros.busqueda) {
-      const busqueda = this.normalizar(filtros.busqueda);
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        this.normalizar(reporte.nombre).includes(busqueda) ||
-        this.normalizar(reporte.ciudad).includes(busqueda) ||
-        this.normalizar(reporte.generadoPor).includes(busqueda)
+    if (filters.search) {
+      const search = this.normalize(filters.search);
+      filteredReports = filteredReports.filter(report =>
+        this.normalize(report.nombre).includes(search) ||
+        this.normalize(report.city).includes(search) ||
+        this.normalize(report.generatedBy).includes(search)
       );
     }
 
     // Los <input type="date"> entregan 'yyyy-MM-dd'; se compara por día local
-    if (filtros.fechaInicio) {
-      const desde = this.inicioDelDia(filtros.fechaInicio);
-      reportesFiltrados = reportesFiltrados.filter(reporte => reporte.fecha >= desde);
+    if (filters.startDate) {
+      const from = this.startOfDay(filters.startDate);
+      filteredReports = filteredReports.filter(report => report.fecha >= from);
     }
-    if (filtros.fechaFin) {
-      const hasta = this.inicioDelDia(filtros.fechaFin);
-      hasta.setDate(hasta.getDate() + 1);
-      reportesFiltrados = reportesFiltrados.filter(reporte => reporte.fecha < hasta);
-    }
-
-    if (filtros.ciudad && filtros.ciudad !== 'all') {
-      const ciudad = this.normalizar(filtros.ciudad);
-      reportesFiltrados = reportesFiltrados.filter(reporte => this.normalizar(reporte.ciudad) === ciudad);
+    if (filters.endDate) {
+      const to = this.startOfDay(filters.endDate);
+      to.setDate(to.getDate() + 1);
+      filteredReports = filteredReports.filter(report => report.fecha < to);
     }
 
-    if (filtros.estado && filtros.estado !== 'all') {
-      reportesFiltrados = reportesFiltrados.filter(reporte => reporte.estado === filtros.estado);
+    if (filters.city && filters.city !== 'all') {
+      const city = this.normalize(filters.city);
+      filteredReports = filteredReports.filter(report => this.normalize(report.city) === city);
     }
 
-    return of(reportesFiltrados);
+    if (filters.estado && filters.estado !== 'all') {
+      filteredReports = filteredReports.filter(report => report.estado === filters.estado);
+    }
+
+    return of(filteredReports);
   }
 
   // ========================================
   // MÉTODOS DE EXPORTACIÓN
   // ========================================
 
-  descargarPDF(id: number): Observable<Blob> {
-    return this.exportar(id, 'pdf');
+  downloadPdf(id: number): Observable<Blob> {
+    return this.export(id, 'pdf');
   }
 
   /** Excel recibe un CSV (separado por ';' y en UTF-8) que abre directamente. */
-  descargarExcel(id: number): Observable<Blob> {
-    return this.exportar(id, 'csv');
+  downloadExcel(id: number): Observable<Blob> {
+    return this.export(id, 'csv');
   }
 
-  descargarCSV(id: number): Observable<Blob> {
-    return this.exportar(id, 'csv');
+  downloadCsv(id: number): Observable<Blob> {
+    return this.export(id, 'csv');
   }
 
-  private exportar(id: number, formato: 'pdf' | 'csv'): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${id}/export`, { params: { format: formato }, responseType: 'blob' });
+  private export(id: number, format: 'pdf' | 'csv'): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/export`, { params: { format }, responseType: 'blob' });
   }
 
   // ========================================
   // TRADUCCIÓN API <-> WEB
   // ========================================
 
-  private desdeApi(r: ReporteApi): Reporte {
+  private fromApi(r: ReportApi): AlertReport {
     return {
       id: r.id,
       nombre: r.name,
       fecha: new Date(r.createdAt),
-      ciudad: r.city ?? 'No especificada',
-      estado: ESTADO_WEB[r.status] ?? 'Pendiente',
-      usuaria: r.userLabel ?? undefined,
-      acontecimiento: r.event ?? undefined,
-      generadoPor: r.createdByName || 'Administración',
-      formato: r.format === 'EXCEL' ? 'Excel' : 'PDF',
-      tamano: `${r.alertCount} alerta${r.alertCount === 1 ? '' : 's'}`,
-      descripcion: r.description ?? undefined,
-      alertasIds: r.alertIds,
-      desde: r.fromDate ? new Date(r.fromDate) : null,
-      hasta: r.toDate ? new Date(r.toDate) : null,
-      exportaciones: r.exportCount ?? 0
+      city: r.city ?? 'No especificada',
+      estado: WEB_STATUS[r.status] ?? 'Pendiente',
+      user: r.userLabel ?? undefined,
+      incident: r.event ?? undefined,
+      generatedBy: r.createdByName || 'Administración',
+      format: r.format === 'EXCEL' ? 'Excel' : 'PDF',
+      size: `${r.alertCount} alerta${r.alertCount === 1 ? '' : 's'}`,
+      description: r.description ?? undefined,
+      alertIdList: r.alertIds,
+      from: r.fromDate ? new Date(r.fromDate) : null,
+      to: r.toDate ? new Date(r.toDate) : null,
+      exports: r.exportCount ?? 0
     };
   }
 
-  private haciaApi(r: Omit<Reporte, 'id'>) {
+  private toApi(r: Omit<AlertReport, 'id'>) {
     return {
       name: r.nombre,
-      city: r.ciudad,
-      status: ESTADO_API[r.estado],
-      userLabel: r.usuaria ?? null,
-      event: r.acontecimiento ?? null,
-      description: r.descripcion ?? null,
-      format: r.formato === 'PDF' ? 'PDF' : 'EXCEL',
-      alertIds: r.alertasIds ?? null,
-      fromDate: r.desde ? new Date(r.desde).toISOString() : null,
-      toDate: r.hasta ? new Date(r.hasta).toISOString() : null
+      city: r.city,
+      status: API_STATUS[r.estado],
+      userLabel: r.user ?? null,
+      event: r.incident ?? null,
+      description: r.description ?? null,
+      format: r.format === 'PDF' ? 'PDF' : 'EXCEL',
+      alertIds: r.alertIdList ?? null,
+      fromDate: r.from ? new Date(r.from).toISOString() : null,
+      toDate: r.to ? new Date(r.to).toISOString() : null
     };
   }
 
 
-  private inicioDelDia(valor: Date | string): Date {
-    if (typeof valor === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-      const [a, m, d] = valor.split('-').map(Number);
+  private startOfDay(value: Date | string): Date {
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const [a, m, d] = value.split('-').map(Number);
       return new Date(a, m - 1, d);
     }
-    const f = new Date(valor);
+    const f = new Date(value);
     return new Date(f.getFullYear(), f.getMonth(), f.getDate());
   }
 
-  private normalizar(texto: string | undefined | null): string {
-    return (texto ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  private normalize(text: string | undefined | null): string {
+    return (text ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   }
 }

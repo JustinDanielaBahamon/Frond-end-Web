@@ -19,13 +19,13 @@
     <h2 class="device-panel__title">
       <i class="ti ti-shield-check"></i> Permisos de tu celular
     </h2>
-    @if (permisosCelular(); as pc) {
-      @if (pc.faltan > 0) {
+    @if (phonePermissions(); as pc) {
+      @if (pc.missing > 0) {
         <div class="device-perm-aviso" role="alert">
           <i class="ti ti-alert-circle"></i>
           <div>
             <strong>Por favor otorga los permisos a AlertaMujer para que pueda funcionar correctamente.</strong>
-            <span>En tu celular abre la app → menú → «Permisos y protección» y activa lo que falta ({{ pc.faltan }}).</span>
+            <span>En tu celular abre la app → menú → «Permisos y protección» y activa lo que falta ({{ pc.missing }}).</span>
           </div>
         </div>
       } @else {
@@ -35,21 +35,21 @@
         </p>
       }
       <div class="device-grid device-grid--3col">
-        @for (perm of pc.lista; track perm.id) {
-          <div class="device-perm" [class.device-perm--ok]="perm.concedido" role="status"
-               [attr.aria-label]="perm.titulo + ': ' + (perm.concedido ? 'listo' : 'falta')">
-            <span class="device-perm__icon"><i class="ti" [ngClass]="perm.icono"></i></span>
+        @for (perm of pc.list; track perm.id) {
+          <div class="device-perm" [class.device-perm--ok]="perm.granted" role="status"
+               [attr.aria-label]="perm.title + ': ' + (perm.granted ? 'listo' : 'falta')">
+            <span class="device-perm__icon"><i class="ti" [ngClass]="perm.icon"></i></span>
             <span class="device-perm__body">
-              <span class="device-perm__titulo">{{ perm.titulo }}</span>
-              <span class="device-perm__desc">{{ perm.descripcion }}</span>
+              <span class="device-perm__titulo">{{ perm.title }}</span>
+              <span class="device-perm__desc">{{ perm.description }}</span>
             </span>
             <span class="device-perm__estado">
-              <i class="ti" [ngClass]="perm.concedido ? 'ti-check' : 'ti-x'"></i> {{ perm.concedido ? 'Listo' : 'Falta' }}
+              <i class="ti" [ngClass]="perm.granted ? 'ti-check' : 'ti-x'"></i> {{ perm.granted ? 'Listo' : 'Falta' }}
             </span>
           </div>
         }
       </div>
-      <p class="device-perm__fecha">Informado por {{ pc.celular }} · {{ pc.actualizado }}</p>
+      <p class="device-perm__fecha">Informado por {{ pc.celular }} · {{ pc.updated }}</p>
     } @else {
       <p class="device-permissions-note">
         <i class="ti ti-info-circle"></i>
@@ -73,7 +73,7 @@
             <span class="device-list-item__label">Tiempo restante de la sesión</span>
             <span class="device-list-item__details">Cuando llegue a cero tendrás que volver a iniciar sesión en la web. En el celular la sesión se renueva sola mientras uses la app.</span>
           </div>
-          <span class="device-badge" [ngClass]="sesionPorVencer() ? 'device-badge--advertencia' : 'device-badge--exito'">{{ sesionRestante() }}</span>
+          <span class="device-badge" [ngClass]="sessionExpiring() ? 'device-badge--advertencia' : 'device-badge--exito'">{{ sessionRemaining() }}</span>
         </div>
         @for (service of services(); track service.name) {
           <div class="device-list-item">
@@ -110,21 +110,21 @@
         <i class="ti ti-devices"></i> Mis dispositivos
       </h2>
       <ul class="device-phones">
-        @for (d of misCelulares(); track d.id) {
+        @for (d of myPhones(); track d.id) {
           <li>
-            <button type="button" class="device-phone" (click)="abrirCelular(d)" [attr.aria-label]="'Ver detalles de ' + nombreCelular(d)">
+            <button type="button" class="device-phone" (click)="openPhone(d)" [attr.aria-label]="'Ver detalles de ' + phoneName(d)">
               <span class="device-phone__icon"><i class="ti ti-device-mobile"></i></span>
               <span class="device-phone__body">
                 <span class="device-phone__name">
-                  {{ nombreCelular(d) }}
-                  @if (misCelulares().length > 1 && principalId() === d.id) {
+                  {{ phoneName(d) }}
+                  @if (myPhones().length > 1 && principalId() === d.id) {
                     <span class="device-principal" title="Tu ubicación del día a día se toma de este celular">Principal</span>
                   }
                 </span>
                 <span class="device-phone__meta">
                   {{ d.osName === 'ios' ? 'iOS' : 'Android' }}{{ d.osVersion ? ' ' + d.osVersion : '' }}{{ d.appVersion ? ' · App ' + d.appVersion : '' }}
                 </span>
-                <span class="device-phone__meta">Última conexión: {{ ultimaConexion(d) }}</span>
+                <span class="device-phone__meta">Última conexión: {{ lastConnection(d) }}</span>
               </span>
               <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--exito' : 'device-badge--advertencia'">
                 {{ d.fcmToken ? 'Recibe alertas' : 'Sin notificaciones' }}
@@ -134,23 +134,23 @@
           </li>
         }
         <li>
-          <button type="button" class="device-phone device-phone--pc" (click)="abrirComputador()" aria-label="Ver detalles de este computador">
+          <button type="button" class="device-phone device-phone--pc" (click)="openComputer()" aria-label="Ver detalles de este computador">
             <span class="device-phone__icon"><i class="ti ti-device-desktop"></i></span>
             <span class="device-phone__body">
               <span class="device-phone__name">Este computador</span>
-              <span class="device-phone__meta">{{ nombreComputador() }}</span>
+              <span class="device-phone__meta">{{ computerName() }}</span>
               <span class="device-phone__meta">Solo para consultar · no recibe alertas</span>
             </span>
             <i class="ti ti-chevron-right device-phone__chevron"></i>
           </button>
         </li>
       </ul>
-      @if (misCelulares().length > 1) {
+      @if (myPhones().length > 1) {
         <p class="device-phone__meta device-phone__last">
           <i class="ti ti-info-circle"></i> Tienes la cuenta en varios celulares: tu ubicación del día a día se toma del que usaste más recientemente (el principal). En una alerta se usa el celular que la activó.
         </p>
       }
-      @if (misCelulares().length === 0 && !featuresLoading()) {
+      @if (myPhones().length === 0 && !featuresLoading()) {
         <p class="device-empty">Todavía no tienes un celular vinculado. Inicia sesión en la app móvil para vincularlo.</p>
       }
       @if (criticalFeatures(); as features) {
@@ -249,7 +249,7 @@
           <i class="ti ti-map-pin"></i>
           <span>¿Dónde está mi celular?</span>
         </button>
-        <button class="device-test-btn" (click)="probarAlertasCelular()" [disabled]="loading()" aria-label="Comprobar si tu celular recibe alertas">
+        <button class="device-test-btn" (click)="testPhoneAlerts()" [disabled]="loading()" aria-label="Comprobar si tu celular recibe alertas">
           <i class="ti ti-device-mobile-message"></i>
           <span>¿Mi celular recibe alertas?</span>
         </button>
@@ -289,36 +289,36 @@
 
 </div>
 
-@if (detalle(); as det) {
-  <div class="dd-backdrop" (click)="cerrarDetalle()">
-    <section class="dd-modal" [ngClass]="det.tono ? 'dd-modal--' + det.tono : ''" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
+@if (detail(); as det) {
+  <div class="dd-backdrop" (click)="closeDetail()">
+    <section class="dd-modal" [ngClass]="det.tone ? 'dd-modal--' + det.tone : ''" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
       <header class="dd-head">
-        <span class="dd-head__icon"><i class="ti" [ngClass]="det.icono"></i></span>
+        <span class="dd-head__icon"><i class="ti" [ngClass]="det.icon"></i></span>
         <div>
-          <h2 id="dd-titulo">{{ det.titulo }}</h2>
-          <p>{{ det.subtitulo }}</p>
+          <h2 id="dd-titulo">{{ det.title }}</h2>
+          <p>{{ det.subtitle }}</p>
         </div>
-        <button type="button" class="dd-close" (click)="cerrarDetalle()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+        <button type="button" class="dd-close" (click)="closeDetail()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
       </header>
       <dl class="dd-list">
-        @for (f of det.filas; track f.etiqueta) {
+        @for (f of det.rows; track f.label) {
           <div class="dd-row">
-            <dt>{{ f.etiqueta }}</dt>
-            <dd>{{ f.valor }}</dd>
+            <dt>{{ f.label }}</dt>
+            <dd>{{ f.value }}</dd>
           </div>
         }
       </dl>
       @if (det.nota) {
         <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.nota }}</p>
       }
-      @if (det.enlace) {
-        @if (det.enlace.ruta) {
-          <a class="dd-enlace" [routerLink]="det.enlace.ruta">{{ det.enlace.texto }} <i class="ti ti-map-2"></i></a>
+      @if (det.link) {
+        @if (det.link.route) {
+          <a class="dd-enlace" [routerLink]="det.link.route">{{ det.link.text }} <i class="ti ti-map-2"></i></a>
         } @else {
-          <a class="dd-enlace" [href]="det.enlace.url" target="_blank" rel="noopener">{{ det.enlace.texto }} <i class="ti ti-external-link"></i></a>
+          <a class="dd-enlace" [href]="det.link.url" target="_blank" rel="noopener">{{ det.link.text }} <i class="ti ti-external-link"></i></a>
         }
       }
-      <button type="button" class="dd-ok" (click)="cerrarDetalle()">Entendido</button>
+      <button type="button" class="dd-ok" (click)="closeDetail()">Entendido</button>
     </section>
   </div>
 }

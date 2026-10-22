@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../models/assistance.model';
+import { ResourceCategory, RecordedCall, HelpResource } from '../models/assistance.model';
 import { EmergencyResourceApi } from '../models/resource.model';
 
 interface ResourceCallApi {
@@ -13,7 +13,7 @@ interface ResourceCallApi {
   startedAt: string;
 }
 
-const CATEGORIA: Record<string, CategoriaRecurso> = {
+const CATEGORY: Record<string, ResourceCategory> = {
   emergency_line: 'linea',
   police_station: 'policia',
   police_post: 'policia',
@@ -25,7 +25,7 @@ const CATEGORIA: Record<string, CategoriaRecurso> = {
 };
 
 // El backend envía LocalDateTime en UTC sin zona
-const fechaUtc = (iso: string) => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`);
+const utcDate = (iso: string) => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`);
 
 @Injectable({ providedIn: 'root' })
 export class AssistanceService {
@@ -33,21 +33,21 @@ export class AssistanceService {
   private base = environment.apiUrl;
 
   /** Todos los recursos activos: líneas (con teléfono) y centros (con ubicación). */
-  getRecursos(): Observable<RecursoAyuda[]> {
+  getResources(): Observable<HelpResource[]> {
     return this.http.get<EmergencyResourceApi[]>(`${this.base}/api/resources`).pipe(
-      map((lista) =>
-        lista
+      map((list) =>
+        list
           .filter((r) => r.isActive !== false)
           .map((r) => ({
             id: r.id,
             nombre: r.name,
-            categoria: CATEGORIA[r.resourceType] ?? 'apoyo',
-            descripcion: r.description ?? '',
+            category: CATEGORY[r.resourceType] ?? 'apoyo',
+            description: r.description ?? '',
             telefono: r.telephone ?? null,
-            telefono2: r.secondaryTelephone ?? null,
+            telephone2: r.secondaryTelephone ?? null,
             email: r.email ?? null,
-            direccion: r.address ?? null,
-            ciudad: r.city,
+            address: r.address ?? null,
+            city: r.city,
             lat: r.latitude ?? null,
             lng: r.longitude ?? null,
           }))
@@ -56,32 +56,32 @@ export class AssistanceService {
   }
 
   /** Llamadas que la usuaria hizo desde la app, de la más reciente a la más antigua. */
-  getMisLlamadas(): Observable<LlamadaRegistrada[]> {
+  getMyCalls(): Observable<RecordedCall[]> {
     return this.http.get<ResourceCallApi[]>(`${this.base}/api/resource-calls/me`).pipe(
-      map((lista) =>
-        lista.map((c) => ({
+      map((list) =>
+        list.map((c) => ({
           id: c.id,
-          recursoId: c.emergencyResourceId,
+          resourceId: c.emergencyResourceId,
           telefono: c.telephoneDialed,
           estado: c.status,
-          fecha: fechaUtc(c.startedAt),
+          fecha: utcDate(c.startedAt),
         }))
       )
     );
   }
 
   /** Registra que la usuaria marcó a un recurso (la dueña la pone el backend). */
-  registrarLlamada(recursoId: number, telefono: string): Observable<LlamadaRegistrada> {
+  recordCall(resourceId: number, telefono: string): Observable<RecordedCall> {
     return this.http
       .post<ResourceCallApi>(`${this.base}/api/resource-calls`, {
-        emergencyResourceId: recursoId,
+        emergencyResourceId: resourceId,
         telephoneDialed: telefono,
         status: 'initiated',
       })
-      .pipe(map((c) => ({ id: c.id, recursoId: c.emergencyResourceId, telefono: c.telephoneDialed, estado: c.status, fecha: fechaUtc(c.startedAt) })));
+      .pipe(map((c) => ({ id: c.id, resourceId: c.emergencyResourceId, telefono: c.telephoneDialed, estado: c.status, fecha: utcDate(c.startedAt) })));
   }
 
-  eliminarLlamada(id: number): Observable<void> {
+  deleteCall(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/api/resource-calls/${id}`);
   }
 }

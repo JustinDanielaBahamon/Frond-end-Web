@@ -2,506 +2,506 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { ParteGrabacion, ReproductorContinuoComponent } from '../../../shared/components/reproductor-continuo/reproductor-continuo';
+import { RecordingPart, ContinuousPlayerComponent } from '../../../shared/components/reproductor-continuo/reproductor-continuo';
 import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
 import {
-  MiAlerta, MiEvidencia, MisEvidenciasService, TipoEvidencia,
+  MyAlert, MyEvidence, MyEvidenceService, EvidenceType,
 } from '../../../core/services/mis-evidencias.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
 
-type Filtro = 'todas' | TipoEvidencia;
+type Filter = 'todas' | EvidenceType;
 
-export const TIPOS: Record<TipoEvidencia, { etiqueta: string; plural: string }> = {
-  photo: { etiqueta: 'Foto', plural: 'Fotos' },
-  video: { etiqueta: 'Video', plural: 'Videos' },
-  audio: { etiqueta: 'Audio', plural: 'Audios' },
-  document: { etiqueta: 'Documento', plural: 'Documentos' },
+export const TYPES: Record<EvidenceType, { label: string; plural: string }> = {
+  photo: { label: 'Foto', plural: 'Fotos' },
+  video: { label: 'Video', plural: 'Videos' },
+  audio: { label: 'Audio', plural: 'Audios' },
+  document: { label: 'Documento', plural: 'Documentos' },
 };
 
-const ESTADOS: Record<string, string> = {
+const STATUSES: Record<string, string> = {
   active: 'Activa', resolved: 'Atendida', cancelled: 'Cancelada', expired: 'Expirada',
 };
 
 const MAX_MB = 50;
 // Solo lo que sirve como evidencia de una emergencia (los documentos ya subidos se siguen viendo)
-const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
+const ACCEPTED = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 /** Días que se guardan las evidencias si la alerta no se marca para conservar (backend). */
-export const DIAS_RETENCION = 60;
+export const RETENTION_DAYS = 60;
 /** Máximo de alertas que se pueden conservar (backend: AlertService.MAX_ALERTAS_CONSERVADAS). */
-export const MAX_CONSERVADAS = 5;
+export const MAX_KEPT = 5;
 
 /** Alerta de la lista de la izquierda, con cuántas evidencias tiene. */
-interface AlertaConEvidencias extends MiAlerta {
-  cantidad: number;
+interface AlertWithEvidence extends MyAlert {
+  count: number;
 }
 
 @Component({
   selector: 'app-evidence',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReproductorContinuoComponent],
+  imports: [CommonModule, FormsModule, ContinuousPlayerComponent],
   templateUrl: './evidence.html',
   styleUrl: './evidence.scss',
 })
 export class Evidence implements OnInit, OnDestroy {
-  private service = inject(MisEvidenciasService);
+  private service = inject(MyEvidenceService);
   private geocoding = inject(GeocodingService);
   private route = inject(ActivatedRoute);
 
-  readonly tipos = TIPOS;
-  readonly aceptados = ACEPTADOS;
+  readonly types = TYPES;
+  readonly accepted = ACCEPTED;
   readonly maxMb = MAX_MB;
-  readonly diasRetencion = DIAS_RETENCION;
-  readonly maxConservadas = MAX_CONSERVADAS;
+  readonly retentionDays = RETENTION_DAYS;
+  readonly maxKept = MAX_KEPT;
 
-  evidencias = signal<MiEvidencia[]>([]);
-  alertas = signal<MiAlerta[]>([]);
-  cargando = signal(true);
+  evidences = signal<MyEvidence[]>([]);
+  alerts = signal<MyAlert[]>([]);
+  loading = signal(true);
   error = signal('');
-  aviso = signal('');
+  notice = signal('');
 
   /** Alerta elegida en la lista: solo se muestran sus evidencias. */
   alertaId = signal<number | null>(null);
-  buscarAlerta = signal('');
-  soloConEvidencias = signal(true);
-  filtro = signal<Filtro>('todas');
+  searchAlert = signal('');
+  onlyWithEvidence = signal(true);
+  filter = signal<Filter>('todas');
   /** Barrio y dirección de cada alerta (se resuelven al mostrarse). */
-  direcciones = signal<Record<number, string>>({});
+  addresses = signal<Record<number, string>>({});
 
   // ── Visor ──────────────────────────────────────
-  seleccionada = signal<MiEvidencia | null>(null);
+  selected = signal<MyEvidence | null>(null);
   urlVisor = signal<string | null>(null);
-  cargandoVisor = signal(false);
+  loadingViewer = signal(false);
   errorVisor = signal('');
-  private miniaturas = signal<Record<number, string>>({});
+  private thumbnails = signal<Record<number, string>>({});
   /** Archivo ya descargado de cada evidencia (para no pedirlo dos veces). */
-  private archivos: Record<number, string> = {};
+  private files: Record<number, string> = {};
 
   // ── Grabación completa (partes seguidas) ───────
-  continua = signal<{ tipo: 'video' | 'audio'; partes: ParteGrabacion[] } | null>(null);
-  cargandoContinua = signal(false);
-  private urlsCreadas = new Set<string>();
+  continua = signal<{ tipo: 'video' | 'audio'; parts: RecordingPart[] } | null>(null);
+  loadingContinuous = signal(false);
+  private createdUrls = new Set<string>();
 
   // ── Renombrar ──────────────────────────────────
-  editandoNombre = signal(false);
-  nuevoNombre = signal('');
-  guardandoNombre = signal(false);
+  editingName = signal(false);
+  newName = signal('');
+  savingName = signal(false);
 
   // ── Mapa de la alerta ──────────────────────────
-  mapaVisible = signal(false);
-  @ViewChild('mapaAlerta') private mapaRef?: ElementRef<HTMLDivElement>;
-  private mapa: L.Map | null = null;
+  mapVisible = signal(false);
+  @ViewChild('mapaAlerta') private mapRef?: ElementRef<HTMLDivElement>;
+  private map: L.Map | null = null;
 
   // ── Subida ─────────────────────────────────────
-  subirVisible = signal(false);
-  archivo = signal<File | null>(null);
-  progreso = signal<number | null>(null);
-  errorSubida = signal('');
-  arrastrando = signal(false);
+  uploadVisible = signal(false);
+  file = signal<File | null>(null);
+  progress = signal<number | null>(null);
+  uploadError = signal('');
+  dragging = signal(false);
 
   /** Todas las alertas de la usuaria (más recientes primero) con su número de evidencias. */
-  listaAlertas = computed<AlertaConEvidencias[]>(() => {
-    const cantidad = new Map<number, number>();
-    for (const e of this.evidencias()) cantidad.set(e.alertId, (cantidad.get(e.alertId) ?? 0) + 1);
+  alertList = computed<AlertWithEvidence[]>(() => {
+    const count = new Map<number, number>();
+    for (const e of this.evidences()) count.set(e.alertId, (count.get(e.alertId) ?? 0) + 1);
     // Alertas con evidencias que no vinieron en la lista de alertas
-    const conocidas = new Map<number, MiAlerta>(this.alertas().map((a) => [a.id, a]));
-    for (const e of this.evidencias()) {
-      if (!conocidas.has(e.alertId) && e.alerta) {
-        conocidas.set(e.alertId, {
-          id: e.alertId, estado: e.alerta.estado, metodo: e.alerta.metodo,
-          inicio: e.alerta.inicio ?? e.fecha, lat: e.alerta.lat, lng: e.alerta.lng, conservar: false,
+    const known = new Map<number, MyAlert>(this.alerts().map((a) => [a.id, a]));
+    for (const e of this.evidences()) {
+      if (!known.has(e.alertId) && e.alert) {
+        known.set(e.alertId, {
+          id: e.alertId, estado: e.alert.estado, method: e.alert.method,
+          start: e.alert.start ?? e.fecha, lat: e.alert.lat, lng: e.alert.lng, keep: false,
         });
       }
     }
-    return [...conocidas.values()]
-      .map((a) => ({ ...a, cantidad: cantidad.get(a.id) ?? 0 }))
-      .sort((a, b) => b.inicio.getTime() - a.inicio.getTime());
+    return [...known.values()]
+      .map((a) => ({ ...a, count: count.get(a.id) ?? 0 }))
+      .sort((a, b) => b.start.getTime() - a.start.getTime());
   });
 
-  alertasFiltradas = computed(() => {
-    const termino = this.buscarAlerta().trim().toLowerCase();
-    return this.listaAlertas().filter((a) => {
-      if (this.soloConEvidencias() && a.cantidad === 0 && a.id !== this.alertaId()) return false;
-      if (!termino) return true;
-      return [this.fechaLarga(a.inicio), this.estado(a.estado), this.direcciones()[a.id] ?? '', `#${a.id}`]
-        .some((t) => t.toLowerCase().includes(termino));
+  filteredAlerts = computed(() => {
+    const term = this.searchAlert().trim().toLowerCase();
+    return this.alertList().filter((a) => {
+      if (this.onlyWithEvidence() && a.count === 0 && a.id !== this.alertaId()) return false;
+      if (!term) return true;
+      return [this.longDate(a.start), this.estado(a.estado), this.addresses()[a.id] ?? '', `#${a.id}`]
+        .some((t) => t.toLowerCase().includes(term));
     });
   });
 
-  alertaActual = computed(() => this.listaAlertas().find((a) => a.id === this.alertaId()) ?? null);
+  currentAlert = computed(() => this.alertList().find((a) => a.id === this.alertaId()) ?? null);
 
-  private deLaAlerta = computed(() => this.evidencias().filter((e) => e.alertId === this.alertaId()));
+  private ofTheAlert = computed(() => this.evidences().filter((e) => e.alertId === this.alertaId()));
 
-  conteo = computed(() => {
-    const c = { photo: 0, video: 0, audio: 0, document: 0 } as Record<TipoEvidencia, number>;
-    for (const e of this.deLaAlerta()) c[e.tipo]++;
+  count = computed(() => {
+    const c = { photo: 0, video: 0, audio: 0, document: 0 } as Record<EvidenceType, number>;
+    for (const e of this.ofTheAlert()) c[e.tipo]++;
     return c;
   });
 
   /** Pestañas visibles: solo los tipos que tiene la alerta. */
-  tiposVisibles = computed(() => (Object.keys(TIPOS) as TipoEvidencia[]).filter((t) => this.conteo()[t] > 0));
+  visibleTypes = computed(() => (Object.keys(TYPES) as EvidenceType[]).filter((t) => this.count()[t] > 0));
 
-  filtradas = computed(() => {
-    const filtro = this.filtro();
-    return this.deLaAlerta()
-      .filter((e) => filtro === 'todas' || e.tipo === filtro)
+  filtered = computed(() => {
+    const filter = this.filter();
+    return this.ofTheAlert()
+      .filter((e) => filter === 'todas' || e.tipo === filter)
       .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
   });
 
   ngOnInit(): void {
-    this.cargar();
+    this.load();
   }
 
   ngOnDestroy(): void {
-    this.urlsCreadas.forEach((u) => URL.revokeObjectURL(u));
-    this.mapa?.remove();
+    this.createdUrls.forEach((u) => URL.revokeObjectURL(u));
+    this.map?.remove();
   }
 
-  cargar(): void {
-    this.cargando.set(true);
+  load(): void {
+    this.loading.set(true);
     this.error.set('');
     // "Mis emergencias" abre este módulo con ?alertaId=ID
-    const pedida = Number(this.route.snapshot.queryParamMap.get('alertaId')) || null;
-    this.service.misAlertas().subscribe({
+    const requested = Number(this.route.snapshot.queryParamMap.get('alertaId')) || null;
+    this.service.myAlerts().subscribe({
       next: (a) => {
-        this.alertas.set(a);
-        this.resolverDirecciones();
+        this.alerts.set(a);
+        this.resolveAddresses();
       },
       error: () => {},
     });
-    this.service.listar().subscribe({
-      next: (lista) => {
-        this.evidencias.set(lista);
-        this.cargando.set(false);
-        const inicial = pedida ?? this.listaAlertas().find((a) => a.cantidad > 0)?.id ?? null;
-        if (inicial) this.elegirAlerta(inicial);
+    this.service.list().subscribe({
+      next: (list) => {
+        this.evidences.set(list);
+        this.loading.set(false);
+        const initial = requested ?? this.alertList().find((a) => a.count > 0)?.id ?? null;
+        if (initial) this.chooseAlert(initial);
       },
       error: () => {
         this.error.set('No se pudieron cargar tus evidencias. Intenta de nuevo.');
-        this.cargando.set(false);
+        this.loading.set(false);
       },
     });
   }
 
-  elegirAlerta(id: number): void {
+  chooseAlert(id: number): void {
     this.alertaId.set(id);
     this.continua.set(null);
-    this.filtro.set('todas');
-    this.cerrarEdicion();
-    const primera = this.filtradas()[0];
-    if (primera) this.ver(primera);
+    this.filter.set('todas');
+    this.closeEdit();
+    const first = this.filtered()[0];
+    if (first) this.ver(first);
     else {
-      this.seleccionada.set(null);
+      this.selected.set(null);
       this.urlVisor.set(null);
     }
-    this.filtradas()
-      .filter((e) => e.tipo === 'photo' && e.tieneArchivo)
-      .forEach((e) => this.cargarMiniatura(e));
-    this.resolverDirecciones();
+    this.filtered()
+      .filter((e) => e.tipo === 'photo' && e.hasFile)
+      .forEach((e) => this.loadThumbnail(e));
+    this.resolveAddresses();
   }
 
   /** Barrio y dirección de las alertas de la lista (OpenStreetMap, de a una por segundo). */
-  resolverDirecciones(): void {
-    for (const a of this.alertasFiltradas().slice(0, 15)) {
-      if (a.lat == null || a.lng == null || this.direcciones()[a.id]) continue;
-      this.geocoding.obtener(a.lat, a.lng).then((lugar) => {
-        const texto = lugar ? [lugar.barrio, lugar.direccion].filter(Boolean).join(' · ') || lugar.ciudad : null;
-        if (texto) this.direcciones.update((d) => ({ ...d, [a.id]: texto }));
+  resolveAddresses(): void {
+    for (const a of this.filteredAlerts().slice(0, 15)) {
+      if (a.lat == null || a.lng == null || this.addresses()[a.id]) continue;
+      this.geocoding.get(a.lat, a.lng).then((place) => {
+        const text = place ? [place.neighborhood, place.address].filter(Boolean).join(' · ') || place.city : null;
+        if (text) this.addresses.update((d) => ({ ...d, [a.id]: text }));
       });
     }
   }
 
-  miniatura(e: MiEvidencia): string | null {
-    return this.miniaturas()[e.id] ?? null;
+  thumbnail(e: MyEvidence): string | null {
+    return this.thumbnails()[e.id] ?? null;
   }
 
-  private cargarMiniatura(e: MiEvidencia): void {
-    if (this.miniatura(e)) return;
-    this.service.archivo(e.id).subscribe({
-      next: (blob) => this.miniaturas.update((m) => ({ ...m, [e.id]: this.crearUrl(blob) })),
+  private loadThumbnail(e: MyEvidence): void {
+    if (this.thumbnail(e)) return;
+    this.service.file(e.id).subscribe({
+      next: (blob) => this.thumbnails.update((m) => ({ ...m, [e.id]: this.createUrl(blob) })),
       error: () => {},
     });
   }
 
   /** Descarga todas las partes de un tipo y las muestra en el reproductor continuo. */
   verContinua(tipo: 'video' | 'audio'): void {
-    const partes = this.deLaAlerta()
-      .filter((e) => e.tipo === tipo && e.tieneArchivo)
+    const parts = this.ofTheAlert()
+      .filter((e) => e.tipo === tipo && e.hasFile)
       .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
-    if (partes.length === 0) return;
-    this.seleccionada.set(null);
-    this.cerrarEdicion();
-    this.cargandoContinua.set(true);
-    const alerta = this.alertaId();
-    forkJoin(partes.map((e) => this.service.archivo(e.id))).subscribe({
+    if (parts.length === 0) return;
+    this.selected.set(null);
+    this.closeEdit();
+    this.loadingContinuous.set(true);
+    const alert = this.alertaId();
+    forkJoin(parts.map((e) => this.service.file(e.id))).subscribe({
       next: (blobs) => {
-        if (this.alertaId() !== alerta) return;
+        if (this.alertaId() !== alert) return;
         this.continua.set({
           tipo,
-          partes: partes.map((e, i) => {
-            this.archivos[e.id] ??= this.crearUrl(blobs[i]);
-            return { id: e.id, url: this.archivos[e.id], creada: e.fecha };
+          parts: parts.map((e, i) => {
+            this.files[e.id] ??= this.createUrl(blobs[i]);
+            return { id: e.id, url: this.files[e.id], created: e.fecha };
           }),
         });
-        this.cargandoContinua.set(false);
+        this.loadingContinuous.set(false);
       },
       error: () => {
-        this.cargandoContinua.set(false);
-        this.mostrarAviso('No se pudieron cargar todas las partes de la grabación.');
+        this.loadingContinuous.set(false);
+        this.showNotice('No se pudieron cargar todas las partes de la grabación.');
       },
     });
   }
 
   // ── Visor ──────────────────────────────────────
-  ver(e: MiEvidencia): void {
+  ver(e: MyEvidence): void {
     this.continua.set(null);
-    this.seleccionada.set(e);
-    this.cerrarEdicion();
+    this.selected.set(e);
+    this.closeEdit();
     this.errorVisor.set('');
     this.urlVisor.set(null);
-    if (!e.tieneArchivo) return;
+    if (!e.hasFile) return;
 
-    const enCache = this.miniatura(e);
+    const enCache = this.thumbnail(e);
     if (enCache) {
       this.urlVisor.set(enCache);
       return;
     }
-    this.cargandoVisor.set(true);
-    this.service.archivo(e.id).subscribe({
+    this.loadingViewer.set(true);
+    this.service.file(e.id).subscribe({
       next: (blob) => {
-        if (this.seleccionada()?.id !== e.id) return;
-        const url = this.crearUrl(blob);
-        if (e.tipo === 'photo') this.miniaturas.update((m) => ({ ...m, [e.id]: url }));
+        if (this.selected()?.id !== e.id) return;
+        const url = this.createUrl(blob);
+        if (e.tipo === 'photo') this.thumbnails.update((m) => ({ ...m, [e.id]: url }));
         this.urlVisor.set(url);
-        this.cargandoVisor.set(false);
+        this.loadingViewer.set(false);
       },
       error: () => {
-        this.cargandoVisor.set(false);
+        this.loadingViewer.set(false);
         this.errorVisor.set('No se pudo abrir el archivo.');
       },
     });
   }
 
-  descargar(e: MiEvidencia): void {
-    const abrir = (url: string) => {
+  download(e: MyEvidence): void {
+    const open = (url: string) => {
       const a = document.createElement('a');
       a.href = url;
-      a.download = e.nombreArchivo;
+      a.download = e.fileName;
       a.click();
     };
-    const url = this.seleccionada()?.id === e.id ? this.urlVisor() : this.miniatura(e);
-    if (url) return abrir(url);
-    this.service.archivo(e.id).subscribe({ next: (blob) => abrir(this.crearUrl(blob)) });
+    const url = this.selected()?.id === e.id ? this.urlVisor() : this.thumbnail(e);
+    if (url) return open(url);
+    this.service.file(e.id).subscribe({ next: (blob) => open(this.createUrl(blob)) });
   }
 
-  eliminar(e: MiEvidencia): void {
-    if (!confirm(`¿Eliminar "${e.nombreArchivo}"? Esta acción no se puede deshacer.`)) return;
-    this.service.eliminar(e.id).subscribe({
+  delete(e: MyEvidence): void {
+    if (!confirm(`¿Eliminar "${e.fileName}"? Esta acción no se puede deshacer.`)) return;
+    this.service.delete(e.id).subscribe({
       next: () => {
-        this.evidencias.set(this.evidencias().filter((x) => x.id !== e.id));
-        if (this.seleccionada()?.id === e.id) {
-          this.seleccionada.set(null);
+        this.evidences.set(this.evidences().filter((x) => x.id !== e.id));
+        if (this.selected()?.id === e.id) {
+          this.selected.set(null);
           this.urlVisor.set(null);
-          const siguiente = this.filtradas()[0];
-          if (siguiente) this.ver(siguiente);
+          const next = this.filtered()[0];
+          if (next) this.ver(next);
         }
-        this.mostrarAviso('Evidencia eliminada.');
+        this.showNotice('Evidencia eliminada.');
       },
-      error: () => this.mostrarAviso('No se pudo eliminar la evidencia.'),
+      error: () => this.showNotice('No se pudo eliminar la evidencia.'),
     });
   }
 
-  copiarHuella(e: MiEvidencia): void {
+  copyFingerprint(e: MyEvidence): void {
     if (!e.sha256) return;
-    navigator.clipboard?.writeText(e.sha256).then(() => this.mostrarAviso('Huella SHA-256 copiada.'));
+    navigator.clipboard?.writeText(e.sha256).then(() => this.showNotice('Huella SHA-256 copiada.'));
   }
 
   // ── Conservar ──────────────────────────────────
-  guardandoConservar = signal(false);
-  totalConservadas = computed(() => this.listaAlertas().filter((a) => a.conservar).length);
+  savingKeep = signal(false);
+  totalKept = computed(() => this.alertList().filter((a) => a.keep).length);
 
   /** Fecha en que se borrará la evidencia (si su alerta no está marcada para conservar). */
-  fechaBorrado(e: MiEvidencia): Date {
-    return new Date(e.fecha.getTime() + DIAS_RETENCION * 24 * 60 * 60 * 1000);
+  deletionDate(e: MyEvidence): Date {
+    return new Date(e.fecha.getTime() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
   }
 
-  cambiarConservar(alerta: AlertaConEvidencias): void {
-    if (this.guardandoConservar()) return;
-    const conservar = !alerta.conservar;
-    this.guardandoConservar.set(true);
-    this.service.conservar(alerta.id, conservar).subscribe({
+  toggleKeep(alert: AlertWithEvidence): void {
+    if (this.savingKeep()) return;
+    const keep = !alert.keep;
+    this.savingKeep.set(true);
+    this.service.keep(alert.id, keep).subscribe({
       next: () => {
-        this.alertas.update((l) => l.map((a) => (a.id === alerta.id ? { ...a, conservar } : a)));
-        this.guardandoConservar.set(false);
-        this.mostrarAviso(conservar
+        this.alerts.update((l) => l.map((a) => (a.id === alert.id ? { ...a, keep } : a)));
+        this.savingKeep.set(false);
+        this.showNotice(keep
           ? 'Las evidencias de esta alerta se conservarán hasta que tú las borres.'
-          : `Las evidencias de esta alerta se borrarán a los ${DIAS_RETENCION} días.`);
+          : `Las evidencias de esta alerta se borrarán a los ${RETENTION_DAYS} días.`);
       },
       error: (err: HttpErrorResponse) => {
-        this.guardandoConservar.set(false);
-        this.mostrarAviso(err.error?.message ?? 'No se pudo cambiar. Intenta de nuevo.');
+        this.savingKeep.set(false);
+        this.showNotice(err.error?.message ?? 'No se pudo cambiar. Intenta de nuevo.');
       },
     });
   }
 
   // ── Renombrar ──────────────────────────────────
   /** Se edita el nombre sin la extensión; el servidor se la vuelve a poner. */
-  editarNombre(e: MiEvidencia): void {
-    this.nuevoNombre.set(e.nombreArchivo.replace(/\.[a-z0-9]{1,5}$/i, ''));
-    this.editandoNombre.set(true);
+  editName(e: MyEvidence): void {
+    this.newName.set(e.fileName.replace(/\.[a-z0-9]{1,5}$/i, ''));
+    this.editingName.set(true);
   }
 
-  cerrarEdicion(): void {
-    this.editandoNombre.set(false);
-    this.guardandoNombre.set(false);
+  closeEdit(): void {
+    this.editingName.set(false);
+    this.savingName.set(false);
   }
 
-  guardarNombre(e: MiEvidencia): void {
-    const nombre = this.nuevoNombre().trim();
-    if (!nombre || this.guardandoNombre()) return;
-    this.guardandoNombre.set(true);
-    this.service.renombrar(e.id, nombre).subscribe({
-      next: (actualizada) => {
-        this.evidencias.update((l) => l.map((x) => (x.id === e.id ? { ...x, nombreArchivo: actualizada.nombreArchivo } : x)));
-        this.seleccionada.set({ ...e, nombreArchivo: actualizada.nombreArchivo });
-        this.cerrarEdicion();
-        this.mostrarAviso('Nombre actualizado.');
+  saveName(e: MyEvidence): void {
+    const nombre = this.newName().trim();
+    if (!nombre || this.savingName()) return;
+    this.savingName.set(true);
+    this.service.rename(e.id, nombre).subscribe({
+      next: (updated) => {
+        this.evidences.update((l) => l.map((x) => (x.id === e.id ? { ...x, fileName: updated.fileName } : x)));
+        this.selected.set({ ...e, fileName: updated.fileName });
+        this.closeEdit();
+        this.showNotice('Nombre actualizado.');
       },
       error: (err: HttpErrorResponse) => {
-        this.guardandoNombre.set(false);
-        this.mostrarAviso(err.error?.message ?? 'No se pudo cambiar el nombre.');
+        this.savingName.set(false);
+        this.showNotice(err.error?.message ?? 'No se pudo cambiar el nombre.');
       },
     });
   }
 
   // ── Mapa de la alerta (dentro de la app, con zoom) ─────
-  abrirMapa(): void {
-    const a = this.alertaActual();
+  openMap(): void {
+    const a = this.currentAlert();
     if (a?.lat == null || a?.lng == null) return;
-    const centro: L.LatLngTuple = [a.lat, a.lng];
-    this.mapaVisible.set(true);
+    const center: L.LatLngTuple = [a.lat, a.lng];
+    this.mapVisible.set(true);
     setTimeout(() => {
-      if (!this.mapaRef) return;
-      this.mapa?.remove();
-      this.mapa = L.map(this.mapaRef.nativeElement, { center: centro, zoom: 17 });
-      L.tileLayer(TILES, { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(this.mapa);
-      L.circleMarker(centro, { radius: 10, color: '#fff', weight: 3, fillColor: '#7c3aed', fillOpacity: 1 })
-        .addTo(this.mapa)
-        .bindPopup(this.direcciones()[a.id] ?? 'Lugar de la alerta')
+      if (!this.mapRef) return;
+      this.map?.remove();
+      this.map = L.map(this.mapRef.nativeElement, { center, zoom: 17 });
+      L.tileLayer(TILES, { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(this.map);
+      L.circleMarker(center, { radius: 10, color: '#fff', weight: 3, fillColor: '#7c3aed', fillOpacity: 1 })
+        .addTo(this.map)
+        .bindPopup(this.addresses()[a.id] ?? 'Lugar de la alerta')
         .openPopup();
     }, 50);
   }
 
-  cerrarMapa(): void {
-    this.mapaVisible.set(false);
-    this.mapa?.remove();
-    this.mapa = null;
+  closeMap(): void {
+    this.mapVisible.set(false);
+    this.map?.remove();
+    this.map = null;
   }
 
   // ── Subida ─────────────────────────────────────
-  abrirSubida(): void {
-    this.subirVisible.set(true);
-    this.archivo.set(null);
-    this.errorSubida.set('');
-    this.progreso.set(null);
+  openUpload(): void {
+    this.uploadVisible.set(true);
+    this.file.set(null);
+    this.uploadError.set('');
+    this.progress.set(null);
   }
 
-  cerrarSubida(): void {
-    if (this.progreso() !== null) return; // no cerrar a mitad de la subida
-    this.subirVisible.set(false);
+  closeUpload(): void {
+    if (this.progress() !== null) return; // no cerrar a mitad de la subida
+    this.uploadVisible.set(false);
   }
 
-  elegirArchivo(event: Event): void {
+  chooseFile(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.validarArchivo(input.files?.[0] ?? null);
+    this.validateFile(input.files?.[0] ?? null);
     input.value = '';
   }
 
-  soltar(event: DragEvent): void {
+  drop(event: DragEvent): void {
     event.preventDefault();
-    this.arrastrando.set(false);
-    this.validarArchivo(event.dataTransfer?.files?.[0] ?? null);
+    this.dragging.set(false);
+    this.validateFile(event.dataTransfer?.files?.[0] ?? null);
   }
 
-  private validarArchivo(f: File | null): void {
-    this.errorSubida.set('');
+  private validateFile(f: File | null): void {
+    this.uploadError.set('');
     if (!f) return;
     if (!/^(image\/(png|jpeg|webp|heic)|video\/|audio\/)/.test(f.type)) {
-      this.errorSubida.set('Solo se permiten fotos, videos o audios.');
+      this.uploadError.set('Solo se permiten fotos, videos o audios.');
       return;
     }
     if (f.size > MAX_MB * 1024 * 1024) {
-      this.errorSubida.set(`El archivo pesa ${this.tamano(f.size)}; el máximo es ${MAX_MB} MB.`);
+      this.uploadError.set(`El archivo pesa ${this.size(f.size)}; el máximo es ${MAX_MB} MB.`);
       return;
     }
-    this.archivo.set(f);
+    this.file.set(f);
   }
 
-  subir(): void {
-    const f = this.archivo();
+  upload(): void {
+    const f = this.file();
     const alertId = this.alertaId();
     if (!f || !alertId) return;
-    this.progreso.set(0);
-    this.errorSubida.set('');
-    this.service.subir(f, alertId).subscribe({
+    this.progress.set(0);
+    this.uploadError.set('');
+    this.service.upload(f, alertId).subscribe({
       next: (ev) => {
         if (ev.type === HttpEventType.UploadProgress && ev.total) {
-          this.progreso.set(Math.round((ev.loaded / ev.total) * 100));
+          this.progress.set(Math.round((ev.loaded / ev.total) * 100));
         } else if (ev.type === HttpEventType.Response && ev.body) {
-          const nueva = this.service.desdeApi(ev.body);
-          this.evidencias.update((l) => [nueva, ...l]);
-          this.progreso.set(null);
-          this.subirVisible.set(false);
-          this.filtro.set('todas');
-          this.ver(nueva);
-          this.mostrarAviso('Evidencia subida y protegida con su huella SHA-256.');
+          const newOne = this.service.fromApi(ev.body);
+          this.evidences.update((l) => [newOne, ...l]);
+          this.progress.set(null);
+          this.uploadVisible.set(false);
+          this.filter.set('todas');
+          this.ver(newOne);
+          this.showNotice('Evidencia subida y protegida con su huella SHA-256.');
         }
       },
       error: (err: HttpErrorResponse) => {
-        this.progreso.set(null);
-        this.errorSubida.set(err.error?.message ?? 'No se pudo subir el archivo.');
+        this.progress.set(null);
+        this.uploadError.set(err.error?.message ?? 'No se pudo subir el archivo.');
       },
     });
   }
 
   // ── Formato ────────────────────────────────────
-  tamano(bytes: number | null): string {
+  size(bytes: number | null): string {
     if (bytes == null) return '—';
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  fechaCorta(d: Date | null): string {
+  shortDate(d: Date | null): string {
     return d ? d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   }
 
-  fechaLarga(d: Date | null): string {
+  longDate(d: Date | null): string {
     return d
       ? d.toLocaleString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' })
       : '—';
   }
 
-  hora(d: Date | null): string {
+  time(d: Date | null): string {
     return d ? d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }) : '';
   }
 
   estado(s: string | undefined): string {
-    return s ? ESTADOS[s] ?? s : '—';
+    return s ? STATUSES[s] ?? s : '—';
   }
 
-  private crearUrl(blob: Blob): string {
+  private createUrl(blob: Blob): string {
     const url = URL.createObjectURL(blob);
-    this.urlsCreadas.add(url);
+    this.createdUrls.add(url);
     return url;
   }
 
-  private mostrarAviso(texto: string): void {
-    this.aviso.set(texto);
+  private showNotice(text: string): void {
+    this.notice.set(text);
     setTimeout(() => {
-      if (this.aviso() === texto) this.aviso.set('');
+      if (this.notice() === text) this.notice.set('');
     }, 3500);
   }
 }

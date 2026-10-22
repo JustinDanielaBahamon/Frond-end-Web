@@ -9,33 +9,33 @@ import { CommonModule } from '@angular/common';
   styleUrl: './period-badge.scss'
 })
 export class PeriodBadge {
-  @Input() periodo = '';
-  @Input() opciones: string[] = [];           // si viene vacío, no muestra dropdown (modo compacto)
+  @Input() period = '';
+  @Input() options: string[] = [];           // si viene vacío, no muestra dropdown (modo compacto)
   @Input() conDropdown = false;                 // true solo en el selector principal del header
 
-  @Output() periodoChange = new EventEmitter<string>();
+  @Output() periodChange = new EventEmitter<string>();
 
-  menuAbierto = false;
+  menuOpen = false;
 
   constructor(private elRef: ElementRef) {}
 
   toggleMenu() {
     if (this.conDropdown) {
-      this.menuAbierto = !this.menuAbierto;
+      this.menuOpen = !this.menuOpen;
     }
   }
 
-  seleccionar(p: string) {
-    this.periodo = p;
-    this.periodoChange.emit(p);
-    this.menuAbierto = false;
+  select(p: string) {
+    this.period = p;
+    this.periodChange.emit(p);
+    this.menuOpen = false;
   }
 
   // Cierra el dropdown si se hace click fuera del componente
   @HostListener('document:click', ['$event'])
-  onClickFuera(event: MouseEvent) {
+  onClickOutside(event: MouseEvent) {
     if (!this.elRef.nativeElement.contains(event.target)) {
-      this.menuAbierto = false;
+      this.menuOpen = false;
     }
   }
 }

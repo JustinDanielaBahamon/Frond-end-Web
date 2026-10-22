@@ -5,10 +5,10 @@ import { AuthService } from '../auth/auth.service';
 import { EmergencyContactService } from './emergency-contact.service';
 import { DeviceService } from './device.service';
 import {
-  EstadoSeguridad,
-  RequisitoSeguridad,
-  NivelSeguridad,
-  ColorIndicador
+  SecurityStatus,
+  SecurityRequirement,
+  SecurityLevel,
+  IndicatorColor
 } from '../models/security-status.model';
 
 /**
@@ -21,77 +21,77 @@ export class UserSecurityStatusService {
   private contactService = inject(EmergencyContactService);
   private deviceService = inject(DeviceService);
 
-  getSecurityStatus(): Observable<EstadoSeguridad> {
+  getSecurityStatus(): Observable<SecurityStatus> {
     const user = this.authService.getCurrentUser();
     if (!user) {
-      return of(this.armar(0, 0, 0, false));
+      return of(this.build(0, 0, 0, false));
     }
 
     return forkJoin({
-      contactos: this.contactService.getByUsuario(user.id).pipe(catchError(() => of([]))),
+      contacts: this.contactService.getByUser(user.id).pipe(catchError(() => of([]))),
       celulares: this.deviceService.getMyDevices().pipe(catchError(() => of([]))),
     }).pipe(
-      map(({ contactos, celulares }) => this.armar(
-        contactos.length,
-        contactos.filter((c: { email?: string | null }) => !!c.email).length,
+      map(({ contacts, celulares }) => this.build(
+        contacts.length,
+        contacts.filter((c: { email?: string | null }) => !!c.email).length,
         celulares.length,
         celulares.some(d => !!d.fcmToken),
       ))
     );
   }
 
-  private armar(contactos: number, conCorreo: number, celulares: number, recibeAlertas: boolean): EstadoSeguridad {
-    const requisitos: RequisitoSeguridad[] = [
+  private build(contacts: number, withEmail: number, celulares: number, receivesAlerts: boolean): SecurityStatus {
+    const requirements: SecurityRequirement[] = [
       {
         key: 'contactos',
         label: 'Contactos de emergencia',
-        cumplido: contactos >= 1,
-        valor: `${contactos} contacto${contactos !== 1 ? 's' : ''}`,
+        met: contacts >= 1,
+        value: `${contacts} contacto${contacts !== 1 ? 's' : ''}`,
         icon: 'ti-users',
       },
       {
         key: 'correo',
         label: 'Contactos con correo',
-        cumplido: conCorreo >= 1,
-        valor: conCorreo ? `${conCorreo} reciben el enlace` : 'Ninguno',
+        met: withEmail >= 1,
+        value: withEmail ? `${withEmail} reciben el enlace` : 'Ninguno',
         icon: 'ti-mail',
       },
       {
         key: 'celular',
         label: 'Celular vinculado',
-        cumplido: celulares >= 1,
-        valor: celulares ? `${celulares} celular${celulares !== 1 ? 'es' : ''}` : 'Sin vincular',
+        met: celulares >= 1,
+        value: celulares ? `${celulares} celular${celulares !== 1 ? 'es' : ''}` : 'Sin vincular',
         icon: 'ti-device-mobile',
       },
       {
         key: 'alertas',
         label: 'Notificaciones en el celular',
-        cumplido: recibeAlertas,
-        valor: recibeAlertas ? 'Activas' : 'Inactivas',
+        met: receivesAlerts,
+        value: receivesAlerts ? 'Activas' : 'Inactivas',
         icon: 'ti-bell',
       },
     ];
 
-    const fallidos = requisitos.filter(r => !r.cumplido).length;
-    let nivel: NivelSeguridad;
-    let color: ColorIndicador;
-    if (contactos === 0 || fallidos >= 2) {
-      nivel = 'critico';
+    const failed = requirements.filter(r => !r.met).length;
+    let level: SecurityLevel;
+    let color: IndicatorColor;
+    if (contacts === 0 || failed >= 2) {
+      level = 'critico';
       color = 'rojo';
-    } else if (fallidos === 1) {
-      nivel = 'advertencia';
+    } else if (failed === 1) {
+      level = 'advertencia';
       color = 'amarillo';
     } else {
-      nivel = 'seguro';
+      level = 'seguro';
       color = 'verde';
     }
 
     return {
-      cantidadContactos: contactos,
-      requisitos,
-      nivel,
+      contactCount: contacts,
+      requirements,
+      level,
       color,
-      porcentaje: Math.round(((requisitos.length - fallidos) / requisitos.length) * 100),
+      percentage: Math.round(((requirements.length - failed) / requirements.length) * 100),
     };
   }
 }

@@ -4,7 +4,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
-import { Usuario } from '../models/user.model';
+import { ManagedUser } from '../models/user.model';
 
 // Backend DTO interface
 interface AdminUserDto {
@@ -22,7 +22,7 @@ interface AdminUserDto {
 }
 
 /** Lo que se ha hecho con una cuenta (bloqueos, desbloqueos, solicitudes de eliminación). */
-export interface HistorialModeracion {
+export interface ModerationHistory {
   fecha: string;
   tipo: string;
   adminNombre: string | null;
@@ -33,7 +33,7 @@ export interface HistorialModeracion {
 }
 
 /** Celular de la usuaria tal como lo ve el panel (GET /api/devices, solo admin). */
-export interface CelularAdmin {
+export interface AdminPhone {
   id: number;
   userId: number | null;
   brand: string | null;
@@ -49,7 +49,7 @@ export interface CelularAdmin {
   permissionsUpdatedAt: string | null;
 }
 
-export interface SolicitudEliminacion {
+export interface DeletionRequest {
   id: number;
   userId: number;
   userName: string | null;
@@ -71,28 +71,28 @@ export class UsersService {
   private apiUrl = environment.apiUrl;
 
   // ── Usuarias ─────────────────────────────────────────────────
-  getAll(): Observable<Usuario[]> {
+  getAll(): Observable<ManagedUser[]> {
     return this.http.get<AdminUserDto[]>(`${this.apiUrl}/api/admin/users`).pipe(
       map(dtos => dtos.map(dto => this.fromApi(dto)))
     );
   }
 
-  updateEstado(id: string | number, estado: Usuario['estado']): Observable<Usuario> {
-    const accountStatus = this.mapEstadoToApi(estado);
+  updateStatus(id: string | number, estado: ManagedUser['estado']): Observable<ManagedUser> {
+    const accountStatus = this.mapStatusToApi(estado);
     return this.http.patch<AdminUserDto>(`${this.apiUrl}/api/admin/users/${id}`, { accountStatus }).pipe(
       map(dto => this.fromApi(dto))
     );
   }
 
-  actualizarUsuaria(id: string | number, cambios: Partial<Usuario> & Record<string, unknown>): Observable<Usuario> {
-    const apiChanges = this.toApi(cambios);
+  updateUser(id: string | number, changes: Partial<ManagedUser> & Record<string, unknown>): Observable<ManagedUser> {
+    const apiChanges = this.toApi(changes);
     return this.http.patch<AdminUserDto>(`${this.apiUrl}/api/admin/users/${id}`, apiChanges).pipe(
       map(dto => this.fromApi(dto))
     );
   }
 
   // Crea la usuaria usando el endpoint de registro del backend
-  crearUsuaria(data: Record<string, any>): Observable<Usuario> {
+  createUser(data: Record<string, any>): Observable<ManagedUser> {
     return this.http.post<any>(`${this.apiUrl}/api/auth/register`, {
       nombre: data['nombre'],
       email: data['email'],
@@ -107,11 +107,11 @@ export class UsersService {
           nombre: `${user.firstName} ${user.lastName}`,
           email: user.email,
           telefono: user.telephone || '',
-          fechaRegistro: user.createdAt,
-          alertas: 0,
-          ultimaActividad: user.createdAt,
+          registeredAt: user.createdAt,
+          alerts: 0,
+          lastActivity: user.createdAt,
           estado: 'Activa' as const,
-          rol: user.roleName || 'USER',
+          role: user.roleName || 'USER',
           avatarColor: this.generateAvatarColor(),
           first_name: user.firstName,
           last_name: user.lastName
@@ -124,17 +124,17 @@ export class UsersService {
   /**
    * Convert backend AdminUserDto to frontend Usuario model
    */
-  private fromApi(dto: AdminUserDto): Usuario {
+  private fromApi(dto: AdminUserDto): ManagedUser {
     return {
       id: dto.id.toString(),
       nombre: `${dto.firstName} ${dto.lastName}`,
       email: dto.email,
       telefono: dto.telephone || '',
-      fechaRegistro: dto.createdAt,
-      alertas: dto.alertCount,
-      ultimaActividad: dto.lastAccess || dto.createdAt,
-      estado: this.mapEstadoFromApi(dto.accountStatus),
-      rol: dto.role || 'user',
+      registeredAt: dto.createdAt,
+      alerts: dto.alertCount,
+      lastActivity: dto.lastAccess || dto.createdAt,
+      estado: this.mapStatusFromApi(dto.accountStatus),
+      role: dto.role || 'user',
       avatarColor: this.generateAvatarColor(),
       first_name: dto.firstName,
       last_name: dto.lastName
@@ -144,29 +144,29 @@ export class UsersService {
   /**
    * Convert frontend changes to backend format
    */
-  private toApi(cambios: Partial<Usuario> & Record<string, unknown>): Record<string, unknown> {
+  private toApi(changes: Partial<ManagedUser> & Record<string, unknown>): Record<string, unknown> {
     const apiChanges: Record<string, unknown> = {};
 
-    if (cambios['estado']) {
-      apiChanges['accountStatus'] = this.mapEstadoToApi(cambios['estado'] as Usuario['estado']);
+    if (changes['estado']) {
+      apiChanges['accountStatus'] = this.mapStatusToApi(changes['estado'] as ManagedUser['estado']);
     }
-    if (cambios['nombre']) {
+    if (changes['nombre']) {
       // Split nombre into firstName and lastName
-      const parts = (cambios['nombre'] as string).split(' ');
+      const parts = (changes['nombre'] as string).split(' ');
       apiChanges['firstName'] = parts[0];
       apiChanges['lastName'] = parts.slice(1).join(' ') || parts[0];
     }
-    if (cambios['first_name']) {
-      apiChanges['firstName'] = cambios['first_name'];
+    if (changes['first_name']) {
+      apiChanges['firstName'] = changes['first_name'];
     }
-    if (cambios['last_name']) {
-      apiChanges['lastName'] = cambios['last_name'];
+    if (changes['last_name']) {
+      apiChanges['lastName'] = changes['last_name'];
     }
-    if (cambios['telefono']) {
-      apiChanges['telephone'] = cambios['telefono'];
+    if (changes['telefono']) {
+      apiChanges['telephone'] = changes['telefono'];
     }
-    if (cambios['email']) {
-      apiChanges['email'] = cambios['email'];
+    if (changes['email']) {
+      apiChanges['email'] = changes['email'];
     }
 
     return apiChanges;
@@ -175,7 +175,7 @@ export class UsersService {
   /**
    * Map backend account status to frontend estado
    */
-  private mapEstadoFromApi(accountStatus: string | null): Usuario['estado'] {
+  private mapStatusFromApi(accountStatus: string | null): ManagedUser['estado'] {
     switch (accountStatus) {
       case 'active':
         return 'Activa';
@@ -191,7 +191,7 @@ export class UsersService {
   /**
    * Map frontend estado to backend account status
    */
-  private mapEstadoToApi(estado: Usuario['estado']): string {
+  private mapStatusToApi(estado: ManagedUser['estado']): string {
     switch (estado) {
       case 'Activa':
         return 'active';
@@ -213,49 +213,49 @@ export class UsersService {
   }
 
   // ── Moderación ───────────────────────────────────────────────
-  bloquear(id: string | number, motivo: string, descripcion: string, evidencia: string | null): Observable<void> {
+  block(id: string | number, motivo: string, description: string, evidence: string | null): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/block`, {
-      reason: motivo, description: descripcion, evidence: evidencia,
+      reason: motivo, description, evidence,
     });
   }
 
-  desbloquear(id: string | number, nota: string): Observable<void> {
+  unblock(id: string | number, nota: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/unblock`, { note: nota });
   }
 
-  historial(id: string | number): Observable<HistorialModeracion[]> {
-    return this.http.get<HistorialModeracion[]>(`${this.apiUrl}/api/admin/users/${id}/moderation-history`);
+  history(id: string | number): Observable<ModerationHistory[]> {
+    return this.http.get<ModerationHistory[]>(`${this.apiUrl}/api/admin/users/${id}/moderation-history`);
   }
 
-  evidenciaDeCaso(casoId: number): Observable<string | null> {
+  caseEvidenceOf(casoId: number): Observable<string | null> {
     return this.http.get<{ evidence: string } | null>(`${this.apiUrl}/api/admin/user-reports/${casoId}/evidence`)
       .pipe(map(r => r?.evidence ?? null));
   }
 
-  solicitarEliminacion(id: string | number, motivo: string): Observable<SolicitudEliminacion> {
-    return this.http.post<SolicitudEliminacion>(`${this.apiUrl}/api/admin/users/${id}/deletion-requests`, { reason: motivo });
+  requestDeletion(id: string | number, motivo: string): Observable<DeletionRequest> {
+    return this.http.post<DeletionRequest>(`${this.apiUrl}/api/admin/users/${id}/deletion-requests`, { reason: motivo });
   }
 
-  solicitudesEliminacion(): Observable<SolicitudEliminacion[]> {
-    return this.http.get<SolicitudEliminacion[]>(`${this.apiUrl}/api/admin/deletion-requests`);
+  deletionRequests(): Observable<DeletionRequest[]> {
+    return this.http.get<DeletionRequest[]>(`${this.apiUrl}/api/admin/deletion-requests`);
   }
 
-  decidirEliminacion(id: number, aprobar: boolean, nota: string): Observable<SolicitudEliminacion> {
-    return this.http.post<SolicitudEliminacion>(
-      `${this.apiUrl}/api/admin/deletion-requests/${id}/${aprobar ? 'approve' : 'reject'}`, { note: nota });
+  decideDeletion(id: number, approve: boolean, nota: string): Observable<DeletionRequest> {
+    return this.http.post<DeletionRequest>(
+      `${this.apiUrl}/api/admin/deletion-requests/${id}/${approve ? 'approve' : 'reject'}`, { note: nota });
   }
 
   /** Envía a la usuaria el correo con el código para crear una contraseña nueva. */
-  enviarRecuperacion(email: string): Observable<void> {
+  sendRecovery(email: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/auth/forgot-password`, { email });
   }
 
-  celulares(): Observable<CelularAdmin[]> {
-    return this.http.get<CelularAdmin[]>(`${this.apiUrl}/api/devices`);
+  celulares(): Observable<AdminPhone[]> {
+    return this.http.get<AdminPhone[]>(`${this.apiUrl}/api/devices`);
   }
 
   // ── Datos relacionados ───────────────────────────────────────
-  getAlertasByUsuaria(usuarioId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${usuarioId}`);
+  getAlertsByUser(userId: string | number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${userId}`);
   }
 }

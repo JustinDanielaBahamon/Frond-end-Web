@@ -2,15 +2,15 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  AuditService, FiltrosAuditoria, RegistroAuditoria, ResponsableAuditoria
+  AuditService, AuditFilters, AuditRecord, AuditActor
 } from '../../../core/services/audit.service';
-import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
-import { paginasCompactas } from '../../../shared/utils/paginacion';
+import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
+import { compactPages } from '../../../shared/utils/paginacion';
 
-const POR_PAGINA = 10;
+const PER_PAGE = 10;
 
 /** Nombres legibles de los tipos de registro auditados. */
-export const TIPOS: Record<string, string> = {
+export const TYPES: Record<string, string> = {
   SESSION: 'Sesión',
   SYSTEM_CONFIGURATION: 'Parámetros del sistema',
   ACCOUNT: 'Cuenta',
@@ -22,7 +22,7 @@ export const TIPOS: Record<string, string> = {
   ROLE: 'Rol',
 };
 
-const ACCIONES: Record<string, string> = {
+const ACTIONS: Record<string, string> = {
   LOGIN_SUCCESS: 'Inició sesión',
   LOGIN_FAILED: 'Intento de inicio fallido',
   LOGOUT: 'Cerró sesión',
@@ -58,82 +58,82 @@ const CAMPOS: Record<string, string> = {
 @Component({
   selector: 'app-admin-audit',
   standalone: true,
-  imports: [SelectorFecha, CommonModule, FormsModule],
+  imports: [DatePicker, CommonModule, FormsModule],
   templateUrl: './audit.html',
   styleUrl: './audit.scss',
 })
 export class AuditComponent implements OnInit {
   private auditService = inject(AuditService);
 
-  readonly tipos = Object.entries(TIPOS).map(([valor, etiqueta]) => ({ valor, etiqueta }));
-  readonly acciones = Object.entries(ACCIONES).map(([valor, etiqueta]) => ({ valor, etiqueta }));
+  readonly types = Object.entries(TYPES).map(([value, label]) => ({ value, label }));
+  readonly actions = Object.entries(ACTIONS).map(([value, label]) => ({ value, label }));
 
-  filtros: FiltrosAuditoria = { responsableId: null, tipo: '', accion: '', desde: '', hasta: '' };
-  readonly responsables = signal<ResponsableAuditoria[]>([]);
+  filters: AuditFilters = { actorId: null, tipo: '', action: '', from: '', to: '' };
+  readonly actors = signal<AuditActor[]>([]);
 
-  readonly registros = signal<RegistroAuditoria[]>([]);
+  readonly records = signal<AuditRecord[]>([]);
   readonly total = signal(0);
-  readonly pagina = signal(0);
-  readonly cargando = signal(true);
+  readonly page = signal(0);
+  readonly loading = signal(true);
   readonly error = signal('');
-  readonly exportando = signal(false);
-  readonly seleccionado = signal<RegistroAuditoria | null>(null);
+  readonly exporting = signal(false);
+  readonly selected = signal<AuditRecord | null>(null);
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / POR_PAGINA)));
-  readonly paginas = computed(() => paginasCompactas(this.pagina() + 1, this.totalPaginas()));
-  readonly desdeItem = computed(() => (this.total() === 0 ? 0 : this.pagina() * POR_PAGINA + 1));
-  readonly hastaItem = computed(() => Math.min((this.pagina() + 1) * POR_PAGINA, this.total()));
+  readonly totalPageCount = computed(() => Math.max(1, Math.ceil(this.total() / PER_PAGE)));
+  readonly pages = computed(() => compactPages(this.page() + 1, this.totalPageCount()));
+  readonly fromItem = computed(() => (this.total() === 0 ? 0 : this.page() * PER_PAGE + 1));
+  readonly toItem = computed(() => Math.min((this.page() + 1) * PER_PAGE, this.total()));
 
   ngOnInit(): void {
-    this.auditService.responsables().subscribe({ next: (r) => this.responsables.set(r) });
-    this.cargar();
+    this.auditService.actors().subscribe({ next: (r) => this.actors.set(r) });
+    this.load();
   }
 
-  cargar(): void {
-    this.cargando.set(true);
+  load(): void {
+    this.loading.set(true);
     this.error.set('');
-    this.auditService.listar(this.filtros, this.pagina(), POR_PAGINA).subscribe({
+    this.auditService.list(this.filters, this.page(), PER_PAGE).subscribe({
       next: (p) => {
-        this.registros.set(p.registros);
+        this.records.set(p.records);
         this.total.set(p.total);
-        this.cargando.set(false);
+        this.loading.set(false);
       },
       error: () => {
         this.error.set('No se pudo cargar la auditoría');
-        this.cargando.set(false);
+        this.loading.set(false);
       },
     });
   }
 
-  aplicarFiltros(): void {
-    this.pagina.set(0);
-    this.cargar();
+  applyFilters(): void {
+    this.page.set(0);
+    this.load();
   }
 
-  limpiarFiltros(): void {
-    this.filtros = { responsableId: null, tipo: '', accion: '', desde: '', hasta: '' };
-    this.aplicarFiltros();
+  clearFilters(): void {
+    this.filters = { actorId: null, tipo: '', action: '', from: '', to: '' };
+    this.applyFilters();
   }
 
-  verSesiones(): void {
-    this.filtros = { ...this.filtros, tipo: 'SESSION', accion: '' };
-    this.aplicarFiltros();
+  viewSessions(): void {
+    this.filters = { ...this.filters, tipo: 'SESSION', action: '' };
+    this.applyFilters();
   }
 
-  verIntentosFallidos(): void {
-    this.filtros = { ...this.filtros, tipo: 'SESSION', accion: 'LOGIN_FAILED' };
-    this.aplicarFiltros();
+  viewFailedAttempts(): void {
+    this.filters = { ...this.filters, tipo: 'SESSION', action: 'LOGIN_FAILED' };
+    this.applyFilters();
   }
 
-  irAPagina(n: number): void {
-    if (n < 1 || n > this.totalPaginas()) return;
-    this.pagina.set(n - 1);
-    this.cargar();
+  goToPage(n: number): void {
+    if (n < 1 || n > this.totalPageCount()) return;
+    this.page.set(n - 1);
+    this.load();
   }
 
-  exportar(): void {
-    this.exportando.set(true);
-    this.auditService.exportar(this.filtros).subscribe({
+  export(): void {
+    this.exporting.set(true);
+    this.auditService.export(this.filters).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -141,97 +141,97 @@ export class AuditComponent implements OnInit {
         a.download = `auditoria-${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        this.exportando.set(false);
+        this.exporting.set(false);
       },
       error: () => {
         this.error.set('No se pudo exportar la auditoría');
-        this.exportando.set(false);
+        this.exporting.set(false);
       },
     });
   }
 
   // ── Presentación ─────────────────────────────────────────────
-  accion(r: RegistroAuditoria): string {
-    return ACCIONES[r.accion] ?? r.accion;
+  action(r: AuditRecord): string {
+    return ACTIONS[r.action] ?? r.action;
   }
 
-  tipo(r: RegistroAuditoria): string {
-    return TIPOS[r.tipo] ?? r.tipo;
+  tipo(r: AuditRecord): string {
+    return TYPES[r.tipo] ?? r.tipo;
   }
 
-  objeto(r: RegistroAuditoria): string {
+  object(r: AuditRecord): string {
     if (r.tipo === 'SESSION') return 'Panel de administración';
-    return `${this.tipo(r)}${r.registroId != null ? ' #' + r.registroId : ''}`;
+    return `${this.tipo(r)}${r.recordId != null ? ' #' + r.recordId : ''}`;
   }
 
   /** Quién hizo el cambio cuando no hubo una persona con sesión. */
-  sinResponsable(r: RegistroAuditoria): { texto: string; ayuda: string; icono: string } {
-    if (r.origen?.startsWith('Tarea automática')) {
-      return { texto: r.origen.replace('Tarea automática · ', ''), ayuda: 'Proceso automático del servidor', icono: 'fa-gears' };
+  withoutActor(r: AuditRecord): { text: string; help: string; icon: string } {
+    if (r.source?.startsWith('Tarea automática')) {
+      return { text: r.source.replace('Tarea automática · ', ''), help: 'Proceso automático del servidor', icon: 'fa-gears' };
     }
-    if (r.origen) {
-      return { texto: 'Sin sesión', ayuda: 'Petición sin usuario autenticado (' + r.origen + ')', icono: 'fa-user-slash' };
+    if (r.source) {
+      return { text: 'Sin sesión', help: 'Petición sin usuario autenticado (' + r.source + ')', icon: 'fa-user-slash' };
     }
     return {
-      texto: 'No registrado',
-      ayuda: 'Registro anterior al seguimiento de responsables, o cambio hecho directamente en la base de datos',
-      icono: 'fa-circle-question',
+      text: 'No registrado',
+      help: 'Registro anterior al seguimiento de responsables, o cambio hecho directamente en la base de datos',
+      icon: 'fa-circle-question',
     };
   }
 
-  iconoOrigen(origen: string | null): string {
-    if (!origen) return 'fa-circle-question';
-    if (origen.startsWith('App móvil')) return 'fa-mobile-screen';
-    if (origen.startsWith('Panel web')) return 'fa-desktop';
-    if (origen.startsWith('Tarea automática')) return 'fa-gears';
+  sourceIcon(source: string | null): string {
+    if (!source) return 'fa-circle-question';
+    if (source.startsWith('App móvil')) return 'fa-mobile-screen';
+    if (source.startsWith('Panel web')) return 'fa-desktop';
+    if (source.startsWith('Tarea automática')) return 'fa-gears';
     return 'fa-plug';
   }
 
-  claseAccion(r: RegistroAuditoria): string {
-    if (r.accion === 'LOGIN_FAILED' || r.accion === 'DELETE') return 'badge--danger';
-    if (r.accion === 'LOGIN_SUCCESS' || r.accion === 'INSERT') return 'badge--ok';
-    if (r.accion === 'LOGOUT') return 'badge--muted';
+  actionClass(r: AuditRecord): string {
+    if (r.action === 'LOGIN_FAILED' || r.action === 'DELETE') return 'badge--danger';
+    if (r.action === 'LOGIN_SUCCESS' || r.action === 'INSERT') return 'badge--ok';
+    if (r.action === 'LOGOUT') return 'badge--muted';
     return 'badge--info';
   }
 
   /** "lunes, 20 de octubre de 2026, 10:32:15 a. m." (la app no registra el locale de Angular). */
-  fechaLarga(fecha: Date | string | null): string {
+  longDate(fecha: Date | string | null): string {
     if (!fecha) return '';
     const d = new Date(fecha);
     return isNaN(d.getTime()) ? '' : d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'medium' });
   }
 
   /** Ícono del tipo de acción (cabecera del detalle). */
-  iconoAccion(r: RegistroAuditoria): string {
-    const iconos: Record<string, string> = {
+  actionIcon(r: AuditRecord): string {
+    const icons: Record<string, string> = {
       INSERT: 'fa-plus', UPDATE: 'fa-pen', DELETE: 'fa-trash',
       LOGIN_SUCCESS: 'fa-right-to-bracket', LOGIN_FAILED: 'fa-triangle-exclamation', LOGOUT: 'fa-right-from-bracket',
     };
-    return iconos[r.accion] ?? 'fa-clipboard-list';
+    return icons[r.action] ?? 'fa-clipboard-list';
   }
 
   /** Cambios como filas "dato / antes / después"; si el registro no los trae, antes y después son null. */
-  cambios(r: RegistroAuditoria): { campo: string; antes: string | null; despues: string | null }[] {
-    return this.detalle(r).map((linea) => {
-      const flecha = linea.indexOf(' → ');
-      const dosPuntos = linea.indexOf(': ');
-      if (flecha < 0 || dosPuntos < 0 || dosPuntos > flecha) return { campo: linea, antes: null, despues: null };
+  changes(r: AuditRecord): { field: string; before: string | null; after: string | null }[] {
+    return this.detail(r).map((line) => {
+      const arrow = line.indexOf(' → ');
+      const twoPoints = line.indexOf(': ');
+      if (arrow < 0 || twoPoints < 0 || twoPoints > arrow) return { field: line, before: null, after: null };
       return {
-        campo: linea.slice(0, dosPuntos),
-        antes: linea.slice(dosPuntos + 2, flecha),
-        despues: linea.slice(flecha + 3),
+        field: line.slice(0, twoPoints),
+        before: line.slice(twoPoints + 2, arrow),
+        after: line.slice(arrow + 3),
       };
     });
   }
 
   /** Detalle legible: valores "antes → después", columnas cambiadas o el dispositivo de la sesión. */
-  detalle(r: RegistroAuditoria): string[] {
-    const d = r.descripcion;
+  detail(r: AuditRecord): string[] {
+    const d = r.description;
     if (d.startsWith('Valores: ')) {
-      return d.slice(9).split('; ').map((cambio) => {
-        const i = cambio.indexOf(': ');
-        const campo = cambio.slice(0, i);
-        return `${CAMPOS[campo] ?? campo}: ${cambio.slice(i + 2)}`;
+      return d.slice(9).split('; ').map((change) => {
+        const i = change.indexOf(': ');
+        const field = change.slice(0, i);
+        return `${CAMPOS[field] ?? field}: ${change.slice(i + 2)}`;
       });
     }
     if (d.startsWith('Columnas modificadas: ')) {
@@ -240,11 +240,11 @@ export class AuditComponent implements OnInit {
     return d ? [d] : [];
   }
 
-  verDetalle(r: RegistroAuditoria): void {
-    this.seleccionado.set(r);
+  viewDetail(r: AuditRecord): void {
+    this.selected.set(r);
   }
 
-  cerrarDetalle(): void {
-    this.seleccionado.set(null);
+  closeDetail(): void {
+    this.selected.set(null);
   }
 }

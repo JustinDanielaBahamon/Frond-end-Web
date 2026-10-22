@@ -28,19 +28,19 @@ export interface Device {
   lastAccessIso?: string | null;
   /** Nombre que le puso la usuaria al celular (p. ej. "Celular de Ana"). */
   deviceName?: string | null;
-  registrado?: string;
+  registered?: string;
   /** Lo que la app informa que está listo para una emergencia (null si nunca lo informó). */
-  permisos?: PermisoDispositivo[] | null;
-  permisosActualizados?: string | null;
+  permissions?: DevicePermission[] | null;
+  permissionsUpdated?: string | null;
 }
 
-export interface PermisoDispositivo {
-  etiqueta: string;
-  listo: boolean;
+export interface DevicePermission {
+  label: string;
+  ready: boolean;
 }
 
 /** Permisos que informa la app, en el orden en que importan para una emergencia. */
-const PERMISOS_APP: [string, string][] = [
+const APP_PERMISSIONS: [string, string][] = [
   ['ubicacion', 'Ubicación'],
   ['notificaciones', 'Notificaciones'],
   ['agitar', 'Alerta al agitar'],
@@ -50,11 +50,11 @@ const PERMISOS_APP: [string, string][] = [
   ['camara', 'Cámara'],
 ];
 
-function leerPermisos(json: string | null): PermisoDispositivo[] | null {
+function readPermissions(json: string | null): DevicePermission[] | null {
   if (!json) return null;
   try {
     const p = JSON.parse(json) as Record<string, unknown>;
-    return PERMISOS_APP.filter(([clave]) => clave in p).map(([clave, etiqueta]) => ({ etiqueta, listo: p[clave] === true }));
+    return APP_PERMISSIONS.filter(([key]) => key in p).map(([key, label]) => ({ label, ready: p[key] === true }));
   } catch {
     return null;
   }
@@ -84,24 +84,24 @@ interface AdminDeviceApi {
   permissionsUpdatedAt: string | null;
 }
 
-const ESTADO_DESDE_API: Record<string, Device['status']> = {
+const STATUS_FROM_API: Record<string, Device['status']> = {
   active: 'Activo', inactive: 'Inactivo', blocked: 'Bloqueado', lost: 'Perdido',
 };
-const ESTADO_HACIA_API: Record<Device['status'], string> = {
+const STATUS_TO_API: Record<Device['status'], string> = {
   Activo: 'active', Inactivo: 'inactive', Bloqueado: 'blocked', Perdido: 'lost',
 };
 
-const esHoy = (iso?: string | null) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
+const isToday = (iso?: string | null) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
 
-function formatearUltimoAcceso(iso: string | null): string {
+function formatLastAccess(iso: string | null): string {
   if (!iso) return 'Sin registro';
   const fecha = new Date(iso);
   if (isNaN(fecha.getTime())) return 'Sin registro';
-  const hora = fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
-  return esHoy(iso) ? `Hoy, ${hora}` : `${fecha.toLocaleDateString('es-CO')} ${hora}`;
+  const time = fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+  return isToday(iso) ? `Hoy, ${time}` : `${fecha.toLocaleDateString('es-CO')} ${time}`;
 }
 
-function desdeApi(d: AdminDeviceApi): Device {
+function fromApi(d: AdminDeviceApi): Device {
   const nombre = [d.brand, d.model].filter(Boolean).join(' ');
   return {
     id: d.id,
@@ -111,17 +111,17 @@ function desdeApi(d: AdminDeviceApi): Device {
     type: 'Android',
     imei: d.deviceUuid ?? '',
     phone: d.ownerPhone ?? '',
-    status: ESTADO_DESDE_API[d.status] ?? 'Inactivo',
-    lastSync: formatearUltimoAcceso(d.lastAccess),
+    status: STATUS_FROM_API[d.status] ?? 'Inactivo',
+    lastSync: formatLastAccess(d.lastAccess),
     icon: 'fa-brands fa-android',
     appVersion: d.appVersion,
     gpsStatus: d.gpsStatus,
     pushTokenRegistered: d.pushTokenRegistered,
     lastAccessIso: d.lastAccess,
     deviceName: d.deviceName,
-    registrado: formatearUltimoAcceso(d.createdAt),
-    permisos: leerPermisos(d.permissions),
-    permisosActualizados: d.permissionsUpdatedAt ? formatearUltimoAcceso(d.permissionsUpdatedAt) : null,
+    registered: formatLastAccess(d.createdAt),
+    permissions: readPermissions(d.permissions),
+    permissionsUpdated: d.permissionsUpdatedAt ? formatLastAccess(d.permissionsUpdatedAt) : null,
   };
 }
 
@@ -162,10 +162,10 @@ export interface UserDevice {
  * Interfaz para filtros de dispositivos
  */
 export interface DeviceFilters {
-  busqueda: string;
+  search: string;
   estado: string;
-  fechaInicio: Date | null;
-  fechaFin: Date | null;
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
 @Injectable({
@@ -197,11 +197,11 @@ export class DeviceService {
    */
   getAll(): Observable<Device[]> {
     return this.http.get<AdminDeviceApi[]>(this.url).pipe(
-      map(lista => lista.map(desdeApi)),
+      map(list => list.map(fromApi)),
       // La lista local alimenta los filtros y las estadísticas
       tap(devices => {
         this.devicesSubject.next(devices);
-        this.actualizarEstadisticas();
+        this.updateStats();
       }),
     );
   }
@@ -212,7 +212,7 @@ export class DeviceService {
   getMyDevices(): Observable<UserDevice[]> {
     // El panel web se registra como dispositivo "web" (notificaciones del navegador): no es un celular
     return this.http.get<UserDevice[]>(`${this.url}/user`).pipe(
-      map(lista => lista.filter(d => (d.osName || '').toLowerCase() !== 'web')),
+      map(list => list.filter(d => (d.osName || '').toLowerCase() !== 'web')),
     );
   }
 
@@ -220,7 +220,7 @@ export class DeviceService {
    * Obtener dispositivo por ID
    */
   getById(id: number): Observable<Device> {
-    return this.http.get<AdminDeviceApi>(`${this.url}/${id}`).pipe(map(desdeApi));
+    return this.http.get<AdminDeviceApi>(`${this.url}/${id}`).pipe(map(fromApi));
   }
 
   /**
@@ -232,7 +232,7 @@ export class DeviceService {
    */
   // Desde el panel solo se edita el estado; el resto lo registra la app móvil.
   update(id: number, device: Device): Observable<Device> {
-    return this.cambiarEstado(id, device.status);
+    return this.changeStatus(id, device.status);
   }
 
   /**
@@ -248,75 +248,75 @@ export class DeviceService {
   getStats(): Observable<DeviceStats> {
     // TODO: Conectar al backend
     // return this.http.get<DeviceStats>(`${this.url}/stats`);
-    const stats = this.calcularEstadisticas();
+    const stats = this.computeStats();
     return of(stats).pipe(delay(200));
   }
 
   /**
    * Calcular estadísticas dinámicamente desde los dispositivos
    */
-  private calcularEstadisticas(): DeviceStats {
+  private computeStats(): DeviceStats {
     const devices = this.devicesSubject.value;
     const total = devices.length;
-    const activos = devices.filter(d => d.status === 'Activo').length;
-    const inactivos = devices.filter(d => d.status === 'Inactivo').length;
-    const bloqueados = devices.filter(d => d.status === 'Bloqueado').length;
-    const sincronizadosHoy = devices.filter(d => esHoy(d.lastAccessIso)).length;
+    const active = devices.filter(d => d.status === 'Activo').length;
+    const inactive = devices.filter(d => d.status === 'Inactivo').length;
+    const blocked = devices.filter(d => d.status === 'Bloqueado').length;
+    const syncedToday = devices.filter(d => isToday(d.lastAccessIso)).length;
     
     return {
       totalDevices: total,
-      activeDevices: activos,
-      inactiveDevices: inactivos,
-      blockedDevices: bloqueados,
-      syncedToday: sincronizadosHoy
+      activeDevices: active,
+      inactiveDevices: inactive,
+      blockedDevices: blocked,
+      syncedToday
     };
   }
 
   /**
    * Actualizar estadísticas y notificar a los suscriptores
    */
-  private actualizarEstadisticas(): void {
-    const stats = this.calcularEstadisticas();
+  private updateStats(): void {
+    const stats = this.computeStats();
     this.statsSubject.next(stats);
   }
 
   /**
    * Cambiar estado de dispositivo
    */
-  cambiarEstado(id: number, nuevoEstado: Device['status']): Observable<Device> {
-    return this.http.patch<AdminDeviceApi>(`${this.url}/${id}/status`, { status: ESTADO_HACIA_API[nuevoEstado] }).pipe(
-      map(desdeApi),
-      tap(actualizado => {
-        this.devicesSubject.next(this.devicesSubject.value.map(d => (d.id === id ? actualizado : d)));
-        this.actualizarEstadisticas();
+  changeStatus(id: number, newStatus: Device['status']): Observable<Device> {
+    return this.http.patch<AdminDeviceApi>(`${this.url}/${id}/status`, { status: STATUS_TO_API[newStatus] }).pipe(
+      map(fromApi),
+      tap(updated => {
+        this.devicesSubject.next(this.devicesSubject.value.map(d => (d.id === id ? updated : d)));
+        this.updateStats();
       }),
     );
   }
 
-  filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {
-    let dispositivosFiltrados = [...this.devicesSubject.value];
+  filterDevices(filters: DeviceFilters): Observable<Device[]> {
+    let filteredDevices = [...this.devicesSubject.value];
 
     // Filtro por búsqueda
-    if (filtros.busqueda) {
-      const busquedaLower = filtros.busqueda.toLowerCase();
-      dispositivosFiltrados = dispositivosFiltrados.filter(device => {
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredDevices = filteredDevices.filter(device => {
         return (
-          device.name.toLowerCase().includes(busquedaLower) ||
-          device.imei.includes(busquedaLower) ||
-          device.phone.includes(busquedaLower) ||
-          device.user.name.toLowerCase().includes(busquedaLower) ||
-          device.user.email.toLowerCase().includes(busquedaLower)
+          device.name.toLowerCase().includes(searchLower) ||
+          device.imei.includes(searchLower) ||
+          device.phone.includes(searchLower) ||
+          device.user.name.toLowerCase().includes(searchLower) ||
+          device.user.email.toLowerCase().includes(searchLower)
         );
       });
     }
 
     // Filtro por estado
-    if (filtros.estado && filtros.estado !== 'all') {
-      dispositivosFiltrados = dispositivosFiltrados.filter(device =>
-        device.status === filtros.estado
+    if (filters.estado && filters.estado !== 'all') {
+      filteredDevices = filteredDevices.filter(device =>
+        device.status === filters.estado
       );
     }
 
-    return of(dispositivosFiltrados).pipe(delay(200));
+    return of(filteredDevices).pipe(delay(200));
   }
 }

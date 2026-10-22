@@ -4,46 +4,46 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { iconoZona } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/icono-zona';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
-import { RecorridosService } from '../../../core/services/recorridos.service';
+import { RoutesService } from '../../../core/services/recorridos.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { GeocodingService, Lugar } from '../../../core/services/geocoding.service';
-import { UbicacionEntry } from '../../../core/models/location.model';
+import { GeocodingService, Place } from '../../../core/services/geocoding.service';
+import { LocationEntry } from '../../../core/models/location.model';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { FrequentPlace } from '../../../core/models/frequent-place.model';
 
 type SubTab = 'mapa' | 'historial';
-type EstadoGps = 'buscando' | 'activo' | 'denegado' | 'no-disponible';
+type GpsStatus = 'buscando' | 'activo' | 'denegado' | 'no-disponible';
 
 /** Capas que la usuaria puede prender/apagar (se recuerdan en este navegador). */
-interface Capas {
-  recorridos: boolean;
+interface Layers {
+  routes: boolean;
   soloImportantes: boolean;
-  ubicaciones: boolean;
-  zonas: boolean;
+  locations: boolean;
+  zones: boolean;
 }
 
-const CAPAS_KEY = 'alerta_mujer_capas_mapa';
-const CAPAS_DEFECTO: Capas = { recorridos: true, soloImportantes: false, ubicaciones: true, zonas: true };
+const LAYERS_KEY = 'alerta_mujer_capas_mapa';
+const DEFAULT_LAYERS: Layers = { routes: true, soloImportantes: false, locations: true, zones: true };
 // Neiva (Huila): mismo centro por defecto que la app móvil
-const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
-const COLORES_RECORRIDO = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
+const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
+const ROUTE_COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 // Colores alineados con la app móvil
-export const ZONA_ESTILO: Record<NearbyZone['type'], { color: string; etiqueta: string }> = {
-  safe: { color: '#5316a3', etiqueta: 'Zona segura' },
-  risk: { color: '#cb1ce6', etiqueta: 'Zona de riesgo' },
-  help: { color: '#500ee9', etiqueta: 'Punto de ayuda' },
-  asistencia: { color: '#733bf6', etiqueta: 'Asistencia' },
-  policia: { color: '#9333ea', etiqueta: 'Policía' },
+export const ZONE_STYLE: Record<NearbyZone['type'], { color: string; label: string }> = {
+  safe: { color: '#5316a3', label: 'Zona segura' },
+  risk: { color: '#cb1ce6', label: 'Zona de riesgo' },
+  help: { color: '#500ee9', label: 'Punto de ayuda' },
+  asistencia: { color: '#733bf6', label: 'Asistencia' },
+  policia: { color: '#9333ea', label: 'Policía' },
 };
-const RIESGO_LUGAR: Record<string, { color: string; etiqueta: string }> = {
-  muy_segura: { color: '#5316a3', etiqueta: 'Muy segura' },
-  moderada: { color: '#a70bf5', etiqueta: 'Moderada' },
-  muy_insegura: { color: '#cb1ce6', etiqueta: 'Muy insegura' },
+const PLACE_RISK: Record<string, { color: string; label: string }> = {
+  muy_segura: { color: '#5316a3', label: 'Muy segura' },
+  moderada: { color: '#a70bf5', label: 'Moderada' },
+  muy_insegura: { color: '#cb1ce6', label: 'Muy insegura' },
 };
 
 const phoneIcon = L.divIcon({
@@ -54,7 +54,7 @@ const phoneIcon = L.divIcon({
 });
 
 // Solo se vuelve a pedir la dirección si la usuaria se movió más de esto
-const METROS_PARA_REGEOCODIFICAR = 30;
+const METERS_TO_REGEOCODE = 30;
 
 const youIcon = L.divIcon({
   className: '',
@@ -76,101 +76,101 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   private phoneLocationService = inject(PhoneLocationService);
   private zoneService = inject(NearbyZoneService);
   private frequentPlaceService = inject(FrequentPlaceService);
-  private recorridosService = inject(RecorridosService);
+  private routesService = inject(RoutesService);
   private authService = inject(AuthService);
   private geocoding = inject(GeocodingService);
   private injector = inject(Injector);
 
   private map: L.Map | null = null;
   private resizeObserver?: ResizeObserver;
-  private capaYo = L.layerGroup();
-  private capaCelular = L.layerGroup();
-  private ultimoGeocodificado: L.LatLng | null = null;
-  private capaRecorridos = L.layerGroup();
-  private capaUbicaciones = L.layerGroup();
-  private capaZonas = L.layerGroup();
+  private meLayer = L.layerGroup();
+  private phoneLayer = L.layerGroup();
+  private lastGeocoded: L.LatLng | null = null;
+  private routesLayer = L.layerGroup();
+  private locationsLayer = L.layerGroup();
+  private zonesLayer = L.layerGroup();
   private watchId: number | null = null;
-  private centradoInicial = false;
+  private initiallyCentered = false;
 
-  readonly MAX_RECORRIDOS = this.recorridosService.limiteRecorridos;
-  readonly MAX_ESTRELLAS = this.recorridosService.limiteEstrellas;
-  readonly zonaEstilo = ZONA_ESTILO;
-  readonly riesgoLugar = RIESGO_LUGAR;
+  readonly MAX_ROUTES = this.routesService.routeLimit;
+  readonly MAX_STARRED = this.routesService.starLimit;
+  readonly zoneStyle = ZONE_STYLE;
+  readonly placeRisk = PLACE_RISK;
 
   activeTab = signal<SubTab>('mapa');
 
   // ── Ubicación en vivo (GPS de este dispositivo) ─
-  estadoGps = signal<EstadoGps>('buscando');
-  posicion = signal<{ lat: number; lng: number; precision: number } | null>(null);
-  actualizadoEn = signal<Date | null>(null);
-  seguir = signal(true);
-  lugar = signal<Lugar | null>(null);
-  buscandoLugar = signal(false);
+  gpsStatus = signal<GpsStatus>('buscando');
+  position = signal<{ lat: number; lng: number; precision: number } | null>(null);
+  updatedAt = signal<Date | null>(null);
+  follow = signal(true);
+  place = signal<Place | null>(null);
+  searchingPlace = signal(false);
 
   // ── Ubicación del celular (última que envió la app móvil) ─
-  celular = signal<UbicacionEntry | null>(null);
-  lugarCelular = signal<Lugar | null>(null);
-  cargandoCelular = signal(false);
-  celularConsultado = signal(false);
-  errorCelular = signal(false);
-  avisoCelular = signal<string | null>(null);
+  celular = signal<LocationEntry | null>(null);
+  phonePlace = signal<Place | null>(null);
+  loadingPhone = signal(false);
+  queriedPhone = signal(false);
+  phoneError = signal(false);
+  phoneNotice = signal<string | null>(null);
 
   // ── Datos del mapa ─────────────────────────────
-  recorridos = this.recorridosService.recorridos$;
-  estrellas = computed(() => this.recorridos().filter((r) => r.importante));
-  ubicaciones = signal<FrequentPlace[]>([]);
-  zonas = signal<NearbyZone[]>([]);
+  routes = this.routesService.routes$;
+  starredCount = computed(() => this.routes().filter((r) => r.important));
+  locations = signal<FrequentPlace[]>([]);
+  zones = signal<NearbyZone[]>([]);
 
   // ── Historial (ubicaciones reportadas por el móvil) ─
-  historial = signal<UbicacionEntry[]>([]);
-  lugaresHistorial = signal<Record<number, string>>({});
-  cargandoHistorial = signal(true);
-  errorHistorial = signal(false);
+  history = signal<LocationEntry[]>([]);
+  historyPlaces = signal<Record<number, string>>({});
+  loadingHistory = signal(true);
+  historyError = signal(false);
 
   // ── Capas ──────────────────────────────────────
-  capas = signal<Capas>(this.leerCapas());
+  layers = signal<Layers>(this.readLayers());
 
-  recorridosEnMapa = computed(() => {
-    const c = this.capas();
-    if (!c.recorridos) return [];
-    return c.soloImportantes ? this.estrellas() : this.recorridos();
+  routesOnMap = computed(() => {
+    const c = this.layers();
+    if (!c.routes) return [];
+    return c.soloImportantes ? this.starredCount() : this.routes();
   });
 
-  zonaActual = computed(() => {
-    const p = this.posicion();
+  currentZone = computed(() => {
+    const p = this.position();
     if (!p) return null;
-    return this.zonas().find(
+    return this.zones().find(
       (z) => z.radiusMeters && L.latLng(p.lat, p.lng).distanceTo([z.lat, z.lng]) <= z.radiusMeters
     ) ?? null;
   });
 
   ngOnInit(): void {
-    this.recorridosService.cargar();
+    this.routesService.load();
 
     this.zoneService.getByUser(0).subscribe({
-      next: (zonas) => this.zonas.set(zonas),
-      error: () => this.zonas.set([]),
+      next: (zones) => this.zones.set(zones),
+      error: () => this.zones.set([]),
     });
 
     this.authService.currentUser$.subscribe((user: any) => {
       if (!user) return;
       this.frequentPlaceService.getByUser(user.id).subscribe({
-        next: (lugares) => this.ubicaciones.set(lugares.filter((l) => l.isActive !== false)),
-        error: () => this.ubicaciones.set([]),
+        next: (places) => this.locations.set(places.filter((l) => l.isActive !== false)),
+        error: () => this.locations.set([]),
       });
-      this.cargarHistorial(user.id);
+      this.loadHistory(user.id);
     });
   }
 
   ngAfterViewInit(): void {
     this.initMap();
-    this.iniciarGps();
+    this.startGps();
 
-    effect(() => this.dibujarYo(), { injector: this.injector });
-    effect(() => this.dibujarRecorridos(), { injector: this.injector });
-    effect(() => this.dibujarUbicaciones(), { injector: this.injector });
-    effect(() => this.dibujarZonas(), { injector: this.injector });
-    effect(() => this.dibujarCelular(), { injector: this.injector });
+    effect(() => this.drawMe(), { injector: this.injector });
+    effect(() => this.drawRoutes(), { injector: this.injector });
+    effect(() => this.drawLocations(), { injector: this.injector });
+    effect(() => this.drawZones(), { injector: this.injector });
+    effect(() => this.drawPhone(), { injector: this.injector });
   }
 
   ngOnDestroy(): void {
@@ -181,53 +181,53 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Capas ──────────────────────────────────────
-  toggleCapa(capa: keyof Capas): void {
-    this.capas.update((c) => {
-      const nuevo = { ...c, [capa]: !c[capa] };
+  toggleLayer(layer: keyof Layers): void {
+    this.layers.update((c) => {
+      const newOne = { ...c, [layer]: !c[layer] };
       // "Solo importantes" depende de que los recorridos estén visibles
-      if (capa === 'recorridos' && !nuevo.recorridos) nuevo.soloImportantes = false;
-      return nuevo;
+      if (layer === 'routes' && !newOne.routes) newOne.soloImportantes = false;
+      return newOne;
     });
     try {
-      localStorage.setItem(CAPAS_KEY, JSON.stringify(this.capas()));
+      localStorage.setItem(LAYERS_KEY, JSON.stringify(this.layers()));
     } catch { /* preferencia opcional */ }
   }
 
-  private leerCapas(): Capas {
+  private readLayers(): Layers {
     try {
-      return { ...CAPAS_DEFECTO, ...JSON.parse(localStorage.getItem(CAPAS_KEY) ?? '{}') };
+      return { ...DEFAULT_LAYERS, ...JSON.parse(localStorage.getItem(LAYERS_KEY) ?? '{}') };
     } catch {
-      return { ...CAPAS_DEFECTO };
+      return { ...DEFAULT_LAYERS };
     }
   }
 
   // ── GPS en vivo ────────────────────────────────
-  private iniciarGps(): void {
+  private startGps(): void {
     if (!('geolocation' in navigator)) {
-      this.estadoGps.set('no-disponible');
+      this.gpsStatus.set('no-disponible');
       return;
     }
-    this.estadoGps.set('buscando');
+    this.gpsStatus.set('buscando');
     this.watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        this.posicion.set({ lat: pos.coords.latitude, lng: pos.coords.longitude, precision: pos.coords.accuracy });
-        this.actualizadoEn.set(new Date(pos.timestamp));
-        this.estadoGps.set('activo');
-        this.actualizarLugar(pos.coords.latitude, pos.coords.longitude);
+        this.position.set({ lat: pos.coords.latitude, lng: pos.coords.longitude, precision: pos.coords.accuracy });
+        this.updatedAt.set(new Date(pos.timestamp));
+        this.gpsStatus.set('activo');
+        this.updatePlace(pos.coords.latitude, pos.coords.longitude);
       },
-      (err) => this.estadoGps.set(err.code === err.PERMISSION_DENIED ? 'denegado' : 'no-disponible'),
+      (err) => this.gpsStatus.set(err.code === err.PERMISSION_DENIED ? 'denegado' : 'no-disponible'),
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
     );
   }
 
-  private actualizarLugar(lat: number, lng: number): void {
-    const aqui = L.latLng(lat, lng);
-    if (this.ultimoGeocodificado && this.ultimoGeocodificado.distanceTo(aqui) < METROS_PARA_REGEOCODIFICAR) return;
-    this.ultimoGeocodificado = aqui;
-    this.buscandoLugar.set(true);
-    this.geocoding.obtener(lat, lng).then((lugar) => {
-      this.lugar.set(lugar);
-      this.buscandoLugar.set(false);
+  private updatePlace(lat: number, lng: number): void {
+    const here = L.latLng(lat, lng);
+    if (this.lastGeocoded && this.lastGeocoded.distanceTo(here) < METERS_TO_REGEOCODE) return;
+    this.lastGeocoded = here;
+    this.searchingPlace.set(true);
+    this.geocoding.get(lat, lng).then((place) => {
+      this.place.set(place);
+      this.searchingPlace.set(false);
     });
   }
 
@@ -237,64 +237,64 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
    * nuevo. Si el celular no responde (sin internet, sin permiso de ubicación en segundo plano), se
    * muestra la última ubicación que envió, con su antigüedad.
    */
-  verCelular(): void {
-    this.cargandoCelular.set(true);
-    this.errorCelular.set(false);
-    this.avisoCelular.set(null);
-    this.phoneLocationService.pedirAlCelular().subscribe({
-      next: (r) => this.esperarRespuesta(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+  viewPhone(): void {
+    this.loadingPhone.set(true);
+    this.phoneError.set(false);
+    this.phoneNotice.set(null);
+    this.phoneLocationService.requestFromPhone().subscribe({
+      next: (r) => this.waitForResponse(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
       error: (e) => {
         // 409: sin celular con notificaciones o pedido muy seguido; igual se muestra el último punto
-        this.avisoCelular.set(e?.error?.message ?? null);
-        this.mostrarUltima();
+        this.phoneNotice.set(e?.error?.message ?? null);
+        this.showLatest();
       },
     });
   }
 
-  private esperarRespuesta(desde: number, limite: number): void {
+  private waitForResponse(from: number, limit: number): void {
     this.phoneLocationService.getLatest().subscribe({
       next: (loc) => {
-        const nueva = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= desde;
-        if (nueva || Date.now() >= limite) {
-          if (!nueva) this.avisoCelular.set('El celular no respondió. Se muestra la última ubicación que envió.');
-          this.aplicarCelular(loc);
+        const newOne = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= from;
+        if (newOne || Date.now() >= limit) {
+          if (!newOne) this.phoneNotice.set('El celular no respondió. Se muestra la última ubicación que envió.');
+          this.applyPhone(loc);
           return;
         }
-        setTimeout(() => this.esperarRespuesta(desde, limite), 2500);
+        setTimeout(() => this.waitForResponse(from, limit), 2500);
       },
       error: () => {
-        this.cargandoCelular.set(false);
-        this.errorCelular.set(true);
+        this.loadingPhone.set(false);
+        this.phoneError.set(true);
       },
     });
   }
 
-  private mostrarUltima(): void {
+  private showLatest(): void {
     this.phoneLocationService.getLatest().subscribe({
-      next: (loc) => this.aplicarCelular(loc),
+      next: (loc) => this.applyPhone(loc),
       error: () => {
-        this.cargandoCelular.set(false);
-        this.errorCelular.set(true);
+        this.loadingPhone.set(false);
+        this.phoneError.set(true);
       },
     });
   }
 
-  private aplicarCelular(loc: UbicacionEntry | null): void {
-    this.cargandoCelular.set(false);
-    this.celularConsultado.set(true);
+  private applyPhone(loc: LocationEntry | null): void {
+    this.loadingPhone.set(false);
+    this.queriedPhone.set(true);
     this.celular.set(loc);
     if (!loc) return;
     this.setTab('mapa');
-    this.seguir.set(false);
+    this.follow.set(false);
     setTimeout(() => this.map?.flyTo([loc.lat, loc.lng], 17, { duration: 0.9 }), 150);
-    this.lugarCelular.set(null);
-    this.geocoding.obtener(loc.lat, loc.lng).then((lugar) => {
-      if (this.celular()?.id === loc.id) this.lugarCelular.set(lugar);
+    this.phonePlace.set(null);
+    this.geocoding.get(loc.lat, loc.lng).then((place) => {
+      if (this.celular()?.id === loc.id) this.phonePlace.set(place);
     });
   }
 
   /** "hace 3 min", "hace 2 h"... */
-  haceCuanto(iso?: string): string {
+  howLongAgo(iso?: string): string {
     if (!iso) return '';
     const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
     if (min < 1) return 'hace un momento';
@@ -305,165 +305,165 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     return `hace ${d} ${d === 1 ? 'día' : 'días'}`;
   }
 
-  textoLugar(l: Lugar | null): string {
-    return l ? [[l.direccion, l.ciudad].filter(Boolean).join(', '), l.barrio].filter(Boolean).join(' · ') : '';
+  placeText(l: Place | null): string {
+    return l ? [[l.address, l.city].filter(Boolean).join(', '), l.neighborhood].filter(Boolean).join(' · ') : '';
   }
 
-  reintentarGps(): void {
+  retryGps(): void {
     if (this.watchId !== null) navigator.geolocation.clearWatch(this.watchId);
-    this.iniciarGps();
+    this.startGps();
   }
 
-  centrar(): void {
-    const p = this.posicion();
-    this.seguir.set(true);
+  center(): void {
+    const p = this.position();
+    this.follow.set(true);
     if (p) this.map?.flyTo([p.lat, p.lng], 16, { duration: 0.8 });
   }
 
   // ── Mapa ───────────────────────────────────────
   private initMap(): void {
     if (!this.mapContainer || this.map) return;
-    this.map = L.map(this.mapContainer.nativeElement, { center: CENTRO_POR_DEFECTO, zoom: 14 });
+    this.map = L.map(this.mapContainer.nativeElement, { center: DEFAULT_CENTER, zoom: 14 });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     }).addTo(this.map);
 
     // Orden de abajo hacia arriba: zonas, recorridos, ubicaciones, yo
-    [this.capaZonas, this.capaRecorridos, this.capaUbicaciones, this.capaCelular, this.capaYo].forEach((c) => c.addTo(this.map!));
+    [this.zonesLayer, this.routesLayer, this.locationsLayer, this.phoneLayer, this.meLayer].forEach((c) => c.addTo(this.map!));
 
     // Si la usuaria mueve el mapa, deja de seguirla hasta que pulse "Centrar"
-    this.map.on('dragstart', () => this.seguir.set(false));
+    this.map.on('dragstart', () => this.follow.set(false));
     // Recalcula el tamaño cuando cambia el ancho (sidebar, ventana, pestañas)
     this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
     this.resizeObserver.observe(this.mapContainer.nativeElement);
   }
 
-  private dibujarYo(): void {
-    const p = this.posicion();
+  private drawMe(): void {
+    const p = this.position();
     if (!this.map) return;
-    this.capaYo.clearLayers();
+    this.meLayer.clearLayers();
     if (!p) return;
 
     L.circle([p.lat, p.lng], {
       radius: p.precision, color: '#8e63f1', weight: 1, fillColor: '#8e63f1', fillOpacity: 0.12,
-    }).addTo(this.capaYo);
+    }).addTo(this.meLayer);
     L.marker([p.lat, p.lng], { icon: youIcon, zIndexOffset: 1000 })
       .bindTooltip('Estás aquí')
-      .addTo(this.capaYo);
+      .addTo(this.meLayer);
 
-    if (!this.centradoInicial) {
+    if (!this.initiallyCentered) {
       this.map.setView([p.lat, p.lng], 16);
-      this.centradoInicial = true;
-    } else if (this.seguir()) {
+      this.initiallyCentered = true;
+    } else if (this.follow()) {
       this.map.panTo([p.lat, p.lng], { animate: true });
     }
   }
 
-  private dibujarCelular(): void {
+  private drawPhone(): void {
     const loc = this.celular();
-    const lugar = this.lugarCelular();
+    const place = this.phonePlace();
     if (!this.map) return;
-    this.capaCelular.clearLayers();
+    this.phoneLayer.clearLayers();
     if (!loc) return;
 
     if (loc.accuracy) {
       L.circle([loc.lat, loc.lng], {
         radius: loc.accuracy, color: '#d648ec', weight: 1, fillColor: '#d648ec', fillOpacity: 0.12,
-      }).addTo(this.capaCelular);
+      }).addTo(this.phoneLayer);
     }
-    const detalle = lugar ? escapeHtml(this.textoLugar(lugar)) : 'Buscando dirección…';
+    const detail = place ? escapeHtml(this.placeText(place)) : 'Buscando dirección…';
     L.marker([loc.lat, loc.lng], { icon: phoneIcon, zIndexOffset: 900 })
-      .bindPopup(`<strong>Tu celular</strong><br>${detalle}<br><small>${this.haceCuanto(loc.recordedAt)} · ${loc.time}</small>`)
-      .addTo(this.capaCelular)
+      .bindPopup(`<strong>Tu celular</strong><br>${detail}<br><small>${this.howLongAgo(loc.recordedAt)} · ${loc.time}</small>`)
+      .addTo(this.phoneLayer)
       .openPopup();
   }
 
-  private dibujarRecorridos(): void {
-    const lista = this.recorridosEnMapa();
-    const todos = this.recorridos();
+  private drawRoutes(): void {
+    const list = this.routesOnMap();
+    const all = this.routes();
     if (!this.map) return;
-    this.capaRecorridos.clearLayers();
+    this.routesLayer.clearLayers();
 
-    for (const r of lista) {
+    for (const r of list) {
       if (!r.puntos || r.puntos.length < 2) continue;
       const latlngs = r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
-      const color = COLORES_RECORRIDO[Math.max(0, todos.findIndex((x) => x.id === r.id)) % COLORES_RECORRIDO.length];
-      const nombre = escapeHtml(r.nombrePersonalizado ?? 'Recorrido');
+      const color = ROUTE_COLORS[Math.max(0, all.findIndex((x) => x.id === r.id)) % ROUTE_COLORS.length];
+      const nombre = escapeHtml(r.customName ?? 'Recorrido');
 
-      L.polyline(latlngs, { color, weight: r.importante ? 5 : 4, opacity: 0.95, dashArray: r.importante ? undefined : '8 8' })
-        .bindTooltip(`${r.importante ? '★ ' : ''}${nombre}`, { sticky: true })
-        .addTo(this.capaRecorridos);
+      L.polyline(latlngs, { color, weight: r.important ? 5 : 4, opacity: 0.95, dashArray: r.important ? undefined : '8 8' })
+        .bindTooltip(`${r.important ? '★ ' : ''}${nombre}`, { sticky: true })
+        .addTo(this.routesLayer);
       L.circleMarker(latlngs[0], { radius: 6, color: '#fff', weight: 2, fillColor: '#6922c5', fillOpacity: 1 })
-        .bindPopup(`<strong>${nombre}</strong><br>Inicio: ${escapeHtml(r.barrioInicio)}`)
-        .addTo(this.capaRecorridos);
+        .bindPopup(`<strong>${nombre}</strong><br>Inicio: ${escapeHtml(r.startNeighborhood)}`)
+        .addTo(this.routesLayer);
       L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#c026d3', fillOpacity: 1 })
-        .bindPopup(`<strong>${nombre}</strong><br>Destino: ${escapeHtml(r.barrioFin)}`)
-        .addTo(this.capaRecorridos);
+        .bindPopup(`<strong>${nombre}</strong><br>Destino: ${escapeHtml(r.endNeighborhood)}`)
+        .addTo(this.routesLayer);
     }
   }
 
-  private dibujarUbicaciones(): void {
-    const visibles = this.capas().ubicaciones;
-    const lugares = this.ubicaciones();
+  private drawLocations(): void {
+    const visibles = this.layers().locations;
+    const places = this.locations();
     if (!this.map) return;
-    this.capaUbicaciones.clearLayers();
+    this.locationsLayer.clearLayers();
     if (!visibles) return;
 
-    for (const l of lugares) {
+    for (const l of places) {
       if (!Number.isFinite(l.lat) || !Number.isFinite(l.lng)) continue;
-      const riesgo = RIESGO_LUGAR[l.riskLevel ?? 'moderada'] ?? RIESGO_LUGAR['moderada'];
-      L.marker([l.lat, l.lng], { icon: iconoLugar(riesgo.color) })
+      const risk = PLACE_RISK[l.riskLevel ?? 'moderada'] ?? PLACE_RISK['moderada'];
+      L.marker([l.lat, l.lng], { icon: placeIcon(risk.color) })
         .bindPopup(
           `<strong>${escapeHtml(l.name)}</strong><br>${escapeHtml(l.address || l.city || '')}<br>` +
-          `<span style="color:${riesgo.color};font-weight:700">● ${riesgo.etiqueta}</span>`
+          `<span style="color:${risk.color};font-weight:700">● ${risk.label}</span>`
         )
-        .addTo(this.capaUbicaciones);
+        .addTo(this.locationsLayer);
     }
   }
 
-  private dibujarZonas(): void {
-    const visibles = this.capas().zonas;
-    const zonas = this.zonas();
+  private drawZones(): void {
+    const visibles = this.layers().zones;
+    const zones = this.zones();
     if (!this.map) return;
-    this.capaZonas.clearLayers();
+    this.zonesLayer.clearLayers();
     if (!visibles) return;
 
-    for (const z of zonas) {
+    for (const z of zones) {
       if (!Number.isFinite(z.lat) || !Number.isFinite(z.lng)) continue;
-      const estilo = ZONA_ESTILO[z.type] ?? ZONA_ESTILO.risk;
+      const style = ZONE_STYLE[z.type] ?? ZONE_STYLE.risk;
       if (z.radiusMeters) {
         L.circle([z.lat, z.lng], {
-          radius: z.radiusMeters, color: estilo.color, weight: 1.5, fillColor: estilo.color, fillOpacity: 0.12,
-        }).addTo(this.capaZonas);
+          radius: z.radiusMeters, color: style.color, weight: 1.5, fillColor: style.color, fillOpacity: 0.12,
+        }).addTo(this.zonesLayer);
       }
-      L.marker([z.lat, z.lng], { icon: iconoZona(z.type, estilo.color) })
-        .bindPopup(`<strong>${escapeHtml(z.name)}</strong><br>${estilo.etiqueta}${z.city ? ' · ' + escapeHtml(z.city) : ''}`)
-        .addTo(this.capaZonas);
+      L.marker([z.lat, z.lng], { icon: zoneIcon(z.type, style.color) })
+        .bindPopup(`<strong>${escapeHtml(z.name)}</strong><br>${style.label}${z.city ? ' · ' + escapeHtml(z.city) : ''}`)
+        .addTo(this.zonesLayer);
     }
   }
 
   // ── Historial ──────────────────────────────────
   // Dirección de los registros más recientes, uno por uno (respeta el límite de Nominatim)
-  private async geocodificarHistorial(entradas: UbicacionEntry[]): Promise<void> {
-    for (const e of entradas) {
-      const lugar = await this.geocoding.obtener(e.lat, e.lng);
-      const texto = this.textoLugar(lugar);
-      if (texto) this.lugaresHistorial.update((m) => ({ ...m, [e.id]: texto }));
+  private async geocodeHistory(entries: LocationEntry[]): Promise<void> {
+    for (const e of entries) {
+      const place = await this.geocoding.get(e.lat, e.lng);
+      const text = this.placeText(place);
+      if (text) this.historyPlaces.update((m) => ({ ...m, [e.id]: text }));
     }
   }
 
-  private cargarHistorial(_userId: number): void {
-    this.cargandoHistorial.set(true);
+  private loadHistory(_userId: number): void {
+    this.loadingHistory.set(true);
     this.phoneLocationService.getMine(100).subscribe({
       next: (data) => {
-        this.historial.set(data); // el backend ya las devuelve de la más reciente a la más antigua
-        this.cargandoHistorial.set(false);
-        this.geocodificarHistorial(data.slice(0, 20));
+        this.history.set(data); // el backend ya las devuelve de la más reciente a la más antigua
+        this.loadingHistory.set(false);
+        this.geocodeHistory(data.slice(0, 20));
       },
       error: () => {
-        this.errorHistorial.set(true);
-        this.cargandoHistorial.set(false);
+        this.historyError.set(true);
+        this.loadingHistory.set(false);
       },
     });
   }
@@ -473,19 +473,19 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (tab === 'mapa') setTimeout(() => this.map?.invalidateSize(), 100);
   }
 
-  flyTo(loc: UbicacionEntry): void {
-    this.seguir.set(false);
+  flyTo(loc: LocationEntry): void {
+    this.follow.set(false);
     this.setTab('mapa');
     setTimeout(() => this.map?.flyTo([loc.lat, loc.lng], 17, { duration: 1 }), 150);
   }
 
-  horaActualizacion(): string {
-    const d = this.actualizadoEn();
+  updateTime(): string {
+    const d = this.updatedAt();
     return d ? d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—';
   }
 }
 
-function iconoLugar(color: string): L.DivIcon {
+function placeIcon(color: string): L.DivIcon {
   return L.divIcon({
     className: '',
     html: `<div class="mu-place-pin" style="--pin:${color}"></div>`,
@@ -494,6 +494,6 @@ function iconoLugar(color: string): L.DivIcon {
   });
 }
 
-function escapeHtml(texto: string): string {
-  return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }

@@ -20,7 +20,7 @@
 
       <h1 class="card__title">Únete a nosotros, <span style="color:#ae10df">crea tu cuenta</span></h1>
 
-      <form class="form" [formGroup]="form" (ngSubmit)="continuar()" novalidate>
+      <form class="form" [formGroup]="form" (ngSubmit)="proceed()" novalidate>
 
         <!-- Nombre completo -->
         <div class="form__group">
@@ -30,12 +30,12 @@
               type="text"
               formControlName="nombre"
               class="field__input"
-              [class.is-invalid]="invalido('nombre')"
+              [class.is-invalid]="invalid('nombre')"
               placeholder="Nombre completo"
               autocomplete="name">
           </div>
-          @if (invalido('nombre')) {
-            <p class="field__error">{{ mensaje('nombre') }}</p>
+          @if (invalid('nombre')) {
+            <p class="field__error">{{ message('nombre') }}</p>
           }
         </div>
 
@@ -49,12 +49,12 @@
                 type="tel"
                 formControlName="telefono"
                 class="field__input"
-                [class.is-invalid]="invalido('telefono')"
+                [class.is-invalid]="invalid('telefono')"
                 placeholder="Teléfono"
                 autocomplete="tel">
             </div>
-            @if (invalido('telefono')) {
-              <p class="field__error">{{ mensaje('telefono') }}</p>
+            @if (invalid('telefono')) {
+              <p class="field__error">{{ message('telefono') }}</p>
             }
           </div>
 
@@ -65,15 +65,15 @@
                 type="text"
                 formControlName="fechaNacimiento"
                 class="field__input"
-                [class.is-invalid]="invalido('fechaNacimiento')"
+                [class.is-invalid]="invalid('fechaNacimiento')"
                 placeholder="DD/MM/AAAA"
                 maxlength="10"
                 inputmode="numeric"
                 autocomplete="bday"
-                (input)="alEscribirFecha($event)">
+                (input)="onDateInput($event)">
             </div>
-            @if (invalido('fechaNacimiento')) {
-              <p class="field__error">{{ mensaje('fechaNacimiento') }}</p>
+            @if (invalid('fechaNacimiento')) {
+              <p class="field__error">{{ message('fechaNacimiento') }}</p>
             }
           </div>
 
@@ -89,16 +89,16 @@
                 formControlName="tipoDocumento"
                 class="field__input field__input--select"
                 [class.is-empty]="!form.controls.tipoDocumento.value"
-                [class.is-invalid]="invalido('tipoDocumento')">
+                [class.is-invalid]="invalid('tipoDocumento')">
                 <option value="" disabled>Tipo de documento</option>
-                @for (tipo of tiposDocumento; track tipo) {
+                @for (tipo of documentTypes; track tipo) {
                   <option [value]="tipo">{{ tipo }}</option>
                 }
               </select>
               <span class="field__chevron"><i class="fa-solid fa-chevron-down"></i></span>
             </div>
-            @if (invalido('tipoDocumento')) {
-              <p class="field__error">{{ mensaje('tipoDocumento') }}</p>
+            @if (invalid('tipoDocumento')) {
+              <p class="field__error">{{ message('tipoDocumento') }}</p>
             }
           </div>
 
@@ -109,11 +109,11 @@
                 type="text"
                 formControlName="numeroDocumento"
                 class="field__input"
-                [class.is-invalid]="invalido('numeroDocumento')"
+                [class.is-invalid]="invalid('numeroDocumento')"
                 placeholder="Número de documento">
             </div>
-            @if (invalido('numeroDocumento')) {
-              <p class="field__error">{{ mensaje('numeroDocumento') }}</p>
+            @if (invalid('numeroDocumento')) {
+              <p class="field__error">{{ message('numeroDocumento') }}</p>
             }
           </div>
 
@@ -125,14 +125,14 @@
             <span class="field__icon"><i class="fa-regular fa-envelope"></i></span>
             <input
               type="email"
-              formControlName="correo"
+              formControlName="email"
               class="field__input"
-              [class.is-invalid]="invalido('correo')"
+              [class.is-invalid]="invalid('correo')"
               placeholder="Correo electrónico"
               autocomplete="email">
           </div>
-          @if (invalido('correo')) {
-            <p class="field__error">{{ mensaje('correo') }}</p>
+          @if (invalid('correo')) {
+            <p class="field__error">{{ message('correo') }}</p>
           }
         </div>
 
@@ -146,7 +146,7 @@
                 [type]="verPassword() ? 'text' : 'password'"
                 formControlName="password"
                 class="field__input"
-                [class.is-invalid]="invalido('password')"
+                [class.is-invalid]="invalid('password')"
                 placeholder="Contraseña"
                 autocomplete="new-password">
               <button
@@ -157,8 +157,8 @@
                 <i [class]="verPassword() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
               </button>
             </div>
-            @if (invalido('password')) {
-              <p class="field__error">{{ mensaje('password') }}</p>
+            @if (invalid('password')) {
+              <p class="field__error">{{ message('password') }}</p>
             }
           </div>
 
@@ -166,22 +166,22 @@
             <div class="field field--password">
               <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
               <input
-                [type]="verConfirmar() ? 'text' : 'password'"
-                formControlName="confirmarPassword"
+                [type]="showConfirm() ? 'text' : 'password'"
+                formControlName="confirmPassword"
                 class="field__input"
-                [class.is-invalid]="invalido('confirmarPassword')"
+                [class.is-invalid]="invalid('confirmarPassword')"
                 placeholder="Confirmar contraseña"
                 autocomplete="new-password">
               <button
                 type="button"
                 class="field__eye"
                 aria-label="Mostrar u ocultar confirmación"
-                (click)="verConfirmar.set(!verConfirmar())">
-                <i [class]="verConfirmar() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+                (click)="showConfirm.set(!showConfirm())">
+                <i [class]="showConfirm() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
               </button>
             </div>
-            @if (invalido('confirmarPassword')) {
-              <p class="field__error">{{ mensaje('confirmarPassword') }}</p>
+            @if (invalid('confirmarPassword')) {
+              <p class="field__error">{{ message('confirmarPassword') }}</p>
             }
           </div>
 
@@ -193,16 +193,16 @@
             <input
               type="checkbox"
               [checked]="aceptaTerminos()"
-              (click)="alClickTerminos($event)"
-              (change)="alCambiarTerminos($event)">
+              (click)="onTermsClick($event)"
+              (change)="onTermsChange($event)">
             <span class="checkbox__mark"></span>
             <span class="checkbox__label">Acepto los Términos y condiciones</span>
           </label>
-          <button type="button" class="form__link terms-row__link" (click)="abrirTerminos()">
+          <button type="button" class="form__link terms-row__link" (click)="openTerms()">
             Leer términos
           </button>
         </div>
-        @if (avisoTerminos()) {
+        @if (termsNotice()) {
           <p class="field__error">Debes leer los términos primero</p>
         }
 
@@ -211,37 +211,37 @@
           <label class="checkbox">
             <input
               type="checkbox"
-              [checked]="aceptaPrivacidad()"
-              (click)="alClickPrivacidad($event)"
-              (change)="alCambiarPrivacidad($event)">
+              [checked]="acceptsPrivacy()"
+              (click)="onPrivacyClick($event)"
+              (change)="onPrivacyChange($event)">
             <span class="checkbox__mark"></span>
             <span class="checkbox__label">Acepto la Política de privacidad</span>
           </label>
-          <button type="button" class="form__link terms-row__link" (click)="abrirPrivacidad()">
+          <button type="button" class="form__link terms-row__link" (click)="openPrivacy()">
             Leer política
           </button>
         </div>
-        @if (avisoPrivacidad()) {
+        @if (privacyNotice()) {
           <p class="field__error">Debes leer la política primero</p>
         }
 
         <!-- Mensajes generales -->
-        @if (errorAceptacion()) {
+        @if (acceptanceError()) {
           <p class="field__error">Debes aceptar términos y privacidad</p>
         }
 
-        @if (errorServidor()) {
-          <p class="field__error">{{ errorServidor() }}</p>
+        @if (serverError()) {
+          <p class="field__error">{{ serverError() }}</p>
         }
 
-        @if (exito()) {
+        @if (success()) {
           <div class="form__success">
             <i class="fa-solid fa-circle-check"></i>
             ¡Registro exitoso! Te llevamos al inicio de sesión…
           </div>
         }
 
-        <button type="submit" class="btn-submit" [disabled]="cargando() || exito()">
+        <button type="submit" class="btn-submit" [disabled]="loading() || success()">
           <i class="fa-solid fa-shield-halved"></i>
           Continuar
         </button>

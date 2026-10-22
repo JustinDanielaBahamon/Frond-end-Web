@@ -19,35 +19,35 @@ export class ForgotPasswordComponent {
   private estado = inject(RecoveryStateService);
 
   email = signal(this.estado.email() ?? '');
-  emailValido = signal(true);
-  enviando = signal(false);
+  validEmail = signal(true);
+  sending = signal(false);
   error = signal<string | null>(null);
 
-  volverLogin() {
+  backToLogin() {
     this.router.navigate(['/auth/login']);
   }
 
-  validarCorreo() {
-    const valor = this.email().trim();
-    this.emailValido.set(!valor || /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(valor));
+  validateEmail() {
+    const value = this.email().trim();
+    this.validEmail.set(!value || /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(value));
   }
 
-  enviarCorreo() {
-    this.validarCorreo();
+  sendEmail() {
+    this.validateEmail();
     const email = this.email().trim();
-    if (!email || !this.emailValido() || this.enviando()) return;
+    if (!email || !this.validEmail() || this.sending()) return;
 
-    this.enviando.set(true);
+    this.sending.set(true);
     this.error.set(null);
-    this.passwordService.pedirCodigo(email).subscribe({
+    this.passwordService.requestCode(email).subscribe({
       next: () => {
-        this.enviando.set(false);
+        this.sending.set(false);
         this.estado.email.set(email);
         this.estado.codigo.set(null);
         this.router.navigate(['/auth/verify-code']);
       },
       error: (e) => {
-        this.enviando.set(false);
+        this.sending.set(false);
         this.error.set(e?.status === 429
           ? 'Hiciste muchos intentos. Espera un minuto e inténtalo de nuevo.'
           : 'No pudimos enviar el código. Revisa tu conexión e inténtalo de nuevo.');

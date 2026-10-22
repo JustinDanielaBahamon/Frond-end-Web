@@ -13,8 +13,8 @@
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
     </svg>
     <span>Historial</span>
-    @if (historial().length > 0) {
-      <span class="mu-subtab-count">{{ historial().length }}</span>
+    @if (history().length > 0) {
+      <span class="mu-subtab-count">{{ history().length }}</span>
     }
   </button>
 </div>
@@ -27,47 +27,47 @@
     <section class="mu-card">
       <header class="mu-card-header">
         <h2 class="mu-card-title">Mi ubicación</h2>
-        @switch (estadoGps()) {
+        @switch (gpsStatus()) {
           @case ('activo') { <span class="mu-live"><span class="mu-live-dot"></span>En vivo</span> }
           @case ('buscando') { <span class="mu-status">Buscando GPS…</span> }
           @default { <span class="mu-status mu-status--off">Sin GPS</span> }
         }
       </header>
 
-      @if (posicion(); as p) {
+      @if (position(); as p) {
         <div class="mu-address">
           <div>
             <span class="mu-info-label">Barrio</span>
-            <span class="mu-info-value">{{ lugar()?.barrio || (buscandoLugar() ? 'Buscando…' : 'Sin dato') }}</span>
+            <span class="mu-info-value">{{ place()?.neighborhood || (searchingPlace() ? 'Buscando…' : 'Sin dato') }}</span>
           </div>
           <div>
             <span class="mu-info-label">Dirección</span>
-            <span class="mu-info-value">{{ lugar()?.direccion ? lugar()!.direccion + (lugar()!.ciudad ? ', ' + lugar()!.ciudad : '') : (buscandoLugar() ? 'Buscando…' : 'Sin dato') }}</span>
+            <span class="mu-info-value">{{ place()?.address ? place()!.address + (place()!.city ? ', ' + place()!.city : '') : (searchingPlace() ? 'Buscando…' : 'Sin dato') }}</span>
           </div>
         </div>
-        <p class="mu-meta">Precisión ±{{ p.precision | number:'1.0-0' }} m · Actualizado {{ horaActualizacion() }}</p>
+        <p class="mu-meta">Precisión ±{{ p.precision | number:'1.0-0' }} m · Actualizado {{ updateTime() }}</p>
 
-        @if (zonaActual(); as z) {
-          <div class="mu-banner" [style.--zona]="zonaEstilo[z.type].color">
-            <strong>{{ zonaEstilo[z.type].etiqueta }}:</strong> estás dentro de "{{ z.name }}".
+        @if (currentZone(); as z) {
+          <div class="mu-banner" [style.--zona]="zoneStyle[z.type].color">
+            <strong>{{ zoneStyle[z.type].label }}:</strong> estás dentro de "{{ z.name }}".
           </div>
         }
 
-        <button class="mu-btn" (click)="centrar()" [class.mu-btn--active]="seguir()">
+        <button class="mu-btn" (click)="center()" [class.mu-btn--active]="follow()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/>
           </svg>
-          {{ seguir() ? 'Siguiendo tu ubicación' : 'Centrar en mí' }}
+          {{ follow() ? 'Siguiendo tu ubicación' : 'Centrar en mí' }}
         </button>
       } @else {
-        @switch (estadoGps()) {
+        @switch (gpsStatus()) {
           @case ('denegado') {
             <p class="mu-muted">Bloqueaste el acceso a la ubicación. Actívalo en el candado de la barra de direcciones y vuelve a intentar.</p>
-            <button class="mu-btn" (click)="reintentarGps()">Reintentar</button>
+            <button class="mu-btn" (click)="retryGps()">Reintentar</button>
           }
           @case ('no-disponible') {
             <p class="mu-muted">No pudimos obtener tu ubicación desde este dispositivo.</p>
-            <button class="mu-btn" (click)="reintentarGps()">Reintentar</button>
+            <button class="mu-btn" (click)="retryGps()">Reintentar</button>
           }
           @default {
             <p class="mu-muted">Permite el acceso a la ubicación para verte en el mapa en tiempo real.</p>
@@ -81,7 +81,7 @@
       <header class="mu-card-header">
         <h2 class="mu-card-title">Mi celular</h2>
         @if (celular(); as c) {
-          <span class="mu-status">{{ haceCuanto(c.recordedAt) }}</span>
+          <span class="mu-status">{{ howLongAgo(c.recordedAt) }}</span>
         }
       </header>
 
@@ -89,29 +89,29 @@
         <div class="mu-address">
           <div>
             <span class="mu-info-label">Barrio</span>
-            <span class="mu-info-value">{{ lugarCelular()?.barrio || (lugarCelular() ? 'Sin dato' : 'Buscando…') }}</span>
+            <span class="mu-info-value">{{ phonePlace()?.neighborhood || (phonePlace() ? 'Sin dato' : 'Buscando…') }}</span>
           </div>
           <div>
             <span class="mu-info-label">Dirección</span>
-            <span class="mu-info-value">{{ lugarCelular()?.direccion ? lugarCelular()!.direccion + (lugarCelular()!.ciudad ? ', ' + lugarCelular()!.ciudad : '') : (lugarCelular() ? 'Sin dato' : 'Buscando…') }}</span>
+            <span class="mu-info-value">{{ phonePlace()?.address ? phonePlace()!.address + (phonePlace()!.city ? ', ' + phonePlace()!.city : '') : (phonePlace() ? 'Sin dato' : 'Buscando…') }}</span>
           </div>
         </div>
         <p class="mu-meta">Enviada por la app móvil el {{ c.date }} a las {{ c.time }}</p>
-      } @else if (celularConsultado()) {
+      } @else if (queriedPhone()) {
         <p class="mu-muted">Tu celular todavía no ha enviado su ubicación. Abre la app móvil con la ubicación activada.</p>
       } @else {
         <p class="mu-muted">Le pedimos a tu celular su ubicación actual. Si no responde, verás la última que envió.</p>
       }
-      @if (avisoCelular()) {
-        <p class="mu-muted">{{ avisoCelular() }}</p>
+      @if (phoneNotice()) {
+        <p class="mu-muted">{{ phoneNotice() }}</p>
       }
-      @if (errorCelular()) {
+      @if (phoneError()) {
         <p class="mu-error">No se pudo consultar la ubicación del celular. Intenta de nuevo.</p>
       }
 
-      <button class="mu-btn mu-btn--primary" (click)="verCelular()" [disabled]="cargandoCelular()">
+      <button class="mu-btn mu-btn--primary" (click)="viewPhone()" [disabled]="loadingPhone()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        {{ cargandoCelular() ? 'Preguntando al celular…' : (celular() ? 'Actualizar ubicación del celular' : 'Ver ubicación del celular') }}
+        {{ loadingPhone() ? 'Preguntando al celular…' : (celular() ? 'Actualizar ubicación del celular' : 'Ver ubicación del celular') }}
       </button>
     </section>
 
@@ -128,19 +128,19 @@
           </span>
           <span class="mu-switch-text">
             <span class="mu-switch-title">Mostrar recorridos</span>
-            <span class="mu-switch-sub">{{ recorridos().length }}/{{ MAX_RECORRIDOS }} recorridos guardados</span>
+            <span class="mu-switch-sub">{{ routes().length }}/{{ MAX_ROUTES }} recorridos guardados</span>
           </span>
-          <input type="checkbox" role="switch" class="mu-switch" [checked]="capas().recorridos" (change)="toggleCapa('recorridos')" />
+          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().routes" (change)="toggleLayer('routes')" />
         </label>
 
-        <label class="mu-switch-row mu-switch-row--nested" [class.mu-switch-row--disabled]="!capas().recorridos">
+        <label class="mu-switch-row mu-switch-row--nested" [class.mu-switch-row--disabled]="!layers().routes">
           <span class="mu-switch-icon mu-switch-icon--star">★</span>
           <span class="mu-switch-text">
             <span class="mu-switch-title">Solo importantes</span>
-            <span class="mu-switch-sub">{{ estrellas().length }}/{{ MAX_ESTRELLAS }} importantes</span>
+            <span class="mu-switch-sub">{{ starredCount().length }}/{{ MAX_STARRED }} importantes</span>
           </span>
-          <input type="checkbox" role="switch" class="mu-switch" [checked]="capas().soloImportantes"
-                 [disabled]="!capas().recorridos" (change)="toggleCapa('soloImportantes')" />
+          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().soloImportantes"
+                 [disabled]="!layers().routes" (change)="toggleLayer('soloImportantes')" />
         </label>
 
         <label class="mu-switch-row">
@@ -149,9 +149,9 @@
           </span>
           <span class="mu-switch-text">
             <span class="mu-switch-title">Ubicaciones guardadas</span>
-            <span class="mu-switch-sub">{{ ubicaciones().length }} {{ ubicaciones().length === 1 ? 'ubicación' : 'ubicaciones' }}</span>
+            <span class="mu-switch-sub">{{ locations().length }} {{ locations().length === 1 ? 'ubicación' : 'ubicaciones' }}</span>
           </span>
-          <input type="checkbox" role="switch" class="mu-switch" [checked]="capas().ubicaciones" (change)="toggleCapa('ubicaciones')" />
+          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().locations" (change)="toggleLayer('locations')" />
         </label>
 
         <label class="mu-switch-row">
@@ -160,9 +160,9 @@
           </span>
           <span class="mu-switch-text">
             <span class="mu-switch-title">Zonas auxiliares</span>
-            <span class="mu-switch-sub">{{ zonas().length }} {{ zonas().length === 1 ? 'zona' : 'zonas' }} (seguras, riesgo, policía, asistencia)</span>
+            <span class="mu-switch-sub">{{ zones().length }} {{ zones().length === 1 ? 'zona' : 'zonas' }} (seguras, riesgo, policía, asistencia)</span>
           </span>
-          <input type="checkbox" role="switch" class="mu-switch" [checked]="capas().zonas" (change)="toggleCapa('zonas')" />
+          <input type="checkbox" role="switch" class="mu-switch" [checked]="layers().zones" (change)="toggleLayer('zones')" />
         </label>
       </div>
     </section>
@@ -171,8 +171,8 @@
   <!-- Mapa -->
   <div class="mu-map-wrap">
     <div class="mu-map" #mapContainer></div>
-    @if (posicion() && !seguir()) {
-      <button class="mu-recenter" (click)="centrar()" title="Centrar en mi ubicación" aria-label="Centrar en mi ubicación">
+    @if (position() && !follow()) {
+      <button class="mu-recenter" (click)="center()" title="Centrar en mi ubicación" aria-label="Centrar en mi ubicación">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/></svg>
       </button>
     }
@@ -181,18 +181,18 @@
       @if (celular()) {
         <span><i class="mu-dot mu-dot--phone"></i> Celular</span>
       }
-      @if (capas().recorridos) {
+      @if (layers().routes) {
         <span><i class="mu-line"></i> Recorrido ★</span>
         <span><i class="mu-line mu-line--dashed"></i> Recorrido</span>
       }
-      @if (capas().ubicaciones) {
-        <span><i class="mu-dot" [style.background]="riesgoLugar['muy_segura'].color"></i><i class="mu-dot" [style.background]="riesgoLugar['moderada'].color"></i><i class="mu-dot" [style.background]="riesgoLugar['muy_insegura'].color"></i> Ubicaciones</span>
+      @if (layers().locations) {
+        <span><i class="mu-dot" [style.background]="placeRisk['muy_segura'].color"></i><i class="mu-dot" [style.background]="placeRisk['moderada'].color"></i><i class="mu-dot" [style.background]="placeRisk['muy_insegura'].color"></i> Ubicaciones</span>
       }
-      @if (capas().zonas) {
-        <span><i class="mu-ring" [style.border-color]="zonaEstilo.safe.color"></i> Segura</span>
-        <span><i class="mu-ring" [style.border-color]="zonaEstilo.risk.color"></i> Riesgo</span>
-        <span><i class="mu-ring" [style.border-color]="zonaEstilo.policia.color"></i> Policía</span>
-        <span><i class="mu-ring" [style.border-color]="zonaEstilo.asistencia.color"></i> Asistencia</span>
+      @if (layers().zones) {
+        <span><i class="mu-ring" [style.border-color]="zoneStyle.safe.color"></i> Segura</span>
+        <span><i class="mu-ring" [style.border-color]="zoneStyle.risk.color"></i> Riesgo</span>
+        <span><i class="mu-ring" [style.border-color]="zoneStyle.policia.color"></i> Policía</span>
+        <span><i class="mu-ring" [style.border-color]="zoneStyle.asistencia.color"></i> Asistencia</span>
       }
     </div>
   </div>
@@ -203,32 +203,32 @@
   <section class="mu-card mu-history">
     <header class="mu-card-header">
       <h2 class="mu-card-title">Historial de ubicaciones del móvil</h2>
-      <span class="mu-muted">{{ historial().length }} registros</span>
+      <span class="mu-muted">{{ history().length }} registros</span>
     </header>
     <p class="mu-retencion">
       <i class="ti ti-trash-x" aria-hidden="true"></i>
       Por tu privacidad el historial se limpia solo: las ubicaciones del día a día se borran a los 7 días y los recorridos de tus alertas, a los 30.
     </p>
 
-    @if (cargandoHistorial()) {
+    @if (loadingHistory()) {
       <p class="mu-muted">Cargando historial…</p>
-    } @else if (errorHistorial()) {
+    } @else if (historyError()) {
       <p class="mu-error">No se pudo cargar el historial. Intenta de nuevo.</p>
-    } @else if (historial().length === 0) {
+    } @else if (history().length === 0) {
       <div class="mu-history-empty">
         <p>Sin historial de ubicaciones</p>
         <span class="mu-muted">Aquí aparecerán las ubicaciones que registre la app móvil.</span>
       </div>
     } @else {
       <div class="mu-history-list">
-        @for (loc of historial(); track loc.id) {
+        @for (loc of history(); track loc.id) {
           <button class="mu-history-item" (click)="flyTo(loc)">
             <span class="mu-history-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             </span>
             <span class="mu-history-info">
-              <span class="mu-history-time">{{ loc.date ?? '—' }} · {{ loc.time }} · {{ haceCuanto(loc.recordedAt) }}</span>
-              <span class="mu-history-address">{{ lugaresHistorial()[loc.id] || 'Buscando dirección…' }}</span>
+              <span class="mu-history-time">{{ loc.date ?? '—' }} · {{ loc.time }} · {{ howLongAgo(loc.recordedAt) }}</span>
+              <span class="mu-history-address">{{ historyPlaces()[loc.id] || 'Buscando dirección…' }}</span>
             </span>
             <svg class="mu-history-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>

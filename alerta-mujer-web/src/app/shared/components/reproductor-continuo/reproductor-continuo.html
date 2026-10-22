@@ -1,22 +1,22 @@
-@if (actual(); as parte) {
+@if (actual(); as part) {
   <div class="rc" [class.rc--audio]="tipo === 'audio'">
     @if (tipo === 'video') {
-      <video #medio [src]="parte.url" controls playsinline preload="metadata"
-             (loadedmetadata)="alCargar()" (timeupdate)="alAvanzar()" (play)="alReproducir()"
-             (pause)="alPausar()" (ended)="alTerminar()"></video>
+      <video #method [src]="part.url" controls playsinline preload="metadata"
+             (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
+             (pause)="onPause()" (ended)="onEnd()"></video>
     } @else {
       <div class="rc-audio-icono"><i class="ti ti-wave-sine" aria-hidden="true"></i></div>
-      <audio #medio [src]="parte.url" controls preload="metadata"
-             (loadedmetadata)="alCargar()" (timeupdate)="alAvanzar()" (play)="alReproducir()"
-             (pause)="alPausar()" (ended)="alTerminar()"></audio>
+      <audio #method [src]="part.url" controls preload="metadata"
+             (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
+             (pause)="onPause()" (ended)="onEnd()"></audio>
     }
 
-    @if (partes.length > 1) {
+    @if (parts.length > 1) {
       <div class="rc-barra" role="group" aria-label="Partes de la grabación">
-        @for (p of partes; track p.id; let i = $index) {
-          <button type="button" class="rc-segmento" [class.rc-segmento--actual]="i === indice()"
-                  (click)="irA(i)" [attr.aria-label]="'Parte ' + (i + 1) + ', ' + (p.creada | date: 'h:mm:ss a')">
-            <span class="rc-relleno" [style.width.%]="relleno(i)"></span>
+        @for (p of parts; track p.id; let i = $index) {
+          <button type="button" class="rc-segmento" [class.rc-segmento--actual]="i === index()"
+                  (click)="irA(i)" [attr.aria-label]="'Parte ' + (i + 1) + ', ' + (p.created | date: 'h:mm:ss a')">
+            <span class="rc-relleno" [style.width.%]="fill(i)"></span>
           </button>
         }
       </div>
@@ -24,11 +24,11 @@
 
     <p class="rc-pie">
       <span>
-        @if (partes.length > 1) { Parte {{ indice() + 1 }} de {{ partes.length }} · }
-        {{ parte.creada | date: 'h:mm:ss a' }}
+        @if (parts.length > 1) { Parte {{ index() + 1 }} de {{ parts.length }} · }
+        {{ part.created | date: 'h:mm:ss a' }}
       </span>
-      @if (duracionTotal(); as total) {
-        <span>{{ partes.length > 1 ? 'Total ≈ ' : '' }}{{ minutos(total) }}</span>
+      @if (totalDuration(); as total) {
+        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' }}{{ minutos(total) }}</span>
       }
     </p>
   </div>

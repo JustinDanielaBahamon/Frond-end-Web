@@ -1,8 +1,8 @@
 @if (error()) {
   <div class="ug-alert ug-alert--error" role="alert">{{ error() }}</div>
 }
-@if (aviso()) {
-  <div class="ug-alert ug-alert--success" role="status">{{ aviso() }}</div>
+@if (notice()) {
+  <div class="ug-alert ug-alert--success" role="status">{{ notice() }}</div>
 }
 
 <div class="ug-grid">
@@ -13,34 +13,34 @@
       <!-- Crear / editar -->
       <section class="ug-card">
         <header class="ug-card-header">
-          <h2 class="ug-card-title">{{ editandoId() ? 'Editar ubicación' : 'Nueva ubicación' }}</h2>
-          <button class="ug-icon-btn" aria-label="Cerrar" (click)="cancelar()">
+          <h2 class="ug-card-title">{{ editingId() ? 'Editar ubicación' : 'Nueva ubicación' }}</h2>
+          <button class="ug-icon-btn" aria-label="Cerrar" (click)="cancel()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </header>
 
         <!-- Punto -->
-        <div class="ug-point" [class.ug-point--picking]="eligiendoPunto()">
+        <div class="ug-point" [class.ug-point--picking]="choosingPoint()">
           <span class="ug-point-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </span>
           <span class="ug-point-text">
-            @if (eligiendoPunto()) {
+            @if (choosingPoint()) {
               <strong>Haz clic en el mapa</strong>
               <span>para elegir el lugar exacto</span>
-            } @else if (punto()) {
-              <strong>{{ buscandoDireccion() ? 'Buscando dirección…' : (direccion() || 'Punto elegido') }}</strong>
-              <span>{{ ciudad() || '' }}</span>
+            } @else if (point()) {
+              <strong>{{ searchingAddress() ? 'Buscando dirección…' : (address() || 'Punto elegido') }}</strong>
+              <span>{{ city() || '' }}</span>
             } @else {
               <strong>Sin punto</strong>
               <span>Elige un punto en el mapa</span>
             }
           </span>
-          @if (punto() && !eligiendoPunto()) {
-            <button class="ug-link" (click)="cambiarPunto()">Cambiar</button>
+          @if (point() && !choosingPoint()) {
+            <button class="ug-link" (click)="changePoint()">Cambiar</button>
           }
         </div>
-        <button class="ug-btn ug-btn--ghost ug-btn--sm" (click)="usarMiUbicacion()">
+        <button class="ug-btn ug-btn--ghost ug-btn--sm" (click)="useMyLocation()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/></svg>
           Usar mi ubicación actual
         </button>
@@ -52,7 +52,7 @@
                  [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
         </label>
         <div class="ug-quick">
-          @for (n of nombresRapidos; track n) {
+          @for (n of quickNames; track n) {
             <button class="ug-quick-chip" [class.active]="nombre() === n" (click)="nombre.set(n)">{{ n }}</button>
           }
         </div>
@@ -61,10 +61,10 @@
         <div class="ug-field">
           <span class="ug-label">¿Qué tan segura te sientes ahí?</span>
           <div class="ug-levels" role="radiogroup" aria-label="Nivel de seguridad">
-            @for (n of nivelesLista; track n) {
-              <button role="radio" class="ug-level" [attr.aria-checked]="nivel() === n"
-                      [class.active]="nivel() === n" [style.--nivel]="niveles[n].color" (click)="nivel.set(n)">
-                <span class="ug-level-dot"></span>{{ niveles[n].etiqueta }}
+            @for (n of levelList; track n) {
+              <button role="radio" class="ug-level" [attr.aria-checked]="level() === n"
+                      [class.active]="level() === n" [style.--nivel]="levels[n].color" (click)="level.set(n)">
+                <span class="ug-level-dot"></span>{{ levels[n].label }}
               </button>
             }
           </div>
@@ -74,20 +74,20 @@
         <div class="ug-row">
           <label class="ug-field">
             <span class="ug-label">Dirección / barrio</span>
-            <input class="ug-input" type="text" maxlength="255" [placeholder]="buscandoDireccion() ? 'Buscando…' : 'Se completa sola'"
-                   [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
+            <input class="ug-input" type="text" maxlength="255" [placeholder]="searchingAddress() ? 'Buscando…' : 'Se completa sola'"
+                   [ngModel]="address()" (ngModelChange)="address.set($event)" />
           </label>
           <label class="ug-field ug-field--city">
             <span class="ug-label">Ciudad</span>
-            <input class="ug-input" type="text" maxlength="100" [placeholder]="buscandoDireccion() ? '…' : 'Ciudad'"
-                   [ngModel]="ciudad()" (ngModelChange)="ciudad.set($event)" />
+            <input class="ug-input" type="text" maxlength="100" [placeholder]="searchingAddress() ? '…' : 'Ciudad'"
+                   [ngModel]="city()" (ngModelChange)="city.set($event)" />
           </label>
         </div>
 
         <label class="ug-field">
           <span class="ug-label">Notas</span>
           <textarea class="ug-input" rows="2" maxlength="255" placeholder="Ej: Bien iluminado, portero 24 h…"
-                    [ngModel]="notas()" (ngModelChange)="notas.set($event)"></textarea>
+                    [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
         </label>
 
         @if (errorForm()) {
@@ -95,15 +95,15 @@
         }
 
         <div class="ug-actions">
-          <button class="ug-btn ug-btn--ghost" (click)="cancelar()">Cancelar</button>
-          <button class="ug-btn ug-btn--primary" (click)="guardar()" [disabled]="!formValido() || guardando()">
-            {{ guardando() ? 'Guardando…' : (editandoId() ? 'Guardar cambios' : 'Guardar ubicación') }}
+          <button class="ug-btn ug-btn--ghost" (click)="cancel()">Cancelar</button>
+          <button class="ug-btn ug-btn--primary" (click)="save()" [disabled]="!formValid() || saving()">
+            {{ saving() ? 'Guardando…' : (editingId() ? 'Guardar cambios' : 'Guardar ubicación') }}
           </button>
         </div>
         <p class="ug-help">Tus ubicaciones son privadas: solo tú las ves, aquí y en la app móvil.</p>
       </section>
     } @else {
-      <button class="ug-cta" (click)="nueva()">
+      <button class="ug-cta" (click)="newOne()">
         <span class="ug-cta-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </span>
@@ -118,54 +118,54 @@
     <section class="ug-card">
       <header class="ug-card-header">
         <h2 class="ug-card-title">Mis ubicaciones</h2>
-        <span class="ug-chip">{{ ubicaciones().length }}</span>
+        <span class="ug-chip">{{ locations().length }}</span>
       </header>
 
       <div class="ug-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input type="search" placeholder="Buscar por nombre, dirección o ciudad" aria-label="Buscar ubicaciones"
-               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+               [ngModel]="search()" (ngModelChange)="search.set($event)" />
       </div>
 
       <div class="ug-filters">
-        <button class="ug-filter" [class.active]="filtroRiesgo() === null" (click)="filtroRiesgo.set(null)">
-          Todas <span>{{ ubicaciones().length }}</span>
+        <button class="ug-filter" [class.active]="riskFilter() === null" (click)="riskFilter.set(null)">
+          Todas <span>{{ locations().length }}</span>
         </button>
-        @for (n of nivelesLista; track n) {
-          <button class="ug-filter" [class.active]="filtroRiesgo() === n" [style.--nivel]="niveles[n].color"
-                  (click)="filtroRiesgo.set(filtroRiesgo() === n ? null : n)">
-            <i class="ug-dot"></i>{{ niveles[n].etiqueta }} <span>{{ conteo()[n] }}</span>
+        @for (n of levelList; track n) {
+          <button class="ug-filter" [class.active]="riskFilter() === n" [style.--nivel]="levels[n].color"
+                  (click)="riskFilter.set(riskFilter() === n ? null : n)">
+            <i class="ug-dot"></i>{{ levels[n].label }} <span>{{ count()[n] }}</span>
           </button>
         }
       </div>
 
-      @if (cargando()) {
+      @if (loading()) {
         <p class="ug-muted">Cargando ubicaciones…</p>
       } @else {
         <ul class="ug-list">
-          @for (u of filtradas(); track u.id) {
-            <li class="ug-item" [class.ug-item--selected]="seleccionada() === u.id" [class.ug-item--editing]="editandoId() === u.id"
-                [style.--nivel]="niveles[nivelDe(u)].color">
-              <button class="ug-item-main" (click)="verEnMapa(u)">
+          @for (u of filtered(); track u.id) {
+            <li class="ug-item" [class.ug-item--selected]="selected() === u.id" [class.ug-item--editing]="editingId() === u.id"
+                [style.--nivel]="levels[levelOf(u)].color">
+              <button class="ug-item-main" (click)="viewOnMap(u)">
                 <span class="ug-item-bar"></span>
                 <span class="ug-item-text">
                   <span class="ug-item-name">{{ u.name }}</span>
                   <span class="ug-item-meta">{{ u.address || 'Sin dirección' }}{{ u.city ? ' · ' + u.city : '' }}</span>
-                  <span class="ug-item-level">{{ niveles[nivelDe(u)].etiqueta }}</span>
+                  <span class="ug-item-level">{{ levels[levelOf(u)].label }}</span>
                 </span>
               </button>
               <div class="ug-item-actions">
-                <button class="ug-icon-btn" title="Editar" aria-label="Editar ubicación" (click)="editar(u)">
+                <button class="ug-icon-btn" title="Editar" aria-label="Editar ubicación" (click)="edit(u)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
                 </button>
-                <button class="ug-icon-btn ug-icon-btn--danger" title="Eliminar" aria-label="Eliminar ubicación" (click)="eliminar(u)">
+                <button class="ug-icon-btn ug-icon-btn--danger" title="Eliminar" aria-label="Eliminar ubicación" (click)="delete(u)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                 </button>
               </div>
             </li>
           } @empty {
             <li class="ug-empty">
-              @if (busqueda() || filtroRiesgo()) {
+              @if (search() || riskFilter()) {
                 Ninguna ubicación coincide con la búsqueda.
               } @else {
                 Aún no tienes ubicaciones. Haz clic en el mapa para guardar la primera.
@@ -178,14 +178,14 @@
   </div>
 
   <!-- ══════════ COLUMNA DERECHA: MAPA ══════════ -->
-  <div class="ug-map-wrap" [class.ug-map-wrap--picking]="eligiendoPunto() || !formVisible()">
+  <div class="ug-map-wrap" [class.ug-map-wrap--picking]="choosingPoint() || !formVisible()">
     <div class="ug-map" #mapContainer></div>
-    @if (eligiendoPunto()) {
+    @if (choosingPoint()) {
       <div class="ug-map-hint">Haz clic en el mapa para elegir el lugar</div>
     }
     <div class="ug-legend">
-      @for (n of nivelesLista; track n) {
-        <span><i class="ug-dot" [style.--nivel]="niveles[n].color"></i>{{ niveles[n].etiqueta }}</span>
+      @for (n of levelList; track n) {
+        <span><i class="ug-dot" [style.--nivel]="levels[n].color"></i>{{ levels[n].label }}</span>
       }
     </div>
   </div>

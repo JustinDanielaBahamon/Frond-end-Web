@@ -1,13 +1,13 @@
-export type TipoZona = 'Riesgo Alto' | 'Riesgo Medio' | 'Riesgo Bajo' | 'Segura';
-export type EstadoZona = 'Activa' | 'Revisión' | 'Inactiva';
+export type ZoneType = 'Riesgo Alto' | 'Riesgo Medio' | 'Riesgo Bajo' | 'Segura';
+export type ZoneStatus = 'Activa' | 'Revisión' | 'Inactiva';
 
-export interface Zona {
+export interface Zone {
   id: string;
   nombre: string;
-  ciudad: string;
-  tipo: TipoZona;
-  alertas: number;
-  estado: EstadoZona;
+  city: string;
+  tipo: ZoneType;
+  alerts: number;
+  estado: ZoneStatus;
   updated_at: string;
 
   // Ubicación en el mapa (opcional: las zonas antiguas no la tienen)

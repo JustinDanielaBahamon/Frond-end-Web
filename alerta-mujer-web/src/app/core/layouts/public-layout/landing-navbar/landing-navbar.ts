@@ -13,10 +13,10 @@ export class LandingNavbarComponent {
 
   menuOpened = false;
   menuOpendSession = false;
-  menuOpneIdioms = false;
+  languageMenuOpen = false;
   idiomActual = 'ES';
   menuMobileOpen = false;
-  menuOpneIdiomsMobile = false;
+  languageMenuOpenMobile = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -32,12 +32,12 @@ export class LandingNavbarComponent {
   }
 
   toggleIdiomsMenu() {
-    this.menuOpneIdioms = !this.menuOpneIdioms;
+    this.languageMenuOpen = !this.languageMenuOpen;
   }
 
   changeIdiom(idiom: string) {
     this.idiomActual = idiom;
-    this.menuOpneIdioms = false;
+    this.languageMenuOpen = false;
   }
 
   toggleMobileMenu() {
@@ -45,7 +45,7 @@ export class LandingNavbarComponent {
   }
 
   toggleIdiomsMenuMobile() {
-    this.menuOpneIdiomsMobile = !this.menuOpneIdiomsMobile;
+    this.languageMenuOpenMobile = !this.languageMenuOpenMobile;
   }
 
   closeMobileMenu(): void {
@@ -58,7 +58,7 @@ export class LandingNavbarComponent {
     if (clickedOutside) {
       this.menuOpened = false;
       this.menuOpendSession = false;
-      this.menuOpneIdioms = false;
+      this.languageMenuOpen = false;
     }
   }
 }

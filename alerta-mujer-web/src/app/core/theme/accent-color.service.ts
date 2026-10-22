@@ -6,7 +6,7 @@ const DEFAULT_ACCENT = '#7c3aed'; // = --purple-deep original
 
 interface Hsl { h: number; s: number; l: number; }
 
-const COLORES_RETIRADOS = ['#3b08b2', '#d844ef'];
+const RETIRED_COLORS = ['#3b08b2', '#d844ef'];
 
 @Injectable({ providedIn: 'root' })
 export class AccentColorService {
@@ -31,10 +31,10 @@ export class AccentColorService {
   }
 
   private getInitialAccent(): string {
-    const guardado = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     // Colores que ya no se ofrecen: quien los tenía elegidos vuelve al violeta de la app
-    if (!guardado || COLORES_RETIRADOS.includes(guardado.toLowerCase())) return DEFAULT_ACCENT;
-    return guardado;
+    if (!saved || RETIRED_COLORS.includes(saved.toLowerCase())) return DEFAULT_ACCENT;
+    return saved;
   }
 
   private applyAccent(hex: string, theme: 'light' | 'dark'): void {

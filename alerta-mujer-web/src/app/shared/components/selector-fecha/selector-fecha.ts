@@ -3,21 +3,21 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-const DIAS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
-interface Celda {
+interface Cell {
   iso: string;
-  dia: number;
-  delMes: boolean;
-  hoy: boolean;
-  deshabilitada: boolean;
+  day: number;
+  ofMonth: boolean;
+  today: boolean;
+  disabled: boolean;
 }
 
 const aIso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-const desdeIso = (iso: string | null | undefined): Date | null => {
+const fromIso = (iso: string | null | undefined): Date | null => {
   if (!iso) return null;
   const [a, m, d] = iso.split('-').map(Number);
   return a && m && d ? new Date(a, m - 1, d) : null;
@@ -34,118 +34,118 @@ const desdeIso = (iso: string | null | undefined): Date | null => {
   templateUrl: './selector-fecha.html',
   styleUrl: './selector-fecha.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SelectorFecha), multi: true }],
+  providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DatePicker), multi: true }],
 })
-export class SelectorFecha implements ControlValueAccessor {
+export class DatePicker implements ControlValueAccessor {
   private host = inject(ElementRef<HTMLElement>);
 
   readonly value = input<string | null | undefined>(undefined);
   readonly min = input<string | null>(null);
   readonly max = input<string | null>(null);
   readonly placeholder = input('Elegir fecha');
-  readonly etiqueta = input('Fecha');
+  readonly label = input('Fecha');
   /** Muestra la "x" para quitar la fecha. */
-  readonly limpiable = input(true);
+  readonly clearable = input(true);
   readonly valueChange = output<string | null>();
 
-  private interno = signal<string | null>(null);
-  private tocadoPorNgModel = signal(false);
-  readonly seleccion = computed(() => (this.tocadoPorNgModel() ? this.interno() : (this.value() ?? this.interno())) || null);
+  private internal = signal<string | null>(null);
+  private touchedByNgModel = signal(false);
+  readonly selection = computed(() => (this.touchedByNgModel() ? this.internal() : (this.value() ?? this.internal())) || null);
 
-  abierto = signal(false);
+  open = signal(false);
   /** Primer día del mes que se está mirando. */
-  mes = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  readonly dias = DIAS;
+  month = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  readonly days = DAYS;
 
-  readonly texto = computed(() => {
-    const d = desdeIso(this.seleccion());
+  readonly text = computed(() => {
+    const d = fromIso(this.selection());
     return d ? d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   });
 
-  readonly tituloMes = computed(() => `${MESES[this.mes().getMonth()]} ${this.mes().getFullYear()}`);
+  readonly monthTitle = computed(() => `${MONTHS[this.month().getMonth()]} ${this.month().getFullYear()}`);
 
-  readonly celdas = computed<Celda[]>(() => {
-    const inicio = this.mes();
-    const desfase = (inicio.getDay() + 6) % 7; // la semana empieza el lunes
-    const primero = new Date(inicio.getFullYear(), inicio.getMonth(), 1 - desfase);
-    const hoy = aIso(new Date());
+  readonly cells = computed<Cell[]>(() => {
+    const start = this.month();
+    const offset = (start.getDay() + 6) % 7; // la semana empieza el lunes
+    const first = new Date(start.getFullYear(), start.getMonth(), 1 - offset);
+    const today = aIso(new Date());
     const min = this.min();
     const max = this.max();
     return Array.from({ length: 42 }, (_, i) => {
-      const d = new Date(primero.getFullYear(), primero.getMonth(), primero.getDate() + i);
+      const d = new Date(first.getFullYear(), first.getMonth(), first.getDate() + i);
       const iso = aIso(d);
       return {
         iso,
-        dia: d.getDate(),
-        delMes: d.getMonth() === inicio.getMonth(),
-        hoy: iso === hoy,
-        deshabilitada: (!!min && iso < min) || (!!max && iso > max),
+        day: d.getDate(),
+        ofMonth: d.getMonth() === start.getMonth(),
+        today: iso === today,
+        disabled: (!!min && iso < min) || (!!max && iso > max),
       };
     });
   });
 
-  private alCambiar: (v: string | null) => void = () => {};
-  private alTocar: () => void = () => {};
+  private onChange: (v: string | null) => void = () => {};
+  private onTap: () => void = () => {};
 
   writeValue(v: string | null): void {
-    this.tocadoPorNgModel.set(true);
-    this.interno.set(v || null);
+    this.touchedByNgModel.set(true);
+    this.internal.set(v || null);
   }
   registerOnChange(fn: (v: string | null) => void): void {
-    this.alCambiar = fn;
+    this.onChange = fn;
   }
   registerOnTouched(fn: () => void): void {
-    this.alTocar = fn;
+    this.onTap = fn;
   }
 
-  alternar(): void {
-    if (this.abierto()) {
-      this.abierto.set(false);
+  toggle(): void {
+    if (this.open()) {
+      this.open.set(false);
       return;
     }
-    const d = desdeIso(this.seleccion()) ?? desdeIso(this.max()) ?? new Date();
-    this.mes.set(new Date(d.getFullYear(), d.getMonth(), 1));
-    this.abierto.set(true);
+    const d = fromIso(this.selection()) ?? fromIso(this.max()) ?? new Date();
+    this.month.set(new Date(d.getFullYear(), d.getMonth(), 1));
+    this.open.set(true);
   }
 
-  moverMes(delta: number): void {
-    const m = this.mes();
-    this.mes.set(new Date(m.getFullYear(), m.getMonth() + delta, 1));
+  moveMonth(delta: number): void {
+    const m = this.month();
+    this.month.set(new Date(m.getFullYear(), m.getMonth() + delta, 1));
   }
 
-  elegir(c: Celda): void {
-    if (c.deshabilitada) return;
-    this.emitir(c.iso);
-    this.abierto.set(false);
+  choose(c: Cell): void {
+    if (c.disabled) return;
+    this.emit(c.iso);
+    this.open.set(false);
   }
 
-  hoy(): void {
+  today(): void {
     const iso = aIso(new Date());
     if ((this.min() && iso < this.min()!) || (this.max() && iso > this.max()!)) return;
-    this.emitir(iso);
-    this.abierto.set(false);
+    this.emit(iso);
+    this.open.set(false);
   }
 
-  limpiar(ev?: Event): void {
+  clear(ev?: Event): void {
     ev?.stopPropagation();
-    this.emitir(null);
-    this.abierto.set(false);
+    this.emit(null);
+    this.open.set(false);
   }
 
-  private emitir(v: string | null): void {
-    this.interno.set(v);
-    this.alCambiar(v);
-    this.alTocar();
+  private emit(v: string | null): void {
+    this.internal.set(v);
+    this.onChange(v);
+    this.onTap();
     this.valueChange.emit(v);
   }
 
   @HostListener('document:click', ['$event'])
-  alClickFuera(ev: MouseEvent): void {
-    if (this.abierto() && !this.host.nativeElement.contains(ev.target as Node)) this.abierto.set(false);
+  onClickOutside(ev: MouseEvent): void {
+    if (this.open() && !this.host.nativeElement.contains(ev.target as Node)) this.open.set(false);
   }
 
   @HostListener('keydown.escape')
   alEscape(): void {
-    this.abierto.set(false);
+    this.open.set(false);
   }
 }

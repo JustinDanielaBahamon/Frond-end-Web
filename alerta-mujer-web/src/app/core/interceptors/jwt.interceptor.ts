@@ -26,7 +26,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
       // Las peticiones de /api/auth (login, registro, Google) manejan su propio 401.
       if (error instanceof HttpErrorResponse && error.status === 401
           && token && !req.url.includes('/api/auth/')) {
-        authService.cerrarSesionLocal();
+        authService.signOutLocally();
         router.navigate(['/auth/login']);
       }
       return throwError(() => error);

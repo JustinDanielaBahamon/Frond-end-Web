@@ -49,7 +49,7 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
         this.user = {
-          name: currentUser.nombre,
+          name: currentUser.name,
           email: currentUser.email
         };
       }

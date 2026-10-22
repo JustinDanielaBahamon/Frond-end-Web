@@ -15,7 +15,7 @@ export class InactivityService {
   private authService = inject(AuthService);
 
   readonly options = [0, 5, 10, 15, 30, 60];
-  readonly minutos = signal<number>(this.leer());
+  readonly minutes = signal<number>(this.leer());
 
   private lastActivity = Date.now();
   private interval: ReturnType<typeof setInterval> | null = null;
@@ -34,18 +34,18 @@ export class InactivityService {
     this.interval = null;
   }
 
-  change(minutos: number): void {
-    this.minutos.set(minutos);
+  change(minutes: number): void {
+    this.minutes.set(minutes);
     this.lastActivity = Date.now();
     try {
-      localStorage.setItem(STORAGE_KEY, String(minutos));
+      localStorage.setItem(STORAGE_KEY, String(minutes));
     } catch {
       // Sin almacenamiento: el valor vale solo para esta pestaña
     }
   }
 
   private review(): void {
-    const limit = this.minutos();
+    const limit = this.minutes();
     if (limit > 0 && Date.now() - this.lastActivity >= limit * 60000) {
       this.stop();
       this.authService.logout('inactividad');

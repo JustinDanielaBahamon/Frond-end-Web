@@ -26,7 +26,7 @@
         (input)="onSearchChange($event)" />
     </div>
 
-    <app-selector-fecha class="ah-filtro-fecha-selector" etiqueta="Filtrar historial por día" placeholder="Todas las fechas"
+    <app-selector-fecha class="ah-filtro-fecha-selector" label="Filtrar historial por día" placeholder="Todas las fechas"
                         [value]="dateFilter" (valueChange)="onDate($event)" />
 
     <div class="ah-filtro-tipo">
@@ -124,7 +124,7 @@
             <tr class="ah-row" [class.ah-row--expanded]="expandedAlertId === alert.id" (click)="toggleExpand(alert)">
               <td class="ah-id">#{{ alert.id }}</td>
               <td>
-                <span class="ah-fecha">{{ formatDateTime(alert.time).fecha }}</span>
+                <span class="ah-fecha">{{ formatDateTime(alert.time).date }}</span>
                 <span class="ah-hora">{{ formatDateTime(alert.time).time }}</span>
               </td>
               <td>
@@ -134,8 +134,8 @@
               </td>
               <td class="ah-ubicacion">{{ alert.location || 'Sin ubicación' }}</td>
               <td>
-                <span class="ah-badge" [ngClass]="statusBadge[alert.estado]">
-                  {{ alert.estado }}
+                <span class="ah-badge" [ngClass]="statusBadge[alert.status]">
+                  {{ alert.status }}
                 </span>
               </td>
               <td class="ah-acciones" (click)="$event.stopPropagation()">
@@ -145,7 +145,7 @@
                   @if (openMenuId === alert.id) {
                     <div class="ah-menu">
                       <button (click)="viewEvidences(alert); openMenuId = null">📂 Ver evidencias</button>
-                      @if (alert.estado === 'Pendiente') {
+                      @if (alert.status === 'Pendiente') {
                         <button class="ah-menu-danger" (click)="markCancelled(alert); openMenuId = null">⚠️ Marcar como cancelada</button>
                       }
                     </div>
@@ -185,13 +185,13 @@
                             </div>
                           </li>
                           <li class="ah-mini-timeline-item"
-                              [class.ah-mini-timeline-item--done]="alert.estado === 'Atendida'"
-                              [class.ah-mini-timeline-item--pending]="alert.estado === 'Pendiente'">
+                              [class.ah-mini-timeline-item--done]="alert.status === 'Atendida'"
+                              [class.ah-mini-timeline-item--pending]="alert.status === 'Pendiente'">
                             <span class="ah-mini-timeline-dot"></span>
                             <div>
-                              <span class="ah-mini-timeline-label">{{ alert.estado }}</span>
+                              <span class="ah-mini-timeline-label">{{ alert.status }}</span>
                               <span class="ah-mini-timeline-time">
-                                {{ alert.estado === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' }}
+                                {{ alert.status === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' }}
                               </span>
                             </div>
                           </li>

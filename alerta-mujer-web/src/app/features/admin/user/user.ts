@@ -63,7 +63,7 @@ interface UserForm {
   first_name: string;
   last_name: string;
   email: string;
-  telefono: string;
+  telephone: string;
 }
 
 
@@ -147,8 +147,8 @@ export class UserComponent implements OnInit {
     ];
   }
 
-  private count(estado: string): number {
-    return this.allUsers.filter(u => u.estado === estado).length;
+  private count(status: string): number {
+    return this.allUsers.filter(u => u.status === status).length;
   }
 
   // ── Stat cards ───────────────────────────────────────────────
@@ -188,14 +188,14 @@ export class UserComponent implements OnInit {
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(u =>
-        u.nombre.toLowerCase().includes(term) ||
+        u.name.toLowerCase().includes(term) ||
         u.email.toLowerCase().includes(term) ||
-        u.telefono.includes(term)
+        u.telephone.includes(term)
       );
     }
 
     if (this.statusFilter !== 'Todos') {
-      result = result.filter(u => u.estado === this.statusFilter);
+      result = result.filter(u => u.status === this.statusFilter);
     }
 
     this.totalFiltered = result.length;
@@ -250,7 +250,7 @@ export class UserComponent implements OnInit {
 
   // ── Bloqueo masivo vía API ────────────────────────────────────
   blockSelected(): void {
-    const selected = this.filteredUsers.filter(u => u.selected && u.estado !== 'Bloqueada por Fraude');
+    const selected = this.filteredUsers.filter(u => u.selected && u.status !== 'Bloqueada por Fraude');
     if (selected.length === 0) return;
     this.openBlock(selected, 'bloquear');
   }
@@ -263,7 +263,7 @@ export class UserComponent implements OnInit {
     this.historyDetail = [];
     this.loadingDetail = true;
     this.detailModal = true;
-    this.usersService.celulares().subscribe({
+    this.usersService.phones().subscribe({
       next: (list) => {
         this.phoneDetails = list.filter(c => String(c.userId) === String(u.id) && c.osName !== 'web');
         this.cdr.detectChanges();
@@ -305,7 +305,7 @@ export class UserComponent implements OnInit {
   }
 
   toggleBlock(u: UserUI): void {
-    this.openBlock([u], u.estado === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear');
+    this.openBlock([u], u.status === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear');
   }
 
   private openBlock(users: UserUI[], action: 'bloquear' | 'desbloquear'): void {
@@ -336,8 +336,8 @@ export class UserComponent implements OnInit {
   }
 
   get blockValid(): boolean {
-    const nota = this.blockDescription.trim().length >= 10;
-    return this.blockAction === 'desbloquear' ? nota : nota && !!this.blockReason;
+    const note = this.blockDescription.trim().length >= 10;
+    return this.blockAction === 'desbloquear' ? note : note && !!this.blockReason;
   }
 
   confirmBlock(): void {
@@ -368,8 +368,8 @@ export class UserComponent implements OnInit {
   }
 
   viewEvidence(item: ModerationHistory): void {
-    if (!item.casoId) return;
-    this.usersService.caseEvidenceOf(item.casoId).subscribe({
+    if (!item.caseId) return;
+    this.usersService.caseEvidenceOf(item.caseId).subscribe({
       next: (e) => {
         this.openEvidence = e;
         this.cdr.detectChanges();
@@ -405,11 +405,11 @@ export class UserComponent implements OnInit {
   }
 
   // ── Ayudas del detalle ───────────────────────────────────────
-  permissionsOf(c: AdminPhone): { nombre: string; ok: boolean }[] {
+  permissionsOf(c: AdminPhone): { name: string; ok: boolean }[] {
     if (!c.permissions) return [];
     try {
       const data = JSON.parse(c.permissions) as Record<string, boolean>;
-      return Object.entries(data).map(([k, v]) => ({ nombre: PERMISSION_LABELS[k] ?? k, ok: v === true }));
+      return Object.entries(data).map(([k, v]) => ({ name: PERMISSION_LABELS[k] ?? k, ok: v === true }));
     } catch {
       return [];
     }
@@ -436,17 +436,17 @@ export class UserComponent implements OnInit {
 
   // ── Formulario crear / editar ────────────────────────────────
   private emptyForm(): UserForm {
-    return { first_name: '', last_name: '', email: '', telefono: '' };
+    return { first_name: '', last_name: '', email: '', telephone: '' };
   }
 
   openEditModal(u: UserUI): void {
     this.formMode = 'editar';
     this.selectedUser = u;
     this.form = {
-      first_name: u.first_name ?? u.nombre.split(' ')[0],
+      first_name: u.first_name ?? u.name.split(' ')[0],
       last_name: u.last_name ?? '',
       email: u.email,
-      telefono: u.telefono,
+      telephone: u.telephone,
     };
     this.errorForm = '';
     this.detailModal = false;
@@ -471,11 +471,11 @@ export class UserComponent implements OnInit {
     {
       const u = this.selectedUser!;
       const changes: Partial<ManagedUser> & Record<string, unknown> = {
-        nombre: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
+        name: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
         first_name: this.form.first_name.trim(),
         last_name: this.form.last_name.trim(),
         email,
-        telefono: this.form.telefono.trim(),
+        telephone: this.form.telephone.trim(),
       };
 
       this.usersService.updateUser(u.id, changes).subscribe({
@@ -515,12 +515,12 @@ export class UserComponent implements OnInit {
   }
 
   // ── Helpers de estilo ────────────────────────────────────────
-  getStatusClass(estado: string): string {
+  getStatusClass(status: string): string {
     const map: Record<string, string> = {
       'Activa':               'estado--activa',
       'Inactiva':             'estado--inactiva',
       'Bloqueada por Fraude': 'estado--bloqueada',
     };
-    return map[estado] ?? '';
+    return map[status] ?? '';
   }
 }

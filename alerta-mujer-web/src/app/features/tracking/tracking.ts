@@ -121,8 +121,8 @@ export class TrackingComponent implements OnInit {
   });
   /** Barrio y dirección de cada punto ("lat,lng" redondeado -> texto). */
   readonly pointPlaces = signal<Record<string, string>>({});
-  readonly videos = computed(() => (this.data()?.evidences ?? []).filter((e) => e.tipo === 'video'));
-  readonly audios = computed(() => (this.data()?.evidences ?? []).filter((e) => e.tipo === 'audio'));
+  readonly videos = computed(() => (this.data()?.evidences ?? []).filter((e) => e.type === 'video'));
+  readonly audios = computed(() => (this.data()?.evidences ?? []).filter((e) => e.type === 'audio'));
   private placeKey = '';
 
   // ── Chat de la alerta ──
@@ -135,14 +135,14 @@ export class TrackingComponent implements OnInit {
   readonly errorChat = signal('');
   private chatTimer: ReturnType<typeof setInterval> | null = null;
 
-  private codigo = '';
+  private code = '';
   private map: L.Map | null = null;
   private layer: L.LayerGroup | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private firstView = true;
 
   ngOnInit(): void {
-    this.codigo = this.route.snapshot.paramMap.get('codigo') ?? '';
+    this.code = this.route.snapshot.paramMap.get('codigo') ?? '';
     // Si el servidor (Render gratis) estaba dormido, la primera respuesta puede tardar
     const notice = setTimeout(() => this.wakingUp.set(true), 4000);
     this.query(() => clearTimeout(notice));
@@ -154,7 +154,7 @@ export class TrackingComponent implements OnInit {
   }
 
   private query(onEnd?: () => void): void {
-    this.trackingService.query(this.codigo).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.trackingService.query(this.code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (d) => {
         onEnd?.();
         this.data.set(d);
@@ -237,9 +237,9 @@ export class TrackingComponent implements OnInit {
 
   private frame(d: Tracking): void {
     if (!this.map || !d.route.length) return;
-    const puntos = d.route.map((p) => L.latLng(p.lat, p.lng));
-    if (puntos.length === 1) this.map.setView(puntos[0], 16);
-    else this.map.fitBounds(L.latLngBounds(puntos), { padding: [40, 40], maxZoom: 17 });
+    const points = d.route.map((p) => L.latLng(p.lat, p.lng));
+    if (points.length === 1) this.map.setView(points[0], 16);
+    else this.map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 17 });
   }
 
   // Mensajes nuevos cada 5 s mientras la alerta está activa (al terminar, una última lectura)
@@ -255,7 +255,7 @@ export class TrackingComponent implements OnInit {
 
   private readNewMessages(): void {
     const last = this.messages().at(-1)?.id ?? 0;
-    this.trackingService.messages(this.codigo, last).subscribe({
+    this.trackingService.messages(this.code, last).subscribe({
       next: (newOnes) => {
         if (newOnes.length) this.addMessages(newOnes);
       },
@@ -272,11 +272,11 @@ export class TrackingComponent implements OnInit {
   }
 
   saveName(): void {
-    const nombre = this.draftName().trim().slice(0, 60);
-    if (!nombre) return;
-    this.contactName.set(nombre);
+    const name = this.draftName().trim().slice(0, 60);
+    if (!name) return;
+    this.contactName.set(name);
     try {
-      localStorage.setItem(NAME_KEY, nombre);
+      localStorage.setItem(NAME_KEY, name);
     } catch {
       // modo privado: se pedirá de nuevo la próxima vez
     }
@@ -287,7 +287,7 @@ export class TrackingComponent implements OnInit {
     if (!body || this.sending() || !this.contactName()) return;
     this.sending.set(true);
     this.errorChat.set('');
-    this.trackingService.sendMessage(this.codigo, this.contactName(), body).subscribe({
+    this.trackingService.sendMessage(this.code, this.contactName(), body).subscribe({
       next: (m) => {
         this.addMessages([m]);
         this.messageText.set('');
@@ -326,12 +326,12 @@ export class TrackingComponent implements OnInit {
       this.layer = L.layerGroup().addTo(this.map);
     }
     this.layer!.clearLayers();
-    const puntos = d.route.map((p) => L.latLng(p.lat, p.lng));
+    const points = d.route.map((p) => L.latLng(p.lat, p.lng));
     // Igual que en la app: línea punteada y un pin numerado por cada ubicación enviada
-    if (puntos.length > 1) {
-      L.polyline(puntos, { color: START_COLOR, weight: 3, opacity: 0.85, dashArray: '6 8', lineCap: 'round' }).addTo(this.layer!);
+    if (points.length > 1) {
+      L.polyline(points, { color: START_COLOR, weight: 3, opacity: 0.85, dashArray: '6 8', lineCap: 'round' }).addTo(this.layer!);
     }
-    const u = puntos[puntos.length - 1];
+    const u = points[points.length - 1];
     const precision = d.route[d.route.length - 1].precision;
     if (precision && precision > 0) {
       L.circle(u, { radius: precision, color: CURRENT_COLOR, weight: 1, fillOpacity: 0.12 }).addTo(this.layer!);

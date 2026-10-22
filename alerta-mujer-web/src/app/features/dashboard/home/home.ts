@@ -28,19 +28,19 @@ interface LastLocation {
   lat: number;
   lng: number;
   address: string;
-  fecha: string;
+  date: string;
   coordinates: string;
   precision: string;
 }
 
 interface LastEmergency {
   id: number;
-  fecha: string;
+  date: string;
   time: string;
   location: string;
   activatedBy: string;
   notifiedContacts: number | null;
-  estado: string;
+  status: string;
 }
 
 interface QuickAccess {
@@ -89,7 +89,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   phonesLoaded = signal(false);
 
   // ── ÚLTIMA UBICACIÓN (enviada por el celular) ─────
-  ultimaUbicacion = signal<LastLocation | null>(null);
+  lastLocation = signal<LastLocation | null>(null);
   isRefreshing = signal(false);
   locationNotice = signal<string | null>(null);
 
@@ -125,8 +125,8 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.securityStatusService.getSecurityStatus()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (estado: SecurityStatus) => {
-          this.securityStatus.set(estado.requirements.map(req => ({
+        next: (status: SecurityStatus) => {
+          this.securityStatus.set(status.requirements.map(req => ({
             icon: req.icon,
             value: req.value,
             description: req.label,
@@ -138,7 +138,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
             advertencia: 'Requiere atención',
             critico: 'Configuración incompleta',
           };
-          this.overallStatus.set({ level: levelTexts[estado.level], color: estado.color, percentage: estado.percentage });
+          this.overallStatus.set({ level: levelTexts[status.level], color: status.color, percentage: status.percentage });
           this.isLoadingStatus.set(false);
         },
         error: () => {
@@ -153,8 +153,8 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.deviceService.getMyDevices()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (celulares) => {
-          const newest = [...celulares].sort((a, b) =>
+        next: (phones) => {
+          const newest = [...phones].sort((a, b) =>
             (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0] ?? null;
           this.myPhone.set(newest);
           this.phonesLoaded.set(true);
@@ -195,12 +195,12 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     const start = new Date(a.started_at ?? a.created_at ?? Date.now());
     return {
       id: a.id,
-      fecha: longDate(start),
+      date: longDate(start),
       time: shortTime(start),
       location: a.location || 'Sin ubicación',
       activatedBy: a.activationMethod,
       notifiedContacts: null,
-      estado: a.estado,
+      status: a.status,
     };
   }
 
@@ -214,18 +214,18 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   private showLocation(loc: LocationEntry | null): void {
     if (!loc) return;
-    const fecha = loc.recordedAt ? new Date(loc.recordedAt) : null;
-    this.ultimaUbicacion.set({
+    const date = loc.recordedAt ? new Date(loc.recordedAt) : null;
+    this.lastLocation.set({
       lat: loc.lat,
       lng: loc.lng,
       address: 'Buscando dirección…',
-      fecha: fecha ? `${fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${shortTime(fecha)}` : loc.time,
+      date: date ? `${date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${shortTime(date)}` : loc.time,
       coordinates: `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`,
       precision: loc.accuracy ? `±${Math.round(loc.accuracy)} metros` : 'Sin dato',
     });
     this.geocoding.get(loc.lat, loc.lng).then((place) => {
       const text = place ? [place.address, place.neighborhood, place.city].filter(Boolean).join(', ') : '';
-      this.ultimaUbicacion.update(u => u && { ...u, address: text || 'Dirección no disponible' });
+      this.lastLocation.update(u => u && { ...u, address: text || 'Dirección no disponible' });
       this.updateMarker();
     });
     this.updateMarker();
@@ -241,7 +241,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.isRefreshing.set(true);
     this.locationNotice.set(null);
     this.phoneLocation.requestFromPhone().subscribe({
-      next: (r) => this.waitForLocation(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+      next: (r) => this.waitForLocation(new Date(r.requestedAt).getTime() - 5000, Date.now() + 20000),
       error: (e) => {
         this.locationNotice.set(e?.error?.message ?? 'No se pudo contactar al celular.');
         this.isRefreshing.set(false);
@@ -284,13 +284,13 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateMarker(): void {
-    const u = this.ultimaUbicacion();
+    const u = this.lastLocation();
     if (!this.map || !u) return;
     const popup = `
       <div style="text-align: center; min-width: 200px;">
         <strong style="color: #6d28d9; font-size: 14px;">📍 Mi celular</strong><br>
         <span style="font-size: 12px; color: #666;">${u.address}</span><br>
-        <small style="color: #999;">${u.fecha}</small>
+        <small style="color: #999;">${u.date}</small>
       </div>`;
     if (this.userMarker) {
       this.userMarker.setLatLng([u.lat, u.lng]).setPopupContent(popup);
@@ -302,7 +302,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   /** Lleva el mapa a la última ubicación del celular y abre su información. */
   centerOnPhone(): void {
-    const u = this.ultimaUbicacion();
+    const u = this.lastLocation();
     if (!this.map || !u) return;
     this.map.flyTo([u.lat, u.lng], 17, { duration: 0.8 });
     this.userMarker?.openPopup();
@@ -410,7 +410,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   /** Calcular distancias de zonas desde la última ubicación del celular */
   private computeDistances(): void {
-    const u = this.ultimaUbicacion();
+    const u = this.lastLocation();
     if (!u) return;
     this.zones = this.zones.map(zone => ({
       ...zone,

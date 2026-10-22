@@ -20,10 +20,10 @@
     @if (period === 'custom') {
       <div class="filtros filtros--fechas">
         <label class="fecha-label">Desde
-          <app-selector-fecha etiqueta="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
+          <app-selector-fecha label="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
         </label>
         <label class="fecha-label">Hasta
-          <app-selector-fecha etiqueta="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
+          <app-selector-fecha label="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
         </label>
       </div>
     }
@@ -144,10 +144,10 @@
         <div class="horas-scroll">
           <svg class="horas-svg" viewBox="0 0 1000 275" role="img"
                aria-label="Barras de alertas por hora del día, agrupadas en madrugada, mañana, tarde y noche">
-            @for (f of chartBands; track f.nombre; let i = $index) {
-              <rect class="franja-bg" [class.franja-bg--alt]="i % 2 === 1" [class.franja-bg--noche]="f.nombre === 'Noche'"
+            @for (f of chartBands; track f.name; let i = $index) {
+              <rect class="franja-bg" [class.franja-bg--alt]="i % 2 === 1" [class.franja-bg--noche]="f.name === 'Noche'"
                     [attr.x]="f.x" y="30" [attr.width]="f.w" height="210" />
-              <text class="franja-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.nombre }} · {{ f.range }}</text>
+              <text class="franja-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.name }} · {{ f.range }}</text>
             }
             @for (t of hourTicks; track t.label) {
               <line class="grid-line" x1="50" [attr.y1]="t.y" x2="980" [attr.y2]="t.y" />
@@ -192,7 +192,7 @@
           @if (currentZone; as z) {
             <div class="zona-detalle">
               <span class="zona-detalle__label">Punto seleccionado</span>
-              <span class="zona-detalle__nombre">{{ z.nombre }}</span>
+              <span class="zona-detalle__nombre">{{ z.name }}</span>
               <span class="zona-detalle__meta">
                 {{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}
                 · {{ z.count }} {{ z.count === 1 ? 'alerta' : 'alertas' }}
@@ -211,7 +211,7 @@
               <button type="button" class="zona-item" [class.activo]="i === selectedZone" (click)="selectZone(i)">
                 <span class="rank" [ngClass]="'rank--' + z.rank">{{ z.rank }}</span>
                 <span class="zona-item__texto">
-                  <span class="zona-item__nombre">{{ z.nombre }}</span>
+                  <span class="zona-item__nombre">{{ z.name }}</span>
                   <span class="zona-item__dir">{{ z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible') }}</span>
                   <span class="zona-item__bar">
                     <span class="zona-item__fill" [class.zona-item__fill--top]="i === 0" [style.width.%]="z.bar"></span>
@@ -332,10 +332,10 @@
             @for (a of recentAlerts; track $index) {
               <tr>
                 <td>{{ a.time }}</td>
-                <td>{{ a.nombre }}</td>
+                <td>{{ a.name }}</td>
                 <td>
-                  <span class="estado-badge" [ngClass]="statusClass(a.estado)">
-                    <span class="estado-badge__icono"></span>{{ a.estado }}
+                  <span class="estado-badge" [ngClass]="statusClass(a.status)">
+                    <span class="estado-badge__icono"></span>{{ a.status }}
                   </span>
                 </td>
                 <td>

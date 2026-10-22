@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 export interface AuditRecord {
   id: number;
   action: string;
-  tipo: string;
+  type: string;
   recordId: number | null;
   description: string;
   actorId: number | null;
@@ -17,7 +17,7 @@ export interface AuditRecord {
   /** Desde dónde se hizo: 'Panel web · Chrome · Linux', 'App móvil · Android', 'Tarea automática · …' */
   source: string | null;
   ip: string | null;
-  fecha: Date;
+  date: Date;
 }
 
 export interface AuditPage {
@@ -29,14 +29,14 @@ export interface AuditPage {
 
 export interface AuditActor {
   accountId: number;
-  nombre: string;
+  name: string;
   email: string;
 }
 
 /** Filtros del módulo de Auditoría; responsableId 0 = cambios del sistema. Fechas en 'yyyy-MM-dd'. */
 export interface AuditFilters {
   actorId: number | null;
-  tipo: string;
+  type: string;
   action: string;
   from: string;
   to: string;
@@ -59,7 +59,7 @@ export class AuditService {
 
   actors(): Observable<AuditActor[]> {
     return this.http.get<any[]>(`${this.url}/actors`).pipe(
-      map(list => list.map(a => ({ accountId: a.accountId, nombre: a.name, email: a.email })))
+      map(list => list.map(a => ({ accountId: a.accountId, name: a.name, email: a.email })))
     );
   }
 
@@ -70,7 +70,7 @@ export class AuditService {
   private params(f: AuditFilters): HttpParams {
     let p = new HttpParams();
     if (f.actorId !== null) p = p.set('actorId', f.actorId);
-    if (f.tipo) p = p.set('type', f.tipo);
+    if (f.type) p = p.set('type', f.type);
     if (f.action) p = p.set('action', f.action);
     if (f.from) p = p.set('from', f.from);
     if (f.to) p = p.set('to', f.to);
@@ -81,7 +81,7 @@ export class AuditService {
     return {
       id: r.id,
       action: r.action,
-      tipo: r.entityType,
+      type: r.entityType,
       recordId: r.entityId,
       description: r.description ?? '',
       actorId: r.actorAccountId,
@@ -90,7 +90,7 @@ export class AuditService {
       role: r.actorRole ?? null,
       source: r.source ?? null,
       ip: r.ipAddress,
-      fecha: new Date(r.createdAt)
+      date: new Date(r.createdAt)
     };
   }
 }

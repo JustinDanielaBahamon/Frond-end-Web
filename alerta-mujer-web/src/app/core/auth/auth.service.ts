@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 
 export interface User {
   id: number;
-  nombre: string;
+  name: string;
   email: string;
   role: string;
   firstName?: string;
@@ -23,15 +23,15 @@ export interface LoginCredentials {
 
 /* Datos que llegan desde el formulario de registro */
 export interface UserRecord {
-  nombre: string;
-  telefono: string;
-  tipoDocumento: string;
-  numeroDocumento: string;
-  fechaNacimiento: string; // DD/MM/AAAA
+  name: string;
+  telephone: string;
+  documentType: string;
+  documentNumber: string;
+  birthDate: string; // DD/MM/AAAA
   email: string;
   password: string;
   /** Marcó términos y privacidad: el backend guarda cuándo y qué versión aceptó. */
-  aceptaTerminos: boolean;
+  acceptsTerms: boolean;
 }
 
 const STORAGE_KEY = 'alerta_session';
@@ -65,20 +65,20 @@ export class AuthService {
      No inicia sesión: después del registro se va al login. */
   registrar(data: UserRecord): Observable<User> {
     return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
-      nombre: data.nombre.trim(),
+      nombre: data.name.trim(),
       email: data.email.trim(),
       password: data.password,
-      telefono: data.telefono.trim(),
-      tipoDocumento: data.tipoDocumento,
-      numeroDocumento: data.numeroDocumento.trim(),
-      fechaNacimiento: data.fechaNacimiento,
-      aceptaTerminos: data.aceptaTerminos
+      telefono: data.telephone.trim(),
+      tipoDocumento: data.documentType,
+      numeroDocumento: data.documentNumber.trim(),
+      fechaNacimiento: data.birthDate,
+      aceptaTerminos: data.acceptsTerms
     }).pipe(
       map((response) => {
         const backendUser = response.user;
         const user: User = {
           id: backendUser.id,
-          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
+          name: `${backendUser.firstName} ${backendUser.lastName}`,
           email: backendUser.email,
           role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
           firstName: backendUser.firstName,
@@ -101,10 +101,10 @@ export class AuthService {
    * Cierra la sesión. Antes avisa al backend para que quede en la auditoría
    * (voluntario o por inactividad); si el aviso falla, la sesión se cierra igual.
    */
-  logout(motivo: 'voluntario' | 'inactividad' = 'voluntario'): void {
+  logout(reason: 'voluntario' | 'inactividad' = 'voluntario'): void {
     const token = this.getToken();
     if (token) {
-      this.http.post(`${environment.apiUrl}/api/auth/logout`, { reason: motivo }, {
+      this.http.post(`${environment.apiUrl}/api/auth/logout`, { reason: reason }, {
         headers: { Authorization: `Bearer ${token}` }
       }).subscribe({ error: () => {} });
     }
@@ -171,7 +171,7 @@ export class AuthService {
     const token = this._token$.value;
     if (!current || !token) return;
     const user: User = { ...current, ...changes };
-    user.nombre = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || current.nombre;
+    user.name = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || current.name;
     this.saveSession(user, token);
     this._currentUser$.next(user);
   }
@@ -196,7 +196,7 @@ export class AuthService {
     const backendUser = response.user;
     const user: User = {
       id: backendUser.id,
-      nombre: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+      name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
       email: backendUser.email,
       role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
       firstName: backendUser.firstName,

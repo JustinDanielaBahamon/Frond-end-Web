@@ -4,10 +4,10 @@ export type ResourceCategory = 'linea' | 'policia' | 'salud' | 'apoyo' | 'bomber
 /** Recurso de ayuda (GET /api/resources) adaptado para la UI. */
 export interface HelpResource {
   id: number;
-  nombre: string;
+  name: string;
   category: ResourceCategory;
   description: string;
-  telefono: string | null;
+  telephone: string | null;
   telephone2: string | null;
   email: string | null;
   address: string | null;
@@ -20,7 +20,7 @@ export interface HelpResource {
 export interface RecordedCall {
   id: number;
   resourceId: number;
-  telefono: string;
-  estado: string;
-  fecha: Date;
+  telephone: string;
+  status: string;
+  date: Date;
 }

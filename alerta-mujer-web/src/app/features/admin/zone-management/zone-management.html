@@ -98,16 +98,16 @@
         <tr *ngFor="let z of filteredZones">
           <td class="cell-zona">
             <div class="zone-name">
-              <div class="zone-avatar" [ngClass]="getAvatarClass(z.tipo)">
+              <div class="zone-avatar" [ngClass]="getAvatarClass(z.type)">
                 <i class="fa-solid fa-location-dot"></i>
               </div>
-              {{ z.nombre }}
+              {{ z.name }}
             </div>
           </td>
           <td data-label="Ciudad">{{ z.city }}</td>
-          <td data-label="Tipo"><span class="badge" [ngClass]="getBadgeClass(z.tipo)">{{ z.tipo }}</span></td>
+          <td data-label="Tipo"><span class="badge" [ngClass]="getBadgeClass(z.type)">{{ z.type }}</span></td>
           <td data-label="Alertas">{{ z.alerts }}</td>
-          <td data-label="Estado"><span class="status" [ngClass]="getStatusClass(z.estado)">{{ z.estado }}</span></td>
+          <td data-label="Estado"><span class="status" [ngClass]="getStatusClass(z.status)">{{ z.status }}</span></td>
           <td data-label="Actualizada">{{ relativeTime(z.updated_at) }}</td>
           <td class="cell-acc">
             <div class="actions">
@@ -169,7 +169,7 @@
   ==========================-->
   <app-modal
     *ngIf="modal === 'crear' || modal === 'editar'"
-    tamano="lg"
+    size="lg"
     [title]="modal === 'crear' ? '📍 Nueva zona' : '✏️ Editar zona'"
     [closeOnClickOutside]="false"
     (close)="closeModal()">
@@ -179,7 +179,7 @@
       <div class="form-group">
         <label class="form-label" for="zona-nombre">Nombre</label>
         <input id="zona-nombre" class="form-input" type="text" maxlength="80"
-          placeholder="Ej: Parque Santander" [(ngModel)]="form.nombre" />
+          placeholder="Ej: Parque Santander" [(ngModel)]="form.name" />
       </div>
 
       <div class="form-group">
@@ -196,7 +196,7 @@
         <div class="opciones">
           <button type="button" *ngFor="let t of types" class="opcion"
             [ngClass]="'opcion--' + getAvatarClass(t)"
-            [class.opcion--activa]="form.tipo === t"
+            [class.opcion--activa]="form.type === t"
             (click)="setType(t)">{{ t }}</button>
         </div>
       </div>
@@ -205,7 +205,7 @@
         <span class="form-label">Estado</span>
         <div class="opciones">
           <button type="button" *ngFor="let e of statuses" class="opcion opcion--neutral"
-            [class.opcion--activa]="form.estado === e"
+            [class.opcion--activa]="form.status === e"
             (click)="setStatus(e)">{{ e }}</button>
         </div>
       </div>
@@ -256,17 +256,17 @@
   ==========================-->
   <app-modal
     *ngIf="modal === 'ver' && selectedZone"
-    tamano="lg"
-    titulo="Detalle de la zona"
+    size="lg"
+    title="Detalle de la zona"
     (close)="closeModal()">
 
     <div modal-body>
       <div class="zona-detalle__head">
-        <div class="zone-avatar" [ngClass]="getAvatarClass(selectedZone.tipo)">
+        <div class="zone-avatar" [ngClass]="getAvatarClass(selectedZone.type)">
           <i class="fa-solid fa-location-dot"></i>
         </div>
         <div>
-          <h3>{{ selectedZone.nombre }}</h3>
+          <h3>{{ selectedZone.name }}</h3>
           <p>{{ selectedZone.city }}</p>
         </div>
       </div>
@@ -274,11 +274,11 @@
       <dl class="zona-detalle__grid">
         <div>
           <dt>Tipo</dt>
-          <dd><span class="badge" [ngClass]="getBadgeClass(selectedZone.tipo)">{{ selectedZone.tipo }}</span></dd>
+          <dd><span class="badge" [ngClass]="getBadgeClass(selectedZone.type)">{{ selectedZone.type }}</span></dd>
         </div>
         <div>
           <dt>Estado</dt>
-          <dd><span class="status" [ngClass]="getStatusClass(selectedZone.estado)">{{ selectedZone.estado }}</span></dd>
+          <dd><span class="status" [ngClass]="getStatusClass(selectedZone.status)">{{ selectedZone.status }}</span></dd>
         </div>
         <div>
           <dt>Alertas</dt>

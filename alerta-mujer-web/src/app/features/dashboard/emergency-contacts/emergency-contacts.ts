@@ -9,16 +9,16 @@ import { shrinkPhoto } from '../../../core/utils/foto';
 const RELATIONSHIPS = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 
 type ContactForm = {
-  nombre: string;
-  telefono: string;
+  name: string;
+  telephone: string;
   email?: string;
   relationship: string;
   photo: string | null;
 };
 
 const EMPTY_FORM = (): ContactForm => ({
-  nombre: '',
-  telefono: '',
+  name: '',
+  telephone: '',
   email: '',
   relationship: '',
   photo: null,
@@ -80,8 +80,8 @@ export class EmergencyContacts implements OnInit {
     });
   }
 
-  initials(nombre: string): string {
-    return nombre
+  initials(name: string): string {
+    return name
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
@@ -130,8 +130,8 @@ export class EmergencyContacts implements OnInit {
   }
 
   get addFormValid(): boolean {
-    return !!this.addForm.nombre.trim()
-      && !!this.addForm.telefono.trim()
+    return !!this.addForm.name.trim()
+      && !!this.addForm.telephone.trim()
       && !!this.addForm.relationship;
   }
 
@@ -141,8 +141,8 @@ export class EmergencyContacts implements OnInit {
     this.savingAdd = true;
     const newOne: Omit<EmergencyContact, 'id'> = {
       userId: this.userId,
-      nombre: this.addForm.nombre.trim(),
-      telefono: this.addForm.telefono.trim(),
+      name: this.addForm.name.trim(),
+      telephone: this.addForm.telephone.trim(),
       email: this.addForm.email?.trim(),
       relationship: this.addForm.relationship,
       photo: this.addForm.photo,
@@ -161,15 +161,15 @@ export class EmergencyContacts implements OnInit {
 
   // --- Editar ---
 
-  openEditModal(contacto: EmergencyContact) {
+  openEditModal(contact: EmergencyContact) {
     this.closeMenu();
-    this.editingContact = contacto;
+    this.editingContact = contact;
     this.editForm = {
-      nombre: contacto.nombre,
-      telefono: contacto.telefono,
-      email: contacto.email,
-      relationship: contacto.relationship,
-      photo: contacto.photo ?? null,
+      name: contact.name,
+      telephone: contact.telephone,
+      email: contact.email,
+      relationship: contact.relationship,
+      photo: contact.photo ?? null,
     };
     this.confirmingDelete = false;
     this.editModalOpen = true;
@@ -183,8 +183,8 @@ export class EmergencyContacts implements OnInit {
   }
 
   get editFormValid(): boolean {
-    return !!this.editForm.nombre.trim()
-      && !!this.editForm.telefono.trim()
+    return !!this.editForm.name.trim()
+      && !!this.editForm.telephone.trim()
       && !!this.editForm.relationship;
   }
 
@@ -194,8 +194,8 @@ export class EmergencyContacts implements OnInit {
     this.savingEdit = true;
     const id = this.editingContact.id;
     const changes: Partial<EmergencyContact> = {
-      nombre: this.editForm.nombre.trim(),
-      telefono: this.editForm.telefono.trim(),
+      name: this.editForm.name.trim(),
+      telephone: this.editForm.telephone.trim(),
       email: this.editForm.email?.trim(),
       relationship: this.editForm.relationship,
       photo: this.editForm.photo,
@@ -243,8 +243,8 @@ export class EmergencyContacts implements OnInit {
 
   // --- Acciones rápidas desde el menú ---
 
-  deleteFromMenu(contacto: EmergencyContact) {
-    this.openEditModal(contacto);
+  deleteFromMenu(contact: EmergencyContact) {
+    this.openEditModal(contact);
     this.askDeleteConfirmation();
   }
 }

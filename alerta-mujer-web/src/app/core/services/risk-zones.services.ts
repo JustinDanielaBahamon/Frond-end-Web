@@ -32,8 +32,8 @@ export class RiskZonesService {
         .filter(r => r.resourceType in POINT_TYPES && r.latitude != null && r.longitude != null)
         .map(r => ({
           id: r.id,
-          tipo: r.resourceType as PointType,
-          nombre: r.name,
+          type: r.resourceType as PointType,
+          name: r.name,
           lat: Number(r.latitude),
           lng: Number(r.longitude),
         })))
@@ -42,14 +42,14 @@ export class RiskZonesService {
 
   createPoint(point: Omit<MapPoint, 'id'>): Observable<MapPoint> {
     const resource = {
-      name: point.nombre,
-      resourceType: point.tipo,
+      name: point.name,
+      resourceType: point.type,
       city: 'Sin especificar',
       latitude: point.lat,
       longitude: point.lng,
     };
     return this.http.post<ResourceApi>(this.resourcesUrl, resource).pipe(
-      map(r => ({ id: r.id, tipo: point.tipo, nombre: r.name, lat: Number(r.latitude), lng: Number(r.longitude) }))
+      map(r => ({ id: r.id, type: point.type, name: r.name, lat: Number(r.latitude), lng: Number(r.longitude) }))
     );
   }
 }
@@ -87,7 +87,7 @@ function zoneFromApi(z: ZoneApi): ManualZone {
   const radio = Number(z.radiusMeters);
   return {
     id: z.id,
-    nombre: z.name,
+    name: z.name,
     level: LEVEL_FROM_API[z.riskLevel] ?? 'Medio',
     method: radio > RADIO_PIN ? 'area' : 'pin',
     radio: radio > RADIO_PIN ? radio : undefined,
@@ -99,7 +99,7 @@ function zoneFromApi(z: ZoneApi): ManualZone {
 
 function zoneToApi(z: Omit<ManualZone, 'id'>): Omit<ZoneApi, 'id'> {
   return {
-    name: z.nombre,
+    name: z.name,
     zoneType: 'risk',
     riskLevel: LEVEL_TO_API[z.level] ?? 'medium',
     // El mapa no pide ciudad; se puede corregir luego en Gestión de zonas.

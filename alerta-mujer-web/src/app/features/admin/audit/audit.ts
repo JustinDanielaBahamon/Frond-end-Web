@@ -68,7 +68,7 @@ export class AuditComponent implements OnInit {
   readonly types = Object.entries(TYPES).map(([value, label]) => ({ value, label }));
   readonly actions = Object.entries(ACTIONS).map(([value, label]) => ({ value, label }));
 
-  filters: AuditFilters = { actorId: null, tipo: '', action: '', from: '', to: '' };
+  filters: AuditFilters = { actorId: null, type: '', action: '', from: '', to: '' };
   readonly actors = signal<AuditActor[]>([]);
 
   readonly records = signal<AuditRecord[]>([]);
@@ -111,17 +111,17 @@ export class AuditComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filters = { actorId: null, tipo: '', action: '', from: '', to: '' };
+    this.filters = { actorId: null, type: '', action: '', from: '', to: '' };
     this.applyFilters();
   }
 
   viewSessions(): void {
-    this.filters = { ...this.filters, tipo: 'SESSION', action: '' };
+    this.filters = { ...this.filters, type: 'SESSION', action: '' };
     this.applyFilters();
   }
 
   viewFailedAttempts(): void {
-    this.filters = { ...this.filters, tipo: 'SESSION', action: 'LOGIN_FAILED' };
+    this.filters = { ...this.filters, type: 'SESSION', action: 'LOGIN_FAILED' };
     this.applyFilters();
   }
 
@@ -155,13 +155,13 @@ export class AuditComponent implements OnInit {
     return ACTIONS[r.action] ?? r.action;
   }
 
-  tipo(r: AuditRecord): string {
-    return TYPES[r.tipo] ?? r.tipo;
+  type(r: AuditRecord): string {
+    return TYPES[r.type] ?? r.type;
   }
 
   object(r: AuditRecord): string {
-    if (r.tipo === 'SESSION') return 'Panel de administración';
-    return `${this.tipo(r)}${r.recordId != null ? ' #' + r.recordId : ''}`;
+    if (r.type === 'SESSION') return 'Panel de administración';
+    return `${this.type(r)}${r.recordId != null ? ' #' + r.recordId : ''}`;
   }
 
   /** Quién hizo el cambio cuando no hubo una persona con sesión. */
@@ -195,9 +195,9 @@ export class AuditComponent implements OnInit {
   }
 
   /** "lunes, 20 de octubre de 2026, 10:32:15 a. m." (la app no registra el locale de Angular). */
-  longDate(fecha: Date | string | null): string {
-    if (!fecha) return '';
-    const d = new Date(fecha);
+  longDate(date: Date | string | null): string {
+    if (!date) return '';
+    const d = new Date(date);
     return isNaN(d.getTime()) ? '' : d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'medium' });
   }
 

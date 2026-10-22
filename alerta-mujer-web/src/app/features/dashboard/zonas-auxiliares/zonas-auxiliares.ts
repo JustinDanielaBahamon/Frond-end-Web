@@ -18,7 +18,7 @@ type Category = 'riesgo' | 'segura' | 'policia' | 'salud' | 'apoyo' | 'linea';
 interface Point {
   key: string;
   source: 'zona' | 'recurso';
-  nombre: string;
+  name: string;
   category: Category;
   description?: string;
   address?: string;
@@ -26,7 +26,7 @@ interface Point {
   lat?: number;
   lng?: number;
   radio?: number;
-  telefono?: string;
+  telephone?: string;
   telephone2?: string;
 }
 
@@ -42,8 +42,8 @@ export const CATEGORIES: Record<Category, { label: string; color: string }> = {
 
 const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 
-function zoneCategory(tipo: NearbyZone['type']): Category {
-  switch (tipo) {
+function zoneCategory(type: NearbyZone['type']): Category {
+  switch (type) {
     case 'safe': return 'segura';
     case 'policia': return 'policia';
     case 'asistencia':
@@ -52,8 +52,8 @@ function zoneCategory(tipo: NearbyZone['type']): Category {
   }
 }
 
-function resourceCategory(tipo: string): Category {
-  switch (tipo) {
+function resourceCategory(type: string): Category {
+  switch (type) {
     case 'police_station':
     case 'police_post': return 'policia';
     case 'hospital':
@@ -88,7 +88,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly categories = CATEGORIES;
   readonly categoryList = Object.keys(CATEGORIES) as Category[];
 
-  puntos = signal<Point[]>([]);
+  points = signal<Point[]>([]);
   loading = signal(true);
   error = signal('');
 
@@ -100,11 +100,11 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   locationStatus = signal<'sin-pedir' | 'buscando' | 'ok' | 'denegada'>('sin-pedir');
 
   /** Líneas para llamar sin buscar (se muestran siempre arriba). */
-  lines = computed(() => this.puntos().filter((p) => p.category === 'linea' && p.telefono));
+  lines = computed(() => this.points().filter((p) => p.category === 'linea' && p.telephone));
 
   count = computed(() => {
     const c = Object.fromEntries(this.categoryList.map((k) => [k, 0])) as Record<Category, number>;
-    for (const p of this.puntos()) c[p.category]++;
+    for (const p of this.points()) c[p.category]++;
     return c;
   });
 
@@ -112,10 +112,10 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
     const filter = this.filter();
-    const list = this.puntos().filter((p) => {
+    const list = this.points().filter((p) => {
       if (filter && p.category !== filter) return false;
       if (!term) return true;
-      return [p.nombre, p.address, p.city, p.description, CATEGORIES[p.category].label]
+      return [p.name, p.address, p.city, p.description, CATEGORIES[p.category].label]
         .some((t) => (t ?? '').toLowerCase().includes(term));
     });
     if (!this.myPosition()) return list;
@@ -124,7 +124,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /** Zonas de riesgo / seguras en las que la usuaria está ahora mismo. */
   currentZones = computed(() =>
-    this.puntos().filter((p) => p.radio && (this.distance(p) ?? Infinity) <= p.radio)
+    this.points().filter((p) => p.radio && (this.distance(p) ?? Infinity) <= p.radio)
   );
 
   ngOnInit(): void {
@@ -133,7 +133,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
       resources: this.resourcesService.getActiveResources().pipe(catchError(() => of(null))),
     }).subscribe(({ zones, resources }) => {
       if (!zones && !resources) this.error.set('No se pudieron cargar las zonas. Intenta de nuevo.');
-      this.puntos.set([...(zones ?? []).map(fromZone), ...(resources ?? []).map(fromResource)]);
+      this.points.set([...(zones ?? []).map(fromZone), ...(resources ?? []).map(fromResource)]);
       this.loading.set(false);
     });
 
@@ -260,7 +260,7 @@ function fromZone(z: NearbyZone): Point {
   return {
     key: `z${z.id}`,
     source: 'zona',
-    nombre: z.name,
+    name: z.name,
     category: zoneCategory(z.type),
     description: z.description,
     address: z.address,
@@ -275,14 +275,14 @@ function fromResource(r: EmergencyResourceApi): Point {
   return {
     key: `r${r.id}`,
     source: 'recurso',
-    nombre: r.name,
+    name: r.name,
     category: resourceCategory(r.resourceType),
     description: r.description ?? undefined,
     address: r.address ?? undefined,
     city: r.city,
     lat: r.latitude ?? undefined,
     lng: r.longitude ?? undefined,
-    telefono: r.telephone ?? undefined,
+    telephone: r.telephone ?? undefined,
     telephone2: r.secondaryTelephone ?? undefined,
   };
 }
@@ -310,11 +310,11 @@ function pointPopup(p: Point, distance: string): string {
   return `
     <div class="za-popup">
       <div class="za-popup-type" style="color:${color}">● ${label}</div>
-      <div class="za-popup-name">${escapeHtml(p.nombre)}</div>
+      <div class="za-popup-name">${escapeHtml(p.name)}</div>
       ${place ? `<div class="za-popup-row">${escapeHtml(place)}</div>` : ''}
       ${p.description ? `<div class="za-popup-row">${escapeHtml(p.description)}</div>` : ''}
       ${distance ? `<div class="za-popup-row"><strong>A ${distance} de ti</strong></div>` : ''}
-      ${p.telefono ? `<div class="za-popup-row">Tel. ${escapeHtml(p.telefono)}</div>` : ''}
+      ${p.telephone ? `<div class="za-popup-row">Tel. ${escapeHtml(p.telephone)}</div>` : ''}
     </div>`;
 }
 

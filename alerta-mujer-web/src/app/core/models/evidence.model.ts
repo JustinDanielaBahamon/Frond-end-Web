@@ -3,15 +3,15 @@ export interface Evidence {
   userId: number;
   userName: string;
   userEmail: string;
-  tipo: 'video' | 'foto' | 'audio' | 'documento';
-  nombre: string;
+  type: 'video' | 'foto' | 'audio' | 'documento';
+  name: string;
   size: string;
-  fecha: string; // idealmente ISO parseable, ej. '2026-08-28T20:45:00'
+  date: string; // idealmente ISO parseable, ej. '2026-08-28T20:45:00'
   time: string;
-  alertaId: string;
+  alertId: string;
   alertType: string;
   alertCity: string;
-  estado: 'Verificada' | 'Pendiente' | 'Rechazada';
+  status: 'Verificada' | 'Pendiente' | 'Rechazada';
 
   // Campos opcionales para futuro
   location?: string;        // ej. 'Neiva, Huila'
@@ -25,20 +25,20 @@ export interface Evidence {
 
 export interface LinkedAlert {
   id: string;
-  tipo: string;
-  fecha: string;
+  type: string;
+  date: string;
   time: string;
   city: string;
   location: string;
-  estado: string;
+  status: string;
   description?: string;
   activationMethod?: string;
 }
 
 export interface EvidenceFilters {
   search: string;
-  tipo: string;
-  estado: string;
+  type: string;
+  status: string;
   startDate: Date | null;
   endDate: Date | null;
 }

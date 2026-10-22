@@ -48,13 +48,13 @@
             <tr>
               <td>
                 @if (c.photo) {
-                  <img class="ec-avatar ec-avatar--foto" [src]="c.photo" [alt]="'Foto de ' + c.nombre" />
+                  <img class="ec-avatar ec-avatar--foto" [src]="c.photo" [alt]="'Foto de ' + c.name" />
                 } @else {
-                  <span class="ec-avatar">{{ initials(c.nombre) }}</span>
+                  <span class="ec-avatar">{{ initials(c.name) }}</span>
                 }
               </td>
-              <td class="ec-nombre">{{ c.nombre }}</td>
-              <td>{{ c.telefono }}</td>
+              <td class="ec-nombre">{{ c.name }}</td>
+              <td>{{ c.telephone }}</td>
               <td class="ec-email">{{ c.email || '-' }}</td>
               <td>{{ c.relationship }}</td>
               <td>
@@ -113,7 +113,7 @@
           @if (addForm.photo) {
             <img class="ec-foto-img" [src]="addForm.photo" alt="Foto del contacto" />
           } @else {
-            <span class="ec-foto-vacia">{{ initials(addForm.nombre) || '?' }}</span>
+            <span class="ec-foto-vacia">{{ initials(addForm.name) || '?' }}</span>
           }
           <div class="ec-foto-acciones">
             <label class="ec-foto-boton">
@@ -132,7 +132,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Nombre completo *
           </span>
-          <input type="text" placeholder="Ej. Ana González" [(ngModel)]="addForm.nombre" name="nombre" />
+          <input type="text" placeholder="Ej. Ana González" [(ngModel)]="addForm.name" name="nombre" />
         </label>
 
         <label class="ec-field">
@@ -140,7 +140,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             Teléfono *
           </span>
-          <input type="tel" placeholder="Ej. 300 123 4567" [(ngModel)]="addForm.telefono" name="telefono" />
+          <input type="tel" placeholder="Ej. 300 123 4567" [(ngModel)]="addForm.telephone" name="telefono" />
         </label>
 
         <label class="ec-field">
@@ -191,7 +191,7 @@
           @if (editForm.photo) {
             <img class="ec-foto-img" [src]="editForm.photo" alt="Foto del contacto" />
           } @else {
-            <span class="ec-foto-vacia">{{ initials(editForm.nombre) || '?' }}</span>
+            <span class="ec-foto-vacia">{{ initials(editForm.name) || '?' }}</span>
           }
           <div class="ec-foto-acciones">
             <label class="ec-foto-boton">
@@ -210,7 +210,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Nombre completo *
           </span>
-          <input type="text" [(ngModel)]="editForm.nombre" name="nombreEditar" />
+          <input type="text" [(ngModel)]="editForm.name" name="nombreEditar" />
         </label>
 
         <label class="ec-field">
@@ -218,7 +218,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             Teléfono *
           </span>
-          <input type="tel" [(ngModel)]="editForm.telefono" name="telefonoEditar" />
+          <input type="tel" [(ngModel)]="editForm.telephone" name="telefonoEditar" />
         </label>
 
         <label class="ec-field">
@@ -253,7 +253,7 @@
             <button type="button" class="ec-danger-btn" (click)="askDeleteConfirmation()">Eliminar contacto</button>
           } @else {
             <div class="ec-danger-confirm">
-              <p>¿Seguro que quieres eliminar a <strong>{{ editingContact.nombre }}</strong>?</p>
+              <p>¿Seguro que quieres eliminar a <strong>{{ editingContact.name }}</strong>?</p>
               <div class="ec-danger-confirm-actions">
                 <button type="button" class="ec-btn ec-btn--ghost" (click)="cancelDelete()">Cancelar</button>
                 <button type="button" class="ec-danger-btn ec-danger-btn--confirm" [disabled]="deleting" (click)="confirmDelete()">

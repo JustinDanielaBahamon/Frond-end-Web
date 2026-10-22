@@ -16,9 +16,9 @@ import { RecoveryStateService } from '../../../core/services/recovery-state.serv
 export class ForgotPasswordComponent {
   private router = inject(Router);
   private passwordService = inject(PasswordService);
-  private estado = inject(RecoveryStateService);
+  private status = inject(RecoveryStateService);
 
-  email = signal(this.estado.email() ?? '');
+  email = signal(this.status.email() ?? '');
   validEmail = signal(true);
   sending = signal(false);
   error = signal<string | null>(null);
@@ -42,8 +42,8 @@ export class ForgotPasswordComponent {
     this.passwordService.requestCode(email).subscribe({
       next: () => {
         this.sending.set(false);
-        this.estado.email.set(email);
-        this.estado.codigo.set(null);
+        this.status.email.set(email);
+        this.status.code.set(null);
         this.router.navigate(['/auth/verify-code']);
       },
       error: (e) => {

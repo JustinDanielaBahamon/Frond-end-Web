@@ -32,7 +32,7 @@
         @if (d.active) { <span class="pulso" aria-hidden="true"></span> Alerta activa } @else { La alerta terminó }
       </span>
       <h1 class="banda__titulo">
-        <strong>{{ d.nombre }}</strong>
+        <strong>{{ d.name }}</strong>
         {{ d.active ? 'necesita ayuda' : 'tuvo una alerta de emergencia' }}
       </h1>
       <p class="banda__texto">
@@ -45,10 +45,10 @@
     <!-- Mapa con el recorrido -->
     @if (last()) {
       <section class="mapa-wrap">
-        <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Recorrido de ' + d.nombre"></div>
+        <div id="mapa-seguimiento" class="mapa" role="img" [attr.aria-label]="'Recorrido de ' + d.name"></div>
         <div class="mapa-controles">
           <button class="btn-mapa btn-mapa--principal" type="button" (click)="centerOnPerson()">
-            <i class="ti ti-current-location" aria-hidden="true"></i> Centrar en {{ d.nombre }}
+            <i class="ti ti-current-location" aria-hidden="true"></i> Centrar en {{ d.name }}
           </button>
           @if (d.route.length > 1) {
             <button class="btn-mapa" type="button" (click)="center()">
@@ -92,13 +92,13 @@
       @if (d.active || messages().length) {
         <section class="tarjeta chat">
           <h2 class="tarjeta__titulo">
-            <i class="ti ti-messages" aria-hidden="true"></i> Mensajes con {{ d.nombre }}
+            <i class="ti ti-messages" aria-hidden="true"></i> Mensajes con {{ d.name }}
           </h2>
 
           <div id="chat-lista" class="chat__lista" aria-live="polite">
             @for (m of messages(); track m.id) {
               <div class="chat__msg" [class.chat__msg--ella]="m.deElla">
-                <p class="chat__autor">{{ m.deElla ? d.nombre : m.nombre }} · {{ m.time | date: 'h:mm a' }}</p>
+                <p class="chat__autor">{{ m.deElla ? d.name : m.name }} · {{ m.time | date: 'h:mm a' }}</p>
                 <p class="chat__texto">{{ m.text }}</p>
               </div>
             } @empty {
@@ -209,13 +209,13 @@
           <!-- La app graba por partes: aquí se reproducen seguidas, como una sola grabación -->
           @if (videos().length) {
             <figure class="evidencia">
-              <app-reproductor-continuo tipo="video" [parts]="videos()" />
+              <app-reproductor-continuo type="video" [parts]="videos()" />
               <figcaption>Video{{ videos().length > 1 ? ' · ' + videos().length + ' partes' : '' }}</figcaption>
             </figure>
           }
           @if (audios().length) {
             <figure class="evidencia">
-              <app-reproductor-continuo tipo="audio" [parts]="audios()" />
+              <app-reproductor-continuo type="audio" [parts]="audios()" />
               <figcaption>Audio{{ audios().length > 1 ? ' · ' + audios().length + ' partes' : '' }}</figcaption>
             </figure>
           }

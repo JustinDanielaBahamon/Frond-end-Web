@@ -3,11 +3,11 @@ export type ZoneStatus = 'Activa' | 'Revisión' | 'Inactiva';
 
 export interface Zone {
   id: string;
-  nombre: string;
+  name: string;
   city: string;
-  tipo: ZoneType;
+  type: ZoneType;
   alerts: number;
-  estado: ZoneStatus;
+  status: ZoneStatus;
   updated_at: string;
 
   // Ubicación en el mapa (opcional: las zonas antiguas no la tienen)

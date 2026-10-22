@@ -47,7 +47,7 @@ export class AdminSettingsComponent {
   readonly pendingChanges = signal<Change[] | null>(null);
 
   // ── Estado del sistema ───────────────────────────────────────
-  readonly estado = signal<SystemStatus | null>(null);
+  readonly status = signal<SystemStatus | null>(null);
   readonly statusError = signal(false);
 
   // ── Mensaje flotante ─────────────────────────────────────────
@@ -143,11 +143,11 @@ export class AdminSettingsComponent {
   loadStatus(): void {
     this.settingsService.getStatus().subscribe({
       next: (e) => {
-        this.estado.set(e);
+        this.status.set(e);
         this.statusError.set(false);
       },
       error: () => {
-        this.estado.set(null);
+        this.status.set(null);
         this.statusError.set(true);
       },
     });
@@ -166,7 +166,7 @@ export class AdminSettingsComponent {
         this.downloadCsv(
           'lista-usuarios',
           ['ID', 'Nombre', 'Correo', 'Teléfono', 'Estado', 'Rol', 'Alertas', 'Registro'],
-          users.map((u) => [u.id, u.nombre, u.email, u.telefono, u.estado, u.role, u.alerts, u.registeredAt])
+          users.map((u) => [u.id, u.name, u.email, u.telephone, u.status, u.role, u.alerts, u.registeredAt])
         ),
       error: () => this.notify('No se pudo descargar la lista de usuarios'),
     });
@@ -183,14 +183,14 @@ export class AdminSettingsComponent {
         this.downloadCsv(
           'historial-alertas',
           ['ID', 'Usuaria', 'Activación', 'Estado', 'Inicio', 'Latitud', 'Longitud', 'Mensaje'],
-          lastMonth.map((a) => [a.id, a.nombre, a.activationMethod, a.estado, a.started_at ?? '', a.lat, a.lng, a.description])
+          lastMonth.map((a) => [a.id, a.name, a.activationMethod, a.status, a.started_at ?? '', a.lat, a.lng, a.description])
         );
       },
       error: () => this.notify('No se pudo descargar el historial de alertas'),
     });
   }
 
-  private downloadCsv(nombre: string, columns: string[], rows: unknown[][]): void {
+  private downloadCsv(name: string, columns: string[], rows: unknown[][]): void {
     if (!rows.length) {
       this.notify('No hay datos para descargar');
       return;
@@ -209,7 +209,7 @@ export class AdminSettingsComponent {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${nombre}.csv`;
+    link.download = `${name}.csv`;
     link.click();
     URL.revokeObjectURL(url);
 

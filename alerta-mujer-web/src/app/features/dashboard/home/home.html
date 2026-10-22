@@ -125,7 +125,7 @@
             <i class="ti" [class.ti-loader-2]="isRefreshing()" [class.ti-refresh]="!isRefreshing()"></i>
             {{ isRefreshing() ? 'Preguntando al celular…' : 'Actualizar ubicación' }}
           </button>
-          @if (ultimaUbicacion()) {
+          @if (lastLocation()) {
             <button class="home-btn" type="button" (click)="centerOnPhone()" title="Llevar el mapa a donde está el celular">
               <i class="ti ti-current-location"></i> Centrar en mi celular
             </button>
@@ -207,7 +207,7 @@
         </p>
       </div>
 
-      @if (ultimaUbicacion(); as u) {
+      @if (lastLocation(); as u) {
         <div class="home-map-info">
           <div class="home-map-info__item">
             <i class="ti ti-map-pin"></i>
@@ -220,7 +220,7 @@
             <i class="ti ti-clock"></i>
             <div>
               <p class="home-map-info__label">Fecha y hora</p>
-              <p class="home-map-info__value">{{ u.fecha }}</p>
+              <p class="home-map-info__value">{{ u.date }}</p>
             </div>
           </div>
           <div class="home-map-info__item">
@@ -252,7 +252,7 @@
           <i class="ti ti-alert-octagon"></i> Última emergencia
         </h2>
         @if (lastEmergency(); as e) {
-          <span class="home-badge home-badge--exito">{{ e.estado }}</span>
+          <span class="home-badge home-badge--exito">{{ e.status }}</span>
         }
       </div>
 
@@ -261,7 +261,7 @@
           <div class="home-emergencia__fecha-row">
             <div class="home-emergencia__icon"><i class="ti ti-alert-octagon"></i></div>
             <div>
-              <p class="home-emergencia__fecha">{{ e.fecha }}</p>
+              <p class="home-emergencia__fecha">{{ e.date }}</p>
               <p class="home-emergencia__hora">{{ e.time }}</p>
             </div>
           </div>

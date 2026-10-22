@@ -32,12 +32,12 @@ interface StatsApi {
   exports: number;
 }
 
-const API_STATUS: Record<AlertReport['estado'], ReportApi['status']> = {
+const API_STATUS: Record<AlertReport['status'], ReportApi['status']> = {
   Pendiente: 'pending',
   Atendida: 'attended',
   Cerrada: 'closed'
 };
-const WEB_STATUS: Record<ReportApi['status'], AlertReport['estado']> = {
+const WEB_STATUS: Record<ReportApi['status'], AlertReport['status']> = {
   pending: 'Pendiente',
   attended: 'Atendida',
   closed: 'Cerrada'
@@ -98,7 +98,7 @@ export class ReportsService {
     if (filters.search) {
       const search = this.normalize(filters.search);
       filteredReports = filteredReports.filter(report =>
-        this.normalize(report.nombre).includes(search) ||
+        this.normalize(report.name).includes(search) ||
         this.normalize(report.city).includes(search) ||
         this.normalize(report.generatedBy).includes(search)
       );
@@ -107,12 +107,12 @@ export class ReportsService {
     // Los <input type="date"> entregan 'yyyy-MM-dd'; se compara por día local
     if (filters.startDate) {
       const from = this.startOfDay(filters.startDate);
-      filteredReports = filteredReports.filter(report => report.fecha >= from);
+      filteredReports = filteredReports.filter(report => report.date >= from);
     }
     if (filters.endDate) {
       const to = this.startOfDay(filters.endDate);
       to.setDate(to.getDate() + 1);
-      filteredReports = filteredReports.filter(report => report.fecha < to);
+      filteredReports = filteredReports.filter(report => report.date < to);
     }
 
     if (filters.city && filters.city !== 'all') {
@@ -120,8 +120,8 @@ export class ReportsService {
       filteredReports = filteredReports.filter(report => this.normalize(report.city) === city);
     }
 
-    if (filters.estado && filters.estado !== 'all') {
-      filteredReports = filteredReports.filter(report => report.estado === filters.estado);
+    if (filters.status && filters.status !== 'all') {
+      filteredReports = filteredReports.filter(report => report.status === filters.status);
     }
 
     return of(filteredReports);
@@ -155,10 +155,10 @@ export class ReportsService {
   private fromApi(r: ReportApi): AlertReport {
     return {
       id: r.id,
-      nombre: r.name,
-      fecha: new Date(r.createdAt),
+      name: r.name,
+      date: new Date(r.createdAt),
       city: r.city ?? 'No especificada',
-      estado: WEB_STATUS[r.status] ?? 'Pendiente',
+      status: WEB_STATUS[r.status] ?? 'Pendiente',
       user: r.userLabel ?? undefined,
       incident: r.event ?? undefined,
       generatedBy: r.createdByName || 'Administración',
@@ -174,9 +174,9 @@ export class ReportsService {
 
   private toApi(r: Omit<AlertReport, 'id'>) {
     return {
-      name: r.nombre,
+      name: r.name,
       city: r.city,
-      status: API_STATUS[r.estado],
+      status: API_STATUS[r.status],
       userLabel: r.user ?? null,
       event: r.incident ?? null,
       description: r.description ?? null,

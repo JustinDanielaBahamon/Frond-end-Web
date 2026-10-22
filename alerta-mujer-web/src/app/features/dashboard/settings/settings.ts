@@ -46,7 +46,7 @@ export class Settings implements OnInit {
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
         this.user.set({
-          name: currentUser.nombre,
+          name: currentUser.name,
           email: currentUser.email,
           phone: currentUser.telephone || '',
           avatarUrl: '',

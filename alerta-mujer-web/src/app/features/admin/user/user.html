@@ -94,17 +94,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let u of filteredUsers" [class.row--blocked]="u.estado === 'Bloqueada por Fraude'">
+          <tr *ngFor="let u of filteredUsers" [class.row--blocked]="u.status === 'Bloqueada por Fraude'">
             <td class="cell-check">
               <input type="checkbox" [(ngModel)]="u.selected" (change)="updateSelection()" />
             </td>
             <td class="cell-nombre">
               <div class="user-cell">
                 <div class="avatar" [style.background]="u.avatarColor">
-                  {{ u.nombre.charAt(0) }}
+                  {{ u.name.charAt(0) }}
                 </div>
                 <div class="user-info">
-                  <span class="user-name">{{ u.nombre }}</span>
+                  <span class="user-name">{{ u.name }}</span>
                   <span class="user-role">{{ u.role }}</span>
                 </div>
               </div>
@@ -118,12 +118,12 @@
             </td>
             <td class="muted" data-label="Última actividad">{{ u.lastActivity }}</td>
             <td data-label="Estado">
-              <span class="estado-badge" [ngClass]="getStatusClass(u.estado)">
-                <svg *ngIf="u.estado === 'Bloqueada por Fraude'" width="10" height="10" viewBox="0 0 24 24"
+              <span class="estado-badge" [ngClass]="getStatusClass(u.status)">
+                <svg *ngIf="u.status === 'Bloqueada por Fraude'" width="10" height="10" viewBox="0 0 24 24"
                   fill="currentColor">
                   <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
                 </svg>
-                {{ u.estado }}
+                {{ u.status }}
               </span>
             </td>
             <td class="cell-acc">
@@ -143,16 +143,16 @@
                   </svg>
                 </button>
                 <!-- Bloquear / Desbloquear -->
-                <button class="action-btn" [class.action-btn--block]="u.estado !== 'Bloqueada por Fraude'"
-                  [class.action-btn--unblock]="u.estado === 'Bloqueada por Fraude'"
-                  [title]="u.estado === 'Bloqueada por Fraude' ? 'Desbloquear cuenta' : 'Bloquear por fraude'"
+                <button class="action-btn" [class.action-btn--block]="u.status !== 'Bloqueada por Fraude'"
+                  [class.action-btn--unblock]="u.status === 'Bloqueada por Fraude'"
+                  [title]="u.status === 'Bloqueada por Fraude' ? 'Desbloquear cuenta' : 'Bloquear por fraude'"
                   (click)="toggleBlock(u)">
-                  <svg *ngIf="u.estado !== 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24"
+                  <svg *ngIf="u.status !== 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
-                  <svg *ngIf="u.estado === 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24"
+                  <svg *ngIf="u.status === 'Bloqueada por Fraude'" width="15" height="15" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 9.9-1" />
@@ -223,19 +223,19 @@
 <!-- ===================== MODAL: VER DETALLE ===================== -->
 <app-modal
   *ngIf="detailModal"
-  titulo="Detalle de Usuaria"
+  title="Detalle de Usuaria"
   (close)="closeModals()">
 
   <div modal-body *ngIf="selectedUser">
     <div class="detail-hero">
       <div class="avatar avatar--lg" [style.background]="selectedUser.avatarColor">
-        {{ selectedUser.nombre.charAt(0) }}
+        {{ selectedUser.name.charAt(0) }}
       </div>
       <div>
-        <h3 class="detail-name">{{ selectedUser.nombre }}</h3>
+        <h3 class="detail-name">{{ selectedUser.name }}</h3>
         <p class="detail-email">{{ selectedUser.email }}</p>
-        <span class="estado-badge" [ngClass]="getStatusClass(selectedUser.estado)">
-          {{ selectedUser.estado }}
+        <span class="estado-badge" [ngClass]="getStatusClass(selectedUser.status)">
+          {{ selectedUser.status }}
         </span>
       </div>
     </div>
@@ -243,7 +243,7 @@
     <div class="detail-grid">
       <div class="detail-item">
         <span class="detail-label">Teléfono</span>
-        <span class="detail-value">{{ selectedUser.telefono }}</span>
+        <span class="detail-value">{{ selectedUser.telephone }}</span>
       </div>
       <div class="detail-item">
         <span class="detail-label">Fecha de registro</span>
@@ -280,7 +280,7 @@
         <span>Última conexión: {{ c.lastAccess ? (c.lastAccess | date:'dd/MM/yyyy HH:mm') : 'sin registro' }}</span>
       </div>
       <div class="celular__permisos" *ngIf="permissionsOf(c).length > 0; else withoutPermissions">
-        <span class="permiso" *ngFor="let p of permissionsOf(c)" [class.permiso--ok]="p.ok">{{ p.ok ? '✓' : '✕' }} {{ p.nombre }}</span>
+        <span class="permiso" *ngFor="let p of permissionsOf(c)" [class.permiso--ok]="p.ok">{{ p.ok ? '✓' : '✕' }} {{ p.name }}</span>
       </div>
       <ng-template #withoutPermissions><span class="detail-empty">Su versión de la app aún no informa los permisos.</span></ng-template>
     </div>
@@ -290,11 +290,11 @@
     <p class="detail-empty" *ngIf="historyDetail.length === 0">Sin bloqueos ni solicitudes.</p>
     <ul class="historial" *ngIf="historyDetail.length > 0">
       <li *ngFor="let h of historyDetail">
-        <strong>{{ historyType(h.tipo) }}</strong>
-        <span>{{ h.fecha | date:'dd/MM/yyyy HH:mm' }} · {{ h.adminNombre || 'Administración' }}</span>
-        <span *ngIf="h.motivo">Motivo: {{ h.motivo }}</span>
-        <span *ngIf="h.nota" class="historial__nota">{{ h.nota }}</span>
-        <button type="button" class="link-btn" *ngIf="h.tieneEvidencia" (click)="viewEvidence(h)">Ver evidencia</button>
+        <strong>{{ historyType(h.type) }}</strong>
+        <span>{{ h.date | date:'dd/MM/yyyy HH:mm' }} · {{ h.adminName || 'Administración' }}</span>
+        <span *ngIf="h.reason">Motivo: {{ h.reason }}</span>
+        <span *ngIf="h.note" class="historial__nota">{{ h.note }}</span>
+        <button type="button" class="link-btn" *ngIf="h.hasEvidence" (click)="viewEvidence(h)">Ver evidencia</button>
       </li>
     </ul>
     <img class="evidencia-img" *ngIf="openEvidence" [src]="openEvidence" alt="Evidencia del bloqueo" />
@@ -322,7 +322,7 @@
 <!-- ===================== MODAL: CREAR / EDITAR ===================== -->
 <app-modal
   *ngIf="modalForm"
-  titulo="Editar datos de la usuaria"
+  title="Editar datos de la usuaria"
   (close)="closeModals()">
 
   <div modal-body>
@@ -346,7 +346,7 @@
 
       <label class="form-field">
         <span>Teléfono</span>
-        <input name="telefono" [(ngModel)]="form.telefono" required pattern="^[+0-9 ]{7,20}$" />
+        <input name="telefono" [(ngModel)]="form.telephone" required pattern="^[+0-9 ]{7,20}$" />
       </label>
       <p class="form-ayuda">La contraseña solo la cambia la usuaria: usa "Enviar correo para cambiar contraseña" en su detalle.</p>
 
@@ -366,15 +366,15 @@
 <!-- ===================== MODAL: CONFIRMAR BLOQUEO ===================== -->
 <app-modal
   *ngIf="blockModal"
-  tamano="sm"
-  variante="danger"
+  size="sm"
+  variant="danger"
   [title]="blockAction === 'bloquear' ? 'Bloquear cuenta' : 'Desbloquear cuenta'"
   (close)="closeModals()">
 
   <div modal-body *ngIf="selectedUser">
     <p class="confirm-text">
       <ng-container *ngIf="usersToBlock.length === 1">
-        {{ blockAction === 'bloquear' ? 'Vas a bloquear' : 'Vas a desbloquear' }} la cuenta de <strong>{{ selectedUser.nombre }}</strong>.
+        {{ blockAction === 'bloquear' ? 'Vas a bloquear' : 'Vas a desbloquear' }} la cuenta de <strong>{{ selectedUser.name }}</strong>.
       </ng-container>
       <ng-container *ngIf="usersToBlock.length > 1">
         Vas a bloquear <strong>{{ usersToBlock.length }} cuentas</strong>.
@@ -419,14 +419,14 @@
 <!-- ===================== MODAL: SOLICITAR ELIMINACIÓN ===================== -->
 <app-modal
   *ngIf="deleteModal"
-  tamano="sm"
-  variante="danger"
-  titulo="Solicitar eliminación de la cuenta"
+  size="sm"
+  variant="danger"
+  title="Solicitar eliminación de la cuenta"
   (close)="closeModals()">
 
   <div modal-body *ngIf="selectedUser">
     <p class="confirm-text">
-      Se eliminarán los datos personales de <strong>{{ selectedUser.nombre }}</strong> (nombre, correo, teléfono, documento y foto)
+      Se eliminarán los datos personales de <strong>{{ selectedUser.name }}</strong> (nombre, correo, teléfono, documento y foto)
       y no podrá volver a entrar. Sus alertas quedan en el historial sin sus datos.
     </p>
     <p class="confirm-sub">Por seguridad, <strong>otra administradora</strong> debe aprobarlo en Moderación.</p>

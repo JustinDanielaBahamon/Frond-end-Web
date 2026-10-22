@@ -35,7 +35,7 @@ export class AdminProfileComponent implements AfterViewInit {
 
   readonly user = toSignal(this.authService.currentUser$, { initialValue: null });
   readonly initials = computed(() =>
-    (this.user()?.nombre ?? '?').split(' ').filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join(''));
+    (this.user()?.name ?? '?').split(' ').filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join(''));
 
   readonly theme = this.themeService.currentTheme;
   readonly isDark = computed(() => this.theme() === 'dark');
@@ -106,13 +106,13 @@ export class AdminProfileComponent implements AfterViewInit {
   get fortaleza(): { level: number; text: string } {
     const c = this.password.newOne;
     if (!c) return { level: 0, text: '' };
-    let puntos = 0;
-    if (c.length >= 8) puntos++;
-    if (c.length >= 12) puntos++;
-    if (/[A-Z]/.test(c) && /[a-z]/.test(c)) puntos++;
-    if (/\d/.test(c)) puntos++;
-    if (/[^A-Za-z0-9]/.test(c)) puntos++;
-    const level = c.length < 8 ? 1 : Math.min(4, Math.max(1, puntos - 1));
+    let points = 0;
+    if (c.length >= 8) points++;
+    if (c.length >= 12) points++;
+    if (/[A-Z]/.test(c) && /[a-z]/.test(c)) points++;
+    if (/\d/.test(c)) points++;
+    if (/[^A-Za-z0-9]/.test(c)) points++;
+    const level = c.length < 8 ? 1 : Math.min(4, Math.max(1, points - 1));
     return { level, text: ['', 'Débil', 'Aceptable', 'Buena', 'Fuerte'][level] };
   }
 
@@ -172,7 +172,7 @@ export class AdminProfileComponent implements AfterViewInit {
         const yo = list.find((r) => r.email === email);
         if (!yo) return of(null);
         return this.auditService.list(
-          { actorId: yo.accountId, tipo: 'SESSION', action: '', from: '', to: '' }, 0, 6);
+          { actorId: yo.accountId, type: 'SESSION', action: '', from: '', to: '' }, 0, 6);
       })
     ).subscribe({
       next: (p) => {

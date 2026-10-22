@@ -18,16 +18,16 @@ const RESEND_WAIT = 60; // el backend acepta un código por minuto
 export class VerifyCodeComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private passwordService = inject(PasswordService);
-  private estado = inject(RecoveryStateService);
+  private status = inject(RecoveryStateService);
 
-  readonly email = this.estado.email;
-  codigo = signal<string[]>(Array(DIGITS).fill(''));
+  readonly email = this.status.email;
+  code = signal<string[]>(Array(DIGITS).fill(''));
   remainingTime = signal(RESEND_WAIT);
   verifying = signal(false);
   error = signal<string | null>(null);
   notice = signal<string | null>(null);
 
-  readonly fullCode = computed(() => this.codigo().every((x) => x !== ''));
+  readonly fullCode = computed(() => this.code().every((x) => x !== ''));
   readonly canResend = computed(() => this.remainingTime() === 0);
   readonly formattedTime = computed(() => {
     const t = this.remainingTime();
@@ -64,16 +64,16 @@ export class VerifyCodeComponent implements OnInit, OnDestroy {
       return;
     }
     input.value = digits;
-    this.codigo.update((c) => c.map((x, i) => (i === index ? digits : x)));
+    this.code.update((c) => c.map((x, i) => (i === index ? digits : x)));
     if (digits && input.nextElementSibling instanceof HTMLInputElement) {
       input.nextElementSibling.focus();
     }
   }
 
   private distribute(digits: string, from: number) {
-    this.codigo.update((c) => c.map((x, i) => (i >= from && i - from < digits.length ? digits[i - from] : x)));
+    this.code.update((c) => c.map((x, i) => (i >= from && i - from < digits.length ? digits[i - from] : x)));
     const checkboxes = document.querySelectorAll<HTMLInputElement>('.code-input');
-    checkboxes.forEach((el, i) => (el.value = this.codigo()[i]));
+    checkboxes.forEach((el, i) => (el.value = this.code()[i]));
     checkboxes[Math.min(from + digits.length, DIGITS) - 1]?.focus();
   }
 
@@ -105,7 +105,7 @@ export class VerifyCodeComponent implements OnInit, OnDestroy {
     this.error.set(null);
     this.passwordService.requestCode(email).subscribe({
       next: () => {
-        this.codigo.set(Array(DIGITS).fill(''));
+        this.code.set(Array(DIGITS).fill(''));
         this.notice.set('Te enviamos un código nuevo. El anterior ya no sirve.');
         this.startTimer();
       },
@@ -115,14 +115,14 @@ export class VerifyCodeComponent implements OnInit, OnDestroy {
 
   verifyCode() {
     const email = this.email();
-    const codigo = this.codigo().join('');
+    const code = this.code().join('');
     if (!email || !this.fullCode() || this.verifying()) return;
     this.verifying.set(true);
     this.error.set(null);
-    this.passwordService.verifyCode(email, codigo).subscribe({
+    this.passwordService.verifyCode(email, code).subscribe({
       next: () => {
         this.verifying.set(false);
-        this.estado.codigo.set(codigo);
+        this.status.code.set(code);
         this.router.navigate(['/auth/reset-password']);
       },
       error: (e) => {

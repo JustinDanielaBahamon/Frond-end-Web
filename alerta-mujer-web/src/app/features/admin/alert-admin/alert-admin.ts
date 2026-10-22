@@ -67,7 +67,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   waitingZoneClick = false;
 
   newZone = {
-    nombre: '',
+    name: '',
     level: 'Alto' as 'Alto' | 'Medio' | 'Bajo',
     lat: 0,
     lng: 0,
@@ -88,7 +88,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   ];
 
   // ── Modal punto CAI/Hospital ──────────────────────────────────
-  newPoint: { tipo: PointType; nombre: string; lat: number; lng: number } = { tipo: 'police_post', nombre: '', lat: 0, lng: 0 };
+  newPoint: { type: PointType; name: string; lat: number; lng: number } = { type: 'police_post', name: '', lat: 0, lng: 0 };
   waitingPointClick = false;
 
   // ── Datos — vienen vía API ─────────────────────
@@ -101,9 +101,9 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const term = this.alertSearch.trim().toLowerCase();
     this.filteredAlerts = this.alerts.filter(a => {
       const m = this.methodFilter  === 'Todos' || a.activationMethod === this.methodFilter;
-      const e = this.statusFilter === 'Todos' || a.estado          === this.statusFilter;
+      const e = this.statusFilter === 'Todos' || a.status          === this.statusFilter;
       // Búsqueda por nombre, descripción, lugar o número de alerta
-      const b = !term || [a.nombre, a.description, a.location, `#${a.id}`]
+      const b = !term || [a.name, a.description, a.location, `#${a.id}`]
         .some(t => (t ?? '').toString().toLowerCase().includes(term));
       return m && e && b;
     });
@@ -111,7 +111,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   // ── Getters ──────────────────────────────────────────────────
   get pendingAlerts(): number {
-    return this.alerts.filter(a => a.estado === 'Pendiente').length;
+    return this.alerts.filter(a => a.status === 'Pendiente').length;
   }
 
   get hotZones(): HotZone[] {
@@ -131,7 +131,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         const lng = nearby.reduce((s, b) => s + b.lng, 0) / nearby.length;
         const level: 'Alto' | 'Medio' | 'Bajo' =
           nearby.length >= 5 ? 'Alto' : nearby.length >= 3 ? 'Medio' : 'Bajo';
-        groups.push({ nombre: `Zona ${a.location}`, lat, lng, alerts: nearby.length, level });
+        groups.push({ name: `Zona ${a.location}`, lat, lng, alerts: nearby.length, level });
       }
     });
 
@@ -190,14 +190,14 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     forkJoin({
       alerts: this.alertsService.getAll(),
       zones: this.riskZonesService.getZones(),
-      puntos: this.riskZonesService.getPoints(),
+      points: this.riskZonesService.getPoints(),
     }).subscribe({
-      next: ({ alerts, zones, puntos }) => {
+      next: ({ alerts, zones, points }) => {
         // DEBUG: quítalo cuando ya veas bien los datos
 
         this.alerts = alerts;
         this.manualZones = countAlertsInZones(zones, alerts);
-        this.mapPoints = puntos;
+        this.mapPoints = points;
         this.filterAlerts();
 
         this.paintAlerts();
@@ -230,8 +230,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       if (!this.validCoords(a.lat, a.lng)) return;
 
       const marker = L.marker([a.lat, a.lng], {
-        icon: this.createPinIcon(a.activationMethod, a.estado === 'Atendida'),
-      }).bindTooltip(`${a.nombre}`);
+        icon: this.createPinIcon(a.activationMethod, a.status === 'Atendida'),
+      }).bindTooltip(`${a.name}`);
 
       marker.on('click', () => {
         this.selectAlert(a);
@@ -250,7 +250,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   private paintOnePoint(p: MapPoint): void {
     if (!this.validCoords(p.lat, p.lng)) return;
 
-    const { emoji, background, label, layer } = POINT_TYPES[p.tipo];
+    const { emoji, background, label, layer } = POINT_TYPES[p.type];
 
     const icon = L.divIcon({
       html: `<div style="width:30px;height:30px;border-radius:50%;background:${background};
@@ -261,7 +261,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       iconAnchor: [15, 15],
     });
 
-    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.nombre} · ${label}`);
+    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.name} · ${label}`);
     this.pointMarkers.push({ marker, layer });
 
     if (this.layers[layer]) marker.addTo(this.map);
@@ -337,7 +337,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
         this.detail = d;
         this.loadingDetail = false;
         // La dirección es la de la última ubicación conocida o, si no hay, la de la activación
-        const point = d.ultimaUbicacion ?? (d.ubicacionVisible && this.validCoords(alert.lat, alert.lng) ? alert : null);
+        const point = d.lastLocation ?? (d.locationVisible && this.validCoords(alert.lat, alert.lng) ? alert : null);
         if (point) {
           this.geocoding.get(point.lat, point.lng).then((l) => {
             if (this.activeAlert?.id !== alert.id || !l) return;
@@ -355,19 +355,19 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   }
 
   /** "Correo · enviado", "Push · falló"... */
-  channelText(channel: string, estado: string): string {
-    const nombre = channel === 'email' ? 'Correo' : channel === 'push' ? 'Notificación' : channel;
+  channelText(channel: string, status: string): string {
+    const name = channel === 'email' ? 'Correo' : channel === 'push' ? 'Notificación' : channel;
     const statuses: Record<string, string> = { sent: 'enviado', delivered: 'entregado', failed: 'falló', pending: 'pendiente' };
-    return `${nombre} · ${statuses[estado] ?? estado}`;
+    return `${name} · ${statuses[status] ?? status}`;
   }
 
-  howLongAgo(fecha: Date | null): string {
-    if (!fecha) return '—';
-    const min = Math.round((Date.now() - fecha.getTime()) / 60000);
+  howLongAgo(date: Date | null): string {
+    if (!date) return '—';
+    const min = Math.round((Date.now() - date.getTime()) / 60000);
     if (min < 1) return 'hace un momento';
     if (min < 60) return `hace ${min} min`;
     if (min < 1440) return `hace ${Math.floor(min / 60)} h`;
-    return fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
   }
 
   closePopup(): void {
@@ -375,11 +375,11 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   }
 
   attendAlert(alert: Alert): void {
-    if (alert.estado === 'Atendida') return;
+    if (alert.status === 'Atendida') return;
 
     this.alertsService.updateStatus(alert.id, 'Atendida').subscribe({
       next: () => {
-        alert.estado = 'Atendida';
+        alert.status = 'Atendida';
         this.alertMarkers.get(alert.id)
           ?.setIcon(this.createPinIcon(alert.activationMethod, true));
         this.filterAlerts();
@@ -451,7 +451,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   openZoneModal(mode: 'pin' | 'area' = 'area'): void {
     this.fabOpen = false;
     this.zoneMode = mode;
-    this.newZone = { nombre: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
+    this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
     this.waitingZoneClick = false;
     this.clearPreview();
     this.zoneModal = true;
@@ -475,12 +475,12 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.zoneModal = false;
     this.waitingZoneClick = false;
     this.clearPreview();
-    this.newZone = { nombre: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
+    this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
   }
 
   // ── Guardar zona vía API ────────────────────────────────────
   saveZone(): void {
-    if (!this.newZone.nombre || this.newZone.lat === 0) return;
+    if (!this.newZone.name || this.newZone.lat === 0) return;
 
     const tempZone = {
       centerLat: this.newZone.lat,
@@ -490,7 +490,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const alertsInZone = this.alerts.filter(a => isInsideZone(tempZone, a.lat, a.lng)).length;
 
     const payload: Omit<ManualZone, 'id'> = {
-      nombre: this.newZone.nombre,
+      name: this.newZone.name,
       level: this.newZone.level,
       method: this.zoneMode,
       radio: this.zoneMode === 'area' ? this.newZone.radio : undefined,
@@ -508,7 +508,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
         this.clearPreview();
         this.zoneModal = false;
-        this.newZone = { nombre: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
+        this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
         this.refresh();
       },
       error: (err) => console.error('Error guardando zona:', err)
@@ -520,7 +520,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const radio = z.alerts >= 5 ? 400 : z.alerts >= 3 ? 280 : 180;
 
     const payload: Omit<ManualZone, 'id'> = {
-      nombre: z.nombre,
+      name: z.name,
       level: z.level,
       method: 'area',
       radio,
@@ -559,18 +559,18 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   // ── CAI / Hospital ───────────────────────────────────────────
   addCaiPoint(): void {
     this.fabOpen = false;
-    this.newPoint = { tipo: 'police_post', nombre: '', lat: 0, lng: 0 };
+    this.newPoint = { type: 'police_post', name: '', lat: 0, lng: 0 };
     this.waitingPointClick = true;
     this.pointModal = true;
   }
 
   // ── Guardar punto vía API ────────────────────────────────────
   savePoint(): void {
-    if (!this.newPoint.nombre) return;
+    if (!this.newPoint.name) return;
 
     const payload: Omit<MapPoint, 'id'> = {
-      tipo: this.newPoint.tipo,
-      nombre: this.newPoint.nombre,
+      type: this.newPoint.type,
+      name: this.newPoint.name,
       lat: this.newPoint.lat || this.initialCenter[0],
       lng: this.newPoint.lng || this.initialCenter[1],
     };
@@ -600,14 +600,14 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     const color = this.colorByLevel(zone.level);
 
     const icon = L.divIcon({ html: this.createPinSvg(color), className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
-    const pin = L.marker([zone.centerLat, zone.centerLng], { icon }).bindTooltip(`⚠️ ${zone.nombre} (${zone.level})`);
+    const pin = L.marker([zone.centerLat, zone.centerLng], { icon }).bindTooltip(`⚠️ ${zone.name} (${zone.level})`);
 
     if (zone.method === 'area') {
       // El área lleva también el pin de peligro en su centro, para verla aunque el mapa esté alejado
       const circle = L.circle(
         [zone.centerLat, zone.centerLng],
         { radius: zone.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
-      ).bindTooltip(`${zone.nombre} (${zone.level})`);
+      ).bindTooltip(`${zone.name} (${zone.level})`);
       return L.layerGroup([circle, pin]).addTo(this.map);
     }
 

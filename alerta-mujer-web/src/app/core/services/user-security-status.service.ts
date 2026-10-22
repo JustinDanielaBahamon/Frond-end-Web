@@ -29,18 +29,18 @@ export class UserSecurityStatusService {
 
     return forkJoin({
       contacts: this.contactService.getByUser(user.id).pipe(catchError(() => of([]))),
-      celulares: this.deviceService.getMyDevices().pipe(catchError(() => of([]))),
+      phones: this.deviceService.getMyDevices().pipe(catchError(() => of([]))),
     }).pipe(
-      map(({ contacts, celulares }) => this.build(
+      map(({ contacts, phones }) => this.build(
         contacts.length,
         contacts.filter((c: { email?: string | null }) => !!c.email).length,
-        celulares.length,
-        celulares.some(d => !!d.fcmToken),
+        phones.length,
+        phones.some(d => !!d.fcmToken),
       ))
     );
   }
 
-  private build(contacts: number, withEmail: number, celulares: number, receivesAlerts: boolean): SecurityStatus {
+  private build(contacts: number, withEmail: number, phones: number, receivesAlerts: boolean): SecurityStatus {
     const requirements: SecurityRequirement[] = [
       {
         key: 'contactos',
@@ -59,8 +59,8 @@ export class UserSecurityStatusService {
       {
         key: 'celular',
         label: 'Celular vinculado',
-        met: celulares >= 1,
-        value: celulares ? `${celulares} celular${celulares !== 1 ? 'es' : ''}` : 'Sin vincular',
+        met: phones >= 1,
+        value: phones ? `${phones} celular${phones !== 1 ? 'es' : ''}` : 'Sin vincular',
         icon: 'ti-device-mobile',
       },
       {

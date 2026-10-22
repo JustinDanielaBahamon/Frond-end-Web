@@ -14,7 +14,7 @@ import { DatePicker } from '../../../shared/components/selector-fecha/selector-f
 
 // Campos extra que vienen en db.json; opcionales para no depender del modelo
 type AlertVM = Alert & {
-  nombre?: string;
+  name?: string;
   activationMethod?: string;
   created_at?: string;
   started_at?: string;
@@ -34,7 +34,7 @@ export interface HourBar {
 }
 
 export interface ChartBand {
-  nombre: string;
+  name: string;
   range: string;
   total: number;
   x: number;
@@ -44,7 +44,7 @@ export interface ChartBand {
 
 export interface IncidentZone {
   rank: number;
-  nombre: string;
+  name: string;
   address: string;
   searching: boolean;
   riskZone: string | null;
@@ -104,10 +104,10 @@ function trendSentence(current: number, previousCount: number, view: TrendView =
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
 const TIME_BANDS = [
-  { nombre: 'Madrugada', range: '0h – 5h', start: 0, end: 5 },
-  { nombre: 'Mañana', range: '6h – 11h', start: 6, end: 11 },
-  { nombre: 'Tarde', range: '12h – 17h', start: 12, end: 17 },
-  { nombre: 'Noche', range: '18h – 23h', start: 18, end: 23 },
+  { name: 'Madrugada', range: '0h – 5h', start: 0, end: 5 },
+  { name: 'Mañana', range: '6h – 11h', start: 6, end: 11 },
+  { name: 'Tarde', range: '12h – 17h', start: 12, end: 17 },
+  { name: 'Noche', range: '18h – 23h', start: 18, end: 23 },
 ];
 
 // Geometría del gráfico por hora (coincide con el viewBox 1000x275 del HTML)
@@ -258,7 +258,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   private statusOf(u: unknown): string | undefined {
-    return (u as { estado?: string }).estado;
+    return (u as { status?: string }).status;
   }
 
   // ── Filtros ────────────────────────────────────────────────────
@@ -339,7 +339,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // ── Stat cards ─────────────────────────────────────────────────
   private computeKpis(list: AlertVM[]): void {
     // "Pendientes ahora" ignora el periodo: una alerta sin atender sigue importando aunque sea vieja
-    const pending = this.all.filter(a => a.estado === 'Pendiente');
+    const pending = this.all.filter(a => a.status === 'Pendiente');
     this.pendingAlerts = pending.length;
 
     let masAntigua: AlertVM | null = null;
@@ -351,8 +351,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const time = (masAntigua as AlertVM | null)?.time;
     this.oldestPending = time ? `la más antigua: ${time.toLowerCase()}` : 'Sin pendientes';
 
-    this.attendedAlerts = list.filter(a => a.estado === 'Atendida').length;
-    this.cancelledAlerts = list.filter(a => a.estado === 'Cancelada').length;
+    this.attendedAlerts = list.filter(a => a.status === 'Atendida').length;
+    this.cancelledAlerts = list.filter(a => a.status === 'Cancelada').length;
     this.attendedPercentage = this.pct(this.attendedAlerts, list.length);
     this.cancelledPercentage = this.pct(this.cancelledAlerts, list.length);
   }
@@ -385,7 +385,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.chartBands = TIME_BANDS.map((f, i) => {
       const x = H_X0 + f.start * H_SLOT;
       const w = (f.end - f.start + 1) * H_SLOT;
-      return { nombre: f.nombre, range: f.range, total: totals[i], x, w, cx: x + w / 2 };
+      return { name: f.name, range: f.range, total: totals[i], x, w, cx: x + w / 2 };
     });
 
     this.hasHourData = total > 0;
@@ -408,14 +408,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const maxTot = Math.max(...totals);
     const risky = TIME_BANDS.filter((_, i) => totals[i] === maxTot);
     this.riskyBandText = risky.length === 1
-      ? `${risky[0].nombre} (${risky[0].range})`
-      : risky.map(f => f.nombre).join(' y ');
+      ? `${risky[0].name} (${risky[0].range})`
+      : risky.map(f => f.name).join(' y ');
     this.riskyBandDetail = `${maxTot} de ${total} alertas · ${this.pct(maxTot, total)}%`;
 
     // Franja más tranquila
     const minTot = Math.min(...totals);
     const calm = TIME_BANDS.filter((_, i) => totals[i] === minTot);
-    this.calmBandText = calm.map(f => f.nombre).join(' y ');
+    this.calmBandText = calm.map(f => f.name).join(' y ');
     this.calmBandDetail = `${minTot} ${plural(minTot)}${calm.length > 1 ? ' en cada una' : ''}`;
   }
 
@@ -446,10 +446,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const maxCount = top.length ? top[0].count : 1;
 
     this.incidentZones = top.map((z, i) => {
-      const riskZone = this.riskZones.find(zr => isInsideZone(zr, z.lat, z.lng))?.nombre ?? null;
+      const riskZone = this.riskZones.find(zr => isInsideZone(zr, z.lat, z.lng))?.name ?? null;
       return {
         rank: i + 1,
-        nombre: riskZone ?? `${z.lat.toFixed(4)}, ${z.lng.toFixed(4)}`,
+        name: riskZone ?? `${z.lat.toFixed(4)}, ${z.lng.toFixed(4)}`,
         address: '',
         searching: true,
         riskZone,
@@ -469,8 +469,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (version !== this.zonesVersion) return; // cambió el filtro mientras se consultaba
 
       if (place) {
-        const nombre = place.neighborhood ?? place.address ?? place.city;
-        if (nombre) z.nombre = nombre;
+        const name = place.neighborhood ?? place.address ?? place.city;
+        if (name) z.name = name;
         z.address = place.neighborhood
           ? (place.address ?? '')
           : (place.address ? (place.city ?? '') : '');
@@ -496,7 +496,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.alertMarker = L.circleMarker([a.lat, a.lng], {
       radius: 10, color: '#ffffff', weight: 3, fillColor: '#c026d3', fillOpacity: 1,
     })
-      .bindTooltip(`${this.escape(a.nombre ?? '')} · ${this.escape(a.time)}`)
+      .bindTooltip(`${this.escape(a.name ?? '')} · ${this.escape(a.time)}`)
       .addTo(this.map);
     this.alertMarker.openTooltip();
     this.map.flyTo([a.lat, a.lng], 17, { duration: 0.8 });
@@ -517,12 +517,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.pointsLayer.clearLayers();
-    const puntos: L.LatLngTuple[] = [];
+    const points: L.LatLngTuple[] = [];
 
     this.incidentZones.forEach((z, i) => {
       const selected = i === this.selectedZone;
       const color = i === 0 ? '#c026d3' : '#7c3aed';
-      puntos.push([z.lat, z.lng]);
+      points.push([z.lat, z.lng]);
       L.circleMarker([z.lat, z.lng], {
         radius: 9 + Math.min(z.count, 10) * 1.5,
         color: selected ? '#ffffff' : color,
@@ -530,16 +530,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         fillColor: color,
         fillOpacity: selected ? 0.95 : 0.55,
       })
-        .bindTooltip(`${this.escape(z.nombre)} · ${z.count}`)
+        .bindTooltip(`${this.escape(z.name)} · ${z.count}`)
         .on('click', () => this.selectZone(i))
         .addTo(this.pointsLayer);
     });
 
     setTimeout(() => this.map?.invalidateSize(), 0);
 
-    if (adjust && puntos.length) {
-      if (puntos.length === 1) this.map.setView(puntos[0], 15);
-      else this.map.fitBounds(L.latLngBounds(puntos).pad(0.25));
+    if (adjust && points.length) {
+      if (points.length === 1) this.map.setView(points[0], 15);
+      else this.map.fitBounds(L.latLngBounds(points).pad(0.25));
     }
   }
 
@@ -698,13 +698,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     // El backend las envía de la más reciente a la más antigua
     const base = this.statusFilter === 'Todas'
       ? this.periodList
-      : this.periodList.filter(a => a.estado === this.statusFilter);
+      : this.periodList.filter(a => a.status === this.statusFilter);
     this.recentAlerts = base.slice(0, 5);
   }
 
-  statusClass(estado: string): string {
-    if (estado === 'Atendida') return 'estado-badge--atendida';
-    if (estado === 'Cancelada') return 'estado-badge--cancelada';
+  statusClass(status: string): string {
+    if (status === 'Atendida') return 'estado-badge--atendida';
+    if (status === 'Cancelada') return 'estado-badge--cancelada';
     return 'estado-badge--pendiente';
   }
 }

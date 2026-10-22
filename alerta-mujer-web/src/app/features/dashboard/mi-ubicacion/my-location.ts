@@ -108,7 +108,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   searchingPlace = signal(false);
 
   // ── Ubicación del celular (última que envió la app móvil) ─
-  celular = signal<LocationEntry | null>(null);
+  phone = signal<LocationEntry | null>(null);
   phonePlace = signal<Place | null>(null);
   loadingPhone = signal(false);
   queriedPhone = signal(false);
@@ -242,7 +242,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.phoneError.set(false);
     this.phoneNotice.set(null);
     this.phoneLocationService.requestFromPhone().subscribe({
-      next: (r) => this.waitForResponse(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+      next: (r) => this.waitForResponse(new Date(r.requestedAt).getTime() - 5000, Date.now() + 20000),
       error: (e) => {
         // 409: sin celular con notificaciones o pedido muy seguido; igual se muestra el último punto
         this.phoneNotice.set(e?.error?.message ?? null);
@@ -282,14 +282,14 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   private applyPhone(loc: LocationEntry | null): void {
     this.loadingPhone.set(false);
     this.queriedPhone.set(true);
-    this.celular.set(loc);
+    this.phone.set(loc);
     if (!loc) return;
     this.setTab('mapa');
     this.follow.set(false);
     setTimeout(() => this.map?.flyTo([loc.lat, loc.lng], 17, { duration: 0.9 }), 150);
     this.phonePlace.set(null);
     this.geocoding.get(loc.lat, loc.lng).then((place) => {
-      if (this.celular()?.id === loc.id) this.phonePlace.set(place);
+      if (this.phone()?.id === loc.id) this.phonePlace.set(place);
     });
   }
 
@@ -361,7 +361,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private drawPhone(): void {
-    const loc = this.celular();
+    const loc = this.phone();
     const place = this.phonePlace();
     if (!this.map) return;
     this.phoneLayer.clearLayers();
@@ -386,19 +386,19 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routesLayer.clearLayers();
 
     for (const r of list) {
-      if (!r.puntos || r.puntos.length < 2) continue;
-      const latlngs = r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
+      if (!r.points || r.points.length < 2) continue;
+      const latlngs = r.points.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
       const color = ROUTE_COLORS[Math.max(0, all.findIndex((x) => x.id === r.id)) % ROUTE_COLORS.length];
-      const nombre = escapeHtml(r.customName ?? 'Recorrido');
+      const name = escapeHtml(r.customName ?? 'Recorrido');
 
       L.polyline(latlngs, { color, weight: r.important ? 5 : 4, opacity: 0.95, dashArray: r.important ? undefined : '8 8' })
-        .bindTooltip(`${r.important ? '★ ' : ''}${nombre}`, { sticky: true })
+        .bindTooltip(`${r.important ? '★ ' : ''}${name}`, { sticky: true })
         .addTo(this.routesLayer);
       L.circleMarker(latlngs[0], { radius: 6, color: '#fff', weight: 2, fillColor: '#6922c5', fillOpacity: 1 })
-        .bindPopup(`<strong>${nombre}</strong><br>Inicio: ${escapeHtml(r.startNeighborhood)}`)
+        .bindPopup(`<strong>${name}</strong><br>Inicio: ${escapeHtml(r.startNeighborhood)}`)
         .addTo(this.routesLayer);
       L.circleMarker(latlngs[latlngs.length - 1], { radius: 6, color: '#fff', weight: 2, fillColor: '#c026d3', fillOpacity: 1 })
-        .bindPopup(`<strong>${nombre}</strong><br>Destino: ${escapeHtml(r.endNeighborhood)}`)
+        .bindPopup(`<strong>${name}</strong><br>Destino: ${escapeHtml(r.endNeighborhood)}`)
         .addTo(this.routesLayer);
     }
   }

@@ -12,7 +12,7 @@ describe('ReproductorContinuoComponent', () => {
     await TestBed.configureTestingModule({ imports: [ContinuousPlayerComponent] }).compileComponents();
     fixture = TestBed.createComponent(ContinuousPlayerComponent);
     c = fixture.componentInstance;
-    c.tipo = 'video';
+    c.type = 'video';
     c.parts = [part(1), part(2), part(3)];
     c.ngOnChanges({ partes: new SimpleChange(undefined, c.parts, true) });
   });

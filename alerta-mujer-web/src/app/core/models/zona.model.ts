@@ -1,6 +1,6 @@
 export interface ManualZone {
   id: number;
-  nombre: string;
+  name: string;
   level: 'Alto' | 'Medio' | 'Bajo';
   method: 'pin' | 'area';
   radio?: number;
@@ -10,7 +10,7 @@ export interface ManualZone {
 }
 
 export interface HotZone {
-  nombre: string;
+  name: string;
   lat: number;
   lng: number;
   alerts: number;
@@ -37,8 +37,8 @@ export const POINT_TYPES: Record<PointType, { label: string; emoji: string; back
 
 export interface MapPoint {
   id: number;
-  tipo: PointType;
-  nombre: string;
+  type: PointType;
+  name: string;
   lat: number;
   lng: number;
 }

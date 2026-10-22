@@ -53,7 +53,7 @@
         <div class="alertas-list">
           <div *ngFor="let alert of filteredAlerts" class="alerta-card"
             [class.alerta-card--active]="activeAlert?.id === alert.id"
-            [class.alerta-card--atendida]="alert.estado === 'Atendida'" (click)="selectAlert(alert)">
+            [class.alerta-card--atendida]="alert.status === 'Atendida'" (click)="selectAlert(alert)">
             <div class="alerta-icon" [ngClass]="'alerta-icon--' + methodClass(alert.activationMethod)">
               <!-- Botón de pánico -->
               <svg *ngIf="alert.activationMethod === 'Botón de pánico'" width="16" height="16" viewBox="0 0 24 24"
@@ -90,7 +90,7 @@
 
             <div class="alerta-info">
               <div class="alerta-top">
-                <span class="alerta-nombre">{{ alert.nombre }}</span>
+                <span class="alerta-nombre">{{ alert.name }}</span>
                 <span class="alerta-tiempo">{{ alert.time }}</span>
               </div>
               <span class="alerta-desc">{{ alert.description }}</span>
@@ -103,8 +103,8 @@
               </div>
             </div>
 
-            <button class="btn-atender" [class.btn-atender--done]="alert.estado === 'Atendida'"
-              (click)="$event.stopPropagation(); attendAlert(alert)">{{ alert.estado === 'Atendida' ? '✓' :
+            <button class="btn-atender" [class.btn-atender--done]="alert.status === 'Atendida'"
+              (click)="$event.stopPropagation(); attendAlert(alert)">{{ alert.status === 'Atendida' ? '✓' :
               'Atender' }}</button>
           </div>
 
@@ -146,7 +146,7 @@
           <div class="zona-auto-card" *ngFor="let z of hotZones" (click)="goToZone(z.lat, z.lng)">
             <div class="zona-auto__nivel" [ngClass]="'nivel--' + z.level.toLowerCase()">{{ z.level }}</div>
             <div class="zona-auto__info">
-              <span class="zona-auto__nombre">{{ z.nombre }}</span>
+              <span class="zona-auto__nombre">{{ z.name }}</span>
               <span class="zona-auto__alertas">{{ z.alerts }} alertas en esta área</span>
             </div>
             <!-- BOTÓN: marcar directamente esta zona caliente en el mapa -->
@@ -184,7 +184,7 @@
                 <!-- Ícono según método -->
                 <span class="zona-metodo-icon" *ngIf="z.method === 'pin'">📍</span>
                 <span class="zona-metodo-icon" *ngIf="z.method === 'area'">⭕</span>
-                <span class="zona-manual__nombre">{{ z.nombre }}</span>
+                <span class="zona-manual__nombre">{{ z.name }}</span>
               </div>
               <span class="zona-nivel-badge" [ngClass]="'nivel-badge--' + z.level.toLowerCase()">{{ z.level }}</span>
             </div>
@@ -319,7 +319,7 @@
         <div class="mapa-popup__tipo" [ngClass]="'popup-tipo--' + methodClass(activeAlert.activationMethod)">
           {{ activeAlert.activationMethod }}
         </div>
-        <div class="mapa-popup__nombre">{{ activeAlert.nombre }}</div>
+        <div class="mapa-popup__nombre">{{ activeAlert.name }}</div>
         <div class="mapa-popup__desc">{{ activeAlert.description }}</div>
         <div class="mapa-popup__row">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -343,20 +343,20 @@
             <div class="mapa-popup__dato" *ngIf="alertAddress">
               <span>Lugar</span><strong>{{ alertAddress }}</strong>
             </div>
-            <div class="mapa-popup__dato" *ngIf="d.ubicacionVisible; else withoutLocation">
+            <div class="mapa-popup__dato" *ngIf="d.locationVisible; else withoutLocation">
               <span>Última ubicación</span>
-              <strong>{{ d.ultimaUbicacion ? howLongAgo(d.ultimaUbicacion.time) : 'No envió ubicaciones' }}
-                <small *ngIf="d.puntos > 1"> · {{ d.puntos }} puntos</small></strong>
+              <strong>{{ d.lastLocation ? howLongAgo(d.lastLocation.time) : 'No envió ubicaciones' }}
+                <small *ngIf="d.points > 1"> · {{ d.points }} puntos</small></strong>
             </div>
             <ng-template #withoutLocation>
               <p class="mapa-popup__nota">Alerta cancelada o vencida: su ubicación no se muestra.</p>
             </ng-template>
-            <div class="mapa-popup__envios" *ngIf="d.envios.length; else withoutDeliveries">
+            <div class="mapa-popup__envios" *ngIf="d.deliveries.length; else withoutDeliveries">
               <span>Avisos a contactos</span>
-              <div class="mapa-popup__envio" *ngFor="let e of d.envios">
-                <em>Contacto {{ e.contacto }}<ng-container *ngIf="e.relationship"> ({{ e.relationship }})</ng-container></em>
-                <span *ngFor="let c of e.channels" class="envio-chip" [class.envio-chip--ok]="c.estado === 'sent' || c.estado === 'delivered'"
-                      [class.envio-chip--fallo]="c.estado === 'failed'">{{ channelText(c.channel, c.estado) }}</span>
+              <div class="mapa-popup__envio" *ngFor="let e of d.deliveries">
+                <em>Contacto {{ e.contact }}<ng-container *ngIf="e.relationship"> ({{ e.relationship }})</ng-container></em>
+                <span *ngFor="let c of e.channels" class="envio-chip" [class.envio-chip--ok]="c.status === 'sent' || c.status === 'delivered'"
+                      [class.envio-chip--fallo]="c.status === 'failed'">{{ channelText(c.channel, c.status) }}</span>
               </div>
             </div>
             <ng-template #withoutDeliveries>
@@ -366,7 +366,7 @@
         </div>
 
         <button class="mapa-popup__atender" (click)="attendAlert(activeAlert)">
-          {{ activeAlert.estado === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' }}
+          {{ activeAlert.status === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' }}
         </button>
       </div>
 
@@ -380,7 +380,7 @@
 <!-- Mientras se elige el lugar en el mapa el modal se oculta: su fondo tapaba el mapa y el clic no llegaba -->
 <app-modal
   *ngIf="zoneModal && !waitingZoneClick"
-  tamano="zona"
+  size="zona"
   [title]="zoneMode === 'pin' ? '📍 Pin de zona peligrosa' : '⭕ Área de riesgo'"
   (close)="cancelZoneModal()">
 
@@ -464,7 +464,7 @@
       <div class="form-step__num">{{ zoneMode === 'area' ? '4' : '3' }}</div>
       <div class="form-step__content">
         <p class="form-step__label">Nombre</p>
-        <input class="form-input" type="text" [(ngModel)]="newZone.nombre"
+        <input class="form-input" type="text" [(ngModel)]="newZone.name"
           placeholder="{{ zoneMode === 'pin' ? 'Ej: Esquina calle 13' : 'Ej: Sector La Candelaria' }}" />
       </div>
     </div>
@@ -473,7 +473,7 @@
 
   <div modal-footer>
     <button class="btn-secondary" (click)="cancelZoneModal()">Cancelar</button>
-    <button class="btn-primary" [disabled]="!newZone.nombre || newZone.lat === 0" (click)="saveZone()">
+    <button class="btn-primary" [disabled]="!newZone.name || newZone.lat === 0" (click)="saveZone()">
       Guardar zona
     </button>
   </div>
@@ -485,20 +485,20 @@
      ══════════════════════════════════════════════════════ -->
 <app-modal
   *ngIf="pointModal && !waitingPointClick"
-  titulo="Agregar punto de apoyo"
+  title="Agregar punto de apoyo"
   (close)="pointModal = false">
 
   <div modal-body>
     <div class="form-group">
       <label class="form-label">Tipo</label>
       <div class="nivel-options nivel-options--tipos">
-        <button *ngFor="let t of pointTypes" class="nivel-btn" [class.nivel-btn--active]="newPoint.tipo === t[0]"
-          (click)="newPoint.tipo = t[0]">{{ t[1].emoji }} {{ t[1].label }}</button>
+        <button *ngFor="let t of pointTypes" class="nivel-btn" [class.nivel-btn--active]="newPoint.type === t[0]"
+          (click)="newPoint.type = t[0]">{{ t[1].emoji }} {{ t[1].label }}</button>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Nombre</label>
-      <input class="form-input" type="text" [(ngModel)]="newPoint.nombre" placeholder="Ej: CAI Centro" />
+      <input class="form-input" type="text" [(ngModel)]="newPoint.name" placeholder="Ej: CAI Centro" />
     </div>
     <button class="btn-click-mapa" (click)="waitingPointClick = true">
       📍 {{ newPoint.lat !== 0 ? 'Cambiar la ubicación en el mapa' : 'Elegir la ubicación en el mapa' }}

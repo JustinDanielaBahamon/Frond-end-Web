@@ -18,10 +18,10 @@ interface FilterChip {
 }
 
 interface ZoneForm {
-  nombre: string;
+  name: string;
   city: string;
-  tipo: ZoneType;
-  estado: ZoneStatus;
+  type: ZoneType;
+  status: ZoneStatus;
   lat: number | null;
   lng: number | null;
   radio: number;
@@ -93,9 +93,9 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
   // ── Estadísticas ─────────────────────────────────────────────
   get totalZones()       { return this.allZones.length; }
-  get highRiskZones()  { return this.allZones.filter(z => z.tipo === 'Riesgo Alto').length; }
-  get safeZones()     { return this.allZones.filter(z => z.tipo === 'Segura').length; }
-  get zonesInReview()  { return this.allZones.filter(z => z.estado === 'Revisión').length; }
+  get highRiskZones()  { return this.allZones.filter(z => z.type === 'Riesgo Alto').length; }
+  get safeZones()     { return this.allZones.filter(z => z.type === 'Segura').length; }
+  get zonesInReview()  { return this.allZones.filter(z => z.status === 'Revisión').length; }
 
   // ── Texto de paginación ──────────────────────────────────────
   get from(): number {
@@ -108,7 +108,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
   // ── Formulario ───────────────────────────────────────────────
   get formValid(): boolean {
-    const dataOk = this.form.nombre.trim().length > 0 && this.form.city.trim().length > 0;
+    const dataOk = this.form.name.trim().length > 0 && this.form.city.trim().length > 0;
     // Al crear, la ubicación en el mapa es obligatoria. Al editar es opcional
     // (las zonas antiguas todavía no tienen coordenadas).
     const locationOk = this.modal === 'editar' || this.form.lat !== null;
@@ -157,13 +157,13 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(z =>
-        z.nombre.toLowerCase().includes(term) ||
+        z.name.toLowerCase().includes(term) ||
         z.city.toLowerCase().includes(term)
       );
     }
 
     if (this.typeFilter !== 'Todas') {
-      result = result.filter(z => z.tipo === this.typeFilter);
+      result = result.filter(z => z.type === this.typeFilter);
     }
 
     this.totalFiltered = result.length;
@@ -240,10 +240,10 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     this.errorForm = '';
 
     const base: Omit<Zone, 'id' | 'alerts'> = {
-      nombre: this.form.nombre.trim(),
+      name: this.form.name.trim(),
       city: this.form.city.trim(),
-      tipo: this.form.tipo,
-      estado: this.form.estado,
+      type: this.form.type,
+      status: this.form.status,
       updated_at: new Date().toISOString(),
       ...(this.formHasLocation
         ? { lat: this.form.lat as number, lng: this.form.lng as number, radio: this.form.radio }
@@ -293,7 +293,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
   // ── Acciones: eliminar ───────────────────────────────────────
   deleteZone(z: Zone): void {
-    if (!confirm(`¿Eliminar la zona "${z.nombre}"?`)) return;
+    if (!confirm(`¿Eliminar la zona "${z.name}"?`)) return;
 
     this.zonesService.delete(z.id).subscribe({
       next: () => {
@@ -306,13 +306,13 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   }
 
   // ── Formulario: cambios de campos ────────────────────────────
-  setType(tipo: ZoneType): void {
-    this.form.tipo = tipo;
+  setType(type: ZoneType): void {
+    this.form.type = type;
     this.drawZone(); // cambia el color en el mapa
   }
 
-  setStatus(estado: ZoneStatus): void {
-    this.form.estado = estado;
+  setStatus(status: ZoneStatus): void {
+    this.form.status = status;
   }
 
   setRadio(radio: number | string): void {
@@ -389,7 +389,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     if (!this.formHasLocation) return;
 
     const point: [number, number] = [this.form.lat as number, this.form.lng as number];
-    const color = this.colorByType(this.form.tipo);
+    const color = this.colorByType(this.form.type);
 
     const circle = L.circle(point, {
       radius: this.form.radio, color, fillColor: color, fillOpacity: 0.2, weight: 2,
@@ -409,27 +409,27 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
     this.zoneLayer = null;
   }
 
-  private colorByType(tipo: ZoneType): string {
+  private colorByType(type: ZoneType): string {
     const map: Record<ZoneType, string> = {
       'Riesgo Alto':  '#d946ef',
       'Riesgo Medio': '#c084fc',
       'Riesgo Bajo':  '#a855f7',
       'Segura':       '#8b5cf6',
     };
-    return map[tipo] ?? '#8b5cf6';
+    return map[type] ?? '#8b5cf6';
   }
 
   // ── Helpers internos del formulario ──────────────────────────
   private emptyForm(): ZoneForm {
-    return { nombre: '', city: '', tipo: 'Riesgo Alto', estado: 'Activa', lat: null, lng: null, radio: 300 };
+    return { name: '', city: '', type: 'Riesgo Alto', status: 'Activa', lat: null, lng: null, radio: 300 };
   }
 
   private formFromZone(z: Zone): ZoneForm {
     return {
-      nombre: z.nombre,
+      name: z.name,
       city: z.city,
-      tipo: z.tipo,
-      estado: z.estado,
+      type: z.type,
+      status: z.status,
       lat: Number.isFinite(z.lat) ? (z.lat as number) : null,
       lng: Number.isFinite(z.lng) ? (z.lng as number) : null,
       radio: z.radio ?? 300,
@@ -442,43 +442,43 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   }
 
   // ── Helpers de estilo ────────────────────────────────────────
-  getAvatarClass(tipo: ZoneType): string {
+  getAvatarClass(type: ZoneType): string {
     const map: Record<ZoneType, string> = {
       'Riesgo Alto':  'red',
       'Riesgo Medio': 'yellow',
       'Riesgo Bajo':  'orange',
       'Segura':       'green',
     };
-    return map[tipo] ?? '';
+    return map[type] ?? '';
   }
 
-  getBadgeClass(tipo: ZoneType): string {
+  getBadgeClass(type: ZoneType): string {
     const map: Record<ZoneType, string> = {
       'Riesgo Alto':  'badge-red',
       'Riesgo Medio': 'badge-yellow',
       'Riesgo Bajo':  'badge-orange',
       'Segura':       'badge-green',
     };
-    return map[tipo] ?? '';
+    return map[type] ?? '';
   }
 
-  getStatusClass(estado: ZoneStatus): string {
+  getStatusClass(status: ZoneStatus): string {
     const map: Record<ZoneStatus, string> = {
       'Activa':   'active',
       'Revisión': 'review',
       'Inactiva': 'inactive',
     };
-    return map[estado] ?? '';
+    return map[status] ?? '';
   }
 
   // "Hace 2 horas", "Hace 1 día", etc. a partir de la fecha ISO
   relativeTime(iso: string): string {
-    const minutos = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+    const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
 
-    if (minutos < 1)  return 'Hace un momento';
-    if (minutos < 60) return `Hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+    if (minutes < 1)  return 'Hace un momento';
+    if (minutes < 60) return `Hace ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
 
-    const hours = Math.floor(minutos / 60);
+    const hours = Math.floor(minutes / 60);
     if (hours < 24) return `Hace ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
 
     const days = Math.floor(hours / 24);

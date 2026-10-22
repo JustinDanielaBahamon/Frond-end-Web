@@ -49,11 +49,11 @@
         <label class="ug-field">
           <span class="ug-label">Nombre *</span>
           <input class="ug-input" type="text" maxlength="100" placeholder="Ej: Casa de mi mamá"
-                 [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+                 [ngModel]="name()" (ngModelChange)="name.set($event)" />
         </label>
         <div class="ug-quick">
           @for (n of quickNames; track n) {
-            <button class="ug-quick-chip" [class.active]="nombre() === n" (click)="nombre.set(n)">{{ n }}</button>
+            <button class="ug-quick-chip" [class.active]="name() === n" (click)="name.set(n)">{{ n }}</button>
           }
         </div>
 

@@ -69,7 +69,7 @@ export class AdminLayoutComponent implements OnInit {
     // Perfil que se muestra abajo del sidebar (antes faltaba el [user], por eso no aparecía)
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user
-        ? { name: user.nombre, email: user.email }
+        ? { name: user.name, email: user.email }
         : null;
     });
 
@@ -96,13 +96,13 @@ export class AdminLayoutComponent implements OnInit {
         if (!alerts) return;
 
         this.notifications.set(alerts
-          .filter((a) => a.estado === 'Pendiente')
+          .filter((a) => a.status === 'Pendiente')
           .sort((a, b) => Number(b.id) - Number(a.id))
           .slice(0, 20)
           .map((a) => ({
             id: a.id,
             title: `Alerta pendiente — ${a.activationMethod}`,
-            message: a.location ? `${a.nombre} · ${a.location}` : a.nombre,
+            message: a.location ? `${a.name} · ${a.location}` : a.name,
             time: a.time,
             route: '/admin/alertas',
           })));

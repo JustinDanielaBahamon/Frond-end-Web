@@ -42,8 +42,8 @@
           <div class="ac__icono"><i class="ti" [class.ti-urgent]="a.active" [class.ti-history]="!a.active" aria-hidden="true"></i></div>
           <div class="ac__info">
             <p class="ac__nombre">
-              <strong>{{ a.nombre }}</strong>
-              {{ a.active ? 'activó una alerta de emergencia' : (a.estado === 'cancelled' ? 'canceló su alerta' : 'tuvo una alerta') }}
+              <strong>{{ a.name }}</strong>
+              {{ a.active ? 'activó una alerta de emergencia' : (a.status === 'cancelled' ? 'canceló su alerta' : 'tuvo una alerta') }}
             </p>
             <p class="ac__fecha">
               {{ a.start | date: 'd MMM y, h:mm a' }}

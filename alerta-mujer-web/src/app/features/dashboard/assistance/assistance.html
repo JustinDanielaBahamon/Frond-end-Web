@@ -63,16 +63,16 @@
           <header class="as-line-head">
             <span class="as-line-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r.category }" /></span>
             <div class="as-line-titles">
-              <h2>{{ r.nombre }}</h2>
+              <h2>{{ r.name }}</h2>
               <span>{{ categories[r.category].label }} · {{ r.city }}</span>
             </div>
           </header>
           @if (r.description) {
             <p class="as-line-desc">{{ r.description }}</p>
           }
-          <div class="as-line-number">{{ r.telefono }}</div>
+          <div class="as-line-number">{{ r.telephone }}</div>
           <div class="as-line-actions">
-            <button class="as-btn as-btn--ghost" (click)="copy(r.telefono!)" [attr.aria-label]="'Copiar número de ' + r.nombre">Copiar número</button>
+            <button class="as-btn as-btn--ghost" (click)="copy(r.telephone!)" [attr.aria-label]="'Copiar número de ' + r.name">Copiar número</button>
           </div>
           @if (r.telephone2) {
             <p class="as-line-desc">Otro número: {{ r.telephone2 }}</p>
@@ -116,7 +116,7 @@
             <button class="as-item-main" (click)="viewOnMap(r)">
               <span class="as-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r.category }" /></span>
               <span class="as-item-text">
-                <span class="as-item-name">{{ r.nombre }}</span>
+                <span class="as-item-name">{{ r.name }}</span>
                 <span class="as-item-type">{{ categories[r.category].label }}{{ distanceFormat(r) ? ' · a ' + distanceFormat(r) : '' }}</span>
                 @if (r.description) { <span class="as-item-meta">{{ r.description }}</span> }
                 <span class="as-item-meta">{{ r.address ? r.address + ', ' : '' }}{{ r.city }}</span>
@@ -124,8 +124,8 @@
             </button>
             <div class="as-item-actions">
               <a class="as-btn as-btn--ghost as-btn--sm" [href]="directions(r)" target="_blank" rel="noopener">Cómo llegar</a>
-              @if (r.telefono) {
-                <span class="as-item-meta">Tel. {{ r.telefono }}</span>
+              @if (r.telephone) {
+                <span class="as-item-meta">Tel. {{ r.telephone }}</span>
               }
             </div>
           </li>
@@ -149,8 +149,8 @@
         <li class="as-call" [style.--cat]="r ? categories[r.category].color : null">
           <span class="as-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: r?.category ?? 'linea' }" /></span>
           <span class="as-item-text">
-            <span class="as-item-name">{{ r?.nombre ?? 'Recurso eliminado' }}</span>
-            <span class="as-item-meta">{{ l.telefono }} · {{ fecha(l.fecha) }} · {{ estado(l.estado) }}</span>
+            <span class="as-item-name">{{ r?.name ?? 'Recurso eliminado' }}</span>
+            <span class="as-item-meta">{{ l.telephone }} · {{ date(l.date) }} · {{ status(l.status) }}</span>
           </span>
           <div class="as-item-actions">
             <button class="as-icon-btn" title="Borrar del historial" aria-label="Borrar del historial" (click)="deleteCall(l)">

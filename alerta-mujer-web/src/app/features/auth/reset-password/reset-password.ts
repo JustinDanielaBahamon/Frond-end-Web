@@ -17,9 +17,9 @@ import { RecoveryStateService } from '../../../core/services/recovery-state.serv
 export class ResetPasswordComponent implements OnInit {
   private router = inject(Router);
   private passwordService = inject(PasswordService);
-  private estado = inject(RecoveryStateService);
+  private status = inject(RecoveryStateService);
 
-  readonly email = this.estado.email;
+  readonly email = this.status.email;
   newOne = signal('');
   confirm = signal('');
   viewNew = signal(false);
@@ -32,22 +32,22 @@ export class ResetPasswordComponent implements OnInit {
   readonly canSave = computed(() => evaluatePassword(this.newOne()).valid && this.match() && !this.saving());
 
   ngOnInit(): void {
-    if (!this.estado.email() || !this.estado.codigo()) {
+    if (!this.status.email() || !this.status.code()) {
       this.router.navigate(['/auth/forgot-password']);
     }
   }
 
   save(): void {
-    const email = this.estado.email();
-    const codigo = this.estado.codigo();
-    if (!email || !codigo || !this.canSave()) return;
+    const email = this.status.email();
+    const code = this.status.code();
+    if (!email || !code || !this.canSave()) return;
     this.saving.set(true);
     this.error.set(null);
-    this.passwordService.reset(email, codigo, this.newOne()).subscribe({
+    this.passwordService.reset(email, code, this.newOne()).subscribe({
       next: () => {
         this.saving.set(false);
         this.ready.set(true);
-        this.estado.clear();
+        this.status.clear();
       },
       error: (e) => {
         this.saving.set(false);

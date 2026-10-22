@@ -83,7 +83,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
   editingId = signal<number | null>(null);
   choosingPoint = signal(false);
   point = signal<{ lat: number; lng: number } | null>(null);
-  nombre = signal('');
+  name = signal('');
   address = signal('');
   city = signal('');
   notes = signal('');
@@ -92,7 +92,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
   saving = signal(false);
   errorForm = signal('');
 
-  formValid = computed(() => !!this.point() && this.nombre().trim().length > 0);
+  formValid = computed(() => !!this.point() && this.name().trim().length > 0);
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user: any) => {
@@ -215,7 +215,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
     this.resetForm();
     this.editingId.set(u.id);
     this.point.set({ lat: u.lat, lng: u.lng });
-    this.nombre.set(u.name);
+    this.name.set(u.name);
     this.address.set(u.address ?? '');
     this.city.set(u.city ?? '');
     this.notes.set(u.notes ?? '');
@@ -267,7 +267,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
 
   save(): void {
     const p = this.point();
-    if (!p || !this.nombre().trim()) {
+    if (!p || !this.name().trim()) {
       this.errorForm.set(!p ? 'Elige el punto en el mapa o usa tu ubicación actual.' : 'Ponle un nombre a la ubicación.');
       return;
     }
@@ -275,7 +275,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
     this.errorForm.set('');
 
     const data: Partial<FrequentPlace> = {
-      name: this.nombre().trim(),
+      name: this.name().trim(),
       address: this.address().trim(),
       city: this.city().trim(),
       notes: this.notes().trim(),
@@ -319,7 +319,7 @@ export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy
     this.editingId.set(null);
     this.choosingPoint.set(false);
     this.point.set(null);
-    this.nombre.set('');
+    this.name.set('');
     this.address.set('');
     this.city.set('');
     this.notes.set('');

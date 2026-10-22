@@ -26,11 +26,11 @@
         <h2 class="za-card-title">¿Necesitas ayuda ya? Llama desde tu celular</h2>
         <div class="za-lines">
           @for (l of lines(); track l.key) {
-            <div class="za-line" [title]="l.description ?? l.nombre">
+            <div class="za-line" [title]="l.description ?? l.name">
               <span class="za-line-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: 'linea' }" /></span>
               <span class="za-line-text">
-                <strong>{{ l.telefono }}</strong>
-                <span>{{ l.nombre }}</span>
+                <strong>{{ l.telephone }}</strong>
+                <span>{{ l.name }}</span>
               </span>
             </div>
           }
@@ -53,7 +53,7 @@
             <div class="za-banner" [style.--cat]="categories[z.category].color">
               <strong>{{ z.category === 'riesgo' ? 'Precaución:' : 'Estás en:' }}</strong>
               {{ z.category === 'riesgo' ? 'estás dentro de la zona de riesgo' : categories[z.category].label.toLowerCase() }}
-              "{{ z.nombre }}".
+              "{{ z.name }}".
             </div>
           } @empty {
             <p class="za-muted">No estás dentro de ninguna zona registrada. La lista está ordenada de la más cercana a la más lejana.</p>
@@ -75,7 +75,7 @@
     <section class="za-card">
       <header class="za-card-header">
         <h2 class="za-card-title">Puntos de ayuda y zonas</h2>
-        <span class="za-chip">{{ puntos().length }}</span>
+        <span class="za-chip">{{ points().length }}</span>
       </header>
 
       <div class="za-search">
@@ -86,7 +86,7 @@
 
       <div class="za-filters">
         <button class="za-filter" [class.active]="filter() === null" (click)="filter.set(null)">
-          Todas <span>{{ puntos().length }}</span>
+          Todas <span>{{ points().length }}</span>
         </button>
         @for (c of categoryList; track c) {
           @if (count()[c] > 0) {
@@ -107,7 +107,7 @@
               <button class="za-item-main" (click)="viewOnMap(p)" [disabled]="p.lat == null" [title]="p.lat == null ? 'Sin ubicación en el mapa' : 'Ver en el mapa'">
                 <span class="za-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: p.category }" /></span>
                 <span class="za-item-text">
-                  <span class="za-item-name">{{ p.nombre }}</span>
+                  <span class="za-item-name">{{ p.name }}</span>
                   <span class="za-item-type">{{ categories[p.category].label }}{{ distanceFormat(p) ? ' · a ' + distanceFormat(p) : '' }}</span>
                   @if (p.address || p.city) {
                     <span class="za-item-meta">{{ p.address }}{{ p.address && p.city ? ', ' : '' }}{{ p.city }}</span>
@@ -117,10 +117,10 @@
                   }
                 </span>
               </button>
-              @if (p.telefono) {
-                <span class="za-call" [attr.aria-label]="'Teléfono de ' + p.nombre">
+              @if (p.telephone) {
+                <span class="za-call" [attr.aria-label]="'Teléfono de ' + p.name">
                   <ng-container *ngTemplateOutlet="icon; context: { $implicit: 'linea' }" />
-                  {{ p.telefono }}
+                  {{ p.telephone }}
                 </span>
               }
             </li>

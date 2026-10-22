@@ -24,7 +24,7 @@ interface DeviceDetail {
   subtitle: string;
   icon: string;
   rows: { label: string; value: string }[];
-  nota?: string;
+  note?: string;
   /** Color del encabezado en los resultados de las pruebas. */
   tone?: 'ok' | 'aviso' | 'error';
   /** url: enlace externo; ruta: pantalla de esta misma web (se abre aquí, sin pestaña nueva). */
@@ -80,13 +80,13 @@ export class Device implements OnInit, OnDestroy {
 
   /** Permisos del celular usado más recientemente, tal como los informó la app. */
   phonePermissions = computed(() => {
-    const celular = [...this.myPhones()]
+    const phone = [...this.myPhones()]
       .filter((d) => !!d.permissions)
       .sort((a, b) => (b.permissionsUpdatedAt ?? '').localeCompare(a.permissionsUpdatedAt ?? ''))[0];
-    if (!celular?.permissions) return null;
+    if (!phone?.permissions) return null;
     let data: Record<string, boolean>;
     try {
-      data = JSON.parse(celular.permissions);
+      data = JSON.parse(phone.permissions);
     } catch {
       return null;
     }
@@ -94,18 +94,18 @@ export class Device implements OnInit, OnDestroy {
     return {
       list,
       missing: list.filter((p) => !p.granted).length,
-      celular: this.phoneName(celular),
-      updated: celular.permissionsUpdatedAt
-        ? new Date(celular.permissionsUpdatedAt).toLocaleString('es-CO', SHORT_DATE)
+      phone: this.phoneName(phone),
+      updated: phone.permissionsUpdatedAt
+        ? new Date(phone.permissionsUpdatedAt).toLocaleString('es-CO', SHORT_DATE)
         : 'sin fecha',
     };
   });
 
   /** Celular usado más recientemente: de él se toma la ubicación del día a día. */
   principalId = computed(() => {
-    const celulares = this.myPhones().filter((d) => d.osName !== 'web');
-    if (celulares.length === 0) return null;
-    return [...celulares].sort((a, b) => (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0].id;
+    const phones = this.myPhones().filter((d) => d.osName !== 'web');
+    if (phones.length === 0) return null;
+    return [...phones].sort((a, b) => (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0].id;
   });
 
   /** Tiempo que le queda a la sesión de la web ("5 h 20 min"). */
@@ -160,10 +160,10 @@ export class Device implements OnInit, OnDestroy {
       this.sessionExpiring.set(true);
       return;
     }
-    const minutos = Math.floor(ms / 60000);
-    const hours = Math.floor(minutos / 60);
-    this.sessionRemaining.set(hours > 0 ? `${hours} h ${minutos % 60} min` : `${minutos} min`);
-    this.sessionExpiring.set(minutos < 60);
+    const minutes = Math.floor(ms / 60000);
+    const hours = Math.floor(minutes / 60);
+    this.sessionRemaining.set(hours > 0 ? `${hours} h ${minutes % 60} min` : `${minutes} min`);
+    this.sessionExpiring.set(minutes < 60);
   }
 
   private loadServices(): void {
@@ -237,7 +237,7 @@ export class Device implements OnInit, OnDestroy {
           emergencyContactsCount: contacts ? contacts.length : null
         });
         if (latest && latest !== FAILED) this.resolveAddress(latest);
-        this.ultimaUbicacion = latest && latest !== FAILED ? latest : null;
+        this.lastLocation = latest && latest !== FAILED ? latest : null;
         return contacts !== null && devices !== null && latest !== FAILED;
       }),
       finalize(() => this.featuresLoading.set(false)),
@@ -246,7 +246,7 @@ export class Device implements OnInit, OnDestroy {
   }
 
   /** Última ubicación que envió la app del celular (no la del computador). */
-  private ultimaUbicacion: LocationEntry | null = null;
+  private lastLocation: LocationEntry | null = null;
   private lastAddress: string | null = null;
 
   private locationDate(entry: LocationEntry): string {
@@ -279,8 +279,8 @@ export class Device implements OnInit, OnDestroy {
 
   phoneName(d: UserDevice): string {
     if (d.deviceName) return d.deviceName;
-    const nombre = [d.brand, d.model].filter(Boolean).join(' ');
-    return nombre || 'Celular sin nombre';
+    const name = [d.brand, d.model].filter(Boolean).join(' ');
+    return name || 'Celular sin nombre';
   }
 
   /** "Chrome 130 en Linux" */
@@ -290,7 +290,7 @@ export class Device implements OnInit, OnDestroy {
   }
 
   openPhone(d: UserDevice): void {
-    const fecha = (iso?: string | null) => iso
+    const date = (iso?: string | null) => iso
       ? new Date(iso).toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
       : 'Sin registro';
     this.detail.set({
@@ -306,10 +306,10 @@ export class Device implements OnInit, OnDestroy {
         { label: 'Recibe alertas (push)', value: d.fcmToken ? 'Sí' : 'No' },
         { label: 'GPS', value: GPS_STATUSES[d.gpsStatus] ?? d.gpsStatus },
         { label: 'Estado', value: DEVICE_STATUSES[d.status] ?? d.status },
-        { label: 'Última conexión', value: fecha(d.lastAccess) },
-        { label: 'Vinculado desde', value: fecha(d.createdAt) },
+        { label: 'Última conexión', value: date(d.lastAccess) },
+        { label: 'Vinculado desde', value: date(d.createdAt) },
       ],
-      nota: d.model === 'Dispositivo Expo'
+      note: d.model === 'Dispositivo Expo'
         ? 'Este celular se registró con una versión anterior de la app. Sus datos se completan la próxima vez que abras la app actualizada.'
         : undefined,
     });
@@ -333,7 +333,7 @@ export class Device implements OnInit, OnDestroy {
         { label: 'Zona horaria', value: i?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone },
         { label: 'Conexión', value: `${this.isOnline() ? 'En línea' : 'Sin conexión'} · ${this.connectionQuality()}` },
       ],
-      nota: 'El computador solo sirve para consultar tu información. Las alertas se activan y se reciben en el celular con la app.',
+      note: 'El computador solo sirve para consultar tu información. Las alertas se activan y se reciben en el celular con la app.',
     });
   }
 
@@ -410,14 +410,14 @@ export class Device implements OnInit, OnDestroy {
   }
 
   viewMobileLocation(): void {
-    const u = this.ultimaUbicacion;
+    const u = this.lastLocation;
     if (!u) {
       this.showResult({
         title: 'Sin ubicación del celular',
         subtitle: 'La app todavía no ha enviado tu ubicación',
         icon: 'ti-map-pin-off',
         tone: 'aviso',
-        nota: 'Abre AlertaMujer en tu celular con la ubicación activada y vuelve a intentarlo.',
+        note: 'Abre AlertaMujer en tu celular con la ubicación activada y vuelve a intentarlo.',
       });
       return;
     }
@@ -436,15 +436,15 @@ export class Device implements OnInit, OnDestroy {
   }
 
   testPhoneAlerts(): void {
-    const celulares = this.myPhones();
-    const conPush = celulares.filter((d) => !!d.fcmToken);
-    if (celulares.length === 0) {
+    const phones = this.myPhones();
+    const conPush = phones.filter((d) => !!d.fcmToken);
+    if (phones.length === 0) {
       this.showResult({
         title: 'No tienes un celular vinculado',
         subtitle: 'Las alertas se reciben en la app del celular',
         icon: 'ti-device-mobile-off',
         tone: 'aviso',
-        nota: 'Instala AlertaMujer en tu celular e inicia sesión con esta cuenta.',
+        note: 'Instala AlertaMujer en tu celular e inicia sesión con esta cuenta.',
       });
       return;
     }
@@ -458,8 +458,8 @@ export class Device implements OnInit, OnDestroy {
         : 'Si un contacto activa una alerta, no te llegará al celular',
       icon: ok ? 'ti-bell-check' : 'ti-bell-off',
       tone: ok ? 'ok' : 'error',
-      rows: celulares.map((d) => ({ label: this.phoneName(d), value: d.fcmToken ? 'Recibe alertas' : 'No recibe alertas' })),
-      nota: ok ? undefined : 'Abre la app en tu celular y permite las notificaciones cuando te lo pida.',
+      rows: phones.map((d) => ({ label: this.phoneName(d), value: d.fcmToken ? 'Recibe alertas' : 'No recibe alertas' })),
+      note: ok ? undefined : 'Abre la app en tu celular y permite las notificaciones cuando te lo pida.',
     });
   }
 
@@ -493,7 +493,7 @@ export class Device implements OnInit, OnDestroy {
               subtitle: 'No te llegarán avisos en este computador',
               icon: 'ti-bell-off',
               tone: 'aviso',
-              nota: 'Toca el candado junto a la dirección de la página, busca «Notificaciones» y elige «Permitir».',
+              note: 'Toca el candado junto a la dirección de la página, busca «Notificaciones» y elige «Permitir».',
             });
             this.addActivityLog('warning', 'Avisos del computador bloqueados');
           }
@@ -519,7 +519,7 @@ export class Device implements OnInit, OnDestroy {
             icon: 'ti-wifi',
             tone: 'ok',
             rows: [{ label: 'Tiempo de respuesta', value: `${seconds} s` }],
-            nota: duration > 10000 ? 'El servidor estaba en reposo y tardó en despertar.' : undefined,
+            note: duration > 10000 ? 'El servidor estaba en reposo y tardó en despertar.' : undefined,
           });
           this.addActivityLog('success', `Conexión con el servidor correcta (${seconds} s)`);
         } else {
@@ -539,7 +539,7 @@ export class Device implements OnInit, OnDestroy {
           subtitle: navigator.onLine ? 'Tu internet funciona, pero el servidor no contestó' : 'Revisa tu conexión a internet',
           icon: 'ti-wifi-off',
           tone: 'error',
-          nota: navigator.onLine ? 'Si estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.' : undefined,
+          note: navigator.onLine ? 'Si estaba en reposo puede tardar hasta 3 minutos en despertar: intenta de nuevo en un momento.' : undefined,
         });
         this.addActivityLog('error', 'No hubo conexión con el servidor');
       })
@@ -576,7 +576,7 @@ export class Device implements OnInit, OnDestroy {
             subtitle: 'El servidor no respondió a tiempo',
             icon: 'ti-refresh-alert',
             tone: 'aviso',
-            nota: 'Intenta de nuevo en un momento.',
+            note: 'Intenta de nuevo en un momento.',
           });
           this.addActivityLog('warning', 'Sincronización incompleta: el servidor no respondió');
         }

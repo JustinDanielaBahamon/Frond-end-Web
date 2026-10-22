@@ -26,10 +26,10 @@ interface AdminEvidenceApi {
   alertLongitude: number | null;
 }
 
-const TYPE_FROM_API: Record<string, Evidence['tipo']> = {
+const TYPE_FROM_API: Record<string, Evidence['type']> = {
   photo: 'foto', video: 'video', audio: 'audio', document: 'documento',
 };
-const STATUS_FROM_API: Record<string, Evidence['estado']> = {
+const STATUS_FROM_API: Record<string, Evidence['status']> = {
   pending: 'Pendiente', verified: 'Verificada', rejected: 'Rechazada',
 };
 const ALERT_STATUS: Record<string, string> = {
@@ -58,25 +58,25 @@ function fromApi(e: AdminEvidenceApi): Evidence {
     userId: e.userId ?? 0,
     userName: e.userName ?? 'Sin usuaria',
     userEmail: e.userEmail ?? '',
-    tipo: TYPE_FROM_API[e.mediaType] ?? 'documento',
-    nombre: e.fileName ?? `evidencia-${e.id}`,
+    type: TYPE_FROM_API[e.mediaType] ?? 'documento',
+    name: e.fileName ?? `evidencia-${e.id}`,
     size: readableSize(e.sizeBytes),
-    fecha: e.createdAt ?? '',
+    date: e.createdAt ?? '',
     time: time(e.createdAt),
-    alertaId: String(e.alertId),
+    alertId: String(e.alertId),
     alertType: 'Alerta SOS',
     alertCity: '',
-    estado: STATUS_FROM_API[e.reviewStatus] ?? 'Pendiente',
+    status: STATUS_FROM_API[e.reviewStatus] ?? 'Pendiente',
     location,
     activationMethod: method,
     linkedAlert: {
       id: String(e.alertId),
-      tipo: 'Alerta SOS',
-      fecha: e.alertStartedAt ?? '',
+      type: 'Alerta SOS',
+      date: e.alertStartedAt ?? '',
       time: time(e.alertStartedAt),
       city: '',
       location,
-      estado: ALERT_STATUS[e.alertStatus ?? ''] ?? (e.alertStatus ?? ''),
+      status: ALERT_STATUS[e.alertStatus ?? ''] ?? (e.alertStatus ?? ''),
       description: e.alertMessage ?? undefined,
       activationMethod: method,
     },
@@ -153,9 +153,9 @@ export class EvidenceService {
   private computeStats(): EvidenceStats {
     const evidences = this.evidencesSubject.value;
     const total = evidences.length;
-    const verified = evidences.filter(e => e.estado === 'Verificada').length;
-    const pending = evidences.filter(e => e.estado === 'Pendiente').length;
-    const rejected = evidences.filter(e => e.estado === 'Rechazada').length;
+    const verified = evidences.filter(e => e.status === 'Verificada').length;
+    const pending = evidences.filter(e => e.status === 'Pendiente').length;
+    const rejected = evidences.filter(e => e.status === 'Rechazada').length;
     
     return {
       totalEvidenceCount: total,
@@ -202,44 +202,44 @@ export class EvidenceService {
       const searchLower = filters.search.toLowerCase().trim();
       filteredEvidences = filteredEvidences.filter(evidence => {
         return (
-          evidence.nombre.toLowerCase().includes(searchLower) ||
-          evidence.alertaId.toLowerCase().includes(searchLower) ||
+          evidence.name.toLowerCase().includes(searchLower) ||
+          evidence.alertId.toLowerCase().includes(searchLower) ||
           evidence.userName.toLowerCase().includes(searchLower) ||
           evidence.userEmail.toLowerCase().includes(searchLower) ||
           evidence.alertType.toLowerCase().includes(searchLower) ||
           evidence.alertCity.toLowerCase().includes(searchLower) ||
           (evidence.location && evidence.location.toLowerCase().includes(searchLower)) ||
-          evidence.tipo.toLowerCase().includes(searchLower) ||
-          evidence.estado.toLowerCase().includes(searchLower) ||
+          evidence.type.toLowerCase().includes(searchLower) ||
+          evidence.status.toLowerCase().includes(searchLower) ||
           evidence.size.toLowerCase().includes(searchLower)
         );
       });
     }
 
     // Filtro por tipo
-    if (filters.tipo && filters.tipo !== 'all') {
+    if (filters.type && filters.type !== 'all') {
       filteredEvidences = filteredEvidences.filter(evidence =>
-        evidence.tipo === filters.tipo
+        evidence.type === filters.type
       );
     }
 
     // Filtro por estado
-    if (filters.estado && filters.estado !== 'all') {
+    if (filters.status && filters.status !== 'all') {
       filteredEvidences = filteredEvidences.filter(evidence =>
-        evidence.estado === filters.estado
+        evidence.status === filters.status
       );
     }
 
     // Filtro por rango de fechas
     if (filters.startDate) {
       filteredEvidences = filteredEvidences.filter(evidence =>
-        new Date(evidence.fecha) >= filters.startDate!
+        new Date(evidence.date) >= filters.startDate!
       );
     }
 
     if (filters.endDate) {
       filteredEvidences = filteredEvidences.filter(evidence =>
-        new Date(evidence.fecha) <= filters.endDate!
+        new Date(evidence.date) <= filters.endDate!
       );
     }
 

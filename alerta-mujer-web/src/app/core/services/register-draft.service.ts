@@ -16,7 +16,7 @@ export class RegisterDraftService {
   privacyRead = false;
 
   /* Estado de las casillas */
-  aceptaTerminos = false;
+  acceptsTerms = false;
   acceptsPrivacy = false;
 
   /* Se llama cuando el registro termina bien */
@@ -24,7 +24,7 @@ export class RegisterDraftService {
     this.values = null;
     this.termsRead = false;
     this.privacyRead = false;
-    this.aceptaTerminos = false;
+    this.acceptsTerms = false;
     this.acceptsPrivacy = false;
   }
 }

@@ -7,10 +7,10 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class RecoveryStateService {
   readonly email = signal<string | null>(null);
-  readonly codigo = signal<string | null>(null);
+  readonly code = signal<string | null>(null);
 
   clear(): void {
     this.email.set(null);
-    this.codigo.set(null);
+    this.code.set(null);
   }
 }

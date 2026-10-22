@@ -63,7 +63,7 @@ export class Evidence implements OnInit, OnDestroy {
   notice = signal('');
 
   /** Alerta elegida en la lista: solo se muestran sus evidencias. */
-  alertaId = signal<number | null>(null);
+  alertId = signal<number | null>(null);
   searchAlert = signal('');
   onlyWithEvidence = signal(true);
   filter = signal<Filter>('todas');
@@ -80,7 +80,7 @@ export class Evidence implements OnInit, OnDestroy {
   private files: Record<number, string> = {};
 
   // ── Grabación completa (partes seguidas) ───────
-  continua = signal<{ tipo: 'video' | 'audio'; parts: RecordingPart[] } | null>(null);
+  continua = signal<{ type: 'video' | 'audio'; parts: RecordingPart[] } | null>(null);
   loadingContinuous = signal(false);
   private createdUrls = new Set<string>();
 
@@ -110,8 +110,8 @@ export class Evidence implements OnInit, OnDestroy {
     for (const e of this.evidences()) {
       if (!known.has(e.alertId) && e.alert) {
         known.set(e.alertId, {
-          id: e.alertId, estado: e.alert.estado, method: e.alert.method,
-          start: e.alert.start ?? e.fecha, lat: e.alert.lat, lng: e.alert.lng, keep: false,
+          id: e.alertId, status: e.alert.status, method: e.alert.method,
+          start: e.alert.start ?? e.date, lat: e.alert.lat, lng: e.alert.lng, keep: false,
         });
       }
     }
@@ -123,20 +123,20 @@ export class Evidence implements OnInit, OnDestroy {
   filteredAlerts = computed(() => {
     const term = this.searchAlert().trim().toLowerCase();
     return this.alertList().filter((a) => {
-      if (this.onlyWithEvidence() && a.count === 0 && a.id !== this.alertaId()) return false;
+      if (this.onlyWithEvidence() && a.count === 0 && a.id !== this.alertId()) return false;
       if (!term) return true;
-      return [this.longDate(a.start), this.estado(a.estado), this.addresses()[a.id] ?? '', `#${a.id}`]
+      return [this.longDate(a.start), this.status(a.status), this.addresses()[a.id] ?? '', `#${a.id}`]
         .some((t) => t.toLowerCase().includes(term));
     });
   });
 
-  currentAlert = computed(() => this.alertList().find((a) => a.id === this.alertaId()) ?? null);
+  currentAlert = computed(() => this.alertList().find((a) => a.id === this.alertId()) ?? null);
 
-  private ofTheAlert = computed(() => this.evidences().filter((e) => e.alertId === this.alertaId()));
+  private ofTheAlert = computed(() => this.evidences().filter((e) => e.alertId === this.alertId()));
 
   count = computed(() => {
     const c = { photo: 0, video: 0, audio: 0, document: 0 } as Record<EvidenceType, number>;
-    for (const e of this.ofTheAlert()) c[e.tipo]++;
+    for (const e of this.ofTheAlert()) c[e.type]++;
     return c;
   });
 
@@ -146,8 +146,8 @@ export class Evidence implements OnInit, OnDestroy {
   filtered = computed(() => {
     const filter = this.filter();
     return this.ofTheAlert()
-      .filter((e) => filter === 'todas' || e.tipo === filter)
-      .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+      .filter((e) => filter === 'todas' || e.type === filter)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
   });
 
   ngOnInit(): void {
@@ -186,7 +186,7 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   chooseAlert(id: number): void {
-    this.alertaId.set(id);
+    this.alertId.set(id);
     this.continua.set(null);
     this.filter.set('todas');
     this.closeEdit();
@@ -197,7 +197,7 @@ export class Evidence implements OnInit, OnDestroy {
       this.urlVisor.set(null);
     }
     this.filtered()
-      .filter((e) => e.tipo === 'photo' && e.hasFile)
+      .filter((e) => e.type === 'photo' && e.hasFile)
       .forEach((e) => this.loadThumbnail(e));
     this.resolveAddresses();
   }
@@ -226,23 +226,23 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   /** Descarga todas las partes de un tipo y las muestra en el reproductor continuo. */
-  showContinuous(tipo: 'video' | 'audio'): void {
+  showContinuous(type: 'video' | 'audio'): void {
     const parts = this.ofTheAlert()
-      .filter((e) => e.tipo === tipo && e.hasFile)
-      .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+      .filter((e) => e.type === type && e.hasFile)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
     if (parts.length === 0) return;
     this.selected.set(null);
     this.closeEdit();
     this.loadingContinuous.set(true);
-    const alert = this.alertaId();
+    const alert = this.alertId();
     forkJoin(parts.map((e) => this.service.file(e.id))).subscribe({
       next: (blobs) => {
-        if (this.alertaId() !== alert) return;
+        if (this.alertId() !== alert) return;
         this.continua.set({
-          tipo,
+          type,
           parts: parts.map((e, i) => {
             this.files[e.id] ??= this.createUrl(blobs[i]);
-            return { id: e.id, url: this.files[e.id], created: e.fecha };
+            return { id: e.id, url: this.files[e.id], created: e.date };
           }),
         });
         this.loadingContinuous.set(false);
@@ -273,7 +273,7 @@ export class Evidence implements OnInit, OnDestroy {
       next: (blob) => {
         if (this.selected()?.id !== e.id) return;
         const url = this.createUrl(blob);
-        if (e.tipo === 'photo') this.thumbnails.update((m) => ({ ...m, [e.id]: url }));
+        if (e.type === 'photo') this.thumbnails.update((m) => ({ ...m, [e.id]: url }));
         this.urlVisor.set(url);
         this.loadingViewer.set(false);
       },
@@ -324,7 +324,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   /** Fecha en que se borrará la evidencia (si su alerta no está marcada para conservar). */
   deletionDate(e: MyEvidence): Date {
-    return new Date(e.fecha.getTime() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
+    return new Date(e.date.getTime() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
   }
 
   toggleKeep(alert: AlertWithEvidence): void {
@@ -359,10 +359,10 @@ export class Evidence implements OnInit, OnDestroy {
   }
 
   saveName(e: MyEvidence): void {
-    const nombre = this.newName().trim();
-    if (!nombre || this.savingName()) return;
+    const name = this.newName().trim();
+    if (!name || this.savingName()) return;
     this.savingName.set(true);
-    this.service.rename(e.id, nombre).subscribe({
+    this.service.rename(e.id, name).subscribe({
       next: (updated) => {
         this.evidences.update((l) => l.map((x) => (x.id === e.id ? { ...x, fileName: updated.fileName } : x)));
         this.selected.set({ ...e, fileName: updated.fileName });
@@ -441,7 +441,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   upload(): void {
     const f = this.file();
-    const alertId = this.alertaId();
+    const alertId = this.alertId();
     if (!f || !alertId) return;
     this.progress.set(0);
     this.uploadError.set('');
@@ -488,7 +488,7 @@ export class Evidence implements OnInit, OnDestroy {
     return d ? d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }) : '';
   }
 
-  estado(s: string | undefined): string {
+  status(s: string | undefined): string {
     return s ? STATUSES[s] ?? s : '—';
   }
 

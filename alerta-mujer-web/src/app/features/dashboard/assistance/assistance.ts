@@ -59,7 +59,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   /** Zonas de auxilio del mapa del inicio (policía, centros de asistencia, puntos de ayuda). */
   helpZones = signal<HelpResource[]>([]);
   /** Todo lo que se puede mostrar en el mapa de centros. */
-  private puntos = computed(() => [...this.resources(), ...this.helpZones()]);
+  private points = computed(() => [...this.resources(), ...this.helpZones()]);
   calls = signal<RecordedCall[]>([]);
   loading = signal(true);
   error = signal('');
@@ -71,17 +71,17 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   myPosition = signal<{ lat: number; lng: number } | null>(null);
 
   /** Recursos a los que se puede llamar. */
-  lines = computed(() => this.resources().filter((r) => r.telefono));
+  lines = computed(() => this.resources().filter((r) => r.telephone));
 
   /** Recursos con ubicación, filtrados y ordenados por cercanía si se conoce. */
   centers = computed(() => {
     const term = this.search().trim().toLowerCase();
     const filter = this.filter();
-    const list = this.puntos().filter((r) => {
+    const list = this.points().filter((r) => {
       if (r.lat == null || r.lng == null) return false;
       if (filter && r.category !== filter) return false;
       if (!term) return true;
-      return [r.nombre, r.description, r.address, r.city, CATEGORIES[r.category].label]
+      return [r.name, r.description, r.address, r.city, CATEGORIES[r.category].label]
         .some((t) => (t ?? '').toLowerCase().includes(term));
     });
     if (!this.myPosition()) return list;
@@ -90,11 +90,11 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
 
   centerCount = computed(() => {
     const c = Object.fromEntries(this.categoryList.map((k) => [k, 0])) as Record<ResourceCategory, number>;
-    for (const r of this.puntos()) if (r.lat != null && r.lng != null) c[r.category]++;
+    for (const r of this.points()) if (r.lat != null && r.lng != null) c[r.category]++;
     return c;
   });
 
-  totalCenters = computed(() => this.puntos().filter((r) => r.lat != null && r.lng != null).length);
+  totalCenters = computed(() => this.points().filter((r) => r.lat != null && r.lng != null).length);
 
   ngOnInit(): void {
     this.service.getResources().subscribe({
@@ -220,7 +220,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
         icon: zoneIcon(r.category, color, active),
         zIndexOffset: active ? 500 : 0,
       })
-        .bindPopup(`<strong>${escapeHtml(r.nombre)}</strong><br><span style="color:${color};font-weight:700">${label}</span>`
+        .bindPopup(`<strong>${escapeHtml(r.name)}</strong><br><span style="color:${color};font-weight:700">${label}</span>`
           + (r.address ? `<br>${escapeHtml(r.address)}` : '') + `<br>${escapeHtml(r.city)}`)
         .on('click', () => this.selected.set(r.id))
         .addTo(this.layer);
@@ -245,11 +245,11 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Formato ────────────────────────────────────
-  estado(e: string): string {
+  status(e: string): string {
     return STATUSES[e] ?? e;
   }
 
-  fecha(d: Date): string {
+  date(d: Date): string {
     return d.toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
   }
 
@@ -275,10 +275,10 @@ function fromZone(z: NearbyZone): HelpResource | null {
   if (!category) return null; // las zonas de riesgo y seguras no son centros de atención
   return {
     id: -z.id,
-    nombre: z.name,
+    name: z.name,
     category,
     description: z.description ?? '',
-    telefono: null,
+    telephone: null,
     telephone2: null,
     email: null,
     address: z.address ?? null,

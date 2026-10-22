@@ -12,7 +12,7 @@ export interface GpsPoint {
 /** Recorrido tal como lo usa la UI (misma forma que en la app móvil). */
 export interface SavedRoute {
   id: number;
-  fecha: string;
+  date: string;
   estimatedTime: string;
   estimatedDistance: string;
   startNeighborhood: string;
@@ -20,7 +20,7 @@ export interface SavedRoute {
   municipality: string;
   department: string;
   country: string;
-  puntos: GpsPoint[];
+  points: GpsPoint[];
   pointCount: number;
   esManual: boolean;
   customName?: string;
@@ -28,10 +28,10 @@ export interface SavedRoute {
 }
 
 export interface NewRoute {
-  nombre: string;
+  name: string;
   start: string;
   end: string;
-  puntos: GpsPoint[];
+  points: GpsPoint[];
   distanceKm: number;
   estimatedMinutes: number;
   municipality?: string;
@@ -164,7 +164,7 @@ export class RoutesService {
     if (!Array.isArray(locales) || locales.length === 0) return;
 
     for (const r of locales) {
-      if (!r.puntos || r.puntos.length < 2) continue;
+      if (!r.points || r.points.length < 2) continue;
       try {
         await firstValueFrom(
           this.http.post(this.baseUrl, {
@@ -175,7 +175,7 @@ export class RoutesService {
             department: r.department,
             country: r.country,
             distanceKm: parseFloat(String(r.estimatedDistance ?? '')) || null,
-            points: r.puntos,
+            points: r.points,
             isManual: r.esManual ?? true,
           })
         );
@@ -189,7 +189,7 @@ export class RoutesService {
 
   private toApi(newOne: NewRoute): Partial<SavedRouteApi> {
     return {
-      name: newOne.nombre,
+      name: newOne.name,
       startLabel: newOne.start,
       endLabel: newOne.end,
       city: newOne.municipality,
@@ -197,7 +197,7 @@ export class RoutesService {
       country: newOne.country,
       distanceKm: Math.round(newOne.distanceKm * 100) / 100,
       estimatedMinutes: newOne.estimatedMinutes,
-      points: newOne.puntos,
+      points: newOne.points,
       isManual: true,
     };
   }
@@ -205,7 +205,7 @@ export class RoutesService {
   private fromApi(api: SavedRouteApi): SavedRoute {
     return {
       id: api.id,
-      fecha: api.createdAt,
+      date: api.createdAt,
       estimatedTime: formatMinutes(api.estimatedMinutes),
       estimatedDistance: api.distanceKm != null ? `${Number(api.distanceKm).toFixed(2)} km` : '—',
       startNeighborhood: api.startLabel ?? 'Inicio',
@@ -213,7 +213,7 @@ export class RoutesService {
       municipality: api.city ?? '',
       department: api.department ?? '',
       country: api.country ?? '',
-      puntos: api.points ?? [],
+      points: api.points ?? [],
       pointCount: api.points?.length ?? 0,
       esManual: api.isManual,
       customName: api.name,
@@ -230,8 +230,8 @@ export class RoutesService {
   }
 }
 
-function formatMinutes(minutos?: number): string {
-  if (minutos == null) return '—';
-  if (minutos < 60) return `${minutos} min`;
-  return `${Math.floor(minutos / 60)}h ${minutos % 60}min`;
+function formatMinutes(minutes?: number): string {
+  if (minutes == null) return '—';
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}min`;
 }

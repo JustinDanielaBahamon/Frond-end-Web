@@ -9,18 +9,18 @@ export type EvidenceType = 'photo' | 'video' | 'audio' | 'document';
 export interface MyEvidence {
   id: number;
   alertId: number;
-  tipo: EvidenceType;
+  type: EvidenceType;
   fileName: string;
   contentType: string;
   sizeBytes: number | null;
   sha256: string | null;
   hasFile: boolean;
-  fecha: Date;
+  date: Date;
   alert: {
     id: number;
-    tipo: string;
+    type: string;
     method: string;
-    estado: string;
+    status: string;
     start: Date | null;
     lat: number | null;
     lng: number | null;
@@ -29,7 +29,7 @@ export interface MyEvidence {
 
 export interface MyAlert {
   id: number;
-  estado: string;
+  status: string;
   method: string;
   start: Date;
   lat: number | null;
@@ -91,7 +91,7 @@ export class MyEvidenceService {
       }>>(`${environment.apiUrl}/api/alerts/me`)
       .pipe(map((l) => l.map((a) => ({
         id: a.id,
-        estado: a.status,
+        status: a.status,
         method: a.activationMethod,
         start: utcDate(a.startedAt)!,
         lat: a.latitude != null ? Number(a.latitude) : null,
@@ -108,8 +108,8 @@ export class MyEvidenceService {
   }
 
   /** Cambia el nombre que se muestra (el archivo y su huella no cambian). */
-  rename(id: number, nombre: string): Observable<MyEvidence> {
-    return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: nombre }).pipe(map(fromApi));
+  rename(id: number, name: string): Observable<MyEvidence> {
+    return this.http.patch<EvidenceViewApi>(`${this.url}/${id}/name`, { name: name }).pipe(map(fromApi));
   }
 
   fromApi = fromApi;
@@ -119,19 +119,19 @@ function fromApi(e: EvidenceViewApi): MyEvidence {
   return {
     id: e.id,
     alertId: e.alertId,
-    tipo: e.mediaType,
+    type: e.mediaType,
     fileName: e.fileName ?? `evidencia-${e.id}`,
     contentType: e.contentType ?? '',
     sizeBytes: e.sizeBytes,
     sha256: e.sha256,
     hasFile: e.hasFile,
-    fecha: utcDate(e.createdAt)!,
+    date: utcDate(e.createdAt)!,
     alert: e.alert
       ? {
           id: e.alert.id,
-          tipo: e.alert.alertType,
+          type: e.alert.alertType,
           method: e.alert.activationMethod,
-          estado: e.alert.status,
+          status: e.alert.status,
           start: utcDate(e.alert.startedAt),
           lat: e.alert.latitude != null ? Number(e.alert.latitude) : null,
           lng: e.alert.longitude != null ? Number(e.alert.longitude) : null,

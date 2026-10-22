@@ -21,7 +21,7 @@ export interface RecordingPart {
 })
 export class ContinuousPlayerComponent implements OnChanges {
   @Input({ required: true }) parts: RecordingPart[] = [];
-  @Input({ required: true }) tipo: 'video' | 'audio' = 'video';
+  @Input({ required: true }) type: 'video' | 'audio' = 'video';
 
   @ViewChild('medio') private method?: ElementRef<HTMLMediaElement>;
 
@@ -104,7 +104,7 @@ export class ContinuousPlayerComponent implements OnChanges {
     return Math.round(this.progress() * 100);
   }
 
-  minutos(seconds: number): string {
+  minutes(seconds: number): string {
     const m = Math.floor(seconds / 60);
     const s = Math.round(seconds % 60);
     return `${m}:${String(s).padStart(2, '0')}`;

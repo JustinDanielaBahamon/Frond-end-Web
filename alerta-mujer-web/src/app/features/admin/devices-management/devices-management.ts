@@ -70,12 +70,12 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     return permissions.filter((p) => p.ready).length;
   }
 
-  gpsText(estado?: string | null): string {
+  gpsText(status?: string | null): string {
     // Valores de identity.device.gps_status
     const texts: Record<string, string> = {
       active: 'Encendido', inactive: 'Apagado', denied: 'Sin permiso', unknown: 'Desconocido',
     };
-    return estado ? texts[estado] ?? estado : 'Sin informar';
+    return status ? texts[status] ?? status : 'Sin informar';
   }
 
   ngOnDestroy(): void {
@@ -127,7 +127,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     const filters = {
       search: this.searchTerm,
-      estado: this.filterStatus,
+      status: this.filterStatus,
       startDate: null,
       endDate: null
     };
@@ -340,20 +340,20 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
   }
 
-  selectStatus(estado: string, event: Event): void {
+  selectStatus(status: string, event: Event): void {
     event.stopPropagation();
-    this.filterStatus = estado;
+    this.filterStatus = status;
     this.isStatusDropdownOpen = false;
     this.applyFilters();
   }
 
-  getStatusLabel(estado: string): string {
-    switch (estado) {
+  getStatusLabel(status: string): string {
+    switch (status) {
       case 'all': return 'Todos los estados';
       case 'Activo': return 'Activo';
       case 'Inactivo': return 'Inactivo';
       case 'Bloqueado': return 'Bloqueado';
-      default: return estado;
+      default: return status;
     }
   }
 
@@ -363,10 +363,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.isEditTypeDropdownOpen = !this.isEditTypeDropdownOpen;
   }
 
-  selectEditType(tipo: string, event: Event): void {
+  selectEditType(type: string, event: Event): void {
     event.stopPropagation();
     if (this.selectedDevice) {
-      this.selectedDevice.type = tipo as 'Android';
+      this.selectedDevice.type = type as 'Android';
     }
     this.isEditTypeDropdownOpen = false;
   }
@@ -376,10 +376,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.isEditStatusDropdownOpen = !this.isEditStatusDropdownOpen;
   }
 
-  selectEditStatus(estado: string, event: Event): void {
+  selectEditStatus(status: string, event: Event): void {
     event.stopPropagation();
     if (this.selectedDevice) {
-      this.selectedDevice.status = estado as Device['status'];
+      this.selectedDevice.status = status as Device['status'];
     }
     this.isEditStatusDropdownOpen = false;
   }

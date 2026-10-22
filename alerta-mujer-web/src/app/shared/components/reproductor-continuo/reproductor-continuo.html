@@ -1,6 +1,6 @@
 @if (current(); as part) {
-  <div class="rc" [class.rc--audio]="tipo === 'audio'">
-    @if (tipo === 'video') {
+  <div class="rc" [class.rc--audio]="type === 'audio'">
+    @if (type === 'video') {
       <video #method [src]="part.url" controls playsinline preload="metadata"
              (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
              (pause)="onPause()" (ended)="onEnd()"></video>
@@ -28,7 +28,7 @@
         {{ part.created | date: 'h:mm:ss a' }}
       </span>
       @if (totalDuration(); as total) {
-        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' }}{{ minutos(total) }}</span>
+        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' }}{{ minutes(total) }}</span>
       }
     </p>
   </div>

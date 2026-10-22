@@ -23,6 +23,17 @@ interface AdminUserDto {
 
 /** Lo que se ha hecho con una cuenta (bloqueos, desbloqueos, solicitudes de eliminación). */
 export interface ModerationHistory {
+  date: string;
+  type: string;
+  adminName: string | null;
+  reason: string | null;
+  note: string | null;
+  caseId: number | null;
+  hasEvidence: boolean;
+}
+
+/** Moderation history as the backend sends it (JSON keys in Spanish). */
+interface ModerationHistoryApi {
   fecha: string;
   tipo: string;
   adminNombre: string | null;
@@ -77,8 +88,8 @@ export class UsersService {
     );
   }
 
-  updateStatus(id: string | number, estado: ManagedUser['estado']): Observable<ManagedUser> {
-    const accountStatus = this.mapStatusToApi(estado);
+  updateStatus(id: string | number, status: ManagedUser['status']): Observable<ManagedUser> {
+    const accountStatus = this.mapStatusToApi(status);
     return this.http.patch<AdminUserDto>(`${this.apiUrl}/api/admin/users/${id}`, { accountStatus }).pipe(
       map(dto => this.fromApi(dto))
     );
@@ -104,13 +115,13 @@ export class UsersService {
         const user = response.user;
         return {
           id: user.id.toString(),
-          nombre: `${user.firstName} ${user.lastName}`,
+          name: `${user.firstName} ${user.lastName}`,
           email: user.email,
-          telefono: user.telephone || '',
+          telephone: user.telephone || '',
           registeredAt: user.createdAt,
           alerts: 0,
           lastActivity: user.createdAt,
-          estado: 'Activa' as const,
+          status: 'Activa' as const,
           role: user.roleName || 'USER',
           avatarColor: this.generateAvatarColor(),
           first_name: user.firstName,
@@ -127,13 +138,13 @@ export class UsersService {
   private fromApi(dto: AdminUserDto): ManagedUser {
     return {
       id: dto.id.toString(),
-      nombre: `${dto.firstName} ${dto.lastName}`,
+      name: `${dto.firstName} ${dto.lastName}`,
       email: dto.email,
-      telefono: dto.telephone || '',
+      telephone: dto.telephone || '',
       registeredAt: dto.createdAt,
       alerts: dto.alertCount,
       lastActivity: dto.lastAccess || dto.createdAt,
-      estado: this.mapStatusFromApi(dto.accountStatus),
+      status: this.mapStatusFromApi(dto.accountStatus),
       role: dto.role || 'user',
       avatarColor: this.generateAvatarColor(),
       first_name: dto.firstName,
@@ -147,12 +158,12 @@ export class UsersService {
   private toApi(changes: Partial<ManagedUser> & Record<string, unknown>): Record<string, unknown> {
     const apiChanges: Record<string, unknown> = {};
 
-    if (changes['estado']) {
-      apiChanges['accountStatus'] = this.mapStatusToApi(changes['estado'] as ManagedUser['estado']);
+    if (changes['status']) {
+      apiChanges['accountStatus'] = this.mapStatusToApi(changes['status'] as ManagedUser['status']);
     }
-    if (changes['nombre']) {
+    if (changes['name']) {
       // Split nombre into firstName and lastName
-      const parts = (changes['nombre'] as string).split(' ');
+      const parts = (changes['name'] as string).split(' ');
       apiChanges['firstName'] = parts[0];
       apiChanges['lastName'] = parts.slice(1).join(' ') || parts[0];
     }
@@ -162,8 +173,8 @@ export class UsersService {
     if (changes['last_name']) {
       apiChanges['lastName'] = changes['last_name'];
     }
-    if (changes['telefono']) {
-      apiChanges['telephone'] = changes['telefono'];
+    if (changes['telephone']) {
+      apiChanges['telephone'] = changes['telephone'];
     }
     if (changes['email']) {
       apiChanges['email'] = changes['email'];
@@ -175,7 +186,7 @@ export class UsersService {
   /**
    * Map backend account status to frontend estado
    */
-  private mapStatusFromApi(accountStatus: string | null): ManagedUser['estado'] {
+  private mapStatusFromApi(accountStatus: string | null): ManagedUser['status'] {
     switch (accountStatus) {
       case 'active':
         return 'Activa';
@@ -191,8 +202,8 @@ export class UsersService {
   /**
    * Map frontend estado to backend account status
    */
-  private mapStatusToApi(estado: ManagedUser['estado']): string {
-    switch (estado) {
+  private mapStatusToApi(status: ManagedUser['status']): string {
+    switch (status) {
       case 'Activa':
         return 'active';
       case 'Inactiva':
@@ -213,36 +224,50 @@ export class UsersService {
   }
 
   // ── Moderación ───────────────────────────────────────────────
-  block(id: string | number, motivo: string, description: string, evidence: string | null): Observable<void> {
+  block(id: string | number, reason: string, description: string, evidence: string | null): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/block`, {
-      reason: motivo, description, evidence,
+      reason: reason, description, evidence,
     });
   }
 
-  unblock(id: string | number, nota: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/unblock`, { note: nota });
+  unblock(id: string | number, note: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/api/admin/users/${id}/unblock`, { note: note });
   }
 
   history(id: string | number): Observable<ModerationHistory[]> {
-    return this.http.get<ModerationHistory[]>(`${this.apiUrl}/api/admin/users/${id}/moderation-history`);
+    return this.http
+      .get<ModerationHistoryApi[]>(`${this.apiUrl}/api/admin/users/${id}/moderation-history`)
+      .pipe(
+        map((list) =>
+          list.map((h) => ({
+            date: h.fecha,
+            type: h.tipo,
+            adminName: h.adminNombre,
+            reason: h.motivo,
+            note: h.nota,
+            caseId: h.casoId,
+            hasEvidence: h.tieneEvidencia,
+          })),
+        ),
+      );
   }
 
-  caseEvidenceOf(casoId: number): Observable<string | null> {
-    return this.http.get<{ evidence: string } | null>(`${this.apiUrl}/api/admin/user-reports/${casoId}/evidence`)
+  caseEvidenceOf(caseId: number): Observable<string | null> {
+    return this.http.get<{ evidence: string } | null>(`${this.apiUrl}/api/admin/user-reports/${caseId}/evidence`)
       .pipe(map(r => r?.evidence ?? null));
   }
 
-  requestDeletion(id: string | number, motivo: string): Observable<DeletionRequest> {
-    return this.http.post<DeletionRequest>(`${this.apiUrl}/api/admin/users/${id}/deletion-requests`, { reason: motivo });
+  requestDeletion(id: string | number, reason: string): Observable<DeletionRequest> {
+    return this.http.post<DeletionRequest>(`${this.apiUrl}/api/admin/users/${id}/deletion-requests`, { reason: reason });
   }
 
   deletionRequests(): Observable<DeletionRequest[]> {
     return this.http.get<DeletionRequest[]>(`${this.apiUrl}/api/admin/deletion-requests`);
   }
 
-  decideDeletion(id: number, approve: boolean, nota: string): Observable<DeletionRequest> {
+  decideDeletion(id: number, approve: boolean, note: string): Observable<DeletionRequest> {
     return this.http.post<DeletionRequest>(
-      `${this.apiUrl}/api/admin/deletion-requests/${id}/${approve ? 'approve' : 'reject'}`, { note: nota });
+      `${this.apiUrl}/api/admin/deletion-requests/${id}/${approve ? 'approve' : 'reject'}`, { note: note });
   }
 
   /** Envía a la usuaria el correo con el código para crear una contraseña nueva. */
@@ -250,7 +275,7 @@ export class UsersService {
     return this.http.post<void>(`${this.apiUrl}/api/auth/forgot-password`, { email });
   }
 
-  celulares(): Observable<AdminPhone[]> {
+  phones(): Observable<AdminPhone[]> {
     return this.http.get<AdminPhone[]>(`${this.apiUrl}/api/devices`);
   }
 

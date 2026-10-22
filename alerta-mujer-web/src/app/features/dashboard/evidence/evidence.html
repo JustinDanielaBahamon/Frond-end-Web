@@ -56,8 +56,8 @@
         <ul class="ev-alertas" role="listbox" aria-label="Alertas">
           @for (a of filteredAlerts(); track a.id) {
             <li>
-              <button class="ev-alerta" role="option" [attr.aria-selected]="alertaId() === a.id"
-                      [class.ev-alerta--activa]="alertaId() === a.id" (click)="chooseAlert(a.id)">
+              <button class="ev-alerta" role="option" [attr.aria-selected]="alertId() === a.id"
+                      [class.ev-alerta--activa]="alertId() === a.id" (click)="chooseAlert(a.id)">
                 <span class="ev-alerta-fecha">
                   <strong>{{ a.start | date: 'd' }}</strong>
                   <small>{{ a.start | date: 'MMM' }}</small>
@@ -67,7 +67,7 @@
                   <span class="ev-alerta-lugar">{{ addresses()[a.id] || (a.lat != null ? 'Buscando la dirección…' : 'Sin ubicación') }}</span>
                 </span>
                 <span class="ev-alerta-meta">
-                  <span class="ev-chip ev-chip--{{ a.estado }}">{{ estado(a.estado) }}</span>
+                  <span class="ev-chip ev-chip--{{ a.status }}">{{ status(a.status) }}</span>
                   @if (a.keep) { <span class="ev-chip ev-chip--conservada" title="Evidencias conservadas">Conservada</span> }
                   <span class="ev-alerta-cantidad">{{ a.count }} {{ a.count === 1 ? 'archivo' : 'archivos' }}</span>
                 </span>
@@ -139,15 +139,15 @@
             <div class="ev-tiles">
               @for (e of filtered(); track e.id) {
                 <button class="ev-tile" [class.ev-tile--selected]="selected()?.id === e.id" (click)="show(e)" [title]="e.fileName">
-                  <span class="ev-thumb ev-thumb--{{ e.tipo }}">
+                  <span class="ev-thumb ev-thumb--{{ e.type }}">
                     @if (thumbnail(e); as src) {
                       <img [src]="src" alt="" />
                     } @else {
-                      <ng-container *ngTemplateOutlet="icon; context: { $implicit: e.tipo }" />
+                      <ng-container *ngTemplateOutlet="icon; context: { $implicit: e.type }" />
                     }
                   </span>
                   <span class="ev-tile-name">{{ e.fileName }}</span>
-                  <span class="ev-tile-meta">{{ types[e.tipo].label }} · {{ time(e.fecha) }}</span>
+                  <span class="ev-tile-meta">{{ types[e.type].label }} · {{ time(e.date) }}</span>
                 </button>
               } @empty {
                 <div class="ev-empty ev-empty--compacto">
@@ -167,12 +167,12 @@
         <p class="ev-muted">Juntando las partes de la grabación…</p>
       } @else if (continua(); as c) {
         <div class="ev-detail-head">
-          <h2 class="ev-detail-title">{{ c.tipo === 'video' ? 'Video completo' : 'Audio completo' }} · {{ c.parts.length }} partes</h2>
+          <h2 class="ev-detail-title">{{ c.type === 'video' ? 'Video completo' : 'Audio completo' }} · {{ c.parts.length }} partes</h2>
         </div>
-        <app-reproductor-continuo [tipo]="c.tipo" [parts]="c.parts" />
+        <app-reproductor-continuo [type]="c.type" [parts]="c.parts" />
         <p class="ev-muted">Para descargar o ver la huella de una parte, elígela en la lista.</p>
       } @else if (selected(); as e) {
-        <div class="ev-viewer ev-viewer--{{ e.tipo }}">
+        <div class="ev-viewer ev-viewer--{{ e.type }}">
           @if (loadingViewer()) {
             <p class="ev-muted">Cargando archivo…</p>
           } @else if (errorVisor()) {
@@ -180,7 +180,7 @@
           } @else if (!e.hasFile) {
             <p class="ev-muted">Esta evidencia no tiene un archivo guardado en el servidor.</p>
           } @else if (urlVisor(); as src) {
-            @switch (e.tipo) {
+            @switch (e.type) {
               @case ('photo') { <img [src]="src" [alt]="e.fileName" /> }
               @case ('video') { <video [src]="src" controls playsinline preload="metadata"></video> }
               @case ('audio') {
@@ -215,11 +215,11 @@
         }
 
         <dl class="ev-meta">
-          <div><dt>Tipo</dt><dd>{{ types[e.tipo].label }}</dd></div>
+          <div><dt>Tipo</dt><dd>{{ types[e.type].label }}</dd></div>
           <div><dt>Tamaño</dt><dd>{{ size(e.sizeBytes) }}</dd></div>
-          <div><dt>Guardada</dt><dd>{{ longDate(e.fecha) }}</dd></div>
+          <div><dt>Guardada</dt><dd>{{ longDate(e.date) }}</dd></div>
           <div><dt>Se borra</dt><dd>{{ currentAlert()?.keep ? 'Conservada' : shortDate(deletionDate(e)) }}</dd></div>
-          <div><dt>Alerta</dt><dd>{{ shortDate(e.alert?.start ?? null) }} · {{ estado(e.alert?.estado) }}</dd></div>
+          <div><dt>Alerta</dt><dd>{{ shortDate(e.alert?.start ?? null) }} · {{ status(e.alert?.status) }}</dd></div>
           @if (e.alert?.start) {
             <div><dt>Inicio de la alerta</dt><dd>{{ longDate(e.alert!.start) }}</dd></div>
           }
@@ -302,7 +302,7 @@
 
       <footer class="ev-modal-footer">
         <button class="ev-btn ev-btn--ghost" (click)="closeUpload()" [disabled]="progress() !== null">Cancelar</button>
-        <button class="ev-btn ev-btn--primary" (click)="upload()" [disabled]="!file() || !alertaId() || progress() !== null">
+        <button class="ev-btn ev-btn--primary" (click)="upload()" [disabled]="!file() || !alertId() || progress() !== null">
           {{ progress() !== null ? 'Subiendo ' + progress() + '%' : 'Subir' }}
         </button>
       </footer>

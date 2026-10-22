@@ -34,8 +34,8 @@ export class EvidencesManagementComponent implements OnInit {
   // Filtros
   filters: EvidenceFilters = {
     search: '',
-    tipo: '',
-    estado: '',
+    type: '',
+    status: '',
     startDate: null,
     endDate: null
   };
@@ -125,8 +125,8 @@ export class EvidencesManagementComponent implements OnInit {
 
     const filters: EvidenceFilters = {
       search: this.searchTermEvidence,
-      tipo: this.filterEvidenceType,
-      estado: this.filterStatus,
+      type: this.filterEvidenceType,
+      status: this.filterStatus,
       startDate: null,
       endDate: null
     };
@@ -203,7 +203,7 @@ export class EvidencesManagementComponent implements OnInit {
     this.evidenceService.download(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
         const evidence = this.selectedEvidence || this.filteredEvidences.find(e => e.id === id);
-        const fileName = evidence?.nombre || `evidencia_${id}`;
+        const fileName = evidence?.name || `evidencia_${id}`;
         this.downloadFile(blob, fileName);
         // Las estadísticas se actualizan automáticamente en el servicio
         this.loading = false;
@@ -259,7 +259,7 @@ export class EvidencesManagementComponent implements OnInit {
   }
 
   /** Descarga el archivo real. Si llega vacío es que ya no está en el servidor: se avisa, no se inventa. */
-  private downloadFile(blob: Blob, nombre: string): void {
+  private downloadFile(blob: Blob, name: string): void {
     if (blob.size === 0) {
       this.error = 'El archivo de esta evidencia está vacío o ya no existe en el servidor.';
       return;
@@ -267,7 +267,7 @@ export class EvidencesManagementComponent implements OnInit {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = nombre;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -299,38 +299,38 @@ export class EvidencesManagementComponent implements OnInit {
     this.isEvidenceTypeDropdownOpen = false; // Cerrar el otro dropdown
   }
 
-  selectEvidenceType(tipo: string, event: Event): void {
+  selectEvidenceType(type: string, event: Event): void {
     event.stopPropagation();
-    this.filterEvidenceType = tipo;
+    this.filterEvidenceType = type;
     this.isEvidenceTypeDropdownOpen = false;
     // No aplicar filtros automáticamente, esperar al botón Buscar
   }
 
-  selectStatus(estado: string, event: Event): void {
+  selectStatus(status: string, event: Event): void {
     event.stopPropagation();
-    this.filterStatus = estado;
+    this.filterStatus = status;
     this.isStatusDropdownOpen = false;
     // No aplicar filtros automáticamente, esperar al botón Buscar
   }
 
-  getEvidenceTypeLabel(tipo: string): string {
-    switch (tipo) {
+  getEvidenceTypeLabel(type: string): string {
+    switch (type) {
       case 'all': return 'Todos los tipos';
       case 'foto': return 'Imagen';
       case 'video': return 'Video';
       case 'audio': return 'Audio';
       case 'documento': return 'Documento';
-      default: return tipo;
+      default: return type;
     }
   }
 
-  getStatusLabel(estado: string): string {
-    switch (estado) {
+  getStatusLabel(status: string): string {
+    switch (status) {
       case 'all': return 'Todos los estados';
       case 'Verificada': return 'Verificada';
       case 'Pendiente': return 'Pendiente';
       case 'Rechazada': return 'Rechazada';
-      default: return estado;
+      default: return status;
     }
   }
 
@@ -338,8 +338,8 @@ export class EvidencesManagementComponent implements OnInit {
   // UTILIDADES
   // ========================================
 
-  getEvidenceTypeBadgeClass(tipo: string): string {
-    switch (tipo) {
+  getEvidenceTypeBadgeClass(type: string): string {
+    switch (type) {
       case 'foto':
         return 'badge-image';
       case 'video':
@@ -353,8 +353,8 @@ export class EvidencesManagementComponent implements OnInit {
     }
   }
 
-  getEvidenceStatusBadgeClass(estado: string): string {
-    switch (estado) {
+  getEvidenceStatusBadgeClass(status: string): string {
+    switch (status) {
       case 'Verificada':
         return 'status-verified';
       case 'Pendiente':
@@ -366,8 +366,8 @@ export class EvidencesManagementComponent implements OnInit {
     }
   }
 
-  getEvidenceTypeDisplay(tipo: string): string {
-    switch (tipo) {
+  getEvidenceTypeDisplay(type: string): string {
+    switch (type) {
       case 'foto':
         return 'Imagen';
       case 'video':
@@ -377,7 +377,7 @@ export class EvidencesManagementComponent implements OnInit {
       case 'documento':
         return 'Documento';
       default:
-        return tipo;
+        return type;
     }
   }
 

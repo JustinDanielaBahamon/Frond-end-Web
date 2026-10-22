@@ -1,8 +1,8 @@
 export interface EmergencyContact {
   id: number;
   userId: number;
-  nombre: string;
-  telefono: string;
+  name: string;
+  telephone: string;
   email?: string;
   relationship: string;
   /** Data URI de la foto (la misma que se pone desde la app). */

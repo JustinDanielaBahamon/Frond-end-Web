@@ -39,8 +39,10 @@ export class PhoneLocationService {
   }
 
   /** Pide al celular (push silencioso) que envíe su ubicación actual. */
-  requestFromPhone(): Observable<{ celulares: number; solicitadoEn: string }> {
-    return this.http.post<{ celulares: number; solicitadoEn: string }>(`${this.url}/me/request`, {});
+  requestFromPhone(): Observable<{ phones: number; requestedAt: string }> {
+    return this.http
+      .post<{ celulares: number; solicitadoEn: string }>(`${this.url}/me/request`, {})
+      .pipe(map((r) => ({ phones: r.celulares, requestedAt: r.solicitadoEn })));
   }
 
   /** Última ubicación que envió el celular (null si nunca ha enviado). */

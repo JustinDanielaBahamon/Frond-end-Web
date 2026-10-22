@@ -1,12 +1,12 @@
 export interface ManagedUser {
   id: string;
-  nombre: string;
+  name: string;
   email: string;
-  telefono: string;
+  telephone: string;
   registeredAt: string;
   alerts: number;
   lastActivity: string;
-  estado: 'Activa' | 'Inactiva' | 'Bloqueada por Fraude';
+  status: 'Activa' | 'Inactiva' | 'Bloqueada por Fraude';
   role: string;
   emergencyContact?: string;
   avatarColor: string;

@@ -49,7 +49,7 @@
           </div>
         }
       </div>
-      <p class="device-perm__fecha">Informado por {{ pc.celular }} · {{ pc.updated }}</p>
+      <p class="device-perm__fecha">Informado por {{ pc.phone }} · {{ pc.updated }}</p>
     } @else {
       <p class="device-permissions-note">
         <i class="ti ti-info-circle"></i>
@@ -308,8 +308,8 @@
           </div>
         }
       </dl>
-      @if (det.nota) {
-        <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.nota }}</p>
+      @if (det.note) {
+        <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.note }}</p>
       }
       @if (det.link) {
         @if (det.link.route) {

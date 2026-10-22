@@ -59,8 +59,8 @@
             @if (settingsError()) {
               <p class="field-error">{{ settingsError() }}</p>
             }
-            @if (settings()?.updated; as fecha) {
-              <span class="card__note"><i class="fa-regular fa-clock"></i> Última modificación: {{ fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+            @if (settings()?.updated; as date) {
+              <span class="card__note"><i class="fa-regular fa-clock"></i> Última modificación: {{ date | date: 'dd/MM/yyyy HH:mm' }}</span>
             }
             <button class="btn-secondary" type="button" (click)="discardChanges()">Descartar</button>
             <button class="btn-primary" type="submit" [disabled]="savingSettings()">
@@ -85,7 +85,7 @@
           <i class="fa-solid fa-circle-xmark"></i>
           <span>No se pudo consultar el servidor</span>
         </div>
-      } @else if (estado(); as e) {
+      } @else if (status(); as e) {
         <div class="status-line" [class.status-line--bad]="!e.database">
           <i class="fa-solid" [class.fa-circle-check]="e.database" [class.fa-circle-xmark]="!e.database"></i>
           <span>Base de datos</span>

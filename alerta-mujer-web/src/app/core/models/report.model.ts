@@ -5,7 +5,7 @@
 // Datos de la alerta
 export interface AlertData {
   id: number;
-  tipo: 'main' | 'mini' | 'reminder';
+  type: 'main' | 'mini' | 'reminder';
   activationMethod: 'boton_fisico' | 'widget' | 'movimiento_brusco' | 'voz' | 'automatico';
   finalStatus: 'resolved' | 'cancelled' | 'completed' | 'failed';
   startTime: Date;
@@ -17,7 +17,7 @@ export interface AlertData {
 export interface AlertActivator {
   user: {
     id: number;
-    nombre: string;
+    name: string;
     privateName?: string; // Solo visible para admin
   };
   device: {
@@ -51,7 +51,7 @@ export interface AlertLocation {
 // Contactos notificados
 export interface AlertContact {
   id: number;
-  nombre: string;
+  name: string;
   relationship: string;
   channel: 'SMS' | 'llamada' | 'email' | 'push';
   deliveryStatus: 'sent' | 'delivered' | 'failed';
@@ -64,13 +64,13 @@ export interface AlertReminder {
   sequenceNumber: number;
   triggerTime: Date;
   method: 'SMS' | 'llamada' | 'push';
-  estado: 'enviado' | 'fallido';
+  status: 'enviado' | 'fallido';
 }
 
 // Evidencia generada
 export interface AlertEvidence {
   id: number;
-  tipo: 'foto' | 'video' | 'audio';
+  type: 'foto' | 'video' | 'audio';
   fileUrl: string;
   fileName: string;
   fileSize: string;
@@ -85,7 +85,7 @@ export interface ResourceCall {
   number: string;
   callTime: Date;
   duration: number; // en segundos
-  estado: 'completada' | 'no_respondida' | 'fallida';
+  status: 'completada' | 'no_respondida' | 'fallida';
 }
 
 // Qué pasó durante la alerta
@@ -101,7 +101,7 @@ export interface AlertEvents {
 export interface ReportMetadata {
   generatedBy: {
     id: number;
-    nombre: string;
+    name: string;
     role: string;
   };
   generatedAt: Date;
@@ -111,10 +111,10 @@ export interface ReportMetadata {
 // Reporte completo
 export interface AlertReport {
   id: number;
-  nombre: string;
-  fecha: Date;
+  name: string;
+  date: Date;
   city: string;
-  estado: 'Pendiente' | 'Cerrada' | 'Atendida';
+  status: 'Pendiente' | 'Cerrada' | 'Atendida';
   user?: string;
   incident?: string;
   generatedBy: string;
@@ -142,7 +142,7 @@ export interface ReportFilters {
   startDate: Date | null;
   endDate: Date | null;
   city: string;
-  estado: string;
+  status: string;
 }
 
 export interface ReportStats {

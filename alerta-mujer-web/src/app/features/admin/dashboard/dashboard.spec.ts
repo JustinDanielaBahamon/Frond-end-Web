@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminDashboardComponent } from './dashboard';
 
-const alert = (fecha: Date) => ({ created_at: fecha.toISOString() }) as never;
+const alert = (date: Date) => ({ created_at: date.toISOString() }) as never;
 
 describe('AdminDashboardComponent · tendencia por mes', () => {
   let c: AdminDashboardComponent;

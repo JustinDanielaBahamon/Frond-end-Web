@@ -109,8 +109,8 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   private computeStats(alerts: Alert[]) {
     this.totalAlertCount = alerts.length;
-    this.attendedAlerts = alerts.filter(a => a.estado === 'Atendida').length;
-    this.cancelledAlerts = alerts.filter(a => a.estado === 'Cancelada').length;
+    this.attendedAlerts = alerts.filter(a => a.status === 'Atendida').length;
+    this.cancelledAlerts = alerts.filter(a => a.status === 'Cancelada').length;
 
     // 👇 asume que 'tiempo' es parseable como fecha (ej. "2026-06-13T10:32:00").
     // Si tu formato es distinto (ej. "13 jun 2026, 10:32 AM"), dime el formato exacto
@@ -269,9 +269,9 @@ closeMenu() {
 
     if (this.dateFilter) {
       result = result.filter(a => {
-        const fecha = new Date(a.time);
-        if (isNaN(fecha.getTime())) return false;
-        return this.toLocalIsoDate(fecha) === this.dateFilter;
+        const date = new Date(a.time);
+        if (isNaN(date.getTime())) return false;
+        return this.toLocalIsoDate(date) === this.dateFilter;
       });
     }
 
@@ -282,7 +282,7 @@ closeMenu() {
     if (this.searchTerm.trim()) {
       const q = this.searchTerm.trim().toLowerCase();
       result = result.filter(a =>
-        a.estado.toLowerCase().includes(q) ||
+        a.status.toLowerCase().includes(q) ||
         a.location.toLowerCase().includes(q) ||
         (a.activationMethod ?? '').toLowerCase().includes(q) ||
         a.time.toLowerCase().includes(q)
@@ -295,27 +295,27 @@ closeMenu() {
   }
 
   /** Convierte una fecha a 'YYYY-MM-DD' usando la hora local (evita el corrimiento de un día que da toISOString con UTC). */
-  private toLocalIsoDate(fecha: Date): string {
-    const year = fecha.getFullYear();
-    const month = String(fecha.getMonth() + 1).padStart(2, '0');
-    const day = String(fecha.getDate()).padStart(2, '0');
+  private toLocalIsoDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
   /** Muestra la fecha elegida en formato legible, ej. "13 jun 2026". */
   formatDate(isoDate: string): string {
     const [year, month, day] = isoDate.split('-').map(Number);
-    const fecha = new Date(year, month - 1, day);
-    return fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   /** Divide alerta.tiempo en fecha y hora legibles para las dos líneas de la tabla. */
-  formatDateTime(time: string): { fecha: string; time: string } {
-    const fecha = new Date(time);
-    if (isNaN(fecha.getTime())) return { fecha: time, time: '' };
+  formatDateTime(time: string): { date: string; time: string } {
+    const date = new Date(time);
+    if (isNaN(date.getTime())) return { date: time, time: '' };
     return {
-      fecha: fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }),
-      time: fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+      date: date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }),
+      time: date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
     };
   }
 
@@ -393,7 +393,7 @@ closeMenu() {
    * Por ahora actualiza el estado localmente para que la UI responda de inmediato.
    */
   markCancelled(alert: Alert) {
-    alert.estado = 'Cancelada';
+    alert.status = 'Cancelada';
     this.computeStats(this.alerts);
   }
 

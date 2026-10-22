@@ -151,22 +151,22 @@
               <div class="evidence-preview">
                 <div class="preview-thumbnail"
                   [ngClass]="{
-                    'video-icon': evidence.tipo === 'video',
-                    'audio-icon': evidence.tipo === 'audio',
-                    'document-icon': evidence.tipo === 'documento'
+                    'video-icon': evidence.type === 'video',
+                    'audio-icon': evidence.type === 'audio',
+                    'document-icon': evidence.type === 'documento'
                   }"
                 >
-                  <img *ngIf="evidence.tipo === 'foto' && evidence.fileUrl" [src]="evidence.fileUrl" alt="Preview" />
-                  <i *ngIf="evidence.tipo === 'video'" class="fa-solid fa-video"></i>
-                  <i *ngIf="evidence.tipo === 'audio'" class="fa-solid fa-headphones"></i>
-                  <i *ngIf="evidence.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
-                  <i *ngIf="evidence.tipo === 'foto' && !evidence.fileUrl" class="fa-solid fa-image"></i>
+                  <img *ngIf="evidence.type === 'foto' && evidence.fileUrl" [src]="evidence.fileUrl" alt="Preview" />
+                  <i *ngIf="evidence.type === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="evidence.type === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="evidence.type === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="evidence.type === 'foto' && !evidence.fileUrl" class="fa-solid fa-image"></i>
                 </div>
               </div>
             </td>
             <td>
               <div class="evidence-details">
-                <span class="evidence-name">{{ evidence.nombre }}</span>
+                <span class="evidence-name">{{ evidence.name }}</span>
                 <span class="evidence-id-size">ID: {{ evidence.id }} - {{ evidence.size }}</span>
               </div>
             </td>
@@ -178,19 +178,19 @@
             </td>
             <td>
               <div class="alert-related">
-                <span class="alert-id">{{ evidence.alertaId }}</span>
+                <span class="alert-id">{{ evidence.alertId }}</span>
                 <span class="alert-type-city">{{ evidence.alertType }}<ng-container *ngIf="evidence.alertCity"> - {{ evidence.alertCity }}</ng-container></span>
               </div>
             </td>
             <td>
-              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.tipo)">
-                {{ getEvidenceTypeDisplay(evidence.tipo) }}
+              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.type)">
+                {{ getEvidenceTypeDisplay(evidence.type) }}
               </span>
             </td>
-            <td>{{ evidence.fecha | date:'dd/MM/yyyy' }}<br>{{ evidence.time }}</td>
+            <td>{{ evidence.date | date:'dd/MM/yyyy' }}<br>{{ evidence.time }}</td>
             <td>
-              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.estado)">
-                {{ evidence.estado }}
+              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.status)">
+                {{ evidence.status }}
               </span>
             </td>
             <td class="actions-cell">
@@ -256,26 +256,26 @@
               <div class="evidence-preview-large">
                 <div class="preview-thumbnail-large"
                   [ngClass]="{
-                    'video-icon': selectedEvidence.tipo === 'video',
-                    'audio-icon': selectedEvidence.tipo === 'audio',
-                    'document-icon': selectedEvidence.tipo === 'documento'
+                    'video-icon': selectedEvidence.type === 'video',
+                    'audio-icon': selectedEvidence.type === 'audio',
+                    'document-icon': selectedEvidence.type === 'documento'
                   }"
                 >
-                  <img *ngIf="selectedEvidence.tipo === 'foto' && selectedEvidence.fileUrl" [src]="selectedEvidence.fileUrl" alt="Preview" />
-                  <i *ngIf="selectedEvidence.tipo === 'video'" class="fa-solid fa-video"></i>
-                  <i *ngIf="selectedEvidence.tipo === 'audio'" class="fa-solid fa-headphones"></i>
-                  <i *ngIf="selectedEvidence.tipo === 'documento'" class="fa-solid fa-file-pdf"></i>
-                  <i *ngIf="selectedEvidence.tipo === 'foto' && !selectedEvidence.fileUrl" class="fa-solid fa-image"></i>
+                  <img *ngIf="selectedEvidence.type === 'foto' && selectedEvidence.fileUrl" [src]="selectedEvidence.fileUrl" alt="Preview" />
+                  <i *ngIf="selectedEvidence.type === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="selectedEvidence.type === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="selectedEvidence.type === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="selectedEvidence.type === 'foto' && !selectedEvidence.fileUrl" class="fa-solid fa-image"></i>
                 </div>
               </div>
               <div class="detail-info">
-                <h3>{{ selectedEvidence.nombre }}</h3>
+                <h3>{{ selectedEvidence.name }}</h3>
                 <div class="detail-meta">
-                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(selectedEvidence.estado)">
-                    {{ selectedEvidence.estado }}
+                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(selectedEvidence.status)">
+                    {{ selectedEvidence.status }}
                   </span>
-                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(selectedEvidence.tipo)">
-                    {{ getEvidenceTypeDisplay(selectedEvidence.tipo) }}
+                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(selectedEvidence.type)">
+                    {{ getEvidenceTypeDisplay(selectedEvidence.type) }}
                   </span>
                 </div>
               </div>
@@ -291,7 +291,7 @@
                 </div>
                 <div class="detail-item">
                   <label>Fecha</label>
-                  <p>{{ selectedEvidence.fecha | date:'dd/MM/yyyy' }}</p>
+                  <p>{{ selectedEvidence.date | date:'dd/MM/yyyy' }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Hora</label>
@@ -325,7 +325,7 @@
               <div class="detail-grid">
                 <div class="detail-item">
                   <label>ID Alerta</label>
-                  <p>{{ selectedEvidence.alertaId }}</p>
+                  <p>{{ selectedEvidence.alertId }}</p>
                 </div>
                 <div class="detail-item">
                   <label>Tipo</label>
@@ -377,7 +377,7 @@
           <button 
             class="btn-action verify" 
             (click)="changeEvidenceStatus(selectedEvidence.id, 'Verificada')"
-            [disabled]="selectedEvidence.estado === 'Verificada'"
+            [disabled]="selectedEvidence.status === 'Verificada'"
           >
             <i class="fa-solid fa-check"></i>
             Verificar
@@ -385,7 +385,7 @@
           <button 
             class="btn-action reject" 
             (click)="changeEvidenceStatus(selectedEvidence.id, 'Rechazada')"
-            [disabled]="selectedEvidence.estado === 'Rechazada'"
+            [disabled]="selectedEvidence.status === 'Rechazada'"
           >
             <i class="fa-solid fa-xmark"></i>
             Rechazar

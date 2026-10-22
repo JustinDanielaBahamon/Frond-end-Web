@@ -40,10 +40,10 @@ export class AssistanceService {
           .filter((r) => r.isActive !== false)
           .map((r) => ({
             id: r.id,
-            nombre: r.name,
+            name: r.name,
             category: CATEGORY[r.resourceType] ?? 'apoyo',
             description: r.description ?? '',
-            telefono: r.telephone ?? null,
+            telephone: r.telephone ?? null,
             telephone2: r.secondaryTelephone ?? null,
             email: r.email ?? null,
             address: r.address ?? null,
@@ -62,23 +62,23 @@ export class AssistanceService {
         list.map((c) => ({
           id: c.id,
           resourceId: c.emergencyResourceId,
-          telefono: c.telephoneDialed,
-          estado: c.status,
-          fecha: utcDate(c.startedAt),
+          telephone: c.telephoneDialed,
+          status: c.status,
+          date: utcDate(c.startedAt),
         }))
       )
     );
   }
 
   /** Registra que la usuaria marcó a un recurso (la dueña la pone el backend). */
-  recordCall(resourceId: number, telefono: string): Observable<RecordedCall> {
+  recordCall(resourceId: number, telephone: string): Observable<RecordedCall> {
     return this.http
       .post<ResourceCallApi>(`${this.base}/api/resource-calls`, {
         emergencyResourceId: resourceId,
-        telephoneDialed: telefono,
+        telephoneDialed: telephone,
         status: 'initiated',
       })
-      .pipe(map((c) => ({ id: c.id, resourceId: c.emergencyResourceId, telefono: c.telephoneDialed, estado: c.status, fecha: utcDate(c.startedAt) })));
+      .pipe(map((c) => ({ id: c.id, resourceId: c.emergencyResourceId, telephone: c.telephoneDialed, status: c.status, date: utcDate(c.startedAt) })));
   }
 
   deleteCall(id: number): Observable<void> {

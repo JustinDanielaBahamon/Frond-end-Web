@@ -4,7 +4,7 @@
     <div class="identity">
       <div class="identity__avatar" aria-hidden="true">{{ initials() }}</div>
       <div>
-        <h1>{{ user()?.nombre || 'Mi perfil' }}</h1>
+        <h1>{{ user()?.name || 'Mi perfil' }}</h1>
         <p>{{ user()?.email }} · Administración</p>
       </div>
     </div>
@@ -86,7 +86,7 @@
       <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> Sesión y apariencia</h2>
       <label class="field">
         <span>Cerrar sesión por inactividad</span>
-        <select [ngModel]="inactivity.minutos()" (ngModelChange)="changeInactivity($event)">
+        <select [ngModel]="inactivity.minutes()" (ngModelChange)="changeInactivity($event)">
           @for (op of inactivity.options; track op) {
             <option [ngValue]="op">{{ inactivityLabel(op) }}</option>
           }
@@ -123,7 +123,7 @@
                 <small>{{ r.description }}</small>
               </div>
               <div class="activity__meta">
-                <span>{{ r.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+                <span>{{ r.date | date: 'dd/MM/yyyy HH:mm' }}</span>
                 <small>{{ r.ip || '' }}</small>
               </div>
             </li>

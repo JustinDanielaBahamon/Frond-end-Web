@@ -28,7 +28,7 @@
             <span class="field__icon"><i class="fa-regular fa-user"></i></span>
             <input
               type="text"
-              formControlName="nombre"
+              formControlName="name"
               class="field__input"
               [class.is-invalid]="invalid('nombre')"
               placeholder="Nombre completo"
@@ -47,7 +47,7 @@
               <span class="field__icon"><i class="fa-solid fa-phone"></i></span>
               <input
                 type="tel"
-                formControlName="telefono"
+                formControlName="telephone"
                 class="field__input"
                 [class.is-invalid]="invalid('telefono')"
                 placeholder="Teléfono"
@@ -63,7 +63,7 @@
               <span class="field__icon"><i class="fa-regular fa-calendar"></i></span>
               <input
                 type="text"
-                formControlName="fechaNacimiento"
+                formControlName="birthDate"
                 class="field__input"
                 [class.is-invalid]="invalid('fechaNacimiento')"
                 placeholder="DD/MM/AAAA"
@@ -86,13 +86,13 @@
             <div class="field">
               <span class="field__icon"><i class="fa-regular fa-id-card"></i></span>
               <select
-                formControlName="tipoDocumento"
+                formControlName="documentType"
                 class="field__input field__input--select"
-                [class.is-empty]="!form.controls.tipoDocumento.value"
+                [class.is-empty]="!form.controls.documentType.value"
                 [class.is-invalid]="invalid('tipoDocumento')">
                 <option value="" disabled>Tipo de documento</option>
-                @for (tipo of documentTypes; track tipo) {
-                  <option [value]="tipo">{{ tipo }}</option>
+                @for (type of documentTypes; track type) {
+                  <option [value]="type">{{ type }}</option>
                 }
               </select>
               <span class="field__chevron"><i class="fa-solid fa-chevron-down"></i></span>
@@ -107,7 +107,7 @@
               <span class="field__icon"><i class="fa-solid fa-hashtag"></i></span>
               <input
                 type="text"
-                formControlName="numeroDocumento"
+                formControlName="documentNumber"
                 class="field__input"
                 [class.is-invalid]="invalid('numeroDocumento')"
                 placeholder="Número de documento">
@@ -192,7 +192,7 @@
           <label class="checkbox">
             <input
               type="checkbox"
-              [checked]="aceptaTerminos()"
+              [checked]="acceptsTerms()"
               (click)="onTermsClick($event)"
               (change)="onTermsChange($event)">
             <span class="checkbox__mark"></span>

@@ -51,11 +51,11 @@ export class RegisterComponent {
 
   /* ═══════════ FORMULARIO REACTIVO ═══════════ */
   form = this.fb.nonNullable.group({
-    nombre:            ['', [required]],
-    telefono:          ['', [required]],
-    tipoDocumento:     ['', [Validators.required]],
-    numeroDocumento:   ['', [required]],
-    fechaNacimiento:   ['', [Validators.required, Validators.minLength(10)]],
+    name:            ['', [required]],
+    telephone:          ['', [required]],
+    documentType:     ['', [Validators.required]],
+    documentNumber:   ['', [required]],
+    birthDate:   ['', [Validators.required, Validators.minLength(10)]],
     email:            ['', [Validators.required, containsAt]],
     password:          ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [coincideConPassword]],
@@ -71,7 +71,7 @@ export class RegisterComponent {
   acceptanceError  = signal(false);   // "Debes aceptar términos y privacidad"
   termsNotice    = signal(false);   // "Debes leer los términos primero"
   privacyNotice  = signal(false);   // "Debes leer la política primero"
-  aceptaTerminos   = signal(false);
+  acceptsTerms   = signal(false);
   acceptsPrivacy = signal(false);
 
   /* Mensajes de error de cada campo */
@@ -100,7 +100,7 @@ export class RegisterComponent {
     if (this.draft.values) {
       this.form.patchValue(this.draft.values);
     }
-    this.aceptaTerminos.set(this.draft.aceptaTerminos);
+    this.acceptsTerms.set(this.draft.acceptsTerms);
     this.acceptsPrivacy.set(this.draft.acceptsPrivacy);
 
     /* Si cambia la contraseña, se vuelve a revisar la confirmación */
@@ -143,7 +143,7 @@ export class RegisterComponent {
     }
 
     input.value = text;
-    this.form.controls.fechaNacimiento.setValue(text);
+    this.form.controls.birthDate.setValue(text);
   }
 
   /* ═══════════ CASILLAS (solo después de leer) ═══════════ */
@@ -159,8 +159,8 @@ export class RegisterComponent {
 
   onTermsChange(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    this.aceptaTerminos.set(checked);
-    this.draft.aceptaTerminos = checked;
+    this.acceptsTerms.set(checked);
+    this.draft.acceptsTerms = checked;
     this.acceptanceError.set(false);
   }
 
@@ -199,7 +199,7 @@ export class RegisterComponent {
   /* Guarda lo escrito antes de salir a leer los textos */
   private saveDraft(): void {
     this.draft.values = this.form.getRawValue();
-    this.draft.aceptaTerminos = this.aceptaTerminos();
+    this.draft.acceptsTerms = this.acceptsTerms();
     this.draft.acceptsPrivacy = this.acceptsPrivacy();
   }
 
@@ -210,7 +210,7 @@ export class RegisterComponent {
     this.serverError.set('');
 
     /* 1) Verificar que estén aceptados los términos y la privacidad */
-    if (!this.aceptaTerminos() || !this.acceptsPrivacy()) {
+    if (!this.acceptsTerms() || !this.acceptsPrivacy()) {
       this.acceptanceError.set(true);
       return;
     }
@@ -228,14 +228,14 @@ export class RegisterComponent {
     const v = this.form.getRawValue();
 
     this.auth.registrar({
-      nombre: v.nombre,
-      telefono: v.telefono,
-      tipoDocumento: v.tipoDocumento,
-      numeroDocumento: v.numeroDocumento,
-      fechaNacimiento: v.fechaNacimiento,
+      name: v.name,
+      telephone: v.telephone,
+      documentType: v.documentType,
+      documentNumber: v.documentNumber,
+      birthDate: v.birthDate,
       email: v.email,
       password: v.password,
-      aceptaTerminos: this.aceptaTerminos() && this.acceptsPrivacy()
+      acceptsTerms: this.acceptsTerms() && this.acceptsPrivacy()
     }).subscribe({
       next: () => {
         this.loading.set(false);
@@ -255,8 +255,8 @@ export class RegisterComponent {
   private markRepeated(campos: Record<string, string>): boolean {
     const controls: Record<string, AbstractControl> = {
       email: this.form.controls.email,
-      telefono: this.form.controls.telefono,
-      numeroDocumento: this.form.controls.numeroDocumento,
+      telefono: this.form.controls.telephone,
+      numeroDocumento: this.form.controls.documentNumber,
     };
     let checked = 0;
     for (const [field, notice] of Object.entries(campos)) {

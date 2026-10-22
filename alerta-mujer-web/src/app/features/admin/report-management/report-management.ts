@@ -57,7 +57,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     startDate: null,
     endDate: null,
     city: '',
-    estado: ''
+    status: ''
   };
 
   // Paginación
@@ -84,9 +84,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   // Para formulario de nuevo reporte
   newReport: Partial<AlertReport> = {
-    nombre: '',
+    name: '',
     city: '',
-    estado: 'Pendiente',
+    status: 'Pendiente',
     user: '',
     incident: '',
     description: ''
@@ -182,7 +182,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       startDate: null,
       endDate: null,
       city: '',
-      estado: ''
+      status: ''
     };
     // Aplicar filtros con datos originales en lugar de filtrar con filtros vacíos
     this.loadData();
@@ -245,11 +245,11 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.download(this.reportsService.downloadExcel(id), `informe-${id}.csv`, 'Error al descargar Excel');
   }
 
-  private download(file$: Observable<Blob>, nombre: string, errorMessage: string): void {
+  private download(file$: Observable<Blob>, name: string, errorMessage: string): void {
     this.error = '';
     file$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
-        this.downloadFile(blob, nombre);
+        this.downloadFile(blob, name);
         this.loadStats(); // cada descarga suma una exportación
       },
       error: (err) => {
@@ -267,10 +267,10 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     const reportName = this.generateReportName();
     
     const reportToCreate: Omit<AlertReport, 'id'> = {
-      nombre: reportName,
-      fecha: new Date(),
+      name: reportName,
+      date: new Date(),
       city: this.filters.city || 'Todas',
-      estado: 'Pendiente',
+      status: 'Pendiente',
       generatedBy: 'Administrador',
       format,
       size: '',
@@ -301,16 +301,16 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   generateReportName(): string {
-    const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const date = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const city = this.filters.city ? this.filters.city : 'Todas';
-    const estado = this.filters.estado ? this.filters.estado : 'Todos';
-    return `Reporte ${city} - ${estado} - ${fecha}`;
+    const status = this.filters.status ? this.filters.status : 'Todos';
+    return `Reporte ${city} - ${status} - ${date}`;
   }
 
   filtersDescription(): string {
     const parts: string[] = [];
     if (this.filters.city) parts.push(`Ciudad: ${this.filters.city}`);
-    if (this.filters.estado) parts.push(`Estado: ${this.filters.estado}`);
+    if (this.filters.status) parts.push(`Estado: ${this.filters.status}`);
     if (this.filters.startDate) parts.push(`Desde: ${this.formatDate(this.filters.startDate)}`);
     if (this.filters.endDate) parts.push(`Hasta: ${this.formatDate(this.filters.endDate)}`);
     if (this.filters.search) parts.push(`Búsqueda: ${this.filters.search}`);
@@ -337,11 +337,11 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.showPrinterModal = false;
   }
 
-  private downloadFile(blob: Blob, nombre: string): void {
+  private downloadFile(blob: Blob, name: string): void {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = nombre;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -372,10 +372,10 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.loading = true;
     const updatedReport: AlertReport = {
       id: this.editingReport.id,
-      nombre: this.nameModel,
-      fecha: this.editingReport.fecha,
+      name: this.nameModel,
+      date: this.editingReport.date,
       city: this.cityModel,
-      estado: this.statusModel as any,
+      status: this.statusModel as any,
       user: this.userModel,
       incident: this.incidentModel,
       generatedBy: this.editingReport.generatedBy,
@@ -422,7 +422,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.loading = true;
     
     // Si hay alertas seleccionadas, generar datos basados en ellas
-    let nombre = this.nameModel;
+    let name = this.nameModel;
     let user = this.userModel;
     let incident = this.incidentModel;
     let city = this.cityModel || 'No especificada';
@@ -435,18 +435,18 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
       
       if (selectedAlertsObj.length > 0) {
         // Generar nombre automático basado en alertas si no hay nombre personalizado
-        if (!nombre) {
-          const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          const alertTypes = [...new Set(selectedAlertsObj.map(a => this.typeLabel(a.tipo)))].join(', ');
-          nombre = `Reporte ${alertTypes} - ${fecha}`;
+        if (!name) {
+          const date = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const alertTypes = [...new Set(selectedAlertsObj.map(a => this.typeLabel(a.type)))].join(', ');
+          name = `Reporte ${alertTypes} - ${date}`;
         }
         
         // Usar datos de la primera alerta seleccionada como base
         if (!user) {
-          user = [...new Set(selectedAlertsObj.map(a => a.nombre))].join(', ');
+          user = [...new Set(selectedAlertsObj.map(a => a.name))].join(', ');
         }
         if (!incident) {
-          incident = this.typeLabel(selectedAlertsObj[0].tipo);
+          incident = this.typeLabel(selectedAlertsObj[0].type);
         }
         if (!description) {
           description = `Reporte basado en ${this.selectedAlerts.length} alerta(s)`;
@@ -455,10 +455,10 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     }
 
     const reportToCreate: Omit<AlertReport, 'id'> = {
-      nombre: nombre || 'Reporte Sin Nombre',
-      fecha: new Date(),
+      name: name || 'Reporte Sin Nombre',
+      date: new Date(),
       city,
-      estado: (this.statusModel || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
+      status: (this.statusModel || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
       user,
       incident,
       generatedBy: 'Administrador',
@@ -490,9 +490,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   openNewModal(): void {
     this.editingReport = null;
     this.newReport = {
-      nombre: '',
+      name: '',
       city: '',
-      estado: 'Pendiente',
+      status: 'Pendiente',
       user: '',
       incident: '',
       description: ''
@@ -505,9 +505,9 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.showNewModal = false;
     this.editingReport = null;
     this.newReport = {
-      nombre: '',
+      name: '',
       city: '',
-      estado: 'Pendiente',
+      status: 'Pendiente',
       user: '',
       incident: '',
       description: ''
@@ -526,22 +526,22 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   /** Nombre legible del tipo de alerta que envía la app móvil. */
-  typeLabel(tipo: string): string {
+  typeLabel(type: string): string {
     const labels: Record<string, string> = { main: 'Alerta SOS', mini: 'Mini alerta', reminder: 'Recordatorio' };
-    return labels[tipo] || tipo || 'Alerta';
+    return labels[type] || type || 'Alerta';
   }
 
-  getStatusClass(estado: string): string {
+  getStatusClass(status: string): string {
     const classes: Record<string, string> = {
       'Pendiente': 'pending',
       'Cerrada': 'closed',
       'Atendida': 'attended'
     };
-    return classes[estado] || 'pending';
+    return classes[status] || 'pending';
   }
 
-  formatDate(fecha: Date): string {
-    return new Date(fecha).toLocaleString('es-ES', {
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -566,14 +566,14 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   // Helpers para formularios en modales
   get nameModel(): string {
-    return this.editingReport ? this.editingReport.nombre : this.newReport.nombre || '';
+    return this.editingReport ? this.editingReport.name : this.newReport.name || '';
   }
 
   set nameModel(value: string) {
     if (this.editingReport) {
-      this.editingReport.nombre = value;
+      this.editingReport.name = value;
     } else {
-      this.newReport.nombre = value;
+      this.newReport.name = value;
     }
   }
 
@@ -590,14 +590,14 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   }
 
   get statusModel(): string {
-    return this.editingReport ? this.editingReport.estado : this.newReport.estado || 'Pendiente';
+    return this.editingReport ? this.editingReport.status : this.newReport.status || 'Pendiente';
   }
 
   set statusModel(value: string) {
     if (this.editingReport) {
-      this.editingReport.estado = value as any;
+      this.editingReport.status = value as any;
     } else {
-      this.newReport.estado = value as any;
+      this.newReport.status = value as any;
     }
   }
 
@@ -641,17 +641,17 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // GESTIÓN DE ALERTAS
   // ========================================
 
-  toggleAlertSelected(alertaId: number): void {
-    const index = this.selectedAlerts.indexOf(alertaId);
+  toggleAlertSelected(alertId: number): void {
+    const index = this.selectedAlerts.indexOf(alertId);
     if (index === -1) {
-      this.selectedAlerts.push(alertaId);
+      this.selectedAlerts.push(alertId);
     } else {
       this.selectedAlerts.splice(index, 1);
     }
   }
 
-  isAlertSelected(alertaId: number): boolean {
-    return this.selectedAlerts.includes(alertaId);
+  isAlertSelected(alertId: number): boolean {
+    return this.selectedAlerts.includes(alertId);
   }
 
   selectAllAlerts(): void {

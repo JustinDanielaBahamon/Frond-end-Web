@@ -50,31 +50,31 @@ export class AlertsService {
   }
 
   // Cambio de estado desde administración (PATCH /api/alerts/{id}/status, solo ADMIN)
-  updateStatus(id: number, estado: AlertStatus): Observable<Alert> {
-    return this.http.patch<any>(`${this.url}/${id}/status`, { status: API_STATUS[estado] }).pipe(
+  updateStatus(id: number, status: AlertStatus): Observable<Alert> {
+    return this.http.patch<any>(`${this.url}/${id}/status`, { status: API_STATUS[status] }).pipe(
       map(a => this.normalize(a))
     );
   }
 
   /** Detalle del panel: última ubicación y envío a cada contacto (sin nombre ni correo). */
   adminDetail(id: number): Observable<AdminAlertDetail> {
-    const fecha = (iso: string | null) => (iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null);
+    const date = (iso: string | null) => (iso ? new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`) : null);
     return this.http.get<any>(`${this.url}/${id}/admin-detail`).pipe(
       map((d) => ({
-        ubicacionVisible: !!d.ubicacionVisible,
-        puntos: d.puntos ?? 0,
-        ultimaUbicacion: d.ultimaUbicacion
+        locationVisible: !!d.ubicacionVisible,
+        points: d.puntos ?? 0,
+        lastLocation: d.ultimaUbicacion
           ? {
               lat: Number(d.ultimaUbicacion.latitude),
               lng: Number(d.ultimaUbicacion.longitude),
               precision: d.ultimaUbicacion.accuracy != null ? Number(d.ultimaUbicacion.accuracy) : null,
-              time: fecha(d.ultimaUbicacion.recordedAt),
+              time: date(d.ultimaUbicacion.recordedAt),
             }
           : null,
-        envios: (d.envios ?? []).map((e: any) => ({
-          contacto: e.contacto,
+        deliveries: (d.envios ?? []).map((e: any) => ({
+          contact: e.contacto,
           relationship: e.relationship ?? null,
-          channels: (e.channels ?? []).map((c: any) => ({ channel: c.channel, estado: c.status, sent: fecha(c.sentAt) })),
+          channels: (e.channels ?? []).map((c: any) => ({ channel: c.channel, status: c.status, sent: date(c.sentAt) })),
         })),
       })),
     );
@@ -89,16 +89,16 @@ export class AlertsService {
     const userId = a.userId ?? a.userProfileId;
     return {
       id: a.id,
-      nombre: a.userName || (userId != null ? `Usuaria #${userId}` : 'Sin nombre'),
+      name: a.userName || (userId != null ? `Usuaria #${userId}` : 'Sin nombre'),
       description: a.message ?? '',
       activationMethod: this.normalizeMethod(a.activationMethod),
       time: this.howLongAgo(a.startedAt ?? a.createdAt),
       location: lat || lng ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : '',
       lat,
       lng,
-      estado: this.normalizeStatus(a.status),
+      status: this.normalizeStatus(a.status),
       userId,
-      tipo: a.alertType ?? '',
+      type: a.alertType ?? '',
       created_at: a.createdAt,
       started_at: a.startedAt,
     };
@@ -122,9 +122,9 @@ export class AlertsService {
     return 'Pendiente';
   }
 
-  private howLongAgo(fecha?: string): string {
-    if (!fecha) return '';
-    const t = new Date(fecha).getTime();
+  private howLongAgo(date?: string): string {
+    if (!date) return '';
+    const t = new Date(date).getTime();
     if (isNaN(t)) return '';
     const min = Math.round((Date.now() - t) / 60000);
     if (min < 1) return 'Ahora';
@@ -137,8 +137,8 @@ export class AlertsService {
 /** Datos extra de una alerta para el panel (GET /api/alerts/{id}/admin-detail). */
 export interface AdminAlertDetail {
   /** false: alerta cancelada o vencida, la administración no ve su ubicación (auditoría S2). */
-  ubicacionVisible: boolean;
-  puntos: number;
-  ultimaUbicacion: { lat: number; lng: number; precision: number | null; time: Date | null } | null;
-  envios: { contacto: number; relationship: string | null; channels: { channel: string; estado: string; sent: Date | null }[] }[];
+  locationVisible: boolean;
+  points: number;
+  lastLocation: { lat: number; lng: number; precision: number | null; time: Date | null } | null;
+  deliveries: { contact: number; relationship: string | null; channels: { channel: string; status: string; sent: Date | null }[] }[];
 }

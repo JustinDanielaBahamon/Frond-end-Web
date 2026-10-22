@@ -32,8 +32,8 @@ function typeFromApi(z: ZoneApi): ZoneType {
   return 'Riesgo Bajo';
 }
 
-function typeToApi(tipo: ZoneType): Pick<ZoneApi, 'zoneType' | 'riskLevel'> {
-  switch (tipo) {
+function typeToApi(type: ZoneType): Pick<ZoneApi, 'zoneType' | 'riskLevel'> {
+  switch (type) {
     case 'Riesgo Alto': return { zoneType: 'risk', riskLevel: 'high' };
     case 'Riesgo Medio': return { zoneType: 'risk', riskLevel: 'medium' };
     case 'Riesgo Bajo': return { zoneType: 'risk', riskLevel: 'low' };
@@ -44,12 +44,12 @@ function typeToApi(tipo: ZoneType): Pick<ZoneApi, 'zoneType' | 'riskLevel'> {
 function fromApi(z: ZoneApi): Zone {
   return {
     id: String(z.id),
-    nombre: z.name,
+    name: z.name,
     city: z.city,
-    tipo: typeFromApi(z),
+    type: typeFromApi(z),
     alerts: 0,
     // El backend solo guarda activa/inactiva; "Revisión" se guarda como inactiva.
-    estado: z.isActive ? 'Activa' : 'Inactiva',
+    status: z.isActive ? 'Activa' : 'Inactiva',
     updated_at: z.updatedAt ?? z.createdAt ?? '',
     lat: z.latitude != null ? Number(z.latitude) : undefined,
     lng: z.longitude != null ? Number(z.longitude) : undefined,
@@ -68,14 +68,14 @@ function toApi(changes: Partial<Zone>, original?: ZoneApi): Omit<ZoneApi, 'id'> 
   };
 
   const originalType = original ? typeFromApi(original) : undefined;
-  const changeType = changes.tipo && changes.tipo !== originalType ? typeToApi(changes.tipo) : {};
+  const changeType = changes.type && changes.type !== originalType ? typeToApi(changes.type) : {};
 
   return {
     ...base,
     ...changeType,
-    ...(changes.nombre !== undefined && { name: changes.nombre }),
+    ...(changes.name !== undefined && { name: changes.name }),
     ...(changes.city !== undefined && { city: changes.city }),
-    ...(changes.estado !== undefined && { isActive: changes.estado === 'Activa' }),
+    ...(changes.status !== undefined && { isActive: changes.status === 'Activa' }),
     ...(changes.lat != null && { latitude: changes.lat }),
     ...(changes.lng != null && { longitude: changes.lng }),
     ...(changes.radio != null && { radiusMeters: changes.radio }),

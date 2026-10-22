@@ -95,17 +95,17 @@ const isToday = (iso?: string | null) => !!iso && new Date(iso).toDateString() =
 
 function formatLastAccess(iso: string | null): string {
   if (!iso) return 'Sin registro';
-  const fecha = new Date(iso);
-  if (isNaN(fecha.getTime())) return 'Sin registro';
-  const time = fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
-  return isToday(iso) ? `Hoy, ${time}` : `${fecha.toLocaleDateString('es-CO')} ${time}`;
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return 'Sin registro';
+  const time = date.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+  return isToday(iso) ? `Hoy, ${time}` : `${date.toLocaleDateString('es-CO')} ${time}`;
 }
 
 function fromApi(d: AdminDeviceApi): Device {
-  const nombre = [d.brand, d.model].filter(Boolean).join(' ');
+  const name = [d.brand, d.model].filter(Boolean).join(' ');
   return {
     id: d.id,
-    name: nombre || 'Dispositivo sin nombre',
+    name: name || 'Dispositivo sin nombre',
     osVersion: d.osVersion ? `${d.osName ?? ''} ${d.osVersion}`.trim() : (d.osName ?? ''),
     user: { name: d.ownerName ?? 'Sin usuaria', email: d.ownerEmail ?? '' },
     type: 'Android',
@@ -163,7 +163,7 @@ export interface UserDevice {
  */
 export interface DeviceFilters {
   search: string;
-  estado: string;
+  status: string;
   startDate: Date | null;
   endDate: Date | null;
 }
@@ -311,9 +311,9 @@ export class DeviceService {
     }
 
     // Filtro por estado
-    if (filters.estado && filters.estado !== 'all') {
+    if (filters.status && filters.status !== 'all') {
       filteredDevices = filteredDevices.filter(device =>
-        device.status === filters.estado
+        device.status === filters.status
       );
     }
 

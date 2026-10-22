@@ -7,9 +7,9 @@ import { WebPushService } from './web-push.service';
 /** Alerta de otra persona que tiene a la usuaria como contacto de emergencia. */
 export interface ReceivedAlert {
   id: number;
-  nombre: string;
+  name: string;
   active: boolean;
-  estado: string;
+  status: string;
   start: Date | null;
   end: Date | null;
   trackingAvailable: boolean;
@@ -56,9 +56,9 @@ export class ReceivedAlertsService {
       const data = await firstValueFrom(this.http.get<any[]>(`${environment.apiUrl}/api/received-alerts`));
       const list: ReceivedAlert[] = (data ?? []).map((a) => ({
         id: a.alertId,
-        nombre: a.firstName || 'Un contacto',
+        name: a.firstName || 'Un contacto',
         active: !!a.active,
-        estado: a.status,
+        status: a.status,
         start: a.startedAt ? new Date(a.startedAt) : null,
         end: a.endedAt ? new Date(a.endedAt) : null,
         trackingAvailable: !!a.trackingAvailable,
@@ -101,7 +101,7 @@ export class ReceivedAlertsService {
     this.saveNotified([...notified].slice(-50));
     if (this.notificationPermission() !== 'granted') return;
     for (const a of newOnes) {
-      const n = new Notification(`🚨 ${a.nombre} activó una alerta de emergencia`, {
+      const n = new Notification(`🚨 ${a.name} activó una alerta de emergencia`, {
         body: 'Toca para ver dónde está y cómo ayudar.',
         tag: `alerta-${a.id}`,
         requireInteraction: true,

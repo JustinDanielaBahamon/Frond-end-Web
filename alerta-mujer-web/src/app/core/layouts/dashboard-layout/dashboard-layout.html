@@ -26,7 +26,7 @@
         <a class="aviso-contacto" routerLink="/dashboard/alertas-contactos" role="alert">
           <span class="aviso-contacto__pulso" aria-hidden="true"></span>
           <span class="aviso-contacto__texto">
-            <strong>{{ a.nombre }}</strong> activó una alerta de emergencia
+            <strong>{{ a.name }}</strong> activó una alerta de emergencia
             @if (a.start) { a las {{ a.start | date: 'h:mm a' }} }
           </span>
           <span class="aviso-contacto__accion">Ver seguimiento <i class="ti ti-arrow-right" aria-hidden="true"></i></span>

@@ -13,7 +13,7 @@ import { FrequentPlace } from '../../../core/models/frequent-place.model';
 type SelectedPoint = {
   latitude: number;
   longitude: number;
-  nombre?: string;
+  name?: string;
 };
 
 type SelectionMethod = 'mapa' | 'ubicaciones';
@@ -167,8 +167,8 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     const bounds = L.latLngBounds([]);
 
     for (const r of list) {
-      if (!r.puntos || r.puntos.length < 2) continue;
-      const latlngs = r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
+      if (!r.points || r.points.length < 2) continue;
+      const latlngs = r.points.map((p) => [p.latitude, p.longitude] as L.LatLngTuple);
       const color = this.colorDe(r, all);
       const active = selected?.id === r.id;
 
@@ -259,7 +259,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
   selectLocation(place: FrequentPlace): void {
     const point = this.selectingPoint();
     if (!point) return;
-    this.setPoint(point, { latitude: place.lat, longitude: place.lng, nombre: place.name });
+    this.setPoint(point, { latitude: place.lat, longitude: place.lng, name: place.name });
   }
 
   useMyLocation(point: 'A' | 'B'): void {
@@ -269,7 +269,7 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => this.setPoint(point, {
-        latitude: pos.coords.latitude, longitude: pos.coords.longitude, nombre: 'Mi ubicación',
+        latitude: pos.coords.latitude, longitude: pos.coords.longitude, name: 'Mi ubicación',
       }),
       () => this.error.set('No se pudo obtener tu ubicación. Revisa los permisos del navegador.'),
       { enableHighAccuracy: true, timeout: 10000 }
@@ -279,10 +279,10 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
   private setPoint(point: 'A' | 'B', value: SelectedPoint): void {
     if (point === 'A') {
       this.pointA.set(value);
-      if (value.nombre) this.pointAName.set(value.nombre);
+      if (value.name) this.pointAName.set(value.name);
     } else {
       this.pointB.set(value);
-      if (value.nombre) this.pointBName.set(value.nombre);
+      if (value.name) this.pointBName.set(value.name);
     }
     // Tras fijar A, pasa directo a elegir B
     this.selectingPoint.set(point === 'A' && !this.pointB() ? 'B' : null);
@@ -304,15 +304,15 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     const b = this.pointB();
     if (!a || !b || this.saving()) return;
 
-    const start = this.pointAName().trim() || a.nombre || 'Punto A';
-    const end = this.pointBName().trim() || b.nombre || 'Punto B';
+    const start = this.pointAName().trim() || a.name || 'Punto A';
+    const end = this.pointBName().trim() || b.name || 'Punto B';
 
     this.saving.set(true);
     const result = await this.routesService.addRoute({
-      nombre: this.routeName().trim() || `Ruta ${start} → ${end}`,
+      name: this.routeName().trim() || `Ruta ${start} → ${end}`,
       start,
       end,
-      puntos: [
+      points: [
         { latitude: a.latitude, longitude: a.longitude, timestamp: '' },
         { latitude: b.latitude, longitude: b.longitude, timestamp: '' },
       ],
@@ -358,14 +358,14 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   focus(r: SavedRoute): void {
     this.selected.set(this.selected()?.id === r.id ? null : r);
-    if (!this.selected() || !this.map || r.puntos.length < 2) return;
+    if (!this.selected() || !this.map || r.points.length < 2) return;
 
     // Si el filtro lo esconde, mostrarlo
     if (this.visibilityFilter() === 'ocultar' || (this.visibilityFilter() === 'estrellas' && !r.important)) {
       this.visibilityFilter.set('todos');
     }
     this.map.flyToBounds(
-      L.latLngBounds(r.puntos.map((p) => [p.latitude, p.longitude] as L.LatLngTuple)),
+      L.latLngBounds(r.points.map((p) => [p.latitude, p.longitude] as L.LatLngTuple)),
       { padding: [64, 64], maxZoom: 16, duration: 0.8 }
     );
   }
@@ -385,10 +385,10 @@ export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectingPoint.set(null);
   }
 
-  formatDate(fecha: string): string {
-    const d = new Date(fecha);
+  formatDate(date: string): string {
+    const d = new Date(date);
     return isNaN(d.getTime())
-      ? fecha
+      ? date
       : d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 

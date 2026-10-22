@@ -45,10 +45,10 @@ export class GeocodingService {
         clear(a.city_district) ?? clear(a.residential);
       const via = clear(a.road);
       const streetWithNumber = via ? (a.house_number ? `${via} # ${a.house_number}` : via) : null;
-      const nombre = clear(data?.name);
+      const name = clear(data?.name);
       // Si el punto cae sobre un sitio con nombre (colegio, almacén...), se muestra ese nombre
-      const address = nombre && nombre !== via && nombre !== neighborhood
-        ? (streetWithNumber ? `${nombre}, ${streetWithNumber}` : nombre)
+      const address = name && name !== via && name !== neighborhood
+        ? (streetWithNumber ? `${name}, ${streetWithNumber}` : name)
         : streetWithNumber;
       // OSM a veces nombra la ciudad como "Perímetro Urbano Neiva"
       const city = (clear(a.city) ?? clear(a.town) ?? clear(a.village) ?? clear(a.municipality))

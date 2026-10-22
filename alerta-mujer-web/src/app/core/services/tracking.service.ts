@@ -14,7 +14,7 @@ export interface TrackingPoint {
 /** Video, audio o foto grabado durante la alerta (se abre con un enlace que vence en minutos). */
 export interface TrackingEvidence {
   id: number;
-  tipo: 'video' | 'audio' | 'photo' | 'document';
+  type: 'video' | 'audio' | 'photo' | 'document';
   contentType: string;
   created: Date | null;
   url: string;
@@ -22,9 +22,9 @@ export interface TrackingEvidence {
 
 /** Lo que ve un contacto de emergencia desde el enlace del correo (sin iniciar sesión). */
 export interface Tracking {
-  nombre: string;
+  name: string;
   active: boolean;
-  estado: string;
+  status: string;
   start: Date | null;
   end: Date | null;
   route: TrackingPoint[];
@@ -36,7 +36,7 @@ export interface Tracking {
 export interface AlertMessage {
   id: number;
   deElla: boolean;
-  nombre: string;
+  name: string;
   text: string;
   time: Date;
 }
@@ -44,7 +44,7 @@ export interface AlertMessage {
 const toMessage = (m: any): AlertMessage => ({
   id: m.id,
   deElla: m.senderType === 'owner',
-  nombre: m.senderName,
+  name: m.senderName,
   text: m.body,
   time: new Date(m.createdAt),
 });
@@ -53,15 +53,15 @@ const toMessage = (m: any): AlertMessage => ({
 export class TrackingService {
   private http = inject(HttpClient);
 
-  query(codigo: string): Observable<Tracking> {
+  query(code: string): Observable<Tracking> {
     // v: identificador anónimo de este navegador, para que la usuaria sepa que alguien abrió su alerta
-    return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}`, {
+    return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(code)}`, {
       params: { v: visitor() },
     }).pipe(
       map(t => ({
-        nombre: t.firstName || 'Una persona',
+        name: t.firstName || 'Una persona',
         active: !!t.active,
-        estado: t.status,
+        status: t.status,
         start: t.startedAt ? new Date(t.startedAt) : null,
         end: t.endedAt ? new Date(t.endedAt) : null,
         route: (t.route ?? []).map((p: any) => ({
@@ -73,28 +73,28 @@ export class TrackingService {
         emergencyNumber: t.emergencyNumber || '123',
         evidences: (t.evidence ?? []).map((e: any) => ({
           id: e.id,
-          tipo: e.mediaType,
+          type: e.mediaType,
           contentType: e.contentType,
           created: e.createdAt ? new Date(e.createdAt) : null,
-          url: toService(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/evidence/${e.id}`)
+          url: toService(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(code)}/evidence/${e.id}`)
         }))
       }))
     );
   }
 
   /** Mensajes del chat posteriores a despuesDe (0 = todos). */
-  messages(codigo: string, after = 0): Observable<AlertMessage[]> {
+  messages(code: string, after = 0): Observable<AlertMessage[]> {
     return this.http
-      .get<any[]>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/messages`, {
+      .get<any[]>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(code)}/messages`, {
         params: { after },
       })
       .pipe(map((list) => (list ?? []).map(toMessage)));
   }
 
-  sendMessage(codigo: string, nombre: string, text: string): Observable<AlertMessage> {
+  sendMessage(code: string, name: string, text: string): Observable<AlertMessage> {
     return this.http
-      .post<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}/messages`, {
-        name: nombre,
+      .post<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(code)}/messages`, {
+        name: name,
         body: text,
       })
       .pipe(map(toMessage));

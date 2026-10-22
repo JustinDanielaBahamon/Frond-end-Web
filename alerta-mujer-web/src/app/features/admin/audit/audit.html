@@ -13,8 +13,8 @@
 
   <!-- Accesos rápidos -->
   <div class="quick">
-    <button class="chip" [class.chip--active]="!filters.tipo && !filters.action" (click)="clearFilters()">Todo</button>
-    <button class="chip" [class.chip--active]="filters.tipo === 'SESSION' && !filters.action" (click)="viewSessions()">
+    <button class="chip" [class.chip--active]="!filters.type && !filters.action" (click)="clearFilters()">Todo</button>
+    <button class="chip" [class.chip--active]="filters.type === 'SESSION' && !filters.action" (click)="viewSessions()">
       <i class="fa-solid fa-right-to-bracket"></i> Sesiones
     </button>
     <button class="chip chip--danger" [class.chip--active]="filters.action === 'LOGIN_FAILED'" (click)="viewFailedAttempts()">
@@ -29,14 +29,14 @@
       <select [(ngModel)]="filters.actorId" (ngModelChange)="applyFilters()">
         <option [ngValue]="null">Todas las personas</option>
         @for (r of actors(); track r.accountId) {
-          <option [ngValue]="r.accountId">{{ r.nombre || r.email }}</option>
+          <option [ngValue]="r.accountId">{{ r.name || r.email }}</option>
         }
         <option [ngValue]="0">Sin persona (tareas automáticas y registros antiguos)</option>
       </select>
     </label>
     <label class="field">
       <span>Tipo</span>
-      <select [(ngModel)]="filters.tipo" (ngModelChange)="applyFilters()">
+      <select [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
         <option value="">Todos</option>
         @for (t of types; track t.value) {
           <option [value]="t.value">{{ t.label }}</option>
@@ -54,11 +54,11 @@
     </label>
     <label class="field">
       <span>Desde</span>
-      <app-selector-fecha etiqueta="Desde" [(ngModel)]="filters.from" [max]="filters.to || null" (valueChange)="applyFilters()" />
+      <app-selector-fecha label="Desde" [(ngModel)]="filters.from" [max]="filters.to || null" (valueChange)="applyFilters()" />
     </label>
     <label class="field">
       <span>Hasta</span>
-      <app-selector-fecha etiqueta="Hasta" [(ngModel)]="filters.to" [min]="filters.from || null" (valueChange)="applyFilters()" />
+      <app-selector-fecha label="Hasta" [(ngModel)]="filters.to" [min]="filters.from || null" (valueChange)="applyFilters()" />
     </label>
     <button class="btn-clear" (click)="clearFilters()">
       <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar
@@ -92,7 +92,7 @@
           } @else {
             @for (r of records(); track r.id) {
               <tr (click)="viewDetail(r)" tabindex="0" (keydown.enter)="viewDetail(r)">
-                <td class="nowrap">{{ r.fecha | date: 'dd/MM/yyyy' }}<br /><small>{{ r.fecha | date: 'HH:mm:ss' }}</small></td>
+                <td class="nowrap">{{ r.date | date: 'dd/MM/yyyy' }}<br /><small>{{ r.date | date: 'HH:mm:ss' }}</small></td>
                 <td>
                   @if (r.actor) {
                     <strong>{{ r.actor }}</strong>
@@ -155,7 +155,7 @@
           <span class="registro__icono" [ngClass]="actionClass(r)"><i class="fa-solid" [ngClass]="actionIcon(r)"></i></span>
           <div class="registro__titulos">
             <h2 id="registro-titulo">{{ action(r) }} · {{ object(r) }}</h2>
-            <p>{{ longDate(r.fecha) }}</p>
+            <p>{{ longDate(r.date) }}</p>
           </div>
           <button class="icon-btn" (click)="closeDetail()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </header>

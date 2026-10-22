@@ -91,11 +91,11 @@
       <div class="filter-group">
         <div class="filter-item">
           <label>Fecha Inicial</label>
-          <app-selector-fecha etiqueta="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
+          <app-selector-fecha label="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Fecha Final</label>
-          <app-selector-fecha etiqueta="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
+          <app-selector-fecha label="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Lugar de Alerta</label>
@@ -117,7 +117,7 @@
           <label>Estado</label>
           <select 
             aria-label="Filtrar por Estado"
-            [(ngModel)]="filters.estado"
+            [(ngModel)]="filters.status"
             (change)="applyFilters()"
           >
             <option value="">Todos</option>
@@ -183,15 +183,15 @@
                         <div class="report-icon">
                           <i class="fa-solid fa-file-lines"></i>
                         </div>
-                        {{ report.nombre }}
+                        {{ report.name }}
                       </div>
                     </td>
-                    <td>{{ formatDate(report.fecha) }}</td>
+                    <td>{{ formatDate(report.date) }}</td>
                     <td>{{ report.city }}</td>
                     <td>{{ report.user || '-' }}</td>
                     <td>{{ report.incident || '-' }}</td>
                     <td>
-                      <span class="status {{ getStatusClass(report.estado) }}">{{ report.estado }}</span>
+                      <span class="status {{ getStatusClass(report.status) }}">{{ report.status }}</span>
                     </td>
                     <td>{{ report.generatedBy }}</td>
                     <td>
@@ -337,12 +337,12 @@
                       >
                       <label [for]="'alerta-' + alert.id" class="alerta-label">
                         <div class="alerta-info">
-                          <span class="alerta-tipo">{{ typeLabel(alert.tipo) }} · {{ alert.nombre }}</span>
+                          <span class="alerta-tipo">{{ typeLabel(alert.type) }} · {{ alert.name }}</span>
                           <span class="alerta-ubicacion">{{ alert.location }}</span>
                           <span class="alerta-fecha">{{ alert.time }}</span>
                         </div>
-                        <span class="alerta-estado status {{ getStatusClass(alert.estado) }}">
-                          {{ alert.estado }}
+                        <span class="alerta-estado status {{ getStatusClass(alert.status) }}">
+                          {{ alert.status }}
                         </span>
                       </label>
                     </div>
@@ -453,8 +453,8 @@
                 <i class="fa-solid fa-file-lines"></i>
               </div>
               <div class="detail-info">
-                <h3>{{ selectedReport.nombre }}</h3>
-                <span class="status {{ getStatusClass(selectedReport.estado) }}">{{ selectedReport.estado }}</span>
+                <h3>{{ selectedReport.name }}</h3>
+                <span class="status {{ getStatusClass(selectedReport.status) }}">{{ selectedReport.status }}</span>
               </div>
             </div>
             
@@ -465,7 +465,7 @@
               </div>
               <div class="detail-item">
                 <label>Fecha</label>
-                <p>{{ formatDate(selectedReport.fecha) }}</p>
+                <p>{{ formatDate(selectedReport.date) }}</p>
               </div>
               <div class="detail-item">
                 <label>Ciudad</label>

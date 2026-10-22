@@ -67,7 +67,7 @@
                       {{ selectionMethod() === 'mapa' ? 'Haz clic en el mapa…' : 'Elige una de tus ubicaciones' }}
                     </span>
                   } @else if (value) {
-                    <span class="gr-point-value">{{ value.nombre || coordinates(value) }}</span>
+                    <span class="gr-point-value">{{ value.name || coordinates(value) }}</span>
                   } @else {
                     <span class="gr-point-placeholder">Sin definir</span>
                   }
@@ -200,7 +200,7 @@
                 <span class="gr-row-text">
                   <span class="gr-row-name">{{ r.customName || 'Recorrido sin nombre' }}</span>
                   <span class="gr-row-meta">{{ r.startNeighborhood }} → {{ r.endNeighborhood }}</span>
-                  <span class="gr-row-meta">{{ formatDate(r.fecha) }} · {{ r.estimatedDistance }} · {{ r.estimatedTime }}</span>
+                  <span class="gr-row-meta">{{ formatDate(r.date) }} · {{ r.estimatedDistance }} · {{ r.estimatedTime }}</span>
                 </span>
                 <svg class="gr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
@@ -246,7 +246,7 @@
       </header>
       <dl class="gr-detail">
         <div><dt>Trayecto</dt><dd>{{ r.startNeighborhood }} → {{ r.endNeighborhood }}</dd></div>
-        <div><dt>Guardado</dt><dd>{{ formatDate(r.fecha) }}</dd></div>
+        <div><dt>Guardado</dt><dd>{{ formatDate(r.date) }}</dd></div>
         <div><dt>Distancia</dt><dd>{{ r.estimatedDistance }}</dd></div>
         <div><dt>Tiempo estimado</dt><dd>{{ r.estimatedTime }}</dd></div>
         @if (r.municipality) {

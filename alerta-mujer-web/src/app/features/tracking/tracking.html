@@ -12,11 +12,19 @@
       <i class="ti ti-link-off icono-grande" aria-hidden="true"></i>
       <p>{{ error() }}</p>
       <button class="btn btn--secundario" (click)="reintentar()">Intentar de nuevo</button>
+      @if (desdePanel) {
+        <button class="btn btn--secundario" (click)="volverAlPanel()"><i class="ti ti-arrow-left"></i> Volver a mis contactos</button>
+      }
     </section>
   } @else if (datos(); as d) {
     <!-- Encabezado: quién y en qué estado está la alerta -->
     <header class="banda" [class.banda--terminada]="!d.activa">
       <div class="banda__marca">
+        @if (desdePanel) {
+          <button type="button" class="banda__volver" (click)="volverAlPanel()" aria-label="Volver a Alertas de mis contactos">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Volver
+          </button>
+        }
         <img src="logo.png" alt="" width="28" height="28" />
         <span>AlertaMujer</span>
       </div>

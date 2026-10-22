@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ReproductorContinuoComponent } from '../../shared/components/reproductor-continuo/reproductor-continuo';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { MensajeAlerta, Seguimiento, TrackingService } from '../../core/services/tracking.service';
@@ -54,6 +54,17 @@ const duracionTexto = (ms: number): string => {
 })
 export class TrackingComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  /**
+   * true si se llegó desde "Alertas de mis contactos" del panel con sesión iniciada: solo entonces
+   * se ofrece volver. Desde el enlace del correo no hay a dónde volver.
+   */
+  readonly desdePanel = typeof history !== 'undefined' && history.state?.desdePanel === true;
+
+  volverAlPanel(): void {
+    this.router.navigate(['/dashboard/alertas-contactos']);
+  }
   private trackingService = inject(TrackingService);
   private geocoding = inject(GeocodingService);
   private destroyRef = inject(DestroyRef);

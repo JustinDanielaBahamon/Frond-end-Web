@@ -201,8 +201,13 @@
               <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
-          <button *ngFor="let p of paginas" class="page-btn" [class.page-btn--active]="p === paginaActual"
-            (click)="cambiarPagina(p)">{{ p }}</button>
+          @for (p of paginas; track $index) {
+            @if (p === null) {
+              <span class="page-ellipsis" aria-hidden="true">…</span>
+            } @else {
+              <button class="page-btn" [class.page-btn--active]="p === paginaActual" (click)="cambiarPagina(p)">{{ p }}</button>
+            }
+          }
           <button class="page-btn" [disabled]="paginaActual >= totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m9 18 6-6-6-6" />

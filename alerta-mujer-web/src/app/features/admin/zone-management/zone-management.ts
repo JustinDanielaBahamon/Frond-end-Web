@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ZonesService } from '../../../core/services/zones.Services';
 import { Zona, TipoZona, EstadoZona } from '../../../core/models/zone-management-model';
 import { Modal } from '../../../shared/components/modal/modal';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 // Leaflet se carga por CDN en index.html (igual que en el módulo de Alertas)
 declare const L: any;
@@ -60,7 +61,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   porPagina = 6;
   totalFiltradas = 0;
   totalPaginas = 1;
-  paginas: number[] = [];
+  paginas: (number | null)[] = [];
 
   // ── Modal (crear / editar / ver) ─────────────────────────────
   modal: ModoModal = null;
@@ -171,7 +172,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
 
     const start = (this.paginaActual - 1) * this.porPagina;
     this.zonasFiltradas = resultado.slice(start, start + this.porPagina);
-    this.paginas = Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+    this.paginas = paginasCompactas(this.paginaActual, this.totalPaginas);
   }
 
   setChip(value: string): void {

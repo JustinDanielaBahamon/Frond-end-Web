@@ -258,8 +258,12 @@
           </span>
           <div class="ah-pagination-controls">
             <button (click)="paginaAnterior()" [disabled]="currentPage === 1">‹</button>
-            @for (p of paginasVisibles; track p) {
-              <button [class.active]="p === currentPage" (click)="irAPagina(p)">{{ p }}</button>
+            @for (p of paginasVisibles; track $index) {
+              @if (p === null) {
+                <span class="ah-ellipsis" aria-hidden="true">…</span>
+              } @else {
+                <button [class.active]="p === currentPage" (click)="irAPagina(p)">{{ p }}</button>
+              }
             }
             <button (click)="paginaSiguiente()" [disabled]="currentPage === totalPages">›</button>
           </div>

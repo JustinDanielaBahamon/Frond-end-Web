@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
-import { AdminPhone, ModerationHistory, UsersService } from '../../../core/services/users.services';
+import { AdminPhone, AlertSummary, ModerationHistory, UsersService } from '../../../core/services/users.services';
 import { shrinkPhoto } from '../../../core/utils/foto';
 import { ManagedUser } from '../../../core/models/user.model';
 import { Chip } from '../../../shared/components/chip/chip';
@@ -49,14 +49,6 @@ export interface EmergencyContact {
   relationship: string;
 }
 
-export interface AlertSummary {
-  id: string;
-  userId: number;
-  description: string;
-  location: string;
-  status: string;
-  created_at: string;
-}
 
 // Modelo del formulario (crear / editar)
 interface UserForm {
@@ -283,7 +275,7 @@ export class UserComponent implements OnInit {
       next: (alerts) => {
         // Las más recientes primero, máximo 5
         this.alertDetails = [...alerts]
-          .sort((a, b) => b.created_at.localeCompare(a.created_at))
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .slice(0, 5);
         this.loadingDetail = false;
         this.cdr.detectChanges();

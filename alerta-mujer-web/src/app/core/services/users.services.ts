@@ -21,6 +21,16 @@ interface AdminUserDto {
   alertCount: number;
 }
 
+/** Alert as the panel user detail lists it. */
+export interface AlertSummary {
+  id: string;
+  userId: number;
+  description: string;
+  location: string;
+  status: string;
+  createdAt: string;
+}
+
 /** Lo que se ha hecho con una cuenta (bloqueos, desbloqueos, solicitudes de eliminación). */
 export interface ModerationHistory {
   date: string;
@@ -280,7 +290,22 @@ export class UsersService {
   }
 
   // ── Datos relacionados ───────────────────────────────────────
-  getAlertsByUser(userId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${userId}`);
+  /** Alerts of a user for the panel detail, mapped from the backend fields (message, latitude, startedAt...). */
+  getAlertsByUser(userId: string | number): Observable<AlertSummary[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/api/alerts/user/${userId}`).pipe(
+      map((list) =>
+        list.map((a) => ({
+          id: String(a.id),
+          userId: a.userProfileId,
+          description: a.message?.trim() || 'Alerta sin mensaje',
+          location:
+            a.latitude != null && a.longitude != null
+              ? `${Number(a.latitude).toFixed(4)}, ${Number(a.longitude).toFixed(4)}`
+              : 'Sin ubicación',
+          status: a.status,
+          createdAt: a.startedAt ?? a.createdAt ?? '',
+        })),
+      ),
+    );
   }
 }

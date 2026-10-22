@@ -286,10 +286,12 @@ export class UserComponent implements OnInit {
           .sort((a, b) => b.created_at.localeCompare(a.created_at))
           .slice(0, 5);
         this.cargandoDetalle = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando detalle:', err);
         this.cargandoDetalle = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -493,12 +495,14 @@ export class UserComponent implements OnInit {
     this.guardando = false;
     this.cerrarModales();
     this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   private manejarErrorGuardado(err: unknown): void {
     console.error('Error guardando usuaria:', err);
     this.guardando = false;
     this.errorForm = 'No se pudo guardar. Intenta de nuevo.';
+    this.cdr.detectChanges();
   }
 
   cerrarModales(): void {

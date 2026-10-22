@@ -207,13 +207,15 @@ export class EvidencesManagementComponent implements OnInit {
       next: (blob) => {
         const evidencia = this.evidenciaSeleccionada || this.evidenciasFiltradas.find(e => e.id === id);
         const nombreArchivo = evidencia?.nombre || `evidencia_${id}`;
-        this.descargarArchivo(blob, nombreArchivo, evidencia?.tipo);
+        this.descargarArchivo(blob, nombreArchivo);
         // Las estadísticas se actualizan automáticamente en el servicio
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al descargar evidencia';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error descargando:', err);
       }
     });
@@ -231,6 +233,7 @@ export class EvidencesManagementComponent implements OnInit {
         error: (err) => {
           this.error = 'Error al eliminar evidencia';
           this.cargando = false;
+          this.cdr.detectChanges();
           console.error('Error eliminando:', err);
         }
       });
@@ -252,31 +255,18 @@ export class EvidencesManagementComponent implements OnInit {
       error: (err) => {
         this.error = 'Error al cambiar estado';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error cambiando estado:', err);
       }
     });
   }
 
-  private descargarArchivo(blob: Blob, nombre: string, tipo?: string): void {
-    
+  /** Descarga el archivo real. Si llega vacío es que ya no está en el servidor: se avisa, no se inventa. */
+  private descargarArchivo(blob: Blob, nombre: string): void {
     if (blob.size === 0) {
-      // Generar contenido simulado según el tipo de archivo
-      const contenido = this.generarContenidoSimulado(nombre, tipo);
-      const mimeType = this.obtenerMimeType(tipo);
-      const extension = this.obtenerExtension(tipo);
-      
-      const blobReal = new Blob([contenido], { type: mimeType });
-      const url = window.URL.createObjectURL(blobReal);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nombre.endsWith(extension) ? nombre : nombre + extension;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      this.error = 'El archivo de esta evidencia está vacío o ya no existe en el servidor.';
       return;
     }
-    
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -285,57 +275,6 @@ export class EvidencesManagementComponent implements OnInit {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-  }
-
-  private generarContenidoSimulado(nombre: string, tipo?: string): string {
-    const fecha = new Date().toLocaleString('es-ES');
-    let contenido = `Evidencia: ${nombre}\n`;
-    contenido += `Fecha de descarga: ${fecha}\n`;
-    contenido += `Sistema: AlertaMujer\n\n`;
-    contenido += `Esta es una evidencia de ejemplo generada por el sistema.\n`;
-    contenido += `En producción, este archivo contendría el contenido real de la evidencia.\n`;
-    
-    if (tipo === 'video') {
-      contenido += `\n[Contenido de video simulado]`;
-    } else if (tipo === 'audio') {
-      contenido += `\n[Contenido de audio simulado]`;
-    } else if (tipo === 'documento') {
-      contenido += `\n[Contenido de documento PDF simulado]`;
-    } else if (tipo === 'foto') {
-      contenido += `\n[Contenido de imagen simulado]`;
-    }
-    
-    return contenido;
-  }
-
-  private obtenerMimeType(tipo?: string): string {
-    switch (tipo) {
-      case 'video':
-        return 'video/mp4';
-      case 'audio':
-        return 'audio/mpeg';
-      case 'documento':
-        return 'application/pdf';
-      case 'foto':
-        return 'image/jpeg';
-      default:
-        return 'text/plain';
-    }
-  }
-
-  private obtenerExtension(tipo?: string): string {
-    switch (tipo) {
-      case 'video':
-        return '.mp4';
-      case 'audio':
-        return '.mp3';
-      case 'documento':
-        return '.pdf';
-      case 'foto':
-        return '.jpg';
-      default:
-        return '.txt';
-    }
   }
 
   // ========================================

@@ -271,6 +271,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.error = 'Error al actualizar dispositivo';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error actualizando dispositivo:', err);
       }
     });
@@ -290,6 +291,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.error = 'Error al eliminar dispositivo';
           this.cargando = false;
+          this.cdr.detectChanges();
           console.error('Error eliminando dispositivo:', err);
         }
       });
@@ -309,6 +311,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.error = 'Error al cambiar estado';
         this.cargando = false;
+        this.cdr.detectChanges();
         console.error('Error cambiando estado:', err);
       }
     });

@@ -54,7 +54,10 @@ export class TrackingService {
   private http = inject(HttpClient);
 
   consultar(codigo: string): Observable<Seguimiento> {
-    return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}`).pipe(
+    // v: identificador anónimo de este navegador, para que la usuaria sepa que alguien abrió su alerta
+    return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}`, {
+      params: { v: visitante() },
+    }).pipe(
       map(t => ({
         nombre: t.firstName || 'Una persona',
         activa: !!t.active,
@@ -95,5 +98,21 @@ export class TrackingService {
         body: texto,
       })
       .pipe(map(aMensaje));
+  }
+}
+
+const CLAVE_VISITANTE = 'alerta-mujer-visitante';
+
+/** Identificador anónimo y estable de este navegador (no contiene datos personales). */
+function visitante(): string {
+  try {
+    let id = localStorage.getItem(CLAVE_VISITANTE);
+    if (!id) {
+      id = 'web-' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+      localStorage.setItem(CLAVE_VISITANTE, id);
+    }
+    return id;
+  } catch {
+    return 'web-sin-almacenamiento';
   }
 }

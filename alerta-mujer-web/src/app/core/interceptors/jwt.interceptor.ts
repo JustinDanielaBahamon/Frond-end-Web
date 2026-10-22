@@ -10,6 +10,10 @@ export const jwtInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  // El seguimiento público (enlace del correo a los contactos) no usa sesión: nunca se le manda el
+  // token ni se envía al login por un error, aunque el navegador tenga una sesión vieja guardada
+  if (req.url.includes('/api/public/')) return next(req);
+
   const token = authService.getToken();
 
   const authReq = token

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compactPages } from './paginacion';
+import { compactPages } from './pagination';
 
 describe('paginasCompactas', () => {
   it('muestra todas cuando son pocas', () => {

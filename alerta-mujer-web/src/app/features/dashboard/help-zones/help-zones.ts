@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of, catchError } from 'rxjs';
 import * as L from 'leaflet';
-import { zoneIcon } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/zone-icon';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { ResourcesService } from '../../../core/services/resources.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
@@ -65,11 +65,11 @@ function resourceCategory(type: string): Category {
 }
 
 @Component({
-  selector: 'app-zonas-auxiliares',
+  selector: 'app-help-zones',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './zonas-auxiliares.html',
-  styleUrl: './zonas-auxiliares.scss',
+  templateUrl: './help-zones.html',
+  styleUrl: './help-zones.scss',
 })
 export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;

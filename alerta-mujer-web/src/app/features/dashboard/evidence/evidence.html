@@ -169,7 +169,7 @@
         <div class="ev-detail-head">
           <h2 class="ev-detail-title">{{ c.type === 'video' ? 'Video completo' : 'Audio completo' }} · {{ c.parts.length }} partes</h2>
         </div>
-        <app-reproductor-continuo [type]="c.type" [parts]="c.parts" />
+        <app-continuous-player [type]="c.type" [parts]="c.parts" />
         <p class="ev-muted">Para descargar o ver la huella de una parte, elígela en la lista.</p>
       } @else if (selected(); as e) {
         <div class="ev-viewer ev-viewer--{{ e.type }}">

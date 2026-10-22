@@ -9,11 +9,11 @@ import { AuthService } from '../../../../core/auth/auth.service';
  * data and cannot be undone, so an admin other than the requester approves it.
  */
 @Component({
-  selector: 'app-solicitudes-eliminacion',
+  selector: 'app-deletion-requests',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './solicitudes-eliminacion.html',
-  styleUrl: './solicitudes-eliminacion.scss',
+  templateUrl: './deletion-requests.html',
+  styleUrl: './deletion-requests.scss',
 })
 export class DeletionRequests implements OnInit {
   private usersService = inject(UsersService);

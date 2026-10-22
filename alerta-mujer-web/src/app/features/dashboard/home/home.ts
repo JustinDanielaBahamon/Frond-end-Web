@@ -3,7 +3,7 @@ import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
-import { zoneIcon } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/zone-icon';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';

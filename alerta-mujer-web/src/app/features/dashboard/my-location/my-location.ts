@@ -4,11 +4,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { zoneIcon } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/zone-icon';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
-import { RoutesService } from '../../../core/services/recorridos.service';
+import { RoutesService } from '../../../core/services/saved-routes.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { GeocodingService, Place } from '../../../core/services/geocoding.service';
 import { LocationEntry } from '../../../core/models/location.model';

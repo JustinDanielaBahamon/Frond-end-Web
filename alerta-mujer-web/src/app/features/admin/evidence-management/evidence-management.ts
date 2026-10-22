@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Evidence, EvidenceFilters, EvidenceStats } from '../../../core/models/evidence.model';
 import { EvidenceService } from '../../../core/services/evidence.service';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-evidences-management',

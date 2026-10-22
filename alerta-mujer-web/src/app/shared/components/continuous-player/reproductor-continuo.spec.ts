@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
-import { RecordingPart, ContinuousPlayerComponent } from './reproductor-continuo';
+import { RecordingPart, ContinuousPlayerComponent } from './continuous-player';
 
 const part = (id: number): RecordingPart => ({ id, url: `blob:parte-${id}`, created: new Date(2026, 9, 20, 10, 0, id) });
 

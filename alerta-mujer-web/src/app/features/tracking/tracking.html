@@ -209,13 +209,13 @@
           <!-- The app records in parts: here they are played in a row, as a single recording -->
           @if (videos().length) {
             <figure class="evidencia">
-              <app-reproductor-continuo type="video" [parts]="videos()" />
+              <app-continuous-player type="video" [parts]="videos()" />
               <figcaption>Video{{ videos().length > 1 ? ' · ' + videos().length + ' partes' : '' }}</figcaption>
             </figure>
           }
           @if (audios().length) {
             <figure class="evidencia">
-              <app-reproductor-continuo type="audio" [parts]="audios()" />
+              <app-continuous-player type="audio" [parts]="audios()" />
               <figcaption>Audio{{ audios().length > 1 ? ' · ' + audios().length + ' partes' : '' }}</figcaption>
             </figure>
           }

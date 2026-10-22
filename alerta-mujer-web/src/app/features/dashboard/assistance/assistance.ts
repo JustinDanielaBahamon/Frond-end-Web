@@ -9,7 +9,7 @@ import { AssistanceService } from '../../../core/services/assistance.service';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
-import { zoneIcon } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/zone-icon';
 import { ResourceCategory, RecordedCall, HelpResource } from '../../../core/models/assistance.model';
 
 type Tab = 'lineas' | 'centros' | 'llamadas';

@@ -6,8 +6,8 @@ import { AlertReport, ReportFilters, ReportStats, Pagination } from '../../../co
 import { ReportsService } from '../../../core/services/reports.service';
 import { AlertsService } from '../../../core/services/alerts.services';
 import { Alert } from '../../../core/models/alert.model';
-import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-report-management',

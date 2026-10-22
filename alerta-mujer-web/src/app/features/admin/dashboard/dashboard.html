@@ -20,10 +20,10 @@
     @if (period === 'custom') {
       <div class="filtros filtros--fechas">
         <label class="fecha-label">Desde
-          <app-selector-fecha label="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
+          <app-date-picker label="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
         </label>
         <label class="fecha-label">Hasta
-          <app-selector-fecha label="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
+          <app-date-picker label="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
         </label>
       </div>
     }

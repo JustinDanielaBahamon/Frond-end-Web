@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
 import { EmergencyContact } from '../../../core/models/emergency-contact.model';
 import { AuthService } from '../../../core/auth/auth.service';
-import { shrinkPhoto } from '../../../core/utils/foto';
+import { shrinkPhoto } from '../../../core/utils/photo';
 
 const RELATIONSHIPS = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 

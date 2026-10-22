@@ -7,7 +7,7 @@ import { AlertsService, AdminAlertDetail } from '../../../core/services/alerts.s
 import { GeocodingService } from '../../../core/services/geocoding.service';
 import { RiskZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/risk-zones.services';
 import { Alert, ActivationMethod } from '../../../core/models/alert.model';
-import { ManualZone, HotZone, MapPoint, PointType, POINT_TYPES, PointLayer } from '../../../core/models/zona.model';
+import { ManualZone, HotZone, MapPoint, PointType, POINT_TYPES, PointLayer } from '../../../core/models/map-zone.model';
 import { Modal } from '../../../shared/components/modal/modal';
 import { Chip } from '../../../shared/components/chip/chip';
 

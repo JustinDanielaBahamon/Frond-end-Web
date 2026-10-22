@@ -13,11 +13,11 @@ export interface RecordingPart {
  * ends the next starts. The bar shows every part and allows jumping to any of them.
  */
 @Component({
-  selector: 'app-reproductor-continuo',
+  selector: 'app-continuous-player',
   standalone: true,
   imports: [DatePipe],
-  templateUrl: './reproductor-continuo.html',
-  styleUrl: './reproductor-continuo.scss',
+  templateUrl: './continuous-player.html',
+  styleUrl: './continuous-player.scss',
 })
 export class ContinuousPlayerComponent implements OnChanges {
   @Input({ required: true }) parts: RecordingPart[] = [];

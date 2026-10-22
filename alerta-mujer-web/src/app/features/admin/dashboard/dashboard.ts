@@ -9,8 +9,8 @@ import { GeocodingService } from '../../../core/services/geocoding.service';
 import { RiskZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/risk-zones.services';
 import { UsersService } from '../../../core/services/users.services';
 import { Alert } from '../../../core/models/alert.model';
-import { ManualZone } from '../../../core/models/zona.model';
-import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
+import { ManualZone } from '../../../core/models/map-zone.model';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
 
 // Extra fields that come in db.json; optional so as not to depend on the model
 type AlertVM = Alert & {

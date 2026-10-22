@@ -2,13 +2,13 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { RecordingPart, ContinuousPlayerComponent } from '../../../shared/components/reproductor-continuo/reproductor-continuo';
+import { RecordingPart, ContinuousPlayerComponent } from '../../../shared/components/continuous-player/continuous-player';
 import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
 import {
   MyAlert, MyEvidence, MyEvidenceService, EvidenceType,
-} from '../../../core/services/mis-evidencias.service';
+} from '../../../core/services/my-evidence.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
 
 type Filter = 'todas' | EvidenceType;

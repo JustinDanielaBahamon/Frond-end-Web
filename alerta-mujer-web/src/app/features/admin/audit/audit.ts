@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import {
   AuditService, AuditFilters, AuditRecord, AuditActor
 } from '../../../core/services/audit.service';
-import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
+import { compactPages } from '../../../shared/utils/pagination';
 
 const PER_PAGE = 10;
 

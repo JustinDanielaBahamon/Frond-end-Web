@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ModeratorService, Report } from '../../../core/services/moderator.service';
 import { UsersService } from '../../../core/services/users.services';
-import { DeletionRequests } from './solicitudes-eliminacion/solicitudes-eliminacion';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { DeletionRequests } from './deletion-requests/deletion-requests';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-moderator-management',

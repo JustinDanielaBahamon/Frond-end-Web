@@ -3,10 +3,10 @@ import { DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ReceivedAlertsService } from '../../../core/services/received-alerts.service';
 import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/sidebar';
-import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
+import { TopbarComponent } from '../../../shared/layouts/topbar/topbar';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { PhoneMovementService } from '../../../core/services/movimiento-celular.service';
+import { PhoneMovementService } from '../../../core/services/phone-movement.service';
 
 @Component({
   selector: 'app-dashboard-layout',

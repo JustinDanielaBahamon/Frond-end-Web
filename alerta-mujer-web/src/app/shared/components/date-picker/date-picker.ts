@@ -29,10 +29,10 @@ const fromIso = (iso: string | null | undefined): Date | null => {
  * [value] + (valueChange).
  */
 @Component({
-  selector: 'app-selector-fecha',
+  selector: 'app-date-picker',
   standalone: true,
-  templateUrl: './selector-fecha.html',
-  styleUrl: './selector-fecha.scss',
+  templateUrl: './date-picker.html',
+  styleUrl: './date-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DatePicker), multi: true }],
 })

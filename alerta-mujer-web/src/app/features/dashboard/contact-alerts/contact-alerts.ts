@@ -5,11 +5,11 @@ import { ReceivedAlertsService } from '../../../core/services/received-alerts.se
 
 /** "Alertas de mis contactos": the alerts of the people who have me as an emergency contact. */
 @Component({
-  selector: 'app-alertas-contactos',
+  selector: 'app-contact-alerts',
   standalone: true,
   imports: [DatePipe],
-  templateUrl: './alertas-contactos.html',
-  styleUrl: './alertas-contactos.scss',
+  templateUrl: './contact-alerts.html',
+  styleUrl: './contact-alerts.scss',
 })
 export class AlertContactsComponent implements OnInit {
   readonly service = inject(ReceivedAlertsService);

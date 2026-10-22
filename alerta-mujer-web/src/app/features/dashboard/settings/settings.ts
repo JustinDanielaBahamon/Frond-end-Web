@@ -2,11 +2,11 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PasswordChangeComponent } from '../../../shared/components/password-change/password-change';
-import { DeleteAccountComponent } from '../../../shared/components/eliminar-cuenta/eliminar-cuenta';
+import { DeleteAccountComponent } from '../../../shared/components/delete-account/delete-account';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { PhoneMovementService } from '../../../core/services/movimiento-celular.service';
+import { PhoneMovementService } from '../../../core/services/phone-movement.service';
 
 interface AccentColor {
   name: string;

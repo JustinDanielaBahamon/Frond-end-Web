@@ -5,7 +5,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
-import { RoutesService, SavedRoute } from '../../../core/services/recorridos.service';
+import { RoutesService, SavedRoute } from '../../../core/services/saved-routes.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FrequentPlace } from '../../../core/models/frequent-place.model';
@@ -28,11 +28,11 @@ const SPEED_KMH = 5;
 const COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 
 @Component({
-  selector: 'app-guardar-recorrido',
+  selector: 'app-save-route',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './guardar-recorrido.html',
-  styleUrl: './guardar-recorrido.scss',
+  templateUrl: './save-route.html',
+  styleUrl: './save-route.scss',
 })
 export class SaveRouteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;

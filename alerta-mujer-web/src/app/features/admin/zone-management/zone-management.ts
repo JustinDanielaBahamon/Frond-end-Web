@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ZonesService } from '../../../core/services/zones.Services';
 import { Zone, ZoneType, ZoneStatus } from '../../../core/models/zone-management-model';
 import { Modal } from '../../../shared/components/modal/modal';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/pagination';
 
 // Leaflet is loaded from a CDN in index.html (same as in the Alerts module)
 declare const L: any;

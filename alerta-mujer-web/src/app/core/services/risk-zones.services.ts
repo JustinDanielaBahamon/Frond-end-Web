@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ManualZone, MapPoint, PointType, POINT_TYPES } from '../models/zona.model';
+import { ManualZone, MapPoint, PointType, POINT_TYPES } from '../models/map-zone.model';
 
 @Injectable({ providedIn: 'root' })
 export class RiskZonesService {

@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 import { AdminPhone, AlertSummary, ModerationHistory, UsersService } from '../../../core/services/users.services';
-import { shrinkPhoto } from '../../../core/utils/foto';
+import { shrinkPhoto } from '../../../core/utils/photo';
 import { ManagedUser } from '../../../core/models/user.model';
 import { Chip } from '../../../shared/components/chip/chip';
 import { Modal } from '../../../shared/components/modal/modal';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/pagination';
 
 // We extend the real model only with the UI selection flag (it does not live in the API)
 type UserUI = ManagedUser & { selected?: boolean };

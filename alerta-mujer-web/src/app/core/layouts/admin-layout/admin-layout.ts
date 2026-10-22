@@ -4,7 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { of, timer } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 import { SidebarComponent, SidebarLink, SidebarUser } from '../../../shared/layouts/sidebar/sidebar';
-import { TopbarAccountLink, TopbarComponent, TopbarNotification } from '../../../shared/layouts/tobber/topbar';
+import { TopbarAccountLink, TopbarComponent, TopbarNotification } from '../../../shared/layouts/topbar/topbar';
 import { AuthService } from '../../../core/auth/auth.service';
 import { InactivityService } from '../../../core/auth/inactivity.service';
 import { ThemeService } from '../../../core/theme/theme.service';

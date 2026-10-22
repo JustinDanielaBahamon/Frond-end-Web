@@ -12,11 +12,11 @@ const CONFIRMATION = 'ELIMINAR';
  * When done it signs out (the backend already revoked all sessions).
  */
 @Component({
-  selector: 'app-eliminar-cuenta',
+  selector: 'app-delete-account',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './eliminar-cuenta.html',
-  styleUrls: ['../password-change/password-change.scss', './eliminar-cuenta.scss'],
+  templateUrl: './delete-account.html',
+  styleUrls: ['../password-change/password-change.scss', './delete-account.scss'],
 })
 export class DeleteAccountComponent {
   @Output() close = new EventEmitter<void>();

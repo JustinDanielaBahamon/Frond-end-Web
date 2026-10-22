@@ -6,8 +6,8 @@ import { AlertsService } from '../../../core/services/alerts.services';
 import { Alert } from '../../../core/models/alert.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
-import { DatePicker } from '../../../shared/components/selector-fecha/selector-fecha';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
+import { compactPages } from '../../../shared/utils/pagination';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',

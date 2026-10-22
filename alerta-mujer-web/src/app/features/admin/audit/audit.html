@@ -54,11 +54,11 @@
     </label>
     <label class="field">
       <span>Desde</span>
-      <app-selector-fecha label="Desde" [(ngModel)]="filters.from" [max]="filters.to || null" (valueChange)="applyFilters()" />
+      <app-date-picker label="Desde" [(ngModel)]="filters.from" [max]="filters.to || null" (valueChange)="applyFilters()" />
     </label>
     <label class="field">
       <span>Hasta</span>
-      <app-selector-fecha label="Hasta" [(ngModel)]="filters.to" [min]="filters.from || null" (valueChange)="applyFilters()" />
+      <app-date-picker label="Hasta" [(ngModel)]="filters.to" [min]="filters.from || null" (valueChange)="applyFilters()" />
     </label>
     <button class="btn-clear" (click)="clearFilters()">
       <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar

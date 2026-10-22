@@ -91,11 +91,11 @@
       <div class="filter-group">
         <div class="filter-item">
           <label>Fecha Inicial</label>
-          <app-selector-fecha label="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
+          <app-date-picker label="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Fecha Final</label>
-          <app-selector-fecha label="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
+          <app-date-picker label="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
           <label>Lugar de Alerta</label>

@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
-import { ContinuousPlayerComponent } from '../../shared/components/reproductor-continuo/reproductor-continuo';
+import { ContinuousPlayerComponent } from '../../shared/components/continuous-player/continuous-player';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

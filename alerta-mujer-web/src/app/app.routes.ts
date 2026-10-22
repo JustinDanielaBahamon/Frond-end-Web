@@ -107,14 +107,14 @@ export const routes: Routes = [
       {
         path: 'ubicacion',
         loadComponent: () =>
-          import('./features/dashboard/ubicacion/location-shell')
+          import('./features/dashboard/location/location-shell')
             .then(m => m.LocationShellComponent),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'my-location' },
           {
             path: 'my-location',
             loadComponent: () =>
-              import('./features/dashboard/mi-ubicacion/my-location')
+              import('./features/dashboard/my-location/my-location')
                 .then(m => m.MyLocationComponent),
           },
           { path: 'history', redirectTo: 'my-location', pathMatch: 'full' },
@@ -124,19 +124,19 @@ export const routes: Routes = [
           {
             path: 'ubicaciones-guardadas',
             loadComponent: () =>
-              import('./features/dashboard/ubicaciones-guardadas/ubicaciones-guardadas')
+              import('./features/dashboard/saved-locations/saved-locations')
                 .then(m => m.SavedLocationsComponent),
           },
           {
             path: 'zonas-auxiliares',
             loadComponent: () =>
-              import('./features/dashboard/zonas-auxiliares/zonas-auxiliares')
+              import('./features/dashboard/help-zones/help-zones')
                 .then(m => m.HelpZonesComponent),
           },
           {
             path: 'guardar-recorrido',
             loadComponent: () =>
-              import('./features/dashboard/guardar-recorrido/guardar-recorrido')
+              import('./features/dashboard/save-route/save-route')
                 .then(m => m.SaveRouteComponent),
           },
           { path: 'historial-recorridos', redirectTo: 'guardar-recorrido', pathMatch: 'full' },
@@ -146,7 +146,7 @@ export const routes: Routes = [
       {
         path: 'alertas-contactos',
         loadComponent: () =>
-          import('./features/dashboard/alertas-contactos/alertas-contactos')
+          import('./features/dashboard/contact-alerts/contact-alerts')
             .then(m => m.AlertContactsComponent),
       },
       {

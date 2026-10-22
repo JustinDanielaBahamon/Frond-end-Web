@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DeviceService, Device, DeviceStats, DevicePermission } from '../../../core/services/device.service';
 import { Observable, Subject } from 'rxjs';
-import { compactPages } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-device-management',

@@ -25,11 +25,11 @@ export const LEVELS: Record<RiskLevel, { label: string; color: string }> = {
 const QUICK_NAMES = ['Casa', 'Trabajo', 'Universidad', 'Colegio', 'Gimnasio'];
 
 @Component({
-  selector: 'app-ubicaciones-guardadas',
+  selector: 'app-saved-locations',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './ubicaciones-guardadas.html',
-  styleUrl: './ubicaciones-guardadas.scss',
+  templateUrl: './saved-locations.html',
+  styleUrl: './saved-locations.scss',
 })
 export class SavedLocationsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;

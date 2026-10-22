@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { ModeratorService, Report } from '../../../core/services/moderator.service';
 import { UsersService } from '../../../core/services/users.services';
 import { SolicitudesEliminacion } from './solicitudes-eliminacion/solicitudes-eliminacion';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 @Component({
   selector: 'app-moderator-management',
@@ -27,8 +28,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   itemsPerPage = 7;
   totalItems = 0;
 
-  get paginas(): number[] {
-    return Array.from({ length: Math.max(1, this.totalPages) }, (_, i) => i + 1);
+  get paginas(): (number | null)[] {
+    return paginasCompactas(this.currentPage, this.totalPages);
   }
 
   // Estados UI

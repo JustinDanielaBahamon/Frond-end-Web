@@ -149,10 +149,13 @@
           [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <button *ngFor="let p of paginas" class="page-btn"
-          [class.active]="p === paginaActual"
-          [attr.aria-label]="'Página ' + p"
-          (click)="cambiarPagina(p)">{{ p }}</button>
+        @for (p of paginas; track $index) {
+          @if (p === null) {
+            <span class="page-ellipsis" aria-hidden="true">…</span>
+          } @else {
+            <button class="page-btn" [class.active]="p === paginaActual" [attr.aria-label]="'Página ' + p" (click)="cambiarPagina(p)">{{ p }}</button>
+          }
+        }
         <button class="page-btn" aria-label="Página siguiente"
           [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
           <i class="fa-solid fa-chevron-right"></i>

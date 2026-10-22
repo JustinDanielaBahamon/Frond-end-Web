@@ -247,29 +247,14 @@
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
               
-              @for (pagina of paginasVisibles; track pagina) {
-                <button 
-                  class="page-btn" 
-                  [class.active]="pagina === paginacion.paginaActual"
-                  (click)="cambiarPagina(pagina)"
-                >
-                  {{ pagina }}
-                </button>
+              @for (pagina of paginasVisibles; track $index) {
+                @if (pagina === null) {
+                  <span class="page-ellipsis" aria-hidden="true">…</span>
+                } @else {
+                  <button class="page-btn" [class.active]="pagina === paginacion.paginaActual" (click)="cambiarPagina(pagina)">{{ pagina }}</button>
+                }
               }
-              
-              @if (paginacion.totalPaginas > 5) {
-                <span class="page-ellipsis">...</span>
-              }
-              
-              @if (paginacion.totalPaginas > 5 && !paginasVisibles.includes(paginacion.totalPaginas)) {
-                <button 
-                  class="page-btn" 
-                  (click)="irAUltimaPagina()"
-                >
-                  {{ paginacion.totalPaginas }}
-                </button>
-              }
-              
+
               <button 
                 class="page-btn" 
                 aria-label="Página siguiente"

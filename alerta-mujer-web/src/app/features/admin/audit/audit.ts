@@ -5,6 +5,7 @@ import {
   AuditService, FiltrosAuditoria, RegistroAuditoria, ResponsableAuditoria
 } from '../../../core/services/audit.service';
 import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 const POR_PAGINA = 10;
 
@@ -79,15 +80,7 @@ export class AuditComponent implements OnInit {
   readonly seleccionado = signal<RegistroAuditoria | null>(null);
 
   readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / POR_PAGINA)));
-  readonly paginas = computed(() => {
-    // Ventana de 5 páginas alrededor de la actual
-    const total = this.totalPaginas();
-    const actual = this.pagina() + 1;
-    let inicio = Math.max(1, actual - 2);
-    const fin = Math.min(total, inicio + 4);
-    inicio = Math.max(1, fin - 4);
-    return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
-  });
+  readonly paginas = computed(() => paginasCompactas(this.pagina() + 1, this.totalPaginas()));
   readonly desdeItem = computed(() => (this.total() === 0 ? 0 : this.pagina() * POR_PAGINA + 1));
   readonly hastaItem = computed(() => Math.min((this.pagina() + 1) * POR_PAGINA, this.total()));
 

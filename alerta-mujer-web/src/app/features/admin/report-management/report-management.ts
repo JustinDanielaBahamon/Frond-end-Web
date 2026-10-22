@@ -7,6 +7,7 @@ import { ReportsService } from '../../../core/services/reports.service';
 import { AlertsService } from '../../../core/services/alerts.services';
 import { Alerta } from '../../../core/models/alert.model';
 import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 @Component({
   selector: 'app-report-management',
@@ -549,23 +550,8 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  get paginasVisibles(): number[] {
-    const paginas: number[] = [];
-    const maxPaginasVisibles = 5;
-    const mitad = Math.floor(maxPaginasVisibles / 2);
-    
-    let inicio = Math.max(1, this.paginacion.paginaActual - mitad);
-    let fin = Math.min(this.paginacion.totalPaginas, inicio + maxPaginasVisibles - 1);
-    
-    if (fin - inicio < maxPaginasVisibles - 1) {
-      inicio = Math.max(1, fin - maxPaginasVisibles + 1);
-    }
-    
-    for (let i = inicio; i <= fin; i++) {
-      paginas.push(i);
-    }
-    
-    return paginas;
+  get paginasVisibles(): (number | null)[] {
+    return paginasCompactas(this.paginacion.paginaActual, this.paginacion.totalPaginas);
   }
 
   // Helpers para template

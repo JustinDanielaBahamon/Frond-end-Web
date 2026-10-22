@@ -8,6 +8,7 @@ import { reducirFoto } from '../../../core/utils/foto';
 import { Usuario } from '../../../core/models/user.model';
 import { Chip } from '../../../shared/components/chip/chip';
 import { Modal } from '../../../shared/components/modal/modal';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 // Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
 type UsuariaUI = Usuario & { selected?: boolean };
@@ -91,7 +92,7 @@ export class UserComponent implements OnInit {
   readonly porPagina = 6;
   totalFiltradas = 0;
   totalPaginas = 1;
-  paginas: number[] = [];
+  paginas: (number | null)[] = [];
 
   selectedCount = 0;
   allSelected = false;
@@ -203,7 +204,7 @@ export class UserComponent implements OnInit {
 
     const start = (this.paginaActual - 1) * this.porPagina;
     this.usuariasFiltradas = resultado.slice(start, start + this.porPagina);
-    this.paginas = Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+    this.paginas = paginasCompactas(this.paginaActual, this.totalPaginas);
     this.updateSelection();
   }
 

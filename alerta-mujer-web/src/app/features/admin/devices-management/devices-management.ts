@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DeviceService, Device, DeviceStats, PermisoDispositivo } from '../../../core/services/device.service';
 import { Observable, Subject } from 'rxjs';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 @Component({
   selector: 'app-device-management',
@@ -183,12 +184,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  getPagesArray(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
+  getPagesArray(): (number | null)[] {
+    return paginasCompactas(this.currentPage, this.totalPages);
   }
 
   /**

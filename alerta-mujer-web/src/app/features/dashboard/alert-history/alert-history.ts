@@ -7,6 +7,7 @@ import { Alerta } from '../../../core/models/alert.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
 import { SelectorFecha } from '../../../shared/components/selector-fecha/selector-fecha';
+import { paginasCompactas } from '../../../shared/utils/paginacion';
 
 const iconDefault = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -335,8 +336,8 @@ cerrarMenu() {
     return Math.min(this.currentPage * this.pageSize, this.alertasFiltradas.length);
   }
 
-  get paginasVisibles(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  get paginasVisibles(): (number | null)[] {
+    return paginasCompactas(this.currentPage, this.totalPages);
   }
 
   irAPagina(p: number) {

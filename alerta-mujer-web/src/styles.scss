@@ -79,3 +79,15 @@ img.tiles-oscuras {
   background: linear-gradient(180deg, #c084fc, #a855f7);
   background-clip: padding-box;
 }
+
+/* Puntos suspensivos de la paginación abreviada (1 … 8 9 10 … 24) */
+.page-ellipsis,
+.ah-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  opacity: 0.6;
+  font-weight: 700;
+  user-select: none;
+}

@@ -312,7 +312,11 @@
         <p class="dd-nota"><i class="ti ti-info-circle"></i> {{ det.nota }}</p>
       }
       @if (det.enlace) {
-        <a class="dd-enlace" [href]="det.enlace.url" target="_blank" rel="noopener">{{ det.enlace.texto }} <i class="ti ti-external-link"></i></a>
+        @if (det.enlace.ruta) {
+          <a class="dd-enlace" [routerLink]="det.enlace.ruta">{{ det.enlace.texto }} <i class="ti ti-map-2"></i></a>
+        } @else {
+          <a class="dd-enlace" [href]="det.enlace.url" target="_blank" rel="noopener">{{ det.enlace.texto }} <i class="ti ti-external-link"></i></a>
+        }
       }
       <button type="button" class="dd-ok" (click)="cerrarDetalle()">Entendido</button>
     </section>

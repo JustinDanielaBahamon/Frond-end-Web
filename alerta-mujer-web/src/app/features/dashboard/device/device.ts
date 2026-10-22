@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Observable, Subject, Subscription, catchError, finalize, forkJoin, map, of, takeUntil } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
@@ -26,7 +27,8 @@ interface DetalleDispositivo {
   nota?: string;
   /** Color del encabezado en los resultados de las pruebas. */
   tono?: 'ok' | 'aviso' | 'error';
-  enlace?: { url: string; texto: string };
+  /** url: enlace externo; ruta: pantalla de esta misma web (se abre aquí, sin pestaña nueva). */
+  enlace?: { url?: string; ruta?: string; texto: string };
 }
 
 /** Permisos que informa la app (ver reportarPermisos en la app móvil). */
@@ -51,7 +53,7 @@ const ESTADOS_DISPOSITIVO: Record<string, string> = {
 @Component({
   selector: 'app-device',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './device.html',
   styleUrl: './device.scss',
 })
@@ -428,7 +430,8 @@ export class Device implements OnInit, OnDestroy {
         { etiqueta: 'Dirección', valor: this.direccionUltima ?? 'Buscando la dirección…' },
         { etiqueta: 'Fecha y hora', valor: this.fechaUbicacion(u) },
       ],
-      enlace: { url: `https://www.google.com/maps?q=${u.lat},${u.lng}`, texto: 'Ver en el mapa' },
+      // Se abre en el mapa de AlertaMujer (Mi ubicación), no en Google Maps
+      enlace: { ruta: '/dashboard/ubicacion/my-location', texto: 'Ver en mi mapa' },
     });
   }
 

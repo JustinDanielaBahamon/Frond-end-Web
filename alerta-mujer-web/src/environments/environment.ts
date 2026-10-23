@@ -4,9 +4,9 @@
 export const environment = {
   production: false,
   // MICROSERVICIOS EN PRODUCCIÓN (para probar localmente contra producción)
-  apiUrl: 'https://alerta-mujer-auth.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
-  alertApiUrl: 'https://alerta-mujer-alert.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
-  evidenceApiUrl: 'https://alerta-mujer-evidence.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
+  apiUrl: 'https://alerta-mujer-auth.onrender.com',
+  alertApiUrl: 'https://alerta-mujer-alert.onrender.com',
+  evidenceApiUrl: 'https://alerta-mujer-evidence.onrender.com',
   
   // DESARROLLO LOCAL (comentar las líneas de arriba y descomentar estas para usar localhost)
   // apiUrl: 'http://localhost:8080',

@@ -7,6 +7,7 @@ import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { MovimientoCelularService } from '../../../core/services/movimiento-celular.service';
+import { URL_DESCARGA_APK } from '../../../shared/constants/descarga-app';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -22,6 +23,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   readonly alertasRecibidas = inject(ReceivedAlertsService);
   /** "Tu celular cambió de lugar" (solo para la usuaria; se activa en Configuración). */
   readonly movimiento = inject(MovimientoCelularService);
+  /** APK del último release (el mismo enlace de la página de inicio). */
+  readonly urlDescargaApk = URL_DESCARGA_APK;
 
   sidebarCollapsed = false;
 

@@ -34,9 +34,9 @@
   <div class="sidebar__spacer"></div>
 
   @if (showMobileAppButton) {
-    <a [href]="mobileAppUrl" target="_blank" class="sidebar__mobile-btn">
-      <i class="fa-solid fa-arrow-up-right-from-square"></i>
-      Abrir app móvil
+    <a [href]="mobileAppUrl" target="_blank" rel="noopener" download class="sidebar__mobile-btn">
+      <i class="fa-solid fa-download"></i>
+      Descargar app móvil
     </a>
   }
 

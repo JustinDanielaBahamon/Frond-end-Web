@@ -1,15 +1,15 @@
 // Producción. Se usa al compilar con `ng build` (configuración "production"),
 // gracias a fileReplacements en angular.json.
 // apiUrl es solo el dominio del backend: los servicios ya agregan "/api/...".
-// Actualizar cuando el backend esté desplegado en Render.
+// Microservicios en Azure Container Apps (entorno alertamujer-env, Brazil South).
 export const environment = {
   production: true,
   // Auth Service (también atiende todo lo que no es de Alert ni de Evidence)
-  apiUrl: 'https://alerta-mujer-auth.onrender.com',
+  apiUrl: 'https://alerta-mujer-auth.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
   // Microservicios: dirección de Alert y Evidence (vacía = todo va a apiUrl, que es Auth).
   // Ver core/api/servicios.ts para saber qué rutas atiende cada uno.
-  alertApiUrl: 'https://alerta-mujer-alert.onrender.com',
-  evidenceApiUrl: 'https://alerta-mujer-evidence.onrender.com',
+  alertApiUrl: 'https://alerta-mujer-alert.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
+  evidenceApiUrl: 'https://alerta-mujer-evidence.wittybush-c3d970eb.brazilsouth.azurecontainerapps.io',
   // Firebase (inicio de sesión con Google). Datos públicos de la "app web" del proyecto
   // en Firebase Console -> Configuración del proyecto -> Tus apps. No son secretos.
   firebase: {

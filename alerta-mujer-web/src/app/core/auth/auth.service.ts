@@ -65,7 +65,7 @@ export class AuthService {
  * Full registration: saves the user with all her data.
  *      Does not sign in: after registering she goes to the login.
  */
-  registrar(data: UserRecord): Observable<User> {
+  register(data: UserRecord): Observable<User> {
     return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
       nombre: data.name.trim(),
       email: data.email.trim(),

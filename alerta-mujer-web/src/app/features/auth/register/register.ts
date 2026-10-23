@@ -259,6 +259,9 @@ export class RegisterComponent {
       email: this.form.controls.email,
       telephone: this.form.controls.telephone,
       documentNumber: this.form.controls.documentNumber,
+      // Keys sent by the backend before the English JSON keys
+      telefono: this.form.controls.telephone,
+      numeroDocumento: this.form.controls.documentNumber,
     };
     let checked = 0;
     for (const [field, notice] of Object.entries(fields)) {

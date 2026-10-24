@@ -29,7 +29,7 @@ const MAX_MB = 50;
 const ACEPTADOS = 'image/png,image/jpeg,image/webp,image/heic,video/*,audio/*';
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 /** Días que se guardan las evidencias si la alerta no se marca para conservar (backend). */
-export const DIAS_RETENCION = 60;
+export const DIAS_RETENCION = 30;
 /** Máximo de alertas que se pueden conservar (backend: AlertService.MAX_ALERTAS_CONSERVADAS). */
 export const MAX_CONSERVADAS = 5;
 

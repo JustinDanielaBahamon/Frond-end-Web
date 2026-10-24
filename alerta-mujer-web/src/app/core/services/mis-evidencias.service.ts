@@ -34,7 +34,7 @@ export interface MiAlerta {
   inicio: Date;
   lat: number | null;
   lng: number | null;
-  /** La usuaria la marcó para que sus evidencias no se borren a los 60 días. */
+  /** La usuaria la marcó para que sus evidencias no se borren a los 30 días. */
   conservar: boolean;
 }
 
@@ -100,7 +100,7 @@ export class MisEvidenciasService {
       }))));
   }
 
-  /** Conservar (o no) las evidencias de una alerta más allá de los 60 días. */
+  /** Conservar (o no) las evidencias de una alerta más allá de los 30 días. */
   conservar(alertId: number, conservar: boolean): Observable<void> {
     return this.http
       .patch(`${environment.apiUrl}/api/alerts/${alertId}/keep-evidence`, { keep: conservar })

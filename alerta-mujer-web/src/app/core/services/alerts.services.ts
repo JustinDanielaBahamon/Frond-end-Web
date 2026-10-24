@@ -27,14 +27,14 @@ export class AlertsService {
   // Usado por USUARIA: solo sus propias alertas
   getByUsuario(usuarioId: number): Observable<Alerta[]> {
     return this.http.get<any[]>(`${this.url}/user/${usuarioId}`).pipe(
-      map(lista => lista.map(a => this.normalizar(a)))
+      map(lista => lista.map(a => this.normalizar(a, true)))
     );
   }
 
   // Usado por USUARIA: sus alertas, de la más reciente a la más antigua
   getMine(): Observable<Alerta[]> {
     return this.http.get<any[]>(`${this.url}/me`).pipe(
-      map(lista => lista.map(a => this.normalizar(a)))
+      map(lista => lista.map(a => this.normalizar(a, true)))
     );
   }
 
@@ -89,7 +89,9 @@ export class AlertsService {
   // ── Normalización ──────────────────────────────────────────────
   // Convierte la alerta del backend (campos en inglés) al modelo Alerta del panel.
   // En administración el backend agrega userId, userName y userEmail.
-  private normalizar(a: any): Alerta {
+  // own: her own views. An alert cancelled with the duress PIN keeps running in silence, but on
+  // her screens it shows as cancelled (whoever forced her may be looking), like in the app.
+  private normalizar(a: any, own = false): Alerta {
     const lat = a.latitude != null ? Number(a.latitude) : 0;
     const lng = a.longitude != null ? Number(a.longitude) : 0;
     const usuarioId = a.userId ?? a.userProfileId;
@@ -102,7 +104,7 @@ export class AlertsService {
       ubicacion: lat || lng ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : '',
       lat,
       lng,
-      estado: this.normalizarEstado(a.status),
+      estado: own && a.duressAt ? 'Cancelada' : this.normalizarEstado(a.status),
       usuarioId,
       tipo: a.alertType ?? '',
       created_at: a.createdAt,

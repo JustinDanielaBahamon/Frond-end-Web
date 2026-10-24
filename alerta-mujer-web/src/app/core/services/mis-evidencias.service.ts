@@ -87,11 +87,12 @@ export class MisEvidenciasService {
     return this.http
       .get<Array<{
         id: number; status: string; activationMethod: string; startedAt: string;
-        latitude: number | null; longitude: number | null; keepEvidence?: boolean;
+        latitude: number | null; longitude: number | null; keepEvidence?: boolean; duressAt?: string | null;
       }>>(`${environment.apiUrl}/api/alerts/me`)
       .pipe(map((l) => l.map((a) => ({
         id: a.id,
-        estado: a.status,
+        // Cancelled with the duress PIN: it keeps running, but on her screens it looks cancelled
+        estado: a.duressAt ? 'cancelled' : a.status,
         metodo: a.activationMethod,
         inicio: fechaUtc(a.startedAt)!,
         lat: a.latitude != null ? Number(a.latitude) : null,

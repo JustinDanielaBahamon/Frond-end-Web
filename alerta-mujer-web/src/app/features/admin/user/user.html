@@ -40,14 +40,6 @@
       </button>
     </div>
 
-    <div class="filter-wrap">
-      <select class="filter-select" [(ngModel)]="filtroEstado" (change)="applyFilters()">
-        <option value="Todos">Filtrar por Estado (Todos)</option>
-        <option value="Activa">Activa</option>
-        <option value="Inactiva">Inactiva</option>
-        <option value="Bloqueada por Fraude">Bloqueada por Fraude</option>
-      </select>
-    </div>
   </div>
 
   <p class="aviso-panel" *ngIf="aviso" role="status">{{ aviso }}</p>

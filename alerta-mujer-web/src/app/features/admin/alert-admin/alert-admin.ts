@@ -167,6 +167,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       'Movimiento sospechoso': 'movimiento',
       'Botón de encendido':    'movimiento',
       'Manual':                'manual',
+      'Avísame si no llego':   'widget',
+      'Señal perdida':         'movimiento',
     };
     return map[medio] ?? 'boton';
   }
@@ -633,6 +635,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       'Movimiento sospechoso': '#8b5cf6',
       'Botón de encendido':    '#a855f7',
       'Manual':                '#9333ea',
+      'Avísame si no llego':   '#7c3aed',
+      'Señal perdida':         '#c026d3',
     };
 
     const color = atendida ? '#9ca3af' : (colores[medio] ?? '#d946ef');

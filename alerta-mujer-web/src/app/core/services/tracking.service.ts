@@ -30,6 +30,10 @@ export interface Seguimiento {
   recorrido: PuntoSeguimiento[];
   numeroEmergencia: string;
   evidencias: EvidenciaSeguimiento[];
+  /** Why the server activated it in a trip ("No confirmó que llegó a…"); null if she activated it. */
+  reason: string | null;
+  /** true if the server activated it because her phone's signal stopped. */
+  signalLost: boolean;
 }
 
 /** Mensaje del chat de la alerta. deElla: lo escribió quien activó la alerta. */
@@ -53,10 +57,16 @@ const aMensaje = (m: any): MensajeAlerta => ({
 export class TrackingService {
   private http = inject(HttpClient);
 
-  consultar(codigo: string): Observable<Seguimiento> {
+  /**
+   * delivery: the delivery the contact came from (?c= of the email link), so the user's history shows
+   * that this contact already saw the alert.
+   */
+  consultar(codigo: string, delivery?: string | null): Observable<Seguimiento> {
     // v: identificador anónimo de este navegador, para que la usuaria sepa que alguien abrió su alerta
+    const params: Record<string, string> = { v: visitante() };
+    if (delivery && /^\d+$/.test(delivery)) params['c'] = delivery;
     return this.http.get<any>(`${environment.apiUrl}/api/public/tracking/${encodeURIComponent(codigo)}`, {
-      params: { v: visitante() },
+      params,
     }).pipe(
       map(t => ({
         nombre: t.firstName || 'Una persona',
@@ -71,6 +81,8 @@ export class TrackingService {
           hora: new Date(p.recordedAt)
         })),
         numeroEmergencia: t.emergencyNumber || '123',
+        reason: t.reason || null,
+        signalLost: t.activationMethod === 'signal_lost',
         evidencias: (t.evidence ?? []).map((e: any) => ({
           id: e.id,
           tipo: e.mediaType,

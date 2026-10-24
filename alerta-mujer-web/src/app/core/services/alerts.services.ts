@@ -112,6 +112,9 @@ export class AlertsService {
 
   private normalizarMedio(valor: unknown): MedioActivacion {
     const v = String(valor ?? '').toLowerCase();
+    // Alerts the server activated in a trip: she did not confirm the arrival or her phone's signal stopped
+    if (v === 'signal_lost') return 'Señal perdida';
+    if (v === 'timer') return 'Avísame si no llego';
     if (v.includes('widget')) return 'Widget';
     if (v.includes('contact')) return 'Contacto';
     if (v.includes('power')) return 'Botón de encendido';

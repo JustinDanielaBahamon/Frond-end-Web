@@ -136,6 +136,8 @@ export class TrackingComponent implements OnInit {
   private chatTemporizador: ReturnType<typeof setInterval> | null = null;
 
   private codigo = '';
+  /** Delivery the contact came from (?c= of the email): marks in the history that she saw it. */
+  private delivery: string | null = null;
   private mapa: L.Map | null = null;
   private capa: L.LayerGroup | null = null;
   private temporizador: ReturnType<typeof setInterval> | null = null;
@@ -143,6 +145,7 @@ export class TrackingComponent implements OnInit {
 
   ngOnInit(): void {
     this.codigo = this.route.snapshot.paramMap.get('codigo') ?? '';
+    this.delivery = this.route.snapshot.queryParamMap.get('c');
     // Si el servidor (Render gratis) estaba dormido, la primera respuesta puede tardar
     const aviso = setTimeout(() => this.despertando.set(true), 4000);
     this.consultar(() => clearTimeout(aviso));
@@ -154,7 +157,7 @@ export class TrackingComponent implements OnInit {
   }
 
   private consultar(alTerminar?: () => void): void {
-    this.trackingService.consultar(this.codigo).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.trackingService.consultar(this.codigo, this.delivery).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (d) => {
         alTerminar?.();
         this.datos.set(d);

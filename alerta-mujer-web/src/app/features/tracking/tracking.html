@@ -39,6 +39,12 @@
         @if (d.inicio) { Activó la alerta a las {{ d.inicio | date: 'h:mm a' }} · }
         {{ d.activa ? 'lleva' : 'duró' }} {{ duracion() }}
       </p>
+      @if (d.reason) {
+        <p class="banda__reason">
+          <i class="ti" [class.ti-antenna-bars-off]="d.signalLost" [class.ti-clock-exclamation]="!d.signalLost" aria-hidden="true"></i>
+          <span><strong>La app avisó por {{ d.nombre }}:</strong> {{ d.reason }}</span>
+        </p>
+      }
     </header>
 
     <div class="cuerpo">

@@ -34,7 +34,11 @@ export interface Seguimiento {
   reason: string | null;
   /** true if the server activated it because her phone's signal stopped. */
   signalLost: boolean;
+  /** Warning for the contacts while it is active: she did not answer, her signal stopped or she was forced to cancel. */
+  warning: AlertWarning | null;
 }
+
+export type AlertWarning = 'unanswered' | 'signal_lost' | 'duress';
 
 /** Mensaje del chat de la alerta. deElla: lo escribió quien activó la alerta. */
 export interface MensajeAlerta {
@@ -83,6 +87,7 @@ export class TrackingService {
         numeroEmergencia: t.emergencyNumber || '123',
         reason: t.reason || null,
         signalLost: t.activationMethod === 'signal_lost',
+        warning: t.warning || null,
         evidencias: (t.evidence ?? []).map((e: any) => ({
           id: e.id,
           tipo: e.mediaType,

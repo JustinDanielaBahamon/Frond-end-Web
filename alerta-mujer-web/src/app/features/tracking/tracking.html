@@ -45,6 +45,18 @@
           <span><strong>La app avisó por {{ d.nombre }}:</strong> {{ d.reason }}</span>
         </p>
       }
+      @if (d.activa && d.warning) {
+        <p class="banda__reason banda__reason--warning" role="alert">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+          <span>
+            @switch (d.warning) {
+              @case ('unanswered') { Le preguntamos si sigue en peligro y no respondió. Su alerta sigue activa. }
+              @case ('signal_lost') { Su celular dejó de enviar ubicación: puede estar apagado, sin batería o sin señal. Abajo ves la última ubicación. }
+              @case ('duress') { Canceló la alerta con su código de emergencia: podría estar siendo obligada. La alerta sigue activa. No la llames si eso puede ponerla en riesgo. }
+            }
+          </span>
+        </p>
+      }
     </header>
 
     <div class="cuerpo">

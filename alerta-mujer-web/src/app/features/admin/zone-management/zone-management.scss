@@ -717,3 +717,41 @@ $yellow: #c084fc;
 @media (max-width: 380px) {
   .stats-grid { grid-template-columns: 1fr; }
 }
+
+// =============================================
+// LÍNEAS MÁS VISIBLES (igual que el Dashboard)
+// Solo estilos: no cambia nada del HTML ni del TS
+// =============================================
+
+// Tarjetas con borde morado, como las del Dashboard
+// (en modo claro, admin-lines-light.scss lo sube a 2px y usa el morado de líneas)
+.stat-card,
+.toolbar,
+.table-card {
+  border: 1px solid $border;
+}
+
+// Modo oscuro: líneas internas más gruesas
+:host-context([data-theme="dark"]) {
+  .search-box,
+  .chip,
+  .page-btn,
+  .actions button {
+    border-width: 2px;
+  }
+
+  .table-footer { border-top: 2px solid $border; }
+
+  // Encabezado y separadores de filas (escritorio)
+  @media (min-width: 769px) {
+    .table-card th { border-bottom: 2px solid $border; }
+    .table-card td { border-top: 2px solid $border; }
+    .table-card tbody tr:first-child td { border-top: none; }
+  }
+
+  // Celular: separador entre tarjetas de zona
+  @media (max-width: 768px) {
+    .table-card tbody tr { border-top-width: 2px; }
+    .table-card td.cell-acc { border-top-width: 2px; }
+  }
+}

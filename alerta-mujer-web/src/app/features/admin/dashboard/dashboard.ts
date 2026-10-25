@@ -6,7 +6,7 @@ import * as L from 'leaflet';
 
 import { AlertsService } from '../../../core/services/alerts.services';
 import { GeocodingService } from '../../../core/services/geocoding.service';
-import { RiskZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/risk-zones.services';
+import { ZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/zones.service';
 import { UsersService } from '../../../core/services/users.services';
 import { Alert } from '../../../core/models/alert.model';
 import { ManualZone } from '../../../core/models/map-zone.model';
@@ -127,7 +127,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private cdr = inject(ChangeDetectorRef);
   private alertsService = inject(AlertsService);
-  private riskZonesService = inject(RiskZonesService);
+  private zonesService = inject(ZonesService);
   private usersService = inject(UsersService);
   private geocoding = inject(GeocodingService);
 
@@ -231,7 +231,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     forkJoin({
       alerts: this.alertsService.getAll(),
-      zones: this.riskZonesService.getZones(),
+      zones: this.zonesService.getRiskZones(),
       users: this.usersService.getAll(),
     }).subscribe({
       next: ({ alerts, zones: apiZones, users }) => {

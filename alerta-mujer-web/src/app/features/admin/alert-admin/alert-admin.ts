@@ -5,7 +5,8 @@ import { forkJoin } from 'rxjs';
 
 import { AlertsService, AdminAlertDetail } from '../../../core/services/alerts.services';
 import { GeocodingService } from '../../../core/services/geocoding.service';
-import { RiskZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/risk-zones.services';
+import { ZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/zones.service';
+import { ResourcesService } from '../../../core/services/resources.service';
 import { Alert, ActivationMethod } from '../../../core/models/alert.model';
 import { ManualZone, HotZone, MapPoint, PointType, POINT_TYPES, PointLayer } from '../../../core/models/map-zone.model';
 import { Modal } from '../../../shared/components/modal/modal';
@@ -29,7 +30,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
   detail: AdminAlertDetail | null = null;
   loadingDetail = false;
   alertAddress: string | null = null;
-  private riskZonesService = inject(RiskZonesService);
+  private zonesService = inject(ZonesService);
+  private resourcesService = inject(ResourcesService);
   private cdr = inject(ChangeDetectorRef);
 
   // ── Mapa ─────────────────────────────────────────────────────
@@ -191,8 +193,8 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     this.loading = true;
     forkJoin({
       alerts: this.alertsService.getAll(),
-      zones: this.riskZonesService.getZones(),
-      points: this.riskZonesService.getPoints(),
+      zones: this.zonesService.getRiskZones(),
+      points: this.resourcesService.getMapPoints(),
     }).subscribe({
       next: ({ alerts, zones, points }) => {
         // DEBUG: remove it once the data looks right
@@ -501,7 +503,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       alertsInZone,
     };
 
-    this.riskZonesService.createZone(payload).subscribe({
+    this.zonesService.createRiskZone(payload).subscribe({
       next: (createdZone) => {
         const layer = this.paintZoneOnMap(createdZone);
         this.zoneLayers.set(createdZone.id, layer);
@@ -531,7 +533,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       alertsInZone: z.alerts,
     };
 
-    this.riskZonesService.createZone(payload).subscribe({
+    this.zonesService.createRiskZone(payload).subscribe({
       next: (createdZone) => {
         const layer = this.paintZoneOnMap(createdZone);
         this.zoneLayers.set(createdZone.id, layer);
@@ -546,7 +548,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   // ── Delete zone through the API ────────────────────────────────────
   deleteZone(id: number): void {
-    this.riskZonesService.deleteZone(id).subscribe({
+    this.zonesService.delete(id).subscribe({
       next: () => {
         const layer = this.zoneLayers.get(id);
         if (layer) this.map?.removeLayer(layer);
@@ -577,7 +579,7 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       lng: this.newPoint.lng || this.initialCenter[1],
     };
 
-    this.riskZonesService.createPoint(payload).subscribe({
+    this.resourcesService.createMapPoint(payload).subscribe({
       next: (createdPoint) => {
         this.mapPoints.push(createdPoint);
         this.paintOnePoint(createdPoint);

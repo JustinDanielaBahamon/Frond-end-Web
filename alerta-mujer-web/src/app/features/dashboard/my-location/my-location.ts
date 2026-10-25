@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { zoneIcon } from '../../../core/utils/zone-icon';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
-import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
+import { ZonesService } from '../../../core/services/zones.service';
 import { FrequentPlaceService } from '../../../core/services/frequent-places.service';
 import { RoutesService } from '../../../core/services/saved-routes.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -74,7 +74,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
   private phoneLocationService = inject(PhoneLocationService);
-  private zoneService = inject(NearbyZoneService);
+  private zoneService = inject(ZonesService);
   private frequentPlaceService = inject(FrequentPlaceService);
   private routesService = inject(RoutesService);
   private authService = inject(AuthService);
@@ -147,7 +147,7 @@ export class MyLocationComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.routesService.load();
 
-    this.zoneService.getByUser(0).subscribe({
+    this.zoneService.getNearby().subscribe({
       next: (zones) => this.zones.set(zones),
       error: () => this.zones.set([]),
     });

@@ -4,7 +4,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ZonesService } from '../../../core/services/zones.Services';
+import { ZonesService } from '../../../core/services/zones.service';
 import { Zone, ZoneType, ZoneStatus } from '../../../core/models/zone-management-model';
 import { Modal } from '../../../shared/components/modal/modal';
 import { compactPages } from '../../../shared/utils/pagination';

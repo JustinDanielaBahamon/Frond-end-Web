@@ -3,11 +3,40 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { EmergencyResource, EmergencyResourceApi, ResourceCall } from '../models/resource.model';
+import { MapPoint, PointType, POINT_TYPES } from '../models/map-zone.model';
 
 @Injectable({ providedIn: 'root' })
 export class ResourcesService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/resources`;
+
+  /** Support points of the alerts map (CAI, hospitals, firefighters...): resources with coordinates. */
+  getMapPoints(): Observable<MapPoint[]> {
+    return this.http.get<EmergencyResourceApi[]>(this.apiUrl).pipe(
+      map(resources => resources
+        .filter(r => r.resourceType in POINT_TYPES && r.latitude != null && r.longitude != null)
+        .map(r => ({
+          id: r.id,
+          type: r.resourceType as PointType,
+          name: r.name,
+          lat: Number(r.latitude),
+          lng: Number(r.longitude),
+        })))
+    );
+  }
+
+  createMapPoint(point: Omit<MapPoint, 'id'>): Observable<MapPoint> {
+    const resource = {
+      name: point.name,
+      resourceType: point.type,
+      city: 'Sin especificar',
+      latitude: point.lat,
+      longitude: point.lng,
+    };
+    return this.http.post<EmergencyResourceApi>(this.apiUrl, resource).pipe(
+      map(r => ({ id: r.id, type: point.type, name: r.name, lat: Number(r.latitude), lng: Number(r.longitude) }))
+    );
+  }
 
   /**
    * Get all emergency resources

@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, of, catchError } from 'rxjs';
 import * as L from 'leaflet';
 import { zoneIcon } from '../../../core/utils/zone-icon';
-import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
+import { ZonesService } from '../../../core/services/zones.service';
 import { ResourcesService } from '../../../core/services/resources.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { EmergencyResourceApi } from '../../../core/models/resource.model';
@@ -74,7 +74,7 @@ function resourceCategory(type: string): Category {
 export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
-  private zoneService = inject(NearbyZoneService);
+  private zoneService = inject(ZonesService);
   private resourcesService = inject(ResourcesService);
   private injector = inject(Injector);
 
@@ -129,7 +129,7 @@ export class HelpZonesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     forkJoin({
-      zones: this.zoneService.getByUser(0).pipe(catchError(() => of(null))),
+      zones: this.zoneService.getNearby().pipe(catchError(() => of(null))),
       resources: this.resourcesService.getActiveResources().pipe(catchError(() => of(null))),
     }).subscribe(({ zones, resources }) => {
       if (!zones && !resources) this.error.set('No se pudieron cargar las zonas. Intenta de nuevo.');

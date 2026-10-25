@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { AssistanceService } from '../../../core/services/assistance.service';
-import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
+import { ZonesService } from '../../../core/services/zones.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { zoneIcon } from '../../../core/utils/zone-icon';
@@ -40,7 +40,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer?: ElementRef<HTMLDivElement>;
 
   private service = inject(AssistanceService);
-  private zonesService = inject(NearbyZoneService);
+  private zonesService = inject(ZonesService);
   private phoneLocation = inject(PhoneLocationService);
   private injector = inject(Injector);
 
@@ -107,7 +107,7 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
         this.loading.set(false);
       },
     });
-    this.zonesService.getByUser(0).subscribe({
+    this.zonesService.getNearby().subscribe({
       next: (zones) => this.helpZones.set(zones.map(fromZone).filter((z): z is HelpResource => z !== null)),
       error: () => {},
     });

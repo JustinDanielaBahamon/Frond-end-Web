@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { zoneIcon } from '../../../core/utils/zone-icon';
-import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
+import { ZonesService } from '../../../core/services/zones.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';
 import { SecurityLevel, SecurityStatus } from '../../../core/models/security-status.model';
@@ -66,7 +66,7 @@ const shortTime = (d: Date) => d.toLocaleTimeString('es-CO', { hour: 'numeric', 
 export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   private map: L.Map | null = null;
-  private zoneService = inject(NearbyZoneService);
+  private zoneService = inject(ZonesService);
   private securityStatusService = inject(UserSecurityStatusService);
   private authService = inject(AuthService);
   private deviceService = inject(DeviceService);
@@ -336,7 +336,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.zoneService.getByUser(currentUser.id).subscribe({
+    this.zoneService.getNearby().subscribe({
       next: (zones) => {
         this.zones = zones;
         this.drawZonesOnMap();

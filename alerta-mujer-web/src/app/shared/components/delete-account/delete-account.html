@@ -3,22 +3,22 @@
     <header class="pc-head">
       <span class="pc-head__icon"><i class="ti ti-trash"></i></span>
       <div>
-        <h2 id="ec-titulo">¿Eliminar tu cuenta?</h2>
-        <p>Se cerrará tu sesión en la web y en la app, en todos tus dispositivos.</p>
+        <h2 id="ec-titulo">{{ '¿Eliminar tu cuenta?' | t }}</h2>
+        <p>{{ 'Se cerrará tu sesión en la web y en la app, en todos tus dispositivos.' | t }}</p>
       </div>
-      <button type="button" class="pc-close" (click)="exit()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+      <button type="button" class="pc-close" (click)="exit()" [attr.aria-label]="'Cerrar' | t"><i class="ti ti-x"></i></button>
     </header>
 
     <form class="pc-form" (ngSubmit)="delete()">
       <ul class="ec-list">
         @for (line of whatGetsDeleted; track line) {
-          <li><i class="ti ti-circle-x"></i><span>{{ line }}</span></li>
+          <li><i class="ti ti-circle-x"></i><span>{{ line | t }}</span></li>
         }
       </ul>
-      <p class="ec-notice">Esto no se puede deshacer. Tus alertas quedan solo como un registro anónimo.</p>
+      <p class="ec-notice">{{ 'Esto no se puede deshacer. Tus alertas quedan solo como un registro anónimo.' | t }}</p>
 
       <label class="pc-field">
-        <span>Escribe <strong>{{ word }}</strong> para confirmar</span>
+        <span>{{ 'Escribe' | t }} <strong>{{ word | t }}</strong> {{ 'para confirmar' | t }}</span>
         <div class="pc-input">
           <input name="confirmacion" autocomplete="off" [placeholder]="word" [disabled]="deleting()"
                  [ngModel]="text()" (ngModelChange)="text.set($event)" />
@@ -26,13 +26,13 @@
       </label>
 
       @if (error()) {
-        <p class="pc-error"><i class="ti ti-alert-circle"></i>{{ error() }}</p>
+        <p class="pc-error"><i class="ti ti-alert-circle"></i>{{ error() | t }}</p>
       }
 
       <div class="pc-actions">
-        <button type="button" class="pc-btn pc-btn--ghost" (click)="exit()" [disabled]="deleting()">Cancelar</button>
+        <button type="button" class="pc-btn pc-btn--ghost" (click)="exit()" [disabled]="deleting()">{{ 'Cancelar' | t }}</button>
         <button type="submit" class="pc-btn pc-btn--primary" [disabled]="!ready() || deleting()">
-          {{ deleting() ? 'Eliminando…' : 'Eliminar definitivamente' }}
+          {{ deleting() ? 'Eliminando…' : 'Eliminar definitivamente' | t }}
         </button>
       </div>
     </form>

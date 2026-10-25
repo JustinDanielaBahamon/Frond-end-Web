@@ -3,11 +3,11 @@
 
   <!-- TÍTULO -->
   <div class="alerts-header">
-    <h1 class="alerts-title">Centro de Vigilancia y Respuesta</h1>
+    <h1 class="alerts-title">{{ 'Centro de Vigilancia y Respuesta' | t }}</h1>
     <div class="alerts-header__right">
       <span class="live-dot"></span>
-      <span class="live-label">En vivo</span>
-      <span class="alerts-count">{{ pendingAlerts }} alertas activas</span>
+      <span class="live-label">{{ 'En vivo' | t }}</span>
+      <span class="alerts-count">{{ pendingAlerts | t }} {{ 'alertas activas' | t }}</span>
     </div>
   </div>
 
@@ -20,33 +20,33 @@
       <!-- Tabs -->
       <div class="panel-tabs">
         <button class="panel-tab" [class.panel-tab--active]="activeTab === 'alertas'" (click)="activeTab = 'alertas'">
-          🟣 Alertas
-          <span class="tab-badge">{{ pendingAlerts }}</span>
+          {{ '🟣 Alertas' | t }}
+          <span class="tab-badge">{{ pendingAlerts | t }}</span>
         </button>
         <button class="panel-tab" [class.panel-tab--active]="activeTab === 'zonas'" (click)="activeTab = 'zonas'">
-          🗺️ Zonas
-          <span class="tab-badge tab-badge--purple">{{ manualZones.length }}</span>
+          {{ '🗺️ Zonas' | t }}
+          <span class="tab-badge tab-badge--purple">{{ manualZones.length | t }}</span>
         </button>
       </div>
 
       <!-- ── TAB ALERTAS ── -->
       <ng-container *ngIf="activeTab === 'alertas'">
         <div class="panel-filters">
-          <input class="panel-search" type="search" placeholder="Buscar por nombre, lugar o #número"
-            aria-label="Buscar alertas" [(ngModel)]="alertSearch" (input)="filterAlerts()" />
+          <input class="panel-search" type="search" [placeholder]="'Buscar por nombre, lugar o #número' | t"
+            [attr.aria-label]="'Buscar alertas' | t" [(ngModel)]="alertSearch" (input)="filterAlerts()" />
           <select class="panel-select" [(ngModel)]="methodFilter" (change)="filterAlerts()">
-            <option value="Todos">Todos los modos</option>
-            <option value="Botón de pánico">Botón de pánico</option>
-            <option value="Widget">Widget</option>
-            <option value="Contacto">Desde contactos</option>
-            <option value="Movimiento sospechoso">Movimiento sospechoso</option>
-            <option value="Botón de encendido">Botón de encendido</option>
-            <option value="Manual">Manual</option>
+            <option value="Todos">{{ 'Todos los modos' | t }}</option>
+            <option value="Botón de pánico">{{ 'Botón de pánico' | t }}</option>
+            <option value="Widget">{{ 'Widget' | t }}</option>
+            <option value="Contacto">{{ 'Desde contactos' | t }}</option>
+            <option value="Movimiento sospechoso">{{ 'Movimiento sospechoso' | t }}</option>
+            <option value="Botón de encendido">{{ 'Botón de encendido' | t }}</option>
+            <option value="Manual">{{ 'Manual' | t }}</option>
           </select>
           <select class="panel-select" [(ngModel)]="statusFilter" (change)="filterAlerts()">
-            <option value="Todos">Todos</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Atendida">Atendida</option>
+            <option value="Todos">{{ 'Todos' | t }}</option>
+            <option value="Pendiente">{{ 'Pendiente' | t }}</option>
+            <option value="Atendida">{{ 'Atendida' | t }}</option>
           </select>
         </div>
 
@@ -90,29 +90,29 @@
 
             <div class="alert-data">
               <div class="alert-top">
-                <span class="alert-name">{{ alert.name }}</span>
-                <span class="alert-time">{{ alert.time }}</span>
+                <span class="alert-name">{{ alert.name | t }}</span>
+                <span class="alert-time">{{ alert.time | t }}</span>
               </div>
-              <span class="alert-desc">{{ alert.description }}</span>
+              <span class="alert-desc">{{ alert.description | t }}</span>
               <div class="alert-coords">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                {{ alert.lat.toFixed(4) }}, {{ alert.lng.toFixed(4) }}
+                {{ alert.lat.toFixed(4) | t }}, {{ alert.lng.toFixed(4) | t }}
               </div>
             </div>
 
             <button class="btn-attend" [class.btn-attend--done]="alert.status === 'Atendida'"
               (click)="$event.stopPropagation(); attendAlert(alert)">{{ alert.status === 'Atendida' ? '✓' :
-              'Atender' }}</button>
+              'Atender' | t }}</button>
           </div>
 
           <div class="list-empty" *ngIf="filteredAlerts.length === 0">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.5">
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
-            <p>No hay alertas con ese filtro</p>
+            <p>{{ 'No hay alertas con ese filtro' | t }}</p>
           </div>
         </div>
       </ng-container>
@@ -127,35 +127,35 @@
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
-            Pin de peligro
+            {{ 'Pin de peligro' | t }}
           </button>
           <button class="btn-add-zone btn-add-zone--area" (click)="openZoneModal('area')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <circle cx="12" cy="12" r="10" />
             </svg>
-            Área de riesgo
+            {{ 'Área de riesgo' | t }}
           </button>
         </div>
 
         <!-- Automatic zones by density -->
         <div class="zones-section">
           <div class="zones-section__title">
-            <span>🔥 Zonas calientes</span>
-            <span class="zones-section__sub">Por densidad de alertas</span>
+            <span>{{ '🔥 Zonas calientes' | t }}</span>
+            <span class="zones-section__sub">{{ 'Por densidad de alertas' | t }}</span>
           </div>
           <div class="zone-auto-card" *ngFor="let z of hotZones" (click)="goToZone(z.lat, z.lng)">
-            <div class="zone-auto__level" [ngClass]="'level--' + z.level.toLowerCase()">{{ z.level }}</div>
+            <div class="zone-auto__level" [ngClass]="'level--' + z.level.toLowerCase()">{{ z.level | t }}</div>
             <div class="zone-auto__info">
-              <span class="zone-auto__name">{{ z.name }}</span>
-              <span class="zone-auto__alerts">{{ z.alerts }} alertas en esta área</span>
+              <span class="zone-auto__name">{{ z.name | t }}</span>
+              <span class="zone-auto__alerts">{{ z.alerts | t }} {{ 'alertas en esta área' | t }}</span>
             </div>
             <!-- BUTTON: mark this hot zone directly on the map -->
             <button class="btn-mark-zone" (click)="$event.stopPropagation(); markHotZone(z)"
-              title="Marcar esta zona en el mapa">
+              [title]="'Marcar esta zona en el mapa' | t">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              Marcar
+              {{ 'Marcar' | t }}
             </button>
           </div>
         </div>
@@ -163,8 +163,8 @@
         <!-- Zonas marcadas manualmente -->
         <div class="zones-section">
           <div class="zones-section__title">
-            <span>📍 Zonas marcadas</span>
-            <span class="zones-section__sub">{{ manualZones.length }} total</span>
+            <span>{{ '📍 Zonas marcadas' | t }}</span>
+            <span class="zones-section__sub">{{ manualZones.length | t }} {{ 'total' | t }}</span>
           </div>
 
           <!-- Filtro nivel -->
@@ -184,15 +184,15 @@
                 <!-- Icon by method -->
                 <span class="zone-method-icon" *ngIf="z.method === 'pin'">📍</span>
                 <span class="zone-method-icon" *ngIf="z.method === 'area'">⭕</span>
-                <span class="zone-manual__name">{{ z.name }}</span>
+                <span class="zone-manual__name">{{ z.name | t }}</span>
               </div>
-              <span class="zone-level-badge" [ngClass]="'level-badge--' + z.level.toLowerCase()">{{ z.level }}</span>
+              <span class="zone-level-badge" [ngClass]="'level-badge--' + z.level.toLowerCase()">{{ z.level | t }}</span>
             </div>
             <div class="zone-manual__meta">
-              <span>{{ z.alertsInZone }} alertas dentro</span>
-              <span *ngIf="z.method === 'area' && z.radio" class="zone-radio-label">r: {{ z.radio }}m</span>
+              <span>{{ z.alertsInZone | t }} {{ 'alertas dentro' | t }}</span>
+              <span *ngIf="z.method === 'area' && z.radio" class="zone-radio-label">r: {{ z.radio | t }}m</span>
               <button class="btn-delete-zone" (click)="$event.stopPropagation(); deleteZone(z.id)"
-                title="Eliminar zona">
+                [title]="'Eliminar zona' | t">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
@@ -202,7 +202,7 @@
           </div>
 
           <div class="list-empty" *ngIf="filteredManualZones.length === 0">
-            <p>No hay zonas marcadas.<br>Usa los botones de arriba para agregar.</p>
+            <p>{{ 'No hay zonas marcadas.' | t }}<br>{{ 'Usa los botones de arriba para agregar.' | t }}</p>
           </div>
         </div>
       </ng-container>
@@ -219,10 +219,10 @@
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
           <circle cx="12" cy="10" r="3" />
         </svg>
-        Haz click en el mapa para colocar el
-        {{ waitingZoneClick ? (zoneMode === 'pin' ? 'pin de peligro' : 'centro del área') : 'punto' }}
+        {{ 'Haz click en el mapa para colocar el' | t }}
+        {{ waitingZoneClick ? (zoneMode === 'pin' ? 'pin de peligro' : 'centro del área') : 'punto' | t }}
         <button class="btn-cancel-drawing"
-          (click)="waitingZoneClick = false; waitingPointClick = false">Cancelar</button>
+          (click)="waitingZoneClick = false; waitingPointClick = false">{{ 'Cancelar' | t }}</button>
       </div>
 
       <!-- FAB -->
@@ -233,26 +233,26 @@
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
-            Pin de zona peligrosa
+            {{ 'Pin de zona peligrosa' | t }}
           </button>
           <button class="fab-option" (click)="openZoneModal('area')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10" />
             </svg>
-            Área de riesgo
+            {{ 'Área de riesgo' | t }}
           </button>
           <button class="fab-option" (click)="addCaiPoint()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
-            Agregar CAI / Hospital
+            {{ 'Agregar CAI / Hospital' | t }}
           </button>
           <button class="fab-option" (click)="clearView()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" />
               <path d="M12 8v4l3 3" />
             </svg>
-            Centrar mapa
+            {{ 'Centrar mapa' | t }}
           </button>
         </div>
         <button class="fab-main" (click)="fabOpen = !fabOpen">
@@ -270,39 +270,39 @@
       <!-- Filtros capas -->
       <div class="filters-layers">
         <button class="filters-toggle" (click)="filtersOpen = !filtersOpen">
-          Capas
+          {{ 'Capas' | t }}
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path [attr.d]="filtersOpen ? 'm18 15-6-6-6 6' : 'm6 9 6 6 6-6'" />
           </svg>
         </button>
         <div class="filters-body" *ngIf="filtersOpen">
           <div class="filter-row">
-            <span class="filter-label">Alertas</span>
+            <span class="filter-label">{{ 'Alertas' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.alerts"
                 (change)="toggleLayer('alerts')"><span class="toggle__slider"></span></label>
           </div>
           <div class="filter-row">
-            <span class="filter-label">Zonas de Riesgo</span>
+            <span class="filter-label">{{ 'Zonas de Riesgo' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.zones" (change)="toggleLayer('zones')"><span
                 class="toggle__slider"></span></label>
           </div>
           <div class="filter-row">
-            <span class="filter-label">Policía y CAI</span>
+            <span class="filter-label">{{ 'Policía y CAI' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.cais" (change)="toggleLayer('cais')"><span
                 class="toggle__slider"></span></label>
           </div>
           <div class="filter-row">
-            <span class="filter-label">Salud</span>
+            <span class="filter-label">{{ 'Salud' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.hospitals"
                 (change)="toggleLayer('hospitals')"><span class="toggle__slider"></span></label>
           </div>
           <div class="filter-row">
-            <span class="filter-label">Bomberos y apoyo</span>
+            <span class="filter-label">{{ 'Bomberos y apoyo' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.support"
                 (change)="toggleLayer('support')"><span class="toggle__slider"></span></label>
           </div>
           <div class="filter-row">
-            <span class="filter-label">Calor</span>
+            <span class="filter-label">{{ 'Calor' | t }}</span>
             <label class="toggle"><input type="checkbox" [(ngModel)]="layers.heat" (change)="toggleLayer('heat')"><span
                 class="toggle__slider"></span></label>
           </div>
@@ -317,56 +317,56 @@
           </svg>
         </button>
         <div class="map-popup__type" [ngClass]="'popup-type--' + methodClass(activeAlert.activationMethod)">
-          {{ activeAlert.activationMethod }}
+          {{ activeAlert.activationMethod | t }}
         </div>
-        <div class="map-popup__name">{{ activeAlert.name }}</div>
-        <div class="map-popup__desc">{{ activeAlert.description }}</div>
+        <div class="map-popup__name">{{ activeAlert.name | t }}</div>
+        <div class="map-popup__desc">{{ activeAlert.description | t }}</div>
         <div class="map-popup__row">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
-          {{ activeAlert.lat.toFixed(6) }}, {{ activeAlert.lng.toFixed(6) }}
+          {{ activeAlert.lat.toFixed(6) | t }}, {{ activeAlert.lng.toFixed(6) | t }}
         </div>
         <div class="map-popup__row">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
           </svg>
-          {{ activeAlert.time }}
+          {{ activeAlert.time | t }}
         </div>
 
         <!-- Detail: address, last location and delivery to each contact (without their data) -->
         <div class="map-popup__detail">
-          <p class="map-popup__loading" *ngIf="loadingDetail">Cargando detalle…</p>
+          <p class="map-popup__loading" *ngIf="loadingDetail">{{ 'Cargando detalle…' | t }}</p>
           <ng-container *ngIf="detail as d">
             <div class="map-popup__item" *ngIf="alertAddress">
-              <span>Lugar</span><strong>{{ alertAddress }}</strong>
+              <span>{{ 'Lugar' | t }}</span><strong>{{ alertAddress | t }}</strong>
             </div>
             <div class="map-popup__item" *ngIf="d.locationVisible; else withoutLocation">
-              <span>Última ubicación</span>
-              <strong>{{ d.lastLocation ? howLongAgo(d.lastLocation.time) : 'No envió ubicaciones' }}
-                <small *ngIf="d.points > 1"> · {{ d.points }} puntos</small></strong>
+              <span>{{ 'Última ubicación' | t }}</span>
+              <strong>{{ d.lastLocation ? howLongAgo(d.lastLocation.time) : 'No envió ubicaciones' | t }}
+                <small *ngIf="d.points > 1"> · {{ d.points | t }} {{ 'puntos' | t }}</small></strong>
             </div>
             <ng-template #withoutLocation>
-              <p class="map-popup__note">Alerta cancelada o vencida: su ubicación no se muestra.</p>
+              <p class="map-popup__note">{{ 'Alerta cancelada o vencida: su ubicación no se muestra.' | t }}</p>
             </ng-template>
             <div class="map-popup__deliveries" *ngIf="d.deliveries.length; else withoutDeliveries">
-              <span>Avisos a contactos</span>
+              <span>{{ 'Avisos a contactos' | t }}</span>
               <div class="map-popup__delivery" *ngFor="let e of d.deliveries">
-                <em>Contacto {{ e.contact }}<ng-container *ngIf="e.relationship"> ({{ e.relationship }})</ng-container></em>
+                <em>{{ 'Contacto' | t }} {{ e.contact | t }}<ng-container *ngIf="e.relationship"> ({{ e.relationship | t }})</ng-container></em>
                 <span *ngFor="let c of e.channels" class="delivery-chip" [class.delivery-chip--ok]="c.status === 'sent' || c.status === 'delivered'"
-                      [class.delivery-chip--failure]="c.status === 'failed'">{{ channelText(c.channel, c.status) }}</span>
+                      [class.delivery-chip--failure]="c.status === 'failed'">{{ channelText(c.channel, c.status) | t }}</span>
               </div>
             </div>
             <ng-template #withoutDeliveries>
-              <p class="map-popup__note">No se registraron avisos a contactos.</p>
+              <p class="map-popup__note">{{ 'No se registraron avisos a contactos.' | t }}</p>
             </ng-template>
           </ng-container>
         </div>
 
         <button class="map-popup__attend" (click)="attendAlert(activeAlert)">
-          {{ activeAlert.status === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' }}
+          {{ activeAlert.status === 'Atendida' ? '✓ Atendida' : 'Marcar como atendida' | t }}
         </button>
       </div>
 
@@ -389,13 +389,13 @@
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
         <circle cx="12" cy="10" r="3" />
       </svg>
-      Pin puntual
+      {{ 'Pin puntual' | t }}
     </button>
     <button class="modal__mode-tab" [class.modal__mode-tab--active]="zoneMode === 'area'" (click)="zoneMode = 'area'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10" />
       </svg>
-      Área circular
+      {{ 'Área circular' | t }}
     </button>
   </div>
 
@@ -406,7 +406,7 @@
       <div class="form-step__num">1</div>
       <div class="form-step__content">
         <p class="form-step__label">
-          {{ zoneMode === 'pin' ? 'Colocar pin en el mapa' : 'Elegir centro del área' }}
+          {{ zoneMode === 'pin' ? 'Colocar pin en el mapa' : 'Elegir centro del área' | t }}
         </p>
         <button class="btn-click-map" [class.btn-click-map--active]="waitingZoneClick"
           (click)="enableMapClick()">
@@ -415,10 +415,10 @@
             <circle cx="12" cy="10" r="3" />
           </svg>
           {{ waitingZoneClick ? '⏳ Haz click en el mapa...' : (newZone.lat !== 0 ? '✓ Ubicación seleccionada' :
-          'Seleccionar en el mapa') }}
+          'Seleccionar en el mapa') | t }}
         </button>
         <p class="form-coords" *ngIf="newZone.lat !== 0">
-          {{ newZone.lat.toFixed(5) }}, {{ newZone.lng.toFixed(5) }}
+          {{ newZone.lat.toFixed(5) | t }}, {{ newZone.lng.toFixed(5) | t }}
         </p>
       </div>
     </div>
@@ -427,16 +427,16 @@
     <div class="form-step" *ngIf="zoneMode === 'area'">
       <div class="form-step__num">2</div>
       <div class="form-step__content">
-        <p class="form-step__label">Radio del área</p>
+        <p class="form-step__label">{{ 'Radio del área' | t }}</p>
         <div class="radio-slider-row">
           <input type="range" min="100" max="1500" step="50" [(ngModel)]="newZone.radio" (input)="onRadioChange()"
             class="radio-slider" />
-          <span class="radio-value">{{ newZone.radio }}m</span>
+          <span class="radio-value">{{ newZone.radio | t }}m</span>
         </div>
         <div class="radio-presets">
           <button *ngFor="let r of [150, 300, 500, 1000]" class="radio-preset-btn"
             [class.radio-preset-btn--active]="newZone.radio === r" (click)="newZone.radio = r; onRadioChange()">
-            {{ r }}m
+            {{ r | t }}m
           </button>
         </div>
       </div>
@@ -444,14 +444,14 @@
 
     <!-- PASO 2/3: Nivel -->
     <div class="form-step">
-      <div class="form-step__num">{{ zoneMode === 'area' ? '3' : '2' }}</div>
+      <div class="form-step__num">{{ zoneMode === 'area' ? '3' : '2' | t }}</div>
       <div class="form-step__content">
-        <p class="form-step__label">Nivel de peligro</p>
+        <p class="form-step__label">{{ 'Nivel de peligro' | t }}</p>
         <div class="level-options">
           <button *ngFor="let n of riskLevels" class="level-btn"
             [class.level-btn--active]="newZone.level === n.value" [ngClass]="'level-btn--' + n.value.toLowerCase()"
             (click)="setLevel(n.value)">
-            {{ n.label }}
+            {{ n.label | t }}
           </button>
         </div>
       </div>
@@ -459,20 +459,20 @@
 
     <!-- PASO 3/4: Nombre -->
     <div class="form-step">
-      <div class="form-step__num">{{ zoneMode === 'area' ? '4' : '3' }}</div>
+      <div class="form-step__num">{{ zoneMode === 'area' ? '4' : '3' | t }}</div>
       <div class="form-step__content">
-        <p class="form-step__label">Nombre</p>
+        <p class="form-step__label">{{ 'Nombre' | t }}</p>
         <input class="form-input" type="text" [(ngModel)]="newZone.name"
-          placeholder="{{ zoneMode === 'pin' ? 'Ej: Esquina calle 13' : 'Ej: Sector La Candelaria' }}" />
+          placeholder="{{ zoneMode === 'pin' ? 'Ej: Esquina calle 13' : 'Ej: Sector La Candelaria' | t }}" />
       </div>
     </div>
 
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" (click)="cancelZoneModal()">Cancelar</button>
+    <button class="btn-secondary" (click)="cancelZoneModal()">{{ 'Cancelar' | t }}</button>
     <button class="btn-primary" [disabled]="!newZone.name || newZone.lat === 0" (click)="saveZone()">
-      Guardar zona
+      {{ 'Guardar zona' | t }}
     </button>
   </div>
 
@@ -483,34 +483,33 @@
      ══════════════════════════════════════════════════════ -->
 <app-modal
   *ngIf="pointModal && !waitingPointClick"
-  title="Agregar punto de apoyo"
+  [title]="'Agregar punto de apoyo' | t"
   (close)="pointModal = false">
 
   <div modal-body>
     <div class="form-group">
-      <label class="form-label">Tipo</label>
+      <label class="form-label">{{ 'Tipo' | t }}</label>
       <div class="level-options level-options--types">
         <button *ngFor="let t of pointTypes" class="level-btn" [class.level-btn--active]="newPoint.type === t[0]"
-          (click)="newPoint.type = t[0]">{{ t[1].emoji }} {{ t[1].label }}</button>
+          (click)="newPoint.type = t[0]">{{ t[1].emoji | t }} {{ t[1].label | t }}</button>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Nombre</label>
-      <input class="form-input" type="text" [(ngModel)]="newPoint.name" placeholder="Ej: CAI Centro" />
+      <label class="form-label">{{ 'Nombre' | t }}</label>
+      <input class="form-input" type="text" [(ngModel)]="newPoint.name" [placeholder]="'Ej: CAI Centro' | t" />
     </div>
     <button class="btn-click-map" (click)="waitingPointClick = true">
-      📍 {{ newPoint.lat !== 0 ? 'Cambiar la ubicación en el mapa' : 'Elegir la ubicación en el mapa' }}
+      📍 {{ newPoint.lat !== 0 ? 'Cambiar la ubicación en el mapa' : 'Elegir la ubicación en el mapa' | t }}
     </button>
     <p class="form-hint">
-      <span *ngIf="newPoint.lat !== 0"> ✓ {{ newPoint.lat | number:'1.5-5' }}, {{ newPoint.lng | number:'1.5-5'
-        }}</span>
-      <span *ngIf="newPoint.lat === 0"> Coordenadas: —</span>
+      <span *ngIf="newPoint.lat !== 0"> ✓ {{ (newPoint.lat | number:'1.5-5') | t }}, {{ (newPoint.lng | number:'1.5-5') | t }}</span>
+      <span *ngIf="newPoint.lat === 0"> {{ 'Coordenadas: —' | t }}</span>
     </p>
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" (click)="pointModal = false">Cancelar</button>
-    <button class="btn-primary" (click)="savePoint()">Guardar</button>
+    <button class="btn-secondary" (click)="pointModal = false">{{ 'Cancelar' | t }}</button>
+    <button class="btn-primary" (click)="savePoint()">{{ 'Guardar' | t }}</button>
   </div>
 
 </app-modal>

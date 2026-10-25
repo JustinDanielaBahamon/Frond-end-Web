@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +28,7 @@ const EMPTY_FORM = (): ContactForm => ({
 @Component({
   selector: 'app-emergency-contacts',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule],
+  imports: [TPipe, CommonModule, NgClass, FormsModule],
   templateUrl: './emergency-contacts.html',
   styleUrl: './emergency-contacts.scss',
 })

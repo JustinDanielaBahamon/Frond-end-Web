@@ -3,68 +3,67 @@
   <!-- ENCABEZADO -->
   <header class="page-header">
     <div>
-      <h1>Configuración del sistema</h1>
-      <p>Parámetros que afectan a toda la plataforma. Tu cuenta personal está en
-        <a routerLink="/admin/perfil">Mi perfil</a>.</p>
+      <h1>{{ 'Configuración del sistema' | t }}</h1>
+      <p>{{ 'Parámetros que afectan a toda la plataforma. Tu cuenta personal está en' | t }}
+        <a routerLink="/admin/perfil">{{ 'Mi perfil' | t }}</a>.</p>
     </div>
   </header>
 
   <!-- MENSAJE FLOTANTE -->
   @if (message()) {
-    <div class="toast" role="status">{{ message() }}</div>
+    <div class="toast" role="status">{{ message() | t }}</div>
   }
 
   <section class="settings-grid">
 
     <!-- ═════════ APP PARAMETERS ═════════ -->
     <article class="card card--wide">
-      <h2 class="card__title"><i class="fa-solid fa-sliders"></i> Parámetros de la app</h2>
+      <h2 class="card__title"><i class="fa-solid fa-sliders"></i> {{ 'Parámetros de la app' | t }}</h2>
       <div class="warning">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>Estos valores se aplican a <strong>todas las usuarias</strong>. Antes de guardar verás un resumen para confirmar,
-          y cada cambio queda registrado en <a routerLink="/admin/auditoria">Auditoría</a>.</span>
+        <span>{{ 'Estos valores se aplican a' | t }} <strong>{{ 'todas las usuarias' | t }}</strong>{{ '. Antes de guardar verás un resumen para confirmar, y cada cambio queda registrado en' | t }} <a routerLink="/admin/auditoria">{{ 'Auditoría' | t }}</a>.</span>
       </div>
 
       @if (loadingSettings()) {
-        <p class="label">Cargando…</p>
+        <p class="label">{{ 'Cargando…' | t }}</p>
       } @else {
         <form class="params-form" (ngSubmit)="checkChanges()">
           <label class="field">
-            <span>Duración máxima de una alerta SOS (minutos)</span>
+            <span>{{ 'Duración máxima de una alerta SOS (minutos)' | t }}</span>
             <input type="number" name="duracion" [(ngModel)]="form.maxAlertDurationMin" min="30" max="1440" step="5" required />
-            <small>Una alerta que siga activa después de este tiempo se marca como expirada. Entre 30 y 1440.</small>
+            <small>{{ 'Una alerta que siga activa después de este tiempo se marca como expirada. Entre 30 y 1440.' | t }}</small>
           </label>
           <label class="field">
-            <span>Contactos de emergencia por usuaria</span>
+            <span>{{ 'Contactos de emergencia por usuaria' | t }}</span>
             <input type="number" name="maxContactos" [(ngModel)]="form.maxContacts" min="1" max="20" required />
-            <small>Máximo que puede registrar cada usuaria (entre 1 y 20).</small>
+            <small>{{ 'Máximo que puede registrar cada usuaria (entre 1 y 20).' | t }}</small>
           </label>
           <label class="field">
-            <span>Número de emergencia</span>
+            <span>{{ 'Número de emergencia' | t }}</span>
             <input name="numero" [(ngModel)]="form.emergencyNumber" inputmode="tel" maxlength="16" required />
-            <small>Línea que se ofrece a las usuarias (en Colombia, 123).</small>
+            <small>{{ 'Línea que se ofrece a las usuarias (en Colombia, 123).' | t }}</small>
           </label>
           <label class="field">
-            <span>Versión mínima de la app móvil</span>
-            <input name="versionMinima" [(ngModel)]="form.versionMinimaApp" placeholder="Ej: 1.2.0 (vacío = sin mínimo)" maxlength="20" />
-            <small>Quien tenga una versión anterior verá al abrir la app un aviso para descargar la nueva. No la bloquea: el botón de alerta sigue funcionando. Súbela solo cuando publiques un APK nuevo.</small>
+            <span>{{ 'Versión mínima de la app móvil' | t }}</span>
+            <input name="versionMinima" [(ngModel)]="form.versionMinimaApp" [placeholder]="'Ej: 1.2.0 (vacío = sin mínimo)' | t" maxlength="20" />
+            <small>{{ 'Quien tenga una versión anterior verá al abrir la app un aviso para descargar la nueva. No la bloquea: el botón de alerta sigue funcionando. Súbela solo cuando publiques un APK nuevo.' | t }}</small>
           </label>
           <label class="field">
-            <span>Correo de soporte</span>
+            <span>{{ 'Correo de soporte' | t }}</span>
             <input type="email" name="correo" [(ngModel)]="form.supportEmail" required />
-            <small>Recibe las solicitudes de ayuda del panel.</small>
+            <small>{{ 'Recibe las solicitudes de ayuda del panel.' | t }}</small>
           </label>
 
           <div class="params-form__actions">
             @if (settingsError()) {
-              <p class="field-error">{{ settingsError() }}</p>
+              <p class="field-error">{{ settingsError() | t }}</p>
             }
             @if (settings()?.updated; as date) {
-              <span class="card__note"><i class="fa-regular fa-clock"></i> Última modificación: {{ date | date: 'dd/MM/yyyy HH:mm' }}</span>
+              <span class="card__note"><i class="fa-regular fa-clock"></i> {{ 'Última modificación:' | t }} {{ (date | date: 'dd/MM/yyyy HH:mm') | t }}</span>
             }
-            <button class="btn-secondary" type="button" (click)="discardChanges()">Descartar</button>
+            <button class="btn-secondary" type="button" (click)="discardChanges()">{{ 'Descartar' | t }}</button>
             <button class="btn-primary" type="submit" [disabled]="savingSettings()">
-              <i class="fa-solid fa-check"></i> Revisar y guardar
+              <i class="fa-solid fa-check"></i> {{ 'Revisar y guardar' | t }}
             </button>
           </div>
         </form>
@@ -74,8 +73,8 @@
     <!-- ═════════ ESTADO DEL SISTEMA ═════════ -->
     <article class="card">
       <h2 class="card__title">
-        <i class="fa-solid fa-heart-pulse"></i> Estado del sistema
-        <button class="icon-btn" type="button" (click)="loadStatus()" aria-label="Actualizar estado">
+        <i class="fa-solid fa-heart-pulse"></i> {{ 'Estado del sistema' | t }}
+        <button class="icon-btn" type="button" (click)="loadStatus()" [attr.aria-label]="'Actualizar estado' | t">
           <i class="fa-solid fa-rotate-right"></i>
         </button>
       </h2>
@@ -83,60 +82,60 @@
       @if (statusError()) {
         <div class="status-line status-line--bad">
           <i class="fa-solid fa-circle-xmark"></i>
-          <span>No se pudo consultar el servidor</span>
+          <span>{{ 'No se pudo consultar el servidor' | t }}</span>
         </div>
       } @else if (status(); as e) {
         <div class="status-line" [class.status-line--bad]="!e.database">
           <i class="fa-solid" [class.fa-circle-check]="e.database" [class.fa-circle-xmark]="!e.database"></i>
-          <span>Base de datos</span>
-          <strong>{{ e.database ? 'Conectada (' + e.latencyMs + ' ms)' : 'Sin conexión' }}</strong>
+          <span>{{ 'Base de datos' | t }}</span>
+          <strong>{{ e.database ? 'Conectada (' + e.latencyMs + ' ms)' : 'Sin conexión' | t }}</strong>
         </div>
         <div class="status-line" [class.status-line--bad]="!e.pushNotifications">
           <i class="fa-solid" [class.fa-circle-check]="e.pushNotifications" [class.fa-circle-xmark]="!e.pushNotifications"></i>
-          <span>Notificaciones push</span>
-          <strong>{{ e.pushNotifications ? 'Configuradas' : 'Sin configurar' }}</strong>
+          <span>{{ 'Notificaciones push' | t }}</span>
+          <strong>{{ e.pushNotifications ? 'Configuradas' : 'Sin configurar' | t }}</strong>
         </div>
         <div class="status-line status-line--neutral">
           <i class="fa-solid fa-bell"></i>
-          <span>Alertas activas ahora</span>
-          <strong>{{ e.activeAlerts }}</strong>
+          <span>{{ 'Alertas activas ahora' | t }}</span>
+          <strong>{{ e.activeAlerts | t }}</strong>
         </div>
         <div class="status-line status-line--neutral">
           <i class="fa-regular fa-clock"></i>
-          <span>Revisión de alertas vencidas</span>
+          <span>{{ 'Revisión de alertas vencidas' | t }}</span>
           <strong>
             @if (e.lastExpirationRun; as f) {
-              {{ f | date: 'HH:mm' }}{{ e.expiredLastRun ? ' · ' + e.expiredLastRun + ' expiradas' : '' }}
+              {{ (f | date: 'HH:mm') | t }}{{ e.expiredLastRun ? ' · ' + e.expiredLastRun + ' expiradas' : '' | t }}
             } @else {
-              Pendiente
+              {{ 'Pendiente' | t }}
             }
           </strong>
         </div>
         <p class="card__note">
           <i class="fa-solid fa-server"></i>
-          En línea desde {{ e.onlineSince | date: 'dd/MM/yyyy HH:mm' }}
+          {{ 'En línea desde' | t }} {{ (e.onlineSince | date: 'dd/MM/yyyy HH:mm') | t }}
         </p>
       } @else {
-        <p class="label">Consultando…</p>
+        <p class="label">{{ 'Consultando…' | t }}</p>
       }
     </article>
 
     <!-- ═════════ DATOS ═════════ -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-database"></i> Exportar datos</h2>
+      <h2 class="card__title"><i class="fa-solid fa-database"></i> {{ 'Exportar datos' | t }}</h2>
 
       <button class="row-link row-link--stack" (click)="downloadUsers()">
         <span class="row-link__text">
-          <span class="row-link__title">Lista de usuarios</span>
-          <span class="row-link__desc">Archivo CSV que se abre en Excel</span>
+          <span class="row-link__title">{{ 'Lista de usuarios' | t }}</span>
+          <span class="row-link__desc">{{ 'Archivo CSV que se abre en Excel' | t }}</span>
         </span>
         <i class="fa-solid fa-download row-link__chevron"></i>
       </button>
 
       <button class="row-link row-link--stack" (click)="downloadAlerts()">
         <span class="row-link__text">
-          <span class="row-link__title">Historial de alertas</span>
-          <span class="row-link__desc">Alertas de los últimos 30 días, en CSV</span>
+          <span class="row-link__title">{{ 'Historial de alertas' | t }}</span>
+          <span class="row-link__desc">{{ 'Alertas de los últimos 30 días, en CSV' | t }}</span>
         </span>
         <i class="fa-solid fa-download row-link__chevron"></i>
       </button>
@@ -144,30 +143,30 @@
       <div class="info-box">
         <i class="fa-solid fa-user-shield"></i>
         <div>
-          <p class="info-box__title">Información sensible</p>
-          <p class="info-box__desc">Los archivos incluyen datos personales de las usuarias. Guárdalos en un lugar seguro y no los compartas.</p>
+          <p class="info-box__title">{{ 'Información sensible' | t }}</p>
+          <p class="info-box__desc">{{ 'Los archivos incluyen datos personales de las usuarias. Guárdalos en un lugar seguro y no los compartas.' | t }}</p>
         </div>
       </div>
     </article>
 
     <!-- ═════════ AYUDA Y SOPORTE ═════════ -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-regular fa-circle-question"></i> Ayuda y soporte</h2>
+      <h2 class="card__title"><i class="fa-regular fa-circle-question"></i> {{ 'Ayuda y soporte' | t }}</h2>
 
       <div class="help-box">
         <div class="help-box__top">
           <div class="help-box__icon"><i class="fa-solid fa-headset"></i></div>
           <div>
-            <p class="help-box__title">¿Tienes algún problema?</p>
+            <p class="help-box__title">{{ '¿Tienes algún problema?' | t }}</p>
             <p class="help-box__desc">
-              Escríbenos a {{ settings()?.supportEmail || 'soporte' }} y te ayudamos.
+              {{ 'Escríbenos a' | t }} {{ (settings()?.supportEmail || 'soporte') | t }} {{ 'y te ayudamos.' | t }}
             </p>
           </div>
         </div>
         @if (supportLink) {
           <a class="btn-help" [href]="supportLink">
             <i class="fa-regular fa-envelope"></i>
-            Pedir ayuda
+            {{ 'Pedir ayuda' | t }}
           </a>
         }
       </div>
@@ -179,21 +178,21 @@
   @if (pendingChanges(); as changes) {
     <div class="overlay" (click)="cancelChanges()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirmar-titulo" (click)="$event.stopPropagation()">
-        <h2 id="confirmar-titulo"><i class="fa-solid fa-triangle-exclamation"></i> Confirmar cambios del sistema</h2>
-        <p>Estos cambios se aplicarán a todas las usuarias de la app:</p>
+        <h2 id="confirmar-titulo"><i class="fa-solid fa-triangle-exclamation"></i> {{ 'Confirmar cambios del sistema' | t }}</h2>
+        <p>{{ 'Estos cambios se aplicarán a todas las usuarias de la app:' | t }}</p>
         <ul class="diff">
           @for (c of changes; track c.field) {
             <li>
-              <span class="diff__field">{{ c.field }}</span>
-              <span class="diff__values"><del>{{ c.before }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.after }}</strong></span>
+              <span class="diff__field">{{ c.field | t }}</span>
+              <span class="diff__values"><del>{{ c.before | t }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.after | t }}</strong></span>
             </li>
           }
         </ul>
-        <p class="dialog__note">Quedará registrado en Auditoría con tu nombre, la fecha y tu IP.</p>
+        <p class="dialog__note">{{ 'Quedará registrado en Auditoría con tu nombre, la fecha y tu IP.' | t }}</p>
         <div class="dialog__actions">
-          <button class="btn-secondary" type="button" (click)="cancelChanges()" [disabled]="savingSettings()">Cancelar</button>
+          <button class="btn-secondary" type="button" (click)="cancelChanges()" [disabled]="savingSettings()">{{ 'Cancelar' | t }}</button>
           <button class="btn-primary" type="button" (click)="confirmChanges()" [disabled]="savingSettings()">
-            {{ savingSettings() ? 'Guardando…' : 'Confirmar y guardar' }}
+            {{ savingSettings() ? 'Guardando…' : 'Confirmar y guardar' | t }}
           </button>
         </div>
       </div>

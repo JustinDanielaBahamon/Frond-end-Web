@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,7 +42,7 @@ interface AlertWithEvidence extends MyAlert {
 @Component({
   selector: 'app-evidence',
   standalone: true,
-  imports: [CommonModule, FormsModule, ContinuousPlayerComponent],
+  imports: [TPipe, CommonModule, FormsModule, ContinuousPlayerComponent],
   templateUrl: './evidence.html',
   styleUrl: './evidence.scss',
 })

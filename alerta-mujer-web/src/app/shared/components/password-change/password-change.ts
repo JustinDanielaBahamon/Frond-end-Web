@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PasswordService, evaluatePassword } from '../../../core/services/password.service';
@@ -7,7 +8,7 @@ import { PasswordStrengthComponent } from '../password-strength/password-strengt
 @Component({
   selector: 'app-password-change',
   standalone: true,
-  imports: [FormsModule, PasswordStrengthComponent],
+  imports: [TPipe, FormsModule, PasswordStrengthComponent],
   templateUrl: './password-change.html',
   styleUrl: './password-change.scss',
 })

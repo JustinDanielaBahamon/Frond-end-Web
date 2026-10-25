@@ -2,39 +2,39 @@
 
     <!-- LOGO -->
     <div class="navbar-logo">
-        <img src="logo.png" alt="Logo">
-        <span>Alerta Mujer</span>
+        <img src="logo.png" [alt]="'Logo' | t">
+        <span>{{ 'Alerta Mujer' | t }}</span>
     </div>
 
     <!-- LINKS DESKTOP -->
     <nav class="navbar-links">
 
         <a href="#inicio" class="active-link">
-            Inicio
+            {{ 'Inicio' | t }}
         </a>
 
         <a href="#funciones">
-            Funciones
+            {{ 'Funciones' | t }}
         </a>
 
         <a href="#como-funciona">
-            Cómo funciona
+            {{ 'Cómo funciona' | t }}
         </a>
 
         <a href="#testimonios">
-            Testimonios
+            {{ 'Testimonios' | t }}
         </a>
 
         <a href="#descargar">
-            Descargar app
+            {{ 'Descargar app' | t }}
         </a>
 
         <a href="#faq">
-            FAQ
+            {{ 'FAQ' | t }}
         </a>
 
         <a href="#contacto">
-            Contacto
+            {{ 'Contacto' | t }}
         </a>
 
     </nav>
@@ -60,8 +60,12 @@
                     <img src="https://flagcdn.com/fr.svg" class="flag-nav" alt="">
                 }
 
+                @if (currentLanguage === 'PT') {
+                    <img src="https://flagcdn.com/br.svg" class="flag-nav" alt="">
+                }
+
                 <span>
-                    {{ currentLanguage }}
+                    {{ currentLanguage | t }}
                     <i class="fa-solid fa-caret-down"></i>
                 </span>
 
@@ -75,17 +79,22 @@
 
                         <li (click)="changeIdiom('ES')">
                             <img src="https://flagcdn.com/es.svg" class="flag-dropdown" alt="">
-                            ES
+                            {{ 'ES' | t }}
                         </li>
 
                         <li (click)="changeIdiom('EN')">
                             <img src="https://flagcdn.com/us.svg" class="flag-dropdown" alt="">
-                            EN
+                            {{ 'EN' | t }}
                         </li>
 
                         <li (click)="changeIdiom('FR')">
                             <img src="https://flagcdn.com/fr.svg" class="flag-dropdown" alt="">
-                            FR
+                            {{ 'FR' | t }}
+                        </li>
+
+                        <li (click)="changeIdiom('PT')">
+                            <img src="https://flagcdn.com/br.svg" class="flag-dropdown" alt="">
+                            {{ 'PT' | t }}
                         </li>
 
                     </ul>
@@ -100,7 +109,7 @@
             (click)="themeService.toggleTheme()"
             class="theme-toggle"
             [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
-            {{ themeService.currentTheme() === 'dark' ? '☀️' : '🌙' }}
+            {{ themeService.currentTheme() === 'dark' ? '☀️' : '🌙' | t }}
         </button>
 
         <!-- HAMBURGUESA -->
@@ -117,11 +126,11 @@
     </button>
 
         <button class="login-btn desktop-btn"  routerLink="/auth/login">
-            Iniciar sesión
+            {{ 'Iniciar sesión' | t }}
         </button>
 
         <button class="register-btn desktop-btn" routerLink="/auth/register">
-            Regístrate
+            {{ 'Regístrate' | t }}
         </button>
 
     </div>
@@ -136,41 +145,41 @@
 
     <a href="#inicio" (click)="closeMobileMenu()">
         <i class="fa-solid fa-house"></i>
-        Inicio
+        {{ 'Inicio' | t }}
     </a>
     
     <a href="#funciones" (click)="closeMobileMenu()">
         <i class="fa-solid fa-shield-heart"></i>
-        Funciones
+        {{ 'Funciones' | t }}
     </a>
     
     <a href="#como-funciona" (click)="closeMobileMenu()">
         <i class="fa-solid fa-circle-play"></i>
-        Cómo funciona
+        {{ 'Cómo funciona' | t }}
     </a>
     
     <a href="#testimonios" (click)="closeMobileMenu()">
         <i class="fa-solid fa-star"></i>
-        Testimonios
+        {{ 'Testimonios' | t }}
     </a>
 
     <a href="#descargar" (click)="closeMobileMenu()">
         <i class="fa-solid fa-mobile-screen-button"></i>
-        Descargar app
+        {{ 'Descargar app' | t }}
     </a>
     
     <a href="#faq" (click)="closeMobileMenu()">
         <i class="fa-solid fa-circle-question"></i>
-        FAQ
+        {{ 'FAQ' | t }}
     </a>
     
     <a href="#contacto" (click)="closeMobileMenu()">
         <i class="fa-solid fa-envelope"></i>
-        Contacto
+        {{ 'Contacto' | t }}
     </a>
 
      <div class="mobile-divider"></div>
-    <h4 class="button-language-mobil" style="margin-left: 16px; " (click)="toggleIdiomsMenuMobile()" ><i class="fa-solid fa-globe " style="margin-right: 0px;"></i> Idioma</h4>
+    <h4 class="button-language-mobil" style="margin-left: 16px; " (click)="toggleIdiomsMenuMobile()" ><i class="fa-solid fa-globe " style="margin-right: 0px;"></i> {{ 'Idioma' | t }}</h4>
     @if(languageMenuOpenMobile){
         <div class="mobile-language-options">
 
@@ -178,24 +187,32 @@
         <img
             src="https://flagcdn.com/es.svg"
             class="flag-mobile"
-            alt="ES">
-        Español
+            [alt]="'ES' | t">
+        {{ 'Español' | t }}
     </button>
 
     <button (click)="changeIdiom('EN')">
         <img
             src="https://flagcdn.com/us.svg"
             class="flag-mobile"
-            alt="EN">
-        English
+            [alt]="'EN' | t">
+        {{ 'English' | t }}
     </button>
 
     <button (click)="changeIdiom('FR')">
         <img
             src="https://flagcdn.com/fr.svg"
             class="flag-mobile"
-            alt="FR">
-        Français
+            [alt]="'FR' | t">
+        {{ 'Français' | t }}
+    </button>
+
+    <button (click)="changeIdiom('PT')">
+        <img
+            src="https://flagcdn.com/br.svg"
+            class="flag-mobile"
+            [alt]="'PT' | t">
+        {{ 'Português' | t }}
     </button>
 
     </div>
@@ -205,11 +222,11 @@
     <div class="mobile-divider"></div>
 
     <button class="login-btn mobile-btn"  routerLink="/auth/login">
-        Iniciar sesión
+        {{ 'Iniciar sesión' | t }}
     </button>
 
     <button class="register-btn mobile-btn" routerLink="/auth/register">
-        Regístrate
+        {{ 'Regístrate' | t }}
     </button>
 
 </div>

@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { compactPages } from '../../../shared/utils/pagination';
 @Component({
   selector: 'app-device-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './devices-management.html',
   styleUrls: ['./devices-management.scss']
 })

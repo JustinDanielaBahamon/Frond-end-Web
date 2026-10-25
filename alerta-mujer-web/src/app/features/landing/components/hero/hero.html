@@ -7,28 +7,26 @@
 
             <div class="container-text-main">
                 <h1 class="text-banner">
-                    Tu seguridad,
+                    {{ 'Tu seguridad,' | t }}
                     <br>
-                    <span>nuestra prioridad</span>
+                    <span>{{ 'nuestra prioridad' | t }}</span>
                 </h1>
             </div>
 
             <div class="container-text-second">
                 <p>
-                    Alerta Mujer es la app que te acompaña y protege en todo momento.
-                    Envía alertas, comparte tu ubicación y recibe apoyo de tus
-                    contactos de confianza.
+                    {{ 'Alerta Mujer es la app que te acompaña y protege en todo momento. Envía alertas, comparte tu ubicación y recibe apoyo de tus contactos de confianza.' | t }}
                 </p>
             </div>
 
             <div class="container-buttons">
 
                 <button class="start-btn" routerLink="/auth/register">
-                    Comenzar ahora
+                    {{ 'Comenzar ahora' | t }}
                 </button>
 
                 <button class="learn-btn">
-                    Conocer más
+                    {{ 'Conocer más' | t }}
                 </button>
 
             </div>
@@ -36,12 +34,12 @@
             <div class="container-stats">
 
                 <div class="img-stats">
-                    <img src="mujerTWO.png" alt="Mujer">
+                    <img src="mujerTWO.png" [alt]="'Mujer' | t">
                 </div>
 
                 <p>
-                    +5000 mujeres ya confían en
-                    <b>Alerta Mujer</b>
+                    {{ '+5000 mujeres ya confían en' | t }}
+                    <b>{{ 'Alerta Mujer' | t }}</b>
                 </p>
 
             </div>

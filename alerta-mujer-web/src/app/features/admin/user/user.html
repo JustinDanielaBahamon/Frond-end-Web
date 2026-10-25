@@ -2,23 +2,23 @@
 
   <!-- HEADER -->
   <div class="users-header">
-    <h1 class="users-title">Administración de Cuentas</h1>
+    <h1 class="users-title">{{ 'Administración de Cuentas' | t }}</h1>
     <div class="users-stats">
       <div class="mini-stat">
-        <span class="mini-stat__value">{{ totalUsers }}</span>
-        <span class="mini-stat__label">Total</span>
+        <span class="mini-stat__value">{{ totalUsers | t }}</span>
+        <span class="mini-stat__label">{{ 'Total' | t }}</span>
       </div>
       <div class="mini-stat mini-stat--green">
-        <span class="mini-stat__value">{{ activeUsers }}</span>
-        <span class="mini-stat__label">Activas</span>
+        <span class="mini-stat__value">{{ activeUsers | t }}</span>
+        <span class="mini-stat__label">{{ 'Activas' | t }}</span>
       </div>
       <div class="mini-stat mini-stat--red">
-        <span class="mini-stat__value">{{ blockedUsers }}</span>
-        <span class="mini-stat__label">Bloqueadas</span>
+        <span class="mini-stat__value">{{ blockedUsers | t }}</span>
+        <span class="mini-stat__label">{{ 'Bloqueadas' | t }}</span>
       </div>
       <div class="mini-stat mini-stat--amber">
-        <span class="mini-stat__value">{{ inactiveUsers }}</span>
-        <span class="mini-stat__label">Inactivas</span>
+        <span class="mini-stat__value">{{ inactiveUsers | t }}</span>
+        <span class="mini-stat__label">{{ 'Inactivas' | t }}</span>
       </div>
     </div>
   </div>
@@ -31,7 +31,7 @@
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
-      <input class="search-input" type="text" placeholder="Buscar por nombre, email, etc." [(ngModel)]="searchTerm"
+      <input class="search-input" type="text" [placeholder]="'Buscar por nombre, email, etc.' | t" [(ngModel)]="searchTerm"
         (input)="currentPage = 1; applyFilters()" />
       <button *ngIf="searchTerm" class="search-clear" (click)="clearSearch()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -42,7 +42,7 @@
 
   </div>
 
-  <p class="notice-panel" *ngIf="notice" role="status">{{ notice }}</p>
+  <p class="notice-panel" *ngIf="notice" role="status">{{ notice | t }}</p>
 
   <!-- FILTER CHIPS -->
   <div class="filter-chips">
@@ -56,7 +56,7 @@
     <!-- Select all (only visible on mobile, where the thead is hidden) -->
     <label class="select-all-mobile">
       <input type="checkbox" (change)="toggleAll($event)" [checked]="allSelected" />
-      Seleccionar todas
+      {{ 'Seleccionar todas' | t }}
     </label>
 
     <div class="table-wrap">
@@ -76,13 +76,13 @@
             <th>
               <input type="checkbox" (change)="toggleAll($event)" [checked]="allSelected" />
             </th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Fecha Registro</th>
-            <th>Alertas</th>
-            <th>Última Actividad</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>{{ 'Nombre' | t }}</th>
+            <th>{{ 'Email' | t }}</th>
+            <th>{{ 'Fecha Registro' | t }}</th>
+            <th>{{ 'Alertas' | t }}</th>
+            <th>{{ 'Última Actividad' | t }}</th>
+            <th>{{ 'Estado' | t }}</th>
+            <th>{{ 'Acciones' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -93,42 +93,42 @@
             <td class="cell-name">
               <div class="user-cell">
                 <div class="avatar" [style.background]="u.avatarColor">
-                  {{ u.name.charAt(0) }}
+                  {{ u.name.charAt(0) | t }}
                 </div>
                 <div class="user-info">
-                  <span class="user-name">{{ u.name }}</span>
-                  <span class="user-role">{{ u.role }}</span>
+                  <span class="user-name">{{ u.name | t }}</span>
+                  <span class="user-role">{{ u.role | t }}</span>
                 </div>
               </div>
             </td>
-            <td class="email-cell" data-label="Email">{{ u.email }}</td>
-            <td data-label="Registro">{{ u.registeredAt }}</td>
+            <td class="email-cell" data-label="Email">{{ u.email | t }}</td>
+            <td data-label="Registro">{{ u.registeredAt | t }}</td>
             <td data-label="Alertas">
               <span class="alerts-badge" [class.alerts-badge--high]="u.alerts > 5">
-                {{ u.alerts }}
+                {{ u.alerts | t }}
               </span>
             </td>
-            <td class="muted" data-label="Última actividad">{{ u.lastActivity }}</td>
+            <td class="muted" data-label="Última actividad">{{ u.lastActivity | t }}</td>
             <td data-label="Estado">
               <span class="state-badge" [ngClass]="getStatusClass(u.status)">
                 <svg *ngIf="u.status === 'Bloqueada por Fraude'" width="10" height="10" viewBox="0 0 24 24"
                   fill="currentColor">
                   <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
                 </svg>
-                {{ u.status }}
+                {{ u.status | t }}
               </span>
             </td>
             <td class="cell-acc">
               <div class="actions-cell">
                 <!-- Ver detalle -->
-                <button class="action-btn action-btn--view" title="Ver detalle" (click)="viewDetail(u)">
+                <button class="action-btn action-btn--view" [title]="'Ver detalle' | t" (click)="viewDetail(u)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 </button>
                 <!-- Reset password -->
-                <button class="action-btn action-btn--reset" title="Restablecer contraseña"
+                <button class="action-btn action-btn--reset" [title]="'Restablecer contraseña' | t"
                   (click)="resetPassword(u)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
@@ -161,8 +161,8 @@
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
-              <p>No se encontraron usuarias con ese criterio.</p>
-              <button class="btn-clear-filter" (click)="clearAll()">Limpiar filtros</button>
+              <p>{{ 'No se encontraron usuarias con ese criterio.' | t }}</p>
+              <button class="btn-clear-filter" (click)="clearAll()">{{ 'Limpiar filtros' | t }}</button>
             </td>
           </tr>
         </tbody>
@@ -172,20 +172,20 @@
     <!-- FOOTER: bulk actions + pagination -->
     <div class="table-footer">
       <div class="bulk-actions" *ngIf="selectedCount > 0">
-        <span class="bulk-label">{{ selectedCount }} seleccionada(s)</span>
+        <span class="bulk-label">{{ selectedCount | t }} {{ 'seleccionada(s)' | t }}</span>
         <button class="bulk-btn bulk-btn--danger" (click)="blockSelected()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
-          Bloquear seleccionadas
+          {{ 'Bloquear seleccionadas' | t }}
         </button>
-        <button class="bulk-btn" (click)="deselectAll()">Cancelar</button>
+        <button class="bulk-btn" (click)="deselectAll()">{{ 'Cancelar' | t }}</button>
       </div>
       <div class="pagination" *ngIf="selectedCount === 0">
         <span class="pagination__info">
-          Mostrando {{ totalFiltered === 0 ? 0 : (currentPage - 1) * perPage + 1 }}–{{ Math.min(currentPage * perPage, totalFiltered) }} de
-          {{ totalFiltered }}
+          {{ 'Mostrando' | t }} {{ totalFiltered === 0 ? 0 : (currentPage - 1) * perPage + 1 | t }}–{{ Math.min(currentPage * perPage, totalFiltered) | t }} {{ 'de' | t }}
+          {{ totalFiltered | t }}
         </span>
         <div class="pagination__controls">
           <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
@@ -197,7 +197,7 @@
             @if (p === null) {
               <span class="page-ellipsis" aria-hidden="true">…</span>
             } @else {
-              <button class="page-btn" [class.page-btn--active]="p === currentPage" (click)="changePage(p)">{{ p }}</button>
+              <button class="page-btn" [class.page-btn--active]="p === currentPage" (click)="changePage(p)">{{ p | t }}</button>
             }
           }
           <button class="page-btn" [disabled]="currentPage >= totalPageCount" (click)="changePage(currentPage + 1)">
@@ -215,106 +215,106 @@
 <!-- ===================== MODAL: VER DETALLE ===================== -->
 <app-modal
   *ngIf="detailModal"
-  title="Detalle de Usuaria"
+  [title]="'Detalle de Usuaria' | t"
   (close)="closeModals()">
 
   <div modal-body *ngIf="selectedUser">
     <div class="detail-hero">
       <div class="avatar avatar--lg" [style.background]="selectedUser.avatarColor">
-        {{ selectedUser.name.charAt(0) }}
+        {{ selectedUser.name.charAt(0) | t }}
       </div>
       <div>
-        <h3 class="detail-name">{{ selectedUser.name }}</h3>
-        <p class="detail-email">{{ selectedUser.email }}</p>
+        <h3 class="detail-name">{{ selectedUser.name | t }}</h3>
+        <p class="detail-email">{{ selectedUser.email | t }}</p>
         <span class="state-badge" [ngClass]="getStatusClass(selectedUser.status)">
-          {{ selectedUser.status }}
+          {{ selectedUser.status | t }}
         </span>
       </div>
     </div>
 
     <div class="detail-grid">
       <div class="detail-item">
-        <span class="detail-label">Teléfono</span>
-        <span class="detail-value">{{ selectedUser.telephone }}</span>
+        <span class="detail-label">{{ 'Teléfono' | t }}</span>
+        <span class="detail-value">{{ selectedUser.telephone | t }}</span>
       </div>
       <div class="detail-item">
-        <span class="detail-label">Fecha de registro</span>
-        <span class="detail-value">{{ selectedUser.registeredAt }}</span>
+        <span class="detail-label">{{ 'Fecha de registro' | t }}</span>
+        <span class="detail-value">{{ selectedUser.registeredAt | t }}</span>
       </div>
       <div class="detail-item">
-        <span class="detail-label">Alertas enviadas</span>
-        <span class="detail-value">{{ selectedUser.alerts }}</span>
+        <span class="detail-label">{{ 'Alertas enviadas' | t }}</span>
+        <span class="detail-value">{{ selectedUser.alerts | t }}</span>
       </div>
       <div class="detail-item">
-        <span class="detail-label">Rol</span>
-        <span class="detail-value">{{ selectedUser.role }}</span>
+        <span class="detail-label">{{ 'Rol' | t }}</span>
+        <span class="detail-value">{{ selectedUser.role | t }}</span>
       </div>
     </div>
 
     <div class="detail-grid">
       <div class="detail-item">
-        <span class="detail-label">Última actividad</span>
-        <span class="detail-value">{{ selectedUser.lastActivity || 'Sin registro' }}</span>
+        <span class="detail-label">{{ 'Última actividad' | t }}</span>
+        <span class="detail-value">{{ (selectedUser.lastActivity || 'Sin registro') | t }}</span>
       </div>
       <div class="detail-item">
-        <span class="detail-label">Celulares con la app</span>
-        <span class="detail-value">{{ phoneDetails.length }}</span>
+        <span class="detail-label">{{ 'Celulares con la app' | t }}</span>
+        <span class="detail-value">{{ phoneDetails.length | t }}</span>
       </div>
     </div>
 
     <!-- Phones and permissions (reported by the app) -->
-    <h4 class="detail-section">Celulares y permisos</h4>
-    <p class="detail-empty" *ngIf="phoneDetails.length === 0">No tiene la app móvil instalada o aún no ha entrado.</p>
+    <h4 class="detail-section">{{ 'Celulares y permisos' | t }}</h4>
+    <p class="detail-empty" *ngIf="phoneDetails.length === 0">{{ 'No tiene la app móvil instalada o aún no ha entrado.' | t }}</p>
     <div class="phone" *ngFor="let c of phoneDetails">
       <div class="phone__header">
-        <strong>{{ phoneName(c) }}</strong>
-        <span>Android {{ c.osVersion || '' }} · App {{ c.appVersion || '?' }} · {{ c.pushTokenRegistered ? 'recibe alertas' : 'sin notificaciones' }}</span>
-        <span>Última conexión: {{ c.lastAccess ? (c.lastAccess | date:'dd/MM/yyyy HH:mm') : 'sin registro' }}</span>
+        <strong>{{ phoneName(c) | t }}</strong>
+        <span>{{ 'Android' | t }} {{ (c.osVersion || '') | t }} {{ '· App' | t }} {{ (c.appVersion || '?') | t }} · {{ c.pushTokenRegistered ? 'recibe alertas' : 'sin notificaciones' | t }}</span>
+        <span>{{ 'Última conexión:' | t }} {{ (c.lastAccess ? (c.lastAccess | date:'dd/MM/yyyy HH:mm') : 'sin registro') | t }}</span>
       </div>
       <div class="phone__permissions" *ngIf="permissionsOf(c).length > 0; else withoutPermissions">
-        <span class="permission" *ngFor="let p of permissionsOf(c)" [class.permission--ok]="p.ok">{{ p.ok ? '✓' : '✕' }} {{ p.name }}</span>
+        <span class="permission" *ngFor="let p of permissionsOf(c)" [class.permission--ok]="p.ok">{{ p.ok ? '✓' : '✕' | t }} {{ p.name | t }}</span>
       </div>
-      <ng-template #withoutPermissions><span class="detail-empty">Su versión de la app aún no informa los permisos.</span></ng-template>
+      <ng-template #withoutPermissions><span class="detail-empty">{{ 'Su versión de la app aún no informa los permisos.' | t }}</span></ng-template>
     </div>
 
     <!-- Moderation history -->
-    <h4 class="detail-section">Historial de moderación</h4>
-    <p class="detail-empty" *ngIf="historyDetail.length === 0">Sin bloqueos ni solicitudes.</p>
+    <h4 class="detail-section">{{ 'Historial de moderación' | t }}</h4>
+    <p class="detail-empty" *ngIf="historyDetail.length === 0">{{ 'Sin bloqueos ni solicitudes.' | t }}</p>
     <ul class="history" *ngIf="historyDetail.length > 0">
       <li *ngFor="let h of historyDetail">
-        <strong>{{ historyType(h.type) }}</strong>
-        <span>{{ h.date | date:'dd/MM/yyyy HH:mm' }} · {{ h.adminName || 'Administración' }}</span>
-        <span *ngIf="h.reason">Motivo: {{ h.reason }}</span>
-        <span *ngIf="h.note" class="history__note">{{ h.note }}</span>
-        <button type="button" class="link-btn" *ngIf="h.hasEvidence" (click)="viewEvidence(h)">Ver evidencia</button>
+        <strong>{{ historyType(h.type) | t }}</strong>
+        <span>{{ (h.date | date:'dd/MM/yyyy HH:mm') | t }} · {{ (h.adminName || 'Administración') | t }}</span>
+        <span *ngIf="h.reason">{{ 'Motivo:' | t }} {{ h.reason | t }}</span>
+        <span *ngIf="h.note" class="history__note">{{ h.note | t }}</span>
+        <button type="button" class="link-btn" *ngIf="h.hasEvidence" (click)="viewEvidence(h)">{{ 'Ver evidencia' | t }}</button>
       </li>
     </ul>
-    <img class="evidence-img" *ngIf="openEvidence" [src]="openEvidence" alt="Evidencia del bloqueo" />
+    <img class="evidence-img" *ngIf="openEvidence" [src]="openEvidence" [alt]="'Evidencia del bloqueo' | t" />
 
     <!-- Últimas alertas (tabla alertas) -->
-    <h4 class="detail-section">Últimas alertas</h4>
+    <h4 class="detail-section">{{ 'Últimas alertas' | t }}</h4>
     <p class="detail-empty" *ngIf="!loadingDetail && alertDetails.length === 0">
-      Sin alertas registradas.
+      {{ 'Sin alertas registradas.' | t }}
     </p>
     <ul class="detail-list" *ngIf="!loadingDetail && alertDetails.length > 0">
       <li *ngFor="let a of alertDetails">
-        <strong>{{ a.description }}</strong>
-        <span>{{ a.location }} · {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        <strong>{{ a.description | t }}</strong>
+        <span>{{ a.location | t }} · {{ (a.createdAt | date:'dd/MM/yyyy HH:mm') | t }}</span>
       </li>
     </ul>
   </div>
 
   <div modal-footer>
-    <button class="btn-danger-outline" (click)="openDelete(selectedUser!)">Solicitar eliminación</button>
-    <button class="btn-secondary" (click)="openEditModal(selectedUser!)">Editar datos</button>
-    <button class="btn-primary" (click)="resetPassword(selectedUser!)">Enviar correo para cambiar contraseña</button>
+    <button class="btn-danger-outline" (click)="openDelete(selectedUser!)">{{ 'Solicitar eliminación' | t }}</button>
+    <button class="btn-secondary" (click)="openEditModal(selectedUser!)">{{ 'Editar datos' | t }}</button>
+    <button class="btn-primary" (click)="resetPassword(selectedUser!)">{{ 'Enviar correo para cambiar contraseña' | t }}</button>
   </div>
 </app-modal>
 
 <!-- ===================== MODAL: CREAR / EDITAR ===================== -->
 <app-modal
   *ngIf="modalForm"
-  title="Editar datos de la usuaria"
+  [title]="'Editar datos de la usuaria' | t"
   (close)="closeModals()">
 
   <div modal-body>
@@ -322,35 +322,35 @@
           (ngSubmit)="f.valid && saveUser()">
       <div class="form-row">
         <label class="form-field">
-          <span>Nombre</span>
+          <span>{{ 'Nombre' | t }}</span>
           <input name="first_name" [(ngModel)]="form.first_name" required minlength="2" />
         </label>
         <label class="form-field">
-          <span>Apellido</span>
+          <span>{{ 'Apellido' | t }}</span>
           <input name="last_name" [(ngModel)]="form.last_name" required minlength="2" />
         </label>
       </div>
 
       <label class="form-field">
-        <span>Correo</span>
+        <span>{{ 'Correo' | t }}</span>
         <input type="email" name="email" [(ngModel)]="form.email" required email />
       </label>
 
       <label class="form-field">
-        <span>Teléfono</span>
+        <span>{{ 'Teléfono' | t }}</span>
         <input name="telefono" [(ngModel)]="form.telephone" required pattern="^[+0-9 ]{7,20}$" />
       </label>
-      <p class="form-help">La contraseña solo la cambia la usuaria: usa "Enviar correo para cambiar contraseña" en su detalle.</p>
+      <p class="form-help">{{ 'La contraseña solo la cambia la usuaria: usa "Enviar correo para cambiar contraseña" en su detalle.' | t }}</p>
 
-      <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
-      <p class="form-error" *ngIf="f.submitted && f.invalid">Revisa los campos marcados.</p>
+      <p class="form-error" *ngIf="errorForm">{{ errorForm | t }}</p>
+      <p class="form-error" *ngIf="f.submitted && f.invalid">{{ 'Revisa los campos marcados.' | t }}</p>
     </form>
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" type="button" (click)="closeModals()">Cancelar</button>
+    <button class="btn-secondary" type="button" (click)="closeModals()">{{ 'Cancelar' | t }}</button>
     <button class="btn-primary" type="submit" form="user-form" [disabled]="saving">
-      {{ saving ? 'Guardando...' : 'Guardar' }}
+      {{ saving ? 'Guardando...' : 'Guardar' | t }}
     </button>
   </div>
 </app-modal>
@@ -366,44 +366,44 @@
   <div modal-body *ngIf="selectedUser">
     <p class="confirm-text">
       <ng-container *ngIf="usersToBlock.length === 1">
-        {{ blockAction === 'bloquear' ? 'Vas a bloquear' : 'Vas a desbloquear' }} la cuenta de <strong>{{ selectedUser.name }}</strong>.
+        {{ blockAction === 'bloquear' ? 'Vas a bloquear' : 'Vas a desbloquear' | t }} {{ 'la cuenta de' | t }} <strong>{{ selectedUser.name | t }}</strong>.
       </ng-container>
       <ng-container *ngIf="usersToBlock.length > 1">
-        Vas a bloquear <strong>{{ usersToBlock.length }} cuentas</strong>.
+        {{ 'Vas a bloquear' | t }} <strong>{{ usersToBlock.length | t }} {{ 'cuentas' | t }}</strong>.
       </ng-container>
     </p>
     <label class="form-field" *ngIf="blockAction === 'bloquear'">
-      <span>Motivo *</span>
+      <span>{{ 'Motivo *' | t }}</span>
       <select [(ngModel)]="blockReason" name="motivoBloqueo">
-        <option value="" disabled>Elige el motivo</option>
-        <option *ngFor="let m of blockReasons" [value]="m">{{ m }}</option>
+        <option value="" disabled>{{ 'Elige el motivo' | t }}</option>
+        <option *ngFor="let m of blockReasons" [value]="m">{{ m | t }}</option>
       </select>
     </label>
     <label class="form-field">
-      <span>{{ blockAction === 'bloquear' ? '¿Qué pasó? *' : '¿Por qué se desbloquea? *' }}</span>
+      <span>{{ blockAction === 'bloquear' ? '¿Qué pasó? *' : '¿Por qué se desbloquea? *' | t }}</span>
       <textarea rows="3" [(ngModel)]="blockDescription" name="descripcionBloqueo" maxlength="1000"
-                placeholder="Mínimo 10 caracteres. Queda registrado en Moderación."></textarea>
+                [placeholder]="'Mínimo 10 caracteres. Queda registrado en Moderación.' | t"></textarea>
     </label>
     <div class="evidence" *ngIf="blockAction === 'bloquear'">
       <label class="btn-secondary evidence__button">
-        {{ blockEvidence ? 'Cambiar captura' : 'Adjuntar captura (opcional)' }}
+        {{ blockEvidence ? 'Cambiar captura' : 'Adjuntar captura (opcional)' | t }}
         <input type="file" accept="image/*" hidden (change)="chooseEvidence($event)" />
       </label>
-      <img *ngIf="blockEvidence" [src]="blockEvidence" alt="Captura adjunta" />
-      <button type="button" class="link-btn" *ngIf="blockEvidence" (click)="blockEvidence = null">Quitar</button>
+      <img *ngIf="blockEvidence" [src]="blockEvidence" [alt]="'Captura adjunta' | t" />
+      <button type="button" class="link-btn" *ngIf="blockEvidence" (click)="blockEvidence = null">{{ 'Quitar' | t }}</button>
     </div>
     <p class="confirm-sub" *ngIf="blockAction === 'bloquear'">
-      No podrá entrar a la app ni a la web hasta que se desbloquee. El caso queda en Moderación con el motivo y la captura.
+      {{ 'No podrá entrar a la app ni a la web hasta que se desbloquee. El caso queda en Moderación con el motivo y la captura.' | t }}
     </p>
-    <p class="form-error" *ngIf="blockError">{{ blockError }}</p>
+    <p class="form-error" *ngIf="blockError">{{ blockError | t }}</p>
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" (click)="closeModals()">Cancelar</button>
+    <button class="btn-secondary" (click)="closeModals()">{{ 'Cancelar' | t }}</button>
     <button class="btn-danger" *ngIf="blockAction === 'bloquear'" [disabled]="!blockValid || savingBlock" (click)="confirmBlock()">
-      {{ savingBlock ? 'Bloqueando…' : 'Bloquear' }}</button>
+      {{ savingBlock ? 'Bloqueando…' : 'Bloquear' | t }}</button>
     <button class="btn-primary" *ngIf="blockAction === 'desbloquear'" [disabled]="!blockValid || savingBlock" (click)="confirmBlock()">
-      {{ savingBlock ? 'Desbloqueando…' : 'Desbloquear' }}</button>
+      {{ savingBlock ? 'Desbloqueando…' : 'Desbloquear' | t }}</button>
   </div>
 
 </app-modal>
@@ -413,26 +413,25 @@
   *ngIf="deleteModal"
   size="sm"
   variant="danger"
-  title="Solicitar eliminación de la cuenta"
+  [title]="'Solicitar eliminación de la cuenta' | t"
   (close)="closeModals()">
 
   <div modal-body *ngIf="selectedUser">
     <p class="confirm-text">
-      Se eliminarán los datos personales de <strong>{{ selectedUser.name }}</strong> (nombre, correo, teléfono, documento y foto)
-      y no podrá volver a entrar. Sus alertas quedan en el historial sin sus datos.
+      {{ 'Se eliminarán los datos personales de' | t }} <strong>{{ selectedUser.name | t }}</strong> {{ '(nombre, correo, teléfono, documento y foto) y no podrá volver a entrar. Sus alertas quedan en el historial sin sus datos.' | t }}
     </p>
-    <p class="confirm-sub">Por seguridad, <strong>otra administradora</strong> debe aprobarlo en Moderación.</p>
+    <p class="confirm-sub">{{ 'Por seguridad,' | t }} <strong>{{ 'otra administradora' | t }}</strong> {{ 'debe aprobarlo en Moderación.' | t }}</p>
     <label class="form-field">
-      <span>Motivo *</span>
+      <span>{{ 'Motivo *' | t }}</span>
       <textarea rows="3" [(ngModel)]="deleteReason" name="motivoEliminar" maxlength="500"
-                placeholder="Ej.: la usuaria lo pidió por correo el 19/10. Mínimo 10 caracteres."></textarea>
+                [placeholder]="'Ej.: la usuaria lo pidió por correo el 19/10. Mínimo 10 caracteres.' | t"></textarea>
     </label>
-    <p class="form-error" *ngIf="deleteError">{{ deleteError }}</p>
+    <p class="form-error" *ngIf="deleteError">{{ deleteError | t }}</p>
   </div>
 
   <div modal-footer>
-    <button class="btn-secondary" (click)="closeModals()">Cancelar</button>
+    <button class="btn-secondary" (click)="closeModals()">{{ 'Cancelar' | t }}</button>
     <button class="btn-danger" [disabled]="deleteReason.trim().length < 10 || savingDelete" (click)="requestDeletion()">
-      {{ savingDelete ? 'Enviando…' : 'Enviar solicitud' }}</button>
+      {{ savingDelete ? 'Enviando…' : 'Enviar solicitud' | t }}</button>
   </div>
 </app-modal>

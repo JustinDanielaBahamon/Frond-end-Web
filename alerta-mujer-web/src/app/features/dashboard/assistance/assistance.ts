@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild,
   computed, effect, inject, signal,
@@ -32,7 +33,7 @@ const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 @Component({
   selector: 'app-assistance',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './assistance.html',
   styleUrl: './assistance.scss',
 })

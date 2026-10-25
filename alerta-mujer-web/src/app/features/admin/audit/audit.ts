@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -58,7 +59,7 @@ const CAMPOS: Record<string, string> = {
 @Component({
   selector: 'app-admin-audit',
   standalone: true,
-  imports: [DatePicker, CommonModule, FormsModule],
+  imports: [TPipe, DatePicker, CommonModule, FormsModule],
   templateUrl: './audit.html',
   styleUrl: './audit.scss',
 })

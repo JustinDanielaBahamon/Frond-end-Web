@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
@@ -24,7 +25,7 @@ const TILE_ATTRIBUTION = '© OpenStreetMap contributors';
 
 @Component({
   selector: 'app-alert-history',
-  imports: [DatePicker, CommonModule, NgClass],
+  imports: [TPipe, DatePicker, CommonModule, NgClass],
   templateUrl: './alert-history.html',
   styleUrl: './alert-history.scss',
 })

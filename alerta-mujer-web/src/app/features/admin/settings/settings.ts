@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +30,7 @@ const LABELS: Record<keyof SettingsForm, string> = {
 @Component({
   selector: 'app-admin-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [TPipe, CommonModule, FormsModule, RouterLink],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })

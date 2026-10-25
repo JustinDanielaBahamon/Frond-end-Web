@@ -1,10 +1,11 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chip',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './chip.html',
   styleUrl: './chip.scss'
 })

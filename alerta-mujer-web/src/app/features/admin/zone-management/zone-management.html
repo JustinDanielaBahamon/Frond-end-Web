@@ -5,12 +5,12 @@
   ==========================-->
   <header class="page-header">
     <div>
-      <h1>Gestión de Zonas</h1>
-      <p>Administra las zonas seguras y zonas de riesgo de la aplicación.</p>
+      <h1>{{ 'Gestión de Zonas' | t }}</h1>
+      <p>{{ 'Administra las zonas seguras y zonas de riesgo de la aplicación.' | t }}</p>
     </div>
     <button type="button" class="btn-primary" (click)="openCreate()">
       <i class="fa-solid fa-plus"></i>
-      Nueva Zona
+      {{ 'Nueva Zona' | t }}
     </button>
   </header>
 
@@ -20,8 +20,8 @@
   <section class="stats-grid">
     <div class="stat-card purple">
       <div class="stat-info">
-        <span>Total Zonas</span>
-        <h2>{{ totalZones }}</h2>
+        <span>{{ 'Total Zonas' | t }}</span>
+        <h2>{{ totalZones | t }}</h2>
       </div>
       <div class="stat-icon">
         <i class="fa-solid fa-location-dot"></i>
@@ -30,8 +30,8 @@
 
     <div class="stat-card red">
       <div class="stat-info">
-        <span>Zonas Riesgo Alto</span>
-        <h2>{{ highRiskZones }}</h2>
+        <span>{{ 'Zonas Riesgo Alto' | t }}</span>
+        <h2>{{ highRiskZones | t }}</h2>
       </div>
       <div class="stat-icon">
         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -40,8 +40,8 @@
 
     <div class="stat-card green">
       <div class="stat-info">
-        <span>Zonas Seguras</span>
-        <h2>{{ safeZones }}</h2>
+        <span>{{ 'Zonas Seguras' | t }}</span>
+        <h2>{{ safeZones | t }}</h2>
       </div>
       <div class="stat-icon">
         <i class="fa-solid fa-shield-heart"></i>
@@ -50,8 +50,8 @@
 
     <div class="stat-card blue">
       <div class="stat-info">
-        <span>En Revisión</span>
-        <h2>{{ zonesInReview }}</h2>
+        <span>{{ 'En Revisión' | t }}</span>
+        <h2>{{ zonesInReview | t }}</h2>
       </div>
       <div class="stat-icon">
         <i class="fa-solid fa-clock"></i>
@@ -65,7 +65,7 @@
   <div class="toolbar">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Buscar zona..." aria-label="Buscar zona"
+      <input type="text" [placeholder]="'Buscar zona...' | t" [attr.aria-label]="'Buscar zona' | t"
         [(ngModel)]="searchTerm" (input)="applyFilters()" />
     </div>
 
@@ -73,7 +73,7 @@
       <button *ngFor="let chip of chips" class="chip"
         [class.active]="typeFilter === chip.value"
         (click)="setChip(chip.value)">
-        {{ chip.label }}
+        {{ chip.label | t }}
       </button>
     </div>
   </div>
@@ -85,13 +85,13 @@
     <table>
       <thead>
         <tr>
-          <th>Zona</th>
-          <th>Ciudad</th>
-          <th>Tipo</th>
-          <th>Alertas</th>
-          <th>Estado</th>
-          <th>Última actualización</th>
-          <th>Acciones</th>
+          <th>{{ 'Zona' | t }}</th>
+          <th>{{ 'Ciudad' | t }}</th>
+          <th>{{ 'Tipo' | t }}</th>
+          <th>{{ 'Alertas' | t }}</th>
+          <th>{{ 'Estado' | t }}</th>
+          <th>{{ 'Última actualización' | t }}</th>
+          <th>{{ 'Acciones' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -101,33 +101,33 @@
               <div class="zone-avatar" [ngClass]="getAvatarClass(z.type)">
                 <i class="fa-solid fa-location-dot"></i>
               </div>
-              {{ z.name }}
+              {{ z.name | t }}
             </div>
           </td>
-          <td data-label="Ciudad">{{ z.city }}</td>
-          <td data-label="Tipo"><span class="badge" [ngClass]="getBadgeClass(z.type)">{{ z.type }}</span></td>
-          <td data-label="Alertas">{{ z.alerts }}</td>
-          <td data-label="Estado"><span class="status" [ngClass]="getStatusClass(z.status)">{{ z.status }}</span></td>
-          <td data-label="Actualizada">{{ relativeTime(z.updated_at) }}</td>
+          <td data-label="Ciudad">{{ z.city | t }}</td>
+          <td data-label="Tipo"><span class="badge" [ngClass]="getBadgeClass(z.type)">{{ z.type | t }}</span></td>
+          <td data-label="Alertas">{{ z.alerts | t }}</td>
+          <td data-label="Estado"><span class="status" [ngClass]="getStatusClass(z.status)">{{ z.status | t }}</span></td>
+          <td data-label="Actualizada">{{ relativeTime(z.updated_at) | t }}</td>
           <td class="cell-acc">
             <div class="actions">
-              <button aria-label="Ver detalles" title="Ver detalles" (click)="viewZone(z)"><i class="fa-solid fa-eye"></i></button>
-              <button aria-label="Editar" title="Editar" (click)="editZone(z)"><i class="fa-solid fa-pen"></i></button>
-              <button aria-label="Eliminar" (click)="deleteZone(z)"><i class="fa-solid fa-trash"></i></button>
+              <button [attr.aria-label]="'Ver detalles' | t" [title]="'Ver detalles' | t" (click)="viewZone(z)"><i class="fa-solid fa-eye"></i></button>
+              <button [attr.aria-label]="'Editar' | t" [title]="'Editar' | t" (click)="editZone(z)"><i class="fa-solid fa-pen"></i></button>
+              <button [attr.aria-label]="'Eliminar' | t" (click)="deleteZone(z)"><i class="fa-solid fa-trash"></i></button>
             </div>
           </td>
         </tr>
 
         <!-- Cargando -->
         <tr *ngIf="loading">
-          <td colspan="7" class="empty-state">Cargando zonas...</td>
+          <td colspan="7" class="empty-state">{{ 'Cargando zonas...' | t }}</td>
         </tr>
 
         <!-- Sin resultados -->
         <tr *ngIf="!loading && filteredZones.length === 0">
           <td colspan="7" class="empty-state">
-            <p>No se encontraron zonas con ese criterio.</p>
-            <button class="chip" (click)="clearAll()">Limpiar filtros</button>
+            <p>{{ 'No se encontraron zonas con ese criterio.' | t }}</p>
+            <button class="chip" (click)="clearAll()">{{ 'Limpiar filtros' | t }}</button>
           </td>
         </tr>
       </tbody>
@@ -138,14 +138,14 @@
     ==========================-->
     <div class="table-footer">
       <div class="table-info">
-        Mostrando
-        <strong>{{ from }} - {{ to }}</strong>
-        de
-        <strong>{{ totalFiltered }}</strong>
-        zonas registradas
+        {{ 'Mostrando' | t }}
+        <strong>{{ from | t }} - {{ to | t }}</strong>
+        {{ 'de' | t }}
+        <strong>{{ totalFiltered | t }}</strong>
+        {{ 'zonas registradas' | t }}
       </div>
       <div class="pagination">
-        <button class="page-btn" aria-label="Página anterior"
+        <button class="page-btn" [attr.aria-label]="'Página anterior' | t"
           [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -153,10 +153,10 @@
           @if (p === null) {
             <span class="page-ellipsis" aria-hidden="true">…</span>
           } @else {
-            <button class="page-btn" [class.active]="p === currentPage" [attr.aria-label]="'Página ' + p" (click)="changePage(p)">{{ p }}</button>
+            <button class="page-btn" [class.active]="p === currentPage" [attr.aria-label]="'Página ' + p" (click)="changePage(p)">{{ p | t }}</button>
           }
         }
-        <button class="page-btn" aria-label="Página siguiente"
+        <button class="page-btn" [attr.aria-label]="'Página siguiente' | t"
           [disabled]="currentPage === totalPageCount" (click)="changePage(currentPage + 1)">
           <i class="fa-solid fa-chevron-right"></i>
         </button>
@@ -177,76 +177,76 @@
     <div modal-body>
 
       <div class="form-group">
-        <label class="form-label" for="zona-nombre">Nombre</label>
+        <label class="form-label" for="zona-nombre">{{ 'Nombre' | t }}</label>
         <input id="zona-nombre" class="form-input" type="text" maxlength="80"
-          placeholder="Ej: Parque Santander" [(ngModel)]="form.name" />
+          [placeholder]="'Ej: Parque Santander' | t" [(ngModel)]="form.name" />
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="zona-ciudad">Ciudad</label>
+        <label class="form-label" for="zona-ciudad">{{ 'Ciudad' | t }}</label>
         <input id="zona-ciudad" class="form-input" type="text" maxlength="60" list="ciudades-zona"
-          placeholder="Ej: Neiva" [(ngModel)]="form.city" (input)="onCityChange()" />
+          [placeholder]="'Ej: Neiva' | t" [(ngModel)]="form.city" (input)="onCityChange()" />
         <datalist id="ciudades-zona">
           <option *ngFor="let c of suggestedCities" [value]="c"></option>
         </datalist>
       </div>
 
       <div class="form-group">
-        <span class="form-label">Tipo de zona</span>
+        <span class="form-label">{{ 'Tipo de zona' | t }}</span>
         <div class="options">
           <button type="button" *ngFor="let t of types" class="option"
             [ngClass]="'option--' + getAvatarClass(t)"
             [class.option--activa]="form.type === t"
-            (click)="setType(t)">{{ t }}</button>
+            (click)="setType(t)">{{ t | t }}</button>
         </div>
       </div>
 
       <div class="form-group">
-        <span class="form-label">Estado</span>
+        <span class="form-label">{{ 'Estado' | t }}</span>
         <div class="options">
           <button type="button" *ngFor="let e of statuses" class="option option--neutral"
             [class.option--activa]="form.status === e"
-            (click)="setStatus(e)">{{ e }}</button>
+            (click)="setStatus(e)">{{ e | t }}</button>
         </div>
       </div>
 
       <div class="form-group">
         <span class="form-label">
-          Ubicación en el mapa
-          <small class="form-optional" *ngIf="modal === 'editar'">(opcional)</small>
+          {{ 'Ubicación en el mapa' | t }}
+          <small class="form-optional" *ngIf="modal === 'editar'">{{ '(opcional)' | t }}</small>
         </span>
-        <p class="form-hint">Haz clic en el mapa para marcar el centro de la zona.</p>
+        <p class="form-hint">{{ 'Haz clic en el mapa para marcar el centro de la zona.' | t }}</p>
         <div #modalMap class="zone-map"></div>
         <p class="zone-map-info">
           <ng-container *ngIf="formHasLocation">
-            ✓ {{ form.lat | number:'1.5-5' }}, {{ form.lng | number:'1.5-5' }}
+            ✓ {{ (form.lat | number:'1.5-5') | t }}, {{ (form.lng | number:'1.5-5') | t }}
           </ng-container>
-          <ng-container *ngIf="!formHasLocation">Sin ubicación seleccionada</ng-container>
+          <ng-container *ngIf="!formHasLocation">{{ 'Sin ubicación seleccionada' | t }}</ng-container>
         </p>
       </div>
 
       <div class="form-group">
-        <span class="form-label">Radio del área</span>
+        <span class="form-label">{{ 'Radio del área' | t }}</span>
         <div class="radio-row">
           <input type="range" min="100" max="1500" step="50" class="radio-slider"
-            aria-label="Radio del área en metros"
+            [attr.aria-label]="'Radio del área en metros' | t"
             [ngModel]="form.radio" (ngModelChange)="setRadio($event)" />
-          <span class="radio-value">{{ form.radio }} m</span>
+          <span class="radio-value">{{ form.radio | t }} m</span>
         </div>
         <div class="options options--girls">
           <button type="button" *ngFor="let r of quickRadii" class="option option--neutral"
             [class.option--activa]="form.radio === r"
-            (click)="setRadio(r)">{{ r }} m</button>
+            (click)="setRadio(r)">{{ r | t }} m</button>
         </div>
       </div>
 
-      <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      <p class="form-error" *ngIf="errorForm">{{ errorForm | t }}</p>
     </div>
 
     <div modal-footer>
-      <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+      <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'Cancelar' | t }}</button>
       <button type="button" class="btn-primary btn-modal" [disabled]="!formValid || saving" (click)="save()">
-        {{ saving ? 'Guardando...' : (modal === 'crear' ? 'Guardar zona' : 'Guardar cambios') }}
+        {{ saving ? 'Guardando...' : (modal === 'crear' ? 'Guardar zona' : 'Guardar cambios') | t }}
       </button>
     </div>
   </app-modal>
@@ -257,7 +257,7 @@
   <app-modal
     *ngIf="modal === 'ver' && selectedZone"
     size="lg"
-    title="Detalle de la zona"
+    [title]="'Detalle de la zona' | t"
     (close)="closeModal()">
 
     <div modal-body>
@@ -266,54 +266,54 @@
           <i class="fa-solid fa-location-dot"></i>
         </div>
         <div>
-          <h3>{{ selectedZone.name }}</h3>
-          <p>{{ selectedZone.city }}</p>
+          <h3>{{ selectedZone.name | t }}</h3>
+          <p>{{ selectedZone.city | t }}</p>
         </div>
       </div>
 
       <dl class="zone-detail__grid">
         <div>
-          <dt>Tipo</dt>
-          <dd><span class="badge" [ngClass]="getBadgeClass(selectedZone.type)">{{ selectedZone.type }}</span></dd>
+          <dt>{{ 'Tipo' | t }}</dt>
+          <dd><span class="badge" [ngClass]="getBadgeClass(selectedZone.type)">{{ selectedZone.type | t }}</span></dd>
         </div>
         <div>
-          <dt>Estado</dt>
-          <dd><span class="status" [ngClass]="getStatusClass(selectedZone.status)">{{ selectedZone.status }}</span></dd>
+          <dt>{{ 'Estado' | t }}</dt>
+          <dd><span class="status" [ngClass]="getStatusClass(selectedZone.status)">{{ selectedZone.status | t }}</span></dd>
         </div>
         <div>
-          <dt>Alertas</dt>
-          <dd>{{ selectedZone.alerts }}</dd>
+          <dt>{{ 'Alertas' | t }}</dt>
+          <dd>{{ selectedZone.alerts | t }}</dd>
         </div>
         <div>
-          <dt>Última actualización</dt>
-          <dd>{{ relativeTime(selectedZone.updated_at) }}
-            <small class="zone-detail__date">{{ selectedZone.updated_at | date:'dd/MM/yyyy HH:mm' }}</small>
+          <dt>{{ 'Última actualización' | t }}</dt>
+          <dd>{{ relativeTime(selectedZone.updated_at) | t }}
+            <small class="zone-detail__date">{{ (selectedZone.updated_at | date:'dd/MM/yyyy HH:mm') | t }}</small>
           </dd>
         </div>
       </dl>
 
       <div *ngIf="hasLocation(selectedZone); else withoutLocation">
-        <span class="form-label">Ubicación</span>
+        <span class="form-label">{{ 'Ubicación' | t }}</span>
         <div #modalMap class="zone-map"></div>
         <p class="zone-map-info">
-          {{ selectedZone.lat | number:'1.5-5' }}, {{ selectedZone.lng | number:'1.5-5' }}
-          · radio {{ selectedZone.radio ?? 300 }} m
+          {{ (selectedZone.lat | number:'1.5-5') | t }}, {{ (selectedZone.lng | number:'1.5-5') | t }}
+          {{ '· radio' | t }} {{ selectedZone.radio ?? 300 | t }} m
         </p>
       </div>
 
       <ng-template #withoutLocation>
         <p class="zone-sin-location">
-          Esta zona todavía no tiene una ubicación en el mapa. Puedes agregarla desde
-          <strong>Editar</strong>.
+          {{ 'Esta zona todavía no tiene una ubicación en el mapa. Puedes agregarla desde' | t }}
+          <strong>{{ 'Editar' | t }}</strong>.
         </p>
       </ng-template>
     </div>
 
     <div modal-footer>
-      <button type="button" class="btn-secondary" (click)="closeModal()">Cerrar</button>
+      <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'Cerrar' | t }}</button>
       <button type="button" class="btn-primary btn-modal" (click)="editFromView()">
         <i class="fa-solid fa-pen"></i>
-        Editar
+        {{ 'Editar' | t }}
       </button>
     </div>
   </app-modal>

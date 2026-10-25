@@ -3,32 +3,32 @@
   <svg class="sf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
   </svg>
-  <span class="sf-text" [class.sf-text--empty]="!text()">{{ text() || placeholder() }}</span>
+  <span class="sf-text" [class.sf-text--empty]="!text()">{{ (text() || placeholder()) | t }}</span>
   @if (clearable() && selection()) {
-    <span class="sf-clear" role="button" tabindex="0" aria-label="Quitar la fecha" (click)="clear($event)" (keydown.enter)="clear($event)">✕</span>
+    <span class="sf-clear" role="button" tabindex="0" [attr.aria-label]="'Quitar la fecha' | t" (click)="clear($event)" (keydown.enter)="clear($event)">✕</span>
   }
 </button>
 
 @if (open()) {
   <div class="sf-panel" role="dialog" [attr.aria-label]="label()">
     <div class="sf-header">
-      <button type="button" class="sf-nav" aria-label="Mes anterior" (click)="moveMonth(-1)">‹</button>
-      <span class="sf-mes">{{ monthTitle() }}</span>
-      <button type="button" class="sf-nav" aria-label="Mes siguiente" (click)="moveMonth(1)">›</button>
+      <button type="button" class="sf-nav" [attr.aria-label]="'Mes anterior' | t" (click)="moveMonth(-1)">‹</button>
+      <span class="sf-mes">{{ monthTitle() | t }}</span>
+      <button type="button" class="sf-nav" [attr.aria-label]="'Mes siguiente' | t" (click)="moveMonth(1)">›</button>
     </div>
     <div class="sf-grilla">
-      @for (d of days; track $index) { <span class="sf-day-week">{{ d }}</span> }
+      @for (d of days; track $index) { <span class="sf-day-week">{{ d | t }}</span> }
       @for (c of cells(); track c.iso) {
         <button type="button" class="sf-day"
                 [class.sf-day--outside]="!c.ofMonth" [class.sf-day--today]="c.today" [class.sf-day--chosen]="c.iso === selection()"
                 [disabled]="c.disabled" [attr.aria-label]="c.iso" [attr.aria-pressed]="c.iso === selection()"
-                (click)="choose(c)">{{ c.day }}</button>
+                (click)="choose(c)">{{ c.day | t }}</button>
       }
     </div>
     <div class="sf-footer">
-      <button type="button" class="sf-action" (click)="today()">Hoy</button>
+      <button type="button" class="sf-action" (click)="today()">{{ 'Hoy' | t }}</button>
       @if (clearable()) {
-        <button type="button" class="sf-action sf-action--suave" (click)="clear()">Quitar</button>
+        <button type="button" class="sf-action sf-action--suave" (click)="clear()">{{ 'Quitar' | t }}</button>
       }
     </div>
   </div>

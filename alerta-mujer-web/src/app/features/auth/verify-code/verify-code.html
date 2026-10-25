@@ -31,7 +31,7 @@
           <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
           <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
         </svg>
-        <img class="hero-image" src="login.png" alt="Alerta Mujer">
+        <img class="hero-image" src="login.png" [alt]="'Alerta Mujer' | t">
         <span class="spark spark--1">✦</span>
         <span class="spark spark--2">✦</span>
         <span class="spark spark--3">✦</span>
@@ -44,16 +44,16 @@
         <!-- Brand section (logo and name) -->
         <div class="brand">
           <div class="brand__icon">
-            <img src="logo.png" alt="Logo Alerta Mujer">
+            <img src="logo.png" [alt]="'Logo Alerta Mujer' | t">
           </div>
           <div class="brand__text">
             <span class="brand__name">
-              ALERTA
+              {{ 'ALERTA' | t }}
               <br>
-              <strong>MUJER</strong>
+              <strong>{{ 'MUJER' | t }}</strong>
             </span>
             <span class="brand__tagline">
-              Seguridad para todas
+              {{ 'Seguridad para todas' | t }}
             </span>
           </div>
         </div>
@@ -65,11 +65,10 @@
   
         <!-- Card title and subtitle -->
         <h1 class="card__title">
-          Verifica tu <span class="card__title--accent">código</span>
+          {{ 'Verifica tu' | t }} <span class="card__title--accent">{{ 'código' | t }}</span>
         </h1>
         <p class="card__subtitle">
-          Enviamos un código de 6 dígitos a <strong>{{ maskedEmail() }}</strong>. Vence en 15 minutos.
-          Si no lo ves, revisa la carpeta de spam.
+          {{ 'Enviamos un código de 6 dígitos a' | t }} <strong>{{ maskedEmail() | t }}</strong>{{ '. Vence en 15 minutos. Si no lo ves, revisa la carpeta de spam.' | t }}
         </p>
   
         <!-- Code verification form -->
@@ -94,15 +93,15 @@
           </div>
 
           @if (error()) {
-            <p class="code-error" role="alert">{{ error() }}</p>
+            <p class="code-error" role="alert">{{ error() | t }}</p>
           } @else if (notice()) {
-            <p class="code-notice" role="status">{{ notice() }}</p>
+            <p class="code-notice" role="status">{{ notice() | t }}</p>
           }
 
           <!-- Timer and code resend section -->
           <div class="timer-section">
             <span class="timer">
-              {{ canResend() ? '¿No te llegó?' : 'Reenviar en ' + formattedTime() }}
+              {{ canResend() ? '¿No te llegó?' : 'Reenviar en ' + formattedTime() | t }}
             </span>
             <button
               type="button"
@@ -110,7 +109,7 @@
               [class.resend-link--disabled]="!canResend()"
               [disabled]="!canResend()"
               (click)="resendCode()">
-              Reenviar código
+              {{ 'Reenviar código' | t }}
             </button>
           </div>
           <!-- Verification button -->
@@ -119,7 +118,7 @@
             type="submit"
             [disabled]="!fullCode() || verifying()">
             <i class="fa-solid fa-shield-halved"></i>
-            {{ verifying() ? 'VERIFICANDO…' : 'VERIFICAR CÓDIGO' }}
+            {{ verifying() ? 'VERIFICANDO…' : 'VERIFICAR CÓDIGO' | t }}
           </button>
         </form>
   
@@ -128,7 +127,7 @@
           <span
             class="form__link"
             (click)="changeEmail()">
-            Usar otro correo
+            {{ 'Usar otro correo' | t }}
           </span>
         </p>
   

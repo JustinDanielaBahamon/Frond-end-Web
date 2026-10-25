@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -7,7 +8,7 @@ import { ReceivedAlertsService } from '../../../core/services/received-alerts.se
 @Component({
   selector: 'app-contact-alerts',
   standalone: true,
-  imports: [DatePipe],
+  imports: [TPipe, DatePipe],
   templateUrl: './contact-alerts.html',
   styleUrl: './contact-alerts.scss',
 })

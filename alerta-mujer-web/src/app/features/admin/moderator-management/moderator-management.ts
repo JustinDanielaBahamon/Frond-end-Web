@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-moderator-management',
-  imports: [CommonModule, FormsModule, DeletionRequests],
+  imports: [TPipe, CommonModule, FormsModule, DeletionRequests],
   templateUrl: './moderator-management.html',
   styleUrl: './moderator-management.scss',
 })

@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild,
   WritableSignal, computed, effect, inject, signal,
@@ -30,7 +31,7 @@ const COLORS = ['#a78bfa', '#7238f8', '#e372f4', '#782dda'];
 @Component({
   selector: 'app-save-route',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './save-route.html',
   styleUrl: './save-route.scss',
 })

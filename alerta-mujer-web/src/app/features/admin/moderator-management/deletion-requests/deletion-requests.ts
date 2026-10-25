@@ -1,3 +1,4 @@
+import { TPipe } from '../../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 @Component({
   selector: 'app-deletion-requests',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './deletion-requests.html',
   styleUrl: './deletion-requests.scss',
 })

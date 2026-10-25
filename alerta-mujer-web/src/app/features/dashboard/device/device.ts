@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -53,7 +54,7 @@ const DEVICE_STATUSES: Record<string, string> = {
 @Component({
   selector: 'app-device',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [TPipe, CommonModule, RouterLink],
   templateUrl: './device.html',
   styleUrl: './device.scss',
 })

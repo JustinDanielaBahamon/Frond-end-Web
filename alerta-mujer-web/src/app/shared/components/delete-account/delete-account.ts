@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +15,7 @@ const CONFIRMATION = 'ELIMINAR';
 @Component({
   selector: 'app-delete-account',
   standalone: true,
-  imports: [FormsModule],
+  imports: [TPipe, FormsModule],
   templateUrl: './delete-account.html',
   styleUrls: ['../password-change/password-change.scss', './delete-account.scss'],
 })

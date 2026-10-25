@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,7 @@ declare const L: any;
 @Component({
   selector: 'app-alert-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, Modal, Chip],
+  imports: [TPipe, CommonModule, FormsModule, Modal, Chip],
   templateUrl: './alert-admin.html',
   styleUrl: './alert-admin.scss',
 })

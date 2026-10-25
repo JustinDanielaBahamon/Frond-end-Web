@@ -1,8 +1,8 @@
 <div class="container-contacts">
 
     <div class="text-contacts">
-        <h1>Contáctanos</h1>
-        <p>Estamos aquí para ayudarte</p>
+        <h1>{{ 'Contáctanos' | t }}</h1>
+        <p>{{ 'Estamos aquí para ayudarte' | t }}</p>
     </div>
 
     <div class="container-content">
@@ -12,7 +12,7 @@
         <div class="form">
 
             <div class="text-form">
-                <h1>Formulario</h1>
+                <h1>{{ 'Formulario' | t }}</h1>
             </div>
 
             <form>
@@ -23,14 +23,14 @@
                         <input
                             type="text"
                             class="form-control"
-                            placeholder="Nombre completo">
+                            [placeholder]="'Nombre completo' | t">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <input
                             type="email"
                             class="form-control"
-                            placeholder="Correo electrónico">
+                            [placeholder]="'Correo electrónico' | t">
                     </div>
 
                 </div>
@@ -40,12 +40,12 @@
                     <textarea
                         class="form-control"
                         rows="5"
-                        placeholder="Mensaje"></textarea>
+                        [placeholder]="'Mensaje' | t"></textarea>
 
                 </div>
 
                 <button type="submit" class="btn-contact">
-                    Enviar mensaje
+                    {{ 'Enviar mensaje' | t }}
                 </button>
 
             </form>
@@ -65,8 +65,8 @@
                     </div>
 
                     <div>
-                        <h5>Correo electrónico</h5>
-                        <p>hola@alertamujer.com</p>
+                        <h5>{{ 'Correo electrónico' | t }}</h5>
+                        <p>{{ 'hola@alertamujer.com' | t }}</p>
                     </div>
 
                 </div>
@@ -78,7 +78,7 @@
                     </div>
 
                     <div>
-                        <h5>Teléfono</h5>
+                        <h5>{{ 'Teléfono' | t }}</h5>
                         <p>+57 300 123 4567</p>
                     </div>
 
@@ -91,8 +91,8 @@
                     </div>
 
                     <div>
-                        <h5>Ubicación</h5>
-                        <p>Bogotá, Colombia</p>
+                        <h5>{{ 'Ubicación' | t }}</h5>
+                        <p>{{ 'Bogotá, Colombia' | t }}</p>
                     </div>
 
                 </div>
@@ -103,12 +103,12 @@
 
                 <img
                     src="./logoContacts.png"
-                    alt="Contacto"
+                    [alt]="'Contacto' | t"
                     class="img-contact-light">
 
                 <img
                     src="./logoContactsoscuro.png"
-                    alt="Contacto"
+                    [alt]="'Contacto' | t"
                     class="img-contact-dark">
 
             </div>

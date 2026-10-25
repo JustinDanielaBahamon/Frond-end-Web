@@ -1,9 +1,10 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [TPipe, ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })

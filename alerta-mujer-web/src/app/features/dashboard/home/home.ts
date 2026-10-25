@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { AfterViewInit, Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -59,7 +60,7 @@ const shortTime = (d: Date) => d.toLocaleTimeString('es-CO', { hour: 'numeric', 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass, RouterLink],
+  imports: [TPipe, CommonModule, NgClass, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

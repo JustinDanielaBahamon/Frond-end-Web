@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
@@ -9,7 +10,7 @@ import { GoogleAuthService } from '../../../core/auth/google-auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CardComponent, NgIf, RouterModule],
+  imports: [TPipe, FormsModule, CardComponent, NgIf, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   encapsulation: ViewEncapsulation.None

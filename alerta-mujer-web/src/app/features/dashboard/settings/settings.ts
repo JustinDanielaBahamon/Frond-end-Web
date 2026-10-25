@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -23,7 +24,7 @@ interface ToggleSetting {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, RouterLink, PasswordChangeComponent, DeleteAccountComponent],
+  imports: [TPipe, CommonModule, RouterLink, PasswordChangeComponent, DeleteAccountComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })

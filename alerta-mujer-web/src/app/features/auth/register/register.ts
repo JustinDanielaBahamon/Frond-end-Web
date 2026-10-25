@@ -1,4 +1,5 @@
 // register.ts
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -35,7 +36,7 @@ const matchesPassword: ValidatorFn = (control: AbstractControl): ValidationError
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CardComponent, RouterModule],
+  imports: [TPipe, ReactiveFormsModule, CardComponent, RouterModule],
   templateUrl: './register.html',
   styleUrl: './register.scss',
   encapsulation: ViewEncapsulation.None

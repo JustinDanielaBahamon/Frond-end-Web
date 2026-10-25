@@ -1,3 +1,4 @@
+import { TPipe } from '../../i18n/i18n';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -12,7 +13,7 @@ import { APK_DOWNLOAD_URL } from '../../../shared/constants/descarga-app';
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, SidebarComponent, TopbarComponent, DatePipe],
+  imports: [TPipe, RouterLink, RouterLinkActive, RouterOutlet, SidebarComponent, TopbarComponent, DatePipe],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss'
 })

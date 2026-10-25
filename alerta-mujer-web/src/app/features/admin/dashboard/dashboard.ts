@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -119,7 +120,7 @@ const H_BASE = 240;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DatePicker, CommonModule, RouterLink],
+  imports: [TPipe, DatePicker, CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

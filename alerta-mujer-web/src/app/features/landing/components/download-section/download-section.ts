@@ -1,9 +1,10 @@
+import { TPipe } from '../../../../core/i18n/i18n';
 import { Component } from '@angular/core';
 import { APK_DOWNLOAD_URL } from '../../../../shared/constants/descarga-app';
 
 @Component({
   selector: 'app-download-section',
-  imports: [],
+  imports: [TPipe, ],
   templateUrl: './download-section.html',
   styleUrl: './download-section.scss',
 })

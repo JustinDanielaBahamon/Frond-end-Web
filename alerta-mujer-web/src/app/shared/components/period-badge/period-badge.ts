@@ -1,10 +1,11 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-period-badge',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './period-badge.html',
   styleUrl: './period-badge.scss'
 })

@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -25,7 +26,7 @@ export interface TopbarAccountLink {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [TPipe, RouterLink],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss'
 })

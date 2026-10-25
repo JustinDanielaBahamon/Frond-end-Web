@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, forwardRef, inject, input, output, signal,
 } from '@angular/core';
@@ -31,6 +32,7 @@ const fromIso = (iso: string | null | undefined): Date | null => {
 @Component({
   selector: 'app-date-picker',
   standalone: true,
+  imports: [TPipe],
   templateUrl: './date-picker.html',
   styleUrl: './date-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

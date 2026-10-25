@@ -4,7 +4,7 @@
     <div class="modal__header" [class.modal__header--danger]="variant === 'danger'">
       <h2>
         <ng-content select="[modal-titulo]"></ng-content>
-        <ng-container *ngIf="title">{{ title }}</ng-container>
+        <ng-container *ngIf="title">{{ title | t }}</ng-container>
       </h2>
       <button class="modal__close" (click)="close.emit()">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

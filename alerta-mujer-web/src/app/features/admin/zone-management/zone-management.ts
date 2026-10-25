@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, HostListener, inject,
 } from '@angular/core';
@@ -32,7 +33,7 @@ type ModalMode = 'crear' | 'editar' | 'ver' | null;
 @Component({
   selector: 'app-zone-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, Modal],
+  imports: [TPipe, CommonModule, FormsModule, Modal],
   templateUrl: './zone-management.html',
   styleUrl: './zone-management.scss',
 })

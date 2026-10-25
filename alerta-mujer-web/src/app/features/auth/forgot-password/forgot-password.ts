@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +9,7 @@ import { RecoveryStateService } from '../../../core/services/recovery-state.serv
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [FormsModule, RouterModule, CardComponent],
+  imports: [TPipe, FormsModule, RouterModule, CardComponent],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss',
   encapsulation: ViewEncapsulation.None

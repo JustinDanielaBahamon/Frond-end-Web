@@ -1,8 +1,8 @@
 <div class="lt-header page-title-row">
   <span class="page-title-icon"><i class="ti ti-map-pin"></i></span>
   <div>
-    <h1 class="lt-title">{{ title }}</h1>
-    <p class="lt-subtitle">{{ subtitle }}</p>
+    <h1 class="lt-title">{{ title | t }}</h1>
+    <p class="lt-subtitle">{{ subtitle | t }}</p>
   </div>
 </div>
 
@@ -38,7 +38,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         }
       }
-      {{ tab.label }}
+      {{ tab.label | t }}
     </a>
   }
 </nav>

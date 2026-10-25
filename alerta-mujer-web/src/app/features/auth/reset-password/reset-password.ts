@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { RecoveryStateService } from '../../../core/services/recovery-state.serv
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [FormsModule, CardComponent, PasswordStrengthComponent],
+  imports: [TPipe, FormsModule, CardComponent, PasswordStrengthComponent],
   templateUrl: './reset-password.html',
   styleUrls: ['../verify-code/verify-code.scss', './reset-password.scss'],
 })

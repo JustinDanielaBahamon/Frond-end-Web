@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, computed, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
@@ -15,7 +16,7 @@ export interface RecordingPart {
 @Component({
   selector: 'app-continuous-player',
   standalone: true,
-  imports: [DatePipe],
+  imports: [TPipe, DatePipe],
   templateUrl: './continuous-player.html',
   styleUrl: './continuous-player.scss',
 })

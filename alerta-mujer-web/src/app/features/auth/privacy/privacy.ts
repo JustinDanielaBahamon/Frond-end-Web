@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { RegisterDraftService } from '../../../core/services/register-draft.service';
@@ -6,6 +7,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 @Component({
   selector: 'app-privacy',
   standalone: true,
+  imports: [TPipe],
   templateUrl: './privacy.html',
   styleUrl: '../legal/legal.scss'
 })

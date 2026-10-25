@@ -1,3 +1,4 @@
+import { TPipe } from '../../core/i18n/i18n';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ContinuousPlayerComponent } from '../../shared/components/continuous-player/continuous-player';
 import { CommonModule } from '@angular/common';
@@ -48,7 +49,7 @@ const durationText = (ms: number): string => {
 @Component({
   selector: 'app-tracking',
   standalone: true,
-  imports: [CommonModule, ContinuousPlayerComponent],
+  imports: [TPipe, CommonModule, ContinuousPlayerComponent],
   templateUrl: './tracking.html',
   styleUrl: './tracking.scss',
 })

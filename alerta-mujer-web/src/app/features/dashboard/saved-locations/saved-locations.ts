@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild,
   computed, effect, inject, signal,
@@ -27,7 +28,7 @@ const QUICK_NAMES = ['Casa', 'Trabajo', 'Universidad', 'Colegio', 'Gimnasio'];
 @Component({
   selector: 'app-saved-locations',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './saved-locations.html',
   styleUrl: './saved-locations.scss',
 })

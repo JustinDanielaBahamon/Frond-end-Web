@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-report-management',
-  imports: [DatePicker, CommonModule, FormsModule],
+  imports: [TPipe, DatePicker, CommonModule, FormsModule],
   templateUrl: './report-management.html',
   styleUrl: './report-management.scss',
 })

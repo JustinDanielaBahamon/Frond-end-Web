@@ -2,51 +2,51 @@
 
   <header class="page-header">
     <div class="identity">
-      <div class="identity__avatar" aria-hidden="true">{{ initials() }}</div>
+      <div class="identity__avatar" aria-hidden="true">{{ initials() | t }}</div>
       <div>
-        <h1>{{ user()?.name || 'Mi perfil' }}</h1>
-        <p>{{ user()?.email }} · Administración</p>
+        <h1>{{ (user()?.name || 'Mi perfil') | t }}</h1>
+        <p>{{ user()?.email | t }} {{ '· Administración' | t }}</p>
       </div>
     </div>
     <button class="btn-outline" (click)="signOut()">
-      <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+      <i class="fa-solid fa-right-from-bracket"></i> {{ 'Cerrar sesión' | t }}
     </button>
   </header>
 
   @if (message()) {
-    <div class="toast" [class.toast--error]="errorMessage()" role="status">{{ message() }}</div>
+    <div class="toast" [class.toast--error]="errorMessage()" role="status">{{ message() | t }}</div>
   }
 
   <section class="grid">
 
     <!-- DATOS PERSONALES -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-regular fa-address-card"></i> Datos personales</h2>
+      <h2 class="card__title"><i class="fa-regular fa-address-card"></i> {{ 'Datos personales' | t }}</h2>
       @if (loadingData()) {
-        <p class="muted">Cargando…</p>
+        <p class="muted">{{ 'Cargando…' | t }}</p>
       } @else {
         <form class="form" (ngSubmit)="saveData()">
           <div class="form__row">
             <label class="field">
-              <span>Nombre</span>
+              <span>{{ 'Nombre' | t }}</span>
               <input name="firstName" [(ngModel)]="data.firstName" maxlength="100" required autocomplete="given-name" />
             </label>
             <label class="field">
-              <span>Apellido</span>
+              <span>{{ 'Apellido' | t }}</span>
               <input name="lastName" [(ngModel)]="data.lastName" maxlength="100" autocomplete="family-name" />
             </label>
           </div>
           <label class="field">
-            <span>Teléfono</span>
+            <span>{{ 'Teléfono' | t }}</span>
             <input name="telephone" [(ngModel)]="data.telephone" maxlength="20" inputmode="tel" autocomplete="tel" />
           </label>
           <label class="field">
-            <span>Correo</span>
+            <span>{{ 'Correo' | t }}</span>
             <input [value]="user()?.email || ''" disabled />
-            <small>El correo identifica la cuenta y no se puede cambiar desde aquí.</small>
+            <small>{{ 'El correo identifica la cuenta y no se puede cambiar desde aquí.' | t }}</small>
           </label>
           <button class="btn-primary" type="submit" [disabled]="savingData()">
-            {{ savingData() ? 'Guardando…' : 'Guardar datos' }}
+            {{ savingData() ? 'Guardando…' : 'Guardar datos' | t }}
           </button>
         </form>
       }
@@ -54,77 +54,77 @@
 
     <!-- CONTRASEÑA -->
     <article class="card" id="contrasena">
-      <h2 class="card__title"><i class="fa-solid fa-key"></i> Contraseña</h2>
+      <h2 class="card__title"><i class="fa-solid fa-key"></i> {{ 'Contraseña' | t }}</h2>
       <form class="form" (ngSubmit)="changePassword()">
         <label class="field">
-          <span>Contraseña actual</span>
+          <span>{{ 'Contraseña actual' | t }}</span>
           <input type="password" name="actual" [(ngModel)]="password.current" autocomplete="current-password" required />
         </label>
         <label class="field">
-          <span>Nueva contraseña</span>
+          <span>{{ 'Nueva contraseña' | t }}</span>
           <input type="password" name="nueva" [(ngModel)]="password.newOne" autocomplete="new-password" minlength="8" required />
         </label>
         @if (fortaleza.level) {
           <div class="strength" [attr.data-nivel]="fortaleza.level">
             <div class="strength__bar"><span></span><span></span><span></span><span></span></div>
-            <small>{{ fortaleza.text }}</small>
+            <small>{{ fortaleza.text | t }}</small>
           </div>
         }
         <label class="field">
-          <span>Repite la nueva contraseña</span>
+          <span>{{ 'Repite la nueva contraseña' | t }}</span>
           <input type="password" name="confirmar" [(ngModel)]="password.confirm" autocomplete="new-password" required />
         </label>
-        <small class="muted">Mínimo 8 caracteres. Usa mayúsculas, números y símbolos para hacerla más fuerte.</small>
+        <small class="muted">{{ 'Mínimo 8 caracteres. Usa mayúsculas, números y símbolos para hacerla más fuerte.' | t }}</small>
         <button class="btn-primary" type="submit" [disabled]="savingPassword()">
-          {{ savingPassword() ? 'Guardando…' : 'Cambiar contraseña' }}
+          {{ savingPassword() ? 'Guardando…' : 'Cambiar contraseña' | t }}
         </button>
       </form>
     </article>
 
     <!-- SESIÓN Y APARIENCIA -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> Sesión y apariencia</h2>
+      <h2 class="card__title"><i class="fa-solid fa-shield-halved"></i> {{ 'Sesión y apariencia' | t }}</h2>
       <label class="field">
-        <span>Cerrar sesión por inactividad</span>
+        <span>{{ 'Cerrar sesión por inactividad' | t }}</span>
         <select [ngModel]="inactivity.minutes()" (ngModelChange)="changeInactivity($event)">
           @for (op of inactivity.options; track op) {
-            <option [ngValue]="op">{{ inactivityLabel(op) }}</option>
+            <option [ngValue]="op">{{ inactivityLabel(op) | t }}</option>
           }
         </select>
-        <small>Si el panel queda abierto sin uso, la sesión se cierra sola. Se aplica a este navegador.</small>
+        <small>{{ 'Si el panel queda abierto sin uso, la sesión se cierra sola. Se aplica a este navegador.' | t }}</small>
       </label>
 
-      <p class="label">Tema</p>
+      <p class="label">{{ 'Tema' | t }}</p>
       <div class="theme-options">
         <button class="theme-btn" [class.theme-btn--active]="!isDark()" (click)="changeTheme('light')">
-          <i class="fa-regular fa-sun"></i> Claro
+          <i class="fa-regular fa-sun"></i> {{ 'Claro' | t }}
         </button>
         <button class="theme-btn" [class.theme-btn--active]="isDark()" (click)="changeTheme('dark')">
-          <i class="fa-regular fa-moon"></i> Oscuro
+          <i class="fa-regular fa-moon"></i> {{ 'Oscuro' | t }}
         </button>
       </div>
 
-      <p class="note"><i class="fa-solid fa-circle-info"></i> Por seguridad, la sesión también vence 24 horas después de iniciarla.</p>
+      <p class="note"><i class="fa-solid fa-circle-info"></i> {{ 'Por seguridad, la sesión también vence 24 horas después de iniciarla.' | t }}</p>
     </article>
 
     <!-- ACTIVIDAD RECIENTE -->
     <article class="card">
-      <h2 class="card__title"><i class="fa-solid fa-clock-rotate-left"></i> Mi actividad reciente</h2>
+      <h2 class="card__title"><i class="fa-solid fa-clock-rotate-left"></i> {{ 'Mi actividad reciente' | t }}</h2>
       @if (loadingActivity()) {
-        <p class="muted">Cargando…</p>
+        <p class="muted">{{ 'Cargando…' | t }}</p>
       } @else if (activity().length === 0) {
-        <p class="muted">Aún no hay inicios de sesión registrados.</p>
+        <p class="muted">{{ 'Aún no hay inicios de sesión registrados.' | t }}</p>
       } @else {
         <ul class="activity">
           @for (r of activity(); track r.id) {
             <li class="activity__item" [class.activity__item--bad]="r.action === 'LOGIN_FAILED'">
               <div>
-                <strong>{{ activityText(r) }}</strong>
-                <small>{{ r.description }}</small>
+                <strong>{{ activityText(r) | t }}</strong>
+                <small>{{ r.description | t }}</small>
               </div>
               <div class="activity__meta">
-                <span>{{ r.date | date: 'dd/MM/yyyy HH:mm' }}</span>
-                <small>{{ r.ip || '' }}</small>
+                <span>{{ (r.date | date: 'dd/MM/yyyy HH:mm') | t }}</span>
+                <small>{{ (r.ip || '') | t }}</small>
               </div>
             </li>
           }
@@ -132,7 +132,7 @@
       }
       <p class="note">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        Si ves un acceso que no reconoces, cambia tu contraseña de inmediato.
+        {{ 'Si ves un acceso que no reconoces, cambia tu contraseña de inmediato.' | t }}
       </p>
     </article>
 

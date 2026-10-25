@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -11,7 +12,7 @@ const RESEND_WAIT = 60; // the backend accepts one code per minute
 @Component({
   selector: 'app-verify-code',
   standalone: true,
-  imports: [FormsModule, RouterModule, CardComponent],
+  imports: [TPipe, FormsModule, RouterModule, CardComponent],
   templateUrl: './verify-code.html',
   styleUrl: './verify-code.scss'
 })

@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import {
   AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild,
   computed, effect, inject, signal,
@@ -66,7 +67,7 @@ const youIcon = L.divIcon({
 @Component({
   selector: 'app-my-location',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './my-location.html',
   styleUrl: './my-location.scss',
 })

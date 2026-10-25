@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { AfterViewInit, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -21,7 +22,7 @@ const SESSION_ACTIONS: Record<string, string> = {
 @Component({
   selector: 'app-admin-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

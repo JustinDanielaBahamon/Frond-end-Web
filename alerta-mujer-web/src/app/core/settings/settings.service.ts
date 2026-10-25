@@ -20,13 +20,13 @@ export class SettingsService {
     this.applyFontSize(this.fontSize());
   }
 
+  /** The texts are translated when the app starts (core/i18n): a new language reloads the page. */
   setLanguage(lang: AppLanguage): void {
+    if (lang === this.language()) return;
     this.language.set(lang);
     localStorage.setItem(LANG_KEY, lang);
     this.applyLanguage(lang);
-    // TODO: connect this to your i18n library (ngx-translate, @angular/localize, etc.)
-    // For now this service only stores the preference and sets the `lang` attribute
-    // on the <html>; it does not translate the app texts automatically.
+    location.reload();
   }
 
   setFontSize(size: AppFontSize): void {

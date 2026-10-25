@@ -2,58 +2,49 @@
   <article class="legal-card">
 
     <button type="button" class="legal-back" (click)="back()">
-      <i class="fa-solid fa-arrow-left"></i> {{ backText }}
+      <i class="fa-solid fa-arrow-left"></i> {{ backText | t }}
     </button>
 
-    <h1 class="legal-title">Política de privacidad</h1>
-    <p class="legal-date">Última actualización: octubre de 2026</p>
+    <h1 class="legal-title">{{ 'Política de privacidad' | t }}</h1>
+    <p class="legal-date">{{ 'Última actualización: octubre de 2026' | t }}</p>
 
-    <h2>1. Qué datos recogemos</h2>
+    <h2>{{ '1. Qué datos recogemos' | t }}</h2>
     <p>
-      Al registrarte te pedimos tu nombre completo, teléfono, tipo y número de documento,
-      fecha de nacimiento y correo electrónico. Durante el uso de la plataforma también
-      pueden registrarse tus alertas, contactos de emergencia y datos de ubicación.
+      {{ 'Al registrarte te pedimos tu nombre completo, teléfono, tipo y número de documento, fecha de nacimiento y correo electrónico. Durante el uso de la plataforma también pueden registrarse tus alertas, contactos de emergencia y datos de ubicación.' | t }}
     </p>
 
-    <h2>2. Para qué usamos tus datos</h2>
+    <h2>{{ '2. Para qué usamos tus datos' | t }}</h2>
     <p>
-      Usamos tus datos para crear y proteger tu cuenta, enviar tus alertas a tus contactos
-      de confianza, mostrarte zonas y recursos de ayuda cercanos y mejorar el servicio.
+      {{ 'Usamos tus datos para crear y proteger tu cuenta, enviar tus alertas a tus contactos de confianza, mostrarte zonas y recursos de ayuda cercanos y mejorar el servicio.' | t }}
     </p>
 
-    <h2>3. Con quién los compartimos</h2>
+    <h2>{{ '3. Con quién los compartimos' | t }}</h2>
     <p>
-      No vendemos tu información. Solo se comparte con las personas que tú elijas como
-      contactos de emergencia y cuando una autoridad competente lo exija por ley.
+      {{ 'No vendemos tu información. Solo se comparte con las personas que tú elijas como contactos de emergencia y cuando una autoridad competente lo exija por ley.' | t }}
     </p>
 
-    <h2>4. Cómo los protegemos</h2>
+    <h2>{{ '4. Cómo los protegemos' | t }}</h2>
     <p>
-      Aplicamos medidas técnicas y de organización para evitar el acceso no autorizado,
-      la pérdida o el uso indebido de tu información.
+      {{ 'Aplicamos medidas técnicas y de organización para evitar el acceso no autorizado, la pérdida o el uso indebido de tu información.' | t }}
     </p>
 
-    <h2>5. Tus derechos</h2>
+    <h2>{{ '5. Tus derechos' | t }}</h2>
     <p>
-      Puedes conocer, actualizar, corregir y solicitar la eliminación de tus datos, así
-      como retirar tu autorización, de acuerdo con la normativa colombiana de protección
-      de datos personales.
+      {{ 'Puedes conocer, actualizar, corregir y solicitar la eliminación de tus datos, así como retirar tu autorización, de acuerdo con la normativa colombiana de protección de datos personales.' | t }}
     </p>
 
-    <h2>6. Tiempo de conservación</h2>
+    <h2>{{ '6. Tiempo de conservación' | t }}</h2>
     <p>
-      Conservamos tus datos mientras tu cuenta esté activa o mientras sea necesario para
-      cumplir obligaciones legales.
+      {{ 'Conservamos tus datos mientras tu cuenta esté activa o mientras sea necesario para cumplir obligaciones legales.' | t }}
     </p>
 
-    <h2>7. Contacto</h2>
+    <h2>{{ '7. Contacto' | t }}</h2>
     <p>
-      Para ejercer tus derechos o resolver dudas sobre esta política, escríbenos desde
-      la sección de contacto de la página principal.
+      {{ 'Para ejercer tus derechos o resolver dudas sobre esta política, escríbenos desde la sección de contacto de la página principal.' | t }}
     </p>
 
     <button type="button" class="legal-btn" (click)="back()">
-      {{ understoodText }}
+      {{ understoodText | t }}
     </button>
 
   </article>

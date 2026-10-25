@@ -12,7 +12,7 @@
     }
 
     @if (parts.length > 1) {
-      <div class="rc-bar" role="group" aria-label="Partes de la grabación">
+      <div class="rc-bar" role="group" [attr.aria-label]="'Partes de la grabación' | t">
         @for (p of parts; track p.id; let i = $index) {
           <button type="button" class="rc-segment" [class.rc-segment--actual]="i === index()"
                   (click)="irA(i)" [attr.aria-label]="'Parte ' + (i + 1) + ', ' + (p.created | date: 'h:mm:ss a')">
@@ -24,11 +24,11 @@
 
     <p class="rc-footer">
       <span>
-        @if (parts.length > 1) { Parte {{ index() + 1 }} de {{ parts.length }} · }
-        {{ part.created | date: 'h:mm:ss a' }}
+        @if (parts.length > 1) { {{ 'Parte' | t }} {{ index() + 1 | t }} {{ 'de' | t }} {{ parts.length | t }} · }
+        {{ (part.created | date: 'h:mm:ss a') | t }}
       </span>
       @if (totalDuration(); as total) {
-        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' }}{{ minutes(total) }}</span>
+        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' | t }}{{ minutes(total) | t }}</span>
       }
     </p>
   </div>

@@ -755,3 +755,17 @@ $yellow: #c084fc;
     .table-card td.cell-acc { border-top-width: 2px; }
   }
 }
+
+// =============================================
+// BOTÓN "NUEVA ZONA": mismo morado del módulo activo del sidebar
+// (solo el del encabezado; los botones de los modales no cambian)
+// =============================================
+.page-header .btn-primary {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent);
+  }
+}

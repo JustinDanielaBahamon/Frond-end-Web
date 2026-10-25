@@ -1585,3 +1585,19 @@ body {
     i { margin-right: 4px; }
   }
 }
+
+
+// =============================================
+// BOTÓN "NUEVO REPORTE": mismo morado del módulo activo del sidebar
+// (!important para ganarle al degradado rosado de admin-dark.scss)
+// =============================================
+.page-header .btn-new-report {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef)) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent) !important;
+
+  &:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent) !important;
+  }
+}

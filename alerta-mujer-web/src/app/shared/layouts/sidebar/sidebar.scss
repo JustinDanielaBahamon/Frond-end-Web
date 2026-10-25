@@ -390,16 +390,31 @@
  * ==================================================
  */
 .sidebar__group {
-  margin: 1.1rem 0 0.35rem;
-  padding: 0 14px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 1.2rem 0 0.4rem;
+  padding: 0 4px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #c4a1ff; // lavanda: se distingue de los módulos (blanco/gris)
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+  // Thin line after the title, so it reads as a separator
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(196, 161, 255, 0.35), transparent);
+  }
 
   &:first-child { margin-top: 0; }
+}
+
+// Tabler icons (outline) of the admin menu: a bit bigger than Font Awesome
+.sidebar__link-icon.ti {
+  width: 20px;
+  font-size: 1.15rem;
 }

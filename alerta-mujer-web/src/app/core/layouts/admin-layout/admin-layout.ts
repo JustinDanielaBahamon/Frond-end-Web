@@ -41,17 +41,17 @@ export class AdminLayoutComponent implements OnInit {
   notifications = signal<TopbarNotification[]>([]);
 
   links: SidebarLink[] = [
-    { label: 'Dashboard',    route: '/admin/dashboard', exact: true, group: 'Módulo principal' },
-    { label: 'Gestión de usuarios', route: '/admin/usuarios' },
-    { label: 'Gestión de alertas', route: '/admin/alertas' },
-    { label: 'Zonas y puntos de ayuda', route: '/admin/zone-management' },
-    { label: 'Informes', route: '/admin/report-management', group: 'Gestión y control' },
-    { label: 'Gestión de evidencias', route: '/admin/evidence-management' },
-    { label: 'Moderación', route: '/admin/moderator-management' },
-    { label: 'Gestión de dispositivos', route: '/admin/devices-management' },
-    { label: 'Auditoría', route: '/admin/auditoria', group: 'Sistema & ajustes' },
-    { label: 'Configuración', route: '/admin/settings' },
-    { label: 'Mi perfil', route: '/admin/perfil' },
+    { label: 'Dashboard',    route: '/admin/dashboard', exact: true, group: 'Módulo principal', icon: 'ti ti-layout-dashboard' },
+    { label: 'Gestión de usuarios', route: '/admin/usuarios', icon: 'ti ti-users' },
+    { label: 'Gestión de alertas', route: '/admin/alertas', icon: 'ti ti-alert-triangle' },
+    { label: 'Zonas y puntos de ayuda', route: '/admin/zone-management', icon: 'ti ti-map-pin' },
+    { label: 'Informes', route: '/admin/report-management', group: 'Gestión y control', icon: 'ti ti-report-analytics' },
+    { label: 'Gestión de evidencias', route: '/admin/evidence-management', icon: 'ti ti-folder' },
+    { label: 'Moderación', route: '/admin/moderator-management', icon: 'ti ti-shield-check' },
+    { label: 'Gestión de dispositivos', route: '/admin/devices-management', icon: 'ti ti-device-mobile' },
+    { label: 'Auditoría', route: '/admin/auditoria', group: 'Sistema & ajustes', icon: 'ti ti-history' },
+    { label: 'Configuración', route: '/admin/settings', icon: 'ti ti-settings' },
+    { label: 'Mi perfil', route: '/admin/perfil', icon: 'ti ti-user-circle' },
   ];
 
   // Account menu links (top right), besides "Mi perfil"

@@ -41,15 +41,15 @@ export class AdminLayoutComponent implements OnInit {
   notifications = signal<TopbarNotification[]>([]);
 
   links: SidebarLink[] = [
-    { label: 'Dashboard',    route: '/admin/dashboard', exact: true },
+    { label: 'Dashboard',    route: '/admin/dashboard', exact: true, group: 'Módulo principal' },
     { label: 'Gestión de usuarios', route: '/admin/usuarios' },
     { label: 'Gestión de alertas', route: '/admin/alertas' },
     { label: 'Zonas y puntos de ayuda', route: '/admin/zone-management' },
-    { label: 'Informes', route: '/admin/report-management' },
+    { label: 'Informes', route: '/admin/report-management', group: 'Gestión y control' },
     { label: 'Gestión de evidencias', route: '/admin/evidence-management' },
     { label: 'Moderación', route: '/admin/moderator-management' },
     { label: 'Gestión de dispositivos', route: '/admin/devices-management' },
-    { label: 'Auditoría', route: '/admin/auditoria' },
+    { label: 'Auditoría', route: '/admin/auditoria', group: 'Sistema & ajustes' },
     { label: 'Configuración', route: '/admin/settings' },
     { label: 'Mi perfil', route: '/admin/perfil' },
   ];

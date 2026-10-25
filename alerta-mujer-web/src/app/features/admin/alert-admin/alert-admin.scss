@@ -951,3 +951,105 @@ $yellow: #c084fc;
   .alerts-page { height: auto; overflow: auto; }
   .map-box { min-height: 300px; }
 }
+// =============================================
+// AJUSTES DE DISEÑO — legibilidad en modo oscuro
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// ── Botón + del mapa: mismo morado del módulo activo del sidebar ──
+.fab-main {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover { filter: brightness(1.08); }
+}
+
+// ── Botones de tipo / nivel de peligro: el texto no tenía color propio ──
+.level-btn {
+  color: $text-primary;
+}
+
+// ── Pestañas "Pin puntual / Área circular" dentro del modal ──
+.modal__mode-tabs {
+  display: flex;
+  border-bottom: 1px solid $border;
+}
+
+.modal__mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: $bg-base;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+
+  &--active {
+    background: $bg-card;
+    color: $purple-deep;
+    border-bottom-color: $purple-deep;
+  }
+}
+
+// ── Botones Cancelar / Guardar del pie de los modales ──
+[modal-footer] .btn-secondary,
+[modal-footer] .btn-primary {
+  padding: 9px 18px;
+  border-radius: $radius-sm;
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+[modal-footer] .btn-secondary {
+  background: transparent;
+  border: 1.5px solid $border;
+  color: $text-primary;
+
+  &:hover { background: $bg-card-hover; border-color: $purple-deep; }
+}
+
+[modal-footer] .btn-primary {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  border: none;
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(1.08); }
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+// ── Modo oscuro: textos secundarios un poco más claros ──
+:host-context([data-theme="dark"]) {
+  .alert-time,
+  .alert-coords,
+  .list-empty,
+  .zones-section__sub,
+  .zone-radio-label,
+  .form-hint,
+  .map-popup__row,
+  .map-popup__loading,
+  .map-popup__note,
+  .map-popup__item span,
+  .map-popup__item small,
+  .map-popup__deliveries > span {
+    color: $text-muted;
+  }
+
+  .form-step__label,
+  .form-label {
+    color: $text-primary;
+  }
+}

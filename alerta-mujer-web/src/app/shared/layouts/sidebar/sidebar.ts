@@ -7,6 +7,8 @@ export interface SidebarLink {
   route: string;
   icon?: string;
   exact?: boolean;
+  /** Optional: title of the group that starts with this link (e.g. "Módulo principal"). */
+  group?: string;
 }
 
 export interface SidebarUser {

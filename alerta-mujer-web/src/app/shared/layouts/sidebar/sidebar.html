@@ -18,6 +18,9 @@
 
   <nav class="sidebar__nav">
     @for (link of links; track link.route) {
+      @if (link.group) {
+        <p class="sidebar__group">{{ link.group | t }}</p>
+      }
       <a
         [routerLink]="link.route"
         routerLinkActive="sidebar__link--active"

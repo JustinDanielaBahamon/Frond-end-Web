@@ -382,3 +382,24 @@
     gap: 10px;
   }
 }
+
+/*
+ * ==================================================
+ * =   Group titles inside the menu                    =
+ * =   (only show when a link has "group")             =
+ * ==================================================
+ */
+.sidebar__group {
+  margin: 1.1rem 0 0.35rem;
+  padding: 0 14px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:first-child { margin-top: 0; }
+}

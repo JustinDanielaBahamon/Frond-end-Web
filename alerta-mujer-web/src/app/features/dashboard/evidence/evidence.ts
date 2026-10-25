@@ -7,8 +7,8 @@ import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
 import {
-  MyAlert, MyEvidence, MyEvidenceService, EvidenceType,
-} from '../../../core/services/my-evidence.service';
+  MyAlert, MyEvidence, EvidenceService, EvidenceType,
+} from '../../../core/services/evidence.service';
 import { GeocodingService } from '../../../core/services/geocoding.service';
 
 type Filter = 'todas' | EvidenceType;
@@ -46,7 +46,7 @@ interface AlertWithEvidence extends MyAlert {
   styleUrl: './evidence.scss',
 })
 export class Evidence implements OnInit, OnDestroy {
-  private service = inject(MyEvidenceService);
+  private service = inject(EvidenceService);
   private geocoding = inject(GeocodingService);
   private route = inject(ActivatedRoute);
 
@@ -171,7 +171,7 @@ export class Evidence implements OnInit, OnDestroy {
       },
       error: () => {},
     });
-    this.service.list().subscribe({
+    this.service.listMine().subscribe({
       next: (list) => {
         this.evidences.set(list);
         this.loading.set(false);
@@ -219,7 +219,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   private loadThumbnail(e: MyEvidence): void {
     if (this.thumbnail(e)) return;
-    this.service.file(e.id).subscribe({
+    this.service.getFile(e.id).subscribe({
       next: (blob) => this.thumbnails.update((m) => ({ ...m, [e.id]: this.createUrl(blob) })),
       error: () => {},
     });
@@ -235,7 +235,7 @@ export class Evidence implements OnInit, OnDestroy {
     this.closeEdit();
     this.loadingContinuous.set(true);
     const alert = this.alertId();
-    forkJoin(parts.map((e) => this.service.file(e.id))).subscribe({
+    forkJoin(parts.map((e) => this.service.getFile(e.id))).subscribe({
       next: (blobs) => {
         if (this.alertId() !== alert) return;
         this.continua.set({
@@ -269,7 +269,7 @@ export class Evidence implements OnInit, OnDestroy {
       return;
     }
     this.loadingViewer.set(true);
-    this.service.file(e.id).subscribe({
+    this.service.getFile(e.id).subscribe({
       next: (blob) => {
         if (this.selected()?.id !== e.id) return;
         const url = this.createUrl(blob);
@@ -293,7 +293,7 @@ export class Evidence implements OnInit, OnDestroy {
     };
     const url = this.selected()?.id === e.id ? this.urlVisor() : this.thumbnail(e);
     if (url) return open(url);
-    this.service.file(e.id).subscribe({ next: (blob) => open(this.createUrl(blob)) });
+    this.service.getFile(e.id).subscribe({ next: (blob) => open(this.createUrl(blob)) });
   }
 
   delete(e: MyEvidence): void {
@@ -450,7 +450,7 @@ export class Evidence implements OnInit, OnDestroy {
         if (ev.type === HttpEventType.UploadProgress && ev.total) {
           this.progress.set(Math.round((ev.loaded / ev.total) * 100));
         } else if (ev.type === HttpEventType.Response && ev.body) {
-          const newOne = this.service.fromApi(ev.body);
+          const newOne = this.service.ownFromApi(ev.body);
           this.evidences.update((l) => [newOne, ...l]);
           this.progress.set(null);
           this.uploadVisible.set(false);

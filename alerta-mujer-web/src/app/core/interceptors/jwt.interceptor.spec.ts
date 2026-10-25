@@ -9,7 +9,7 @@ describe('jwtInterceptor', () => {
   let http: HttpClient;
   let backend: HttpTestingController;
   const router = { navigate: vi.fn() };
-  const auth = { getToken: () => 'token-viejo', cerrarSesionLocal: vi.fn() };
+  const auth = { getToken: () => 'token-viejo', signOutLocally: vi.fn() };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -31,7 +31,7 @@ describe('jwtInterceptor', () => {
     expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({}, { status: 401, statusText: 'Unauthorized' });
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(auth.cerrarSesionLocal).not.toHaveBeenCalled();
+    expect(auth.signOutLocally).not.toHaveBeenCalled();
   });
 
   it('las rutas privadas llevan el token y un 401 cierra la sesión', () => {

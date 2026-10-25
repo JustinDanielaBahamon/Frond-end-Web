@@ -10,17 +10,17 @@ export class ResourcesService {
   private apiUrl = `${environment.apiUrl}/api/resources`;
 
   /**
-   * Obtener todos los recursos de emergencia
+   * Get all emergency resources
    */
   getAllResources(): Observable<EmergencyResource[]> {
     return this.http.get<EmergencyResource[]>(this.apiUrl);
   }
 
-  /** Recursos activos con los campos reales del backend (teléfonos y coordenadas). */
+  /** Active resources with the real backend fields (phones and coordinates). */
   getActiveResources(): Observable<EmergencyResourceApi[]> {
     return this.http
       .get<EmergencyResourceApi[]>(this.apiUrl)
-      .pipe(map((lista) => lista.filter((r) => r.isActive !== false)));
+      .pipe(map((list) => list.filter((r) => r.isActive !== false)));
   }
 
   /**

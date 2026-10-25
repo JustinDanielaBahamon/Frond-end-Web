@@ -1,6 +1,6 @@
 /* ── Tokens de color ────────────────────────────────── */
 :root {
-  /* Púrpuras - Paleta unificada morado-rosa-lila */
+  /* Purples - unified purple-pink-lilac palette */
   --color-purple-deep : #5b21b6;
   --color-purple      : #7c3aed;
   --color-purple-mid  : #a78bfa;
@@ -41,17 +41,17 @@
   --shadow-btn-hover  : 0 12px 32px rgba(214, 72, 236, 0.45);
   --shadow-card-badge : 0 12px 36px rgba(124, 58, 237, 0.18);
 
-  /* Tipografía */
+  /* Typography */
   --font-base : 'Nunito', sans-serif;
 
-  /* Escala tipográfica */
-  --font-size-xs : 0.75rem;   /* Textos de apoyo, fechas, labels pequeños */
+  /* Type scale */
+  --font-size-xs : 0.75rem;   /* Support texts, dates, small labels */
   --font-size-sm : 0.875rem;  /* Textos de cuerpo */
   --font-size-base: 1rem;     /* Base */
-  --font-size-lg : 1.125rem;  /* Subtítulos */
-  --font-size-xl : 1.25rem;   /* Títulos de panel */
-  --font-size-2xl: 1.5rem;    /* Títulos principales */
-  --font-size-3xl: 1.875rem;  /* Títulos grandes */
+  --font-size-lg : 1.125rem;  /* Subtitles */
+  --font-size-xl : 1.25rem;   /* Panel titles */
+  --font-size-2xl: 1.5rem;    /* Main titles */
+  --font-size-3xl: 1.875rem;  /* Big titles */
 
   /* Radios */
   --radius-card     : 28px;

@@ -14,18 +14,18 @@ export class TermsComponent {
   private draft  = inject(RegisterDraftService);
   private auth   = inject(AuthService);
 
-  /** Con sesión iniciada se llegó desde Ajustes; si no, desde el registro. */
-  readonly conSesion = this.auth.isLoggedIn();
-  readonly textoVolver = this.conSesion ? 'Volver a Ajustes' : 'Volver al registro';
-  readonly textoEntendido = this.conSesion ? 'Entendido, volver a Ajustes' : 'Entendido, volver al registro';
+  /** With a session it came from Settings; otherwise, from the registration. */
+  readonly withSession = this.auth.isLoggedIn();
+  readonly backText = this.withSession ? 'Volver a Ajustes' : 'Volver al registro';
+  readonly understoodText = this.withSession ? 'Entendido, volver a Ajustes' : 'Entendido, volver al registro';
 
-  volver() {
-    if (this.conSesion) {
-      const admin = this.auth.getCurrentUser()?.rol === 'Admin';
+  back() {
+    if (this.withSession) {
+      const admin = this.auth.getCurrentUser()?.role === 'Admin';
       this.router.navigate([admin ? '/admin/settings' : '/dashboard/settings']);
       return;
     }
-    this.draft.terminosLeidos = true;   // habilita el checkbox en el registro
+    this.draft.termsRead = true;   // enables the checkbox in the registration
     this.router.navigate(['/auth/register']);
   }
 }

@@ -4,27 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsersService } from '../../../core/services/users.services';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { AdminSettingsService, EstadoSistema, ParametrosApp } from '../../../core/services/admin-settings.service';
+import { AdminSettingsService, SystemStatus, AppSettings } from '../../../core/services/admin-settings.service';
 
-type FormParametros = Omit<ParametrosApp, 'actualizado'>;
+type SettingsForm = Omit<AppSettings, 'updated'>;
 
-interface Cambio {
-  campo: string;
-  antes: string;
-  despues: string;
+interface Change {
+  field: string;
+  before: string;
+  after: string;
 }
 
-const ETIQUETAS: Record<keyof FormParametros, string> = {
-  duracionMaximaAlertaMin: 'Duración máxima de una alerta SOS',
-  numeroEmergencia: 'Número de emergencia',
-  correoSoporte: 'Correo de soporte',
-  maxContactos: 'Contactos de emergencia por usuaria',
+const LABELS: Record<keyof SettingsForm, string> = {
+  maxAlertDurationMin: 'Duración máxima de una alerta SOS',
+  emergencyNumber: 'Número de emergencia',
+  supportEmail: 'Correo de soporte',
+  maxContacts: 'Contactos de emergencia por usuaria',
   versionMinimaApp: 'Versión mínima de la app móvil',
 };
 
 /**
- * Configuración del sistema: parámetros globales que afectan a todas las usuarias,
- * estado del servidor y exportación de datos. Lo personal de cada admin está en Mi perfil.
+ * System settings: global parameters that affect every user,
+ * server status and data export. Each admin's personal settings are in My profile.
  */
 @Component({
   selector: 'app-admin-settings',
@@ -38,187 +38,187 @@ export class AdminSettingsComponent {
   private alertsService = inject(AlertsService);
   private settingsService = inject(AdminSettingsService);
 
-  // ── Parámetros de la app (servidor) ──────────────────────────
-  readonly parametros = signal<ParametrosApp | null>(null);
-  form: FormParametros = { duracionMaximaAlertaMin: 30, numeroEmergencia: '', correoSoporte: '', maxContactos: 5, versionMinimaApp: '' };
-  readonly cargandoParametros = signal(true);
-  readonly guardandoParametros = signal(false);
-  readonly errorParametros = signal('');
-  readonly cambiosPendientes = signal<Cambio[] | null>(null);
+  // ── App parameters (server) ──────────────────────────
+  readonly settings = signal<AppSettings | null>(null);
+  form: SettingsForm = { maxAlertDurationMin: 30, emergencyNumber: '', supportEmail: '', maxContacts: 5, versionMinimaApp: '' };
+  readonly loadingSettings = signal(true);
+  readonly savingSettings = signal(false);
+  readonly settingsError = signal('');
+  readonly pendingChanges = signal<Change[] | null>(null);
 
   // ── Estado del sistema ───────────────────────────────────────
-  readonly estado = signal<EstadoSistema | null>(null);
-  readonly errorEstado = signal(false);
+  readonly status = signal<SystemStatus | null>(null);
+  readonly statusError = signal(false);
 
   // ── Mensaje flotante ─────────────────────────────────────────
-  readonly mensaje = signal('');
-  private mensajeTimer: ReturnType<typeof setTimeout> | null = null;
+  readonly message = signal('');
+  private messageTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    this.cargarParametros();
-    this.cargarEstado();
+    this.loadSettings();
+    this.loadStatus();
   }
 
-  // ── Parámetros ───────────────────────────────────────────────
-  private cargarParametros(): void {
-    this.cargandoParametros.set(true);
-    this.settingsService.obtenerParametros().subscribe({
+  // ── Parameters ───────────────────────────────────────────────
+  private loadSettings(): void {
+    this.loadingSettings.set(true);
+    this.settingsService.getSettings().subscribe({
       next: (p) => {
-        this.aplicarParametros(p);
-        this.cargandoParametros.set(false);
+        this.applySettings(p);
+        this.loadingSettings.set(false);
       },
       error: () => {
-        this.errorParametros.set('No se pudieron cargar los parámetros');
-        this.cargandoParametros.set(false);
+        this.settingsError.set('No se pudieron cargar los parámetros');
+        this.loadingSettings.set(false);
       },
     });
   }
 
-  private normalizado(): FormParametros {
+  private normalized(): SettingsForm {
     return {
-      duracionMaximaAlertaMin: Number(this.form.duracionMaximaAlertaMin),
-      numeroEmergencia: String(this.form.numeroEmergencia ?? '').trim(),
-      correoSoporte: String(this.form.correoSoporte ?? '').trim(),
-      maxContactos: Number(this.form.maxContactos),
+      maxAlertDurationMin: Number(this.form.maxAlertDurationMin),
+      emergencyNumber: String(this.form.emergencyNumber ?? '').trim(),
+      supportEmail: String(this.form.supportEmail ?? '').trim(),
+      maxContacts: Number(this.form.maxContacts),
       versionMinimaApp: String(this.form.versionMinimaApp ?? '').trim(),
     };
   }
 
-  /** Muestra los cambios (antes → después) y pide confirmarlos: afectan a todas las usuarias. */
-  revisarCambios(): void {
-    this.errorParametros.set('');
-    const actual = this.parametros();
-    if (!actual) return;
-    const nuevo = this.normalizado();
-    const valor = (v: string | number) => (v === '' ? '(sin definir)' : String(v));
-    const cambios = (Object.keys(ETIQUETAS) as (keyof FormParametros)[])
-      .filter((k) => String(actual[k]) !== String(nuevo[k]))
-      .map((k) => ({ campo: ETIQUETAS[k], antes: valor(actual[k]), despues: valor(nuevo[k]) }));
-    if (cambios.length === 0) {
-      this.avisar('No hay cambios para guardar');
+  /** Shows the changes (before → after) and asks to confirm them: they affect every user. */
+  checkChanges(): void {
+    this.settingsError.set('');
+    const current = this.settings();
+    if (!current) return;
+    const newOne = this.normalized();
+    const value = (v: string | number) => (v === '' ? '(sin definir)' : String(v));
+    const changes = (Object.keys(LABELS) as (keyof SettingsForm)[])
+      .filter((k) => String(current[k]) !== String(newOne[k]))
+      .map((k) => ({ field: LABELS[k], before: value(current[k]), after: value(newOne[k]) }));
+    if (changes.length === 0) {
+      this.notify('No hay cambios para guardar');
       return;
     }
-    this.cambiosPendientes.set(cambios);
+    this.pendingChanges.set(changes);
   }
 
-  cancelarCambios(): void {
-    this.cambiosPendientes.set(null);
+  cancelChanges(): void {
+    this.pendingChanges.set(null);
   }
 
-  descartarCambios(): void {
-    const p = this.parametros();
-    if (p) this.aplicarParametros(p);
-    this.errorParametros.set('');
+  discardChanges(): void {
+    const p = this.settings();
+    if (p) this.applySettings(p);
+    this.settingsError.set('');
   }
 
-  confirmarCambios(): void {
-    this.guardandoParametros.set(true);
-    this.settingsService.guardarParametros(this.normalizado()).subscribe({
+  confirmChanges(): void {
+    this.savingSettings.set(true);
+    this.settingsService.saveSettings(this.normalized()).subscribe({
       next: (p) => {
-        this.aplicarParametros(p);
-        this.guardandoParametros.set(false);
-        this.cambiosPendientes.set(null);
-        this.avisar('Parámetros guardados. El cambio quedó registrado en Auditoría.');
+        this.applySettings(p);
+        this.savingSettings.set(false);
+        this.pendingChanges.set(null);
+        this.notify('Parámetros guardados. El cambio quedó registrado en Auditoría.');
       },
       error: (err) => {
-        this.guardandoParametros.set(false);
-        this.cambiosPendientes.set(null);
-        this.errorParametros.set(err?.error?.message || 'No se pudieron guardar los parámetros');
+        this.savingSettings.set(false);
+        this.pendingChanges.set(null);
+        this.settingsError.set(err?.error?.message || 'No se pudieron guardar los parámetros');
       },
     });
   }
 
-  private aplicarParametros(p: ParametrosApp): void {
-    this.parametros.set(p);
+  private applySettings(p: AppSettings): void {
+    this.settings.set(p);
     this.form = {
-      duracionMaximaAlertaMin: p.duracionMaximaAlertaMin,
-      numeroEmergencia: p.numeroEmergencia,
-      correoSoporte: p.correoSoporte,
-      maxContactos: p.maxContactos,
+      maxAlertDurationMin: p.maxAlertDurationMin,
+      emergencyNumber: p.emergencyNumber,
+      supportEmail: p.supportEmail,
+      maxContacts: p.maxContacts,
       versionMinimaApp: p.versionMinimaApp,
     };
   }
 
   // ── Estado del sistema ───────────────────────────────────────
-  cargarEstado(): void {
-    this.settingsService.obtenerEstado().subscribe({
+  loadStatus(): void {
+    this.settingsService.getStatus().subscribe({
       next: (e) => {
-        this.estado.set(e);
-        this.errorEstado.set(false);
+        this.status.set(e);
+        this.statusError.set(false);
       },
       error: () => {
-        this.estado.set(null);
-        this.errorEstado.set(true);
+        this.status.set(null);
+        this.statusError.set(true);
       },
     });
   }
 
   // ── Ayuda ────────────────────────────────────────────────────
-  get enlaceSoporte(): string {
-    const correo = this.parametros()?.correoSoporte;
-    return correo ? `mailto:${correo}?subject=${encodeURIComponent('Ayuda panel Alerta Mujer')}` : '';
+  get supportLink(): string {
+    const email = this.settings()?.supportEmail;
+    return email ? `mailto:${email}?subject=${encodeURIComponent('Ayuda panel Alerta Mujer')}` : '';
   }
 
-  // ── Descargas (CSV con ';', se abre directo en Excel en español) ──
-  descargarUsuarios(): void {
+  // ── Downloads (CSV with ';', opens directly in Excel in Spanish) ──
+  downloadUsers(): void {
     this.usersService.getAll().subscribe({
-      next: (usuarios) =>
-        this.descargarCsv(
+      next: (users) =>
+        this.downloadCsv(
           'lista-usuarios',
           ['ID', 'Nombre', 'Correo', 'Teléfono', 'Estado', 'Rol', 'Alertas', 'Registro'],
-          usuarios.map((u) => [u.id, u.nombre, u.email, u.telefono, u.estado, u.rol, u.alertas, u.fechaRegistro])
+          users.map((u) => [u.id, u.name, u.email, u.telephone, u.status, u.role, u.alerts, u.registeredAt])
         ),
-      error: () => this.avisar('No se pudo descargar la lista de usuarios'),
+      error: () => this.notify('No se pudo descargar la lista de usuarios'),
     });
   }
 
-  descargarAlertas(): void {
+  downloadAlerts(): void {
     this.alertsService.getAll().subscribe({
-      next: (alertas) => {
-        const hace30Dias = Date.now() - 30 * 24 * 60 * 60 * 1000;
-        const ultimoMes = alertas.filter((a) => {
+      next: (alerts) => {
+        const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        const lastMonth = alerts.filter((a) => {
           const t = new Date(a.started_at ?? a.created_at ?? '').getTime();
-          return isNaN(t) || t >= hace30Dias;
+          return isNaN(t) || t >= thirtyDaysAgo;
         });
-        this.descargarCsv(
+        this.downloadCsv(
           'historial-alertas',
           ['ID', 'Usuaria', 'Activación', 'Estado', 'Inicio', 'Latitud', 'Longitud', 'Mensaje'],
-          ultimoMes.map((a) => [a.id, a.nombre, a.medioActivacion, a.estado, a.started_at ?? '', a.lat, a.lng, a.descripcion])
+          lastMonth.map((a) => [a.id, a.name, a.activationMethod, a.status, a.started_at ?? '', a.lat, a.lng, a.description])
         );
       },
-      error: () => this.avisar('No se pudo descargar el historial de alertas'),
+      error: () => this.notify('No se pudo descargar el historial de alertas'),
     });
   }
 
-  private descargarCsv(nombre: string, columnas: string[], filas: unknown[][]): void {
-    if (!filas.length) {
-      this.avisar('No hay datos para descargar');
+  private downloadCsv(name: string, columns: string[], rows: unknown[][]): void {
+    if (!rows.length) {
+      this.notify('No hay datos para descargar');
       return;
     }
 
-    const escapar = (valor: unknown): string => {
-      let texto = valor === null || valor === undefined ? '' : String(valor);
-      // Evita que Excel interprete un texto como fórmula
-      if (/^[=+\-@]/.test(texto) && !/^-?\d+(\.\d+)?$/.test(texto)) texto = `'${texto}`;
-      return `"${texto.replace(/"/g, '""')}"`;
+    const escape = (value: unknown): string => {
+      let text = value === null || value === undefined ? '' : String(value);
+      // Prevents Excel from interpreting a text as a formula
+      if (/^[=+\-@]/.test(text) && !/^-?\d+(\.\d+)?$/.test(text)) text = `'${text}`;
+      return `"${text.replace(/"/g, '""')}"`;
     };
 
-    const csv = [columnas, ...filas].map((fila) => fila.map(escapar).join(';')).join('\r\n');
+    const csv = [columns, ...rows].map((row) => row.map(escape).join(';')).join('\r\n');
 
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = `${nombre}.csv`;
-    enlace.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${name}.csv`;
+    link.click();
     URL.revokeObjectURL(url);
 
-    this.avisar('Descarga iniciada');
+    this.notify('Descarga iniciada');
   }
 
-  private avisar(texto: string): void {
-    this.mensaje.set(texto);
-    if (this.mensajeTimer) clearTimeout(this.mensajeTimer);
-    this.mensajeTimer = setTimeout(() => this.mensaje.set(''), 3500);
+  private notify(text: string): void {
+    this.message.set(text);
+    if (this.messageTimer) clearTimeout(this.messageTimer);
+    this.messageTimer = setTimeout(() => this.message.set(''), 3500);
   }
 }

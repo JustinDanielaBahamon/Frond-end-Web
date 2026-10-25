@@ -2,11 +2,11 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PasswordChangeComponent } from '../../../shared/components/password-change/password-change';
-import { EliminarCuentaComponent } from '../../../shared/components/eliminar-cuenta/eliminar-cuenta';
+import { DeleteAccountComponent } from '../../../shared/components/delete-account/delete-account';
 import { ThemeService, Theme } from '../../../core/theme/theme.service';
 import { AccentColorService } from '../../../core/theme/accent-color.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { MovimientoCelularService } from '../../../core/services/movimiento-celular.service';
+import { PhoneMovementService } from '../../../core/services/phone-movement.service';
 
 interface AccentColor {
   name: string;
@@ -23,7 +23,7 @@ interface ToggleSetting {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, RouterLink, PasswordChangeComponent, EliminarCuentaComponent],
+  imports: [CommonModule, RouterLink, PasswordChangeComponent, DeleteAccountComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
@@ -31,9 +31,9 @@ export class Settings implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly accentColorService = inject(AccentColorService);
   private readonly authService = inject(AuthService);
-  private readonly movimiento = inject(MovimientoCelularService);
+  private readonly movement = inject(PhoneMovementService);
 
-  // --- Cuenta (conectar con el usuario autenticado real) ---
+  // --- Account (connect with the real authenticated user) ---
   readonly user = signal({
     name: '',
     email: '',
@@ -46,7 +46,7 @@ export class Settings implements OnInit {
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
         this.user.set({
-          name: currentUser.nombre,
+          name: currentUser.name,
           email: currentUser.email,
           phone: currentUser.telephone || '',
           avatarUrl: '',
@@ -56,11 +56,11 @@ export class Settings implements OnInit {
     });
   }
 
-  // --- Apariencia: tema (global, vía ThemeService) ---
+  // --- Appearance: theme (global, through ThemeService) ---
   readonly theme = this.themeService.currentTheme; // 'light' | 'dark'
   readonly isDark = computed(() => this.theme() === 'dark');
 
-  // --- Apariencia: color de acento (global, vía AccentColorService) ---
+  // --- Appearance: accent color (global, through AccentColorService) ---
   readonly accentColors: AccentColor[] = [
     { name: 'Violeta', value: '#7c3aed' },
     { name: 'Índigo profundo', value: '#130253' },
@@ -74,13 +74,13 @@ export class Settings implements OnInit {
     { key: 'emergencyAlerts', label: 'Alertas de emergencia', description: 'Recibe notificaciones de alertas activas.', enabled: true },
     { key: 'appUpdates', label: 'Actualizaciones de la app', description: 'Entérate de nuevas funciones y mejoras.', enabled: true },
     { key: 'securityReminders', label: 'Recordatorios de seguridad', description: 'Consejos y recomendaciones.', enabled: false },
-    { key: 'locationNotifications', label: 'Notificaciones de ubicación', description: 'Te avisamos aquí, con un sonido, cuando tu celular cambia de lugar (como mucho cada 30 min). Solo lo ves tú.', enabled: this.movimiento.activo() },
+    { key: 'locationNotifications', label: 'Notificaciones de ubicación', description: 'Te avisamos aquí, con un sonido, cuando tu celular cambia de lugar (como mucho cada 30 min). Solo lo ves tú.', enabled: this.movement.active() },
     { key: 'soundVibration', label: 'Sonidos y vibración', description: 'Vibración y sonido en alertas.', enabled: true }
   ]);
 
-  // --- Cambio de contraseña ---
-  readonly cambiandoContrasena = signal(false);
-  readonly eliminandoCuenta = signal(false);
+  // --- Password change ---
+  readonly changingPassword = signal(false);
+  readonly deletingAccount = signal(false);
 
   toggleTheme(mode: Theme): void {
     this.themeService.setTheme(mode);
@@ -95,7 +95,7 @@ export class Settings implements OnInit {
       list.map(item => item.key === key ? { ...item, enabled: !item.enabled } : item)
     );
     if (key === 'locationNotifications') {
-      this.movimiento.cambiarActivo(!!this.notifications().find((n) => n.key === key)?.enabled);
+      this.movement.toggleActive(!!this.notifications().find((n) => n.key === key)?.enabled);
     }
   }
 }

@@ -5,19 +5,19 @@
       <h1>Auditoría</h1>
       <p>Quién entró al panel, desde dónde y qué cambió. Registro de solo lectura.</p>
     </div>
-    <button class="btn-primary" (click)="exportar()" [disabled]="exportando()">
+    <button class="btn-primary" (click)="export()" [disabled]="exporting()">
       <i class="fa-solid fa-file-arrow-down"></i>
-      {{ exportando() ? 'Exportando…' : 'Exportar CSV' }}
+      {{ exporting() ? 'Exportando…' : 'Exportar CSV' }}
     </button>
   </header>
 
-  <!-- Accesos rápidos -->
+  <!-- Quick access -->
   <div class="quick">
-    <button class="chip" [class.chip--active]="!filtros.tipo && !filtros.accion" (click)="limpiarFiltros()">Todo</button>
-    <button class="chip" [class.chip--active]="filtros.tipo === 'SESSION' && !filtros.accion" (click)="verSesiones()">
+    <button class="chip" [class.chip--active]="!filters.type && !filters.action" (click)="clearFilters()">Todo</button>
+    <button class="chip" [class.chip--active]="filters.type === 'SESSION' && !filters.action" (click)="viewSessions()">
       <i class="fa-solid fa-right-to-bracket"></i> Sesiones
     </button>
-    <button class="chip chip--danger" [class.chip--active]="filtros.accion === 'LOGIN_FAILED'" (click)="verIntentosFallidos()">
+    <button class="chip chip--danger" [class.chip--active]="filters.action === 'LOGIN_FAILED'" (click)="viewFailedAttempts()">
       <i class="fa-solid fa-triangle-exclamation"></i> Intentos fallidos
     </button>
   </div>
@@ -26,41 +26,41 @@
   <section class="filters">
     <label class="field">
       <span>Responsable</span>
-      <select [(ngModel)]="filtros.responsableId" (ngModelChange)="aplicarFiltros()">
+      <select [(ngModel)]="filters.actorId" (ngModelChange)="applyFilters()">
         <option [ngValue]="null">Todas las personas</option>
-        @for (r of responsables(); track r.cuentaId) {
-          <option [ngValue]="r.cuentaId">{{ r.nombre || r.correo }}</option>
+        @for (r of actors(); track r.accountId) {
+          <option [ngValue]="r.accountId">{{ r.name || r.email }}</option>
         }
         <option [ngValue]="0">Sin persona (tareas automáticas y registros antiguos)</option>
       </select>
     </label>
     <label class="field">
       <span>Tipo</span>
-      <select [(ngModel)]="filtros.tipo" (ngModelChange)="aplicarFiltros()">
+      <select [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
         <option value="">Todos</option>
-        @for (t of tipos; track t.valor) {
-          <option [value]="t.valor">{{ t.etiqueta }}</option>
+        @for (t of types; track t.value) {
+          <option [value]="t.value">{{ t.label }}</option>
         }
       </select>
     </label>
     <label class="field">
       <span>Acción</span>
-      <select [(ngModel)]="filtros.accion" (ngModelChange)="aplicarFiltros()">
+      <select [(ngModel)]="filters.action" (ngModelChange)="applyFilters()">
         <option value="">Todas</option>
-        @for (a of acciones; track a.valor) {
-          <option [value]="a.valor">{{ a.etiqueta }}</option>
+        @for (a of actions; track a.value) {
+          <option [value]="a.value">{{ a.label }}</option>
         }
       </select>
     </label>
     <label class="field">
       <span>Desde</span>
-      <app-selector-fecha etiqueta="Desde" [(ngModel)]="filtros.desde" [max]="filtros.hasta || null" (valueChange)="aplicarFiltros()" />
+      <app-date-picker label="Desde" [(ngModel)]="filters.from" [max]="filters.to || null" (valueChange)="applyFilters()" />
     </label>
     <label class="field">
       <span>Hasta</span>
-      <app-selector-fecha etiqueta="Hasta" [(ngModel)]="filtros.hasta" [min]="filtros.desde || null" (valueChange)="aplicarFiltros()" />
+      <app-date-picker label="Hasta" [(ngModel)]="filters.to" [min]="filters.from || null" (valueChange)="applyFilters()" />
     </label>
-    <button class="btn-clear" (click)="limpiarFiltros()">
+    <button class="btn-clear" (click)="clearFilters()">
       <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar
     </button>
   </section>
@@ -85,38 +85,38 @@
           </tr>
         </thead>
         <tbody>
-          @if (cargando()) {
+          @if (loading()) {
             <tr><td colspan="7" class="empty">Cargando…</td></tr>
-          } @else if (registros().length === 0) {
+          } @else if (records().length === 0) {
             <tr><td colspan="7" class="empty">No hay registros con estos filtros.</td></tr>
           } @else {
-            @for (r of registros(); track r.id) {
-              <tr (click)="verDetalle(r)" tabindex="0" (keydown.enter)="verDetalle(r)">
-                <td class="nowrap">{{ r.fecha | date: 'dd/MM/yyyy' }}<br /><small>{{ r.fecha | date: 'HH:mm:ss' }}</small></td>
+            @for (r of records(); track r.id) {
+              <tr (click)="viewDetail(r)" tabindex="0" (keydown.enter)="viewDetail(r)">
+                <td class="nowrap">{{ r.date | date: 'dd/MM/yyyy' }}<br /><small>{{ r.date | date: 'HH:mm:ss' }}</small></td>
                 <td>
-                  @if (r.responsable) {
-                    <strong>{{ r.responsable }}</strong>
-                    @if (r.rol) {
-                      <span class="role" [class.role--admin]="r.rol === 'Administración'">{{ r.rol }}</span>
+                  @if (r.actor) {
+                    <strong>{{ r.actor }}</strong>
+                    @if (r.role) {
+                      <span class="role" [class.role--admin]="r.role === 'Administración'">{{ r.role }}</span>
                     }
-                    <br /><small>{{ r.responsableCorreo }}</small>
+                    <br /><small>{{ r.actorEmail }}</small>
                   } @else {
-                    @let sin = sinResponsable(r);
-                    <span class="muted" [title]="sin.ayuda"><i class="fa-solid" [ngClass]="sin.icono"></i> {{ sin.texto }}</span>
+                    @let sin = withoutActor(r);
+                    <span class="muted" [title]="sin.help"><i class="fa-solid" [ngClass]="sin.icon"></i> {{ sin.text }}</span>
                   }
                 </td>
                 <td class="origin">
-                  @if (r.origen) {
-                    <i class="fa-solid" [ngClass]="iconoOrigen(r.origen)"></i> {{ r.origen }}
+                  @if (r.source) {
+                    <i class="fa-solid" [ngClass]="sourceIcon(r.source)"></i> {{ r.source }}
                   } @else {
                     <span class="muted">—</span>
                   }
                 </td>
-                <td><span class="badge" [ngClass]="claseAccion(r)">{{ accion(r) }}</span></td>
-                <td>{{ objeto(r) }}</td>
+                <td><span class="badge" [ngClass]="actionClass(r)">{{ action(r) }}</span></td>
+                <td>{{ object(r) }}</td>
                 <td class="detail">
-                  @for (linea of detalle(r); track $index) {
-                    <div>{{ linea }}</div>
+                  @for (line of detail(r); track $index) {
+                    <div>{{ line }}</div>
                   }
                 </td>
                 <td class="nowrap"><small>{{ r.ip || '—' }}</small></td>
@@ -128,19 +128,19 @@
     </div>
 
     <footer class="table-footer">
-      <span>Mostrando <strong>{{ desdeItem() }} - {{ hastaItem() }}</strong> de <strong>{{ total() }}</strong> registros</span>
+      <span>Mostrando <strong>{{ fromItem() }} - {{ toItem() }}</strong> de <strong>{{ total() }}</strong> registros</span>
       <div class="pagination">
-        <button class="page-btn" (click)="irAPagina(pagina())" [disabled]="pagina() === 0" aria-label="Página anterior">
+        <button class="page-btn" (click)="goToPage(page())" [disabled]="page() === 0" aria-label="Página anterior">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
-        @for (n of paginas(); track $index) {
+        @for (n of pages(); track $index) {
           @if (n === null) {
             <span class="page-ellipsis" aria-hidden="true">…</span>
           } @else {
-            <button class="page-btn" [class.active]="n === pagina() + 1" (click)="irAPagina(n)">{{ n }}</button>
+            <button class="page-btn" [class.active]="n === page() + 1" (click)="goToPage(n)">{{ n }}</button>
           }
         }
-        <button class="page-btn" (click)="irAPagina(pagina() + 2)" [disabled]="pagina() + 1 >= totalPaginas()" aria-label="Página siguiente">
+        <button class="page-btn" (click)="goToPage(page() + 2)" [disabled]="page() + 1 >= totalPageCount()" aria-label="Página siguiente">
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
@@ -148,66 +148,66 @@
   </section>
 
   <!-- Detalle -->
-  @if (seleccionado(); as r) {
-    <div class="overlay" (click)="cerrarDetalle()">
+  @if (selected(); as r) {
+    <div class="overlay" (click)="closeDetail()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="registro-titulo" (click)="$event.stopPropagation()">
-        <header class="registro__cabecera">
-          <span class="registro__icono" [ngClass]="claseAccion(r)"><i class="fa-solid" [ngClass]="iconoAccion(r)"></i></span>
-          <div class="registro__titulos">
-            <h2 id="registro-titulo">{{ accion(r) }} · {{ objeto(r) }}</h2>
-            <p>{{ fechaLarga(r.fecha) }}</p>
+        <header class="record__header">
+          <span class="record__icon" [ngClass]="actionClass(r)"><i class="fa-solid" [ngClass]="actionIcon(r)"></i></span>
+          <div class="record__titles">
+            <h2 id="registro-titulo">{{ action(r) }} · {{ object(r) }}</h2>
+            <p>{{ longDate(r.date) }}</p>
           </div>
-          <button class="icon-btn" (click)="cerrarDetalle()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+          <button class="icon-btn" (click)="closeDetail()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </header>
 
-        <!-- Quién -->
-        <section class="registro__bloque">
+        <!-- Who -->
+        <section class="record__block">
           <h3>Responsable</h3>
-          <div class="registro__persona">
-            @if (r.responsable) {
-              <span class="registro__avatar">{{ r.responsable.charAt(0).toUpperCase() }}</span>
+          <div class="record__persona">
+            @if (r.actor) {
+              <span class="record__avatar">{{ r.actor.charAt(0).toUpperCase() }}</span>
               <div>
-                <strong>{{ r.responsable }}</strong>
-                <small>{{ r.responsableCorreo }}{{ r.rol ? ' · ' + r.rol : '' }}</small>
+                <strong>{{ r.actor }}</strong>
+                <small>{{ r.actorEmail }}{{ r.role ? ' · ' + r.role : '' }}</small>
               </div>
             } @else {
-              <span class="registro__avatar registro__avatar--sistema"><i class="fa-solid" [ngClass]="sinResponsable(r).icono"></i></span>
+              <span class="record__avatar record__avatar--system"><i class="fa-solid" [ngClass]="withoutActor(r).icon"></i></span>
               <div>
-                <strong>{{ sinResponsable(r).texto }}</strong>
-                <small>{{ sinResponsable(r).ayuda }}</small>
+                <strong>{{ withoutActor(r).text }}</strong>
+                <small>{{ withoutActor(r).help }}</small>
               </div>
             }
           </div>
         </section>
 
-        <!-- Qué cambió -->
-        <section class="registro__bloque">
+        <!-- What changed -->
+        <section class="record__block">
           <h3>Qué pasó</h3>
-          @if (cambios(r); as lista) {
-            @if (lista.length && lista[0].antes !== null) {
-              <table class="registro__cambios">
+          @if (changes(r); as list) {
+            @if (list.length && list[0].before !== null) {
+              <table class="record__changes">
                 <thead><tr><th>Dato</th><th>Antes</th><th>Después</th></tr></thead>
                 <tbody>
-                  @for (c of lista; track $index) {
+                  @for (c of list; track $index) {
                     <tr>
-                      <td>{{ c.campo }}</td>
-                      <td class="registro__antes">{{ c.antes }}</td>
-                      <td class="registro__despues">{{ c.despues }}</td>
+                      <td>{{ c.field }}</td>
+                      <td class="record__antes">{{ c.before }}</td>
+                      <td class="record__after">{{ c.after }}</td>
                     </tr>
                   }
                 </tbody>
               </table>
             } @else {
-              <ul class="registro__lineas">
-                @for (c of lista; track $index) { <li>{{ c.campo }}</li> } @empty { <li>Sin detalle registrado.</li> }
+              <ul class="record__lines">
+                @for (c of list; track $index) { <li>{{ c.field }}</li> } @empty { <li>Sin detalle registrado.</li> }
               </ul>
             }
           }
         </section>
 
-        <!-- Datos técnicos -->
-        <footer class="registro__tecnico">
-          <span><i class="fa-solid" [ngClass]="iconoOrigen(r.origen)"></i> {{ r.origen || 'Origen no registrado' }}</span>
+        <!-- Technical data -->
+        <footer class="record__technical">
+          <span><i class="fa-solid" [ngClass]="sourceIcon(r.source)"></i> {{ r.source || 'Origen no registrado' }}</span>
           <span><i class="fa-solid fa-network-wired"></i> IP {{ r.ip || '—' }}</span>
           <span><i class="fa-solid fa-hashtag"></i> Registro {{ r.id }}</span>
         </footer>

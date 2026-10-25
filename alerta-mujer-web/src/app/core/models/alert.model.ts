@@ -1,23 +1,23 @@
-export type MedioActivacion = 'Botón de pánico' | 'Contacto' | 'Widget' | 'Movimiento sospechoso' | 'Botón de encendido' | 'Manual'
+export type ActivationMethod = 'Botón de pánico' | 'Contacto' | 'Widget' | 'Movimiento sospechoso' | 'Botón de encendido' | 'Manual'
   | 'Avísame si no llego' | 'Señal perdida';
-export type EstadoAlerta = 'Pendiente' | 'Atendida' | 'Cancelada';
+export type AlertStatus = 'Pendiente' | 'Atendida' | 'Cancelada';
 
-export interface Alerta {
+export interface Alert {
   id: number;
-  nombre: string;
-  descripcion: string;
-  medioActivacion: MedioActivacion;
-  tiempo: string;
-  ubicacion: string;
-  /** true cuando ubicacion ya es barrio y dirección (no coordenadas). */
-  direccionResuelta?: boolean;
+  name: string;
+  description: string;
+  activationMethod: ActivationMethod;
+  time: string;
+  location: string;
+  /** true when location is already neighborhood and address (not coordinates). */
+  resolvedAddress?: boolean;
   lat: number;
   lng: number;
-  estado: EstadoAlerta;
-  usuarioId?: number; // opcional: admin no lo usa, usuaria sí lo necesita para filtrar
+  status: AlertStatus;
+  userId?: number; // optional: admin does not use it, the user needs it to filter
 
-  // Campos extra que pueden venir en db.json (los usa el dashboard)
-  tipo: string;
+  // Extra fields that may come in db.json (used by the dashboard)
+  type: string;
   created_at?: string;
   started_at?: string;
 }

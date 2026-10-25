@@ -1,6 +1,8 @@
-/*==================================================
-=   AUDITORÍA — PANEL ADMIN (tokens de tokens.scss)
-==================================================*/
+/*
+ * ==================================================
+ * =   AUDIT — ADMIN PANEL (tokens from tokens.scss)
+ * ==================================================
+ */
 
 $btn-purple: #7c3aed;
 $btn-purple-hover: #6d28d9;
@@ -284,7 +286,7 @@ table {
 }
 
 // ── Detalle del registro ────────────────────────────────────────
-.registro__cabecera {
+.record__header {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -293,7 +295,7 @@ table {
   .icon-btn { margin-left: auto; }
 }
 
-.registro__icono {
+.record__icon {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
@@ -303,12 +305,12 @@ table {
   font-size: 1.1rem;
 }
 
-.registro__titulos {
+.record__titles {
   h2 { margin: 0; font-size: 1.05rem; font-weight: 700; }
   p { margin: 3px 0 0; font-size: 0.82rem; color: var(--text-secondary); }
 }
 
-.registro__bloque {
+.record__block {
   margin-bottom: 16px;
 
   h3 {
@@ -321,7 +323,7 @@ table {
   }
 }
 
-.registro__persona {
+.record__persona {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -333,7 +335,7 @@ table {
   small { display: block; font-size: 0.78rem; color: var(--text-secondary); }
 }
 
-.registro__avatar {
+.record__avatar {
   flex-shrink: 0;
   width: 36px;
   height: 36px;
@@ -344,10 +346,10 @@ table {
   color: #fff;
   background: linear-gradient(135deg, #a855f7, #7c3aed);
 
-  &--sistema { background: rgba(124, 58, 237, 0.2); color: #7c3aed; }
+  &--system { background: rgba(124, 58, 237, 0.2); color: #7c3aed; }
 }
 
-.registro__cambios {
+.record__changes {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.82rem;
@@ -369,10 +371,10 @@ table {
   }
 }
 
-.registro__antes { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: rgba(192, 38, 211, 0.6); }
-.registro__despues { font-weight: 600; color: #7c3aed; }
+.record__antes { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: rgba(192, 38, 211, 0.6); }
+.record__after { font-weight: 600; color: #7c3aed; }
 
-.registro__lineas {
+.record__lines {
   margin: 0;
   padding-left: 18px;
   font-size: 0.85rem;
@@ -380,7 +382,7 @@ table {
   li + li { margin-top: 4px; }
 }
 
-.registro__tecnico {
+.record__technical {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;

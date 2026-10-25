@@ -35,7 +35,7 @@ app-topbar:not(#_) {
   }
 }
 
-/* Barra superior: móvil */
+/* Top bar: mobile */
 @media (max-width: 768px) {
   app-topbar:not(#_) {
     .topbar {
@@ -52,7 +52,7 @@ app-topbar:not(#_) {
   }
 }
 
-/* Barra superior: móvil pequeño */
+/* Top bar: small mobile */
 @media (max-width: 480px) {
   app-topbar:not(#_) {
     .topbar {
@@ -75,7 +75,7 @@ app-topbar:not(#_) {
   }
 }
 
-/* Botones de los modales */
+/* Modal buttons */
 app-modal:not(#_) [modal-footer] {
   display: flex;
   flex-wrap: wrap;
@@ -97,7 +97,7 @@ app-modal:not(#_) [modal-footer] button,
   white-space: nowrap;
 }
 
-/* Botones de los modales: móvil */
+/* Modal buttons: mobile */
 @media (max-width: 600px) {
   app-modal:not(#_) [modal-footer],
   .modal-footer:not(#_) {
@@ -113,7 +113,7 @@ app-modal:not(#_) [modal-footer] button,
   }
 }
 
-/* Botones de encabezado de página */
+/* Page header buttons */
 @media (max-width: 600px) {
   .btn-add:not(#_),
   .btn-new-report:not(#_),
@@ -123,7 +123,7 @@ app-modal:not(#_) [modal-footer] button,
   }
 }
 
-/* Botones de acción y filtros */
+/* Action and filter buttons */
 .btn-add:not(#_),
 .btn-new-report:not(#_),
 .btn-add-report:not(#_),

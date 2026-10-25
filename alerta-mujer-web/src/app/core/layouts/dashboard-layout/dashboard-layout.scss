@@ -5,7 +5,7 @@
   font-family: 'Nunito', sans-serif;
 }
 
-// Body: columna con topbar fija arriba + main con scroll propio
+// Body: column with a fixed topbar on top + main with its own scroll
 .layout__body {
   flex: 1;
   display: flex;
@@ -15,7 +15,7 @@
   background: #f3eeff;
 }
 
-// Único elemento que scrollea
+// The only scrolling element
 .layout__main {
   flex: 1;
   overflow-y: auto;
@@ -50,7 +50,7 @@
   }
 }
 
-// ── BOTTOM NAV (solo móvil)
+// ── BOTTOM NAV (mobile only)
 .bottom-nav {
   display: none;
   background: #2d1457;
@@ -79,20 +79,22 @@
   }
 }
 
-/* El modo oscuro de este layout ya NO vive aquí.
-   Vive en app/shared/styles/theme/dashboard-dark.scss,
-   bajo el bloque:
-   [data-theme="dark"] {
-     .layout__body,
-     .layout__main { background: var(--bg-base) !important; }
-     .bottom-nav { ... }
-   }
-   No agregues aquí ningún bloque "body.dark-mode" ni
-   "[data-theme='dark']" — todo el dark mode del dashboard
-   se centraliza en ese único archivo de tema. */
+/*
+ * The dark mode of this layout NO longer lives here.
+ *    It lives in app/shared/styles/theme/dashboard-dark.scss,
+ *    under the block:
+ *    [data-theme="dark"] {
+ *      .layout__body,
+ *      .layout__main { background: var(--bg-base) !important; }
+ *      .bottom-nav { ... }
+ *    }
+ *    Do not add any "body.dark-mode" or
+ *    "[data-theme='dark']" block here — all the dashboard dark mode
+ *    is centralized in that single theme file.
+ */
 
-/* Aviso: un contacto de la usuaria activó una alerta (visible en todo el panel) */
-.aviso-contacto {
+/* Notice: a contact of the user activated an alert (visible across the whole panel) */
+.notice-contact {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -104,7 +106,7 @@
   background: linear-gradient(135deg, #6d28d9, #c026d3);
   box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
 
-  &__pulso {
+  &__pulse {
     width: 12px;
     height: 12px;
     flex-shrink: 0;
@@ -113,8 +115,8 @@
     animation: aviso-pulso 1.6s infinite;
   }
 
-  &__texto { flex: 1; }
-  &__accion { font-weight: 800; white-space: nowrap; }
+  &__text { flex: 1; }
+  &__action { font-weight: 800; white-space: nowrap; }
 }
 
 @keyframes aviso-pulso {
@@ -123,10 +125,10 @@
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-@media (prefers-reduced-motion: reduce) { .aviso-contacto__pulso { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .notice-contact__pulse { animation: none; } }
 
-// ── Aviso "tu celular cambió de lugar" ──────────────
-.aviso-movimiento {
+// ── "Your phone changed places" notice ──────────────
+.notice-movement {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -139,7 +141,7 @@
 
   > i { font-size: 1.4rem; }
 
-  &__texto {
+  &__text {
     flex: 1;
     font-size: 0.9rem;
     line-height: 1.4;
@@ -147,7 +149,7 @@
     small { display: block; opacity: 0.8; font-size: 0.75rem; }
   }
 
-  &__accion {
+  &__action {
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.2);
@@ -158,7 +160,7 @@
     white-space: nowrap;
   }
 
-  &__cerrar {
+  &__close {
     border: none;
     background: transparent;
     color: #fff;

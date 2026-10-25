@@ -1,8 +1,8 @@
-// ── PALETA REDUCIDA DEL PANEL DE USUARIA ────────────
-// Rojo (peligro) queda reservado solo para lo relacionado
-// con emergencias/SOS; el resto de la interfaz se apoya en
-// principal/acento/éxito. Si ya tienes variables globales de
-// tema, estas se pueden sustituir por var(--global, fallback).
+// ── REDUCED PALETTE OF THE USER PANEL ────────────
+// Red (danger) is reserved only for what relates
+// to emergencies/SOS; the rest of the interface relies on
+// primary/accent/success. If you already have global theme
+// variables, these can be replaced with var(--global, fallback).
 :host {
   --color-principal: #6d28d9;
   --color-principal-claro: #7c3aed;
@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  font-family: 'Nunito', sans-serif; // 🔤 fuente consistente en todo el módulo
+  font-family: 'Nunito', sans-serif; // 🔤 consistent font across the whole module
 }
 
 // ── PANEL BASE (reutilizable) ──────────────────────
@@ -59,7 +59,7 @@
   gap: 10px;
 }
 
-.estado-dot {
+.state-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -96,12 +96,12 @@
   color: var(--color-texto-secundario);
   margin: 0;
 
-  &--advertencia { 
+  &--warning { 
     color: var(--color-advertencia);
     font-weight: 600;
   }
   
-  &--peligro { 
+  &--danger { 
     color: var(--color-peligro);
     font-weight: 600;
   }
@@ -167,8 +167,8 @@
     color: var(--color-principal);
   }
 
-  &--primario {
-    // 🎨 Color de los botones (antes: degradado var(--color-principal))
+  &--primary {
+    // 🎨 Button color (before: var(--color-principal) gradient)
     background: #380759;
     color: #fff;
   }
@@ -207,7 +207,7 @@
   border-radius: 50px;
   white-space: nowrap;
 
-  &--exito { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--success { background: rgba(89, 16, 185, 0.15); color: #440596; }
 }
 
 // ── FILAS ────────────────────────────────────────────
@@ -244,8 +244,8 @@
   }
 }
 
-// ── ESTADO DE SEGURIDAD (grid de 4 items) ───────────
-.home-seguridad-grid {
+// ── SECURITY STATUS (grid of 4 items) ───────────
+.home-security-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
@@ -254,7 +254,7 @@
   @media (max-width: 560px) { grid-template-columns: repeat(2, 1fr); }
 }
 
-.home-seguridad-item {
+.home-security-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -283,7 +283,7 @@
     margin: 0;
   }
 
-  &__descripcion {
+  &__description {
     font-size: var(--font-size-xs);
     color: var(--color-texto-secundario);
     margin: 0;
@@ -302,22 +302,22 @@
     font-size: 0.65rem;
     margin-top: 2px;
 
-    &--exito {
+    &--success {
       background: var(--color-exito);
     }
 
-    &--advertencia {
+    &--warning {
       background: var(--color-advertencia);
     }
 
-    &--peligro {
+    &--danger {
       background: var(--color-peligro);
     }
   }
 }
 
 // ── MI DISPOSITIVO ───────────────────────────────────
-.home-dispositivo-body {
+.home-device-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -325,7 +325,7 @@
   margin-bottom: 1rem;
 }
 
-.home-dispositivo-info {
+.home-device-info {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -333,25 +333,25 @@
   min-width: 0;
 }
 
-.home-dispositivo-row {
+.home-device-row {
   display: flex;
   flex-direction: column;
   gap: 2px;
   margin: 0;
 }
 
-.home-dispositivo-label {
+.home-device-label {
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
 }
 
-.home-dispositivo-value {
+.home-device-value {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-texto-principal);
 }
 
-.home-dispositivo-icon {
+.home-device-icon {
   width: 72px;
   height: 72px;
   border-radius: 50%;
@@ -393,14 +393,14 @@
     font-size: 0.95rem;
     flex-shrink: 0;
 
-    &--peligro   { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
-    &--exito     { background: rgba(89, 16, 185, 0.12); color: #440596; }
+    &--danger   { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
+    &--success     { background: rgba(89, 16, 185, 0.12); color: #440596; }
     &--principal { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
   }
 
   &__body { flex: 1; min-width: 0; }
 
-  &__titulo {
+  &__title {
     font-size: var(--font-size-sm);
     font-weight: 700;
     color: var(--color-texto-principal);
@@ -410,7 +410,7 @@
     text-overflow: ellipsis;
   }
 
-  &__fecha {
+  &__date {
     font-size: var(--font-size-xs);
     color: var(--color-texto-secundario);
     margin: 2px 0 0;
@@ -424,11 +424,11 @@
 }
 
 // ── ÚLTIMA EMERGENCIA ─────────────────────────────────
-.home-panel--emergencia {
+.home-panel--emergency {
   max-width: 100%;
 }
 
-.home-emergencia {
+.home-emergency {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -438,13 +438,13 @@
 
 
 
-.home-emergencia__fecha-row {
+.home-emergency__date-row {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.home-emergencia__icon {
+.home-emergency__icon {
   width: 38px;
   height: 38px;
   border-radius: 10px;
@@ -457,20 +457,20 @@
   flex-shrink: 0;
 }
 
-.home-emergencia__fecha {
+.home-emergency__date {
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--color-texto-principal);
   margin: 0;
 }
 
-.home-emergencia__hora {
+.home-emergency__hour {
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   margin: 1px 0 0;
 }
 
-.home-emergencia__detalle {
+.home-emergency__detail {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -480,21 +480,21 @@
   i { color: var(--color-principal); font-size: 0.95rem; margin-top: 2px; }
 }
 
-.home-emergencia__detalle-label {
+.home-emergency__detail-label {
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   margin: 0;
 }
 
-.home-emergencia__detalle-valor {
+.home-emergency__detail-valor {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-texto-principal);
   margin: 1px 0 0;
 }
 
-// ── ÚLTIMA UBICACIÓN (mapa de ancho completo) ─────────────────────
-.home-panel--mapa {
+// ── LAST LOCATION (full-width map) ─────────────────────
+.home-panel--map {
   display: flex;
   flex-direction: column;
 }
@@ -564,7 +564,7 @@
   }
 }
 
-// ── ÚLTIMA UBICACIÓN (mini-mapa - LEGACY, por si acaso) ─────────────────────
+// ── LAST LOCATION (mini map - LEGACY, just in case) ─────────────────────
 .home-mini-map {
   width: 100%;
   height: 150px;
@@ -580,7 +580,7 @@
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
 }
 
-.home-mini-map__direccion {
+.home-mini-map__address {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -592,20 +592,20 @@
   i { color: var(--color-principal); }
 }
 
-.home-mini-map__fecha {
+.home-mini-map__date {
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   margin: 2px 0 0;
 }
 
 // ── ACCESOS RÁPIDOS ───────────────────────────────────
-.home-accesos-grid {
+.home-shortcuts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 0.75rem;
 }
 
-.home-acceso {
+.home-access {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -627,11 +627,11 @@
     justify-content: center;
     font-size: 1.3rem;
 
-    &--peligro     { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
-    &--exito       { background: rgba(89, 16, 185, 0.12); color: #440596; }
+    &--danger     { background: rgba(192, 38, 211, 0.12);  color: var(--color-peligro); }
+    &--success       { background: rgba(89, 16, 185, 0.12); color: #440596; }
     &--principal   { background: rgba(109, 40, 217, 0.12); color: var(--color-principal); }
-    &--acento      { background: rgba(91, 33, 182, 0.12);  color: var(--color-acento); }
-    &--advertencia { background: rgba(147, 6, 217, 0.12);  color: var(--color-advertencia); }
+    &--accent      { background: rgba(91, 33, 182, 0.12);  color: var(--color-acento); }
+    &--warning { background: rgba(147, 6, 217, 0.12);  color: var(--color-advertencia); }
   }
 
   &__label {
@@ -649,13 +649,13 @@
 }
 
 // ── ACCIONES RÁPIDAS ──────────────────────────────────
-.home-acciones-list {
+.home-actions-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.home-accion-item {
+.home-action-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -790,13 +790,13 @@
   }
 }
 
-// El modo oscuro de este componente vive en
+// The dark mode of this component lives in
 // src/app/shared/styles/theme/home-dark.scss
 // bajo [data-theme="dark"] { ... } redefiniendo las
 // variables --color-* declaradas arriba en :host.
 
 
-// ── ANIMACIONES GLOBALES PARA EL MAPA ─────────────────
+// ── GLOBAL MAP ANIMATIONS ─────────────────
 :global {
   @keyframes pulse {
     0% {
@@ -811,7 +811,7 @@
   }
 }
 
-.home-aviso {
+.home-notice {
   margin: 8px 0;
   font-size: 13px;
   color: var(--text-muted, #6b5b95);

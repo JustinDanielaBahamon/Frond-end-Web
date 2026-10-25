@@ -25,7 +25,7 @@
   }
 }
 
-// Mismo patrón tipográfico que el resto de las pantallas (ver assistance.scss: .as-title)
+// Same typographic pattern as the other screens (see assistance.scss: .as-title)
 .ah-title {
   font-family: 'Nunito', sans-serif;
   font-size: var(--font-size-2xl);
@@ -93,8 +93,8 @@
   }
 }
 
-.ah-filtro-fecha,
-.ah-filtro-tipo {
+.ah-filter-date,
+.ah-filter-type {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -110,7 +110,7 @@
   cursor: pointer;
 }
 
-.ah-filtro-fecha {
+.ah-filter-date {
   &-icon {
     width: 16px;
     height: 16px;
@@ -143,7 +143,7 @@
   }
 }
 
-.ah-filtro-tipo {
+.ah-filter-type {
   &-icon {
     width: 15px;
     height: 15px;
@@ -179,7 +179,7 @@
   &:hover { background: var(--purple-pale, #f5f3ff); }
 }
 
-// STATS — tarjeta blanca + acento de color a la izquierda + ícono circular
+// STATS — white card + color accent on the left + round icon
 // Total / Atendidas / Canceladas
 .ah-stats {
   display: grid;
@@ -200,7 +200,7 @@
 
     &--total      { border-left-color:  #560c79; }
     &--atendidas  { border-left-color: #2e1065; }
-    &--canceladas { border-left-color: #c90fe6 }
+    &--cancelled { border-left-color: #c90fe6 }
 
     .ah-stat-icon {
       width: 40px;
@@ -217,7 +217,7 @@
 
     &--total .ah-stat-icon      { background: linear-gradient(135deg, #560c79, #9236ad); }
     &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #2e1065, #5506bd); }
-    &--canceladas .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
+    &--cancelled .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
 
     .ah-stat-body { min-width: 0; }
 
@@ -236,7 +236,7 @@
       color: var(--text-primary, #1a1a1a);
     }
 
-    // antes 0.68rem / #4b4b55: demasiado pequeño y bajo contraste
+    // before 0.68rem / #4b4b55: too small and low contrast
     .ah-stat-sub {
       font-size: var(--font-size-xs);
       font-weight: 700;
@@ -265,10 +265,10 @@
   border-collapse: collapse;
   font-size: var(--font-size-sm);
 
-  // Antes usaba var(--purple-pale, #2d1457): esa variable se usa en toda la app
-  // como fondo CLARO (lavanda pálido), así que aquí el header salía lavado y
-  // el texto blanco casi no se leía. Ahora usa un morado intermedio propio,
-  // consistente con los acentos de la app (--purple-mid / --purple-deep).
+  // It used var(--purple-pale, #2d1457) before: that variable is used across the app
+  // as a LIGHT background (pale lavender), so here the header looked washed out and
+  // the white text was barely readable. Now it uses its own mid purple,
+  // consistent with the app accents (--purple-mid / --purple-deep).
   thead tr {
     background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
   }
@@ -293,15 +293,15 @@
   }
 
   .ah-id    { color: var(--pink,  #c90fe6); font-weight: 700; }
-  .ah-fecha { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
-  // antes 0.75rem con color casi negro sobre texto ya negro: subo contraste con gris intermedio legible
-  .ah-hora  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
-  .ah-ubicacion { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
+  .ah-date { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
+  // before 0.75rem with an almost black color on already black text: contrast raised with a readable mid grey
+  .ah-hour  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
+  .ah-location { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
 }
 
 
 
-// BADGES — medio de activación
+// BADGES — activation method
 .ah-badge {
   display: inline-flex;
   align-items: center;
@@ -310,19 +310,19 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
 
-  &.badge-boton      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
+  &.badge-button      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
   &.badge-widget     { background: var(--purple-pale, #e6dbfe); color: var(--purple-deep, #481ab3); }
-  &.badge-movimiento { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
+  &.badge-movement { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
   &.badge-manual     { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
 
   // BADGES — estado
   &.badge-ok        { background: rgb(5 141 50 / 98%); color: #ffffff; }
-  &.badge-pendiente { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
-  &.badge-falsa     { background: rgba(89, 16, 185, 0.18); color: #360478; }
+  &.badge-pending { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
+  &.badge-false     { background: rgba(89, 16, 185, 0.18); color: #360478; }
 }
 
-// Acciones (ojo + menú de tres puntos)
-.ah-acciones {
+// Actions (eye + three-dot menu)
+.ah-actions {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -404,7 +404,7 @@
   }
 
   // antes 0.78rem / #4b4b55: ligero refuerzo de contraste
-  &-modo {
+  &-mode {
     font-size: var(--font-size-xs);
     font-weight: 700;
     color: var(--text-muted, #374151);
@@ -470,7 +470,7 @@
 }
 
 .ah-mini-timeline-label { font-size: var(--font-size-sm); font-weight: 700; color: var(--text-primary, #1a1a1a); }
-// antes 0.72rem / #4b4b55: subo un poco tamaño y contraste
+// before 0.72rem / #4b4b55: size and contrast raised a bit
 .ah-mini-timeline-time { font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted, #374151); }
 
 .ah-mini-map-wrap {
@@ -525,7 +525,7 @@
   &:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 }
 
-// antes 0.7rem / #4b4b55: etiqueta demasiado pequeña
+// before 0.7rem / #4b4b55: label too small
 .ah-expand-item-label { font-size: var(--font-size-xs); color: var(--text-muted, #374151); font-weight: 700; }
 .ah-expand-item-value { font-size: var(--font-size-sm); color: var(--text-primary, #1a1a1a); font-weight: 700; }
 
@@ -603,16 +603,18 @@
    MODO OSCURO — MIS EMERGENCIAS (scope local al componente)
    ================================================== */
 
-/* :host-context permite seleccionar basándose en el estado de ancestros
-   manteniendo el scope del componente de Angular */
+/*
+ * :host-context allows selecting based on the state of ancestors
+ *    while keeping the Angular component scope
+ */
 
 :host-context([data-theme="dark"]) {
-  /* Encabezado de tabla con degradado morado-fucsia */
+  /* Table header with a purple-fuchsia gradient */
   .ah-table thead tr {
     background: linear-gradient(135deg, #7630D9, #D948B2) !important;
   }
 
-  /* Icono del título */
+  /* Title icon */
   .ah-titlebar-icon {
     background: var(--purple-mid, #7c3aed) !important;
     color: #ffffff !important;
@@ -622,7 +624,7 @@
   .ah-title { color: var(--text-primary) !important; }
   .ah-sub { color: var(--text-muted) !important; }
 
-  /* Toolbar - búsqueda y filtros */
+  /* Toolbar - search and filters */
   .ah-search {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
@@ -640,8 +642,8 @@
     }
   }
 
-  .ah-filtro-fecha,
-  .ah-filtro-tipo {
+  .ah-filter-date,
+  .ah-filter-type {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
     color: var(--text-primary) !important;
@@ -649,7 +651,7 @@
     &-icon { color: var(--purple-mid) !important; }
   }
 
-  .ah-filtro-fecha-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+  .ah-filter-date-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
 
   .ah-view-toggle {
     background: var(--bg-card) !important;
@@ -658,14 +660,14 @@
     &:hover { background: var(--purple-pale) !important; }
   }
 
-  /* Stats - tarjetas con acentos fijos, iguales al modo claro */
+  /* Stats - cards with fixed accents, same as light mode */
   .ah-stat {
     background: var(--bg-card) !important;
     border-color: var(--border) !important;
 
     &--total      { border-left-color: #560c79 !important; }
     &--atendidas  { border-left-color: #2e1065 !important; }
-    &--canceladas { border-left-color: #c90fe6 !important; }
+    &--cancelled { border-left-color: #c90fe6 !important; }
 
     .ah-stat-label { color: var(--text-muted) !important; }
     .ah-stat-val { color: var(--text-primary) !important; }
@@ -688,24 +690,24 @@
     }
 
     .ah-id { color: var(--pink) !important; }
-    .ah-fecha { color: var(--text-primary) !important; }
-    .ah-hora { color: var(--text-muted) !important; }
-    .ah-ubicacion { color: var(--text-primary) !important; }
+    .ah-date { color: var(--text-primary) !important; }
+    .ah-hour { color: var(--text-muted) !important; }
+    .ah-location { color: var(--text-primary) !important; }
   }
 
   /* Badges */
   .ah-badge {
-    &.badge-boton      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
+    &.badge-button      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
     &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
-    &.badge-movimiento { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-movement { background: var(--amber-pale) !important; color: var(--amber) !important; }
     &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
 
     &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
-    &.badge-pendiente { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
-    &.badge-falsa     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
+    &.badge-pending { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-false     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
   }
 
-  /* Iconos de acción */
+  /* Action icons */
   .ah-icon-btn {
     color: var(--text-muted) !important;
     &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
@@ -731,7 +733,7 @@
   }
 
   .ah-expand-head-title { color: var(--purple-mid) !important; }
-  .ah-expand-head-modo { color: var(--text-muted) !important; }
+  .ah-expand-head-mode { color: var(--text-muted) !important; }
   .ah-expand-col-title { color: var(--text-muted) !important; }
 
   .ah-mini-timeline-item:not(:last-child)::after { background: var(--border) !important; }
@@ -766,7 +768,7 @@
     &:hover { background: var(--purple-pale) !important; }
   }
 
-  /* Paginación */
+  /* Pagination */
   .ah-pagination {
     border-top-color: var(--border) !important;
 

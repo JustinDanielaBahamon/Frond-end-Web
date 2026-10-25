@@ -3,10 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card';
 import { PasswordStrengthComponent } from '../../../shared/components/password-strength/password-strength';
-import { PasswordService, evaluarContrasena } from '../../../core/services/password.service';
+import { PasswordService, evaluatePassword } from '../../../core/services/password.service';
 import { RecoveryStateService } from '../../../core/services/recovery-state.service';
 
-/** Último paso de "olvidé mi contraseña": la nueva contraseña con el código ya verificado. */
+/** Last step of "forgot my password": the new password with the already verified code. */
 @Component({
   selector: 'app-reset-password',
   standalone: true,
@@ -17,40 +17,40 @@ import { RecoveryStateService } from '../../../core/services/recovery-state.serv
 export class ResetPasswordComponent implements OnInit {
   private router = inject(Router);
   private passwordService = inject(PasswordService);
-  private estado = inject(RecoveryStateService);
+  private status = inject(RecoveryStateService);
 
-  readonly email = this.estado.email;
-  nueva = signal('');
-  confirmar = signal('');
-  verNueva = signal(false);
-  verConfirmar = signal(false);
-  guardando = signal(false);
+  readonly email = this.status.email;
+  newOne = signal('');
+  confirm = signal('');
+  viewNew = signal(false);
+  showConfirm = signal(false);
+  saving = signal(false);
   error = signal<string | null>(null);
-  listo = signal(false);
+  ready = signal(false);
 
-  readonly coinciden = computed(() => this.confirmar().length > 0 && this.confirmar() === this.nueva());
-  readonly puedeGuardar = computed(() => evaluarContrasena(this.nueva()).valida && this.coinciden() && !this.guardando());
+  readonly match = computed(() => this.confirm().length > 0 && this.confirm() === this.newOne());
+  readonly canSave = computed(() => evaluatePassword(this.newOne()).valid && this.match() && !this.saving());
 
   ngOnInit(): void {
-    if (!this.estado.email() || !this.estado.codigo()) {
+    if (!this.status.email() || !this.status.code()) {
       this.router.navigate(['/auth/forgot-password']);
     }
   }
 
-  guardar(): void {
-    const email = this.estado.email();
-    const codigo = this.estado.codigo();
-    if (!email || !codigo || !this.puedeGuardar()) return;
-    this.guardando.set(true);
+  save(): void {
+    const email = this.status.email();
+    const code = this.status.code();
+    if (!email || !code || !this.canSave()) return;
+    this.saving.set(true);
     this.error.set(null);
-    this.passwordService.restablecer(email, codigo, this.nueva()).subscribe({
+    this.passwordService.reset(email, code, this.newOne()).subscribe({
       next: () => {
-        this.guardando.set(false);
-        this.listo.set(true);
-        this.estado.limpiar();
+        this.saving.set(false);
+        this.ready.set(true);
+        this.status.clear();
       },
       error: (e) => {
-        this.guardando.set(false);
+        this.saving.set(false);
         this.error.set(e?.error?.message ?? 'No se pudo guardar la contraseña. Pide un código nuevo.');
       },
     });

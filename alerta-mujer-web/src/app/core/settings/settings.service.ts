@@ -24,9 +24,9 @@ export class SettingsService {
     this.language.set(lang);
     localStorage.setItem(LANG_KEY, lang);
     this.applyLanguage(lang);
-    // TODO: conecta esto con tu librería de i18n (ngx-translate, @angular/localize, etc.)
-    // Este servicio por ahora solo guarda la preferencia y pone el atributo `lang`
-    // en el <html>; no traduce automáticamente los textos de la app.
+    // TODO: connect this to your i18n library (ngx-translate, @angular/localize, etc.)
+    // For now this service only stores the preference and sets the `lang` attribute
+    // on the <html>; it does not translate the app texts automatically.
   }
 
   setFontSize(size: AppFontSize): void {

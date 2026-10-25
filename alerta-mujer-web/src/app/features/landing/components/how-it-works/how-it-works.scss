@@ -1,4 +1,4 @@
-/* Estilos generales de la sección */
+/* General section styles */
 .steps-section {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 40px 20px;
@@ -21,7 +21,7 @@
     margin-bottom: 40px;
 }
 
-/* Contenedor de los pasos */
+/* Steps container */
 .steps-container {
     display: flex;
     justify-content: space-between;
@@ -39,7 +39,7 @@
     padding: 0 10px;
 }
 
-/* El círculo contenedor del icono */
+/* The icon container circle */
 .icon-wrapper {
     width: 90px;
     height: 90px;
@@ -59,7 +59,7 @@
     color: #58249c;
 }
 
-/* La burbuja con el número del paso */
+/* The bubble with the step number */
 .step-number {
     position: absolute;
     top: -10px;
@@ -91,9 +91,11 @@
     margin: 0;
 }
 
-/* -------------------------------------------
-   Estilos especiales para el Paso 3 (Alerta Roja)
-------------------------------------------- */
+/*
+ * -------------------------------------------
+ *    Special styles for Step 3 (Red alert)
+ * -------------------------------------------
+ */
 .step-alert .icon-wrapper {
     background-color: #c026d3; /* Fondo rojo/rosa vibrante */
     box-shadow: 0 6px 15px rgba(224, 43, 87, 0.3);
@@ -104,14 +106,16 @@
     font-size: 40px;
 }
 
-/* -------------------------------------------
-   Línea de puntos conectores (Diseño IDÉNTICO)
-------------------------------------------- */
+/*
+ * -------------------------------------------
+ *    Connector dotted line (IDENTICAL design)
+ * -------------------------------------------
+ */
 .step-item:not(:last-child)::after {
     content: "................";
     position: absolute;
     left: 60%;
-    top: 45px; /* Alineado exactamente a la mitad del círculo */
+    top: 45px; /* Aligned exactly at the middle of the circle */
     width: 80%;
     letter-spacing: 5px;
     font-size: 32px;
@@ -129,17 +133,17 @@
     padding: 60px 20px;
 }
 
-/* Caja contenedora interna (Alinea Imagen a la izquierda y Texto a la derecha) */
+/* Inner container box (aligns the image on the left and the text on the right) */
 .container-work {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 50px; /* Espacio de separación entre la imagen y los textos */
+    gap: 50px; /* Separation between the image and the texts */
 }
 
-/* Control del tamaño de la imagen */
+/* Image size control */
 .img-work {
     flex: 1;
     max-width: 450px;
@@ -158,7 +162,7 @@
     flex: 1.2;
 }
 
-/* Título idéntico a la imagen */
+/* Title identical to the image */
 .text-title-work {
     font-size: 28px;
     color: #1e0b3d; /* Azul oscuro corporativo */
@@ -166,7 +170,7 @@
     margin-bottom: 24px;
 }
 
-/* Grid de dos columnas para los beneficios */
+/* Two-column grid for the benefits */
 .text-prop-grid {
     list-style: none;
     padding: 0;
@@ -179,16 +183,16 @@
 /* Cada beneficio individual */
 .text-prop-grid li {
     font-size: 15px;
-    color: #33334d; /* Color gris oscuro nítido */
+    color: #33334d; /* Sharp dark grey color */
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 12px; /* Separación entre el check morado y el texto */
+    gap: 12px; /* Separation between the purple check and the text */
 }
 
-/* Estilo del ícono Check (Morado) */
+/* Check icon style (purple) */
 .check-icon {
-    color: #58249c; /* El mismo tono morado de tu marca */
+    color: #58249c; /* The same purple tone of your brand */
     font-size: 16px;
     font-weight: 900;
 }
@@ -203,7 +207,7 @@
         align-items: center;
     }
 
-    /* Ocultamos los puntos horizontales en celular */
+    /* We hide the horizontal dots on phones */
     .step-item:not(:last-child)::after {
         display: none; 
     }
@@ -220,7 +224,7 @@
         width: 100%;
     }
 
-    /* Ocultamos los puntos horizontales en celular */
+    /* We hide the horizontal dots on phones */
     .step-item:not(:last-child)::after {
         display: none; 
     }

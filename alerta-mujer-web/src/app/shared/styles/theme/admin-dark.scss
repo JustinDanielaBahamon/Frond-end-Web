@@ -1,17 +1,19 @@
-/*==================================================
-=   MODO OSCURO — PANEL ADMIN
-=   Dispositivos · Moderadores · Evidencias · Reportes
+/*
+ * ==================================================
+ * =   DARK MODE — ADMIN PANEL
+ * =   Devices · Moderators · Evidence · Reports
+ *
+ *    These 4 modules have their colors hard-coded
+ *    in their .scss (#fff, #f8f7fc, #2d0b5e...), that is why they
+ *    did not react to the theme. Here they are overridden using
+ *    the tokens from tokens.scss, same as dashboard-dark.
+ * ==================================================
+ */
 
-   Estos 4 módulos tienen los colores escritos a mano
-   en su .scss (#fff, #f8f7fc, #2d0b5e...), por eso no
-   reaccionaban al tema. Aquí se sobreescriben usando
-   los tokens de tokens.scss, igual que dashboard-dark.
-==================================================*/
-
-// Estilos comunes a los 4 módulos (misma estructura HTML)
+// Styles shared by the 4 modules (same HTML structure)
 @mixin admin-dark($root) {
 
-  /* ── Fondo de la página ─────────────────────── */
+  /* ── Page background ─────────────────────── */
   .#{$root} {
     background: var(--bg-base) !important;
     color: var(--text-primary);
@@ -52,11 +54,11 @@
     .stat-change {
       &.positive { color: var(--green) !important; }
       &.negative { color: var(--red) !important; }
-      .vs-ayer   { color: var(--text-muted) !important; }
+      .vs-yesterday   { color: var(--text-muted) !important; }
     }
   }
 
-  /* ── Toolbar: búsqueda y filtros ────────────── */
+  /* ── Toolbar: search and filters ────────────── */
   .toolbar {
 
     .search-box {
@@ -169,7 +171,7 @@
     background: var(--purple-pale) !important;
   }
 
-  /* ── Contenido de las celdas ────────────────── */
+  /* ── Cell content ────────────────── */
   .device-info,
   .report-name { color: var(--text-primary) !important; }
 
@@ -189,11 +191,11 @@
   .evidence-id-size,
   .alert-type-city { color: var(--text-muted) !important; }
 
-  // el puntito de estado toma el color del texto del estado
+  // the status dot takes the color of the status text
   .status::before,
   .status-badge::before { background: currentColor !important; }
 
-  /* ── Botones de acción de cada fila ─────────── */
+  /* ── Action buttons of each row ─────────── */
   .actions button,
   .actions-cell button {
     background: var(--purple-pale) !important;
@@ -205,7 +207,7 @@
     }
   }
 
-  /* ── Pie de tabla y paginación ──────────────── */
+  /* ── Table footer and pagination ──────────────── */
   .table-footer {
     border-top-color: var(--border) !important;
 
@@ -327,9 +329,11 @@
   .user-card { background: var(--purple-pale) !important; }
 }
 
-/*==================================================
-=   GESTIÓN DE DISPOSITIVOS
-==================================================*/
+/*
+ * ==================================================
+ * =   DEVICE MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-device-management {
   @include admin-dark('device-management');
@@ -346,9 +350,11 @@
   }
 }
 
-/*==================================================
-=   GESTIÓN DE MODERADORES
-==================================================*/
+/*
+ * ==================================================
+ * =   MODERATOR MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-moderator-management {
   @include admin-dark('moderator-management');
@@ -377,9 +383,11 @@
   }
 }
 
-/*==================================================
-=   GESTIÓN DE EVIDENCIAS
-==================================================*/
+/*
+ * ==================================================
+ * =   EVIDENCE MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-evidences-management {
   @include admin-dark('evidences-management');
@@ -406,9 +414,11 @@
   }
 }
 
-/*==================================================
-=   GESTIÓN DE REPORTES
-==================================================*/
+/*
+ * ==================================================
+ * =   REPORT MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-report-management {
   @include admin-dark('reports-management');
@@ -430,16 +440,16 @@
     &:hover { background: var(--purple-pale-hover) !important; }
   }
 
-  /* ── Selector de alertas del formulario ─────── */
-  .alertas-selector {
+  /* ── Form alert selector ─────── */
+  .alerts-selector {
     label { color: var(--purple-mid) !important; }
 
-    .alertas-count {
+    .alerts-count {
       background: var(--purple-pale) !important;
       color: var(--purple-mid) !important;
     }
 
-    .alertas-actions .btn-small {
+    .alerts-actions .btn-small {
       background: var(--bg-base) !important;
       border-color: var(--border) !important;
       color: var(--purple-mid) !important;
@@ -450,16 +460,16 @@
       }
     }
 
-    .loading-alertas,
-    .no-alertas {
+    .loading-alerts,
+    .no-alerts {
       background: var(--bg-base) !important;
       color: var(--text-muted) !important;
     }
 
-    .alertas-list {
+    .alerts-list {
       border-color: var(--border) !important;
 
-      .alerta-item {
+      .alert-item {
         background: var(--bg-base) !important;
         border-color: var(--border) !important;
 
@@ -471,15 +481,15 @@
 
         &.selected { box-shadow: 0 0 0 2px rgba(183, 155, 245, 0.18) !important; }
 
-        .alerta-tipo      { color: var(--text-primary) !important; }
-        .alerta-ubicacion,
-        .alerta-fecha     { color: var(--text-muted) !important; }
+        .alert-type      { color: var(--text-primary) !important; }
+        .alert-location,
+        .alert-date     { color: var(--text-muted) !important; }
       }
     }
   }
 
-  /* ── Modal "no se encontró impresora" ───────── */
+  /* ── "No printer found" modal ───────── */
   .modal-impresora-header h2 { color: var(--text-primary) !important; }
   .modal-impresora-body p    { color: var(--text-muted) !important; }
-  .modal-impresora-body .mensaje-final { color: var(--purple-mid) !important; }
+  .modal-impresora-body .message-final { color: var(--purple-mid) !important; }
 }

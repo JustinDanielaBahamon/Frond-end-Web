@@ -1,15 +1,15 @@
-export interface ContactoEmergencia {
+export interface EmergencyContact {
   id: number;
-  usuarioId: number;
-  nombre: string;
-  telefono: string;
+  userId: number;
+  name: string;
+  telephone: string;
   email?: string;
-  relacion: string;
-  /** Data URI de la foto (la misma que se pone desde la app). */
-  foto?: string | null;
+  relationship: string;
+  /** Photo data URI (the same one set from the app). */
+  photo?: string | null;
 }
 
-// Modelo que devuelve el backend EmergencyContact
+// Model returned by the backend EmergencyContact
 export interface EmergencyContactApi {
   id: number;
   userProfileId: number;

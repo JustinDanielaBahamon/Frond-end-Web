@@ -1,0 +1,26 @@
+<section class="requests" *ngIf="requests.length > 0">
+  <h2><i class="fa-solid fa-user-xmark"></i> Solicitudes para eliminar cuentas</h2>
+  <p class="requests__help">Eliminar una cuenta borra sus datos personales y no se puede deshacer. La pide una administradora y la aprueba otra.</p>
+  <p class="requests__error" *ngIf="requestError">{{ requestError }}</p>
+  <article class="request" *ngFor="let s of pendingRequests">
+    <div class="request__info">
+      <strong>{{ s.userName }}</strong> <span>{{ s.userEmail }}</span>
+      <p>“{{ s.reason }}”</p>
+      <small>Pedida por {{ s.requestedByName }} · {{ s.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+    </div>
+    <div class="request__actions">
+      <input type="text" placeholder="Nota (opcional)" [(ngModel)]="decisionNote[s.id]" [name]="'nota' + s.id" />
+      <button type="button" class="btn-secondary" (click)="decide(s, false)">{{ isMine(s) ? 'Cancelar solicitud' : 'Rechazar' }}</button>
+      <button type="button" class="btn-danger" [disabled]="isMine(s)" [title]="isMine(s) ? 'La debe aprobar otra administradora' : ''" (click)="decide(s, true)">Aprobar y eliminar</button>
+    </div>
+  </article>
+  <p class="requests__help" *ngIf="pendingRequests.length === 0">No hay solicitudes pendientes.</p>
+  <details *ngIf="decidedRequests.length > 0">
+    <summary>Últimas decididas</summary>
+    <ul>
+      <li *ngFor="let s of decidedRequests">
+        {{ s.userName }} · {{ s.status === 'approved' ? 'eliminada' : 'rechazada' }} por {{ s.decidedByName }} ({{ s.decidedAt | date:'dd/MM/yyyy' }})
+      </li>
+    </ul>
+  </details>
+</section>

@@ -5,7 +5,7 @@ import { delay, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 /**
- * Interfaz para definir la estructura de un dispositivo
+ * Interface that defines the structure of a device
  */
 export interface Device {
   id: number;
@@ -15,32 +15,32 @@ export interface Device {
     name: string;
     email: string;
   };
-  type: 'Android';  // la app solo existe para Android
+  type: 'Android';  // the app only exists for Android
   imei: string;
   phone: string;
   status: 'Activo' | 'Inactivo' | 'Bloqueado' | 'Perdido';
   lastSync: string;
   icon: string;
-  // Datos extra del backend (solo lectura)
+  // Extra backend data (read only)
   appVersion?: string | null;
   gpsStatus?: string | null;
   pushTokenRegistered?: boolean;
   lastAccessIso?: string | null;
-  /** Nombre que le puso la usuaria al celular (p. ej. "Celular de Ana"). */
+  /** Name the user gave the phone (e.g. "Celular de Ana"). */
   deviceName?: string | null;
-  registrado?: string;
-  /** Lo que la app informa que está listo para una emergencia (null si nunca lo informó). */
-  permisos?: PermisoDispositivo[] | null;
-  permisosActualizados?: string | null;
+  registered?: string;
+  /** What the app reports as ready for an emergency (null if it never reported it). */
+  permissions?: DevicePermission[] | null;
+  permissionsUpdated?: string | null;
 }
 
-export interface PermisoDispositivo {
-  etiqueta: string;
-  listo: boolean;
+export interface DevicePermission {
+  label: string;
+  ready: boolean;
 }
 
-/** Permisos que informa la app, en el orden en que importan para una emergencia. */
-const PERMISOS_APP: [string, string][] = [
+/** Permissions the app reports, in the order they matter for an emergency. */
+const APP_PERMISSIONS: [string, string][] = [
   ['ubicacion', 'Ubicación'],
   ['notificaciones', 'Notificaciones'],
   ['agitar', 'Alerta al agitar'],
@@ -50,17 +50,17 @@ const PERMISOS_APP: [string, string][] = [
   ['camara', 'Cámara'],
 ];
 
-function leerPermisos(json: string | null): PermisoDispositivo[] | null {
+function readPermissions(json: string | null): DevicePermission[] | null {
   if (!json) return null;
   try {
     const p = JSON.parse(json) as Record<string, unknown>;
-    return PERMISOS_APP.filter(([clave]) => clave in p).map(([clave, etiqueta]) => ({ etiqueta, listo: p[clave] === true }));
+    return APP_PERMISSIONS.filter(([key]) => key in p).map(([key, label]) => ({ label, ready: p[key] === true }));
   } catch {
     return null;
   }
 }
 
-/** Dispositivo tal como lo devuelve el backend al panel de administración. */
+/** Device as the backend returns it to the admin panel. */
 interface AdminDeviceApi {
   id: number;
   accountId: number;
@@ -84,49 +84,49 @@ interface AdminDeviceApi {
   permissionsUpdatedAt: string | null;
 }
 
-const ESTADO_DESDE_API: Record<string, Device['status']> = {
+const STATUS_FROM_API: Record<string, Device['status']> = {
   active: 'Activo', inactive: 'Inactivo', blocked: 'Bloqueado', lost: 'Perdido',
 };
-const ESTADO_HACIA_API: Record<Device['status'], string> = {
+const STATUS_TO_API: Record<Device['status'], string> = {
   Activo: 'active', Inactivo: 'inactive', Bloqueado: 'blocked', Perdido: 'lost',
 };
 
-const esHoy = (iso?: string | null) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
+const isToday = (iso?: string | null) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
 
-function formatearUltimoAcceso(iso: string | null): string {
+function formatLastAccess(iso: string | null): string {
   if (!iso) return 'Sin registro';
-  const fecha = new Date(iso);
-  if (isNaN(fecha.getTime())) return 'Sin registro';
-  const hora = fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
-  return esHoy(iso) ? `Hoy, ${hora}` : `${fecha.toLocaleDateString('es-CO')} ${hora}`;
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return 'Sin registro';
+  const time = date.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+  return isToday(iso) ? `Hoy, ${time}` : `${date.toLocaleDateString('es-CO')} ${time}`;
 }
 
-function desdeApi(d: AdminDeviceApi): Device {
-  const nombre = [d.brand, d.model].filter(Boolean).join(' ');
+function fromApi(d: AdminDeviceApi): Device {
+  const name = [d.brand, d.model].filter(Boolean).join(' ');
   return {
     id: d.id,
-    name: nombre || 'Dispositivo sin nombre',
+    name: name || 'Dispositivo sin nombre',
     osVersion: d.osVersion ? `${d.osName ?? ''} ${d.osVersion}`.trim() : (d.osName ?? ''),
     user: { name: d.ownerName ?? 'Sin usuaria', email: d.ownerEmail ?? '' },
     type: 'Android',
     imei: d.deviceUuid ?? '',
     phone: d.ownerPhone ?? '',
-    status: ESTADO_DESDE_API[d.status] ?? 'Inactivo',
-    lastSync: formatearUltimoAcceso(d.lastAccess),
+    status: STATUS_FROM_API[d.status] ?? 'Inactivo',
+    lastSync: formatLastAccess(d.lastAccess),
     icon: 'fa-brands fa-android',
     appVersion: d.appVersion,
     gpsStatus: d.gpsStatus,
     pushTokenRegistered: d.pushTokenRegistered,
     lastAccessIso: d.lastAccess,
     deviceName: d.deviceName,
-    registrado: formatearUltimoAcceso(d.createdAt),
-    permisos: leerPermisos(d.permissions),
-    permisosActualizados: d.permissionsUpdatedAt ? formatearUltimoAcceso(d.permissionsUpdatedAt) : null,
+    registered: formatLastAccess(d.createdAt),
+    permissions: readPermissions(d.permissions),
+    permissionsUpdated: d.permissionsUpdatedAt ? formatLastAccess(d.permissionsUpdatedAt) : null,
   };
 }
 
 /**
- * Interfaz para estadísticas de dispositivos
+ * Interface for device stats
  */
 export interface DeviceStats {
   totalDevices: number;
@@ -137,7 +137,7 @@ export interface DeviceStats {
 }
 
 /**
- * Celular que la app móvil registró para la usuaria (GET /api/devices/user)
+ * Phone the mobile app registered for the user (GET /api/devices/user)
  */
 export interface UserDevice {
   id: number;
@@ -153,19 +153,19 @@ export interface UserDevice {
   status: string;
   lastAccess: string | null;
   fcmToken: string | null;
-  /** JSON con los permisos que informa la app, p. ej. {"ubicacion":true,"agitar":false}. */
+  /** JSON with the permissions the app reports, e.g. {"ubicacion":true,"agitar":false}. */
   permissions?: string | null;
   permissionsUpdatedAt?: string | null;
 }
 
 /**
- * Interfaz para filtros de dispositivos
+ * Interface for device filters
  */
 export interface DeviceFilters {
-  busqueda: string;
-  estado: string;
-  fechaInicio: Date | null;
-  fechaFin: Date | null;
+  search: string;
+  status: string;
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
 @Injectable({
@@ -175,7 +175,7 @@ export class DeviceService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/devices`;
 
-  // Sin datos mock - se cargarán desde el backend
+  // No mock data - it is loaded from the backend
   private devicesSubject = new BehaviorSubject<Device[]>([]);
   devices$ = this.devicesSubject.asObservable();
 
@@ -189,7 +189,7 @@ export class DeviceService {
   stats$ = this.statsSubject.asObservable();
 
   // ========================================
-  // MÉTODOS API (Conectar al backend)
+  // API METHODS (connect to the backend)
   // ========================================
 
   /**
@@ -197,22 +197,22 @@ export class DeviceService {
    */
   getAll(): Observable<Device[]> {
     return this.http.get<AdminDeviceApi[]>(this.url).pipe(
-      map(lista => lista.map(desdeApi)),
-      // La lista local alimenta los filtros y las estadísticas
+      map(list => list.map(fromApi)),
+      // The local list feeds the filters and the stats
       tap(devices => {
         this.devicesSubject.next(devices);
-        this.actualizarEstadisticas();
+        this.updateStats();
       }),
     );
   }
 
   /**
-   * Celulares de la usuaria autenticada
+   * Phones of the authenticated user
    */
   getMyDevices(): Observable<UserDevice[]> {
-    // El panel web se registra como dispositivo "web" (notificaciones del navegador): no es un celular
+    // The web panel registers as a "web" device (browser notifications): it is not a phone
     return this.http.get<UserDevice[]>(`${this.url}/user`).pipe(
-      map(lista => lista.filter(d => (d.osName || '').toLowerCase() !== 'web')),
+      map(list => list.filter(d => (d.osName || '').toLowerCase() !== 'web')),
     );
   }
 
@@ -220,7 +220,7 @@ export class DeviceService {
    * Obtener dispositivo por ID
    */
   getById(id: number): Observable<Device> {
-    return this.http.get<AdminDeviceApi>(`${this.url}/${id}`).pipe(map(desdeApi));
+    return this.http.get<AdminDeviceApi>(`${this.url}/${id}`).pipe(map(fromApi));
   }
 
   /**
@@ -230,9 +230,9 @@ export class DeviceService {
   /**
    * Actualizar dispositivo
    */
-  // Desde el panel solo se edita el estado; el resto lo registra la app móvil.
+  // From the panel only the status is edited; the rest is registered by the mobile app.
   update(id: number, device: Device): Observable<Device> {
-    return this.cambiarEstado(id, device.status);
+    return this.changeStatus(id, device.status);
   }
 
   /**
@@ -243,80 +243,80 @@ export class DeviceService {
   }
 
   /**
-   * Obtener estadísticas
+   * Get stats
    */
   getStats(): Observable<DeviceStats> {
     // TODO: Conectar al backend
     // return this.http.get<DeviceStats>(`${this.url}/stats`);
-    const stats = this.calcularEstadisticas();
+    const stats = this.computeStats();
     return of(stats).pipe(delay(200));
   }
 
   /**
-   * Calcular estadísticas dinámicamente desde los dispositivos
+   * Compute stats dynamically from the devices
    */
-  private calcularEstadisticas(): DeviceStats {
+  private computeStats(): DeviceStats {
     const devices = this.devicesSubject.value;
     const total = devices.length;
-    const activos = devices.filter(d => d.status === 'Activo').length;
-    const inactivos = devices.filter(d => d.status === 'Inactivo').length;
-    const bloqueados = devices.filter(d => d.status === 'Bloqueado').length;
-    const sincronizadosHoy = devices.filter(d => esHoy(d.lastAccessIso)).length;
+    const active = devices.filter(d => d.status === 'Activo').length;
+    const inactive = devices.filter(d => d.status === 'Inactivo').length;
+    const blocked = devices.filter(d => d.status === 'Bloqueado').length;
+    const syncedToday = devices.filter(d => isToday(d.lastAccessIso)).length;
     
     return {
       totalDevices: total,
-      activeDevices: activos,
-      inactiveDevices: inactivos,
-      blockedDevices: bloqueados,
-      syncedToday: sincronizadosHoy
+      activeDevices: active,
+      inactiveDevices: inactive,
+      blockedDevices: blocked,
+      syncedToday
     };
   }
 
   /**
-   * Actualizar estadísticas y notificar a los suscriptores
+   * Update stats and notify the subscribers
    */
-  private actualizarEstadisticas(): void {
-    const stats = this.calcularEstadisticas();
+  private updateStats(): void {
+    const stats = this.computeStats();
     this.statsSubject.next(stats);
   }
 
   /**
    * Cambiar estado de dispositivo
    */
-  cambiarEstado(id: number, nuevoEstado: Device['status']): Observable<Device> {
-    return this.http.patch<AdminDeviceApi>(`${this.url}/${id}/status`, { status: ESTADO_HACIA_API[nuevoEstado] }).pipe(
-      map(desdeApi),
-      tap(actualizado => {
-        this.devicesSubject.next(this.devicesSubject.value.map(d => (d.id === id ? actualizado : d)));
-        this.actualizarEstadisticas();
+  changeStatus(id: number, newStatus: Device['status']): Observable<Device> {
+    return this.http.patch<AdminDeviceApi>(`${this.url}/${id}/status`, { status: STATUS_TO_API[newStatus] }).pipe(
+      map(fromApi),
+      tap(updated => {
+        this.devicesSubject.next(this.devicesSubject.value.map(d => (d.id === id ? updated : d)));
+        this.updateStats();
       }),
     );
   }
 
-  filtrarDispositivos(filtros: DeviceFilters): Observable<Device[]> {
-    let dispositivosFiltrados = [...this.devicesSubject.value];
+  filterDevices(filters: DeviceFilters): Observable<Device[]> {
+    let filteredDevices = [...this.devicesSubject.value];
 
-    // Filtro por búsqueda
-    if (filtros.busqueda) {
-      const busquedaLower = filtros.busqueda.toLowerCase();
-      dispositivosFiltrados = dispositivosFiltrados.filter(device => {
+    // Search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredDevices = filteredDevices.filter(device => {
         return (
-          device.name.toLowerCase().includes(busquedaLower) ||
-          device.imei.includes(busquedaLower) ||
-          device.phone.includes(busquedaLower) ||
-          device.user.name.toLowerCase().includes(busquedaLower) ||
-          device.user.email.toLowerCase().includes(busquedaLower)
+          device.name.toLowerCase().includes(searchLower) ||
+          device.imei.includes(searchLower) ||
+          device.phone.includes(searchLower) ||
+          device.user.name.toLowerCase().includes(searchLower) ||
+          device.user.email.toLowerCase().includes(searchLower)
         );
       });
     }
 
     // Filtro por estado
-    if (filtros.estado && filtros.estado !== 'all') {
-      dispositivosFiltrados = dispositivosFiltrados.filter(device =>
-        device.status === filtros.estado
+    if (filters.status && filters.status !== 'all') {
+      filteredDevices = filteredDevices.filter(device =>
+        device.status === filters.status
       );
     }
 
-    return of(dispositivosFiltrados).pipe(delay(200));
+    return of(filteredDevices).pipe(delay(200));
   }
 }

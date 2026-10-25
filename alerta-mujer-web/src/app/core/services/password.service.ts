@@ -3,42 +3,42 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-/** Cambio y recuperación de contraseña (la recuperación usa un código de 6 dígitos enviado al correo). */
+/** Password change and recovery (recovery uses a 6-digit code sent by email). */
 @Injectable({ providedIn: 'root' })
 export class PasswordService {
   private http = inject(HttpClient);
   private api = environment.apiUrl;
 
-  cambiar(actual: string, nueva: string): Observable<void> {
-    return this.http.put<void>(`${this.api}/api/users/me/password`, { currentPassword: actual, newPassword: nueva });
+  change(current: string, newOne: string): Observable<void> {
+    return this.http.put<void>(`${this.api}/api/users/me/password`, { currentPassword: current, newPassword: newOne });
   }
 
-  pedirCodigo(email: string): Observable<{ message: string }> {
+  requestCode(email: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/api/auth/forgot-password`, { email });
   }
 
-  verificarCodigo(email: string, code: string): Observable<void> {
+  verifyCode(email: string, code: string): Observable<void> {
     return this.http.post<void>(`${this.api}/api/auth/verify-reset-code`, { email, code });
   }
 
-  restablecer(email: string, code: string, newPassword: string): Observable<{ message: string }> {
+  reset(email: string, code: string, newPassword: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/api/auth/reset-password`, { email, code, newPassword });
   }
 }
 
-export type Requisito = { texto: string; cumple: boolean };
+export type Requirement = { text: string; meets: boolean };
 
-/** Requisitos visibles y nivel de seguridad (0 a 4) de una contraseña. */
-export function evaluarContrasena(clave: string): { requisitos: Requisito[]; nivel: number; etiqueta: string; valida: boolean } {
-  const requisitos: Requisito[] = [
-    { texto: 'Al menos 8 caracteres', cumple: clave.length >= 8 },
-    { texto: 'Una letra mayúscula', cumple: /[A-ZÁÉÍÓÚÑ]/.test(clave) },
-    { texto: 'Una letra minúscula', cumple: /[a-záéíóúñ]/.test(clave) },
-    { texto: 'Un número', cumple: /\d/.test(clave) },
+/** Visible requirements and strength level (0 to 4) of a password. */
+export function evaluatePassword(key: string): { requirements: Requirement[]; level: number; label: string; valid: boolean } {
+  const requirements: Requirement[] = [
+    { text: 'Al menos 8 caracteres', meets: key.length >= 8 },
+    { text: 'Una letra mayúscula', meets: /[A-ZÁÉÍÓÚÑ]/.test(key) },
+    { text: 'Una letra minúscula', meets: /[a-záéíóúñ]/.test(key) },
+    { text: 'Un número', meets: /\d/.test(key) },
   ];
-  const cumplidos = requisitos.filter((r) => r.cumple).length;
-  const nivel = clave.length === 0 ? 0 : Math.max(1, cumplidos);
-  const etiquetas = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
-  // El backend solo exige 8 caracteres; el resto se recomienda
-  return { requisitos, nivel, etiqueta: etiquetas[nivel], valida: clave.length >= 8 && clave.length <= 100 };
+  const met = requirements.filter((r) => r.meets).length;
+  const level = key.length === 0 ? 0 : Math.max(1, met);
+  const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+  // The backend only requires 8 characters; the rest is recommended
+  return { requirements, level, label: labels[level], valid: key.length >= 8 && key.length <= 100 };
 }

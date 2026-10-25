@@ -82,7 +82,7 @@
     td:last-child  { border-bottom-right-radius: 12px; }
   }
 
-  // antes: var(--purple-pale, #f9f8ff) — casi blanco, sin contraste con la tarjeta
+  // before: var(--purple-pale, #f9f8ff) — almost white, no contrast with the card
   thead {
     background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
 
@@ -124,9 +124,9 @@
   font-size: var(--font-size-xs);
 }
 
-.ec-nombre { font-weight: 700; color: #111827; }
+.ec-name { font-weight: 700; color: #111827; }
 
-.ec-prioridad {
+.ec-priority {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +146,7 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
 
-  &--activo   { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--active   { background: rgba(89, 16, 185, 0.15); color: #440596; }
   &--inactivo { background: rgba(203, 28, 230, 0.12); color: #cb1ce6; }
 }
 
@@ -437,13 +437,13 @@
   .ec-table-wrap { overflow-x: auto; }
   .ec-table { min-width: 640px; }
 }
-// ── Fotos de los contactos ──────────────────────────────
-.ec-avatar--foto {
+// ── Contact photos ──────────────────────────────
+.ec-avatar--photo {
   object-fit: cover;
   border: 2px solid #ede9fe;
 }
 
-.ec-foto {
+.ec-photo {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -453,21 +453,21 @@
   background: #f5f3ff;
 }
 
-.ec-foto-img,
-.ec-foto-vacia {
+.ec-photo-img,
+.ec-photo-vacia {
   width: 72px;
   height: 72px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.ec-foto-img {
+.ec-photo-img {
   object-fit: cover;
   border: 3px solid #fff;
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 }
 
-.ec-foto-vacia {
+.ec-photo-vacia {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -477,15 +477,15 @@
   background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
-.ec-foto-acciones {
+.ec-photo-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
-.ec-foto-boton,
-.ec-foto-quitar {
+.ec-photo-button,
+.ec-photo-remove {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -496,18 +496,18 @@
   cursor: pointer;
 }
 
-.ec-foto-boton {
+.ec-photo-button {
   background: #7c3aed;
   color: #fff;
 }
 
-.ec-foto-quitar {
+.ec-photo-remove {
   border: 1px solid #c4b5fd;
   background: #fff;
   color: #6d28d9;
 }
 
-.ec-foto-error {
+.ec-photo-error {
   width: 100%;
   font-size: var(--font-size-xs);
   font-weight: 600;

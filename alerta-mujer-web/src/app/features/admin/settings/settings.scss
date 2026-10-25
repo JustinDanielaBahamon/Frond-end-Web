@@ -1,8 +1,10 @@
-/*==================================================
-=   CONFIGURACIÓN — PANEL ADMIN
-=   Usa los tokens de tokens.scss, así que cambia
-=   solo entre modo claro y oscuro.
-==================================================*/
+/*
+ * ==================================================
+ * =   SETTINGS — ADMIN PANEL
+ * =   Uses the tokens from tokens.scss, so it only changes
+ * =   between light and dark mode.
+ * ==================================================
+ */
 
 $btn-purple: #7c3aed;
 $btn-purple-hover: #6d28d9;
@@ -356,7 +358,7 @@ $btn-purple-hover: #6d28d9;
 
 
 
-/* ── Parámetros ─────────────────────────────── */
+/* ── Parameters ─────────────────────────────── */
 .page-header a,
 .warning a { color: var(--purple-deep); font-weight: 600; }
 
@@ -404,7 +406,7 @@ $btn-purple-hover: #6d28d9;
 
 .status-line--neutral i { color: var(--purple-deep); }
 
-/* ── Confirmación ───────────────────────────── */
+/* ── Confirmation ───────────────────────────── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -462,8 +464,8 @@ $btn-purple-hover: #6d28d9;
     background: var(--bg-base);
   }
 
-  &__campo { font-size: 0.8rem; color: var(--text-muted); }
-  &__valores { font-size: 0.95rem; }
+  &__field { font-size: 0.8rem; color: var(--text-muted); }
+  &__values { font-size: 0.95rem; }
   del { color: #c026d3; }
   strong { color: #7c3aed; }
   i { font-size: 0.75rem; color: var(--text-muted); margin: 0 4px; }

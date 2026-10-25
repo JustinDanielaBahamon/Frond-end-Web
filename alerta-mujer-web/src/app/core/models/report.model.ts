@@ -2,159 +2,159 @@
 //=            MODELOS DE REPORTE
 //======================================
 
-// Datos de la alerta
-export interface AlertaData {
+// Alert data
+export interface AlertData {
   id: number;
-  tipo: 'main' | 'mini' | 'reminder';
-  metodoActivacion: 'boton_fisico' | 'widget' | 'movimiento_brusco' | 'voz' | 'automatico';
-  estadoFinal: 'resolved' | 'cancelled' | 'completed' | 'failed';
-  horaInicio: Date;
-  horaFin: Date | null;
-  duracionTotal: number; // en segundos
+  type: 'main' | 'mini' | 'reminder';
+  activationMethod: 'boton_fisico' | 'widget' | 'movimiento_brusco' | 'voz' | 'automatico';
+  finalStatus: 'resolved' | 'cancelled' | 'completed' | 'failed';
+  startTime: Date;
+  endTime: Date | null;
+  totalDuration: number; // en segundos
 }
 
-// Quién activó la alerta
+// Who activated the alert
 export interface AlertActivator {
-  usuaria: {
+  user: {
     id: number;
-    nombre: string;
-    nombrePrivado?: string; // Solo visible para admin
+    name: string;
+    privateName?: string; // Only visible to admin
   };
-  dispositivo: {
-    marca: string;
-    modelo: string;
+  device: {
+    brand: string;
+    model: string;
     versionAndroid: string;
     deviceId: string;
   };
 }
 
-// Ubicación durante la alerta
+// Location during the alert
 export interface AlertLocation {
-  coordenadas: {
-    latitud: number;
-    longitud: number;
-    hora: Date;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+    time: Date;
   }[];
-  puntoInicio: {
-    latitud: number;
-    longitud: number;
-    hora: Date;
+  startPoint: {
+    latitude: number;
+    longitude: number;
+    time: Date;
   };
-  ultimoPunto: {
-    latitud: number;
-    longitud: number;
-    hora: Date;
+  lastPoint: {
+    latitude: number;
+    longitude: number;
+    time: Date;
   };
-  mapaImagenUrl?: string; // URL de imagen estática del mapa
+  mapImageUrl?: string; // Static map image URL
 }
 
 // Contactos notificados
 export interface AlertContact {
   id: number;
-  nombre: string;
-  relacion: string;
-  canal: 'SMS' | 'llamada' | 'email' | 'push';
-  estadoEntrega: 'sent' | 'delivered' | 'failed';
-  horaNotificacion: Date;
+  name: string;
+  relationship: string;
+  channel: 'SMS' | 'llamada' | 'email' | 'push';
+  deliveryStatus: 'sent' | 'delivered' | 'failed';
+  notificationTime: Date;
 }
 
 // Recordatorios disparados
 export interface AlertReminder {
   id: number;
-  numeroSecuencia: number;
-  horaDisparo: Date;
-  metodo: 'SMS' | 'llamada' | 'push';
-  estado: 'enviado' | 'fallido';
+  sequenceNumber: number;
+  triggerTime: Date;
+  method: 'SMS' | 'llamada' | 'push';
+  status: 'enviado' | 'fallido';
 }
 
 // Evidencia generada
 export interface AlertEvidence {
   id: number;
-  tipo: 'foto' | 'video' | 'audio';
+  type: 'foto' | 'video' | 'audio';
   fileUrl: string;
   fileName: string;
   fileSize: string;
-  fechaCaptura: Date;
-  thumbnailUrl?: string; // Para miniaturas en PDF
+  captureDate: Date;
+  thumbnailUrl?: string; // For thumbnails in the PDF
 }
 
 // Llamadas a recursos de emergencia
 export interface ResourceCall {
   id: number;
-  recurso: string; // hospital, policía, línea de ayuda, etc.
-  numero: string;
-  horaLlamada: Date;
-  duracion: number; // en segundos
-  estado: 'completada' | 'no_respondida' | 'fallida';
+  resource: string; // hospital, police, help line, etc.
+  number: string;
+  callTime: Date;
+  duration: number; // en segundos
+  status: 'completada' | 'no_respondida' | 'fallida';
 }
 
-// Qué pasó durante la alerta
+// What happened during the alert
 export interface AlertEvents {
-  ubicacion: AlertLocation;
-  contactosNotificados: AlertContact[];
-  recordatorios: AlertReminder[];
-  evidencia: AlertEvidence[];
-  llamadasRecursos: ResourceCall[];
+  location: AlertLocation;
+  notifiedContacts: AlertContact[];
+  reminders: AlertReminder[];
+  evidence: AlertEvidence[];
+  resourceCalls: ResourceCall[];
 }
 
 // Metadatos del reporte
 export interface ReportMetadata {
-  generadoPor: {
+  generatedBy: {
     id: number;
-    nombre: string;
-    rol: string;
+    name: string;
+    role: string;
   };
-  fechaGeneracion: Date;
-  versionReporte: string;
+  generatedAt: Date;
+  reportVersion: string;
 }
 
 // Reporte completo
-export interface Reporte {
+export interface AlertReport {
   id: number;
-  nombre: string;
-  fecha: Date;
-  ciudad: string;
-  estado: 'Pendiente' | 'Cerrada' | 'Atendida';
-  usuaria?: string;
-  acontecimiento?: string;
-  generadoPor: string;
-  formato: 'PDF' | 'Excel' | 'CSV';
-  tamano: string;
-  descripcion?: string;
+  name: string;
+  date: Date;
+  city: string;
+  status: 'Pendiente' | 'Cerrada' | 'Atendida';
+  user?: string;
+  incident?: string;
+  generatedBy: string;
+  format: 'PDF' | 'Excel' | 'CSV';
+  size: string;
+  description?: string;
   
   // Referencia a alertas del sistema
-  alertasIds?: number[]; // IDs de las alertas incluidas en este reporte
-  // Sin alertas elegidas, el informe cubre las alertas iniciadas en este rango
-  desde?: Date | null;
-  hasta?: Date | null;
-  exportaciones?: number;
+  alertIdList?: number[]; // IDs of the alerts included in this report
+  // Without chosen alerts, the report covers the alerts started in this range
+  from?: Date | null;
+  to?: Date | null;
+  exports?: number;
   
-  // Datos detallados de la alerta
-  alertaData?: AlertaData;
-  activador?: AlertActivator;
-  eventos?: AlertEvents;
-  metadatos?: ReportMetadata;
+  // Detailed alert data
+  alertData?: AlertData;
+  activator?: AlertActivator;
+  events?: AlertEvents;
+  metadata?: ReportMetadata;
 }
 
-// Filtros de búsqueda
-export interface ReporteFilters {
-  busqueda: string;
-  fechaInicio: Date | null;
-  fechaFin: Date | null;
-  ciudad: string;
-  estado: string;
+// Search filters
+export interface ReportFilters {
+  search: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  city: string;
+  status: string;
 }
 
-export interface ReporteStats {
-  totalReportes: number;
-  totalAlertas: number;
-  zonasActivas: number;
-  exportaciones: number;
+export interface ReportStats {
+  totalReportCount: number;
+  totalAlertCount: number;
+  activeZones: number;
+  exports: number;
 }
 
-export interface Paginacion {
-  paginaActual: number;
-  elementosPorPagina: number;
-  totalElementos: number;
-  totalPaginas: number;
+export interface Pagination {
+  currentPage: number;
+  itemsPerPage: number;
+  totalElements: number;
+  totalPageCount: number;
 }

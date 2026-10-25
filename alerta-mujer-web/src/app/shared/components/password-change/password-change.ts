@@ -1,9 +1,9 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PasswordService, evaluarContrasena } from '../../../core/services/password.service';
+import { PasswordService, evaluatePassword } from '../../../core/services/password.service';
 import { PasswordStrengthComponent } from '../password-strength/password-strength';
 
-/** Ventana para cambiar la contraseña de la cuenta en sesión (pide la actual). */
+/** Window to change the password of the signed-in account (asks for the current one). */
 @Component({
   selector: 'app-password-change',
   standalone: true,
@@ -13,37 +13,37 @@ import { PasswordStrengthComponent } from '../password-strength/password-strengt
 })
 export class PasswordChangeComponent {
   private service = inject(PasswordService);
-  readonly cerrar = output<void>();
+  readonly close = output<void>();
 
-  actual = signal('');
-  nueva = signal('');
-  confirmar = signal('');
-  ver = signal({ actual: false, nueva: false, confirmar: false });
-  enviando = signal(false);
+  current = signal('');
+  newOne = signal('');
+  confirm = signal('');
+  show = signal({ current: false, newPassword: false, confirm: false });
+  sending = signal(false);
   error = signal<string | null>(null);
-  listo = signal(false);
+  ready = signal(false);
 
-  readonly evaluacion = computed(() => evaluarContrasena(this.nueva()));
-  readonly coinciden = computed(() => this.confirmar().length > 0 && this.confirmar() === this.nueva());
-  readonly puedeGuardar = computed(
-    () => !!this.actual() && this.evaluacion().valida && this.coinciden() && this.nueva() !== this.actual() && !this.enviando(),
+  readonly evaluation = computed(() => evaluatePassword(this.newOne()));
+  readonly match = computed(() => this.confirm().length > 0 && this.confirm() === this.newOne());
+  readonly canSave = computed(
+    () => !!this.current() && this.evaluation().valid && this.match() && this.newOne() !== this.current() && !this.sending(),
   );
 
-  alternar(campo: 'actual' | 'nueva' | 'confirmar'): void {
-    this.ver.update((v) => ({ ...v, [campo]: !v[campo] }));
+  toggle(field: 'current' | 'newPassword' | 'confirm'): void {
+    this.show.update((v) => ({ ...v, [field]: !v[field] }));
   }
 
-  guardar(): void {
-    if (!this.puedeGuardar()) return;
-    this.enviando.set(true);
+  save(): void {
+    if (!this.canSave()) return;
+    this.sending.set(true);
     this.error.set(null);
-    this.service.cambiar(this.actual(), this.nueva()).subscribe({
+    this.service.change(this.current(), this.newOne()).subscribe({
       next: () => {
-        this.enviando.set(false);
-        this.listo.set(true);
+        this.sending.set(false);
+        this.ready.set(true);
       },
       error: (e) => {
-        this.enviando.set(false);
+        this.sending.set(false);
         this.error.set(e?.error?.message ?? 'No se pudo cambiar la contraseña. Intenta de nuevo.');
       },
     });

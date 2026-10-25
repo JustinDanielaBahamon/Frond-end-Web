@@ -2,26 +2,26 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
-import { ContactoEmergencia } from '../../../core/models/emergency-contact.model';
+import { EmergencyContact } from '../../../core/models/emergency-contact.model';
 import { AuthService } from '../../../core/auth/auth.service';
-import { reducirFoto } from '../../../core/utils/foto';
+import { shrinkPhoto } from '../../../core/utils/photo';
 
-const RELACIONES = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
+const RELATIONSHIPS = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 
-type ContactoForm = {
-  nombre: string;
-  telefono: string;
+type ContactForm = {
+  name: string;
+  telephone: string;
   email?: string;
-  relacion: string;
-  foto: string | null;
+  relationship: string;
+  photo: string | null;
 };
 
-const FORM_VACIO = (): ContactoForm => ({
-  nombre: '',
-  telefono: '',
+const EMPTY_FORM = (): ContactForm => ({
+  name: '',
+  telephone: '',
   email: '',
-  relacion: '',
-  foto: null,
+  relationship: '',
+  photo: null,
 });
 
 @Component({
@@ -34,45 +34,45 @@ const FORM_VACIO = (): ContactoForm => ({
 export class EmergencyContacts implements OnInit {
   private contactService = inject(EmergencyContactService);
   private authService = inject(AuthService);
-  // La app no usa zone.js: tras cada respuesta del servidor hay que avisar que cambió la vista
+  // The app does not use zone.js: after each server response the view change must be signaled
   private cdr = inject(ChangeDetectorRef);
 
-  private usuarioId = 0;
+  private userId = 0;
 
   loading = true;
   error = false;
 
-  contactos: ContactoEmergencia[] = [];
+  contacts: EmergencyContact[] = [];
 
-  relaciones = RELACIONES;
+  relationships = RELATIONSHIPS;
 
-  menuAbierto: number | null = null;
+  menuOpen: number | null = null;
 
-  modalAgregarAbierto = false;
-  formAgregar: ContactoForm = FORM_VACIO();
-  guardandoAgregar = false;
+  addModalOpen = false;
+  addForm: ContactForm = EMPTY_FORM();
+  savingAdd = false;
 
-  modalEditarAbierto = false;
-  contactoEditando: ContactoEmergencia | null = null;
-  formEditar: ContactoForm = FORM_VACIO();
-  guardandoEditar = false;
-  confirmandoEliminar = false;
-  eliminando = false;
+  editModalOpen = false;
+  editingContact: EmergencyContact | null = null;
+  editForm: ContactForm = EMPTY_FORM();
+  savingEdit = false;
+  confirmingDelete = false;
+  deleting = false;
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe((usuario: any) => {
-      if (!usuario) { this.error = true; this.loading = false; this.cdr.markForCheck(); return; }
-      this.usuarioId = usuario.id;
-      this.cargarContactos();
+    this.authService.currentUser$.subscribe((user: any) => {
+      if (!user) { this.error = true; this.loading = false; this.cdr.markForCheck(); return; }
+      this.userId = user.id;
+      this.loadContacts();
     });
   }
 
-  private cargarContactos() {
+  private loadContacts() {
     this.loading = true;
     this.error = false;
-    this.contactService.getByUsuario(this.usuarioId).subscribe({
+    this.contactService.getByUser(this.userId).subscribe({
       next: (data) => {
-        this.contactos = data;
+        this.contacts = data;
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -80,8 +80,8 @@ export class EmergencyContacts implements OnInit {
     });
   }
 
-  iniciales(nombre: string): string {
-    return nombre
+  initials(name: string): string {
+    return name
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
@@ -89,162 +89,162 @@ export class EmergencyContacts implements OnInit {
       .join('');
   }
 
-  errorFoto = '';
+  photoError = '';
 
-  async elegirFoto(evento: Event, form: ContactoForm) {
-    const input = evento.target as HTMLInputElement;
-    const archivo = input.files?.[0];
+  async choosePhoto(event: Event, form: ContactForm) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     input.value = ''; // permite volver a elegir la misma foto
-    if (!archivo) return;
-    this.errorFoto = '';
+    if (!file) return;
+    this.photoError = '';
     try {
-      form.foto = await reducirFoto(archivo);
+      form.photo = await shrinkPhoto(file);
     } catch (e) {
-      this.errorFoto = e instanceof Error ? e.message : 'No se pudo usar la foto';
+      this.photoError = e instanceof Error ? e.message : 'No se pudo usar la foto';
     }
     this.cdr.markForCheck();
   }
 
-  quitarFoto(form: ContactoForm) {
-    form.foto = null;
+  removePhoto(form: ContactForm) {
+    form.photo = null;
   }
 
   toggleMenu(id: number) {
-    this.menuAbierto = this.menuAbierto === id ? null : id;
+    this.menuOpen = this.menuOpen === id ? null : id;
   }
 
-  cerrarMenu() {
-    this.menuAbierto = null;
+  closeMenu() {
+    this.menuOpen = null;
   }
 
   // --- Agregar ---
 
-  abrirModalAgregar() {
-    this.formAgregar = FORM_VACIO();
-    this.modalAgregarAbierto = true;
+  openAddModal() {
+    this.addForm = EMPTY_FORM();
+    this.addModalOpen = true;
   }
 
-  cerrarModalAgregar() {
-    if (this.guardandoAgregar) return;
-    this.modalAgregarAbierto = false;
+  closeAddModal() {
+    if (this.savingAdd) return;
+    this.addModalOpen = false;
   }
 
-  get formAgregarValido(): boolean {
-    return !!this.formAgregar.nombre.trim()
-      && !!this.formAgregar.telefono.trim()
-      && !!this.formAgregar.relacion;
+  get addFormValid(): boolean {
+    return !!this.addForm.name.trim()
+      && !!this.addForm.telephone.trim()
+      && !!this.addForm.relationship;
   }
 
-  guardarNuevoContacto() {
-    if (!this.formAgregarValido || this.guardandoAgregar) return;
+  saveNewContact() {
+    if (!this.addFormValid || this.savingAdd) return;
 
-    this.guardandoAgregar = true;
-    const nuevo: Omit<ContactoEmergencia, 'id'> = {
-      usuarioId: this.usuarioId,
-      nombre: this.formAgregar.nombre.trim(),
-      telefono: this.formAgregar.telefono.trim(),
-      email: this.formAgregar.email?.trim(),
-      relacion: this.formAgregar.relacion,
-      foto: this.formAgregar.foto,
+    this.savingAdd = true;
+    const newOne: Omit<EmergencyContact, 'id'> = {
+      userId: this.userId,
+      name: this.addForm.name.trim(),
+      telephone: this.addForm.telephone.trim(),
+      email: this.addForm.email?.trim(),
+      relationship: this.addForm.relationship,
+      photo: this.addForm.photo,
     };
 
-    this.contactService.create(nuevo).subscribe({
-      next: (creado) => {
-        this.contactos = [...this.contactos, creado];
-        this.guardandoAgregar = false;
-        this.modalAgregarAbierto = false;
+    this.contactService.create(newOne).subscribe({
+      next: (created) => {
+        this.contacts = [...this.contacts, created];
+        this.savingAdd = false;
+        this.addModalOpen = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.guardandoAgregar = false; this.cdr.markForCheck(); },
+      error: () => { this.savingAdd = false; this.cdr.markForCheck(); },
     });
   }
 
   // --- Editar ---
 
-  abrirModalEditar(contacto: ContactoEmergencia) {
-    this.cerrarMenu();
-    this.contactoEditando = contacto;
-    this.formEditar = {
-      nombre: contacto.nombre,
-      telefono: contacto.telefono,
-      email: contacto.email,
-      relacion: contacto.relacion,
-      foto: contacto.foto ?? null,
+  openEditModal(contact: EmergencyContact) {
+    this.closeMenu();
+    this.editingContact = contact;
+    this.editForm = {
+      name: contact.name,
+      telephone: contact.telephone,
+      email: contact.email,
+      relationship: contact.relationship,
+      photo: contact.photo ?? null,
     };
-    this.confirmandoEliminar = false;
-    this.modalEditarAbierto = true;
+    this.confirmingDelete = false;
+    this.editModalOpen = true;
   }
 
-  cerrarModalEditar() {
-    if (this.guardandoEditar || this.eliminando) return;
-    this.modalEditarAbierto = false;
-    this.contactoEditando = null;
-    this.confirmandoEliminar = false;
+  closeEditModal() {
+    if (this.savingEdit || this.deleting) return;
+    this.editModalOpen = false;
+    this.editingContact = null;
+    this.confirmingDelete = false;
   }
 
-  get formEditarValido(): boolean {
-    return !!this.formEditar.nombre.trim()
-      && !!this.formEditar.telefono.trim()
-      && !!this.formEditar.relacion;
+  get editFormValid(): boolean {
+    return !!this.editForm.name.trim()
+      && !!this.editForm.telephone.trim()
+      && !!this.editForm.relationship;
   }
 
-  guardarCambios() {
-    if (!this.contactoEditando || !this.formEditarValido || this.guardandoEditar) return;
+  saveChanges() {
+    if (!this.editingContact || !this.editFormValid || this.savingEdit) return;
 
-    this.guardandoEditar = true;
-    const id = this.contactoEditando.id;
-    const cambios: Partial<ContactoEmergencia> = {
-      nombre: this.formEditar.nombre.trim(),
-      telefono: this.formEditar.telefono.trim(),
-      email: this.formEditar.email?.trim(),
-      relacion: this.formEditar.relacion,
-      foto: this.formEditar.foto,
+    this.savingEdit = true;
+    const id = this.editingContact.id;
+    const changes: Partial<EmergencyContact> = {
+      name: this.editForm.name.trim(),
+      telephone: this.editForm.telephone.trim(),
+      email: this.editForm.email?.trim(),
+      relationship: this.editForm.relationship,
+      photo: this.editForm.photo,
     };
 
-    this.contactService.update(id, cambios).subscribe({
-      next: (actualizado) => {
-        this.contactos = this.contactos
-          .map(c => (c.id === id ? actualizado : c));
-        this.guardandoEditar = false;
-        this.modalEditarAbierto = false;
-        this.contactoEditando = null;
+    this.contactService.update(id, changes).subscribe({
+      next: (updated) => {
+        this.contacts = this.contacts
+          .map(c => (c.id === id ? updated : c));
+        this.savingEdit = false;
+        this.editModalOpen = false;
+        this.editingContact = null;
         this.cdr.markForCheck();
       },
-      error: () => { this.guardandoEditar = false; this.cdr.markForCheck(); },
+      error: () => { this.savingEdit = false; this.cdr.markForCheck(); },
     });
   }
 
-  pedirConfirmacionEliminar() {
-    this.confirmandoEliminar = true;
+  askDeleteConfirmation() {
+    this.confirmingDelete = true;
   }
 
-  cancelarEliminar() {
-    this.confirmandoEliminar = false;
+  cancelDelete() {
+    this.confirmingDelete = false;
   }
 
-  confirmarEliminar() {
-    if (!this.contactoEditando || this.eliminando) return;
+  confirmDelete() {
+    if (!this.editingContact || this.deleting) return;
 
-    this.eliminando = true;
-    const id = this.contactoEditando.id;
+    this.deleting = true;
+    const id = this.editingContact.id;
 
     this.contactService.delete(id).subscribe({
       next: () => {
-        this.contactos = this.contactos.filter(c => c.id !== id);
-        this.eliminando = false;
-        this.modalEditarAbierto = false;
-        this.contactoEditando = null;
-        this.confirmandoEliminar = false;
+        this.contacts = this.contacts.filter(c => c.id !== id);
+        this.deleting = false;
+        this.editModalOpen = false;
+        this.editingContact = null;
+        this.confirmingDelete = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.eliminando = false; this.cdr.markForCheck(); },
+      error: () => { this.deleting = false; this.cdr.markForCheck(); },
     });
   }
 
-  // --- Acciones rápidas desde el menú ---
+  // --- Quick actions from the menu ---
 
-  eliminarDesdeMenu(contacto: ContactoEmergencia) {
-    this.abrirModalEditar(contacto);
-    this.pedirConfirmacionEliminar();
+  deleteFromMenu(contact: EmergencyContact) {
+    this.openEditModal(contact);
+    this.askDeleteConfirmation();
   }
 }

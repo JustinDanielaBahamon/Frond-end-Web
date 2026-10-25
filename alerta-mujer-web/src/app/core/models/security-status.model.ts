@@ -1,18 +1,18 @@
-export type NivelSeguridad = 'seguro' | 'advertencia' | 'critico';
-export type ColorIndicador = 'verde' | 'amarillo' | 'rojo';
+export type SecurityLevel = 'seguro' | 'advertencia' | 'critico';
+export type IndicatorColor = 'verde' | 'amarillo' | 'rojo';
 
-export interface RequisitoSeguridad {
+export interface SecurityRequirement {
   key: 'contactos' | 'correo' | 'celular' | 'alertas';
   label: string;
-  cumplido: boolean;
-  valor: string;
+  met: boolean;
+  value: string;
   icon: string;
 }
 
-export interface EstadoSeguridad {
-  cantidadContactos: number;
-  requisitos: RequisitoSeguridad[];
-  nivel: NivelSeguridad;
-  color: ColorIndicador;
-  porcentaje: number; // 0-100
+export interface SecurityStatus {
+  contactCount: number;
+  requirements: SecurityRequirement[];
+  level: SecurityLevel;
+  color: IndicatorColor;
+  percentage: number; // 0-100
 }

@@ -351,7 +351,7 @@
   }
 }
 
-// --- Tamaño de letra ---
+// --- Font size ---
 // (Removed - feature eliminated per user request)
 
 // --- Status pill (bloqueo de app) ---
@@ -413,8 +413,8 @@ a.setting-row {
   }
 }
 
-// Eliminar la cuenta: mismo renglón, en el color de acento para que se distinga
-.setting-row--peligro {
+// Delete account: same row, in the accent color so it stands out
+.setting-row--destructive {
   justify-content: space-between;
 
   span {

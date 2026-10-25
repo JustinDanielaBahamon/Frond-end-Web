@@ -1,52 +1,52 @@
-export interface Evidencia {
+export interface Evidence {
   id: number;
-  usuarioId: number;
-  usuarioNombre: string;
-  usuarioEmail: string;
-  tipo: 'video' | 'foto' | 'audio' | 'documento';
-  nombre: string;
-  tamanio: string;
-  fecha: string; // idealmente ISO parseable, ej. '2026-08-28T20:45:00'
-  hora: string;
-  alertaId: string;
-  alertaTipo: string;
-  alertaCiudad: string;
-  estado: 'Verificada' | 'Pendiente' | 'Rechazada';
+  userId: number;
+  userName: string;
+  userEmail: string;
+  type: 'video' | 'foto' | 'audio' | 'documento';
+  name: string;
+  size: string;
+  date: string; // idealmente ISO parseable, ej. '2026-08-28T20:45:00'
+  time: string;
+  alertId: string;
+  alertType: string;
+  alertCity: string;
+  status: 'Verificada' | 'Pendiente' | 'Rechazada';
 
   // Campos opcionales para futuro
-  ubicacion?: string;        // ej. 'Neiva, Huila'
-  metodoActivacion?: string; // ej. 'Movimiento brusco'
-  archivoUrl?: string;       // imagen/miniatura real. Sin esto, se usa el ícono por tipo.
-  duracion?: string;         // solo video/audio, ej. '01:23'
+  location?: string;        // ej. 'Neiva, Huila'
+  activationMethod?: string; // ej. 'Movimiento brusco'
+  fileUrl?: string;       // real image/thumbnail. Without it, the icon by type is used.
+  duration?: string;         // solo video/audio, ej. '01:23'
 
-  // Información completa de alerta asociada
-  alertaAsociada?: AlertaAsociada;
+  // Full information of the linked alert
+  linkedAlert?: LinkedAlert;
 }
 
-export interface AlertaAsociada {
+export interface LinkedAlert {
   id: string;
-  tipo: string;
-  fecha: string;
-  hora: string;
-  ciudad: string;
-  ubicacion: string;
-  estado: string;
-  descripcion?: string;
-  metodoActivacion?: string;
+  type: string;
+  date: string;
+  time: string;
+  city: string;
+  location: string;
+  status: string;
+  description?: string;
+  activationMethod?: string;
 }
 
-export interface EvidenciaFilters {
-  busqueda: string;
-  tipo: string;
-  estado: string;
-  fechaInicio: Date | null;
-  fechaFin: Date | null;
+export interface EvidenceFilters {
+  search: string;
+  type: string;
+  status: string;
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
-export interface EvidenciaStats {
-  totalEvidencias: number;
-  verificadas: number;
-  pendientes: number;
-  rechazadas: number;
-  descargas: number;
+export interface EvidenceStats {
+  totalEvidenceCount: number;
+  verified: number;
+  pending: number;
+  rejected: number;
+  downloads: number;
 }

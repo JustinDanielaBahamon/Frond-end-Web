@@ -1,0 +1,35 @@
+@if (current(); as part) {
+  <div class="rc" [class.rc--audio]="type === 'audio'">
+    @if (type === 'video') {
+      <video #method [src]="part.url" controls playsinline preload="metadata"
+             (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
+             (pause)="onPause()" (ended)="onEnd()"></video>
+    } @else {
+      <div class="rc-audio-icon"><i class="ti ti-wave-sine" aria-hidden="true"></i></div>
+      <audio #method [src]="part.url" controls preload="metadata"
+             (loadedmetadata)="onLoad()" (timeupdate)="onAdvance()" (play)="onPlay()"
+             (pause)="onPause()" (ended)="onEnd()"></audio>
+    }
+
+    @if (parts.length > 1) {
+      <div class="rc-bar" role="group" aria-label="Partes de la grabación">
+        @for (p of parts; track p.id; let i = $index) {
+          <button type="button" class="rc-segment" [class.rc-segment--actual]="i === index()"
+                  (click)="irA(i)" [attr.aria-label]="'Parte ' + (i + 1) + ', ' + (p.created | date: 'h:mm:ss a')">
+            <span class="rc-fill" [style.width.%]="fill(i)"></span>
+          </button>
+        }
+      </div>
+    }
+
+    <p class="rc-footer">
+      <span>
+        @if (parts.length > 1) { Parte {{ index() + 1 }} de {{ parts.length }} · }
+        {{ part.created | date: 'h:mm:ss a' }}
+      </span>
+      @if (totalDuration(); as total) {
+        <span>{{ parts.length > 1 ? 'Total ≈ ' : '' }}{{ minutes(total) }}</span>
+      }
+    </p>
+  </div>
+}

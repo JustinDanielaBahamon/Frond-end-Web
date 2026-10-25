@@ -1,5 +1,5 @@
 /* LOGIN PAGE - ESTRUCTURA GENERAL */
-/* Contenedor principal de la página, ocupa toda la pantalla */
+/* Main page container, takes the whole screen */
 .login-page {
     position: relative;
     min-height: 100vh;
@@ -19,7 +19,7 @@
 
 
 /* BACKGROUND ORBS */
-/* Círculos difuminados decorativos del fondo */
+/* Decorative blurred background circles */
 .bg-orb {
     position: absolute;
     border-radius: 50%;
@@ -47,7 +47,7 @@
 
 
 /* WRAPPER */
-/* Grid de dos columnas: imagen a la izquierda y tarjeta a la derecha */
+/* Two-column grid: image on the left and card on the right */
 .login-page__wrapper {
     position: relative;
     z-index: 2;
@@ -64,7 +64,7 @@
 
 
 /* HERO */
-/* Zona visual con la imagen del celular */
+/* Visual area with the phone image */
 .login-page__visual {
     position: relative;
 
@@ -80,7 +80,7 @@
 
 
 /* HALOS */
-/* Círculos de luz y aro decorativo detrás de la imagen */
+/* Light circles and decorative ring behind the image */
 .halo {
     position: absolute;
     border-radius: 50%;
@@ -152,7 +152,7 @@
 
 
 /* LEAVES */
-/* Hojas decorativas a los lados de la imagen */
+/* Decorative leaves on the sides of the image */
 .leaf {
     position: absolute;
 
@@ -179,7 +179,7 @@
 
 
 /* SPARKLES */
-/* Destellos amarillos con animación flotante */
+/* Yellow sparkles with a floating animation */
 .spark {
     position: absolute;
 
@@ -248,8 +248,8 @@
 }
 
 
-/* BORDE DE LA TARJETA */
-/* Borde morado bien visible. Se usa .login-page .card con !important porque el componente app-card (card.scss) trae un borde blanco con !important que tapaba el borde anterior */
+/* CARD BORDER */
+/* Clearly visible purple border. .login-page .card is used with !important because the app-card component (card.scss) brings a white border with !important that covered the previous border */
 .login-page .card {
     border: 2px solid #b48ee0 !important;
     box-shadow:
@@ -259,7 +259,7 @@
 
 
 /* BRAND */
-/* Logo y nombre de la app en la parte superior de la tarjeta */
+/* App logo and name at the top of the card */
 .brand {
     display: flex;
     align-items: center;
@@ -311,7 +311,7 @@
 
 
 /* TITULOS */
-/* Título y subtítulo de la tarjeta */
+/* Card title and subtitle */
 .card__title {
     font-size: 2rem;
     text-align: center;
@@ -330,7 +330,7 @@
 
 
 /* FORMULARIO */
-/* Contenedor de los campos del formulario */
+/* Container of the form fields */
 .form {
     display: flex;
     flex-direction: column;
@@ -339,7 +339,7 @@
 
 
 /* INPUTS */
-/* Campos de correo y contraseña. Borde más visible: de #f4cdfa a #b48ee0 */
+/* Email and password fields. More visible border: from #f4cdfa to #b48ee0 */
 .field {
     position: relative;
 }
@@ -390,7 +390,7 @@
 
 
 /* BOTON OJO */
-/* Botón para mostrar u ocultar la contraseña */
+/* Button to show or hide the password */
 .field__eye {
     position: absolute;
 
@@ -415,7 +415,7 @@
 
 
 /* MENSAJES ERROR */
-/* Mensajes de validación debajo de los campos */
+/* Validation messages under the fields */
 .input-error {
     margin-top: -8px;
     margin-left: 6px;
@@ -429,7 +429,7 @@
 
 
 /* OPCIONES */
-/* Fila con "Recuérdame" y "¿Olvidaste tu contraseña?" */
+/* Row with "Recuérdame" and "¿Olvidaste tu contraseña?" */
 .form__options {
     display: flex;
     justify-content: space-between;
@@ -455,7 +455,7 @@
 
 
 /* CHECKBOX */
-/* Casilla "Recuérdame". Borde más visible: de #edaff6 a #b48ee0 */
+/* "Recuérdame" checkbox. More visible border: from #edaff6 to #b48ee0 */
 .checkbox {
     display: flex;
     align-items: center;
@@ -511,7 +511,7 @@
 
 
 /* BOTON LOGIN */
-/* Botón principal "INGRESAR" */
+/* Main "INGRESAR" button */
 .btn-submit {
     margin-top: 8px;
 
@@ -548,7 +548,7 @@
 
 
 /* FOOTER */
-/* Texto "¿No tienes cuenta? Crea una cuenta" */
+/* "¿No tienes cuenta? Crea una cuenta" text */
 .card__footer {
     margin-top: 28px;
 
@@ -591,7 +591,7 @@
 
 
 /* RESPONSIVE 1100px */
-/* Se oculta la imagen y queda solo la tarjeta centrada */
+/* The image is hidden and only the centered card remains */
 @media (max-width:1100px) {
 
     .login-page {
@@ -911,7 +911,7 @@
 
 
 /* ANIMACIONES */
-/* Entrada suave de la tarjeta y la imagen */
+/* Soft entrance of the card and the image */
 @keyframes fadeUp {
     from {
         opacity: 0;
@@ -959,7 +959,7 @@ html {
 
 
 /* BOTON DE REGRESO */
-/* Flecha para volver al inicio, arriba a la izquierda */
+/* Arrow to go back home, top left */
 .back-btn {
     position: absolute;
     top: 28px;
@@ -991,7 +991,7 @@ html {
 
 
 /* MODO OSCURO - LOGIN PAGE */
-/* Estilos del tema oscuro. Solo se cambió el selector de la tarjeta a .login-page .card para que el borde del modo claro no lo pise */
+/* Dark theme styles. Only the card selector was changed to .login-page .card so the light mode border does not override it */
 [data-theme="dark"] {
 
     .login-page {
@@ -1114,7 +1114,7 @@ html {
     }
 }
 
-/* Inicio de sesión con Google */
+/* Google sign-in */
 .login-divider {
     display: flex;
     align-items: center;

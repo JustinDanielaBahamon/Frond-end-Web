@@ -1,17 +1,17 @@
-// Producción. Se usa al compilar con `ng build` (configuración "production"),
+// Production. Used when building with `ng build` ("production" configuration),
 // gracias a fileReplacements en angular.json.
-// apiUrl es solo el dominio del backend: los servicios ya agregan "/api/...".
-// Actualizar cuando el backend esté desplegado en Render.
+// apiUrl is only the backend domain: the services already add "/api/...".
+// Update when the backend is deployed on Render.
 export const environment = {
   production: true,
-  // Auth Service (también atiende todo lo que no es de Alert ni de Evidence)
+  // Auth Service (also serves everything that is not Alert or Evidence)
   apiUrl: 'https://alerta-mujer-auth.onrender.com',
-  // Microservicios: dirección de Alert y Evidence (vacía = todo va a apiUrl, que es Auth).
-  // Ver core/api/servicios.ts para saber qué rutas atiende cada uno.
+  // Microservices: address of Alert and Evidence (empty = everything goes to apiUrl, which is Auth).
+  // See core/api/servicios.ts to know which paths each one serves.
   alertApiUrl: 'https://alerta-mujer-alert.onrender.com',
   evidenceApiUrl: 'https://alerta-mujer-evidence.onrender.com',
-  // Firebase (inicio de sesión con Google). Datos públicos de la "app web" del proyecto
-  // en Firebase Console -> Configuración del proyecto -> Tus apps. No son secretos.
+  // Firebase (Google sign-in). Public data of the project "web app"
+  // in Firebase Console -> Project settings -> Your apps. They are not secrets.
   firebase: {
     apiKey: 'AIzaSyAbsx-T3GLgE3w1YIN-1AiUslK2oOUkBmM',
     authDomain: 'alerta-mujer-b4fae.firebaseapp.com',
@@ -19,7 +19,7 @@ export const environment = {
     appId: '1:656563018279:web:b60ad55bf3f52ad1c30c02',
     messagingSenderId: '656563018279',
   },
-  // Notificaciones del navegador: clave pública VAPID (Firebase Console -> Cloud Messaging ->
-  // Certificados push web). No es secreta. Vacía = sin notificaciones con la pestaña cerrada.
+  // Browser notifications: public VAPID key (Firebase Console -> Cloud Messaging ->
+  // Web push certificates). It is not secret. Empty = no notifications with the tab closed.
   webPushVapidKey: 'BLSiU9gEWnISkoKuhb8fFlSfT8G6PVmezlBWl9s6KHI6Dor7DmyFXuyNibpXOYmXUShIDId_8AxmEr_Fz4ANc6w',
 };

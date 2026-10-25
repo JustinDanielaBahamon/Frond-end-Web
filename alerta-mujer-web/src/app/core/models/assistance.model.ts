@@ -1,26 +1,26 @@
-/** Categoría de un recurso de ayuda, derivada del resourceType del backend. */
-export type CategoriaRecurso = 'linea' | 'policia' | 'salud' | 'apoyo' | 'bomberos';
+/** Category of a help resource, derived from the backend resourceType. */
+export type ResourceCategory = 'linea' | 'policia' | 'salud' | 'apoyo' | 'bomberos';
 
-/** Recurso de ayuda (GET /api/resources) adaptado para la UI. */
-export interface RecursoAyuda {
+/** Help resource (GET /api/resources) adapted for the UI. */
+export interface HelpResource {
   id: number;
-  nombre: string;
-  categoria: CategoriaRecurso;
-  descripcion: string;
-  telefono: string | null;
-  telefono2: string | null;
+  name: string;
+  category: ResourceCategory;
+  description: string;
+  telephone: string | null;
+  telephone2: string | null;
   email: string | null;
-  direccion: string | null;
-  ciudad: string;
+  address: string | null;
+  city: string;
   lat: number | null;
   lng: number | null;
 }
 
-/** Llamada registrada por la usuaria (GET /api/resource-calls/me). */
-export interface LlamadaRegistrada {
+/** Call recorded by the user (GET /api/resource-calls/me). */
+export interface RecordedCall {
   id: number;
-  recursoId: number;
-  telefono: string;
-  estado: string;
-  fecha: Date;
+  resourceId: number;
+  telephone: string;
+  status: string;
+  date: Date;
 }

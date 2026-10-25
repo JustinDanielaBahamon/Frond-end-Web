@@ -1,0 +1,421 @@
+// My location — theme tokens (works in light and dark), same language as "Guardar recorrido"
+
+$card: var(--bg-card, #241d3d);
+$soft: var(--purple-pale, #30293d);
+$border: var(--border, #4c3a80);
+$text: var(--text-primary, #ede9fe);
+$muted: var(--text-muted, #a8a0c4);
+$accent: var(--purple-mid, #aa86ea);
+$accent-strong: var(--purple-deep, #9463e9);
+$live: #6922c5;
+$star: #b324fb;
+
+:host { display: block; }
+
+.mu-error { color: #e671f8; font-size: 0.85rem; margin: 0; }
+.mu-muted { color: $muted; font-size: 0.82rem; margin: 0; line-height: 1.4; }
+
+// ── Sub-tabs ──────────────────────────────────
+.mu-subtabs {
+  display: inline-flex;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  padding: 0.3rem;
+  background: $soft;
+  border: 1px solid $border;
+  border-radius: 0.75rem;
+}
+
+.mu-subtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.55rem;
+  background: transparent;
+  color: $muted;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  svg { width: 15px; height: 15px; }
+  &:hover { color: $text; }
+  &--active { background: $card; color: $text; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+}
+
+.mu-subtab-count {
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: $accent-strong;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+// ── Layout ────────────────────────────────────────
+.mu-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  &[hidden] { display: none; }
+  @media (max-width: 960px) { grid-template-columns: 1fr; }
+}
+
+.mu-left { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+
+.mu-card {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mu-card-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.mu-card-title { margin: 0; font-size: 1rem; font-weight: 700; color: $text; }
+
+// ── Estado en vivo ────────────────────────────────
+.mu-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(105, 34, 197, 0.14);
+  color: $live;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.mu-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $live;
+  animation: mu-pulse 1.6s ease-out infinite;
+}
+
+@keyframes mu-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(105, 34, 197, 0.6); }
+  100% { box-shadow: 0 0 0 8px rgba(105, 34, 197, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) { .mu-live-dot { animation: none; } }
+
+.mu-status {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: $soft;
+  color: $muted;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &--off { color: #e671f8; }
+}
+
+.mu-address {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  > div { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.75rem; border-radius: 0.7rem; background: $soft; }
+  .mu-info-value { font-size: 0.88rem; line-height: 1.3; }
+}
+
+.mu-coords {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+
+  > div { display: flex; flex-direction: column; padding: 0.6rem 0.75rem; border-radius: 0.7rem; background: $soft; }
+}
+
+.mu-info-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: $muted; }
+.mu-info-value { font-size: 0.95rem; font-weight: 800; color: $text; font-variant-numeric: tabular-nums; }
+.mu-meta { margin: 0; font-size: 0.75rem; color: $muted; }
+
+.mu-banner {
+  --zona: #{$accent};
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+  border-left: 3px solid var(--zona);
+  background: $soft;
+  color: $text;
+  font-size: 0.8rem;
+  line-height: 1.4;
+
+  strong { color: var(--zona); }
+}
+
+.mu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem;
+  border: 1px solid $border;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: $text;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+
+  svg { width: 15px; height: 15px; }
+  &:hover { border-color: $accent; }
+  &--active { color: $accent; border-color: $accent; }
+  &--primary { border: none; color: #fff; background: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3)); &:hover { filter: brightness(1.08); } }
+  &:disabled { opacity: 0.55; cursor: wait; }
+}
+
+// ── Capas (switches) ──────────────────────────────
+.mu-layers { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.mu-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.75rem;
+  background: $soft;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  // "Solo importantes" hangs from "Mostrar recorridos"
+  &--nested { margin-left: 1.4rem; position: relative;
+    &::before { content: ''; position: absolute; left: -0.85rem; top: -0.4rem; bottom: 50%; width: 0.6rem;
+      border-left: 2px solid $border; border-bottom: 2px solid $border; border-bottom-left-radius: 0.4rem; }
+  }
+  &--disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.mu-switch-icon {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.6rem;
+  background: $card;
+  color: $accent;
+
+  svg { width: 16px; height: 16px; }
+  &--star { color: $star; font-size: 1rem; }
+  &--place { color: #a70bf5; }
+  &--zone { color: #5316a3; }
+}
+
+.mu-switch-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.mu-switch-title { font-size: 0.84rem; font-weight: 700; color: $text; }
+.mu-switch-sub { font-size: 0.72rem; font-weight: 600; color: $muted; }
+
+// Interruptor nativo accesible (checkbox con role="switch")
+.mu-switch {
+  appearance: none;
+  flex-shrink: 0;
+  position: relative;
+  width: 2.5rem;
+  height: 1.4rem;
+  margin: 0;
+  border-radius: 999px;
+  background: $border;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+  }
+
+  &:checked { background: $accent-strong; &::after { transform: translateX(1.1rem); } }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+  &:disabled { cursor: not-allowed; }
+}
+
+// ── Mapa ──────────────────────────────────────────
+.mu-map-wrap {
+  position: sticky;
+  top: 1rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid $border;
+}
+
+.mu-map {
+  width: 100%;
+  height: max(480px, calc(100vh - 230px));
+  background: $soft;
+
+  @media (max-width: 960px) { height: 420px; }
+}
+
+:host ::ng-deep .mu-map.leaflet-container { font-family: inherit; }
+
+.mu-recenter {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0.65rem;
+  background: rgba(26, 20, 40, 0.88);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  svg { width: 18px; height: 18px; }
+  &:hover { background: $accent-strong; }
+}
+
+.mu-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  max-width: calc(100% - 24px);
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.8rem;
+  background: rgba(26, 20, 40, 0.85);
+  color: #f5f3ff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+
+  span { display: inline-flex; align-items: center; gap: 0.25rem; }
+}
+
+.mu-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; &--you { background: #8e63f1; } &--phone { background: #d648ec; } }
+.mu-ring { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid; }
+.mu-line { display: inline-block; width: 16px; border-top: 3px solid $accent; &--dashed { border-top-style: dashed; } }
+
+:host ::ng-deep .mu-you-marker {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #8e63f1;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(142, 99, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+:host ::ng-deep .mu-place-pin {
+  width: 22px;
+  height: 22px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+// ── Historial ─────────────────────────────────────
+.mu-history { max-width: 760px; }
+
+.mu-history-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 2.25rem 1rem;
+  border: 1px dashed $border;
+  border-radius: 0.8rem;
+  text-align: center;
+
+  p { margin: 0; font-weight: 700; color: $text; }
+}
+
+.mu-history-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 560px; overflow-y: auto; }
+
+.mu-history-item {
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid $border;
+  border-radius: 0.8rem;
+  background: $soft;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: $accent; }
+}
+
+.mu-history-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.6rem;
+  background: $card;
+  color: $accent;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.mu-history-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.mu-history-time { font-size: 0.82rem; font-weight: 700; color: $text; }
+.mu-history-detail { font-size: 0.72rem; font-weight: 600; color: $muted; }
+.mu-history-address { font-size: 0.72rem; font-weight: 600; color: $accent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mu-history-chevron { width: 16px; height: 16px; flex-shrink: 0; color: $muted; }
+
+:host ::ng-deep .mu-phone-marker {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #d648ec;
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(214, 72, 236, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+
+  svg { width: 16px; height: 16px; }
+}
+
+.mu-retention {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  background: rgba(124, 58, 237, 0.1);
+  color: $muted;
+  font-size: 0.78rem;
+  line-height: 1.4;
+
+  i { color: #7c3aed; font-size: 1rem; }
+}

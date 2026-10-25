@@ -26,11 +26,11 @@ export interface ActivityLog {
   message: string;
 }
 
-// Datos que vienen del backend: null = no se pudo consultar
+// Data coming from the backend: null = could not be queried
 export interface CriticalFeatureStatus {
   sessionActive: boolean;
-  lastLocationCaptured: string | null; // texto listo para mostrar; null = el celular nunca ha enviado ubicación
+  lastLocationCaptured: string | null; // text ready to show; null = the phone never sent a location
   registeredDevices: number | null;
-  pushTokenRegistered: boolean;        // algún celular tiene token FCM (no se guarda el token aquí)
+  pushTokenRegistered: boolean;        // some phone has an FCM token (the token is not stored here)
   emergencyContactsCount: number | null;
 }

@@ -25,7 +25,7 @@ export class PermissionsService {
       });
     }
 
-    // Algunos navegadores no soportan todos los permisos en la API
+    // Some browsers do not support every permission in the API
     const permissionMap: Record<string, PermissionName> = {
       'geolocation': 'geolocation',
       'camera': 'camera',

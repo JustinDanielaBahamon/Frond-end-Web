@@ -23,7 +23,7 @@ import { DeviceManagementComponent } from './features/admin/devices-management/d
 export const routes: Routes = [
 
   // ─────────────────────────────────────────────────────────────
-  // Landing pública
+  // Public landing
   // ─────────────────────────────────────────────────────────────
 
   {
@@ -40,7 +40,7 @@ export const routes: Routes = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // Seguimiento público de una alerta (enlace del correo a los contactos)
+  // Public tracking of an alert (link in the email to the contacts)
   // ─────────────────────────────────────────────────────────────
 
   {
@@ -93,8 +93,8 @@ export const routes: Routes = [
 
     children: [
 
-      // ⬇️ ESTA ES LA RUTA QUE FALTABA. Sin ella, al entrar a "/dashboard"
-      // el router-outlet del layout no tiene qué mostrar y queda en blanco.
+      // ⬇️ THIS IS THE ROUTE THAT WAS MISSING. Without it, when entering "/dashboard"
+      // the layout router-outlet has nothing to show and stays blank.
       {
         path: '',
         loadComponent: () =>
@@ -107,14 +107,14 @@ export const routes: Routes = [
       {
         path: 'ubicacion',
         loadComponent: () =>
-          import('./features/dashboard/ubicacion/location-shell')
+          import('./features/dashboard/location/location-shell')
             .then(m => m.LocationShellComponent),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'my-location' },
           {
             path: 'my-location',
             loadComponent: () =>
-              import('./features/dashboard/mi-ubicacion/my-location')
+              import('./features/dashboard/my-location/my-location')
                 .then(m => m.MyLocationComponent),
           },
           { path: 'history', redirectTo: 'my-location', pathMatch: 'full' },
@@ -124,20 +124,20 @@ export const routes: Routes = [
           {
             path: 'ubicaciones-guardadas',
             loadComponent: () =>
-              import('./features/dashboard/ubicaciones-guardadas/ubicaciones-guardadas')
-                .then(m => m.UbicacionesGuardadasComponent),
+              import('./features/dashboard/saved-locations/saved-locations')
+                .then(m => m.SavedLocationsComponent),
           },
           {
             path: 'zonas-auxiliares',
             loadComponent: () =>
-              import('./features/dashboard/zonas-auxiliares/zonas-auxiliares')
-                .then(m => m.ZonasAuxiliaresComponent),
+              import('./features/dashboard/help-zones/help-zones')
+                .then(m => m.HelpZonesComponent),
           },
           {
             path: 'guardar-recorrido',
             loadComponent: () =>
-              import('./features/dashboard/guardar-recorrido/guardar-recorrido')
-                .then(m => m.GuardarRecorridoComponent),
+              import('./features/dashboard/save-route/save-route')
+                .then(m => m.SaveRouteComponent),
           },
           { path: 'historial-recorridos', redirectTo: 'guardar-recorrido', pathMatch: 'full' },
         ],
@@ -146,8 +146,8 @@ export const routes: Routes = [
       {
         path: 'alertas-contactos',
         loadComponent: () =>
-          import('./features/dashboard/alertas-contactos/alertas-contactos')
-            .then(m => m.AlertasContactosComponent),
+          import('./features/dashboard/contact-alerts/contact-alerts')
+            .then(m => m.AlertContactsComponent),
       },
       {
         path: 'alert-history',
@@ -163,7 +163,7 @@ export const routes: Routes = [
             .then(m => m.Evidence),
       },
 
-      // ── Módulos nuevos del panel de usuaria ─────────────────
+      // ── New modules of the user panel ─────────────────
       {
         path: 'emergency-contacts',
         loadComponent: () =>

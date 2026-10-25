@@ -3,11 +3,11 @@ import { DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ReceivedAlertsService } from '../../../core/services/received-alerts.service';
 import { SidebarComponent, SidebarLink } from '../../../shared/layouts/sidebar/sidebar';
-import { TopbarComponent } from '../../../shared/layouts/tobber/topbar';
+import { TopbarComponent } from '../../../shared/layouts/topbar/topbar';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { MovimientoCelularService } from '../../../core/services/movimiento-celular.service';
-import { URL_DESCARGA_APK } from '../../../shared/constants/descarga-app';
+import { PhoneMovementService } from '../../../core/services/phone-movement.service';
+import { APK_DOWNLOAD_URL } from '../../../shared/constants/descarga-app';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -19,12 +19,12 @@ import { URL_DESCARGA_APK } from '../../../shared/constants/descarga-app';
 export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
-  /** Alertas de las personas que tienen a la usuaria como contacto (aviso en todo el panel). */
-  readonly alertasRecibidas = inject(ReceivedAlertsService);
-  /** "Tu celular cambió de lugar" (solo para la usuaria; se activa en Configuración). */
-  readonly movimiento = inject(MovimientoCelularService);
-  /** APK del último release (el mismo enlace de la página de inicio). */
-  readonly urlDescargaApk = URL_DESCARGA_APK;
+  /** Alerts of the people who have the user as a contact (notice across the whole panel). */
+  readonly receivedAlerts = inject(ReceivedAlertsService);
+  /** "Your phone changed places" (user only; enabled in Settings). */
+  readonly movement = inject(PhoneMovementService);
+  /** APK of the latest release (the same link as the landing page). */
+  readonly apkDownloadUrl = APK_DOWNLOAD_URL;
 
   sidebarCollapsed = false;
 
@@ -47,12 +47,12 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.alertasRecibidas.iniciar();
-    this.movimiento.iniciar();
+    this.receivedAlerts.start();
+    this.movement.start();
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
         this.user = {
-          name: currentUser.nombre,
+          name: currentUser.name,
           email: currentUser.email
         };
       }
@@ -60,8 +60,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alertasRecibidas.detener();
-    this.movimiento.detener();
+    this.receivedAlerts.stop();
+    this.movement.stop();
   }
 
   toggleTheme() {
@@ -73,8 +73,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    this.alertasRecibidas.detener();
-    this.movimiento.detener();
+    this.receivedAlerts.stop();
+    this.movement.stop();
     this.authService.logout();
   }
 }

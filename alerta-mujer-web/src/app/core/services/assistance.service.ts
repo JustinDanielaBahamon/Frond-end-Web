@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../models/assistance.model';
+import { ResourceCategory, RecordedCall, HelpResource } from '../models/assistance.model';
 import { EmergencyResourceApi } from '../models/resource.model';
 
 interface ResourceCallApi {
@@ -13,7 +13,7 @@ interface ResourceCallApi {
   startedAt: string;
 }
 
-const CATEGORIA: Record<string, CategoriaRecurso> = {
+const CATEGORY: Record<string, ResourceCategory> = {
   emergency_line: 'linea',
   police_station: 'policia',
   police_post: 'policia',
@@ -24,30 +24,30 @@ const CATEGORIA: Record<string, CategoriaRecurso> = {
   support_organization: 'apoyo',
 };
 
-// El backend envía LocalDateTime en UTC sin zona
-const fechaUtc = (iso: string) => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`);
+// The backend sends LocalDateTime in UTC without a zone
+const utcDate = (iso: string) => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`);
 
 @Injectable({ providedIn: 'root' })
 export class AssistanceService {
   private http = inject(HttpClient);
   private base = environment.apiUrl;
 
-  /** Todos los recursos activos: líneas (con teléfono) y centros (con ubicación). */
-  getRecursos(): Observable<RecursoAyuda[]> {
+  /** All active resources: lines (with phone) and centers (with location). */
+  getResources(): Observable<HelpResource[]> {
     return this.http.get<EmergencyResourceApi[]>(`${this.base}/api/resources`).pipe(
-      map((lista) =>
-        lista
+      map((list) =>
+        list
           .filter((r) => r.isActive !== false)
           .map((r) => ({
             id: r.id,
-            nombre: r.name,
-            categoria: CATEGORIA[r.resourceType] ?? 'apoyo',
-            descripcion: r.description ?? '',
-            telefono: r.telephone ?? null,
-            telefono2: r.secondaryTelephone ?? null,
+            name: r.name,
+            category: CATEGORY[r.resourceType] ?? 'apoyo',
+            description: r.description ?? '',
+            telephone: r.telephone ?? null,
+            telephone2: r.secondaryTelephone ?? null,
             email: r.email ?? null,
-            direccion: r.address ?? null,
-            ciudad: r.city,
+            address: r.address ?? null,
+            city: r.city,
             lat: r.latitude ?? null,
             lng: r.longitude ?? null,
           }))
@@ -55,33 +55,33 @@ export class AssistanceService {
     );
   }
 
-  /** Llamadas que la usuaria hizo desde la app, de la más reciente a la más antigua. */
-  getMisLlamadas(): Observable<LlamadaRegistrada[]> {
+  /** Calls the user made from the app, newest to oldest. */
+  getMyCalls(): Observable<RecordedCall[]> {
     return this.http.get<ResourceCallApi[]>(`${this.base}/api/resource-calls/me`).pipe(
-      map((lista) =>
-        lista.map((c) => ({
+      map((list) =>
+        list.map((c) => ({
           id: c.id,
-          recursoId: c.emergencyResourceId,
-          telefono: c.telephoneDialed,
-          estado: c.status,
-          fecha: fechaUtc(c.startedAt),
+          resourceId: c.emergencyResourceId,
+          telephone: c.telephoneDialed,
+          status: c.status,
+          date: utcDate(c.startedAt),
         }))
       )
     );
   }
 
-  /** Registra que la usuaria marcó a un recurso (la dueña la pone el backend). */
-  registrarLlamada(recursoId: number, telefono: string): Observable<LlamadaRegistrada> {
+  /** Records that the user called a resource (the owner is set by the backend). */
+  recordCall(resourceId: number, telephone: string): Observable<RecordedCall> {
     return this.http
       .post<ResourceCallApi>(`${this.base}/api/resource-calls`, {
-        emergencyResourceId: recursoId,
-        telephoneDialed: telefono,
+        emergencyResourceId: resourceId,
+        telephoneDialed: telephone,
         status: 'initiated',
       })
-      .pipe(map((c) => ({ id: c.id, recursoId: c.emergencyResourceId, telefono: c.telephoneDialed, estado: c.status, fecha: fechaUtc(c.startedAt) })));
+      .pipe(map((c) => ({ id: c.id, resourceId: c.emergencyResourceId, telephone: c.telephoneDialed, status: c.status, date: utcDate(c.startedAt) })));
   }
 
-  eliminarLlamada(id: number): Observable<void> {
+  deleteCall(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/api/resource-calls/${id}`);
   }
 }

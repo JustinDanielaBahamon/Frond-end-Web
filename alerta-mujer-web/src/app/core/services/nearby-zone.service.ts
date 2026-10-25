@@ -30,7 +30,7 @@ export class NearbyZoneService {
         .map(z => ({
           id: z.id,
           name: z.name,
-          type: normalizarTipo(z.zoneType),
+          type: normalizeType(z.zoneType),
           description: z.description,
           address: z.address,
           city: z.city,
@@ -45,10 +45,10 @@ export class NearbyZoneService {
   }
 }
 
-// Conserva el tipo real (antes todo lo que no era 'safe' se volvía 'risk', y una
-// estación de policía o un punto de asistencia aparecían como "zona de riesgo").
-const TIPOS: NearbyZone['type'][] = ['safe', 'risk', 'help', 'policia', 'asistencia'];
-function normalizarTipo(zoneType: string): NearbyZone['type'] {
+// Keeps the real type (before, everything that was not 'safe' became 'risk', and a
+// police station or an assistance point showed up as a "risk zone").
+const TYPES: NearbyZone['type'][] = ['safe', 'risk', 'help', 'policia', 'asistencia'];
+function normalizeType(zoneType: string): NearbyZone['type'] {
   const t = (zoneType ?? '').toLowerCase() as NearbyZone['type'];
-  return TIPOS.includes(t) ? t : 'risk';
+  return TYPES.includes(t) ? t : 'risk';
 }

@@ -3,18 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
-import { CelularAdmin, HistorialModeracion, UsersService } from '../../../core/services/users.services';
-import { reducirFoto } from '../../../core/utils/foto';
-import { Usuario } from '../../../core/models/user.model';
+import { AdminPhone, AlertSummary, ModerationHistory, UsersService } from '../../../core/services/users.services';
+import { shrinkPhoto } from '../../../core/utils/photo';
+import { ManagedUser } from '../../../core/models/user.model';
 import { Chip } from '../../../shared/components/chip/chip';
 import { Modal } from '../../../shared/components/modal/modal';
-import { paginasCompactas } from '../../../shared/utils/paginacion';
+import { compactPages } from '../../../shared/utils/pagination';
 
-// Extendemos el modelo real solo con el flag de selección de UI (no vive en la API)
-type UsuariaUI = Usuario & { selected?: boolean };
+// We extend the real model only with the UI selection flag (it does not live in the API)
+type UserUI = ManagedUser & { selected?: boolean };
 
-/** Motivos para bloquear una cuenta (quedan en el caso de moderación). */
-export const MOTIVOS_BLOQUEO = [
+/** Reasons to block an account (they stay in the moderation case). */
+export const BLOCK_REASONS = [
   'Falsas alarmas reiteradas',
   'Fraude o suplantación de identidad',
   'Acoso o amenazas',
@@ -23,12 +23,12 @@ export const MOTIVOS_BLOQUEO = [
   'Otro',
 ];
 
-const PERMISOS_ETIQUETA: Record<string, string> = {
+const PERMISSION_LABELS: Record<string, string> = {
   ubicacion: 'Ubicación', notificaciones: 'Notificaciones', agitar: 'Agitar para alertar', bateria: 'Batería sin restricciones',
   pantallaCompleta: 'Pantalla completa', microfono: 'Micrófono', camara: 'Cámara',
 };
 
-const TIPO_HISTORIAL: Record<string, string> = {
+const HISTORY_TYPE: Record<string, string> = {
   block: 'Cuenta bloqueada', unblock: 'Cuenta desbloqueada', deletion_pending: 'Eliminación solicitada',
   deletion_approved: 'Cuenta eliminada', deletion_rejected: 'Eliminación rechazada',
 };
@@ -40,8 +40,8 @@ interface ChipData {
   count: number;
 }
 
-// Datos que vienen de otras tablas del db.json
-export interface ContactoEmergencia {
+// Data that comes from other db.json tables
+export interface EmergencyContact {
   id: string;
   user_profile_id: number | string;
   contact_name: string;
@@ -49,21 +49,13 @@ export interface ContactoEmergencia {
   relationship: string;
 }
 
-export interface AlertaResumen {
-  id: string;
-  usuarioId: number;
-  descripcion: string;
-  ubicacion: string;
-  status: string;
-  created_at: string;
-}
 
 // Modelo del formulario (crear / editar)
-interface FormUsuaria {
+interface UserForm {
   first_name: string;
   last_name: string;
   email: string;
-  telefono: string;
+  telephone: string;
 }
 
 
@@ -79,144 +71,144 @@ export class UserComponent implements OnInit {
   private usersService = inject(UsersService);
   private cdr = inject(ChangeDetectorRef);
 
-  cargando = true;
+  loading = true;
 
-  private todasLasUsuarias: UsuariaUI[] = [];
+  private allUsers: UserUI[] = [];
 
   // ── Estado UI ────────────────────────────────────────────────
-  usuariasFiltradas: UsuariaUI[] = [];
+  filteredUsers: UserUI[] = [];
   searchTerm = '';
-  filtroEstado = 'Todos';
+  statusFilter = 'Todos';
 
-  paginaActual = 1;
-  readonly porPagina = 6;
-  totalFiltradas = 0;
-  totalPaginas = 1;
-  paginas: (number | null)[] = [];
+  currentPage = 1;
+  readonly perPage = 6;
+  totalFiltered = 0;
+  totalPageCount = 1;
+  pages: (number | null)[] = [];
 
   selectedCount = 0;
   allSelected = false;
 
   // ── Modales ──────────────────────────────────────────────────
-  modalDetalle = false;
-  modalBloqueo = false;
+  detailModal = false;
+  blockModal = false;
   modalForm = false;
-  usuariaSeleccionada: UsuariaUI | null = null;
-  accionBloqueo: 'bloquear' | 'desbloquear' = 'bloquear';
-  readonly motivosBloqueo = MOTIVOS_BLOQUEO;
-  /** Una o varias (bloqueo masivo) usuarias del modal de bloqueo. */
-  usuariasBloqueo: UsuariaUI[] = [];
-  motivoBloqueo = '';
-  descripcionBloqueo = '';
-  evidenciaBloqueo: string | null = null;
-  errorBloqueo = '';
-  guardandoBloqueo = false;
+  selectedUser: UserUI | null = null;
+  blockAction: 'bloquear' | 'desbloquear' = 'bloquear';
+  readonly blockReasons = BLOCK_REASONS;
+  /** One or several (bulk block) users of the block modal. */
+  usersToBlock: UserUI[] = [];
+  blockReason = '';
+  blockDescription = '';
+  blockEvidence: string | null = null;
+  blockError = '';
+  savingBlock = false;
 
-  // Detalle: celulares, permisos e historial de moderación
-  celularesDetalle: CelularAdmin[] = [];
-  historialDetalle: HistorialModeracion[] = [];
-  evidenciaAbierta: string | null = null;
+  // Detail: phones, permissions and moderation history
+  phoneDetails: AdminPhone[] = [];
+  historyDetail: ModerationHistory[] = [];
+  openEvidence: string | null = null;
 
-  // Eliminación (la aprueba otra administradora)
-  modalEliminar = false;
-  motivoEliminar = '';
-  errorEliminar = '';
-  guardandoEliminar = false;
+  // Deletion (approved by another admin)
+  deleteModal = false;
+  deleteReason = '';
+  deleteError = '';
+  savingDelete = false;
 
-  aviso = '';
+  notice = '';
 
   // ── Detalle (datos reales de otras tablas) ───────────────────
-  alertasDetalle: AlertaResumen[] = [];
-  cargandoDetalle = false;
+  alertDetails: AlertSummary[] = [];
+  loadingDetail = false;
 
   // ── Formulario ───────────────────────────────────────────────
-  modoForm: 'editar' = 'editar';
-  guardando = false;
+  formMode: 'editar' = 'editar';
+  saving = false;
   errorForm = '';
-  form: FormUsuaria = this.formVacio();
+  form: UserForm = this.emptyForm();
 
   Math = Math;
 
   // ── Chips ────────────────────────────────────────────────────
   get chips(): ChipData[] {
     return [
-      { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.todasLasUsuarias.length },
-      { label: 'Activas',               value: 'Activa',               color: '#7c3aed', count: this.contar('Activa') },
-      { label: 'Inactivas',             value: 'Inactiva',             color: '#9333ea', count: this.contar('Inactiva') },
-      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#c026d3', count: this.contar('Bloqueada por Fraude') },
+      { label: 'Todas',                 value: 'Todos',                color: '#7c3aed', count: this.allUsers.length },
+      { label: 'Activas',               value: 'Activa',               color: '#7c3aed', count: this.count('Activa') },
+      { label: 'Inactivas',             value: 'Inactiva',             color: '#9333ea', count: this.count('Inactiva') },
+      { label: 'Bloqueadas por Fraude', value: 'Bloqueada por Fraude', color: '#c026d3', count: this.count('Bloqueada por Fraude') },
     ];
   }
 
-  private contar(estado: string): number {
-    return this.todasLasUsuarias.filter(u => u.estado === estado).length;
+  private count(status: string): number {
+    return this.allUsers.filter(u => u.status === status).length;
   }
 
   // ── Stat cards ───────────────────────────────────────────────
-  get totalUsuarias()      { return this.todasLasUsuarias.length; }
-  get usuariasActivas()    { return this.contar('Activa'); }
-  get usuariasBloqueadas() { return this.contar('Bloqueada por Fraude'); }
-  get usuariasInactivas()  { return this.contar('Inactiva'); }
+  get totalUsers()      { return this.allUsers.length; }
+  get activeUsers()    { return this.count('Activa'); }
+  get blockedUsers() { return this.count('Bloqueada por Fraude'); }
+  get inactiveUsers()  { return this.count('Inactiva'); }
 
   // ── Lifecycle ────────────────────────────────────────────────
   ngOnInit(): void {
-    this.cargarUsuarias();
+    this.loadUsers();
   }
 
-  private cargarUsuarias(): void {
-    this.cargando = true;
+  private loadUsers(): void {
+    this.loading = true;
 
-    // El DTO ya trae el contador de alertas calculado por el backend
+    // The DTO already carries the alert count computed by the backend
     this.usersService.getAll().subscribe({
-      next: (usuarios) => {
-        this.todasLasUsuarias = usuarios;
+      next: (users) => {
+        this.allUsers = users;
         this.applyFilters();
-        this.cargando = false;
+        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando usuarias:', err);
-        this.cargando = false;
+        this.loading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  // ── Filtros y paginación ─────────────────────────────────────
+  // ── Filters and pagination ─────────────────────────────────────
   applyFilters(): void {
-    let resultado = [...this.todasLasUsuarias];
+    let result = [...this.allUsers];
 
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      resultado = resultado.filter(u =>
-        u.nombre.toLowerCase().includes(term) ||
+      result = result.filter(u =>
+        u.name.toLowerCase().includes(term) ||
         u.email.toLowerCase().includes(term) ||
-        u.telefono.includes(term)
+        u.telephone.includes(term)
       );
     }
 
-    if (this.filtroEstado !== 'Todos') {
-      resultado = resultado.filter(u => u.estado === this.filtroEstado);
+    if (this.statusFilter !== 'Todos') {
+      result = result.filter(u => u.status === this.statusFilter);
     }
 
-    this.totalFiltradas = resultado.length;
-    this.totalPaginas = Math.ceil(this.totalFiltradas / this.porPagina) || 1;
-    if (this.paginaActual > this.totalPaginas) this.paginaActual = 1;
+    this.totalFiltered = result.length;
+    this.totalPageCount = Math.ceil(this.totalFiltered / this.perPage) || 1;
+    if (this.currentPage > this.totalPageCount) this.currentPage = 1;
 
-    const start = (this.paginaActual - 1) * this.porPagina;
-    this.usuariasFiltradas = resultado.slice(start, start + this.porPagina);
-    this.paginas = paginasCompactas(this.paginaActual, this.totalPaginas);
+    const start = (this.currentPage - 1) * this.perPage;
+    this.filteredUsers = result.slice(start, start + this.perPage);
+    this.pages = compactPages(this.currentPage, this.totalPageCount);
     this.updateSelection();
   }
 
-  cambiarPagina(p: number): void {
-    if (p < 1 || p > this.totalPaginas) return;
-    this.paginaActual = p;
+  changePage(p: number): void {
+    if (p < 1 || p > this.totalPageCount) return;
+    this.currentPage = p;
     this.applyFilters();
   }
 
   setChip(value: string): void {
-    this.filtroEstado = value;
-    this.paginaActual = 1;
+    this.statusFilter = value;
+    this.currentPage = 1;
     this.applyFilters();
   }
 
@@ -227,301 +219,300 @@ export class UserComponent implements OnInit {
 
   clearAll(): void {
     this.searchTerm = '';
-    this.filtroEstado = 'Todos';
+    this.statusFilter = 'Todos';
     this.applyFilters();
   }
 
-  // ── Selección ────────────────────────────────────────────────
+  // ── Selection ────────────────────────────────────────────────
   toggleAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    this.usuariasFiltradas.forEach(u => u.selected = checked);
+    this.filteredUsers.forEach(u => u.selected = checked);
     this.updateSelection();
   }
 
   updateSelection(): void {
-    this.selectedCount = this.usuariasFiltradas.filter(u => u.selected).length;
-    this.allSelected = this.selectedCount === this.usuariasFiltradas.length && this.usuariasFiltradas.length > 0;
+    this.selectedCount = this.filteredUsers.filter(u => u.selected).length;
+    this.allSelected = this.selectedCount === this.filteredUsers.length && this.filteredUsers.length > 0;
   }
 
   deselectAll(): void {
-    this.usuariasFiltradas.forEach(u => u.selected = false);
+    this.filteredUsers.forEach(u => u.selected = false);
     this.updateSelection();
   }
 
-  // ── Bloqueo masivo vía API ────────────────────────────────────
-  bloquearSeleccionadas(): void {
-    const seleccionadas = this.usuariasFiltradas.filter(u => u.selected && u.estado !== 'Bloqueada por Fraude');
-    if (seleccionadas.length === 0) return;
-    this.abrirBloqueo(seleccionadas, 'bloquear');
+  // ── Bulk block through the API ────────────────────────────────────
+  blockSelected(): void {
+    const selected = this.filteredUsers.filter(u => u.selected && u.status !== 'Bloqueada por Fraude');
+    if (selected.length === 0) return;
+    this.openBlock(selected, 'bloquear');
   }
 
-  // ── Ver detalle: carga las últimas alertas reales ────────────
-  verDetalle(u: UsuariaUI): void {
-    this.usuariaSeleccionada = u;
-    this.alertasDetalle = [];
-    this.celularesDetalle = [];
-    this.historialDetalle = [];
-    this.cargandoDetalle = true;
-    this.modalDetalle = true;
-    this.usersService.celulares().subscribe({
-      next: (lista) => {
-        this.celularesDetalle = lista.filter(c => String(c.userId) === String(u.id) && c.osName !== 'web');
+  // ── View detail: loads the real latest alerts ────────────
+  viewDetail(u: UserUI): void {
+    this.selectedUser = u;
+    this.alertDetails = [];
+    this.phoneDetails = [];
+    this.historyDetail = [];
+    this.loadingDetail = true;
+    this.detailModal = true;
+    this.usersService.phones().subscribe({
+      next: (list) => {
+        this.phoneDetails = list.filter(c => String(c.userId) === String(u.id) && c.osName !== 'web');
         this.cdr.detectChanges();
       },
       error: () => {},
     });
-    this.usersService.historial(u.id).subscribe({
+    this.usersService.history(u.id).subscribe({
       next: (h) => {
-        this.historialDetalle = h;
+        this.historyDetail = h;
         this.cdr.detectChanges();
       },
       error: () => {},
     });
 
     // GET /api/alerts/user/{usersId} acepta users.id para admin
-    this.usersService.getAlertasByUsuaria(u.id).subscribe({
-      next: (alertas) => {
-        // Las más recientes primero, máximo 5
-        this.alertasDetalle = [...alertas]
-          .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    this.usersService.getAlertsByUser(u.id).subscribe({
+      next: (alerts) => {
+        // Newest first, at most 5
+        this.alertDetails = [...alerts]
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .slice(0, 5);
-        this.cargandoDetalle = false;
+        this.loadingDetail = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando detalle:', err);
-        this.cargandoDetalle = false;
+        this.loadingDetail = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  /** La contraseña solo la cambia la usuaria: se le envía el correo con el código. */
-  restablecerPassword(u: UsuariaUI): void {
-    this.usersService.enviarRecuperacion(u.email).subscribe({
-      next: () => this.mostrarAviso(`Enviamos a ${u.email} un código para que cree una contraseña nueva.`),
-      error: () => this.mostrarAviso('No se pudo enviar el correo de recuperación. Intenta de nuevo.'),
+  /** Only the user changes the password: she is sent the email with the code. */
+  resetPassword(u: UserUI): void {
+    this.usersService.sendRecovery(u.email).subscribe({
+      next: () => this.showNotice(`Enviamos a ${u.email} un código para que cree una contraseña nueva.`),
+      error: () => this.showNotice('No se pudo enviar el correo de recuperación. Intenta de nuevo.'),
     });
   }
 
-  toggleBloqueo(u: UsuariaUI): void {
-    this.abrirBloqueo([u], u.estado === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear');
+  toggleBlock(u: UserUI): void {
+    this.openBlock([u], u.status === 'Bloqueada por Fraude' ? 'desbloquear' : 'bloquear');
   }
 
-  private abrirBloqueo(usuarias: UsuariaUI[], accion: 'bloquear' | 'desbloquear'): void {
-    this.usuariasBloqueo = usuarias;
-    this.usuariaSeleccionada = usuarias[0];
-    this.accionBloqueo = accion;
-    this.motivoBloqueo = '';
-    this.descripcionBloqueo = '';
-    this.evidenciaBloqueo = null;
-    this.errorBloqueo = '';
-    this.modalDetalle = false;
-    this.modalBloqueo = true;
+  private openBlock(users: UserUI[], action: 'bloquear' | 'desbloquear'): void {
+    this.usersToBlock = users;
+    this.selectedUser = users[0];
+    this.blockAction = action;
+    this.blockReason = '';
+    this.blockDescription = '';
+    this.blockEvidence = null;
+    this.blockError = '';
+    this.detailModal = false;
+    this.blockModal = true;
   }
 
-  async elegirEvidencia(evento: Event): Promise<void> {
-    const input = evento.target as HTMLInputElement;
-    const archivo = input.files?.[0];
+  async chooseEvidence(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     input.value = '';
-    if (!archivo) return;
+    if (!file) return;
     try {
-      // Captura legible pero liviana (el servidor acepta hasta ~300 KB)
-      this.evidenciaBloqueo = await reducirFoto(archivo, 1100);
-      this.errorBloqueo = '';
+      // Readable but light screenshot (the server accepts up to ~300 KB)
+      this.blockEvidence = await shrinkPhoto(file, 1100);
+      this.blockError = '';
     } catch (e) {
-      this.errorBloqueo = e instanceof Error ? e.message : 'No se pudo usar la imagen';
+      this.blockError = e instanceof Error ? e.message : 'No se pudo usar la imagen';
     }
     this.cdr.detectChanges();
   }
 
-  get bloqueoValido(): boolean {
-    const nota = this.descripcionBloqueo.trim().length >= 10;
-    return this.accionBloqueo === 'desbloquear' ? nota : nota && !!this.motivoBloqueo;
+  get blockValid(): boolean {
+    const note = this.blockDescription.trim().length >= 10;
+    return this.blockAction === 'desbloquear' ? note : note && !!this.blockReason;
   }
 
-  confirmarBloqueo(): void {
-    if (!this.bloqueoValido || this.guardandoBloqueo) return;
-    this.guardandoBloqueo = true;
-    this.errorBloqueo = '';
-    const descripcion = this.descripcionBloqueo.trim();
-    const peticiones = this.usuariasBloqueo.map(u => this.accionBloqueo === 'bloquear'
-      ? this.usersService.bloquear(u.id, this.motivoBloqueo, descripcion, this.evidenciaBloqueo)
-      : this.usersService.desbloquear(u.id, descripcion));
-    forkJoin(peticiones).subscribe({
+  confirmBlock(): void {
+    if (!this.blockValid || this.savingBlock) return;
+    this.savingBlock = true;
+    this.blockError = '';
+    const description = this.blockDescription.trim();
+    const requests = this.usersToBlock.map(u => this.blockAction === 'bloquear'
+      ? this.usersService.block(u.id, this.blockReason, description, this.blockEvidence)
+      : this.usersService.unblock(u.id, description));
+    forkJoin(requests).subscribe({
       next: () => {
-        const n = this.usuariasBloqueo.length;
-        this.mostrarAviso(this.accionBloqueo === 'bloquear'
+        const n = this.usersToBlock.length;
+        this.showNotice(this.blockAction === 'bloquear'
           ? `${n === 1 ? 'Cuenta bloqueada' : n + ' cuentas bloqueadas'}. El caso quedó registrado en Moderación.`
           : 'Cuenta desbloqueada.');
-        this.guardandoBloqueo = false;
+        this.savingBlock = false;
         this.deselectAll();
-        this.cerrarModales();
-        this.cargarUsuarias();
+        this.closeModals();
+        this.loadUsers();
       },
       error: (err) => {
-        this.guardandoBloqueo = false;
-        this.errorBloqueo = err?.error?.message ?? 'No se pudo completar. Intenta de nuevo.';
+        this.savingBlock = false;
+        this.blockError = err?.error?.message ?? 'No se pudo completar. Intenta de nuevo.';
         this.cdr.detectChanges();
       },
     });
   }
 
-  verEvidencia(item: HistorialModeracion): void {
-    if (!item.casoId) return;
-    this.usersService.evidenciaDeCaso(item.casoId).subscribe({
+  viewEvidence(item: ModerationHistory): void {
+    if (!item.caseId) return;
+    this.usersService.caseEvidenceOf(item.caseId).subscribe({
       next: (e) => {
-        this.evidenciaAbierta = e;
+        this.openEvidence = e;
         this.cdr.detectChanges();
       },
     });
   }
 
   // ── Eliminar cuenta (la aprueba otra administradora) ─────────
-  abrirEliminar(u: UsuariaUI): void {
-    this.usuariaSeleccionada = u;
-    this.motivoEliminar = '';
-    this.errorEliminar = '';
-    this.modalDetalle = false;
-    this.modalEliminar = true;
+  openDelete(u: UserUI): void {
+    this.selectedUser = u;
+    this.deleteReason = '';
+    this.deleteError = '';
+    this.detailModal = false;
+    this.deleteModal = true;
   }
 
-  solicitarEliminacion(): void {
-    const u = this.usuariaSeleccionada;
-    if (!u || this.motivoEliminar.trim().length < 10 || this.guardandoEliminar) return;
-    this.guardandoEliminar = true;
-    this.usersService.solicitarEliminacion(u.id, this.motivoEliminar.trim()).subscribe({
+  requestDeletion(): void {
+    const u = this.selectedUser;
+    if (!u || this.deleteReason.trim().length < 10 || this.savingDelete) return;
+    this.savingDelete = true;
+    this.usersService.requestDeletion(u.id, this.deleteReason.trim()).subscribe({
       next: () => {
-        this.guardandoEliminar = false;
-        this.cerrarModales();
-        this.mostrarAviso('Solicitud enviada. Otra administradora debe aprobarla en Moderación.');
+        this.savingDelete = false;
+        this.closeModals();
+        this.showNotice('Solicitud enviada. Otra administradora debe aprobarla en Moderación.');
       },
       error: (err) => {
-        this.guardandoEliminar = false;
-        this.errorEliminar = err?.error?.message ?? 'No se pudo enviar la solicitud.';
+        this.savingDelete = false;
+        this.deleteError = err?.error?.message ?? 'No se pudo enviar la solicitud.';
         this.cdr.detectChanges();
       },
     });
   }
 
   // ── Ayudas del detalle ───────────────────────────────────────
-  permisosDe(c: CelularAdmin): { nombre: string; ok: boolean }[] {
+  permissionsOf(c: AdminPhone): { name: string; ok: boolean }[] {
     if (!c.permissions) return [];
     try {
-      const datos = JSON.parse(c.permissions) as Record<string, boolean>;
-      return Object.entries(datos).map(([k, v]) => ({ nombre: PERMISOS_ETIQUETA[k] ?? k, ok: v === true }));
+      const data = JSON.parse(c.permissions) as Record<string, boolean>;
+      return Object.entries(data).map(([k, v]) => ({ name: PERMISSION_LABELS[k] ?? k, ok: v === true }));
     } catch {
       return [];
     }
   }
 
-  nombreCelular(c: CelularAdmin): string {
+  phoneName(c: AdminPhone): string {
     return c.deviceName || [c.brand, c.model].filter(Boolean).join(' ') || 'Celular';
   }
 
-  tipoHistorial(t: string): string {
-    return TIPO_HISTORIAL[t] ?? t;
+  historyType(t: string): string {
+    return HISTORY_TYPE[t] ?? t;
   }
 
-  private mostrarAviso(texto: string): void {
-    this.aviso = texto;
+  private showNotice(text: string): void {
+    this.notice = text;
     this.cdr.detectChanges();
     setTimeout(() => {
-      if (this.aviso === texto) {
-        this.aviso = '';
+      if (this.notice === text) {
+        this.notice = '';
         this.cdr.detectChanges();
       }
     }, 5000);
   }
 
   // ── Formulario crear / editar ────────────────────────────────
-  private formVacio(): FormUsuaria {
-    return { first_name: '', last_name: '', email: '', telefono: '' };
+  private emptyForm(): UserForm {
+    return { first_name: '', last_name: '', email: '', telephone: '' };
   }
 
-  abrirModalEditar(u: UsuariaUI): void {
-    this.modoForm = 'editar';
-    this.usuariaSeleccionada = u;
+  openEditModal(u: UserUI): void {
+    this.formMode = 'editar';
+    this.selectedUser = u;
     this.form = {
-      first_name: u.first_name ?? u.nombre.split(' ')[0],
+      first_name: u.first_name ?? u.name.split(' ')[0],
       last_name: u.last_name ?? '',
       email: u.email,
-      telefono: u.telefono,
+      telephone: u.telephone,
     };
     this.errorForm = '';
-    this.modalDetalle = false;
+    this.detailModal = false;
     this.modalForm = true;
   }
 
-  guardarUsuaria(): void {
+  saveUser(): void {
     this.errorForm = '';
 
     const email = this.form.email.trim().toLowerCase();
-    const duplicado = this.todasLasUsuarias.some(u =>
+    const duplicate = this.allUsers.some(u =>
       u.email.toLowerCase() === email &&
-      u.id !== this.usuariaSeleccionada?.id
+      u.id !== this.selectedUser?.id
     );
-    if (duplicado) {
+    if (duplicate) {
       this.errorForm = 'Ya existe una usuaria con ese correo.';
       return;
     }
 
-    this.guardando = true;
+    this.saving = true;
 
     {
-      const u = this.usuariaSeleccionada!;
-      const cambios: Partial<Usuario> & Record<string, unknown> = {
-        nombre: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
+      const u = this.selectedUser!;
+      const changes: Partial<ManagedUser> & Record<string, unknown> = {
+        name: `${this.form.first_name.trim()} ${this.form.last_name.trim()}`.trim(),
         first_name: this.form.first_name.trim(),
         last_name: this.form.last_name.trim(),
         email,
-        correo: email,
-        telefono: this.form.telefono.trim(),
+        telephone: this.form.telephone.trim(),
       };
 
-      this.usersService.actualizarUsuaria(u.id, cambios).subscribe({
-        next: (actualizada) => {
-          this.todasLasUsuarias = this.todasLasUsuarias.map(x =>
-            x.id === actualizada.id ? { ...x, ...actualizada, alertas: x.alertas } : x
+      this.usersService.updateUser(u.id, changes).subscribe({
+        next: (updated) => {
+          this.allUsers = this.allUsers.map(x =>
+            x.id === updated.id ? { ...x, ...updated, alerts: x.alerts } : x
           );
-          this.finalizarGuardado();
+          this.finishSaving();
         },
-        error: (err) => this.manejarErrorGuardado(err),
+        error: (err) => this.handleSaveError(err),
       });
     }
   }
 
-  private finalizarGuardado(): void {
-    this.guardando = false;
-    this.cerrarModales();
+  private finishSaving(): void {
+    this.saving = false;
+    this.closeModals();
     this.applyFilters();
     this.cdr.detectChanges();
   }
 
-  private manejarErrorGuardado(err: unknown): void {
+  private handleSaveError(err: unknown): void {
     console.error('Error guardando usuaria:', err);
-    this.guardando = false;
+    this.saving = false;
     this.errorForm = 'No se pudo guardar. Intenta de nuevo.';
     this.cdr.detectChanges();
   }
 
-  cerrarModales(): void {
-    this.modalDetalle = false;
-    this.modalBloqueo = false;
+  closeModals(): void {
+    this.detailModal = false;
+    this.blockModal = false;
     this.modalForm = false;
-    this.modalEliminar = false;
-    this.evidenciaAbierta = null;
-    this.usuariaSeleccionada = null;
+    this.deleteModal = false;
+    this.openEvidence = null;
+    this.selectedUser = null;
     this.errorForm = '';
   }
 
   // ── Helpers de estilo ────────────────────────────────────────
-  getEstadoClass(estado: string): string {
+  getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      'Activa':               'estado--activa',
-      'Inactiva':             'estado--inactiva',
-      'Bloqueada por Fraude': 'estado--bloqueada',
+      'Activa':               'state--active',
+      'Inactiva':             'state--inactiva',
+      'Bloqueada por Fraude': 'state--blocked',
     };
-    return map[estado] ?? '';
+    return map[status] ?? '';
   }
 }

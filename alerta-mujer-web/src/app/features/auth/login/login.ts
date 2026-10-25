@@ -26,56 +26,56 @@ export class LoginComponent {
   error = '';
   loading = false;
 
-  viewpassword = false;
+  viewPassword = false;
 
-  emailValido = true;
-  passwordValida = true;
+  validEmail = true;
+  validPassword = true;
 
   // ------------------------
-  // Mostrar/Ocultar contraseña
+  // Show/Hide password
   // ------------------------
 
   showpassword() {
-    this.viewpassword = !this.viewpassword;
+    this.viewPassword = !this.viewPassword;
   }
 
   // ------------------------
-  // Validación correo
+  // Email validation
   // ------------------------
 
-  validarCorreo() {
+  validateEmail() {
 
     if (!this.email) {
-      this.emailValido = true;
+      this.validEmail = true;
       return;
     }
 
     const regex =
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
-    this.emailValido = regex.test(this.email);
+    this.validEmail = regex.test(this.email);
   }
 
   // ------------------------
-  // Validación contraseña
+  // Password validation
   // ------------------------
 
-  validarPassword() {
+  validatePassword() {
 
-    // Al iniciar sesión no se exigen reglas de formato: las cuentas creadas en la app o con
-    // recuperación solo piden 8 caracteres, y el backend es quien valida la contraseña.
-    this.passwordValida = true;
+    // No format rules are required when signing in: accounts created in the app or through
+    // recovery only require 8 characters, and the backend is the one that validates the password.
+    this.validPassword = true;
   }
 
   // ------------------------
-  // Navegación
+  // Navigation
   // ------------------------
 
-  irARegistro() {
+  goToRegister() {
     this.router.navigate(['/auth/register']);
   }
 
-  irAOlvidePassword() {
+  goToForgotPassword() {
     this.router.navigate(['/auth/forgot-password']);
   }
 
@@ -92,16 +92,16 @@ export class LoginComponent {
   // ------------------------
   // Login con Google (Firebase -> backend)
   // ------------------------
-  async continuarConGoogle() {
+  async continueWithGoogle() {
     if (this.loadingGoogle) return;
     this.error = '';
     this.loadingGoogle = true;
     try {
-      const idToken = await this.googleAuth.obtenerIdToken();
+      const idToken = await this.googleAuth.getIdToken();
       this.auth.loginWithGoogle(idToken).subscribe({
         next: (user) => {
           this.loadingGoogle = false;
-          this.router.navigate([user.rol === 'Admin' ? '/admin/dashboard' : '/dashboard']);
+          this.router.navigate([user.role === 'Admin' ? '/admin/dashboard' : '/dashboard']);
         },
         error: (err) => {
           this.loadingGoogle = false;
@@ -110,7 +110,7 @@ export class LoginComponent {
       });
     } catch (e: any) {
       this.loadingGoogle = false;
-      // Cerrar la ventana de Google no es un error que haya que mostrar
+      // Closing the Google window is not an error that needs to be shown
       if (e?.code === 'auth/popup-closed-by-user' || e?.code === 'auth/cancelled-popup-request') return;
       this.error = e?.code === 'auth/popup-blocked'
         ? 'Tu navegador bloqueó la ventana de Google. Permite ventanas emergentes e intenta de nuevo.'
@@ -118,12 +118,12 @@ export class LoginComponent {
     }
   }
 
-  iniciarSesion() {
+  signIn() {
 
-    this.validarCorreo();
-    this.validarPassword();
+    this.validateEmail();
+    this.validatePassword();
 
-    if (!this.emailValido || !this.passwordValida) {
+    if (!this.validEmail || !this.validPassword) {
       this.error = 'Por favor verifica que el correo y la contraseña sean válidos';
       return;
     }
@@ -139,7 +139,7 @@ export class LoginComponent {
       next: (user) => {
         this.loading = false;
 
-        if (user.rol === 'Admin' || user.rol === 'admin') {
+        if (user.role === 'Admin' || user.role === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

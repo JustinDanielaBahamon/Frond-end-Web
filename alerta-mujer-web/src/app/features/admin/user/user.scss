@@ -245,13 +245,13 @@
   overflow: hidden;
 }
 
-// Scroll horizontal cuando el espacio es justo (tablets / laptops con sidebar)
+// Horizontal scroll when space is tight (tablets / laptops with sidebar)
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-// "Seleccionar todas": solo se muestra en móvil (ver media query)
+// "Seleccionar todas": only shown on mobile (see media query)
 .select-all-mobile {
   display: none;
 }
@@ -265,12 +265,12 @@ table {
 
   // Anchos fijos por columna
   col.col-check   { width: 40px; }
-  col.col-nombre  { width: 22%; }
+  col.col-name  { width: 22%; }
   col.col-email   { width: 22%; }
-  col.col-fecha   { width: 11%; }
-  col.col-alertas { width: 9%; }
+  col.col-date   { width: 11%; }
+  col.col-alerts { width: 9%; }
   col.col-activ   { width: 14%; }
-  col.col-estado  { width: 13%; }
+  col.col-status  { width: 13%; }
   col.col-acc     { width: 9%; }
 
   thead tr th {
@@ -386,7 +386,7 @@ table {
 .muted { color: $text-dim; font-size: 0.78rem; }
 
 // ── Estado badges ────────────────────────────
-.estado-badge {
+.state-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -396,17 +396,17 @@ table {
   font-weight: 600;
   white-space: nowrap;
 
-  &.estado--activa {
+  &.state--active {
     background: $green-pale;
     color: $green;
   }
 
-  &.estado--inactiva {
+  &.state--inactiva {
     background: $amber-pale;
     color: $amber;
   }
 
-  &.estado--bloqueada {
+  &.state--blocked {
     background: $red-pale;
     color: $red;
   }
@@ -535,7 +535,7 @@ table {
   }
 }
 
-// ── Paginación ───────────────────────────────
+// ── Pagination ───────────────────────────────
 .pagination {
   display: flex;
   align-items: center;
@@ -602,7 +602,7 @@ table {
 }
 
 // =============================================
-// MODALES (el modal en sí vive en
+// MODALS (the modal itself lives in
 // shared/components/modal/modal.scss)
 // =============================================
 
@@ -769,9 +769,9 @@ table {
 }
 
 // =============================================
-// BOTONES DEL PIE DE LOS MODALES
+// MODAL FOOTER BUTTONS
 // (Cerrar / Editar / Cancelar / Guardar / Restablecer / Bloquear)
-// Usan tokens, así que cambian solos entre modo claro y oscuro.
+// They use tokens, so they switch between light and dark mode by themselves.
 // =============================================
 .btn-secondary,
 .btn-primary,
@@ -791,7 +791,7 @@ table {
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-// Secundario: borde + texto de alto contraste (casi blanco en oscuro, oscuro en claro)
+// Secondary: border + high-contrast text (almost white in dark, dark in light)
 .btn-secondary {
   border: 1.5px solid $border;
   background: $bg-card;
@@ -800,7 +800,7 @@ table {
   &:hover:not(:disabled) { background: $bg-card-hover; border-color: $purple-deep; }
 }
 
-// Principal: degradado morado-rosa con texto blanco en ambos modos
+// Primary: purple-pink gradient with white text in both modes
 .btn-primary {
   border: none;
   background: linear-gradient(90deg, $purple-deep 0%, $pink 100%);
@@ -809,7 +809,7 @@ table {
   &:hover:not(:disabled) { filter: brightness(1.1); }
 }
 
-// Peligro: rojo sólido con texto blanco en ambos modos
+// Danger: solid red with white text in both modes
 .btn-danger {
   border: none;
   background: #c026d3;
@@ -827,11 +827,11 @@ table {
   .users-page { padding: 20px 20px 32px; }
 }
 
-// ── Móvil ≤ 768px: tabla → tarjetas ──────────
+// ── Mobile ≤ 768px: table → cards ──────────
 @media (max-width: 768px) {
   .users-page { padding: 16px 14px 28px; }
 
-  // Header: título arriba, estadísticas en una fila de 4
+  // Header: title on top, stats in a row of 4
   .users-header {
     flex-direction: column;
     align-items: stretch;
@@ -868,7 +868,7 @@ table {
   .filter-select { width: 100%; box-sizing: border-box; }
   .btn-add { width: 100%; justify-content: center; }
 
-  // 16px evita el zoom automático de iOS al enfocar inputs
+  // 16px avoids the automatic iOS zoom when focusing inputs
   .search-input,
   .filter-select,
   .form-field input { font-size: 16px; }
@@ -876,7 +876,7 @@ table {
   .search-input,
   .filter-select { padding-top: 12px; padding-bottom: 12px; }
 
-  // Chips: una sola línea con scroll horizontal
+  // Chips: a single line with horizontal scroll
   .filter-chips {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -888,7 +888,7 @@ table {
     &::-webkit-scrollbar { display: none; }
   }
 
-  // Seleccionar todas (reemplaza el checkbox del thead)
+  // Select all (replaces the thead checkbox)
   .select-all-mobile {
     display: flex;
     align-items: center;
@@ -919,7 +919,7 @@ table {
 
     colgroup { display: none; }
 
-    // El encabezado se oculta visualmente pero queda para lectores de pantalla
+    // The header is hidden visually but stays for screen readers
     thead {
       position: absolute;
       width: 1px;
@@ -948,7 +948,7 @@ table {
         text-overflow: clip;
         text-align: right;
 
-        // Etiqueta de cada dato (viene de data-label en el HTML)
+        // Label of each value (comes from data-label in the HTML)
         &[data-label]::before {
           content: attr(data-label);
           flex-shrink: 0;
@@ -961,7 +961,7 @@ table {
         }
       }
 
-      // Checkbox arriba a la derecha de la tarjeta
+      // Checkbox at the top right of the card
       td.cell-check {
         position: absolute;
         top: 14px;
@@ -969,8 +969,8 @@ table {
         padding: 0;
       }
 
-      // Nombre + avatar como encabezado de la tarjeta
-      td.cell-nombre {
+      // Name + avatar as the card header
+      td.cell-name {
         justify-content: flex-start;
         text-align: left;
         padding: 0 34px 10px 0;
@@ -980,7 +980,7 @@ table {
 
       td.email-cell { word-break: break-all; }
 
-      // Acciones al pie de la tarjeta
+      // Actions at the bottom of the card
       td.cell-acc {
         justify-content: flex-end;
         margin-top: 6px;
@@ -997,7 +997,7 @@ table {
     input[type="checkbox"] { width: 18px; height: 18px; }
   }
 
-  // Botones de acción más grandes para el dedo
+  // Bigger action buttons for the finger
   .actions-cell { gap: 8px; }
   .action-btn { width: 40px; height: 40px; }
 
@@ -1045,7 +1045,7 @@ table {
   }
 }
 
-// ── Móvil pequeño ≤ 480px ────────────────────
+// ── Small mobile ≤ 480px ────────────────────
 @media (max-width: 480px) {
   .users-stats { grid-template-columns: repeat(2, 1fr); }
 
@@ -1055,21 +1055,21 @@ table {
     gap: 12px;
   }
 }
-// ── Moderación y detalle ampliado ─────────────────────
-.aviso-panel { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
-.celular { margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
-.celular__cabecera { display: flex; flex-direction: column; gap: 2px; font-size: 13px; span { color: var(--text-muted); font-size: 12px; } }
-.celular__permisos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.permiso { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(192, 38, 211, 0.12); color: #a21caf; }
-.permiso--ok { background: rgba(124, 58, 237, 0.15); color: #6d28d9; }
-.historial { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
+// ── Moderation and extended detail ─────────────────────
+.notice-panel { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
+.phone { margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
+.phone__header { display: flex; flex-direction: column; gap: 2px; font-size: 13px; span { color: var(--text-muted); font-size: 12px; } }
+.phone__permissions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.permission { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(192, 38, 211, 0.12); color: #a21caf; }
+.permission--ok { background: rgba(124, 58, 237, 0.15); color: #6d28d9; }
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
   li { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-left: 3px solid #7c3aed; border-radius: 8px; background: rgba(124, 58, 237, 0.06); font-size: 13px; }
   span { font-size: 12px; color: var(--text-muted); } }
-.historial__nota { font-style: italic; }
+.history__note { font-style: italic; }
 .link-btn { align-self: flex-start; padding: 0; border: none; background: none; color: #7c3aed; font-weight: 700; cursor: pointer; }
-.evidencia-img { max-width: 100%; margin-top: 8px; border-radius: 10px; border: 1px solid var(--border); }
-.evidencia { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0;
+.evidence-img { max-width: 100%; margin-top: 8px; border-radius: 10px; border: 1px solid var(--border); }
+.evidence { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0;
   img { width: 90px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); } }
-.evidencia__boton { cursor: pointer; }
-.form-ayuda { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
+.evidence__button { cursor: pointer; }
+.form-help { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
 .btn-danger-outline { margin-right: auto; padding: 9px 14px; border: 1.5px solid #a21caf; border-radius: 10px; background: transparent; color: #a21caf; font-weight: 700; cursor: pointer; }

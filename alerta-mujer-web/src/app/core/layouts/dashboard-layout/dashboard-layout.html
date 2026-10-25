@@ -5,7 +5,7 @@
     sectionTitle="Módulo"
     [collapsed]="sidebarCollapsed"
     [showMobileAppButton]="true"
-    [mobileAppUrl]="urlDescargaApk"
+    [mobileAppUrl]="apkDownloadUrl"
     [user]="user"
     (logout)="onLogout()">
   </app-sidebar>
@@ -21,26 +21,26 @@
     </app-topbar>
 
     <main class="layout__main">
-      <!-- Alerta activa de un contacto: aviso en todo el panel hasta que termine -->
-      @for (a of alertasRecibidas.activas(); track a.id) {
-        <a class="aviso-contacto" routerLink="/dashboard/alertas-contactos" role="alert">
-          <span class="aviso-contacto__pulso" aria-hidden="true"></span>
-          <span class="aviso-contacto__texto">
-            <strong>{{ a.nombre }}</strong> activó una alerta de emergencia
-            @if (a.inicio) { a las {{ a.inicio | date: 'h:mm a' }} }
+      <!-- Active alert of a contact: notice across the whole panel until it ends -->
+      @for (a of receivedAlerts.active(); track a.id) {
+        <a class="notice-contact" routerLink="/dashboard/alertas-contactos" role="alert">
+          <span class="notice-contact__pulse" aria-hidden="true"></span>
+          <span class="notice-contact__text">
+            <strong>{{ a.name }}</strong> activó una alerta de emergencia
+            @if (a.start) { a las {{ a.start | date: 'h:mm a' }} }
           </span>
-          <span class="aviso-contacto__accion">Ver seguimiento <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+          <span class="notice-contact__action">Ver seguimiento <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
         </a>
       }
-      @if (movimiento.aviso(); as m) {
-        <div class="aviso-movimiento" role="status">
+      @if (movement.notice(); as m) {
+        <div class="notice-movement" role="status">
           <i class="ti ti-walk" aria-hidden="true"></i>
-          <span class="aviso-movimiento__texto">
-            Tu celular se desplazó de <strong>{{ m.desde }}</strong> y ahora está cerca de <strong>{{ m.hasta }}</strong>
-            <small>{{ m.hora | date: 'h:mm a' }}</small>
+          <span class="notice-movement__text">
+            Tu celular se desplazó de <strong>{{ m.from }}</strong> y ahora está cerca de <strong>{{ m.to }}</strong>
+            <small>{{ m.time | date: 'h:mm a' }}</small>
           </span>
-          <a class="aviso-movimiento__accion" routerLink="/dashboard/ubicacion" (click)="movimiento.cerrarAviso()">Ver en el mapa</a>
-          <button type="button" class="aviso-movimiento__cerrar" aria-label="Cerrar aviso" (click)="movimiento.cerrarAviso()">
+          <a class="notice-movement__action" routerLink="/dashboard/ubicacion" (click)="movement.closeNotice()">Ver en el mapa</a>
+          <button type="button" class="notice-movement__close" aria-label="Cerrar aviso" (click)="movement.closeNotice()">
             <i class="ti ti-x" aria-hidden="true"></i>
           </button>
         </div>

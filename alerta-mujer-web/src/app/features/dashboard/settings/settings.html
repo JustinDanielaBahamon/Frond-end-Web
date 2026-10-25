@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <button type="button" class="setting-row setting-row--link" (click)="cambiandoContrasena.set(true)">
+      <button type="button" class="setting-row setting-row--link" (click)="changingPassword.set(true)">
         <i class="ti ti-lock"></i>
         <span>Cambiar contraseña</span>
         <i class="ti ti-chevron-right"></i>
@@ -120,7 +120,7 @@
         <span>Leer la política de privacidad</span>
         <i class="ti ti-chevron-right"></i>
       </a>
-      <button type="button" class="setting-row setting-row--link setting-row--peligro" (click)="eliminandoCuenta.set(true)">
+      <button type="button" class="setting-row setting-row--link setting-row--destructive" (click)="deletingAccount.set(true)">
         <span><i class="ti ti-trash"></i> Eliminar mi cuenta y mis datos</span>
         <i class="ti ti-chevron-right"></i>
       </button>
@@ -216,10 +216,10 @@
     </div>
   </footer>
 
-  @if (cambiandoContrasena()) {
-    <app-password-change (cerrar)="cambiandoContrasena.set(false)" />
+  @if (changingPassword()) {
+    <app-password-change (close)="changingPassword.set(false)" />
   }
-  @if (eliminandoCuenta()) {
-    <app-eliminar-cuenta (cerrar)="eliminandoCuenta.set(false)" />
+  @if (deletingAccount()) {
+    <app-delete-account (close)="deletingAccount.set(false)" />
   }
 </section>

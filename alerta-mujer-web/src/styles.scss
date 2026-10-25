@@ -15,13 +15,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-// Mapa base de OpenStreetMap oscurecido para el modo oscuro (Leaflet, capa con className)
+// OpenStreetMap base map darkened for dark mode (Leaflet, layer with className)
 .leaflet-tile-pane .tiles-oscuras,
 img.tiles-oscuras {
   filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
 }
 
-// Icono junto al título de cada módulo del panel de la usuaria (mismo estilo que "Mis emergencias")
+// Icon next to the title of each module of the user panel (same style as "Mis emergencias")
 .page-title-row {
   display: flex;
   align-items: flex-start;
@@ -43,9 +43,9 @@ img.tiles-oscuras {
 }
 
 // ── Barras de desplazamiento ──────────────────────────────────────
-// Delgadas, sin flechas y violetas en toda la web (antes salía la barra del sistema, blanca y
-// con flechas, sobre los fondos oscuros). Chrome/Edge usan los pseudo-elementos ::-webkit-*;
-// Firefox, las propiedades estándar. No se combinan: en Chrome, scrollbar-width anula los ::-webkit-*.
+// Thin, without arrows and violet across the whole web (before, the system bar showed up, white and
+// with arrows, over the dark backgrounds). Chrome/Edge use the ::-webkit-* pseudo-elements;
+// Firefox, the standard properties. They are not combined: in Chrome, scrollbar-width overrides ::-webkit-*.
 @supports not selector(::-webkit-scrollbar) {
   * {
     scrollbar-width: thin;
@@ -80,7 +80,7 @@ img.tiles-oscuras {
   background-clip: padding-box;
 }
 
-/* Puntos suspensivos de la paginación abreviada (1 … 8 9 10 … 24) */
+/* Abbreviated pagination ellipsis (1 … 8 9 10 … 24) */
 .page-ellipsis,
 .ah-ellipsis {
   display: inline-flex;

@@ -19,7 +19,7 @@
     font-weight: 700;
 }
 
-.descarga-texto h2 {
+.descarga-text h2 {
     margin: 14px 0 10px;
     font-size: 30px;
     font-weight: 800;
@@ -70,7 +70,7 @@
     }
 }
 
-.descarga-pasos {
+.descarga-steps {
     list-style: none;
     margin: 28px 0 0;
     padding: 0;
@@ -93,7 +93,7 @@
     }
 }
 
-.paso-numero {
+.step-index {
     flex-shrink: 0;
     width: 26px;
     height: 26px;
@@ -107,7 +107,7 @@
     font-weight: 700;
 }
 
-.descarga-imagen img {
+.descarga-image img {
     width: 100%;
     border-radius: 36px;
     object-fit: cover;
@@ -123,16 +123,16 @@
         color: #d8b4fe;
     }
 
-    .descarga-texto h2 {
+    .descarga-text h2 {
         color: #f5f0ff;
     }
 
     .descarga-sub,
-    .descarga-pasos li {
+    .descarga-steps li {
         color: #cfc4e0;
     }
 
-    .descarga-pasos i {
+    .descarga-steps i {
         color: #c4b5fd;
     }
 }
@@ -144,15 +144,15 @@
         text-align: center;
     }
 
-    .descarga-pasos li {
+    .descarga-steps li {
         text-align: left;
     }
 
-    .descarga-imagen {
+    .descarga-image {
         order: -1;
     }
 
-    .descarga-imagen img {
+    .descarga-image img {
         border-radius: 24px;
     }
 }

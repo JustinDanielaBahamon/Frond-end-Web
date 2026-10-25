@@ -10,13 +10,13 @@
   </header>
 
   <!-- MENSAJE FLOTANTE -->
-  @if (mensaje()) {
-    <div class="toast" role="status">{{ mensaje() }}</div>
+  @if (message()) {
+    <div class="toast" role="status">{{ message() }}</div>
   }
 
   <section class="settings-grid">
 
-    <!-- ═════════ PARÁMETROS DE LA APP ═════════ -->
+    <!-- ═════════ APP PARAMETERS ═════════ -->
     <article class="card card--wide">
       <h2 class="card__title"><i class="fa-solid fa-sliders"></i> Parámetros de la app</h2>
       <div class="warning">
@@ -25,23 +25,23 @@
           y cada cambio queda registrado en <a routerLink="/admin/auditoria">Auditoría</a>.</span>
       </div>
 
-      @if (cargandoParametros()) {
+      @if (loadingSettings()) {
         <p class="label">Cargando…</p>
       } @else {
-        <form class="params-form" (ngSubmit)="revisarCambios()">
+        <form class="params-form" (ngSubmit)="checkChanges()">
           <label class="field">
             <span>Duración máxima de una alerta SOS (minutos)</span>
-            <input type="number" name="duracion" [(ngModel)]="form.duracionMaximaAlertaMin" min="30" max="1440" step="5" required />
+            <input type="number" name="duracion" [(ngModel)]="form.maxAlertDurationMin" min="30" max="1440" step="5" required />
             <small>Una alerta que siga activa después de este tiempo se marca como expirada. Entre 30 y 1440.</small>
           </label>
           <label class="field">
             <span>Contactos de emergencia por usuaria</span>
-            <input type="number" name="maxContactos" [(ngModel)]="form.maxContactos" min="1" max="20" required />
+            <input type="number" name="maxContactos" [(ngModel)]="form.maxContacts" min="1" max="20" required />
             <small>Máximo que puede registrar cada usuaria (entre 1 y 20).</small>
           </label>
           <label class="field">
             <span>Número de emergencia</span>
-            <input name="numero" [(ngModel)]="form.numeroEmergencia" inputmode="tel" maxlength="16" required />
+            <input name="numero" [(ngModel)]="form.emergencyNumber" inputmode="tel" maxlength="16" required />
             <small>Línea que se ofrece a las usuarias (en Colombia, 123).</small>
           </label>
           <label class="field">
@@ -51,19 +51,19 @@
           </label>
           <label class="field">
             <span>Correo de soporte</span>
-            <input type="email" name="correo" [(ngModel)]="form.correoSoporte" required />
+            <input type="email" name="correo" [(ngModel)]="form.supportEmail" required />
             <small>Recibe las solicitudes de ayuda del panel.</small>
           </label>
 
           <div class="params-form__actions">
-            @if (errorParametros()) {
-              <p class="field-error">{{ errorParametros() }}</p>
+            @if (settingsError()) {
+              <p class="field-error">{{ settingsError() }}</p>
             }
-            @if (parametros()?.actualizado; as fecha) {
-              <span class="card__note"><i class="fa-regular fa-clock"></i> Última modificación: {{ fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+            @if (settings()?.updated; as date) {
+              <span class="card__note"><i class="fa-regular fa-clock"></i> Última modificación: {{ date | date: 'dd/MM/yyyy HH:mm' }}</span>
             }
-            <button class="btn-secondary" type="button" (click)="descartarCambios()">Descartar</button>
-            <button class="btn-primary" type="submit" [disabled]="guardandoParametros()">
+            <button class="btn-secondary" type="button" (click)="discardChanges()">Descartar</button>
+            <button class="btn-primary" type="submit" [disabled]="savingSettings()">
               <i class="fa-solid fa-check"></i> Revisar y guardar
             </button>
           </div>
@@ -75,38 +75,38 @@
     <article class="card">
       <h2 class="card__title">
         <i class="fa-solid fa-heart-pulse"></i> Estado del sistema
-        <button class="icon-btn" type="button" (click)="cargarEstado()" aria-label="Actualizar estado">
+        <button class="icon-btn" type="button" (click)="loadStatus()" aria-label="Actualizar estado">
           <i class="fa-solid fa-rotate-right"></i>
         </button>
       </h2>
 
-      @if (errorEstado()) {
+      @if (statusError()) {
         <div class="status-line status-line--bad">
           <i class="fa-solid fa-circle-xmark"></i>
           <span>No se pudo consultar el servidor</span>
         </div>
-      } @else if (estado(); as e) {
-        <div class="status-line" [class.status-line--bad]="!e.baseDatos">
-          <i class="fa-solid" [class.fa-circle-check]="e.baseDatos" [class.fa-circle-xmark]="!e.baseDatos"></i>
+      } @else if (status(); as e) {
+        <div class="status-line" [class.status-line--bad]="!e.database">
+          <i class="fa-solid" [class.fa-circle-check]="e.database" [class.fa-circle-xmark]="!e.database"></i>
           <span>Base de datos</span>
-          <strong>{{ e.baseDatos ? 'Conectada (' + e.latenciaMs + ' ms)' : 'Sin conexión' }}</strong>
+          <strong>{{ e.database ? 'Conectada (' + e.latencyMs + ' ms)' : 'Sin conexión' }}</strong>
         </div>
-        <div class="status-line" [class.status-line--bad]="!e.notificacionesPush">
-          <i class="fa-solid" [class.fa-circle-check]="e.notificacionesPush" [class.fa-circle-xmark]="!e.notificacionesPush"></i>
+        <div class="status-line" [class.status-line--bad]="!e.pushNotifications">
+          <i class="fa-solid" [class.fa-circle-check]="e.pushNotifications" [class.fa-circle-xmark]="!e.pushNotifications"></i>
           <span>Notificaciones push</span>
-          <strong>{{ e.notificacionesPush ? 'Configuradas' : 'Sin configurar' }}</strong>
+          <strong>{{ e.pushNotifications ? 'Configuradas' : 'Sin configurar' }}</strong>
         </div>
         <div class="status-line status-line--neutral">
           <i class="fa-solid fa-bell"></i>
           <span>Alertas activas ahora</span>
-          <strong>{{ e.alertasActivas }}</strong>
+          <strong>{{ e.activeAlerts }}</strong>
         </div>
         <div class="status-line status-line--neutral">
           <i class="fa-regular fa-clock"></i>
           <span>Revisión de alertas vencidas</span>
           <strong>
-            @if (e.ultimaRevisionExpiracion; as f) {
-              {{ f | date: 'HH:mm' }}{{ e.expiradasUltimaRevision ? ' · ' + e.expiradasUltimaRevision + ' expiradas' : '' }}
+            @if (e.lastExpirationRun; as f) {
+              {{ f | date: 'HH:mm' }}{{ e.expiredLastRun ? ' · ' + e.expiredLastRun + ' expiradas' : '' }}
             } @else {
               Pendiente
             }
@@ -114,7 +114,7 @@
         </div>
         <p class="card__note">
           <i class="fa-solid fa-server"></i>
-          En línea desde {{ e.enLineaDesde | date: 'dd/MM/yyyy HH:mm' }}
+          En línea desde {{ e.onlineSince | date: 'dd/MM/yyyy HH:mm' }}
         </p>
       } @else {
         <p class="label">Consultando…</p>
@@ -125,7 +125,7 @@
     <article class="card">
       <h2 class="card__title"><i class="fa-solid fa-database"></i> Exportar datos</h2>
 
-      <button class="row-link row-link--stack" (click)="descargarUsuarios()">
+      <button class="row-link row-link--stack" (click)="downloadUsers()">
         <span class="row-link__text">
           <span class="row-link__title">Lista de usuarios</span>
           <span class="row-link__desc">Archivo CSV que se abre en Excel</span>
@@ -133,7 +133,7 @@
         <i class="fa-solid fa-download row-link__chevron"></i>
       </button>
 
-      <button class="row-link row-link--stack" (click)="descargarAlertas()">
+      <button class="row-link row-link--stack" (click)="downloadAlerts()">
         <span class="row-link__text">
           <span class="row-link__title">Historial de alertas</span>
           <span class="row-link__desc">Alertas de los últimos 30 días, en CSV</span>
@@ -160,12 +160,12 @@
           <div>
             <p class="help-box__title">¿Tienes algún problema?</p>
             <p class="help-box__desc">
-              Escríbenos a {{ parametros()?.correoSoporte || 'soporte' }} y te ayudamos.
+              Escríbenos a {{ settings()?.supportEmail || 'soporte' }} y te ayudamos.
             </p>
           </div>
         </div>
-        @if (enlaceSoporte) {
-          <a class="btn-help" [href]="enlaceSoporte">
+        @if (supportLink) {
+          <a class="btn-help" [href]="supportLink">
             <i class="fa-regular fa-envelope"></i>
             Pedir ayuda
           </a>
@@ -175,25 +175,25 @@
 
   </section>
 
-  <!-- CONFIRMACIÓN DE CAMBIOS -->
-  @if (cambiosPendientes(); as cambios) {
-    <div class="overlay" (click)="cancelarCambios()">
+  <!-- CHANGE CONFIRMATION -->
+  @if (pendingChanges(); as changes) {
+    <div class="overlay" (click)="cancelChanges()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirmar-titulo" (click)="$event.stopPropagation()">
         <h2 id="confirmar-titulo"><i class="fa-solid fa-triangle-exclamation"></i> Confirmar cambios del sistema</h2>
         <p>Estos cambios se aplicarán a todas las usuarias de la app:</p>
         <ul class="diff">
-          @for (c of cambios; track c.campo) {
+          @for (c of changes; track c.field) {
             <li>
-              <span class="diff__campo">{{ c.campo }}</span>
-              <span class="diff__valores"><del>{{ c.antes }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.despues }}</strong></span>
+              <span class="diff__field">{{ c.field }}</span>
+              <span class="diff__values"><del>{{ c.before }}</del> <i class="fa-solid fa-arrow-right"></i> <strong>{{ c.after }}</strong></span>
             </li>
           }
         </ul>
         <p class="dialog__note">Quedará registrado en Auditoría con tu nombre, la fecha y tu IP.</p>
         <div class="dialog__actions">
-          <button class="btn-secondary" type="button" (click)="cancelarCambios()" [disabled]="guardandoParametros()">Cancelar</button>
-          <button class="btn-primary" type="button" (click)="confirmarCambios()" [disabled]="guardandoParametros()">
-            {{ guardandoParametros() ? 'Guardando…' : 'Confirmar y guardar' }}
+          <button class="btn-secondary" type="button" (click)="cancelChanges()" [disabled]="savingSettings()">Cancelar</button>
+          <button class="btn-primary" type="button" (click)="confirmChanges()" [disabled]="savingSettings()">
+            {{ savingSettings() ? 'Guardando…' : 'Confirmar y guardar' }}
           </button>
         </div>
       </div>

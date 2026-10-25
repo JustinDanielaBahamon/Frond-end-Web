@@ -3,58 +3,58 @@ import { CommonModule, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
-import { iconoZona } from '../../../core/utils/icono-zona';
+import { zoneIcon } from '../../../core/utils/zone-icon';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
 import { UserSecurityStatusService } from '../../../core/services/user-security-status.service';
-import { EstadoSeguridad } from '../../../core/models/security-status.model';
+import { SecurityLevel, SecurityStatus } from '../../../core/models/security-status.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { DeviceService, UserDevice } from '../../../core/services/device.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { AlertsService } from '../../../core/services/alerts.services';
 import { GeocodingService } from '../../../core/services/geocoding.service';
-import { Alerta } from '../../../core/models/alert.model';
-import { UbicacionEntry } from '../../../core/models/location.model';
+import { Alert } from '../../../core/models/alert.model';
+import { LocationEntry } from '../../../core/models/location.model';
 
-interface SeguridadItem {
+interface SecurityItem {
   icon: string;
-  valor: string;
-  descripcion: string;
-  configurado: boolean;
+  value: string;
+  description: string;
+  configured: boolean;
   tooltip?: string;
 }
 
-interface UltimaUbicacion {
+interface LastLocation {
   lat: number;
   lng: number;
-  direccion: string;
-  fecha: string;
-  coordenadas: string;
+  address: string;
+  date: string;
+  coordinates: string;
   precision: string;
 }
 
-interface UltimaEmergencia {
+interface LastEmergency {
   id: number;
-  fecha: string;
-  hora: string;
-  ubicacion: string;
-  activadaMediante: string;
-  contactosNotificados: number | null;
-  estado: string;
+  date: string;
+  time: string;
+  location: string;
+  activatedBy: string;
+  notifiedContacts: number | null;
+  status: string;
 }
 
-interface AccesoRapido {
+interface QuickAccess {
   icon: string;
   label: string;
   sub: string;
   route: string;
 }
 
-// Mientras no haya ubicación del celular, el mapa muestra Neiva
-const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
+// While there is no phone location, the map shows Neiva
+const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 
-const fechaLarga = (d: Date) => d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
-const horaCorta = (d: Date) => d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+const longDate = (d: Date) => d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+const shortTime = (d: Date) => d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
 
 @Component({
   selector: 'app-dashboard',
@@ -74,30 +74,30 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   private alertsService = inject(AlertsService);
   private geocoding = inject(GeocodingService);
   private destroyRef = inject(DestroyRef);
-  private zonas: NearbyZone[] = [];
+  private zones: NearbyZone[] = [];
   private userMarker: L.Marker | null = null;
   private zoneCircles: L.Circle[] = [];
   private zoneMarkers: L.Marker[] = [];
 
   // ── ESTADO DE SEGURIDAD ───────────────────────────
   isLoadingStatus = signal(true);
-  estadoSeguridad = signal<SeguridadItem[]>([]);
-  estadoGeneral = signal<{ nivel: string; color: string; porcentaje: number } | null>(null);
+  securityStatus = signal<SecurityItem[]>([]);
+  overallStatus = signal<{ level: string; color: string; percentage: number } | null>(null);
 
-  // ── MI DISPOSITIVO (celular más reciente) ─────────
-  miCelular = signal<UserDevice | null>(null);
-  celularesCargados = signal(false);
+  // ── MY DEVICE (most recent phone) ─────────
+  myPhone = signal<UserDevice | null>(null);
+  phonesLoaded = signal(false);
 
-  // ── ÚLTIMA UBICACIÓN (enviada por el celular) ─────
-  ultimaUbicacion = signal<UltimaUbicacion | null>(null);
+  // ── LAST LOCATION (sent by the phone) ─────
+  lastLocation = signal<LastLocation | null>(null);
   isRefreshing = signal(false);
-  avisoUbicacion = signal<string | null>(null);
+  locationNotice = signal<string | null>(null);
 
   // ── ALERTAS ───────────────────────────────────────
-  ultimaEmergencia = signal<UltimaEmergencia | null>(null);
-  alertasCargadas = signal(false);
+  lastEmergency = signal<LastEmergency | null>(null);
+  loadedAlerts = signal(false);
 
-  accesosRapidos: AccesoRapido[] = [
+  quickAccess: QuickAccess[] = [
     { icon: 'ti-alert-triangle', label: 'Mis emergencias', sub: 'Ver historial',    route: '/dashboard/alert-history' },
     { icon: 'ti-folder',         label: 'Evidencias',      sub: 'Ver mis archivos', route: '/dashboard/evidence' },
     { icon: 'ti-users',          label: 'Contactos',       sub: 'Gestionar',        route: '/dashboard/emergency-contacts' },
@@ -106,160 +106,160 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.cargarEstadoSeguridad();
-    this.cargarCelular();
-    this.cargarUltimaEmergencia();
+    this.loadSecurityStatus();
+    this.loadPhone();
+    this.loadLastEmergency();
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.inicializarMiniMapa();
-      this.cargarUltimaUbicacion();
-      this.cargarZonasPeligrosas();
+      this.initMiniMap();
+      this.loadLastLocation();
+      this.loadDangerZones();
     }, 100);
   }
 
-  /** Estado de seguridad calculado con los datos reales de la cuenta y del celular */
-  private cargarEstadoSeguridad(): void {
+  /** Security status computed with the real account and phone data */
+  private loadSecurityStatus(): void {
     this.isLoadingStatus.set(true);
     this.securityStatusService.getSecurityStatus()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (estado: EstadoSeguridad) => {
-          this.estadoSeguridad.set(estado.requisitos.map(req => ({
+        next: (status: SecurityStatus) => {
+          this.securityStatus.set(status.requirements.map(req => ({
             icon: req.icon,
-            valor: req.valor,
-            descripcion: req.label,
-            configurado: req.cumplido,
-            tooltip: req.cumplido ? `${req.label}: ${req.valor}` : `${req.label}: ${req.valor} (requiere atención)`,
+            value: req.value,
+            description: req.label,
+            configured: req.met,
+            tooltip: req.met ? `${req.label}: ${req.value}` : `${req.label}: ${req.value} (requiere atención)`,
           })));
-          const nivelTextos = {
+          const levelTexts: Record<SecurityLevel, string> = {
             seguro: 'Tu cuenta está protegida',
             advertencia: 'Requiere atención',
             critico: 'Configuración incompleta',
           };
-          this.estadoGeneral.set({ nivel: nivelTextos[estado.nivel], color: estado.color, porcentaje: estado.porcentaje });
+          this.overallStatus.set({ level: levelTexts[status.level], color: status.color, percentage: status.percentage });
           this.isLoadingStatus.set(false);
         },
         error: () => {
-          this.estadoSeguridad.set([]);
-          this.estadoGeneral.set({ nivel: 'No se pudo consultar', color: 'rojo', porcentaje: 0 });
+          this.securityStatus.set([]);
+          this.overallStatus.set({ level: 'No se pudo consultar', color: 'rojo', percentage: 0 });
           this.isLoadingStatus.set(false);
         },
       });
   }
 
-  private cargarCelular(): void {
+  private loadPhone(): void {
     this.deviceService.getMyDevices()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (celulares) => {
-          const masReciente = [...celulares].sort((a, b) =>
+        next: (phones) => {
+          const newest = [...phones].sort((a, b) =>
             (b.lastAccess ?? '').localeCompare(a.lastAccess ?? ''))[0] ?? null;
-          this.miCelular.set(masReciente);
-          this.celularesCargados.set(true);
+          this.myPhone.set(newest);
+          this.phonesLoaded.set(true);
         },
-        error: () => this.celularesCargados.set(true),
+        error: () => this.phonesLoaded.set(true),
       });
   }
 
-  nombreCelular(d: UserDevice): string {
+  phoneName(d: UserDevice): string {
     return [d.brand, d.model].filter(Boolean).join(' ') || 'Celular';
   }
 
-  ultimaConexion(d: UserDevice): string {
+  lastConnection(d: UserDevice): string {
     if (!d.lastAccess) return 'Sin registro';
     const f = new Date(d.lastAccess);
-    return `${f.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${horaCorta(f)}`;
+    return `${f.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${shortTime(f)}`;
   }
 
-  private cargarUltimaEmergencia(): void {
+  private loadLastEmergency(): void {
     this.alertsService.getMine()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (alertas) => {
-          this.alertasCargadas.set(true);
-          const a = alertas[0];
+        next: (alerts) => {
+          this.loadedAlerts.set(true);
+          const a = alerts[0];
           if (!a) return;
-          this.ultimaEmergencia.set(this.aEmergencia(a));
-          this.alertsService.contarContactosAvisados(a.id).subscribe({
-            next: (n) => this.ultimaEmergencia.update(e => e && { ...e, contactosNotificados: n }),
+          this.lastEmergency.set(this.toEmergency(a));
+          this.alertsService.countNotifiedContacts(a.id).subscribe({
+            next: (n) => this.lastEmergency.update(e => e && { ...e, notifiedContacts: n }),
             error: () => {},
           });
         },
-        error: () => this.alertasCargadas.set(true),
+        error: () => this.loadedAlerts.set(true),
       });
   }
 
-  private aEmergencia(a: Alerta): UltimaEmergencia {
-    const inicio = new Date(a.started_at ?? a.created_at ?? Date.now());
+  private toEmergency(a: Alert): LastEmergency {
+    const start = new Date(a.started_at ?? a.created_at ?? Date.now());
     return {
       id: a.id,
-      fecha: fechaLarga(inicio),
-      hora: horaCorta(inicio),
-      ubicacion: a.ubicacion || 'Sin ubicación',
-      activadaMediante: a.medioActivacion,
-      contactosNotificados: null,
-      estado: a.estado,
+      date: longDate(start),
+      time: shortTime(start),
+      location: a.location || 'Sin ubicación',
+      activatedBy: a.activationMethod,
+      notifiedContacts: null,
+      status: a.status,
     };
   }
 
-  // ── Ubicación del celular ─────────────────────────
+  // ── Phone location ─────────────────────────
 
-  private cargarUltimaUbicacion(): void {
+  private loadLastLocation(): void {
     this.phoneLocation.getLatest()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (loc) => this.mostrarUbicacion(loc), error: () => {} });
+      .subscribe({ next: (loc) => this.showLocation(loc), error: () => {} });
   }
 
-  private mostrarUbicacion(loc: UbicacionEntry | null): void {
+  private showLocation(loc: LocationEntry | null): void {
     if (!loc) return;
-    const fecha = loc.recordedAt ? new Date(loc.recordedAt) : null;
-    this.ultimaUbicacion.set({
+    const date = loc.recordedAt ? new Date(loc.recordedAt) : null;
+    this.lastLocation.set({
       lat: loc.lat,
       lng: loc.lng,
-      direccion: 'Buscando dirección…',
-      fecha: fecha ? `${fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${horaCorta(fecha)}` : loc.time,
-      coordenadas: `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`,
+      address: 'Buscando dirección…',
+      date: date ? `${date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${shortTime(date)}` : loc.time,
+      coordinates: `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`,
       precision: loc.accuracy ? `±${Math.round(loc.accuracy)} metros` : 'Sin dato',
     });
-    this.geocoding.obtener(loc.lat, loc.lng).then((lugar) => {
-      const texto = lugar ? [lugar.direccion, lugar.barrio, lugar.ciudad].filter(Boolean).join(', ') : '';
-      this.ultimaUbicacion.update(u => u && { ...u, direccion: texto || 'Dirección no disponible' });
-      this.actualizarMarcador();
+    this.geocoding.get(loc.lat, loc.lng).then((place) => {
+      const text = place ? [place.address, place.neighborhood, place.city].filter(Boolean).join(', ') : '';
+      this.lastLocation.update(u => u && { ...u, address: text || 'Dirección no disponible' });
+      this.updateMarker();
     });
-    this.actualizarMarcador();
-    this.calcularDistancias();
+    this.updateMarker();
+    this.computeDistances();
   }
 
   /**
-   * Pide al celular su ubicación actual (push silencioso) y espera hasta 20 s el punto nuevo.
-   * Si no responde, se queda la última que envió.
+   * Asks the phone for its current location (silent push) and waits up to 20 s for the new point.
+   * If it does not answer, the last one it sent stays.
    */
-  refrescarUbicacion(): void {
+  refreshLocation(): void {
     if (this.isRefreshing()) return;
     this.isRefreshing.set(true);
-    this.avisoUbicacion.set(null);
-    this.phoneLocation.pedirAlCelular().subscribe({
-      next: (r) => this.esperarUbicacion(new Date(r.solicitadoEn).getTime() - 5000, Date.now() + 20000),
+    this.locationNotice.set(null);
+    this.phoneLocation.requestFromPhone().subscribe({
+      next: (r) => this.waitForLocation(new Date(r.requestedAt).getTime() - 5000, Date.now() + 20000),
       error: (e) => {
-        this.avisoUbicacion.set(e?.error?.message ?? 'No se pudo contactar al celular.');
+        this.locationNotice.set(e?.error?.message ?? 'No se pudo contactar al celular.');
         this.isRefreshing.set(false);
       },
     });
   }
 
-  private esperarUbicacion(desde: number, limite: number): void {
+  private waitForLocation(from: number, limit: number): void {
     this.phoneLocation.getLatest().subscribe({
       next: (loc) => {
-        const nueva = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= desde;
-        if (nueva || Date.now() >= limite) {
-          if (!nueva) this.avisoUbicacion.set('El celular no respondió. Se muestra la última ubicación que envió.');
-          this.mostrarUbicacion(loc);
+        const newOne = !!loc?.recordedAt && new Date(loc.recordedAt).getTime() >= from;
+        if (newOne || Date.now() >= limit) {
+          if (!newOne) this.locationNotice.set('El celular no respondió. Se muestra la última ubicación que envió.');
+          this.showLocation(loc);
           this.isRefreshing.set(false);
           return;
         }
-        setTimeout(() => this.esperarUbicacion(desde, limite), 2500);
+        setTimeout(() => this.waitForLocation(from, limit), 2500);
       },
       error: () => this.isRefreshing.set(false),
     });
@@ -267,12 +267,12 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Mapa ──────────────────────────────────────────
 
-  private inicializarMiniMapa(): void {
+  private initMiniMap(): void {
     this.map = L.map('home-mini-map', {
-      center: CENTRO_POR_DEFECTO,
+      center: DEFAULT_CENTER,
       zoom: 13,
       zoomControl: true,
-      // La rueda del mouse desplaza la página; el mapa se acerca con los botones + y -
+      // The mouse wheel scrolls the page; the map zooms with the + and - buttons
       scrollWheelZoom: false,
       attributionControl: true,
     });
@@ -283,32 +283,32 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     }).addTo(this.map);
   }
 
-  private actualizarMarcador(): void {
-    const u = this.ultimaUbicacion();
+  private updateMarker(): void {
+    const u = this.lastLocation();
     if (!this.map || !u) return;
     const popup = `
       <div style="text-align: center; min-width: 200px;">
         <strong style="color: #6d28d9; font-size: 14px;">📍 Mi celular</strong><br>
-        <span style="font-size: 12px; color: #666;">${u.direccion}</span><br>
-        <small style="color: #999;">${u.fecha}</small>
+        <span style="font-size: 12px; color: #666;">${u.address}</span><br>
+        <small style="color: #999;">${u.date}</small>
       </div>`;
     if (this.userMarker) {
       this.userMarker.setLatLng([u.lat, u.lng]).setPopupContent(popup);
     } else {
-      this.userMarker = L.marker([u.lat, u.lng], { icon: this.iconoCelular() }).addTo(this.map).bindPopup(popup);
+      this.userMarker = L.marker([u.lat, u.lng], { icon: this.phoneIcon() }).addTo(this.map).bindPopup(popup);
     }
     this.map.setView([u.lat, u.lng], 16);
   }
 
-  /** Lleva el mapa a la última ubicación del celular y abre su información. */
-  centrarEnCelular(): void {
-    const u = this.ultimaUbicacion();
+  /** Takes the map to the last phone location and opens its information. */
+  centerOnPhone(): void {
+    const u = this.lastLocation();
     if (!this.map || !u) return;
     this.map.flyTo([u.lat, u.lng], 17, { duration: 0.8 });
     this.userMarker?.openPopup();
   }
 
-  private iconoCelular(): L.DivIcon {
+  private phoneIcon(): L.DivIcon {
     return L.divIcon({
       className: '',
       html: `
@@ -329,28 +329,28 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** Cargar y mostrar las zonas del backend (sin datos inventados: si no hay, el mapa queda sin zonas) */
-  private cargarZonasPeligrosas(): void {
+  /** Load and show the backend zones (no made-up data: if there are none, the map has no zones) */
+  private loadDangerZones(): void {
     if (!this.map) return;
 
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
     this.zoneService.getByUser(currentUser.id).subscribe({
-      next: (zonas) => {
-        this.zonas = zonas;
-        this.dibujarZonasEnMapa();
+      next: (zones) => {
+        this.zones = zones;
+        this.drawZonesOnMap();
       },
       error: (err) => {
         console.error('Error al cargar zonas:', err);
-        this.zonas = [];
-        this.dibujarZonasEnMapa();
+        this.zones = [];
+        this.drawZonesOnMap();
       }
     });
   }
 
-  /** Dibujar zonas en el mapa con colores según el tipo */
-  private dibujarZonasEnMapa(): void {
+  /** Draw zones on the map with colors by type */
+  private drawZonesOnMap(): void {
     if (!this.map) return;
 
     // Limpiar zonas anteriores
@@ -359,15 +359,15 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     this.zoneMarkers.forEach(marker => marker.remove());
     this.zoneMarkers = [];
 
-    this.zonas.forEach(zona => {
+    this.zones.forEach(zone => {
       if (!this.map) return;
 
-      const config = this.obtenerConfigZona(zona.type);
+      const config = this.getZoneConfig(zone.type);
       
-      // Si tiene radio, dibujar círculo
-      if (zona.radiusMeters) {
-        const circle = L.circle([zona.lat, zona.lng], {
-          radius: zona.radiusMeters,
+      // If it has a radius, draw a circle
+      if (zone.radiusMeters) {
+        const circle = L.circle([zone.lat, zone.lng], {
+          radius: zone.radiusMeters,
           color: config.borderColor,
           fillColor: config.fillColor,
           fillOpacity: 0.25,
@@ -376,51 +376,51 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
         circle.bindPopup(`
           <div style="min-width: 180px;">
-            <strong style="color: ${config.borderColor};">${config.emoji} ${zona.name}</strong><br>
+            <strong style="color: ${config.borderColor};">${config.emoji} ${zone.name}</strong><br>
             <span style="font-size: 12px; color: #666;">${config.label}</span><br>
-            ${zona.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zona.description}</p>` : ''}
-            ${zona.address ? `<small style="color: #999;">📍 ${zona.address}</small>` : ''}
+            ${zone.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zone.description}</p>` : ''}
+            ${zone.address ? `<small style="color: #999;">📍 ${zone.address}</small>` : ''}
           </div>
         `);
 
         this.zoneCircles.push(circle);
       }
 
-      // Mismo marcador con emoji que el resto de mapas (core/utils/icono-zona)
-      const icono = iconoZona(zona.type, config.fillColor);
+      // Same emoji marker as the other maps (core/utils/icono-zona)
+      const icon = zoneIcon(zone.type, config.fillColor);
 
-      const marker = L.marker([zona.lat, zona.lng], { icon: icono })
+      const marker = L.marker([zone.lat, zone.lng], { icon })
         .addTo(this.map)
         .bindPopup(`
           <div style="min-width: 180px;">
-            <strong style="color: ${config.borderColor};">${config.emoji} ${zona.name}</strong><br>
+            <strong style="color: ${config.borderColor};">${config.emoji} ${zone.name}</strong><br>
             <span style="font-size: 12px; color: #666;">${config.label}</span><br>
-            ${zona.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zona.description}</p>` : ''}
-            ${zona.address ? `<small style="color: #999;">📍 ${zona.address}</small><br>` : ''}
-            ${zona.distanceKm ? `<small style="color: #999;">📏 ${zona.distanceKm.toFixed(2)} km de distancia</small>` : ''}
+            ${zone.description ? `<p style="font-size: 11px; margin: 5px 0; color: #888;">${zone.description}</p>` : ''}
+            ${zone.address ? `<small style="color: #999;">📍 ${zone.address}</small><br>` : ''}
+            ${zone.distanceKm ? `<small style="color: #999;">📏 ${zone.distanceKm.toFixed(2)} km de distancia</small>` : ''}
           </div>
         `);
 
       this.zoneMarkers.push(marker);
     });
 
-    // Calcular distancias desde la ubicación del usuario
-    this.calcularDistancias();
+    // Compute distances from the user location
+    this.computeDistances();
   }
 
-  /** Calcular distancias de zonas desde la última ubicación del celular */
-  private calcularDistancias(): void {
-    const u = this.ultimaUbicacion();
+  /** Compute zone distances from the last phone location */
+  private computeDistances(): void {
+    const u = this.lastLocation();
     if (!u) return;
-    this.zonas = this.zonas.map(zona => ({
-      ...zona,
-      distanceKm: this.calcularDistanciaKm(u.lat, u.lng, zona.lat, zona.lng)
+    this.zones = this.zones.map(zone => ({
+      ...zone,
+      distanceKm: this.computeDistanceKm(u.lat, u.lng, zone.lat, zone.lng)
     })).sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
   }
 
-  /** Calcular distancia entre dos puntos en km (fórmula de Haversine) */
-  private calcularDistanciaKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Radio de la Tierra en km
+  /** Compute the distance between two points in km (Haversine formula) */
+  private computeDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth radius in km
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
     const a =
@@ -435,14 +435,14 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     return deg * (Math.PI / 180);
   }
 
-  /** Obtener configuración de color e icono según el tipo de zona */
-  private obtenerConfigZona(type: NearbyZone['type']): { 
+  /** Get the color and icon configuration by zone type */
+  private getZoneConfig(type: NearbyZone['type']): { 
     fillColor: string; 
     borderColor: string; 
     label: string; 
     emoji: string;
   } {
-    const configs = {
+    const configs: Record<NearbyZone['type'], { fillColor: string; borderColor: string; label: string; emoji: string }> = {
       risk: { 
         fillColor: '#cb1ce6', 
         borderColor: '#8f12a2', 

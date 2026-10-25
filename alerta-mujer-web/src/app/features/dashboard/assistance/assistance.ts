@@ -9,25 +9,25 @@ import { AssistanceService } from '../../../core/services/assistance.service';
 import { NearbyZoneService } from '../../../core/services/nearby-zone.service';
 import { PhoneLocationService } from '../../../core/services/phone.location.services';
 import { NearbyZone } from '../../../core/models/nearby-zone.model';
-import { iconoZona } from '../../../core/utils/icono-zona';
-import { CategoriaRecurso, LlamadaRegistrada, RecursoAyuda } from '../../../core/models/assistance.model';
+import { zoneIcon } from '../../../core/utils/zone-icon';
+import { ResourceCategory, RecordedCall, HelpResource } from '../../../core/models/assistance.model';
 
 type Tab = 'lineas' | 'centros' | 'llamadas';
 
-export const CATEGORIAS: Record<CategoriaRecurso, { etiqueta: string; color: string }> = {
-  linea: { etiqueta: 'Línea de ayuda', color: '#8b5cf6' },
-  policia: { etiqueta: 'Policía', color: '#7c3aed' },
-  salud: { etiqueta: 'Salud', color: '#5b21b6' },
-  apoyo: { etiqueta: 'Apoyo a la mujer', color: '#6d28d9' },
-  bomberos: { etiqueta: 'Bomberos', color: '#c026d3' },
+export const CATEGORIES: Record<ResourceCategory, { label: string; color: string }> = {
+  linea: { label: 'Línea de ayuda', color: '#8b5cf6' },
+  policia: { label: 'Policía', color: '#7c3aed' },
+  salud: { label: 'Salud', color: '#5b21b6' },
+  apoyo: { label: 'Apoyo a la mujer', color: '#6d28d9' },
+  bomberos: { label: 'Bomberos', color: '#c026d3' },
 };
 
-const ESTADOS: Record<string, string> = {
+const STATUSES: Record<string, string> = {
   initiated: 'Iniciada', completed: 'Completada', failed: 'Fallida', missed: 'Sin respuesta',
 };
 
-const NUMERO_EMERGENCIA = '123';
-const CENTRO_POR_DEFECTO: L.LatLngTuple = [2.9273, -75.2819];
+const EMERGENCY_NUMBER = '123';
+const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
 
 @Component({
   selector: 'app-assistance',
@@ -40,84 +40,84 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer?: ElementRef<HTMLDivElement>;
 
   private service = inject(AssistanceService);
-  private zonasService = inject(NearbyZoneService);
-  private ubicacionCelular = inject(PhoneLocationService);
+  private zonesService = inject(NearbyZoneService);
+  private phoneLocation = inject(PhoneLocationService);
   private injector = inject(Injector);
 
   private map: L.Map | null = null;
   private resizeObserver?: ResizeObserver;
-  private capa = L.layerGroup();
-  private marcadores = new Map<number, L.Marker>();
-  private vistaAjustada = false;
+  private layer = L.layerGroup();
+  private markers = new Map<number, L.Marker>();
+  private fittedView = false;
 
-  readonly categorias = CATEGORIAS;
-  readonly listaCategorias = Object.keys(CATEGORIAS) as CategoriaRecurso[];
-  readonly numeroEmergencia = NUMERO_EMERGENCIA;
+  readonly categories = CATEGORIES;
+  readonly categoryList = Object.keys(CATEGORIES) as ResourceCategory[];
+  readonly emergencyNumber = EMERGENCY_NUMBER;
 
   tab = signal<Tab>('lineas');
-  recursos = signal<RecursoAyuda[]>([]);
-  /** Zonas de auxilio del mapa del inicio (policía, centros de asistencia, puntos de ayuda). */
-  zonasAuxilio = signal<RecursoAyuda[]>([]);
-  /** Todo lo que se puede mostrar en el mapa de centros. */
-  private puntos = computed(() => [...this.recursos(), ...this.zonasAuxilio()]);
-  llamadas = signal<LlamadaRegistrada[]>([]);
-  cargando = signal(true);
+  resources = signal<HelpResource[]>([]);
+  /** Help zones of the home map (police, assistance centers, help points). */
+  helpZones = signal<HelpResource[]>([]);
+  /** Everything that can be shown on the centers map. */
+  private points = computed(() => [...this.resources(), ...this.helpZones()]);
+  calls = signal<RecordedCall[]>([]);
+  loading = signal(true);
   error = signal('');
-  aviso = signal('');
+  notice = signal('');
 
-  busqueda = signal('');
-  filtro = signal<CategoriaRecurso | null>(null);
-  seleccionado = signal<number | null>(null);
-  miPosicion = signal<{ lat: number; lng: number } | null>(null);
+  search = signal('');
+  filter = signal<ResourceCategory | null>(null);
+  selected = signal<number | null>(null);
+  myPosition = signal<{ lat: number; lng: number } | null>(null);
 
-  /** Recursos a los que se puede llamar. */
-  lineas = computed(() => this.recursos().filter((r) => r.telefono));
+  /** Resources that can be called. */
+  lines = computed(() => this.resources().filter((r) => r.telephone));
 
-  /** Recursos con ubicación, filtrados y ordenados por cercanía si se conoce. */
-  centros = computed(() => {
-    const termino = this.busqueda().trim().toLowerCase();
-    const filtro = this.filtro();
-    const lista = this.puntos().filter((r) => {
+  /** Resources with location, filtered and sorted by proximity when known. */
+  centers = computed(() => {
+    const term = this.search().trim().toLowerCase();
+    const filter = this.filter();
+    const list = this.points().filter((r) => {
       if (r.lat == null || r.lng == null) return false;
-      if (filtro && r.categoria !== filtro) return false;
-      if (!termino) return true;
-      return [r.nombre, r.descripcion, r.direccion, r.ciudad, CATEGORIAS[r.categoria].etiqueta]
-        .some((t) => (t ?? '').toLowerCase().includes(termino));
+      if (filter && r.category !== filter) return false;
+      if (!term) return true;
+      return [r.name, r.description, r.address, r.city, CATEGORIES[r.category].label]
+        .some((t) => (t ?? '').toLowerCase().includes(term));
     });
-    if (!this.miPosicion()) return lista;
-    return [...lista].sort((a, b) => (this.distancia(a) ?? Infinity) - (this.distancia(b) ?? Infinity));
+    if (!this.myPosition()) return list;
+    return [...list].sort((a, b) => (this.distance(a) ?? Infinity) - (this.distance(b) ?? Infinity));
   });
 
-  conteoCentros = computed(() => {
-    const c = Object.fromEntries(this.listaCategorias.map((k) => [k, 0])) as Record<CategoriaRecurso, number>;
-    for (const r of this.puntos()) if (r.lat != null && r.lng != null) c[r.categoria]++;
+  centerCount = computed(() => {
+    const c = Object.fromEntries(this.categoryList.map((k) => [k, 0])) as Record<ResourceCategory, number>;
+    for (const r of this.points()) if (r.lat != null && r.lng != null) c[r.category]++;
     return c;
   });
 
-  totalCentros = computed(() => this.puntos().filter((r) => r.lat != null && r.lng != null).length);
+  totalCenters = computed(() => this.points().filter((r) => r.lat != null && r.lng != null).length);
 
   ngOnInit(): void {
-    this.service.getRecursos().subscribe({
-      next: (lista) => {
-        this.recursos.set(lista);
-        this.cargando.set(false);
+    this.service.getResources().subscribe({
+      next: (list) => {
+        this.resources.set(list);
+        this.loading.set(false);
       },
       error: () => {
         this.error.set('No se pudieron cargar los recursos de ayuda. Intenta de nuevo.');
-        this.cargando.set(false);
+        this.loading.set(false);
       },
     });
-    this.zonasService.getByUser(0).subscribe({
-      next: (zonas) => this.zonasAuxilio.set(zonas.map(desdeZona).filter((z): z is RecursoAyuda => z !== null)),
+    this.zonesService.getByUser(0).subscribe({
+      next: (zones) => this.helpZones.set(zones.map(fromZone).filter((z): z is HelpResource => z !== null)),
       error: () => {},
     });
-    this.cargarLlamadas();
-    // La distancia se mide desde el celular (la ubicación que envía la app), no desde el computador
-    this.usarMiUbicacion(false);
+    this.loadCalls();
+    // The distance is measured from the phone (the location the app sends), not from the computer
+    this.useMyLocation(false);
   }
 
   ngAfterViewInit(): void {
-    effect(() => this.dibujar(), { injector: this.injector });
+    effect(() => this.draw(), { injector: this.injector });
   }
 
   ngOnDestroy(): void {
@@ -132,157 +132,157 @@ export class Assistance implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Llamadas ───────────────────────────────────
-  private cargarLlamadas(): void {
-    this.service.getMisLlamadas().subscribe({ next: (l) => this.llamadas.set(l), error: () => {} });
+  private loadCalls(): void {
+    this.service.getMyCalls().subscribe({ next: (l) => this.calls.set(l), error: () => {} });
   }
 
-  copiar(numero: string): void {
-    navigator.clipboard?.writeText(numero).then(() => this.mostrarAviso(`Número ${numero} copiado.`));
+  copy(number: string): void {
+    navigator.clipboard?.writeText(number).then(() => this.showNotice(`Número ${number} copiado.`));
   }
 
-  eliminarLlamada(l: LlamadaRegistrada): void {
-    this.service.eliminarLlamada(l.id).subscribe({
-      next: () => this.llamadas.update((lista) => lista.filter((x) => x.id !== l.id)),
-      error: () => this.mostrarAviso('No se pudo borrar el registro.'),
+  deleteCall(l: RecordedCall): void {
+    this.service.deleteCall(l.id).subscribe({
+      next: () => this.calls.update((list) => list.filter((x) => x.id !== l.id)),
+      error: () => this.showNotice('No se pudo borrar el registro.'),
     });
   }
 
-  recursoDe(l: LlamadaRegistrada): RecursoAyuda | undefined {
-    return this.recursos().find((r) => r.id === l.recursoId);
+  resourceOf(l: RecordedCall): HelpResource | undefined {
+    return this.resources().find((r) => r.id === l.resourceId);
   }
 
   // ── Centros y mapa ─────────────────────────────
-  usarMiUbicacion(avisar = true): void {
-    this.ubicacionCelular.getLatest().subscribe({
+  useMyLocation(notify = true): void {
+    this.phoneLocation.getLatest().subscribe({
       next: (u) => {
         if (u) {
-          this.miPosicion.set({ lat: u.lat, lng: u.lng });
-          this.vistaAjustada = false;
-        } else if (avisar) {
-          this.mostrarAviso('Tu celular aún no ha enviado su ubicación. Abre AlertaMujer en el celular para ver distancias.');
+          this.myPosition.set({ lat: u.lat, lng: u.lng });
+          this.fittedView = false;
+        } else if (notify) {
+          this.showNotice('Tu celular aún no ha enviado su ubicación. Abre AlertaMujer en el celular para ver distancias.');
         }
       },
-      error: () => { if (avisar) this.mostrarAviso('No pudimos obtener la ubicación de tu celular.'); },
+      error: () => { if (notify) this.showNotice('No pudimos obtener la ubicación de tu celular.'); },
     });
   }
 
-  distancia(r: RecursoAyuda): number | null {
-    const yo = this.miPosicion();
+  distance(r: HelpResource): number | null {
+    const yo = this.myPosition();
     if (!yo || r.lat == null || r.lng == null) return null;
     return L.latLng(yo.lat, yo.lng).distanceTo([r.lat, r.lng]);
   }
 
-  formatoDistancia(r: RecursoAyuda): string {
-    const d = this.distancia(r);
+  distanceFormat(r: HelpResource): string {
+    const d = this.distance(r);
     if (d == null) return '';
     return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(d < 10000 ? 1 : 0)} km`;
   }
 
-  comoLlegar(r: RecursoAyuda): string {
-    const yo = this.miPosicion();
+  directions(r: HelpResource): string {
+    const yo = this.myPosition();
     return `https://www.openstreetmap.org/directions?route=${yo ? `${yo.lat},${yo.lng}` : ''};${r.lat},${r.lng}`;
   }
 
-  verEnMapa(r: RecursoAyuda): void {
-    this.seleccionado.set(r.id);
+  viewOnMap(r: HelpResource): void {
+    this.selected.set(r.id);
     if (r.lat == null || r.lng == null) return;
     this.map?.flyTo([r.lat, r.lng], 16, { duration: 0.8 });
-    setTimeout(() => this.marcadores.get(r.id)?.openPopup(), 850);
+    setTimeout(() => this.markers.get(r.id)?.openPopup(), 850);
   }
 
   private initMap(): void {
     if (this.map || !this.mapContainer) return;
-    this.map = L.map(this.mapContainer.nativeElement, { center: CENTRO_POR_DEFECTO, zoom: 13 });
+    this.map = L.map(this.mapContainer.nativeElement, { center: DEFAULT_CENTER, zoom: 13 });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     }).addTo(this.map);
-    this.capa.addTo(this.map);
+    this.layer.addTo(this.map);
     this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
     this.resizeObserver.observe(this.mapContainer.nativeElement);
-    this.dibujar();
+    this.draw();
   }
 
-  private dibujar(): void {
-    const lista = this.centros();
-    const seleccionado = this.seleccionado();
-    const yo = this.miPosicion();
+  private draw(): void {
+    const list = this.centers();
+    const selected = this.selected();
+    const yo = this.myPosition();
     if (!this.map) return;
 
-    this.capa.clearLayers();
-    this.marcadores.clear();
+    this.layer.clearLayers();
+    this.markers.clear();
     const bounds = L.latLngBounds([]);
 
-    for (const r of lista) {
-      const { color, etiqueta } = CATEGORIAS[r.categoria];
-      const activo = r.id === seleccionado;
-      const marcador = L.marker([r.lat!, r.lng!], {
-        icon: iconoZona(r.categoria, color, activo),
-        zIndexOffset: activo ? 500 : 0,
+    for (const r of list) {
+      const { color, label } = CATEGORIES[r.category];
+      const active = r.id === selected;
+      const marker = L.marker([r.lat!, r.lng!], {
+        icon: zoneIcon(r.category, color, active),
+        zIndexOffset: active ? 500 : 0,
       })
-        .bindPopup(`<strong>${escapeHtml(r.nombre)}</strong><br><span style="color:${color};font-weight:700">${etiqueta}</span>`
-          + (r.direccion ? `<br>${escapeHtml(r.direccion)}` : '') + `<br>${escapeHtml(r.ciudad)}`)
-        .on('click', () => this.seleccionado.set(r.id))
-        .addTo(this.capa);
-      this.marcadores.set(r.id, marcador);
+        .bindPopup(`<strong>${escapeHtml(r.name)}</strong><br><span style="color:${color};font-weight:700">${label}</span>`
+          + (r.address ? `<br>${escapeHtml(r.address)}` : '') + `<br>${escapeHtml(r.city)}`)
+        .on('click', () => this.selected.set(r.id))
+        .addTo(this.layer);
+      this.markers.set(r.id, marker);
     }
-    // Con la ubicación del celular se encuadran los más cercanos (la lista ya viene ordenada);
+    // With the phone location the nearest ones are framed (the list already comes sorted);
     // sin ella, todos
-    for (const r of yo ? lista.slice(0, 8) : lista) bounds.extend([r.lat!, r.lng!]);
+    for (const r of yo ? list.slice(0, 8) : list) bounds.extend([r.lat!, r.lng!]);
     if (yo) bounds.extend([yo.lat, yo.lng]);
 
     if (yo) {
       L.marker([yo.lat, yo.lng], {
         icon: L.divIcon({ className: '', html: '<div class="as-you"></div>', iconSize: [20, 20], iconAnchor: [10, 10] }),
         zIndexOffset: 1000,
-      }).bindTooltip('Estás aquí').addTo(this.capa);
+      }).bindTooltip('Estás aquí').addTo(this.layer);
     }
 
-    if (!this.vistaAjustada && bounds.isValid()) {
+    if (!this.fittedView && bounds.isValid()) {
       this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-      this.vistaAjustada = true;
+      this.fittedView = true;
     }
   }
 
   // ── Formato ────────────────────────────────────
-  estado(e: string): string {
-    return ESTADOS[e] ?? e;
+  status(e: string): string {
+    return STATUSES[e] ?? e;
   }
 
-  fecha(d: Date): string {
+  date(d: Date): string {
     return d.toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
   }
 
-  private mostrarAviso(texto: string): void {
-    this.aviso.set(texto);
+  private showNotice(text: string): void {
+    this.notice.set(text);
     setTimeout(() => {
-      if (this.aviso() === texto) this.aviso.set('');
+      if (this.notice() === text) this.notice.set('');
     }, 3500);
   }
 }
 
-function escapeHtml(texto: string): string {
-  return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }
 
-// Zonas de auxilio como centros (ids negativos para no chocar con los recursos)
-const CATEGORIA_ZONA: Partial<Record<NearbyZone['type'], CategoriaRecurso>> = {
+// Help zones as centers (negative ids so they do not clash with the resources)
+const ZONE_CATEGORY: Partial<Record<NearbyZone['type'], ResourceCategory>> = {
   policia: 'policia', asistencia: 'salud', help: 'apoyo',
 };
 
-function desdeZona(z: NearbyZone): RecursoAyuda | null {
-  const categoria = CATEGORIA_ZONA[z.type];
-  if (!categoria) return null; // las zonas de riesgo y seguras no son centros de atención
+function fromZone(z: NearbyZone): HelpResource | null {
+  const category = ZONE_CATEGORY[z.type];
+  if (!category) return null; // risk and safe zones are not care centers
   return {
     id: -z.id,
-    nombre: z.name,
-    categoria,
-    descripcion: z.description ?? '',
-    telefono: null,
-    telefono2: null,
+    name: z.name,
+    category,
+    description: z.description ?? '',
+    telephone: null,
+    telephone2: null,
     email: null,
-    direccion: z.address ?? null,
-    ciudad: z.city ?? '',
+    address: z.address ?? null,
+    city: z.city ?? '',
     lat: z.lat,
     lng: z.lng,
   };

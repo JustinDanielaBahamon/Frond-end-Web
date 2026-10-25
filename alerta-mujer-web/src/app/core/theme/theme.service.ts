@@ -9,13 +9,13 @@ export class ThemeService {
 
   private readonly theme = signal<Theme>(this.getInitialTheme());
 
-  // exponer como solo-lectura para que los componentes puedan
-  // reaccionar al tema actual sin poder mutarlo directamente
+  // exposed as read-only so the components can
+  // react to the current theme without mutating it directly
   readonly currentTheme = this.theme.asReadonly();
 
   constructor() {
-    // cada vez que theme cambie, aplica el atributo al <html>
-    // y lo guarda para la próxima visita
+    // every time theme changes, applies the attribute to <html>
+    // and stores it for the next visit
     effect(() => {
       const value = this.theme();
       document.documentElement.setAttribute('data-theme', value);
@@ -37,7 +37,7 @@ export class ThemeService {
       return saved;
     }
 
-    // si el usuario nunca eligió, respeta la preferencia del
+    // if the user never chose, respects the preference of the
     // sistema operativo/navegador
     const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
     return prefersDark ? 'dark' : 'light';

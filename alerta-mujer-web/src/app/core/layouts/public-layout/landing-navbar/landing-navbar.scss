@@ -26,7 +26,7 @@
     color: var(--navbar-text);
 }
 
-/* --- ENLACES DE NAVEGACIÓN --- */
+/* --- NAVIGATION LINKS --- */
 .navbar-links {
     display: flex;
     gap: 35px;
@@ -50,7 +50,7 @@
     text-shadow: 0 2px 4px var(--navbar-hover-bg);
 }
 
-/* --- BOTONES DE ACCIÓN (LOGIN Y REGISTRO) --- */
+/* --- ACTION BUTTONS (LOGIN AND REGISTER) --- */
 .navbar-actions {
     display: flex;
     align-items: center;
@@ -129,7 +129,7 @@
     color: var(--navbar-text);
 }
 
-/* Menú Desplegable */
+/* Dropdown menu */
 .language-selector .language-menu {
     position: absolute;
     top: 55px;
@@ -190,9 +190,11 @@
     cursor:pointer;
 }
 
-/* =======================================
-   MENÚ MÓVIL
-======================================= */
+/*
+ * =======================================
+ *    MOBILE MENU
+ * =======================================
+ */
 
 .mobile-menu{
     display:none;
@@ -244,7 +246,7 @@
 ======================================= */
 @media(max-width:1350px){
 
-    .button-lenguaje-mobil{
+    .button-language-mobil{
         display: none !important;
     }
 
@@ -342,7 +344,7 @@
 
 @media(max-width:570px){
 
-    .button-lenguaje-mobil{
+    .button-language-mobil{
         display: flex !important;
     }
 

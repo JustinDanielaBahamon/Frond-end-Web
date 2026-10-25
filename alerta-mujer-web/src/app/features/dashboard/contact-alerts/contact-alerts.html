@@ -1,0 +1,65 @@
+<section class="ac">
+  <header class="ac__header">
+    <div>
+      <h1 class="ac__title">Alertas de mis contactos</h1>
+      <p class="ac__sub">Alertas de las personas que te registraron como contacto de emergencia (últimos 30 días).</p>
+    </div>
+  </header>
+
+  <!-- Avisos del navegador -->
+  @switch (service.notificationPermission()) {
+    @case ('default') {
+      <div class="ac__notice">
+        <i class="ti ti-bell-ringing" aria-hidden="true"></i>
+        <p>
+          Activa los avisos del navegador para enterarte al instante cuando alguien active una alerta
+          {{ service.noticesWithTabClosed ? ', aunque cierres esta pestaña.' : ' mientras tienes el panel abierto.' }}
+        </p>
+        <button type="button" class="ac__btn" (click)="service.requestNotificationPermission()">Activar avisos</button>
+      </div>
+    }
+    @case ('denied') {
+      <div class="ac__notice ac__notice--suave">
+        <i class="ti ti-bell-off" aria-hidden="true"></i>
+        <p>Los avisos del navegador están bloqueados. Puedes permitirlos en la configuración del sitio (candado junto a la dirección).</p>
+      </div>
+    }
+  }
+
+  @if (error()) {
+    <p class="ac__error" role="alert">{{ error() }}</p>
+  }
+
+  @if (service.received().length === 0) {
+    <div class="ac__empty">
+      <i class="ti ti-shield-check" aria-hidden="true"></i>
+      <p>{{ service.loading() ? 'Buscando alertas…' : 'Ningún contacto ha activado una alerta en los últimos 30 días.' }}</p>
+    </div>
+  } @else {
+    <ul class="ac__list">
+      @for (a of service.received(); track a.id) {
+        <li class="ac__item" [class.ac__item--active]="a.active">
+          <div class="ac__icon"><i class="ti" [class.ti-urgent]="a.active" [class.ti-history]="!a.active" aria-hidden="true"></i></div>
+          <div class="ac__info">
+            <p class="ac__name">
+              <strong>{{ a.name }}</strong>
+              {{ a.active ? 'activó una alerta de emergencia' : (a.status === 'cancelled' ? 'canceló su alerta' : 'tuvo una alerta') }}
+            </p>
+            <p class="ac__date">
+              {{ a.start | date: 'd MMM y, h:mm a' }}
+              @if (a.end) { · terminó {{ a.end | date: 'h:mm a' }} }
+            </p>
+          </div>
+          @if (a.trackingAvailable) {
+            <button type="button" class="ac__btn" [disabled]="opening() === a.id" (click)="viewTracking(a.id)">
+              <i class="ti ti-map-pin" aria-hidden="true"></i>
+              {{ opening() === a.id ? 'Abriendo…' : 'Ver seguimiento' }}
+            </button>
+          } @else {
+            <span class="ac__status">Terminada</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

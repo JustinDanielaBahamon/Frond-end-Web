@@ -513,3 +513,58 @@
   font-weight: 600;
   color: #a21caf;
 }
+
+
+// =============================================
+// BOTONES CON EL COLOR DEL MÓDULO ACTIVO DE LA BARRA LATERAL
+// + LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$ec-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+$ec-line: #6d5bb8;        // morado de líneas del panel admin
+$ec-line-soft: #8878c6;   // líneas entre filas de la tabla
+
+// Botones: mismo morado (no tan brillante) que el módulo activo
+.ec-add-btn,
+.ec-btn--primary,
+.ec-photo-button { background: $ec-accent !important; }
+
+// Modo claro
+:host-context(html:not([data-theme="dark"])) {
+  .ec-info-banner,
+  .ec-footer-banner,
+  .ec-table-wrap,
+  .ec-menu,
+  .ec-field input,
+  .ec-field select,
+  .ec-btn--ghost,
+  .ec-photo-remove { border: 2px solid $ec-line !important; }
+
+  .ec-table tbody tr { border-top: 2px solid $ec-line-soft !important; }
+
+  .ec-field input:focus,
+  .ec-field select:focus { border-color: #7c3aed !important; }
+
+  .ec-danger-zone,
+  .ec-danger-btn { border-width: 2px !important; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .ec-info-banner,
+  .ec-footer-banner,
+  .ec-table-wrap,
+  .ec-menu,
+  .ec-field input,
+  .ec-field select,
+  .ec-btn--ghost,
+  .ec-photo-remove { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .ec-table tbody tr { border-top: 2px solid var(--border, #4c3a80) !important; }
+
+  .ec-field input:focus,
+  .ec-field select:focus { border-color: var(--purple-mid, #aa86ea) !important; }
+
+  .ec-danger-zone,
+  .ec-danger-btn { border-width: 2px !important; }
+}

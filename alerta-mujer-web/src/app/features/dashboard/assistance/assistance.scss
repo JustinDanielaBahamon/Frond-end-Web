@@ -388,3 +388,79 @@ $call: #7c3aed;
   border: 3px solid #fff;
   box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.25);
 }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Modo claro: el morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  .as-subtabs,
+  .as-line,
+  .as-btn--ghost,
+  .as-icon-btn,
+  .as-card,
+  .as-search,
+  .as-filter,
+  .as-item,
+  .as-call,
+  .as-map-wrap,
+  .as-alert--info { border: 2px solid #6d5bb8 !important; }
+
+  .as-empty { border: 2px dashed #6d5bb8 !important; }
+
+  // La raya de color de arriba de cada línea de ayuda se queda igual
+  .as-line { border-top: 3px solid var(--cat) !important; }
+
+  // Los mismos colores de antes al pasar el mouse / seleccionar
+  .as-btn--ghost:hover,
+  .as-search:focus-within { border-color: $accent !important; }
+
+  .as-icon-btn:hover { border-color: #e671f8 !important; }
+
+  .as-filter.active { border-color: var(--cat, #{$accent}) !important; }
+
+  .as-item:hover,
+  .as-item--selected,
+  .as-call:hover,
+  .as-call--selected { border-color: var(--cat) !important; }
+
+  .as-sos { border-width: 2px !important; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .as-subtabs,
+  .as-line,
+  .as-btn--ghost,
+  .as-icon-btn,
+  .as-card,
+  .as-search,
+  .as-filter,
+  .as-item,
+  .as-call,
+  .as-map-wrap,
+  .as-alert--info { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .as-empty { border: 2px dashed var(--border, #4c3a80) !important; }
+
+  // La raya de color de arriba de cada línea de ayuda se queda igual
+  .as-line { border-top: 3px solid var(--cat) !important; }
+
+  // Los mismos colores de antes al pasar el mouse / seleccionar
+  .as-btn--ghost:hover,
+  .as-search:focus-within { border-color: $accent !important; }
+
+  .as-icon-btn:hover { border-color: #e671f8 !important; }
+
+  .as-filter.active { border-color: var(--cat, #{$accent}) !important; }
+
+  .as-item:hover,
+  .as-item--selected,
+  .as-call:hover,
+  .as-call--selected { border-color: var(--cat) !important; }
+
+  .as-sos { border-width: 2px !important; }
+}

@@ -30,13 +30,13 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;
 
   links: SidebarLink[] = [
-    { label: 'Inicio',                 route: '/dashboard',                    icon: 'fa-solid fa-house',       exact: true },
+    { label: 'Inicio',                 route: '/dashboard',                    icon: 'fa-solid fa-house',       exact: true, group: 'Mi seguridad' },
     { label: 'Mis emergencias',        route: '/dashboard/alert-history',      icon: 'fa-solid fa-triangle-exclamation' },
     { label: 'Alertas de mis contactos', route: '/dashboard/alertas-contactos', icon: 'fa-solid fa-people-group' },
-    { label: 'Ubicación',              route: '/dashboard/ubicacion',          icon: 'fa-solid fa-location-dot' },
+    { label: 'Ubicación',              route: '/dashboard/ubicacion',          icon: 'fa-solid fa-location-dot', group: 'Protección y apoyo' },
     { label: 'Evidencias',             route: '/dashboard/evidence',           icon: 'fa-solid fa-folder-open' },
     { label: 'Contactos de emergencia', route: '/dashboard/emergency-contacts', icon: 'fa-solid fa-users' },
-    { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset' },
+    { label: 'Asistencia',             route: '/dashboard/assistance',         icon: 'fa-solid fa-headset', group: 'Ayuda y ajustes' },
     { label: 'Estado del Dispositivo', route: '/dashboard/device',             icon: 'fa-solid fa-microchip' },
     { label: 'Configuración',          route: '/dashboard/settings',           icon: 'fa-solid fa-gear' },
   ];

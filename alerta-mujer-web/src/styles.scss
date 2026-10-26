@@ -110,9 +110,9 @@ img.tiles-oscuras {
 
 // Modo claro: fondos, bordes y líneas gruesas con el color elegido
 html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
-  --bg-base: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 10%, #fbfbfd);
-  --bg-card: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 4%, #ffffff);
-  --bg-card-hover: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 12%, #f8f8fb);
+  --bg-base: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 18%, #fbfbfd);
+  --bg-card: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 7%, #ffffff);
+  --bg-card-hover: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 20%, #f8f8fb);
   --border: color-mix(in srgb, var(--purple-deep, #621fd6) 35%, #bdcbd6);
   --am-line: color-mix(in srgb, var(--purple-deep, #621fd6) 40%, #7483a4);
   --am-line-soft: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #989ebf);
@@ -122,7 +122,7 @@ html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
 
 // Modo claro: la barra de arriba también con un toque del color elegido
 html:not([data-theme="dark"]) app-topbar .topbar {
-  background: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 5%, #ffffff);
+  background: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 9%, #ffffff);
 }
 
 // Modo claro: el fondo de la página de la usuaria (antes un lila fijo)

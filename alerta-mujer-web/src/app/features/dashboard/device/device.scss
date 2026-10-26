@@ -790,12 +790,12 @@ $dv-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--acce
   .device-list-item--highlight,
   .device-test-btn,
   .device-phone,
-  .dd-modal { border: 2px solid #6d5bb8 !important; }
+  .dd-modal { border: 2px solid var(--am-line, #6d5bb8) !important; }
 
-  .device-perm { border: 2px dashed #6d5bb8 !important; }
+  .device-perm { border: 2px dashed var(--am-line, #6d5bb8) !important; }
   .device-perm--ok { border: 2px solid transparent !important; }
 
-  .dd-row { border-bottom: 2px solid #8878c6 !important; }
+  .dd-row { border-bottom: 2px solid var(--am-line-soft, #8878c6) !important; }
   .dd-row:last-child { border-bottom: 0 !important; }
 
   .device-perm-notice { border-width: 2px !important; }
@@ -835,4 +835,28 @@ $dv-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--acce
   .device-badge--success { background: rgba(183, 155, 245, 0.18); color: #c4a1ff; }
   .device-badge--warning { background: rgba(215, 140, 255, 0.18); color: #d98cff; }
   .device-badge--neutral { color: var(--text-muted, #a8a0c4); }
+}
+
+
+// =============================================
+// CELULAR: sin márgenes dobles, las filas de servicios ponen la
+// etiqueta debajo del texto y las tarjetas van una por fila
+// =============================================
+@media (max-width: 600px) {
+  .device-wrap { padding: 0; }
+
+  .device-list-item {
+    flex-wrap: wrap;
+    row-gap: 6px;
+
+    .device-badge { margin-left: auto; }
+  }
+
+  .device-list-item__body { flex-basis: calc(100% - 40px); }
+}
+
+@media (max-width: 480px) {
+  .device-grid--3col,
+  .device-grid--4col,
+  .device-grid--5col { grid-template-columns: 1fr; }
 }

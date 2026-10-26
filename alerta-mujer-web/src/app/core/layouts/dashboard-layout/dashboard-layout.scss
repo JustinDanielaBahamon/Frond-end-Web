@@ -168,3 +168,32 @@
     cursor: pointer;
   }
 }
+
+
+// =============================================
+// BARRA LATERAL COMO MENÚ DESLIZABLE EN PANTALLAS CHICAS (igual que el admin)
+// =============================================
+.layout app-sidebar {
+  flex-shrink: 0; // la barra no se encoge cuando el contenido es angosto
+}
+
+// Fondo oscuro detrás del menú: oculto en escritorio
+.layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999; // debajo del menú (1000)
+  }
+}
+
+
+// Celular: un poco menos de margen alrededor de cada módulo
+@media (max-width: 600px) {
+  .layout__main { padding: 0.75rem; }
+}

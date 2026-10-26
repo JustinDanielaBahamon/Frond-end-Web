@@ -529,6 +529,9 @@ $ec-line-soft: #8878c6;   // líneas entre filas de la tabla
 .ec-btn--primary,
 .ec-photo-button { background: $ec-accent !important; }
 
+// Títulos de la tabla: el mismo morado (claro y oscuro)
+.ec-table thead { background: $ec-accent !important; }
+
 // Modo claro
 :host-context(html:not([data-theme="dark"])) {
   .ec-info-banner,
@@ -567,4 +570,17 @@ $ec-line-soft: #8878c6;   // líneas entre filas de la tabla
 
   .ec-danger-zone,
   .ec-danger-btn { border-width: 2px !important; }
+
+  // Caja de la foto: oscura para que contraste con el modo oscuro
+  .ec-photo {
+    background: var(--purple-pale, #2b204a) !important;
+    border: 2px solid var(--border, #4c3a80);
+  }
+
+  .ec-photo-img { border-color: var(--bg-card, #241d3d); }
+
+  .ec-photo-remove {
+    background: transparent !important;
+    color: var(--purple-mid, #b79bf5) !important;
+  }
 }

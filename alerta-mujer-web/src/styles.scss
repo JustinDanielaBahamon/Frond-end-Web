@@ -109,9 +109,12 @@ img.tiles-oscuras {
   --border: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 30%, #373a50);
 }
 
-// Modo claro: bordes y líneas gruesas con el color elegido
+// Modo claro: fondos, bordes y líneas gruesas con el color elegido
 // (con el violeta por defecto dan los mismos tonos de antes)
 html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
+  --bg-base: color-mix(in srgb, var(--purple-deep, #621fd6) 5%, #fbfcff);
+  --bg-card: color-mix(in srgb, var(--purple-deep, #621fd6) 2%, #ffffff);
+  --bg-card-hover: color-mix(in srgb, var(--purple-deep, #621fd6) 8%, #f8f9fc);
   --border: color-mix(in srgb, var(--purple-deep, #621fd6) 35%, #bdcbd6);
   --am-line: color-mix(in srgb, var(--purple-deep, #621fd6) 40%, #7483a4);
   --am-line-soft: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #989ebf);

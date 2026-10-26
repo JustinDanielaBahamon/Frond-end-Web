@@ -109,9 +109,14 @@ img.tiles-oscuras {
   --border: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 30%, #373a50);
 }
 
-// Modo claro: bordes con el color elegido
+// Modo claro: bordes y líneas gruesas con el color elegido
+// (con el violeta por defecto dan los mismos tonos de antes)
 html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
   --border: color-mix(in srgb, var(--purple-deep, #621fd6) 35%, #bdcbd6);
+  --am-line: color-mix(in srgb, var(--purple-deep, #621fd6) 40%, #7483a4);
+  --am-line-soft: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #989ebf);
+  --am-line-light: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #b6bfd6);
+  --am-line-faint: color-mix(in srgb, var(--purple-deep, #621fd6) 20%, #ced2e3);
 }
 
 // Ícono al lado del título de cada módulo

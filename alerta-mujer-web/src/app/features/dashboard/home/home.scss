@@ -825,7 +825,7 @@
 
 // Líneas en el mismo morado que usa el panel admin (modo claro)
 :host {
-  --color-borde: #6d5bb8;
+  --color-borde: var(--am-line, #6d5bb8);
 }
 
 // ── Botones: mismo morado del módulo activo del sidebar ──
@@ -886,5 +886,23 @@
   .home-btn--primary {
     background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef)) !important;
     box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent) !important;
+  }
+}
+
+
+// =============================================
+// CELULAR: sin márgenes dobles y la cabecera del mapa baja de línea
+// (antes el botón "Actualizar ubicación" y "Ver mapa completo" se salían de la pantalla)
+// =============================================
+@media (max-width: 600px) {
+  .home-wrap { padding: 0; }
+
+  .home-panel__header {
+    flex-wrap: wrap;
+
+    > div {
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
   }
 }

@@ -566,3 +566,62 @@ $tipo-colores: (photo: #7238f8, video: #e372f4, audio: #b324fb, document: #a78bf
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$ev-line: #6d5bb8;   // morado de líneas del panel admin (modo claro)
+
+// Modo claro
+.ev-card,
+.ev-filter,
+.ev-search,
+.ev-btn--ghost,
+.ev-icon-btn,
+.ev-modal,
+.ev-rename-input { border: 2px solid $ev-line !important; }
+
+.ev-empty,
+.ev-hash,
+.ev-keep { border: 2px dashed $ev-line !important; }
+
+.ev-de-alert { border-top: 2px solid $ev-line !important; }
+
+// Estas ya tenían su propio color: solo más gruesas
+.ev-continua,
+.ev-alert-item,
+.ev-tile { border-width: 2px !important; }
+
+// Los mismos colores de antes al pasar el mouse / seleccionar
+.ev-filter.active,
+.ev-keep--on { border-color: $accent-strong !important; }
+.ev-keep--on { border-style: solid !important; }
+
+.ev-search:focus-within,
+.ev-btn--ghost:not(:disabled):hover,
+.ev-icon-btn:hover:not(:disabled) { border-color: $accent !important; }
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .ev-card,
+  .ev-filter,
+  .ev-search,
+  .ev-btn--ghost,
+  .ev-icon-btn,
+  .ev-modal,
+  .ev-rename-input,
+  .ev-empty,
+  .ev-hash,
+  .ev-keep { border-color: $border !important; }
+
+  .ev-de-alert { border-top-color: $border !important; }
+
+  .ev-filter.active,
+  .ev-keep--on { border-color: $accent-strong !important; }
+
+  .ev-search:focus-within,
+  .ev-btn--ghost:not(:disabled):hover,
+  .ev-icon-btn:hover:not(:disabled) { border-color: $accent !important; }
+}

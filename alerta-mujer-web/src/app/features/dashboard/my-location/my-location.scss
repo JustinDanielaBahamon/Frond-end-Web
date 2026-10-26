@@ -419,3 +419,60 @@ $star: #b324fb;
 
   i { color: #7c3aed; font-size: 1rem; }
 }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$mu-line: #6d5bb8;   // morado de líneas del panel admin (modo claro)
+
+.mu-subtabs,
+.mu-card,
+.mu-map-wrap,
+.mu-history-item {
+  border: 2px solid $mu-line;
+}
+
+// El tema claro global les pone un lila muy claro con !important
+.mu-btn:not(.mu-btn--primary) {
+  border: 2px solid $mu-line !important;
+
+  &:hover,
+  &.mu-btn--active { border-color: $accent !important; }
+}
+
+.mu-history-empty { border: 2px dashed $mu-line; }
+
+// "Sin GPS": en modo claro el rosa claro casi no se leía
+.mu-status--off { color: #c026d3; }
+.mu-history-item:hover { border-color: $accent; }
+
+.mu-switch-row--nested::before {
+  border-left-color: $mu-line;
+  border-bottom-color: $mu-line;
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .mu-subtabs,
+  .mu-card,
+  .mu-map-wrap,
+  .mu-history-item { border-color: $border; }
+
+  .mu-btn:not(.mu-btn--primary) {
+    border-color: $border !important;
+
+    &:hover,
+    &.mu-btn--active { border-color: $accent !important; }
+  }
+
+  .mu-history-empty { border-color: $border; }
+  .mu-status--off { color: #e671f8; }
+  .mu-history-item:hover { border-color: $accent; }
+
+  .mu-switch-row--nested::before {
+    border-left-color: $border;
+    border-bottom-color: $border;
+  }
+}

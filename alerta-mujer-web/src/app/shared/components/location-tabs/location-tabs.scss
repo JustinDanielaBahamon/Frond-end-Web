@@ -45,3 +45,18 @@
     border-bottom-color: var(--purple-deep, #7c3aed);
   }
 }
+
+
+// =============================================
+// LÍNEA DE LAS PESTAÑAS MÁS GRUESA (como en el admin)
+// =============================================
+.lt-tabs { border-bottom: 2px solid #6d5bb8; }
+
+.lt-tab {
+  border-bottom-width: 3px;
+  margin-bottom: -2px;
+}
+
+:host-context([data-theme="dark"]) {
+  .lt-tabs { border-bottom-color: var(--border, #4c3a80); }
+}

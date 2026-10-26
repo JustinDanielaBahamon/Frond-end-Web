@@ -572,3 +572,75 @@ $danger: #e671f8;
 }
 
 .gr-modal-footer { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$gr-line: #6d5bb8;   // morado de líneas del panel admin (modo claro)
+
+// Modo claro
+.gr-subtabs,
+.gr-card,
+.gr-point-main,
+.gr-icon-btn,
+.gr-input,
+.gr-btn--ghost,
+.gr-row,
+.gr-history-item,
+.gr-map-wrap,
+.gr-modal { border: 2px solid $gr-line !important; }
+
+.gr-places,
+.gr-empty { border: 2px dashed $gr-line !important; }
+
+.gr-detail > div { border-bottom: 2px solid $gr-line !important; }
+
+// Los mismos colores de antes al pasar el mouse / seleccionar
+.gr-point-main:hover,
+.gr-point--active .gr-point-main,
+.gr-icon-btn:hover,
+.gr-input:focus,
+.gr-btn--ghost:not(:disabled):hover,
+.gr-row--selected,
+.gr-history-item:hover,
+.gr-history-item--selected { border-color: $accent !important; }
+
+.gr-icon-btn--danger:hover { border-color: $danger !important; }
+
+// Contadores y "Elegir" que casi no se leían en modo claro
+.gr-chip:not(.gr-chip--star):not(.gr-chip--full),
+.gr-point-action { color: $accent-strong; }
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .gr-subtabs,
+  .gr-card,
+  .gr-point-main,
+  .gr-icon-btn,
+  .gr-input,
+  .gr-btn--ghost,
+  .gr-row,
+  .gr-history-item,
+  .gr-map-wrap,
+  .gr-modal,
+  .gr-places,
+  .gr-empty { border-color: $border !important; }
+
+  .gr-detail > div { border-bottom-color: $border !important; }
+
+  .gr-point-main:hover,
+  .gr-point--active .gr-point-main,
+  .gr-icon-btn:hover,
+  .gr-input:focus,
+  .gr-btn--ghost:not(:disabled):hover,
+  .gr-row--selected,
+  .gr-history-item:hover,
+  .gr-history-item--selected { border-color: $accent !important; }
+
+  .gr-icon-btn--danger:hover { border-color: $danger !important; }
+
+  .gr-chip:not(.gr-chip--star):not(.gr-chip--full),
+  .gr-point-action { color: $accent; }
+}

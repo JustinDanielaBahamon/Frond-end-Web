@@ -46,10 +46,10 @@ export class ContinuousPlayerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     // Tracking refreshes every few seconds and may bring new parts: if the playing one
     // is still in the list, it continues with it without restarting the player
-    const previousOnes: RecordingPart[] = changes['partes']?.previousValue ?? [];
+    const previousOnes: RecordingPart[] = changes['parts']?.previousValue ?? [];
     const currentId = previousOnes[this.index()]?.id;
     const samePart = currentId != null ? this.parts.findIndex((p) => p.id === currentId) : -1;
-    if (samePart >= 0 && !changes['tipo']) {
+    if (samePart >= 0 && !changes['type']) {
       this.index.set(samePart);
       return;
     }

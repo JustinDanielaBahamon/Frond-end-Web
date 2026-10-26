@@ -255,3 +255,32 @@ $btn-purple-hover: #6d28d9;
   .page-header { flex-direction: column; align-items: flex-start; }
   .form__row { grid-template-columns: 1fr; }
 }
+
+
+// =============================================
+// MODO OSCURO — títulos y textos visibles
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+:host-context([data-theme="dark"]) {
+
+  // Títulos de cada tarjeta ("Sesión y apariencia", "Mi actividad reciente"...)
+  // El estilo global los pinta con un degradado morado oscuro: aquí van en lila claro
+  .card__title {
+    background: linear-gradient(90deg, #f3efff, #c4a1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    i {
+      color: #c4a1ff;
+      -webkit-text-fill-color: #c4a1ff;
+    }
+  }
+
+  // "Tema"
+  .label { color: var(--text-primary); }
+
+  // Tipo de cada actividad ("Inicio de sesión", "Cierre de sesión"...)
+  .activity__item strong { color: var(--text-primary); }
+  .activity__item--bad strong { color: var(--red); }
+}

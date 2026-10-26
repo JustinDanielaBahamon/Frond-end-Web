@@ -719,3 +719,145 @@ table {
 
 // Tendencia: tamaño real del dibujo (textos a 11 px)
 .trend-svg { min-width: 640px; }
+
+// =============================================
+// RESPONSIVE COMPLETO DEL DASHBOARD (celular y tablet)
+// Solo diseño: los botones, filtros y datos funcionan igual
+// =============================================
+
+// La tabla también con la barrita morada para moverla de lado
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: $purple-mid transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: $purple-mid; border-radius: 3px; }
+}
+
+@media (max-width: 700px) {
+  .dash-title { font-size: 1.35rem; }
+
+  .dash-card { padding: 14px; }
+
+  // Encabezados con botones (tendencia y alertas recientes):
+  // ícono + título en una fila y los botones debajo, a lo ancho
+  .dash-card__header--filters {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+
+    > .trend-vista,
+    > .filters--table {
+      grid-column: 1 / -1;
+      margin-left: 0;
+    }
+  }
+
+  .trend-vista .filter-button { flex: 1; }
+
+  // Filtros de estado de la tabla: 4 iguales en una fila
+  .filters--table {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    .filter-button { padding: 8px 6px; }
+  }
+
+  // Periodo (Hoy / 7 días / 30 días / Personalizado): 4 iguales en una fila
+  .dash-top > .filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+
+    .filter-button { padding: 8px 6px; }
+  }
+
+  // Fechas personalizadas: una debajo de la otra
+  .filters--dates {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .date-label { justify-content: space-between; }
+
+  // Tarjetas de números: 2 por fila, ícono arriba y número debajo
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+
+      svg { width: 19px; height: 19px; }
+    }
+
+    &__value { font-size: 1.6rem; }
+  }
+
+  // Atajos: 2 por fila, del mismo ancho
+  .atajos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .atajo {
+    justify-content: center;
+    padding: 9px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  // Hora pico / franja más riesgosa / más tranquila: más compactas
+  .hours-stats { gap: 8px; }
+  .mini-stat { padding: 10px 12px; }
+
+  // Leyenda del gráfico de tendencia: la nota va abajo, a la izquierda
+  .legend { gap: 8px 16px; }
+  .legend__note { margin-left: 0; flex-basis: 100%; }
+
+  // Resumen de la tendencia: números un poco más compactos
+  .trend-summary {
+    gap: 10px 20px;
+
+    &__valor { font-size: 1.5rem; }
+    &__sentence { flex-basis: 100%; }
+  }
+
+  // Zonas: el número no empuja el nombre
+  .zone-item {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .zone-detail__meta { overflow-wrap: anywhere; }
+}
+
+// Celulares chicos
+@media (max-width: 480px) {
+  .dash-top > .filters,
+  .filters--table { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+// Celulares muy angostos: todo en una columna
+@media (max-width: 360px) {
+  .dashboard { padding: 12px; }
+  .stats-row { grid-template-columns: 1fr; }
+
+  .stat-card {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .atajos { grid-template-columns: 1fr; }
+}

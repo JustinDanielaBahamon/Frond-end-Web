@@ -1,6 +1,7 @@
 <div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
 
   <app-sidebar
+    class="sidebar--drawer"
     [links]="links"
     sectionTitle="Módulo"
     [collapsed]="sidebarCollapsed"
@@ -9,6 +10,11 @@
     [user]="user"
     (logout)="onLogout()">
   </app-sidebar>
+
+  <!-- Fondo oscuro detrás de la barra lateral (solo en pantallas ≤ 1024px, igual que en el admin) -->
+  @if (!sidebarCollapsed) {
+    <div class="layout__backdrop" (click)="sidebarCollapsed = true"></div>
+  }
 
   <div class="layout__body">
 

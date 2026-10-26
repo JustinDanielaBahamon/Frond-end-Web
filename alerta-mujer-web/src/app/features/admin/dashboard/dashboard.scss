@@ -689,3 +689,33 @@ table {
   margin-left: auto;
   flex-shrink: 0;
 }
+
+// =============================================
+// GRÁFICOS CON TAMAÑO FIJO EN PANTALLAS CHICAS
+// No se encogen: mantienen su tamaño y se mueven
+// hacia los lados (como una tabla). En PC se ven igual que antes.
+// =============================================
+.hours-scroll,
+.trend-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px; // espacio para la barra de desplazamiento
+
+  // Barra de desplazamiento visible y delgada
+  scrollbar-width: thin;
+  scrollbar-color: $purple-mid transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: $purple-mid;
+    border-radius: 3px;
+  }
+}
+
+// Alertas por hora: tamaño real del dibujo (textos a 12 px)
+.hours-svg { min-width: 1000px; }
+
+// Tendencia: tamaño real del dibujo (textos a 11 px)
+.trend-svg { min-width: 640px; }

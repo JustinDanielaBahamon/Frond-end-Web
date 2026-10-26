@@ -365,3 +365,28 @@ $sos: #a70bf5;
   font-weight: 800;
   text-decoration: none;
 }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Modo claro: el mismo morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  --border: #6d5bb8;
+
+  // Contadores que casi no se leían en modo claro
+  .za-chip { color: $accent-strong; }
+}
+
+// Mismo color y estado de antes, solo más gruesas (claro y oscuro)
+.za-card,
+.za-btn:not(.za-btn--primary),
+.za-search,
+.za-filter,
+.za-item,
+.za-empty,
+.za-map-wrap { border-width: 2px; }
+
+.za-call { border-top-width: 2px; }

@@ -454,3 +454,32 @@ $danger: #e671f8;
 :host ::ng-deep .ug-popup-row { font-size: 0.78rem; color: #4b4b55; }
 :host ::ng-deep .ug-popup-notes { margin-top: 0.3rem; font-size: 0.76rem; font-style: italic; color: #4b4b55; }
 :host ::ng-deep .ug-popup-badge { margin-top: 0.35rem; font-size: 0.76rem; font-weight: 800; }
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Modo claro: el mismo morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  --border: #6d5bb8;
+
+  // Contadores que casi no se leían en modo claro
+  .ug-chip { color: $accent-strong; }
+}
+
+// Mismo color y estado de antes, solo más gruesas (claro y oscuro)
+.ug-card,
+.ug-cta,
+.ug-point,
+.ug-input,
+.ug-quick-chip,
+.ug-level,
+.ug-btn--ghost,
+.ug-search,
+.ug-filter,
+.ug-item,
+.ug-icon-btn,
+.ug-empty,
+.ug-map-wrap { border-width: 2px; }

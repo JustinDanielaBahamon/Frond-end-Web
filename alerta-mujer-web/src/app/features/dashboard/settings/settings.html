@@ -56,12 +56,32 @@
       <p class="settings-card__label">{{ 'Tema' | t }}</p>
       <div class="theme-options">
         <button type="button" class="theme-option" [class.active]="theme() === 'light'" (click)="toggleTheme('light')">
-          <span class="theme-preview theme-preview--light"></span>
-          <span>{{ 'Claro' | t }}</span>
+          <!-- Mini vista previa del panel en modo claro (solo decorativa) -->
+          <span class="theme-preview theme-preview--light" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-sun"></i> {{ 'Claro' | t }}
+            @if (theme() === 'light') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
         </button>
         <button type="button" class="theme-option" [class.active]="theme() === 'dark'" (click)="toggleTheme('dark')">
-          <span class="theme-preview theme-preview--dark"></span>
-          <span>{{ 'Oscuro' | t }}</span>
+          <!-- Mini vista previa del panel en modo oscuro (solo decorativa) -->
+          <span class="theme-preview theme-preview--dark" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-moon"></i> {{ 'Oscuro' | t }}
+            @if (theme() === 'dark') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
         </button>
       </div>
 

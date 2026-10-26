@@ -433,9 +433,9 @@ a.setting-row {
 // (solo estilos)
 // =============================================
 :host-context(html:not([data-theme="dark"])) {
-  .settings-card { border: 2px solid #6d5bb8 !important; }
+  .settings-card { border: 2px solid var(--am-line, #6d5bb8) !important; }
   .account-profile,
-  .setting-row { border-bottom: 2px solid #8878c6 !important; }
+  .setting-row { border-bottom: 2px solid var(--am-line-soft, #8878c6) !important; }
   .setting-row:last-of-type { border-bottom: none !important; }
 }
 
@@ -491,7 +491,7 @@ $us-accent: var(--accent-grad-to, #7c39ef);
   }
 }
 
-:host-context(html:not([data-theme="dark"])) .theme-option { border-color: #6d5bb8; }
+:host-context(html:not([data-theme="dark"])) .theme-option { border-color: var(--am-line, #6d5bb8); }
 :host-context([data-theme="dark"]) .theme-option { border-color: var(--border, #4c3a80); }
 :host-context(html) .theme-option.active,
 :host-context(html) .theme-option:hover { border-color: $us-accent; }
@@ -609,3 +609,48 @@ $us-accent: var(--accent-grad-to, #7c39ef);
   .theme-options { min-height: 0; }
   .theme-preview { min-height: 80px; }
 }
+
+// =============================================
+// LETRA MÁS GRANDE (antes casi todo estaba en 12.5 px,
+// más chica que en los demás módulos)
+// =============================================
+.settings__header p { font-size: 0.95rem; }
+
+.settings-card__header h2 { font-size: 1.1rem; }
+.settings-card__label { font-size: 0.95rem; }
+
+.account-profile {
+  strong { font-size: 1.15rem; }
+  span { font-size: 0.95rem; }
+}
+
+// Texto de cada opción ("Cambiar contraseña", "Correo electrónico"…)
+.setting-row {
+  font-size: 0.95rem;
+
+  > span:not(.setting-row__value) { font-size: 0.95rem; }
+  strong { font-size: 0.95rem; }
+
+  // Descripción debajo del título de la opción
+  div > span { font-size: 0.85rem; line-height: 1.4; }
+}
+
+// Valor de la derecha (correo, teléfono, versión): si no cabe, baja a la siguiente línea
+.setting-row:has(.setting-row__value) {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.setting-row .setting-row__value {
+  font-size: 0.875rem;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.setting-row.setting-row--destructive span { font-size: 0.95rem; }
+
+.settings-card__note { font-size: 0.85rem; }
+.privacy-list li { font-size: 0.9rem; }
+.theme-option__label { font-size: 1rem; }
+.settings__footer .footer-item { font-size: 0.95rem; }

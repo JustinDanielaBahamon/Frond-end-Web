@@ -98,7 +98,6 @@ img.tiles-oscuras {
 // Solo estilos: el selector de color ya guarda el color en
 // --accent-grad-from / --accent-grad-to / --purple-deep; aquí hacemos que
 // los fondos, bordes e íconos del panel (admin y usuaria) también lo usen.
-// Con el violeta por defecto se ve igual que antes.
 // =============================================
 
 // Modo oscuro: fondos y bordes con un toque del color elegido
@@ -110,16 +109,25 @@ img.tiles-oscuras {
 }
 
 // Modo claro: fondos, bordes y líneas gruesas con el color elegido
-// (con el violeta por defecto dan los mismos tonos de antes)
 html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
-  --bg-base: color-mix(in srgb, var(--purple-deep, #621fd6) 5%, #fbfcff);
-  --bg-card: color-mix(in srgb, var(--purple-deep, #621fd6) 2%, #ffffff);
-  --bg-card-hover: color-mix(in srgb, var(--purple-deep, #621fd6) 8%, #f8f9fc);
+  --bg-base: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 10%, #fbfbfd);
+  --bg-card: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 4%, #ffffff);
+  --bg-card-hover: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 12%, #f8f8fb);
   --border: color-mix(in srgb, var(--purple-deep, #621fd6) 35%, #bdcbd6);
   --am-line: color-mix(in srgb, var(--purple-deep, #621fd6) 40%, #7483a4);
   --am-line-soft: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #989ebf);
   --am-line-light: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #b6bfd6);
   --am-line-faint: color-mix(in srgb, var(--purple-deep, #621fd6) 20%, #ced2e3);
+}
+
+// Modo claro: la barra de arriba también con un toque del color elegido
+html:not([data-theme="dark"]) app-topbar .topbar {
+  background: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 5%, #ffffff);
+}
+
+// Modo claro: el fondo de la página de la usuaria (antes un lila fijo)
+html:not([data-theme="dark"]) app-dashboard-layout :is(.layout__body, .layout__main) {
+  background: var(--bg-base);
 }
 
 // Ícono al lado del título de cada módulo

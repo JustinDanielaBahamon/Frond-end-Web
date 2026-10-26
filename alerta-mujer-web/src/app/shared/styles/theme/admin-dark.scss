@@ -385,6 +385,112 @@
 
 /*
  * ==================================================
+ * =   MODERATOR MANAGEMENT — modales en modo oscuro
+ * =   (fondo oscuro y textos legibles; solo estilos)
+ * ==================================================
+ */
+[data-theme='dark'] app-moderator-management {
+
+  /* Encabezado de los 3 modales (ver / agregar / editar) */
+  .modal-header {
+    background: var(--bg-card) !important;
+    border-bottom: 2px solid var(--border) !important;
+
+    h2,
+    .modal-header-text h2 { color: var(--text-primary) !important; }
+
+    /* Título de "Ver" y "Editar": mismo tamaño que el de "Agregar" */
+    > h2 {
+      margin: 0 !important;
+      font-size: 1.35rem !important;
+      font-weight: 800 !important;
+    }
+
+    .modal-header-text p { color: var(--text-muted) !important; }
+
+    .modal-close {
+      background: var(--purple-pale) !important;
+      color: var(--text-muted) !important;
+
+      &:hover {
+        background: var(--purple-pale-hover) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+  }
+
+  /* Modal "Ver": tarjeta de arriba */
+  .report-detail .report-header {
+    background: linear-gradient(135deg, var(--purple-pale) 0%, var(--bg-card) 100%) !important;
+    border: 1px solid var(--border) !important;
+
+    .report-header-info {
+      h3 { color: var(--text-primary) !important; }
+
+      .date-badge {
+        background: var(--bg-base) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+
+        &::before { color: var(--purple-mid) !important; }
+      }
+
+      .status-badge-large {
+        background: var(--bg-base) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--purple-mid) !important;
+
+        &::before { background: var(--purple-mid) !important; }
+      }
+    }
+  }
+
+  /* Modal "Ver": chips de motivo y gravedad */
+  .report-detail .detail-section .detail-item {
+    .badge-large,
+    .severity-badge-large {
+      background: var(--purple-pale) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--purple-mid) !important;
+
+      &::before { background: var(--purple-mid) !important; }
+    }
+  }
+
+  /* Modal "Ver": caja de descripción */
+  .report-detail .detail-section .description-box {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+
+    &:hover { border-color: var(--purple-mid) !important; }
+
+    p { color: var(--text-primary) !important; }
+  }
+
+  /* Modal "Ver": nombre y correo de la usuaria */
+  .report-detail .detail-section .user-card .user-details {
+    .user-name  { color: var(--text-primary) !important; }
+    .user-email { color: var(--text-muted) !important; }
+  }
+
+  /* Modal "Ver": "Registrado por" y "Resolución" */
+  .case-extra {
+    color: var(--text-muted) !important;
+
+    strong { color: var(--text-primary) !important; }
+  }
+
+  /* Modal "Agregar": títulos de cada sección */
+  .form-section h4 {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border) !important;
+
+    i { color: var(--purple-mid) !important; }
+  }
+}
+
+/*
+ * ==================================================
  * =   EVIDENCE MANAGEMENT
  * ==================================================
  */

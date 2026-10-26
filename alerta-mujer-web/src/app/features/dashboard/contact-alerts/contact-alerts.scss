@@ -85,3 +85,38 @@
   .ac__item { flex-wrap: wrap; }
   .ac__item .ac__btn { width: 100%; justify-content: center; }
 }
+
+
+// =============================================
+// AJUSTES DE DISEÑO — botones y líneas como en el resto del panel
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Botones "Ver seguimiento" / "Activar avisos": mismo morado del sidebar
+.ac__btn {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover:not(:disabled) { filter: brightness(1.08); }
+}
+
+// Líneas de 2px (morado del admin en claro, borde del tema en oscuro)
+.ac__notice,
+.ac__empty,
+.ac__item {
+  border: 2px solid #6d5bb8;
+}
+
+// La alerta activa conserva su borde rosado (es una emergencia en curso)
+.ac__item--active {
+  border-color: var(--pink);
+  outline: none;
+}
+
+:host-context([data-theme="dark"]) {
+  .ac__notice,
+  .ac__empty,
+  .ac__item { border-color: var(--border); }
+
+  .ac__item--active { border-color: var(--pink); }
+}

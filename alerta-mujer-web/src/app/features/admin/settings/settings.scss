@@ -490,3 +490,52 @@ $btn-purple-hover: #6d28d9;
     h1 { font-size: 1.7rem; }
   }
 }
+
+// =============================================
+// TARJETA "¿TIENES ALGÚN PROBLEMA?": ocupa toda la tarjeta de Ayuda y soporte
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+.help-box {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 0;
+  padding: 28px 22px;
+  text-align: center;
+
+  &__top {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    font-size: 1.6rem;
+  }
+
+  &__title { font-size: 1.15rem; }
+  &__desc  { margin-top: 6px; font-size: 0.9rem; }
+
+  .btn-help { padding: 14px; }
+}
+
+// =============================================
+// MODO OSCURO — títulos de las tarjetas visibles
+// (el estilo global los pinta con un degradado morado oscuro)
+// =============================================
+:host-context([data-theme="dark"]) {
+  .card__title {
+    background: linear-gradient(90deg, #f3efff, #c4a1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    i {
+      color: #c4a1ff;
+      -webkit-text-fill-color: #c4a1ff;
+    }
+  }
+}

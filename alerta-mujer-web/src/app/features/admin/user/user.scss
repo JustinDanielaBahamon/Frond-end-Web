@@ -1073,3 +1073,26 @@ table {
 .evidence__button { cursor: pointer; }
 .form-help { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
 .btn-danger-outline { margin-right: auto; padding: 9px 14px; border: 1.5px solid #a21caf; border-radius: 10px; background: transparent; color: #a21caf; font-weight: 700; cursor: pointer; }
+
+// =============================================
+// CELULAR: los 4 cuadros de arriba (Total, Activas, Bloqueadas,
+// Inactivas) uno debajo del otro, a lo ancho, para que no se vean chicos.
+// Cada cuadro: nombre a la izquierda y número a la derecha.
+// =============================================
+@media (max-width: 480px) {
+  .users-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .mini-stat {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+
+    &__value { font-size: 1.5rem; line-height: 1; }
+    &__label { font-size: 0.9rem; font-weight: 700; }
+  }
+}

@@ -793,3 +793,93 @@
   .ah-empty { color: var(--text-muted) !important; }
   .ah-error { color: var(--red) !important; }
 }
+
+// =============================================
+// AJUSTES DE DISEÑO — color de botones, líneas y modo oscuro
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$ah-line: #6d5bb8;       // mismo morado de líneas del panel admin
+$ah-line-soft: #8878c6;  // separadores entre filas
+$ah-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+
+// ── Encabezado de la tabla y página activa: morado del sidebar ──
+.ah-table thead tr { background: $ah-accent; }
+
+.ah-pagination-controls button.active {
+  background: $ah-accent;
+  border-color: transparent;
+  color: #fff;
+}
+
+// ── Líneas más gruesas (2px, como en el admin) ──
+.ah-search,
+.ah-filter-date,
+.ah-filter-type,
+.ah-view-toggle,
+.ah-table-wrap {
+  border-width: 2px;
+  border-color: $ah-line;
+}
+
+.ah-toolbar .ah-search { border-color: $ah-line !important; }
+
+.ah-stats .ah-stat {
+  border-top: 2px solid $ah-line;
+  border-right: 2px solid $ah-line;
+  border-bottom: 2px solid $ah-line;
+}
+
+// La línea va en la fila completa (así no se corta en la columna de acciones)
+.ah-table td { border-bottom: none; }
+.ah-table tbody tr { border-bottom: 2px solid $ah-line-soft; }
+.ah-table tbody tr:last-child { border-bottom: none; }
+.ah-pagination { border-top: 2px solid $ah-line; }
+.ah-pagination-controls button { border: 2px solid $ah-line; }
+
+// ── Modo oscuro ──
+:host-context([data-theme="dark"]) {
+
+  // Mismo grosor, con el borde oscuro del tema
+  .ah-search,
+  .ah-filter-date,
+  .ah-filter-type,
+  .ah-view-toggle,
+  .ah-table-wrap,
+  .ah-pagination-controls button { border-color: var(--border) !important; }
+
+  .ah-toolbar .ah-search { border-color: var(--border) !important; }
+
+  .ah-stats .ah-stat {
+    border-top-color: var(--border) !important;
+    border-right-color: var(--border) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  .ah-table tbody tr { border-bottom-color: var(--border); }
+  .ah-table td { border-bottom: none !important; }
+  .ah-pagination { border-top-color: var(--border); }
+
+  // El tema oscuro global pinta el encabezado en lila/rosado: aquí va el morado del sidebar
+  .ah-table thead tr { background: $ah-accent !important; }
+
+  .ah-pagination-controls button.active {
+    background: $ah-accent !important;
+    color: #fff !important;
+  }
+
+  // Lista del filtro "Medio": las opciones se veían en blanco sobre blanco
+  .ah-filter-type select {
+    color-scheme: dark;
+
+    option {
+      background: var(--bg-card, #241d3d);
+      color: var(--text-primary, #ede9fe);
+    }
+  }
+
+  // Estado "Cancelada" más legible
+  .ah-badge.badge-false {
+    background: rgba(157, 111, 240, 0.18) !important;
+    color: #c4a1ff !important;
+  }
+}

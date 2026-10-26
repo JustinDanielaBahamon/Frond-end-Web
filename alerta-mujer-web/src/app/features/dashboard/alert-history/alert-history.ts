@@ -50,7 +50,7 @@ export class AlertHistory implements OnInit, OnDestroy {
 
   // NOTE: these values must exactly match the ones the backend sends
   // in Alert.activationMethod. Adjust the list if your real names are different.
-  availableMethods = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Botón de encendido', 'Manual',
+  availableMethods = ['Botón de pánico', 'Contacto', 'Widget', 'Movimiento sospechoso', 'Manual',
     'Avísame si no llego', 'Señal perdida'];
 
 

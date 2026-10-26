@@ -816,3 +816,75 @@
   font-size: 13px;
   color: var(--text-muted, #6b5b95);
 }
+
+
+// =============================================
+// AJUSTES DE DISEÑO — botones, líneas y modo oscuro
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Líneas en el mismo morado que usa el panel admin (modo claro)
+:host {
+  --color-borde: #6d5bb8;
+}
+
+// ── Botones: mismo morado del módulo activo del sidebar ──
+.home-btn--primary,
+.home-btn--refresh {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover:not(:disabled) { opacity: 1; filter: brightness(1.08); }
+}
+
+// ── Líneas más gruesas (2px, como en el admin) ──
+.home-panel,
+.home-security-item,
+.home-full-map,
+.home-map-legend {
+  border: 2px solid var(--color-borde);
+}
+
+.home-btn--outline { border-width: 2px; }
+.home-map-legend__note { border-width: 2px; }
+.home-emergency__detail { border-top: 2px solid var(--color-borde); }
+
+// La etiqueta de "Alertas" (Mi dispositivo) del tamaño de su texto
+.home-device-row .home-badge { width: fit-content; }
+
+// ── Modo oscuro: textos que se perdían ──
+:host-context([data-theme="dark"]) {
+
+  // Fichas de "Estado de tu seguridad" (el tema oscuro global les pone 1px)
+  .home-security-item { border-width: 2px !important; }
+
+  // "Requiere atención • 75% configurado" / "Configuración incompleta"
+  .home-panel__subtitle--warning { color: #c4a1ff; }
+  .home-panel__subtitle--danger  { color: var(--red, #e671f8); }
+
+  // Mi dispositivo → Alertas: "Sin notificaciones" / "Las recibe"
+  .home-badge--advertencia {
+    background: rgba(230, 113, 248, 0.15);
+    color: var(--red, #e671f8);
+  }
+
+  .home-badge--success {
+    background: rgba(157, 111, 240, 0.18) !important;
+    color: #c4a1ff !important;
+  }
+
+  // Botón "Centrar en mi celular"
+  .home-panel__header .home-btn:not(.home-btn--refresh):not(.home-btn--outline):not(.home-btn--primary) {
+    background: transparent;
+    color: var(--text-primary, #ede9fe);
+
+    i { color: var(--purple-mid, #b79bf5); }
+  }
+
+  // Los botones morados ganan al degradado rosado del tema oscuro global
+  .home-btn--primary {
+    background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef)) !important;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent) !important;
+  }
+}

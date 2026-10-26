@@ -97,10 +97,32 @@
       <p class="label">{{ 'Tema' | t }}</p>
       <div class="theme-options">
         <button class="theme-btn" [class.theme-btn--active]="!isDark()" (click)="changeTheme('light')">
-          <i class="fa-regular fa-sun"></i> {{ 'Claro' | t }}
+          <!-- Mini vista previa del panel en modo claro (solo decorativa) -->
+          <span class="theme-preview theme-preview--light" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-btn__label">
+            <i class="fa-regular fa-sun"></i> {{ 'Claro' | t }}
+            @if (!isDark()) { <i class="fa-solid fa-circle-check theme-btn__check"></i> }
+          </span>
         </button>
         <button class="theme-btn" [class.theme-btn--active]="isDark()" (click)="changeTheme('dark')">
-          <i class="fa-regular fa-moon"></i> {{ 'Oscuro' | t }}
+          <!-- Mini vista previa del panel en modo oscuro (solo decorativa) -->
+          <span class="theme-preview theme-preview--dark" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-btn__label">
+            <i class="fa-regular fa-moon"></i> {{ 'Oscuro' | t }}
+            @if (isDark()) { <i class="fa-solid fa-circle-check theme-btn__check"></i> }
+          </span>
         </button>
       </div>
 

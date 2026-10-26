@@ -861,3 +861,33 @@ table {
 
   .atajos { grid-template-columns: 1fr; }
 }
+
+// =============================================
+// PANTALLAS MUY ANGOSTAS: "Hora pico", "Franja más riesgosa" y
+// "Franja más tranquila" ya no se salen de la tarjeta
+// (antes tenían un ancho mínimo de 210 px)
+// =============================================
+.hours-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+
+  > * { min-width: 0; }
+}
+
+.mini-stat__value,
+.mini-stat__sub,
+.stat-card__label,
+.stat-card__sub,
+.dash-card__header h3,
+.dash-card__header p { overflow-wrap: anywhere; }
+
+@media (max-width: 300px) {
+  .dashboard { padding: 8px; }
+  .dash-card { padding: 10px; }
+  .dash-card__header { gap: 8px; }
+  .dash-card__icon { width: 32px; height: 32px; }
+  .dash-card__header--filters { grid-template-columns: 32px minmax(0, 1fr); }
+  .mini-stat { padding: 8px 10px; }
+  .mini-stat__value { font-size: 1rem; }
+  .dash-top > .filters,
+  .filters--table { grid-template-columns: 1fr; }
+}

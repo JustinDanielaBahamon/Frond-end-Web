@@ -766,3 +766,73 @@
   font-weight: 800;
   vertical-align: middle;
 }
+
+
+// =============================================
+// BOTONES Y TARJETAS CON EL COLOR DEL MÓDULO ACTIVO DE LA BARRA LATERAL
+// + LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$dv-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+
+// Mismo morado (no tan brillante) que el módulo activo
+.device-perm--ok,
+.device-btn--primary,
+.device-action-btn,
+.device-principal,
+.dd-ok { background: $dv-accent !important; }
+
+// Modo claro: el morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  .device-panel,
+  .device-btn--icon,
+  .device-permissions-note,
+  .device-list-item--highlight,
+  .device-test-btn,
+  .device-phone,
+  .dd-modal { border: 2px solid #6d5bb8 !important; }
+
+  .device-perm { border: 2px dashed #6d5bb8 !important; }
+  .device-perm--ok { border: 2px solid transparent !important; }
+
+  .dd-row { border-bottom: 2px solid #8878c6 !important; }
+  .dd-row:last-child { border-bottom: 0 !important; }
+
+  .device-perm-notice { border-width: 2px !important; }
+
+  // Los mismos colores de antes al pasar el mouse
+  .device-phone:hover { border-color: #a855f7 !important; }
+  .device-test-btn:hover:not(:disabled) { border-color: var(--color-principal) !important; }
+
+  // Textos de los botones de prueba que casi no se leían en modo claro
+  .device-test-btn { color: var(--purple-deep, #5b21b6); }
+  .device-test-btn:hover:not(:disabled) { color: #fff; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .device-panel,
+  .device-btn--icon,
+  .device-permissions-note,
+  .device-list-item--highlight,
+  .device-test-btn,
+  .device-phone,
+  .dd-modal { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .device-perm { border: 2px dashed var(--border, #4c3a80) !important; }
+  .device-perm--ok { border: 2px solid transparent !important; }
+
+  .dd-row { border-bottom: 2px solid var(--border, #4c3a80) !important; }
+  .dd-row:last-child { border-bottom: 0 !important; }
+
+  .device-perm-notice { border-width: 2px !important; }
+
+  // Los mismos colores de antes al pasar el mouse
+  .device-phone:hover { border-color: #a855f7 !important; }
+  .device-test-btn:hover:not(:disabled) { border-color: var(--color-principal) !important; }
+
+  // Etiquetas ("21 h 3 min", "Activo") que no se veían en modo oscuro
+  .device-badge--success { background: rgba(183, 155, 245, 0.18); color: #c4a1ff; }
+  .device-badge--warning { background: rgba(215, 140, 255, 0.18); color: #d98cff; }
+  .device-badge--neutral { color: var(--text-muted, #a8a0c4); }
+}

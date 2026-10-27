@@ -584,3 +584,121 @@ $ec-line-soft: #8878c6;   // líneas entre filas de la tabla
     color: var(--purple-mid, #b79bf5) !important;
   }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE CONTACTOS (solo diseño)
+// =============================================
+
+// Título, descripción y avisos: los textos bajan de línea en vez de salirse
+.page-title-row > div { min-width: 0; }
+
+.ec-title,
+.ec-sub,
+.ec-info-banner,
+.ec-footer-banner,
+.ec-modal-header h3,
+.ec-modal-header p,
+.ec-danger-confirm p { overflow-wrap: break-word; }
+
+.ec-footer-banner p,
+.ec-modal-header > div { min-width: 0; }
+
+// La tabla mantiene su tamaño y se mueve de lado (con barra morada)
+@media (max-width: 700px) {
+  .ec-table-wrap {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed transparent;
+
+    &::-webkit-scrollbar { height: 8px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 999px; }
+  }
+
+  .ec-table { min-width: 680px; }
+  .ec-table th,
+  .ec-table td { white-space: nowrap; }
+
+  // El menú ⋮ de la última fila abre hacia arriba para que no quede cortado
+  .ec-table tbody tr:last-child:not(:first-child) .ec-menu {
+    top: auto;
+    bottom: 36px;
+  }
+}
+
+// Tablet / celular: menos espacio a los lados
+@media (max-width: 768px) {
+  .ec-wrap { padding: 1rem 0.5rem; }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .ec-wrap { padding: 0.75rem 0; }
+
+  // "Agregar contacto" a lo ancho
+  .ec-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ec-info-banner,
+  .ec-footer-banner { padding: 10px 12px; }
+
+  // Ventanas de agregar / editar
+  .ec-modal-bg { padding: 0.6rem; }
+  .ec-modal-header { padding: 16px 16px 10px; }
+  .ec-modal-body { padding: 4px 16px 8px; }
+  .ec-modal-actions { padding: 14px 16px 16px; }
+
+  .ec-photo {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ec-field input,
+  .ec-field select { min-width: 0; width: 100%; }
+}
+
+// Celulares chicos: botones de las ventanas uno debajo del otro
+@media (max-width: 360px) {
+  .ec-title { font-size: 1.35rem; }
+
+  .ec-modal-actions,
+  .ec-danger-confirm-actions { flex-direction: column-reverse; }
+
+  .ec-photo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ec-photo-actions { justify-content: center; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .page-title-row { gap: 8px; }
+  .page-title-icon { width: 32px; height: 32px; }
+  .ec-title { font-size: 1.15rem; }
+  .ec-title,
+  .ec-sub { overflow-wrap: anywhere; }
+
+  // El ícono del aviso arriba y el texto a lo ancho
+  .ec-info-banner,
+  .ec-footer-banner {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ec-add-btn {
+    height: auto;
+    min-height: 40px;
+    padding: 8px 10px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .ec-btn,
+  .ec-danger-btn,
+  .ec-photo-button,
+  .ec-photo-remove { white-space: normal; text-align: center; justify-content: center; }
+}

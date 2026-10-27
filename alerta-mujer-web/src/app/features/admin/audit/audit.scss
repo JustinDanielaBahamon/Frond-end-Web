@@ -393,3 +393,90 @@ table {
 
   i { margin-right: 4px; color: #a855f7; }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE AUDITORÍA (solo diseño)
+// =============================================
+
+// Las casillas de filtro se pueden encoger (el calendario traía mínimo 170 px)
+.field {
+  min-width: 0;
+
+  app-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+// Tabla: mantiene su tamaño y se mueve hacia los lados con barrita morada
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+}
+
+table th { white-space: nowrap; }
+
+.pagination { flex-wrap: wrap; }
+
+@media (max-width: 1024px) {
+  .table-responsive table { min-width: 900px; }
+}
+
+// Celular
+@media (max-width: 700px) {
+  .page-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .btn-clear { justify-content: center; }
+
+  // Pie de la tabla: información arriba y páginas debajo, centrado
+  .table-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pagination { justify-content: center; }
+}
+
+// Celular chico: filtros uno debajo del otro
+@media (max-width: 480px) {
+  .audit-page { padding: 12px; }
+
+  .page-header h1 { font-size: 1.45rem; }
+
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .btn-clear { width: 100%; }
+
+  .pagination { gap: 4px; }
+
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+  }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .audit-page { padding: 8px; }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .chip { padding: 6px 10px; font-size: 0.8rem; }
+
+  .page-btn {
+    min-width: 28px;
+    height: 28px;
+  }
+}

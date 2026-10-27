@@ -625,3 +625,96 @@ $ev-line: #6d5bb8;   // morado de líneas del panel admin (modo claro)
   .ev-btn--ghost:not(:disabled):hover,
   .ev-icon-btn:hover:not(:disabled) { border-color: $accent !important; }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE EVIDENCIAS (solo diseño)
+// =============================================
+
+// Las dos tarjetas nunca más anchas que la pantalla
+@media (max-width: 960px) {
+  .ev-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Textos largos bajan de línea en vez de salirse
+.ev-title,
+.ev-sub,
+.ev-alert-item-title,
+.ev-keep-text,
+.ev-continua-text,
+.ev-meta dd { overflow-wrap: break-word; }
+
+.ev-hash code { overflow-wrap: anywhere; }
+.ev-keep-text,
+.ev-detail-title { min-width: 0; }
+
+// Cajitas de datos y miniaturas: se ajustan al ancho disponible
+.ev-meta { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
+.ev-tiles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 104px), 1fr)); }
+
+.ev-alerts-head { flex-wrap: wrap; }
+
+// Celular
+@media (max-width: 480px) {
+  // "Subir evidencia" a lo ancho
+  .ev-titlebar .ev-btn {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .ev-card { padding: 0.9rem; }
+
+  // "Se borran a los 30 días": el botón Conservar baja, a lo ancho
+  .ev-keep {
+    flex-wrap: wrap;
+
+    .ev-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .ev-continua-buttons {
+    width: 100%;
+
+    .ev-btn { flex: 1 1 auto; justify-content: center; }
+  }
+
+  // Descargar / Eliminar a lo ancho
+  .ev-actions .ev-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .ev-rename-input { min-width: 0; flex: 1 1 100%; }
+}
+
+// Celulares chicos: en cada alerta, el estado y los archivos van debajo
+@media (max-width: 360px) {
+  .ev-alert-item { flex-wrap: wrap; }
+
+  .ev-alert-item-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+    width: 100%;
+  }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .ev-title { font-size: 1.25rem; }
+  .ev-card { padding: 0.7rem; }
+  .ev-hash,
+  .ev-keep { padding: 0.6rem; }
+  .ev-btn { white-space: normal; text-align: center; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.8rem; }
+
+  // Cada alerta: la fecha arriba y el texto a lo ancho
+  .ev-alert-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ev-alert-item-text { width: 100%; }
+}

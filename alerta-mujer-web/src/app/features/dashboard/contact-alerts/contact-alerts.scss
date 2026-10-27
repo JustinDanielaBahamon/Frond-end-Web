@@ -120,3 +120,79 @@
 
   .ac__item--active { border-color: var(--pink); }
 }
+
+// =============================================
+// RESPONSIVE: LOS TEXTOS NO SE SALEN DE LAS TARJETAS
+// (solo diseño: no cambia nada del HTML ni del TS)
+// =============================================
+.ac__header > div,
+.ac__notice p,
+.ac__empty p { min-width: 0; }
+
+.ac__title,
+.ac__sub,
+.ac__notice p,
+.ac__empty p,
+.ac__name,
+.ac__date { overflow-wrap: break-word; }
+
+// Celular: el aviso pone su botón debajo del texto, a lo ancho
+@media (max-width: 560px) {
+  .ac__notice { flex-wrap: wrap; }
+
+  .ac__notice p { flex: 1 1 160px; }
+
+  .ac__notice .ac__btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ac__title { font-size: 1.4rem; }
+}
+
+// Celulares chicos: el ícono arriba y el texto a lo ancho
+@media (max-width: 360px) {
+  .ac { gap: 12px; }
+
+  .ac__notice {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+
+    p { flex: none; width: 100%; }
+  }
+
+  .ac__empty { padding: 28px 12px; }
+
+  .ac__item {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .ac__icon {
+    width: 36px;
+    height: 36px;
+
+    i { font-size: 18px; }
+  }
+
+  .ac__btn { white-space: normal; text-align: center; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .ac__title { font-size: 1.2rem; }
+
+  // Cada alerta: ícono arriba y texto a lo ancho
+  .ac__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ac__item .ac__btn { width: 100%; }
+
+  .ac__sub { font-size: 0.85rem; }
+  .ac__notice,
+  .ac__empty p { font-size: 0.9rem; }
+}

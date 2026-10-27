@@ -883,3 +883,104 @@ $ah-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--acce
     color: #c4a1ff !important;
   }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE MIS EMERGENCIAS (solo diseño)
+// =============================================
+
+// Título y descripción: bajan de línea en vez de salirse
+.ah-titlebar > div { min-width: 0; }
+.ah-title,
+.ah-sub { overflow-wrap: break-word; }
+
+// Buscador: se ajusta al ancho (antes pedía mínimo 220 px)
+.ah-search {
+  min-width: 0;
+
+  input { min-width: 0; width: 100%; }
+}
+
+// Tarjetas Total / Atendidas / Canceladas: nunca más anchas que la pantalla
+.ah-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+
+.ah-stat-label,
+.ah-stat-sub { overflow-wrap: break-word; }
+
+// Tabla: antes se cortaba (no se veían Estado ni Acciones).
+// Ahora mantiene su tamaño y se mueve hacia los lados con barrita morada
+.ah-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+}
+
+.ah-table th { white-space: nowrap; }
+
+// La paginación se queda fija abajo aunque muevas la tabla
+.ah-pagination {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .ah-table { min-width: 760px; }
+
+  .ah-table td:not(.ah-location) { white-space: nowrap; }
+}
+
+// Celular
+@media (max-width: 600px) {
+  .ah-wrap { padding: 0.75rem; }
+
+  // Filtros a lo ancho: buscador, fecha y medio uno debajo del otro
+  .ah-toolbar > .ah-search,
+  .ah-toolbar > .ah-filtro-fecha-selector,
+  .ah-toolbar > .ah-filter-type {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .ah-toolbar > .ah-filtro-fecha-selector {
+    display: block;
+    width: 100%;
+  }
+
+  .ah-filter-type select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Pie de la tabla centrado
+  .ah-pagination {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ah-pagination-controls { flex-wrap: wrap; justify-content: center; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .ah-wrap { padding: 0.5rem; }
+
+  .ah-title { font-size: 1.3rem; }
+
+  .ah-stats .ah-stat {
+    padding: 0.75rem;
+    gap: 8px;
+
+    .ah-stat-icon {
+      width: 34px;
+      height: 34px;
+    }
+
+    .ah-stat-chevron { display: none; }
+  }
+
+  .ah-search { padding: 0 10px; }
+}

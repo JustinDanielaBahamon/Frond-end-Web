@@ -1601,3 +1601,151 @@ body {
     box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent) !important;
   }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE INFORMES (solo diseño)
+// =============================================
+
+// El calendario no se sale de su casilla (traía un ancho mínimo de 170 px)
+.toolbar .filter-group .filter-item app-date-picker {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+// Buscador: el campo se ajusta al ancho disponible
+.toolbar .search-box {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  input { min-width: 0; width: 100%; }
+}
+
+// Tarjetas de números: se pueden encoger sin salirse
+.stats-grid > * { min-width: 0; }
+
+.stats-grid .stat-card .stat-info {
+  min-width: 0;
+
+  span,
+  p { overflow-wrap: anywhere; }
+}
+
+// Tabla: mantiene su tamaño y se mueve hacia los lados (como en el dashboard)
+.table-card .table-responsive {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+}
+
+@media (max-width: 1024px) {
+  .table-card table {
+    min-width: 960px;
+
+    thead th { white-space: nowrap; }
+    tbody td:not(:first-child) { white-space: nowrap; }
+  }
+
+  .table-card .report-name { min-width: 220px; }
+}
+
+// Tablet y celular
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 24px;
+
+    h1 { font-size: 1.7rem; }
+  }
+
+  .stats-grid { margin-bottom: 24px; }
+  .toolbar { margin-bottom: 24px; }
+
+  // Pie de la tabla: información arriba y páginas debajo, centrado
+  .table-footer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 14px;
+    text-align: center;
+
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .reports-management { padding: 12px; }
+
+  .page-header {
+    h1 { font-size: 1.45rem; overflow-wrap: anywhere; }
+    p { font-size: 0.85rem; }
+  }
+
+  // Explicación: el ícono arriba y el texto a lo ancho
+  .help-reports {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 40px 14px 14px;
+
+    &__text {
+      min-width: 0;
+      overflow-wrap: anywhere;
+
+      ol { padding-left: 16px; }
+    }
+  }
+
+  // Tarjetas de números más compactas
+  .stats-grid .stat-card {
+    padding: 14px 16px;
+    gap: 12px;
+
+    .stat-info h2 { font-size: 1.8rem; }
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+  }
+
+  // Filtros: menos relleno para que quepan
+  .toolbar {
+    padding: 14px;
+    gap: 14px;
+
+    .search-box { padding: 10px 12px; }
+
+    .filter-group .filter-item { min-width: 0; }
+
+    .btn-clear-filters { padding: 0 12px; }
+  }
+
+  .table-footer .pagination .page-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .reports-management { padding: 8px; }
+
+  .stats-grid .stat-card {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .toolbar { padding: 10px; }
+}

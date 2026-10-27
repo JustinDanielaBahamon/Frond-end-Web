@@ -234,3 +234,17 @@
     text-align: center;
   }
 }
+
+// =============================================
+// BARRA DE ABAJO SIEMPRE PEGADA AL FONDO DE LA PANTALLA (celular)
+// Cuando la página tiene poco contenido, la barra ya no sube:
+// el contenido ocupa el espacio que sobra y la barra queda abajo.
+// =============================================
+@media (max-width: 768px) {
+  .layout__body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .layout__main { flex: 1 0 auto; }
+}

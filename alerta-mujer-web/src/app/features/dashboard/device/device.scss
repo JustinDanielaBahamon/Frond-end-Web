@@ -940,3 +940,75 @@ $dv-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--acce
   .dd-head { padding: 16px 16px 8px; }
   .dd-list { padding: 8px 16px; }
 }
+
+// Texto de los botones de pruebas: centrado y sin salirse
+.device-test-btn span { max-width: 100%; text-align: center; overflow-wrap: break-word; }
+
+// =============================================
+// CELULARES MUY ANGOSTOS: cada cajita en columna
+// (ícono arriba, texto a lo ancho, etiqueta debajo)
+// =============================================
+@media (max-width: 480px) {
+  .device-wrap { padding: 0.75rem 0; }
+  .device-header > :first-child { width: 100%; }
+}
+
+@media (max-width: 300px) {
+  .device-wrap { gap: 0.85rem; }
+  .device-title { font-size: 1.15rem; }
+  .device-panel { padding: 0.6rem; }
+  .device-panel__title { font-size: 0.95rem; align-items: flex-start; overflow-wrap: anywhere; min-width: 0; }
+
+  // Ícono del título arriba y el texto debajo
+  .device-header .page-title-row { flex-direction: column; gap: 8px; }
+
+  .device-permissions-note,
+  .device-perm-notice { flex-direction: column; gap: 6px; }
+
+  // Permisos, servicios, dispositivos, funcionalidades y actividad
+  .device-perm,
+  .device-list-item,
+  .device-phone,
+  .device-feature-item,
+  .device-activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .device-perm__body,
+  .device-list-item__body,
+  .device-phone__body,
+  .device-feature-item__body,
+  .device-activity-item__body {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  // Etiquetas (Listo, Activo, Sin notificaciones, 23 h 50 min…) sin salirse
+  .device-perm__status,
+  .device-badge {
+    margin-left: 0;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .device-perm-notice div { min-width: 0; width: 100%; }
+  .device-feature-item__label,
+  .device-activity-item__time { overflow-wrap: anywhere; }
+  .device-perm-notice strong,
+  .device-perm-notice span { overflow-wrap: anywhere; }
+
+  // Botones de pruebas y acciones: ícono arriba y texto centrado
+  .device-test-btn,
+  .device-action-btn {
+    flex-direction: column;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+
+    span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+  }
+}

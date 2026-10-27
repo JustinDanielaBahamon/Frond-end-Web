@@ -464,3 +464,121 @@ $call: #7c3aed;
 
   .as-sos { border-width: 2px !important; }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE ASISTENCIA (solo diseño)
+// =============================================
+
+// Títulos y textos largos bajan de línea en vez de salirse
+.as-titlebar > div,
+.as-sos-text,
+.as-line-titles { min-width: 0; }
+
+.as-title,
+.as-sub,
+.as-sos-text strong,
+.as-sos-text span,
+.as-line-titles h2,
+.as-line-titles span,
+.as-line-desc,
+.as-help,
+.as-item-name,
+.as-item-meta,
+.as-empty { overflow-wrap: break-word; }
+
+// Los números largos (018000…) bajan de línea si no caben
+.as-line-number { overflow-wrap: anywhere; }
+
+// Tarjetas de líneas: nunca más anchas que la pantalla
+.as-lines { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.as-line { min-width: 0; }
+
+// Centros: lista y mapa nunca más anchos que la pantalla
+@media (max-width: 960px) {
+  .as-centers { grid-template-columns: minmax(0, 1fr); }
+}
+
+.as-item-main { width: 100%; }
+.as-item-actions { flex-wrap: wrap; }
+
+// Tablet / celular
+@media (max-width: 600px) {
+  // Pestañas: ocupan todo el ancho, una al lado de la otra
+  .as-subtabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-self: stretch;
+  }
+
+  .as-subtab {
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem 0.4rem;
+  }
+
+  .as-toolbar { flex-wrap: wrap; }
+  .as-toolbar .as-btn { flex: 1 1 100%; }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .as-titlebar { align-items: flex-start; }
+  .as-title { font-size: 1.3rem; }
+
+  // Aviso "¿Estás en peligro?": el botón 123 a lo ancho
+  .as-sos {
+    padding: 0.9rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .as-sos-btn { justify-content: center; }
+
+  .as-line,
+  .as-card { padding: 0.9rem; }
+
+  .as-line-number { font-size: 1.35rem; }
+
+  // "Copiar número" a lo ancho
+  .as-line-actions .as-btn { flex: 1 1 auto; }
+
+  .as-map { height: 280px; }
+}
+
+// Celulares chicos: las pestañas una debajo de la otra
+@media (max-width: 360px) {
+  .as-subtabs { grid-template-columns: minmax(0, 1fr); }
+
+  .as-subtab { justify-content: space-between; text-align: left; padding: 0.5rem 0.75rem; }
+
+  .as-item-actions { justify-content: flex-start; }
+  .as-item-actions .as-btn { flex: 1 1 100%; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .as-title { font-size: 1.15rem; }
+  .as-title,
+  .as-sub { overflow-wrap: anywhere; }
+
+  // El ícono del título arriba y el texto debajo
+  .as-titlebar { flex-direction: column; gap: 0.5rem; }
+
+  .as-line,
+  .as-card,
+  .as-sos { padding: 0.7rem; }
+
+  .as-line-head { flex-direction: column; align-items: flex-start; }
+  .as-line-number { font-size: 1.15rem; }
+
+  .as-sos-btn { padding: 0.65rem 0.8rem; }
+
+  .as-btn { white-space: normal; text-align: center; }
+
+  .as-item-main { flex-direction: column; gap: 0.45rem; }
+
+  // Mis llamadas: el botón de borrar baja a la derecha
+  .as-call { flex-wrap: wrap; }
+  .as-call .as-item-text { flex: 1 1 100%; }
+  .as-call .as-item-actions { margin-left: auto; }
+}

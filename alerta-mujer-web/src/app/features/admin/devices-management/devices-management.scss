@@ -1185,3 +1185,132 @@ $shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
     color: #fff;
   }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE DISPOSITIVOS (solo diseño)
+// =============================================
+
+// Buscador: se ajusta al ancho (antes pedía mínimo 200 px)
+.toolbar .search-box {
+  min-width: 0;
+  box-sizing: border-box;
+
+  input { min-width: 0; width: 100%; }
+}
+
+.toolbar .btn-search { min-width: 0; }
+
+// Tarjetas de números: se pueden encoger sin salirse
+.stats-grid > * { min-width: 0; }
+
+.stats-grid .stat-card .stat-info {
+  min-width: 0;
+
+  span,
+  p { overflow-wrap: anywhere; }
+}
+
+// Nombre del dispositivo: no se aprieta contra la columna de al lado
+.device-info .device-details { min-width: 150px; }
+
+// Tabla: mantiene su tamaño y se mueve hacia los lados con barrita morada
+.table-card {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+
+  table thead th { white-space: nowrap; }
+}
+
+// El pie de la tabla (páginas) se queda fijo aunque muevas la tabla
+.table-card .table-footer {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+}
+
+// Tablet: tarjetas de números de a 2 y filtros a lo ancho
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .stats-grid .stat-card { padding: 16px 18px; }
+
+  .page-header { margin-bottom: 22px; }
+  .toolbar { margin-bottom: 22px; }
+
+  .toolbar .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+
+    .filter-item,
+    .btn-clear-filters { width: 100%; min-width: 0; }
+  }
+
+  .table-footer {
+    align-items: center;
+    text-align: center;
+
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}
+
+// Celular: tarjetas una por fila, compactas
+@media (max-width: 480px) {
+  .device-management { padding: 12px; }
+
+  .page-header {
+    h1 { font-size: 1.45rem; overflow-wrap: anywhere; }
+    p { font-size: 0.85rem; }
+  }
+
+  .stats-grid { grid-template-columns: 1fr; }
+
+  .stats-grid .stat-card {
+    padding: 14px 16px;
+    gap: 12px;
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+  }
+
+  .toolbar { padding: 14px; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .device-management { padding: 8px; }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .stats-grid .stat-card {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .toolbar {
+    padding: 10px;
+
+    .search-box { padding: 10px; }
+  }
+
+  .table-footer .pagination .page-btn {
+    width: 28px;
+    height: 28px;
+  }
+}

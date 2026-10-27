@@ -906,3 +906,117 @@
     }
   }
 }
+
+// =============================================
+// RESPONSIVE: TARJETAS QUE NO SE ENCOGEN, SE PONEN UNA DEBAJO DE OTRA
+// (solo diseño: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Los paneles nunca se salen de la pantalla
+.home-row > * { min-width: 0; }
+
+@media (max-width: 1000px) {
+  .home-row--top,
+  .home-row--bottom { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .home-row--mid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Textos largos bajan de línea en vez de salirse
+.home-panel__title,
+.home-panel__subtitle,
+.home-device-value,
+.home-map-legend__text strong,
+.home-map-legend__text span,
+.home-emergency__date,
+.home-emergency__detail-valor,
+.home-access__label,
+.home-security-item__valor,
+.home-security-item__description { overflow-wrap: anywhere; }
+
+.home-map-legend__item > *,
+.home-emergency__detail > div { min-width: 0; }
+
+// "Estado de tu seguridad": en pantallas chicas las 4 tarjetas
+// van una debajo de la otra (ícono, texto y check en una fila)
+@media (max-width: 560px) {
+  .home-security-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .home-security-item {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 12px 14px;
+    text-align: left;
+
+    &__icon { grid-row: 1 / span 2; }
+
+    &__valor {
+      grid-column: 2;
+      align-self: end;
+    }
+
+    &__description {
+      grid-column: 2;
+      align-self: start;
+    }
+
+    &__check {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      margin: 0;
+    }
+  }
+
+  // Mi dispositivo: el ícono grande baja si no hay espacio
+  .home-device-body { flex-wrap: wrap; }
+
+  // Guía del mapa: una opción por fila
+  .home-map-legend__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .home-panel { padding: 0.9rem; }
+
+  .home-panel__title { font-size: 1.1rem; }
+
+  // Estado de tu seguridad: cada tarjeta a lo ancho, con el contenido centrado
+  .home-security-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+
+  .home-device-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+  }
+
+  // Botones de la cabecera del mapa: a lo ancho y con texto que baja de línea
+  .home-panel__header > div { width: 100%; min-width: 0; }
+  .home-panel__header .home-btn {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+  .home-link { white-space: normal; }
+
+  .home-map-legend { padding: 0.75rem; }
+
+  // Guía del mapa: el ícono arriba y el texto a lo ancho
+  .home-map-legend__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .home-shortcuts-grid { grid-template-columns: minmax(0, 1fr); }
+}

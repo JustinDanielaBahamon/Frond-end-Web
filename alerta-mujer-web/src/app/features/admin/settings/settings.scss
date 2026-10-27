@@ -539,3 +539,115 @@ $btn-purple-hover: #6d28d9;
     }
   }
 }
+
+// =============================================
+// RESPONSIVE COMPLETO DE CONFIGURACIÓN (solo diseño)
+// =============================================
+
+// Las tarjetas se pueden encoger hasta el ancho de la pantalla
+.settings-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.settings-grid > * { min-width: 0; }
+
+// Textos largos bajan de línea en vez de salirse
+.page-header h1,
+.page-header p,
+.card__title,
+.warning,
+.info-box__desc,
+.help-box__desc,
+.row-link__desc,
+.card__note,
+.diff__values { overflow-wrap: anywhere; }
+
+.card__title,
+.info-box > div,
+.help-box__top > div,
+.warning > span,
+.row-link__text { min-width: 0; }
+
+// Valores de "Estado del sistema" sin partirse ("Configuradas", "03:16")
+.status-line strong { white-space: nowrap; }
+
+@media (max-width: 1100px) {
+  .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .settings-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .settings-page { padding: 12px; }
+
+  .page-header {
+    margin-bottom: 18px;
+
+    h1 { font-size: 1.45rem; }
+    p { font-size: 0.88rem; }
+  }
+
+  .settings-grid { gap: 14px; }
+
+  .card {
+    padding: 16px;
+    min-height: 0;
+
+    &__title { font-size: 1.15rem; }
+  }
+
+  .warning { padding: 10px 12px; }
+
+  // Estado del sistema: si el valor no cabe, baja debajo del nombre
+  .status-line {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  // Botones Descartar / Revisar y guardar: a lo ancho
+  .params-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .card__note,
+    .field-error { margin: 0; }
+
+    .btn-primary,
+    .btn-secondary { width: 100%; }
+  }
+
+  .help-box { padding: 20px 14px; }
+
+  // Ventana de confirmación: botones a lo ancho
+  .dialog { padding: 18px; }
+
+  .dialog__actions {
+    flex-direction: column-reverse;
+
+    button { width: 100%; }
+  }
+}
+
+// Celulares muy angostos: en "Estado del sistema" el valor va debajo
+@media (max-width: 300px) {
+  .settings-page { padding: 8px; }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .card { padding: 12px; }
+
+  .status-line strong {
+    margin-left: 28px;
+    flex-basis: 100%;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .info-box,
+  .warning { padding: 10px; }
+
+  .help-box__icon {
+    width: 52px;
+    height: 52px;
+  }
+}

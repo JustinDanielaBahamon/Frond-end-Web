@@ -14,7 +14,7 @@ describe('ReproductorContinuoComponent', () => {
     c = fixture.componentInstance;
     c.type = 'video';
     c.parts = [part(1), part(2), part(3)];
-    c.ngOnChanges({ partes: new SimpleChange(undefined, c.parts, true) });
+    c.ngOnChanges({ parts: new SimpleChange(undefined, c.parts, true) });
   });
 
   it('al terminar una parte pasa a la siguiente y se detiene en la última', () => {
@@ -29,7 +29,7 @@ describe('ReproductorContinuoComponent', () => {
     c.irA(1);
     const previousOnes = c.parts;
     c.parts = [part(1), part(2), part(3), part(4)];
-    c.ngOnChanges({ partes: new SimpleChange(previousOnes, c.parts, false) });
+    c.ngOnChanges({ parts: new SimpleChange(previousOnes, c.parts, false) });
     expect(c.index()).toBe(1);
   });
 
@@ -37,7 +37,7 @@ describe('ReproductorContinuoComponent', () => {
     c.irA(2);
     const previousOnes = c.parts;
     c.parts = [part(7), part(8)];
-    c.ngOnChanges({ partes: new SimpleChange(previousOnes, c.parts, false) });
+    c.ngOnChanges({ parts: new SimpleChange(previousOnes, c.parts, false) });
     expect(c.index()).toBe(0);
   });
 

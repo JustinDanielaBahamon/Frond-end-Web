@@ -47,3 +47,6 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Notes of coding agents (not part of the project)
+.agents/

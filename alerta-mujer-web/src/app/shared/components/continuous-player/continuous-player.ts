@@ -24,7 +24,7 @@ export class ContinuousPlayerComponent implements OnChanges {
   @Input({ required: true }) parts: RecordingPart[] = [];
   @Input({ required: true }) type: 'video' | 'audio' = 'video';
 
-  @ViewChild('medio') private method?: ElementRef<HTMLMediaElement>;
+  @ViewChild('method') private method?: ElementRef<HTMLMediaElement>;
 
   readonly index = signal(0);
   /** Progress of the current part, from 0 to 1. */

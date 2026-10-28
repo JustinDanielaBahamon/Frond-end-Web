@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -44,5 +44,18 @@ describe('AdminDashboardComponent · tendencia por mes', () => {
 
     c.changeTrendView('semana');
     expect(c.trendBars).toHaveLength(7);
+  });
+});
+
+describe('AdminDashboardComponent · mapa de zonas', () => {
+  it('dibuja el mapa de las zonas con más incidentes al terminar de cargar los datos', () => {
+    TestBed.configureTestingModule({ imports: [AdminDashboardComponent] });
+    const fixture = TestBed.createComponent(AdminDashboardComponent);
+    fixture.detectChanges();
+
+    // The panel's three requests (alerts, zones and users) answer with no data
+    TestBed.inject(HttpTestingController).match(() => true).forEach((r) => r.flush([]));
+
+    expect(fixture.nativeElement.querySelector('.map-leaflet.leaflet-container')).not.toBeNull();
   });
 });

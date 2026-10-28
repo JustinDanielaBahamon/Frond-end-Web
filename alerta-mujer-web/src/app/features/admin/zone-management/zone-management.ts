@@ -78,7 +78,7 @@ export class ZoneManagementComponent implements OnInit, OnDestroy {
   form: ZoneForm = this.emptyForm();
 
   // ── Mapa (Leaflet) ───────────────────────────────────────────
-  @ViewChild('mapaModal') modalMap?: ElementRef<HTMLDivElement>;
+  @ViewChild('modalMap') modalMap?: ElementRef<HTMLDivElement>;
 
   private map: any = null;
   private zoneLayer: any = null;

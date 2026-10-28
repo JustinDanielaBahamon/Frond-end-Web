@@ -41,6 +41,16 @@ describe('ReproductorContinuoComponent', () => {
     expect(c.index()).toBe(0);
   });
 
+  it('al cargar una parte toma su duración del elemento de video', () => {
+    fixture.detectChanges();
+    const video: HTMLVideoElement = fixture.nativeElement.querySelector('video');
+    Object.defineProperty(video, 'duration', { configurable: true, value: 12 });
+
+    c.onLoad();
+
+    expect(c.durations()[1]).toBe(12);
+  });
+
   it('la barra muestra completas las partes ya escuchadas', () => {
     c.irA(2);
     expect(c.fill(0)).toBe(100);

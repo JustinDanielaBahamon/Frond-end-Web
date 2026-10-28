@@ -92,7 +92,7 @@ export class Evidence implements OnInit, OnDestroy {
 
   // ── Alert map ──────────────────────────
   mapVisible = signal(false);
-  @ViewChild('mapaAlerta') private mapRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('alertMap') private mapRef?: ElementRef<HTMLDivElement>;
   private map: L.Map | null = null;
 
   // ── Subida ─────────────────────────────────────

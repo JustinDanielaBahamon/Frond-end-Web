@@ -132,7 +132,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private usersService = inject(UsersService);
   private geocoding = inject(GeocodingService);
 
-  @ViewChild('mapaZonas') mapEl?: ElementRef<HTMLDivElement>;
+  @ViewChild('zonesMap') mapEl?: ElementRef<HTMLDivElement>;
 
   loading = true;
   error = false;

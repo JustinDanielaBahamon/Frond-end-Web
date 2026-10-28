@@ -1,15 +1,15 @@
 @use 'sass:color';
 @use '../../../shared/styles/variables.scss' as *;
 
-// Variables propias de esta pantalla (no están en el set compartido)
-$blue:   #3b82f6;
-$orange: #f97316;
-$yellow: #eab308;
+// Variables of this screen (not in the shared set)
+$blue:   #6d28d9;
+$orange: #a855f7;
+$yellow: #c084fc;
 
 // =============================================
 // PAGE
 // =============================================
-.alertas-page {
+.alerts-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -24,7 +24,7 @@ $yellow: #eab308;
 // =============================================
 // HEADER
 // =============================================
-.alertas-header {
+.alerts-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,14 +32,14 @@ $yellow: #eab308;
   flex-shrink: 0;
 }
 
-.alertas-title {
+.alerts-title {
   font-size: 1.4rem;
   font-weight: 800;
   color: $text-primary;
   margin: 0;
 }
 
-.alertas-header__right {
+.alerts-header__right {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -62,7 +62,7 @@ $yellow: #eab308;
   color: $red; text-transform: uppercase; letter-spacing: 0.06em;
 }
 
-.alertas-count {
+.alerts-count {
   font-size: 0.78rem; color: $text-muted;
   background: $bg-card; border: 1.5px solid $border;
   border-radius: 100px; padding: 3px 12px;
@@ -71,7 +71,7 @@ $yellow: #eab308;
 // =============================================
 // LAYOUT
 // =============================================
-.alertas-layout {
+.alerts-layout {
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 14px;
@@ -83,7 +83,7 @@ $yellow: #eab308;
 // =============================================
 // PANEL IZQUIERDO
 // =============================================
-.alertas-panel {
+.alerts-panel {
   display: flex;
   flex-direction: column;
   background: $bg-card;
@@ -144,10 +144,24 @@ $yellow: #eab308;
 // ── Filtros ───────────────────────────────────
 .panel-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 10px 10px;
   border-bottom: 1px solid rgba($border, 0.6);
   flex-shrink: 0;
+}
+
+.panel-search {
+  flex: 1 1 100%;
+  padding: 7px 10px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.78rem;
+  color: $text-primary;
+  background: $bg-card;
+  font-family: inherit;
+
+  &:focus { outline: none; border-color: $purple-deep; }
 }
 
 .panel-select {
@@ -165,7 +179,7 @@ $yellow: #eab308;
 }
 
 // ── Lista alertas ─────────────────────────────
-.alertas-list {
+.alerts-list {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
@@ -174,7 +188,7 @@ $yellow: #eab308;
   &::-webkit-scrollbar-thumb { background: $border; border-radius: 10px; }
 }
 
-.alerta-card {
+.alert-card {
   display: flex;
   align-items: flex-start;
   gap: 9px;
@@ -190,7 +204,7 @@ $yellow: #eab308;
   &--atendida { opacity: 0.5; }
 }
 
-.alerta-icon {
+.alert-icon {
   width: 36px; height: 36px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -203,37 +217,37 @@ $yellow: #eab308;
   &--manual     { background: $amber; }
 }
 
-.alerta-info {
+.alert-data {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column; gap: 2px;
 }
 
-.alerta-top {
+.alert-top {
   display: flex; justify-content: space-between; align-items: center;
 }
 
-.alerta-nombre {
+.alert-name {
   font-size: 0.82rem; font-weight: 700; color: $text-primary;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.alerta-tiempo {
+.alert-time {
   font-size: 0.68rem; color: $text-dim;
   white-space: nowrap; margin-left: 4px; flex-shrink: 0;
 }
 
-.alerta-desc {
+.alert-desc {
   font-size: 0.76rem; color: $text-muted;
 }
 
-.alerta-coords {
+.alert-coords {
   display: flex; align-items: center; gap: 4px;
   font-size: 0.7rem; color: $purple-deep; font-family: monospace;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   svg { flex-shrink: 0; }
 }
 
-.btn-atender {
+.btn-attend {
   flex-shrink: 0;
   padding: 4px 10px;
   border-radius: 100px;
@@ -257,14 +271,14 @@ $yellow: #eab308;
 // =============================================
 // TAB ZONAS
 // =============================================
-.zonas-section {
+.zones-section {
   border-bottom: 1px solid rgba($border, 0.5);
   padding: 10px 10px 8px;
 
   &:last-child { border-bottom: none; flex: 1; overflow-y: auto; }
 }
 
-.zonas-section__title {
+.zones-section__title {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -274,14 +288,14 @@ $yellow: #eab308;
   color: $text-primary;
 }
 
-.zonas-section__sub {
+.zones-section__sub {
   font-size: 0.68rem;
   color: $text-dim;
   font-weight: 400;
 }
 
-// ── Zona automática ───────────────────────────
-.zona-auto-card {
+// ── Automatic zone ───────────────────────────
+.zone-auto-card {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -296,7 +310,7 @@ $yellow: #eab308;
   &:hover { background: $bg-card-hover; border-color: $purple-mid; }
 }
 
-.zona-auto__nivel {
+.zone-auto__level {
   padding: 3px 8px;
   border-radius: 100px;
   font-size: 0.68rem;
@@ -304,12 +318,12 @@ $yellow: #eab308;
   white-space: nowrap;
   flex-shrink: 0;
 
-  &.nivel--alto  { background: $red-pale;          color: $red;    }
-  &.nivel--medio { background: rgba($orange,.15);  color: $orange; }
-  &.nivel--bajo  { background: rgba($yellow,.2);   color: color.adjust($yellow, $lightness: -15%); }
+  &.level--alto  { background: $red-pale;          color: $red;    }
+  &.level--medio { background: rgba($orange,.15);  color: $orange; }
+  &.level--bajo  { background: rgba($yellow,.2);   color: color.adjust($yellow, $lightness: -15%); }
 }
 
-.zona-auto__info {
+.zone-auto__info {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -317,26 +331,26 @@ $yellow: #eab308;
   min-width: 0;
 }
 
-.zona-auto__nombre {
+.zone-auto__name {
   font-size: 0.8rem;
   font-weight: 600;
   color: $text-primary;
 }
 
-.zona-auto__alertas {
+.zone-auto__alerts {
   font-size: 0.7rem;
   color: $text-muted;
 }
 
-// ── Botón agregar zona (fila superior del tab) ─
-.zona-add-row {
+// ── Add zone button (top row of the tab) ─
+.zone-add-row {
   display: flex;
   gap: 6px;
   padding: 10px;
   border-bottom: 1px solid rgba($border, 0.5);
 }
 
-.btn-add-zona {
+.btn-add-zone {
   flex: 1;
   display: flex;
   align-items: center;
@@ -359,7 +373,7 @@ $yellow: #eab308;
   &--area:hover { border-color: $purple-deep; color: $purple-deep; background: $purple-pale; }
 }
 
-.btn-marcar-zona {
+.btn-mark-zone {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -379,7 +393,7 @@ $yellow: #eab308;
 }
 
 // ── Filtro chips zona ─────────────────────────
-.zona-filtros {
+.zone-filters {
   display: flex;
   gap: 5px;
   margin-bottom: 8px;
@@ -387,7 +401,7 @@ $yellow: #eab308;
 }
 
 // ── Zona manual card ──────────────────────────
-.zona-manual-card {
+.zone-manual-card {
   padding: 9px 10px;
   border-radius: $radius-sm;
   border: 1.5px solid rgba($border, 0.6);
@@ -399,41 +413,41 @@ $yellow: #eab308;
   &:hover { background: $bg-card-hover; border-color: $purple-mid; }
 }
 
-.zona-manual__header {
+.zone-manual__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.zona-manual__nombre-row {
+.zone-manual__name-row {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.zona-metodo-icon {
+.zone-method-icon {
   font-size: 0.75rem;
 }
 
-.zona-manual__nombre {
+.zone-manual__name {
   font-size: 0.82rem;
   font-weight: 600;
   color: $text-primary;
 }
 
-.zona-nivel-badge {
+.zone-level-badge {
   padding: 2px 8px;
   border-radius: 100px;
   font-size: 0.68rem;
   font-weight: 700;
 
-  &.nivel-badge--alto  { background: $red-pale;         color: $red;    }
-  &.nivel-badge--medio { background: rgba($orange,.15); color: $orange; }
-  &.nivel-badge--bajo  { background: rgba($yellow,.2);  color: color.adjust($yellow, $lightness: -15%); }
+  &.level-badge--alto  { background: $red-pale;         color: $red;    }
+  &.level-badge--medio { background: rgba($orange,.15); color: $orange; }
+  &.level-badge--bajo  { background: rgba($yellow,.2);  color: color.adjust($yellow, $lightness: -15%); }
 }
 
-.zona-manual__meta {
+.zone-manual__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -442,12 +456,12 @@ $yellow: #eab308;
   gap: 8px;
 }
 
-.zona-radio-label {
+.zone-radio-label {
   font-family: monospace;
   color: $text-dim;
 }
 
-.btn-eliminar-zona {
+.btn-delete-zone {
   background: none;
   border: none;
   cursor: pointer;
@@ -465,7 +479,7 @@ $yellow: #eab308;
 // =============================================
 // PANEL MAPA
 // =============================================
-.mapa-container {
+.map-box {
   position: relative;
   border-radius: $radius-card;
   overflow: hidden;
@@ -475,7 +489,7 @@ $yellow: #eab308;
   min-height: 500px;
 }
 
-.mapa {
+.map {
   width: 100%;
   height: 100%;
   min-height: 500px;
@@ -488,7 +502,7 @@ $yellow: #eab308;
 }
 
 // ── Banner modo dibujo ────────────────────────
-.modo-dibujo-banner {
+.mode-drawing-banner {
   position: absolute;
   top: 12px;
   left: 50%;
@@ -507,7 +521,7 @@ $yellow: #eab308;
   white-space: nowrap;
 }
 
-.btn-cancelar-dibujo {
+.btn-cancel-drawing {
   background: rgba(255,255,255,0.2);
   border: 1.5px solid rgba(255,255,255,0.4);
   color: #fff;
@@ -574,7 +588,7 @@ $yellow: #eab308;
 }
 
 // ── Filtros capas ─────────────────────────────
-.filtros-capas {
+.filters-layers {
   position: absolute;
   bottom: 40px;
   right: 14px;
@@ -587,7 +601,7 @@ $yellow: #eab308;
   overflow: hidden;
 }
 
-.filtros-toggle {
+.filters-toggle {
   display: flex; align-items: center; justify-content: space-between;
   width: 100%; padding: 9px 13px;
   background: $bg-card; border: none;
@@ -597,19 +611,19 @@ $yellow: #eab308;
   &:hover { background: $bg-card-hover; }
 }
 
-.filtros-body {
+.filters-body {
   padding: 4px 0 6px;
   border-top: 1px solid rgba($border, 0.6);
 }
 
-.filtro-row {
+.filter-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 6px 13px;
 
   &:hover { background: $bg-card-hover; }
 }
 
-.filtro-label {
+.filter-label {
   font-size: 0.78rem; color: $text-muted; font-weight: 500;
 }
 
@@ -641,7 +655,7 @@ $yellow: #eab308;
 }
 
 // ── Popup alerta activa ───────────────────────
-.mapa-popup {
+.map-popup {
   position: absolute;
   bottom: 50px; left: 14px;
   z-index: 1000;
@@ -651,7 +665,9 @@ $yellow: #eab308;
   border-radius: $radius-sm;
   padding: 12px 38px 12px 13px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  min-width: 210px; max-width: 270px;
+  min-width: 230px; max-width: 300px;
+  max-height: calc(100% - 70px);
+  overflow-y: auto;
 
   &__close {
     position: absolute; top: 8px; right: 8px;
@@ -660,19 +676,19 @@ $yellow: #eab308;
     &:hover { color: $text-primary; background: $bg-card-hover; }
   }
 
-  &__tipo {
+  &__type {
     display: inline-block;
     padding: 2px 8px; border-radius: 100px;
     font-size: 0.68rem; font-weight: 700;
     margin-bottom: 5px;
 
-    &.popup-tipo--boton      { background: $red-pale;    color: $red; }
-    &.popup-tipo--widget     { background: #dbeafe;      color: $blue; }
-    &.popup-tipo--movimiento { background: $purple-pale; color: $purple-deep; }
-    &.popup-tipo--manual     { background: #fef3c7;      color: $amber; }
+    &.popup-type--boton      { background: $red-pale;    color: $red; }
+    &.popup-type--widget     { background: #ede9fe;      color: $blue; }
+    &.popup-type--movimiento { background: $purple-pale; color: $purple-deep; }
+    &.popup-type--manual     { background: #f3e8ff;      color: $amber; }
   }
 
-  &__nombre {
+  &__name {
     font-size: 0.88rem; font-weight: 700;
     color: $text-primary; margin-bottom: 3px;
   }
@@ -687,7 +703,7 @@ $yellow: #eab308;
     font-family: monospace;
   }
 
-  &__atender {
+  &__attend {
     margin-top: 8px;
     width: 100%;
     padding: 6px;
@@ -701,11 +717,64 @@ $yellow: #eab308;
 
     &:hover { background: $purple-deep; color: #fff; }
   }
+
+  &__detail {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid $border;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__loading, &__note { margin: 0; font-size: 0.72rem; color: $text-dim; }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.72rem;
+
+    span { color: $text-dim; }
+    strong { color: $text-primary; font-weight: 600; }
+    small { font-weight: 400; color: $text-dim; }
+  }
+
+  &__deliveries {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.72rem;
+
+    > span { color: $text-dim; }
+  }
+
+  &__delivery {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+
+    em { font-style: normal; font-weight: 600; color: $text-primary; margin-right: 2px; }
+  }
+}
+
+.delivery-chip {
+  padding: 1px 7px;
+  border-radius: 100px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  background: $purple-pale;
+  color: $text-muted;
+  border: 1px solid $border;
+
+  &--ok { background: $purple-deep; color: #fff; border-color: $purple-deep; }
+  &--failure { background: transparent; color: $purple-deep; border: 1px dashed $purple-deep; }
 }
 
 // =============================================
 // FORMULARIOS DE MODALES
-// (los estilos del contenedor del modal en sí
+// (the styles of the modal container itself
 // ahora viven en shared/components/modal/modal.scss)
 // =============================================
 .form-group { margin-bottom: 14px; }
@@ -738,7 +807,7 @@ $yellow: #eab308;
   }
 }
 
-.btn-click-mapa {
+.btn-click-map {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -756,7 +825,7 @@ $yellow: #eab308;
 
   &:hover { background: $purple-pale-hover; }
 
-  &--activo {
+  &--active {
     border-style: solid;
     background: $purple-deep;
     color: #fff;
@@ -838,12 +907,18 @@ $yellow: #eab308;
 }
 
 // ── Selector nivel ────────────────────────────
-.nivel-options {
+.level-options {
   display: flex;
   gap: 8px;
+
+  // Support point types: several, in two columns
+  &--types {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.nivel-btn {
+.level-btn {
   flex: 1;
   padding: 8px 6px;
   border-radius: $radius-sm;
@@ -861,18 +936,120 @@ $yellow: #eab308;
     color: $purple-deep;
   }
 
-  &--alto:hover,  &--alto.nivel-btn--active  { border-color: $red;    background: $red-pale;         color: $red;    }
-  &--medio:hover, &--medio.nivel-btn--active { border-color: $orange; background: rgba($orange,.12); color: $orange; }
-  &--bajo:hover,  &--bajo.nivel-btn--active  { border-color: $yellow; background: rgba($yellow,.15); color: color.adjust($yellow, $lightness: -15%); }
+  &--alto:hover,  &--alto.level-btn--active  { border-color: $red;    background: $red-pale;         color: $red;    }
+  &--medio:hover, &--medio.level-btn--active { border-color: $orange; background: rgba($orange,.12); color: $orange; }
+  &--bajo:hover,  &--bajo.level-btn--active  { border-color: $yellow; background: rgba($yellow,.15); color: color.adjust($yellow, $lightness: -15%); }
 }
 // =============================================
 // RESPONSIVE
 // =============================================
 @media (max-width: 900px) {
-  .alertas-layout {
+  .alerts-layout {
     grid-template-columns: 1fr;
     grid-template-rows: 300px 1fr;
   }
-  .alertas-page { height: auto; overflow: auto; }
-  .mapa-container { min-height: 300px; }
+  .alerts-page { height: auto; overflow: auto; }
+  .map-box { min-height: 300px; }
+}
+// =============================================
+// AJUSTES DE DISEÑO — legibilidad en modo oscuro
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// ── Botón + del mapa: mismo morado del módulo activo del sidebar ──
+.fab-main {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover { filter: brightness(1.08); }
+}
+
+// ── Botones de tipo / nivel de peligro: el texto no tenía color propio ──
+.level-btn {
+  color: $text-primary;
+}
+
+// ── Pestañas "Pin puntual / Área circular" dentro del modal ──
+.modal__mode-tabs {
+  display: flex;
+  border-bottom: 1px solid $border;
+}
+
+.modal__mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: $bg-base;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+
+  &--active {
+    background: $bg-card;
+    color: $purple-deep;
+    border-bottom-color: $purple-deep;
+  }
+}
+
+// ── Botones Cancelar / Guardar del pie de los modales ──
+[modal-footer] .btn-secondary,
+[modal-footer] .btn-primary {
+  padding: 9px 18px;
+  border-radius: $radius-sm;
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+[modal-footer] .btn-secondary {
+  background: transparent;
+  border: 1.5px solid $border;
+  color: $text-primary;
+
+  &:hover { background: $bg-card-hover; border-color: $purple-deep; }
+}
+
+[modal-footer] .btn-primary {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  border: none;
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(1.08); }
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+// ── Modo oscuro: textos secundarios un poco más claros ──
+:host-context([data-theme="dark"]) {
+  .alert-time,
+  .alert-coords,
+  .list-empty,
+  .zones-section__sub,
+  .zone-radio-label,
+  .form-hint,
+  .map-popup__row,
+  .map-popup__loading,
+  .map-popup__note,
+  .map-popup__item span,
+  .map-popup__item small,
+  .map-popup__deliveries > span {
+    color: $text-muted;
+  }
+
+  .form-step__label,
+  .form-label {
+    color: $text-primary;
+  }
 }

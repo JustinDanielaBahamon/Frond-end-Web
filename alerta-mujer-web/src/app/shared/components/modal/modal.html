@@ -1,19 +1,19 @@
 <div class="modal-overlay" (click)="onOverlayClick()">
-  <div class="modal" [ngClass]="'modal--' + tamano" (click)="$event.stopPropagation()">
+  <div class="modal" [ngClass]="'modal--' + size" (click)="$event.stopPropagation()">
 
-    <div class="modal__header" [class.modal__header--danger]="variante === 'danger'">
+    <div class="modal__header" [class.modal__header--danger]="variant === 'danger'">
       <h2>
         <ng-content select="[modal-titulo]"></ng-content>
-        <ng-container *ngIf="titulo">{{ titulo }}</ng-container>
+        <ng-container *ngIf="title">{{ title | t }}</ng-container>
       </h2>
-      <button class="modal__close" (click)="cerrar.emit()">
+      <button class="modal__close" (click)="close.emit()">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M18 6 6 18M6 6l12 12"/>
         </svg>
       </button>
     </div>
 
-    <!-- Slot opcional para tabs de modo (ej: modal-zona con pin/área) -->
+    <!-- Optional slot for mode tabs (e.g. zone modal with pin/area) -->
     <ng-content select="[modal-tabs]"></ng-content>
 
     <div class="modal__body">

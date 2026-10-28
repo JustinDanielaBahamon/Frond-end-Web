@@ -26,7 +26,7 @@
     color: var(--navbar-text);
 }
 
-/* --- ENLACES DE NAVEGACIÓN --- */
+/* --- NAVIGATION LINKS --- */
 .navbar-links {
     display: flex;
     gap: 35px;
@@ -50,7 +50,7 @@
     text-shadow: 0 2px 4px var(--navbar-hover-bg);
 }
 
-/* --- BOTONES DE ACCIÓN (LOGIN Y REGISTRO) --- */
+/* --- ACTION BUTTONS (LOGIN AND REGISTER) --- */
 .navbar-actions {
     display: flex;
     align-items: center;
@@ -129,7 +129,7 @@
     color: var(--navbar-text);
 }
 
-/* Menú Desplegable */
+/* Dropdown menu */
 .language-selector .language-menu {
     position: absolute;
     top: 55px;
@@ -190,9 +190,11 @@
     cursor:pointer;
 }
 
-/* =======================================
-   MENÚ MÓVIL
-======================================= */
+/*
+ * =======================================
+ *    MOBILE MENU
+ * =======================================
+ */
 
 .mobile-menu{
     display:none;
@@ -244,7 +246,7 @@
 ======================================= */
 @media(max-width:1350px){
 
-    .button-lenguaje-mobil{
+    .button-language-mobil{
         display: none !important;
     }
 
@@ -342,7 +344,7 @@
 
 @media(max-width:570px){
 
-    .button-lenguaje-mobil{
+    .button-language-mobil{
         display: flex !important;
     }
 
@@ -384,5 +386,96 @@
         padding: 0 15px;
 
         transition: all .25s ease;
+    }
+}
+
+
+
+/* =======================================
+   BARRA SIN SALTOS DE LÍNEA
+   Ningún texto se parte en dos renglones y los espacios se
+   ajustan al ancho de la pantalla (antes, entre 1351px y 1450px,
+   "Cómo funciona", "Descargar app" e "Iniciar sesión" se partían).
+   Solo estilos: no cambia nada del HTML ni del TS.
+======================================= */
+.navbar-container {
+    gap: clamp(12px, 1.6vw, 32px);
+    padding: 0 clamp(16px, 2.4vw, 40px);
+}
+
+.navbar-logo,
+.navbar-links,
+.navbar-actions {
+    flex-shrink: 0;
+}
+
+.navbar-logo span,
+.navbar-links a,
+.language-btn,
+.language-btn span,
+.login-btn,
+.register-btn {
+    white-space: nowrap;
+}
+
+.navbar-logo span {
+    font-size: clamp(20px, 1.7vw, 28px);
+}
+
+.navbar-links {
+    gap: clamp(14px, 1.7vw, 35px);
+}
+
+.navbar-links a {
+    font-size: clamp(14px, 1.05vw, 16px);
+}
+
+.navbar-actions {
+    gap: clamp(8px, .9vw, 15px);
+}
+
+.language-btn {
+    font-size: clamp(14px, 1.05vw, 16px);
+    padding: 6px 10px;
+}
+
+
+/* Portátiles (1351px a 1500px): un poco más compacto para que quepa
+   también en idiomas con textos largos (francés, portugués) */
+@media (min-width: 1351px) and (max-width: 1500px) {
+    .navbar-container {
+        gap: 12px;
+        padding: 0 18px;
+    }
+
+    .navbar-logo img {
+        height: 38px;
+    }
+
+    .navbar-logo span {
+        font-size: 20px;
+    }
+
+    .navbar-links {
+        gap: 13px;
+    }
+
+    .navbar-links a {
+        font-size: 14px;
+    }
+
+    .navbar-actions {
+        gap: 8px;
+    }
+
+    .login-btn,
+    .register-btn {
+        height: 42px;
+        padding: 0 12px;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
     }
 }

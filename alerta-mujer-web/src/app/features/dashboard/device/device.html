@@ -2,167 +2,223 @@
   
   <!-- 1. ENCABEZADO -->
   <div class="device-header">
-    <div>
-      <h1 class="device-title">Estado del Dispositivo</h1>
-      <p class="device-subtitle">Diagnóstico completo del sistema • Última actualización: {{ lastRefresh() }}</p>
+    <div class="page-title-row">
+      <span class="page-title-icon"><i class="ti ti-device-mobile"></i></span>
+      <div>
+        <h1 class="device-title">{{ 'Estado del dispositivo' | t }}</h1>
+        <p class="device-subtitle">{{ 'Tus celulares vinculados • Última actualización:' | t }} {{ lastRefresh() | t }}</p>
+      </div>
     </div>
-    <button class="device-btn device-btn--icon" (click)="refreshAll()" title="Refrescar" [disabled]="loading()" aria-label="Refrescar información del dispositivo">
+    <button class="device-btn device-btn--icon" (click)="refreshAll()" [title]="'Refrescar' | t" [disabled]="loading()" [attr.aria-label]="'Refrescar información del dispositivo' | t">
       <i class="ti ti-refresh"></i>
     </button>
   </div>
 
-  <!-- 2. PERMISOS DEL NAVEGADOR -->
+  <!-- 2. PHONE PERMISSIONS (reported by the mobile app) -->
   <div class="device-panel">
     <h2 class="device-panel__title">
-      <i class="ti ti-shield-check"></i> Permisos del Navegador
+      <i class="ti ti-shield-check"></i> {{ 'Permisos de tu celular' | t }}
     </h2>
-    <p class="device-permissions-note">
-      <i class="ti ti-info-circle"></i>
-      <span>Nota: Si un permiso muestra "No disponible", puede significar que tu navegador no soporta la API de consulta de permisos, pero la funcionalidad puede seguir funcionando mediante solicitudes directas.</span>
-    </p>
-    <div class="device-grid device-grid--3col">
-      @for (perm of permissions(); track perm.name) {
-        <div class="device-item" role="status" [attr.aria-label]="'Estado de permiso: ' + (perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles')" aria-live="polite">
-          <div class="device-item__icon" [ngClass]="'device-item__icon--' + getStatusColor(perm.state)">
-            <i class="ti" [ngClass]="getIconForPermission(perm.name)"></i>
+    @if (phonePermissions(); as pc) {
+      @if (pc.missing > 0) {
+        <div class="device-perm-notice" role="alert">
+          <i class="ti ti-alert-circle"></i>
+          <div>
+            <strong>{{ 'Por favor otorga los permisos a AlertaMujer para que pueda funcionar correctamente.' | t }}</strong>
+            <span>{{ 'En tu celular abre la app → menú → «Permisos y protección» y activa lo que falta (' | t }}{{ pc.missing | t }}).</span>
           </div>
-          <p class="device-item__label">{{ perm.name === 'geolocation' ? 'Ubicación' : perm.name === 'notifications' ? 'Notificaciones' : 'Portapapeles' }}</p>
-          <span class="device-badge" [ngClass]="'device-badge--' + getStatusColor(perm.state)">
-            {{ getStatusLabel(perm.state) }}
-          </span>
         </div>
+      } @else {
+        <p class="device-permissions-note">
+          <i class="ti ti-circle-check"></i>
+          <span>{{ 'Tu celular tiene todo listo para una emergencia.' | t }}</span>
+        </p>
       }
-    </div>
+      <div class="device-grid device-grid--3col">
+        @for (perm of pc.list; track perm.id) {
+          <div class="device-perm" [class.device-perm--ok]="perm.granted" role="status"
+               [attr.aria-label]="perm.title + ': ' + (perm.granted ? 'listo' : 'falta')">
+            <span class="device-perm__icon"><i class="ti" [ngClass]="perm.icon"></i></span>
+            <span class="device-perm__body">
+              <span class="device-perm__title">{{ perm.title | t }}</span>
+              <span class="device-perm__desc">{{ perm.description | t }}</span>
+            </span>
+            <span class="device-perm__status">
+              <i class="ti" [ngClass]="perm.granted ? 'ti-check' : 'ti-x'"></i> {{ perm.granted ? 'Listo' : 'Falta' | t }}
+            </span>
+          </div>
+        }
+      </div>
+      <p class="device-perm__date">{{ 'Informado por' | t }} {{ pc.phone | t }} · {{ pc.updated | t }}</p>
+    } @else {
+      <p class="device-permissions-note">
+        <i class="ti ti-info-circle"></i>
+        <span>{{ featuresLoading() ? 'Consultando tu celular…' : 'Abre la app actualizada en tu celular para ver aquí el estado de sus permisos.' | t }}</span>
+      </p>
+    }
   </div>
 
-  <!-- FILA DE 2 COLUMNAS: ESTADO DE SERVICIOS + INFORMACIÓN DEL DISPOSITIVO -->
+  <!-- 2-COLUMN ROW: SERVICE STATUS + DEVICE INFORMATION -->
   <div class="device-row device-row--2col">
     
     <!-- 3. ESTADO DE SERVICIOS -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-wifi"></i> Estado de Servicios
+        <i class="ti ti-wifi"></i> {{ 'Estado de Servicios' | t }}
       </h2>
       <div class="device-list">
+        <div class="device-list-item">
+          <i class="ti ti-clock-hour-4"></i>
+          <div class="device-list-item__body">
+            <span class="device-list-item__label">{{ 'Tiempo restante de la sesión' | t }}</span>
+            <span class="device-list-item__details">{{ 'Cuando llegue a cero tendrás que volver a iniciar sesión en la web. En el celular la sesión se renueva sola mientras uses la app.' | t }}</span>
+          </div>
+          <span class="device-badge" [ngClass]="sessionExpiring() ? 'device-badge--warning' : 'device-badge--success'">{{ sessionRemaining() | t }}</span>
+        </div>
         @for (service of services(); track service.name) {
           <div class="device-list-item">
             <i class="ti" [ngClass]="service.enabled ? 'ti-check' : 'ti-x'"></i>
             <div class="device-list-item__body">
-              <span class="device-list-item__label">{{ service.name }}</span>
+              <span class="device-list-item__label">{{ service.name | t }}</span>
               @if (service.details) {
-                <span class="device-list-item__details">{{ service.details }}</span>
+                <span class="device-list-item__details">{{ service.details | t }}</span>
               }
             </div>
-            <span class="device-badge" [ngClass]="service.enabled ? 'device-badge--exito' : 'device-badge--peligro'">
-              {{ service.enabled ? 'Activo' : 'Inactivo' }}
+            <span class="device-badge" [ngClass]="service.enabled ? 'device-badge--success' : 'device-badge--danger'">
+              {{ service.enabled ? 'Activo' : 'Inactivo' | t }}
             </span>
           </div>
         }
         
-        <!-- Estado de conexión -->
+        <!-- Connection status -->
         <div class="device-list-item device-list-item--highlight">
           <i class="ti ti-wifi"></i>
           <div class="device-list-item__body">
-            <span class="device-list-item__label">Estado de conexión</span>
-            <span class="device-list-item__details">{{ isOnline() ? 'En línea' : 'Sin conexión' }} • Calidad: {{ connectionQuality() }}</span>
+            <span class="device-list-item__label">{{ 'Estado de conexión' | t }}</span>
+            <span class="device-list-item__details">{{ isOnline() ? 'En línea' : 'Sin conexión' | t }} {{ '• Calidad:' | t }} {{ connectionQuality() | t }}</span>
           </div>
-          <span class="device-badge" [ngClass]="isOnline() ? 'device-badge--exito' : 'device-badge--peligro'">
-            {{ isOnline() ? 'Conectado' : 'Desconectado' }}
+          <span class="device-badge" [ngClass]="isOnline() ? 'device-badge--success' : 'device-badge--danger'">
+            {{ isOnline() ? 'Conectado' : 'Desconectado' | t }}
           </span>
         </div>
       </div>
     </div>
 
-    <!-- 4. INFORMACIÓN DEL DISPOSITIVO -->
+    <!-- 4. DISPOSITIVO MÓVIL VINCULADO -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-device-desktop"></i> Información del Dispositivo
+        <i class="ti ti-devices"></i> {{ 'Mis dispositivos' | t }}
       </h2>
-      @if (deviceInfo(); as info) {
-        <div class="device-info-grid">
-          <div class="device-info-item">
-            <span class="device-info-item__label">Navegador</span>
-            <span class="device-info-item__value">{{ info.browser }} {{ info.version }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Sistema Operativo</span>
-            <span class="device-info-item__value">{{ info.os }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Idioma</span>
-            <span class="device-info-item__value">{{ info.language }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Zona Horaria</span>
-            <span class="device-info-item__value">{{ info.timezone }}</span>
-          </div>
-          <div class="device-info-item">
-            <span class="device-info-item__label">Resolución de Pantalla</span>
-            <span class="device-info-item__value">{{ info.screenResolution }}</span>
-          </div>
-        </div>
+      <ul class="device-phones">
+        @for (d of myPhones(); track d.id) {
+          <li>
+            <button type="button" class="device-phone" (click)="openPhone(d)" [attr.aria-label]="'Ver detalles de ' + phoneName(d)">
+              <span class="device-phone__icon"><i class="ti ti-device-mobile"></i></span>
+              <span class="device-phone__body">
+                <span class="device-phone__name">
+                  {{ phoneName(d) | t }}
+                  @if (myPhones().length > 1 && principalId() === d.id) {
+                    <span class="device-principal" [title]="'Tu ubicación del día a día se toma de este celular' | t">{{ 'Principal' | t }}</span>
+                  }
+                </span>
+                <span class="device-phone__meta">
+                  {{ d.osName === 'ios' ? 'iOS' : 'Android' | t }}{{ d.osVersion ? ' ' + d.osVersion : '' | t }}{{ d.appVersion ? ' · App ' + d.appVersion : '' | t }}
+                </span>
+                <span class="device-phone__meta">{{ 'Última conexión:' | t }} {{ lastConnection(d) | t }}</span>
+              </span>
+              <span class="device-badge" [ngClass]="d.fcmToken ? 'device-badge--success' : 'device-badge--warning'">
+                {{ d.fcmToken ? 'Recibe alertas' : 'Sin notificaciones' | t }}
+              </span>
+              <i class="ti ti-chevron-right device-phone__chevron"></i>
+            </button>
+          </li>
+        }
+        <li>
+          <button type="button" class="device-phone device-phone--pc" (click)="openComputer()" [attr.aria-label]="'Ver detalles de este computador' | t">
+            <span class="device-phone__icon"><i class="ti ti-device-desktop"></i></span>
+            <span class="device-phone__body">
+              <span class="device-phone__name">{{ 'Este computador' | t }}</span>
+              <span class="device-phone__meta">{{ computerName() | t }}</span>
+              <span class="device-phone__meta">{{ 'Solo para consultar · no recibe alertas' | t }}</span>
+            </span>
+            <i class="ti ti-chevron-right device-phone__chevron"></i>
+          </button>
+        </li>
+      </ul>
+      @if (myPhones().length > 1) {
+        <p class="device-phone__meta device-phone__last">
+          <i class="ti ti-info-circle"></i> {{ 'Tienes la cuenta en varios celulares: tu ubicación del día a día se toma del que usaste más recientemente (el principal). En una alerta se usa el celular que la activó.' | t }}
+        </p>
+      }
+      @if (myPhones().length === 0 && !featuresLoading()) {
+        <p class="device-empty">{{ 'Todavía no tienes un celular vinculado. Inicia sesión en la app móvil para vincularlo.' | t }}</p>
+      }
+      @if (criticalFeatures(); as features) {
+        <p class="device-phone__meta device-phone__last">
+          <i class="ti ti-map-pin"></i> {{ 'Última ubicación enviada:' | t }} {{ (features.lastLocationCaptured || 'No registrada') | t }}
+        </p>
       }
     </div>
 
   </div>
 
-  <!-- 5. ESTADO DE FUNCIONALIDADES CRÍTICAS -->
+  <!-- 5. STATUS OF CRITICAL FEATURES -->
   <div class="device-panel">
     <h2 class="device-panel__title">
-      <i class="ti ti-activity"></i> Funcionalidades Críticas
+      <i class="ti ti-activity"></i> {{ 'Funcionalidades Críticas' | t }}
     </h2>
     @if (criticalFeatures(); as features) {
       <div class="device-grid device-grid--4col">
-        <div class="device-feature-item" role="status" aria-label="Estado de la sesión" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--peligro'">
+        <div class="device-feature-item" role="status" [attr.aria-label]="'Estado de la sesión' | t" aria-live="polite">
+          <div class="device-feature-item__icon" [ngClass]="features.sessionActive ? 'device-feature-item__icon--success' : 'device-feature-item__icon--danger'">
             <i class="ti ti-login"></i>
           </div>
           <div class="device-feature-item__body">
-            <span class="device-feature-item__label">Sesión</span>
-            <span class="device-feature-item__value">{{ features.sessionActive ? 'Activa' : 'Inactiva' }}</span>
+            <span class="device-feature-item__label">{{ 'Sesión' | t }}</span>
+            <span class="device-feature-item__value">{{ features.sessionActive ? 'Activa' : 'Inactiva' | t }}</span>
           </div>
         </div>
 
-        <div class="device-feature-item" role="status" aria-label="Estado de ubicación" aria-live="polite">
-          <div class="device-feature-item__icon device-feature-item__icon--acento">
+        <div class="device-feature-item" role="status" [attr.aria-label]="'Estado de ubicación' | t" aria-live="polite">
+          <div class="device-feature-item__icon device-feature-item__icon--accent">
             <i class="ti ti-map-pin"></i>
           </div>
           <div class="device-feature-item__body">
-            <span class="device-feature-item__label">Última ubicación</span>
-            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : (features.lastLocationCaptured || 'No registrada') }}</span>
+            <span class="device-feature-item__label">{{ 'Última ubicación' | t }}</span>
+            <span class="device-feature-item__value">{{ (featuresLoading() ? 'Cargando…' : (features.lastLocationCaptured || 'No registrada')) | t }}</span>
           </div>
         </div>
 
-        <div class="device-feature-item" role="status" aria-label="Estado de notificaciones" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.pushTokenRegistered ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+        <div class="device-feature-item" role="status" [attr.aria-label]="'Estado de notificaciones' | t" aria-live="polite">
+          <div class="device-feature-item__icon" [ngClass]="features.pushTokenRegistered ? 'device-feature-item__icon--success' : 'device-feature-item__icon--warning'">
             <i class="ti ti-bell"></i>
           </div>
           <div class="device-feature-item__body">
-            <span class="device-feature-item__label">Notificaciones push en el celular</span>
-            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : pushStatusLabel(features) }}</span>
+            <span class="device-feature-item__label">{{ 'Notificaciones push en el celular' | t }}</span>
+            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : pushStatusLabel(features) | t }}</span>
           </div>
         </div>
 
-        <div class="device-feature-item" role="status" aria-label="Estado de contactos de emergencia" aria-live="polite">
-          <div class="device-feature-item__icon" [ngClass]="features.emergencyContactsCount ? 'device-feature-item__icon--exito' : 'device-feature-item__icon--advertencia'">
+        <div class="device-feature-item" role="status" [attr.aria-label]="'Estado de contactos de emergencia' | t" aria-live="polite">
+          <div class="device-feature-item__icon" [ngClass]="features.emergencyContactsCount ? 'device-feature-item__icon--success' : 'device-feature-item__icon--warning'">
             <i class="ti ti-users"></i>
           </div>
           <div class="device-feature-item__body">
-            <span class="device-feature-item__label">Contactos de emergencia</span>
-            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : features.emergencyContactsCount === null ? 'No disponible' : features.emergencyContactsCount + ' configurados' }}</span>
+            <span class="device-feature-item__label">{{ 'Contactos de emergencia' | t }}</span>
+            <span class="device-feature-item__value">{{ featuresLoading() ? 'Cargando…' : features.emergencyContactsCount === null ? 'No disponible' : features.emergencyContactsCount + ' configurados' | t }}</span>
           </div>
         </div>
       </div>
     }
   </div>
 
-  <!-- FILA DE 2 COLUMNAS: REGISTRO DE ACTIVIDAD + PRUEBAS DE FUNCIONALIDAD -->
+  <!-- 2-COLUMN ROW: ACTIVITY LOG + FEATURE TESTS -->
   <div class="device-row device-row--2col">
 
     <!-- 6. REGISTRO DE ACTIVIDAD -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-history"></i> Registro de Actividad (Últimas 5)
+        <i class="ti ti-history"></i> {{ 'Registro de Actividad (Últimas 5)' | t }}
       </h2>
       @if (activityLog().length > 0) {
         <div class="device-activity-list">
@@ -172,38 +228,38 @@
                 <i class="ti" [ngClass]="getIconForActivityType(log.type)"></i>
               </div>
               <div class="device-activity-item__body">
-                <p class="device-activity-item__message">{{ log.message }}</p>
-                <p class="device-activity-item__time">{{ log.timestamp }}</p>
+                <p class="device-activity-item__message">{{ log.message | t }}</p>
+                <p class="device-activity-item__time">{{ log.timestamp | t }}</p>
               </div>
             </div>
           }
         </div>
       } @else {
-        <p class="device-empty">Sin actividad reciente</p>
+        <p class="device-empty">{{ 'Sin actividad reciente' | t }}</p>
       }
     </div>
 
     <!-- 7. PRUEBAS DE FUNCIONALIDAD -->
     <div class="device-panel">
       <h2 class="device-panel__title">
-        <i class="ti ti-test-pipe"></i> Pruebas de Funcionalidad
+        <i class="ti ti-test-pipe"></i> {{ 'Pruebas de Funcionalidad' | t }}
       </h2>
       <div class="device-test-grid">
-        <button class="device-test-btn" (click)="testGeolocation()" [disabled]="loading()" aria-label="Probar geolocalización del dispositivo">
+        <button class="device-test-btn" (click)="viewMobileLocation()" [disabled]="loading()" [attr.aria-label]="'Ver dónde está tu celular' | t">
           <i class="ti ti-map-pin"></i>
-          <span>Probar Geolocalización</span>
+          <span>{{ '¿Dónde está mi celular?' | t }}</span>
         </button>
-        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" aria-label="Solicitar permiso de notificaciones">
-          <i class="ti ti-shield-check"></i>
-          <span>Solicitar Permiso</span>
+        <button class="device-test-btn" (click)="testPhoneAlerts()" [disabled]="loading()" [attr.aria-label]="'Comprobar si tu celular recibe alertas' | t">
+          <i class="ti ti-device-mobile-message"></i>
+          <span>{{ '¿Mi celular recibe alertas?' | t }}</span>
         </button>
-        <button class="device-test-btn" (click)="testNotificationDisplay()" [disabled]="loading()" aria-label="Probar visualización de notificación">
-          <i class="ti ti-bell"></i>
-          <span>Mostrar Notificación</span>
+        <button class="device-test-btn" (click)="requestNotificationPermission()" [disabled]="loading()" [attr.aria-label]="'Probar notificaciones en este computador' | t">
+          <i class="ti ti-bell-ringing"></i>
+          <span>{{ 'Avisos en este computador' | t }}</span>
         </button>
-        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" aria-label="Probar conectividad de red">
+        <button class="device-test-btn" (click)="testConnectivity()" [disabled]="loading()" [attr.aria-label]="'Probar la conexión con el servidor' | t">
           <i class="ti ti-wifi"></i>
-          <span>Probar Conectividad</span>
+          <span>{{ 'Conexión con el servidor' | t }}</span>
         </button>
       </div>
     </div>
@@ -213,26 +269,56 @@
   <!-- 8. ACCIONES RÁPIDAS -->
   <div class="device-panel">
     <h2 class="device-panel__title">
-      <i class="ti ti-bolt"></i> Acciones Rápidas
+      <i class="ti ti-bolt"></i> {{ 'Acciones Rápidas' | t }}
     </h2>
     <div class="device-actions-grid">
-      <button class="device-action-btn" (click)="syncData()" [disabled]="loading()" aria-label="Sincronizar datos con el servidor">
+      <button class="device-action-btn" (click)="syncData()" [disabled]="loading()" [attr.aria-label]="'Sincronizar datos con el servidor' | t">
         <i class="ti ti-refresh"></i>
-        <span>Sincronizar datos</span>
+        <span>{{ 'Sincronizar datos' | t }}</span>
       </button>
-      <button class="device-action-btn" (click)="clearCache()" [disabled]="loading()" aria-label="Limpiar caché local del dispositivo">
+      <button class="device-action-btn" (click)="clearCache()" [disabled]="loading()" [attr.aria-label]="'Limpiar caché local del dispositivo' | t">
         <i class="ti ti-trash"></i>
-        <span>Limpiar caché</span>
+        <span>{{ 'Limpiar caché' | t }}</span>
       </button>
-      <button class="device-action-btn" (click)="exportDiagnostic()" [disabled]="loading()" aria-label="Exportar diagnóstico completo en formato JSON">
-        <i class="ti ti-download"></i>
-        <span>Exportar diagnóstico</span>
-      </button>
-      <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()" aria-label="Refrescar estado de permisos y servicios">
+      <button class="device-action-btn" (click)="refreshPermissions()" [disabled]="loading()" [attr.aria-label]="'Refrescar estado de permisos y servicios' | t">
         <i class="ti ti-shield-check"></i>
-        <span>Refrescar permisos</span>
+        <span>{{ 'Refrescar permisos' | t }}</span>
       </button>
     </div>
   </div>
 
 </div>
+
+@if (detail(); as det) {
+  <div class="dd-backdrop" (click)="closeDetail()">
+    <section class="dd-modal" [ngClass]="det.tone ? 'dd-modal--' + det.tone : ''" role="dialog" aria-modal="true" aria-labelledby="dd-titulo" (click)="$event.stopPropagation()">
+      <header class="dd-head">
+        <span class="dd-head__icon"><i class="ti" [ngClass]="det.icon"></i></span>
+        <div>
+          <h2 id="dd-titulo">{{ det.title | t }}</h2>
+          <p>{{ det.subtitle | t }}</p>
+        </div>
+        <button type="button" class="dd-close" (click)="closeDetail()" [attr.aria-label]="'Cerrar' | t"><i class="ti ti-x"></i></button>
+      </header>
+      <dl class="dd-list">
+        @for (f of det.rows; track f.label) {
+          <div class="dd-row">
+            <dt>{{ f.label | t }}</dt>
+            <dd>{{ f.value | t }}</dd>
+          </div>
+        }
+      </dl>
+      @if (det.note) {
+        <p class="dd-note"><i class="ti ti-info-circle"></i> {{ det.note | t }}</p>
+      }
+      @if (det.link) {
+        @if (det.link.route) {
+          <a class="dd-link" [routerLink]="det.link.route">{{ det.link.text | t }} <i class="ti ti-map-2"></i></a>
+        } @else {
+          <a class="dd-link" [href]="det.link.url" target="_blank" rel="noopener">{{ det.link.text | t }} <i class="ti ti-external-link"></i></a>
+        }
+      }
+      <button type="button" class="dd-ok" (click)="closeDetail()">{{ 'Entendido' | t }}</button>
+    </section>
+  </div>
+}

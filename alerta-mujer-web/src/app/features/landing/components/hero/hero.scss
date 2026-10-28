@@ -18,10 +18,12 @@
     transition: background-image 0.3s ease;
 }
 
-/* Ajuste de encuadre solo para el tema oscuro:
-   landingoscuro.png tiene proporción distinta a bannerHero.png,
-   así que "cover" recorta distinto. Empujamos el foco un poco
-   hacia arriba para no perder el teléfono/la mujer. */
+/*
+ * Framing adjustment for the dark theme only:
+ *    landingoscuro.png has a different ratio than bannerHero.png,
+ *    so "cover" crops differently. We push the focus a bit
+ *    up so the phone/the woman is not lost.
+ */
 [data-theme="dark"] .container-hero {
     background-position: center top;
 }
@@ -73,7 +75,7 @@
     gap: 15px;
 }
 
-.comenzar-btn {
+.start-btn {
     height: 52px;
     padding: 0 28px;
     border: none;
@@ -86,12 +88,12 @@
     transition: .3s;
 }
 
-.comenzar-btn:hover {
+.start-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px var(--hero-btn-primary-shadow);
 }
 
-.conocer-btn {
+.learn-btn {
     height: 52px;
     padding: 0 28px;
     border-radius: 12px;
@@ -104,7 +106,7 @@
     transition: .3s;
 }
 
-.conocer-btn:hover {
+.learn-btn:hover {
     background: var(--hero-btn-primary-bg);
     color: white;
 }
@@ -197,8 +199,8 @@
         font-size: 16px;
     }
 
-    .comenzar-btn,
-    .conocer-btn {
+    .start-btn,
+    .learn-btn {
         width: 100%;
     }
 }

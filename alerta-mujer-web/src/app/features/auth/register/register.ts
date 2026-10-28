@@ -1,4 +1,5 @@
 // register.ts
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -16,26 +17,26 @@ import { RegisterDraftService } from '../../../core/services/register-draft.serv
 
 /* ═══════════ VALIDADORES PERSONALIZADOS ═══════════ */
 
-/* Campo obligatorio que no acepta solo espacios en blanco */
-const requerido: ValidatorFn = (control: AbstractControl): ValidationErrors | null =>
+/* Required field that does not accept only blank spaces */
+const required: ValidatorFn = (control: AbstractControl): ValidationErrors | null =>
   String(control.value ?? '').trim() ? null : { required: true };
 
-/* El correo debe contener "@" (si está vacío, lo atrapa "required") */
-const contieneArroba: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const valor = String(control.value ?? '');
-  return !valor || valor.includes('@') ? null : { sinArroba: true };
+/* The email must contain "@" (if empty, "required" catches it) */
+const containsAt: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const value = String(control.value ?? '');
+  return !value || value.includes('@') ? null : { missingAt: true };
 };
 
-/* La confirmación debe ser igual a la contraseña */
-const coincideConPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+/* The confirmation must match the password */
+const matchesPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.parent?.get('password')?.value ?? '';
-  return control.value === password ? null : { noCoincide: true };
+  return control.value === password ? null : { mismatch: true };
 };
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CardComponent, RouterModule],
+  imports: [TPipe, ReactiveFormsModule, CardComponent, RouterModule],
   templateUrl: './register.html',
   styleUrl: './register.scss',
   encapsulation: ViewEncapsulation.None
@@ -46,147 +47,151 @@ export class RegisterComponent {
   private auth   = inject(AuthService);
   private draft  = inject(RegisterDraftService);
 
-  /* Opciones exactas de la lista desplegable */
-  readonly tiposDocumento = ['T.I', 'C.C', 'Documento extranjero'];
+  /* Exact dropdown options */
+  readonly documentTypes = ['T.I', 'C.C', 'Documento extranjero'];
 
   /* ═══════════ FORMULARIO REACTIVO ═══════════ */
   form = this.fb.nonNullable.group({
-    nombre:            ['', [requerido]],
-    telefono:          ['', [requerido]],
-    tipoDocumento:     ['', [Validators.required]],
-    numeroDocumento:   ['', [requerido]],
-    fechaNacimiento:   ['', [Validators.required, Validators.minLength(10)]],
-    correo:            ['', [Validators.required, contieneArroba]],
-    password:          ['', [Validators.required, Validators.minLength(6)]],
-    confirmarPassword: ['', [coincideConPassword]],
+    name:            ['', [required]],
+    telephone:          ['', [required]],
+    documentType:     ['', [Validators.required]],
+    documentNumber:   ['', [required]],
+    birthDate:   ['', [Validators.required, Validators.minLength(10)]],
+    email:            ['', [Validators.required, containsAt]],
+    password:          ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [matchesPassword]],
   });
 
-  /* ═══════════ ESTADO DE LA PANTALLA ═══════════ */
-  verPassword      = signal(false);
-  verConfirmar     = signal(false);
-  intentado        = signal(false);   // true cuando ya presionó "Continuar"
-  cargando         = signal(false);
-  exito            = signal(false);
-  errorServidor    = signal('');
-  errorAceptacion  = signal(false);   // "Debes aceptar términos y privacidad"
-  avisoTerminos    = signal(false);   // "Debes leer los términos primero"
-  avisoPrivacidad  = signal(false);   // "Debes leer la política primero"
-  aceptaTerminos   = signal(false);
-  aceptaPrivacidad = signal(false);
+  /* ═══════════ SCREEN STATE ═══════════ */
+  showPassword      = signal(false);
+  showConfirm     = signal(false);
+  attempted        = signal(false);   // true once "Continuar" was pressed
+  loading         = signal(false);
+  success            = signal(false);
+  serverError    = signal('');
+  acceptanceError  = signal(false);   // "Debes aceptar términos y privacidad"
+  termsNotice    = signal(false);   // "Debes leer los términos primero"
+  privacyNotice  = signal(false);   // "Debes leer la política primero"
+  acceptsTerms   = signal(false);
+  acceptsPrivacy = signal(false);
 
-  /* Mensajes de error de cada campo */
-  private readonly mensajes: Record<string, Record<string, string>> = {
-    nombre:            { required: 'El nombre es obligatorio' },
-    telefono:          { required: 'El teléfono es obligatorio' },
-    tipoDocumento:     { required: 'El tipo de documento es obligatorio' },
-    numeroDocumento:   { required: 'El número de documento es obligatorio' },
-    fechaNacimiento:   {
+  /* Error messages of each field */
+  private readonly messages: Record<string, Record<string, string>> = {
+    name:            { required: 'El nombre es obligatorio' },
+    telephone:       { required: 'El teléfono es obligatorio' },
+    documentType:    { required: 'El tipo de documento es obligatorio' },
+    documentNumber:  { required: 'El número de documento es obligatorio' },
+    birthDate:       {
       required: 'La fecha de nacimiento es obligatoria',
       minlength: 'Ingresa una fecha completa DD/MM/AAAA'
     },
-    correo:            {
+    email:           {
       required: 'El correo es obligatorio',
-      sinArroba: 'Correo inválido'
+      missingAt: 'Correo inválido'
     },
     password:          {
       required: 'La contraseña es obligatoria',
-      minlength: 'Mínimo 6 caracteres'
+      minlength: 'Mínimo 8 caracteres'
     },
-    confirmarPassword: { noCoincide: 'Las contraseñas no coinciden' },
+    confirmPassword: { mismatch: 'Las contraseñas no coinciden' },
   };
 
   constructor() {
-    /* Si volvió de leer los términos, recuperamos lo que ya había escrito */
-    if (this.draft.valores) {
-      this.form.patchValue(this.draft.valores);
+    /* If she came back from reading the terms, we restore what she had typed */
+    if (this.draft.values) {
+      this.form.patchValue(this.draft.values);
     }
-    this.aceptaTerminos.set(this.draft.aceptaTerminos);
-    this.aceptaPrivacidad.set(this.draft.aceptaPrivacidad);
+    this.acceptsTerms.set(this.draft.acceptsTerms);
+    this.acceptsPrivacy.set(this.draft.acceptsPrivacy);
 
-    /* Si cambia la contraseña, se vuelve a revisar la confirmación */
+    /* If the password changes, the confirmation is checked again */
     this.form.controls.password.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.form.controls.confirmarPassword.updateValueAndValidity());
+      .subscribe(() => this.form.controls.confirmPassword.updateValueAndValidity());
   }
 
-  /* ═══════════ AYUDAS PARA EL HTML ═══════════ */
+  /* ═══════════ HTML HELPERS ═══════════ */
 
-  /* ¿Mostrar el error de este campo? (después de tocarlo o de enviar) */
-  invalido(campo: string): boolean {
-    const control = this.form.get(campo);
-    return !!control && control.invalid && (control.touched || this.intentado());
+  /* Show the error of this field? (after touching it or submitting) */
+  invalid(field: string): boolean {
+    const control = this.form.get(field);
+    return !!control && control.invalid && (control.touched || this.attempted());
   }
 
-  /* Texto del error de este campo */
-  mensaje(campo: string): string {
-    const errores = this.form.get(campo)?.errors;
-    if (!errores) return '';
-    const clave = Object.keys(errores)[0];
-    return this.mensajes[campo]?.[clave] ?? '';
+  /* Error text of this field */
+  message(field: string): string {
+    const errors = this.form.get(field)?.errors;
+    if (!errors) return '';
+    const key = Object.keys(errors)[0];
+    // Server notices (data already registered) carry their own text
+    if (typeof errors[key] === 'string') return errors[key];
+    return this.messages[field]?.[key] ?? '';
   }
 
-  /* ═══════════ FECHA DD/MM/AAAA ═══════════
-     Deja solo números (máximo 8) y pone las "/" solas.
-     La primera "/" aparece al escribir el 3.er dígito y la segunda al
-     escribir el 5.º; así se puede borrar con la tecla de retroceso. */
-  alEscribirFecha(event: Event): void {
+  /*
+ * ═══════════ DATE DD/MM/YYYY ═══════════
+ *      Keeps only digits (at most 8) and inserts the "/" by itself.
+ *      The first "/" appears when typing the 3rd digit and the second when
+ *      typing the 5th; that way it can be deleted with backspace.
+ */
+  onDateInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const digitos = input.value.replace(/\D/g, '').slice(0, 8);
+    const digits = input.value.replace(/\D/g, '').slice(0, 8);
 
-    let texto = digitos;
-    if (digitos.length > 4) {
-      texto = `${digitos.slice(0, 2)}/${digitos.slice(2, 4)}/${digitos.slice(4)}`;
-    } else if (digitos.length > 2) {
-      texto = `${digitos.slice(0, 2)}/${digitos.slice(2)}`;
+    let text = digits;
+    if (digits.length > 4) {
+      text = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    } else if (digits.length > 2) {
+      text = `${digits.slice(0, 2)}/${digits.slice(2)}`;
     }
 
-    input.value = texto;
-    this.form.controls.fechaNacimiento.setValue(texto);
+    input.value = text;
+    this.form.controls.birthDate.setValue(text);
   }
 
-  /* ═══════════ CASILLAS (solo después de leer) ═══════════ */
+  /* ═══════════ CHECKBOXES (only after reading) ═══════════ */
 
-  alClickTerminos(event: Event): void {
-    if (!this.draft.terminosLeidos) {
-      event.preventDefault();          // la casilla no se marca
-      this.avisoTerminos.set(true);
+  onTermsClick(event: Event): void {
+    if (!this.draft.termsRead) {
+      event.preventDefault();          // the checkbox is not checked
+      this.termsNotice.set(true);
       return;
     }
-    this.avisoTerminos.set(false);
+    this.termsNotice.set(false);
   }
 
-  alCambiarTerminos(event: Event): void {
-    const marcado = (event.target as HTMLInputElement).checked;
-    this.aceptaTerminos.set(marcado);
-    this.draft.aceptaTerminos = marcado;
-    this.errorAceptacion.set(false);
+  onTermsChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.acceptsTerms.set(checked);
+    this.draft.acceptsTerms = checked;
+    this.acceptanceError.set(false);
   }
 
-  alClickPrivacidad(event: Event): void {
-    if (!this.draft.privacidadLeida) {
+  onPrivacyClick(event: Event): void {
+    if (!this.draft.privacyRead) {
       event.preventDefault();
-      this.avisoPrivacidad.set(true);
+      this.privacyNotice.set(true);
       return;
     }
-    this.avisoPrivacidad.set(false);
+    this.privacyNotice.set(false);
   }
 
-  alCambiarPrivacidad(event: Event): void {
-    const marcado = (event.target as HTMLInputElement).checked;
-    this.aceptaPrivacidad.set(marcado);
-    this.draft.aceptaPrivacidad = marcado;
-    this.errorAceptacion.set(false);
+  onPrivacyChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.acceptsPrivacy.set(checked);
+    this.draft.acceptsPrivacy = checked;
+    this.acceptanceError.set(false);
   }
 
   /* ═══════════ NAVEGACIÓN ═══════════ */
 
-  abrirTerminos(): void {
-    this.guardarBorrador();
+  openTerms(): void {
+    this.saveDraft();
     this.router.navigate(['/auth/terms']);
   }
 
-  abrirPrivacidad(): void {
-    this.guardarBorrador();
+  openPrivacy(): void {
+    this.saveDraft();
     this.router.navigate(['/auth/privacy']);
   }
 
@@ -194,56 +199,79 @@ export class RegisterComponent {
     this.router.navigate(['/auth/login']);
   }
 
-  /* Guarda lo escrito antes de salir a leer los textos */
-  private guardarBorrador(): void {
-    this.draft.valores = this.form.getRawValue();
-    this.draft.aceptaTerminos = this.aceptaTerminos();
-    this.draft.aceptaPrivacidad = this.aceptaPrivacidad();
+  /* Saves what was typed before leaving to read the texts */
+  private saveDraft(): void {
+    this.draft.values = this.form.getRawValue();
+    this.draft.acceptsTerms = this.acceptsTerms();
+    this.draft.acceptsPrivacy = this.acceptsPrivacy();
   }
 
   /* ═══════════ ENVIAR ═══════════ */
 
-  continuar(): void {
-    if (this.cargando() || this.exito()) return;
-    this.errorServidor.set('');
+  proceed(): void {
+    if (this.loading() || this.success()) return;
+    this.serverError.set('');
 
-    /* 1) Verificar que estén aceptados los términos y la privacidad */
-    if (!this.aceptaTerminos() || !this.aceptaPrivacidad()) {
-      this.errorAceptacion.set(true);
+    /* 1) Check that the terms and privacy are accepted */
+    if (!this.acceptsTerms() || !this.acceptsPrivacy()) {
+      this.acceptanceError.set(true);
       return;
     }
-    this.errorAceptacion.set(false);
+    this.acceptanceError.set(false);
 
-    /* 2) Validar todos los campos (cada error sale bajo su campo) */
-    this.intentado.set(true);
+    /* 2) Validate every field (each error shows under its field) */
+    this.attempted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    /* 3) Todo bien: registrar, mostrar éxito y redirigir al login */
-    this.cargando.set(true);
+    /* 3) All good: register, show success and redirect to the login */
+    this.loading.set(true);
     const v = this.form.getRawValue();
 
-    this.auth.registrar({
-      nombre: v.nombre,
-      telefono: v.telefono,
-      tipoDocumento: v.tipoDocumento,
-      numeroDocumento: v.numeroDocumento,
-      fechaNacimiento: v.fechaNacimiento,
-      correo: v.correo,
-      password: v.password
+    this.auth.register({
+      name: v.name,
+      telephone: v.telephone,
+      documentType: v.documentType,
+      documentNumber: v.documentNumber,
+      birthDate: v.birthDate,
+      email: v.email,
+      password: v.password,
+      acceptsTerms: this.acceptsTerms() && this.acceptsPrivacy()
     }).subscribe({
       next: () => {
-        this.cargando.set(false);
-        this.exito.set(true);
-        this.draft.limpiar();
+        this.loading.set(false);
+        this.success.set(true);
+        this.draft.clear();
         setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       },
-      error: () => {
-        this.cargando.set(false);
-        this.errorServidor.set('No se pudo completar el registro. Intenta de nuevo.');
+      error: (e: { fields?: Record<string, string> }) => {
+        this.loading.set(false);
+        if (e.fields && this.markRepeated(e.fields)) return;
+        this.serverError.set('No se pudo completar el registro. Intenta de nuevo.');
       }
     });
+  }
+
+  /* Data already used by another account: the notice stays under its field until it is edited */
+  private markRepeated(fields: Record<string, string>): boolean {
+    const controls: Record<string, AbstractControl> = {
+      email: this.form.controls.email,
+      telephone: this.form.controls.telephone,
+      documentNumber: this.form.controls.documentNumber,
+      // Keys sent by the backend before the English JSON keys
+      telefono: this.form.controls.telephone,
+      numeroDocumento: this.form.controls.documentNumber,
+    };
+    let checked = 0;
+    for (const [field, notice] of Object.entries(fields)) {
+      const control = controls[field];
+      if (!control) continue;
+      control.setErrors({ duplicate: notice });
+      control.markAsTouched();
+      checked++;
+    }
+    return checked > 0;
   }
 }

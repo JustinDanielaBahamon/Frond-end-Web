@@ -1,14 +1,20 @@
 <div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
 
   <app-sidebar
+    class="sidebar--drawer"
     [links]="links"
     sectionTitle="Módulo"
     [collapsed]="sidebarCollapsed"
     [showMobileAppButton]="true"
-    mobileAppUrl="https://tu-link-de-descarga"
+    [mobileAppUrl]="apkDownloadUrl"
     [user]="user"
     (logout)="onLogout()">
   </app-sidebar>
+
+  <!-- Fondo oscuro detrás de la barra lateral (solo en pantallas ≤ 1024px, igual que en el admin) -->
+  @if (!sidebarCollapsed) {
+    <div class="layout__backdrop" (click)="sidebarCollapsed = true"></div>
+  }
 
   <div class="layout__body">
 
@@ -21,6 +27,30 @@
     </app-topbar>
 
     <main class="layout__main">
+      <!-- Active alert of a contact: notice across the whole panel until it ends -->
+      @for (a of receivedAlerts.active(); track a.id) {
+        <a class="notice-contact" routerLink="/dashboard/alertas-contactos" role="alert">
+          <span class="notice-contact__pulse" aria-hidden="true"></span>
+          <span class="notice-contact__text">
+            <strong>{{ a.name | t }}</strong> {{ 'activó una alerta de emergencia' | t }}
+            @if (a.start) { {{ 'a las' | t }} {{ (a.start | date: 'h:mm a') | t }} }
+          </span>
+          <span class="notice-contact__action">{{ 'Ver seguimiento' | t }} <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </a>
+      }
+      @if (movement.notice(); as m) {
+        <div class="notice-movement" role="status">
+          <i class="ti ti-walk" aria-hidden="true"></i>
+          <span class="notice-movement__text">
+            {{ 'Tu celular se desplazó de' | t }} <strong>{{ m.from | t }}</strong> {{ 'y ahora está cerca de' | t }} <strong>{{ m.to | t }}</strong>
+            <small>{{ (m.time | date: 'h:mm a') | t }}</small>
+          </span>
+          <a class="notice-movement__action" routerLink="/dashboard/ubicacion" (click)="movement.closeNotice()">{{ 'Ver en el mapa' | t }}</a>
+          <button type="button" class="notice-movement__close" [attr.aria-label]="'Cerrar aviso' | t" (click)="movement.closeNotice()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
       <router-outlet></router-outlet>
     </main>
 
@@ -28,17 +58,17 @@
       <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active"
          [routerLinkActiveOptions]="{exact:true}" class="bottom-nav__item">
         <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
-        <span>Inicio</span>
+        <span>{{ 'Inicio' | t }}</span>
       </a>
       <a routerLink="/dashboard/alert-history" routerLinkActive="bottom-nav__item--active"
          class="bottom-nav__item">
         <i class="ti ti-bell" aria-hidden="true"></i>
-        <span>Alertas</span>
+        <span>{{ 'Alertas' | t }}</span>
       </a>
       <a routerLink="/dashboard/ubicacion" routerLinkActive="bottom-nav__item--active"
          class="bottom-nav__item">
         <i class="ti ti-map-pin" aria-hidden="true"></i>
-        <span>Ubicación</span>
+        <span>{{ 'Ubicación' | t }}</span>
       </a>
       
     </nav>

@@ -8,7 +8,6 @@ import { AdminLayoutComponent } from './core/layouts/admin-layout/admin-layout';
 import { PublicLayoutComponent } from './core/layouts/public-layout/public-layout';
 
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
-import { ForgotPhoneComponent } from './features/auth/forgot-phone/forgot-phone';
 import { VerifyCodeComponent } from './features/auth/verify-code/verify-code';
 import { TermsComponent } from './features/auth/terms/terms'; // NUEVO
 import { PrivacyComponent } from './features/auth/privacy/privacy'; // NUEVO
@@ -24,7 +23,7 @@ import { DeviceManagementComponent } from './features/admin/devices-management/d
 export const routes: Routes = [
 
   // ─────────────────────────────────────────────────────────────
-  // Landing pública
+  // Public landing
   // ─────────────────────────────────────────────────────────────
 
   {
@@ -38,6 +37,17 @@ export const routes: Routes = [
             .then(m => m.LandingHomeComponent)
       }
     ]
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // Public tracking of an alert (link in the email to the contacts)
+  // ─────────────────────────────────────────────────────────────
+
+  {
+    path: 'seguimiento/:codigo',
+    loadComponent: () =>
+      import('./features/tracking/tracking')
+        .then(m => m.TrackingComponent)
   },
 
   // ─────────────────────────────────────────────────────────────
@@ -58,16 +68,16 @@ export const routes: Routes = [
             .then(m => m.ForgotPasswordComponent)
       },
       {
-        path: 'forgot-phone',
-        loadComponent: () =>
-          import('./features/auth/forgot-phone/forgot-phone')
-            .then(m => m.ForgotPhoneComponent)
-      },
-      {
         path: 'verify-code',
         loadComponent: () =>
           import('./features/auth/verify-code/verify-code')
             .then(m => m.VerifyCodeComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () =>
+          import('./features/auth/reset-password/reset-password')
+            .then(m => m.ResetPasswordComponent)
       },
     ]
   },
@@ -83,8 +93,8 @@ export const routes: Routes = [
 
     children: [
 
-      // ⬇️ ESTA ES LA RUTA QUE FALTABA. Sin ella, al entrar a "/dashboard"
-      // el router-outlet del layout no tiene qué mostrar y queda en blanco.
+      // ⬇️ THIS IS THE ROUTE THAT WAS MISSING. Without it, when entering "/dashboard"
+      // the layout router-outlet has nothing to show and stays blank.
       {
         path: '',
         loadComponent: () =>
@@ -97,14 +107,14 @@ export const routes: Routes = [
       {
         path: 'ubicacion',
         loadComponent: () =>
-          import('./features/dashboard/ubicacion/location-shell')
+          import('./features/dashboard/location/location-shell')
             .then(m => m.LocationShellComponent),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'my-location' },
           {
             path: 'my-location',
             loadComponent: () =>
-              import('./features/dashboard/mi-ubicacion/my-location')
+              import('./features/dashboard/my-location/my-location')
                 .then(m => m.MyLocationComponent),
           },
           { path: 'history', redirectTo: 'my-location', pathMatch: 'full' },
@@ -114,25 +124,31 @@ export const routes: Routes = [
           {
             path: 'ubicaciones-guardadas',
             loadComponent: () =>
-              import('./features/dashboard/ubicaciones-guardadas/ubicaciones-guardadas')
-                .then(m => m.UbicacionesGuardadasComponent),
+              import('./features/dashboard/saved-locations/saved-locations')
+                .then(m => m.SavedLocationsComponent),
           },
           {
             path: 'zonas-auxiliares',
             loadComponent: () =>
-              import('./features/dashboard/zonas-auxiliares/zonas-auxiliares')
-                .then(m => m.ZonasAuxiliaresComponent),
+              import('./features/dashboard/help-zones/help-zones')
+                .then(m => m.HelpZonesComponent),
           },
           {
             path: 'guardar-recorrido',
             loadComponent: () =>
-              import('./features/dashboard/guardar-recorrido/guardar-recorrido')
-                .then(m => m.GuardarRecorridoComponent),
+              import('./features/dashboard/save-route/save-route')
+                .then(m => m.SaveRouteComponent),
           },
           { path: 'historial-recorridos', redirectTo: 'guardar-recorrido', pathMatch: 'full' },
         ],
       },
 
+      {
+        path: 'alertas-contactos',
+        loadComponent: () =>
+          import('./features/dashboard/contact-alerts/contact-alerts')
+            .then(m => m.AlertContactsComponent),
+      },
       {
         path: 'alert-history',
         loadComponent: () =>
@@ -147,7 +163,7 @@ export const routes: Routes = [
             .then(m => m.Evidence),
       },
 
-      // ── Módulos nuevos del panel de usuaria ─────────────────
+      // ── New modules of the user panel ─────────────────
       {
         path: 'emergency-contacts',
         loadComponent: () =>
@@ -176,61 +192,6 @@ export const routes: Routes = [
             .then(m => m.Settings),
       },
 
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./features/admin/dashboard/dashboard')
-            .then(m => m.AdminDashboardComponent),
-      },
-      
-      {
-        path: 'usuarios',
-        loadComponent: () =>
-          import('./features/admin/user/user')
-            .then(m => m.UserComponent),
-      },
-      
-      {
-        path: 'alertas',
-        loadComponent: () =>
-          import('./features/admin/alert-admin/alert-admin')
-            .then(m => m.AlertAdminComponent),
-      },
-      
-      {
-        path: 'zone-management',
-        loadComponent: () =>
-          import('./features/admin/zone-management/zone-management')
-            .then(m => m.ZoneManagementComponent),
-      },
-      
-      {
-        path: 'report-management',
-        loadComponent: () =>
-          import('./features/admin/report-management/report-management')
-            .then(m => m.ReportManagementComponent),
-      },
-      
-      {
-        path: 'evidence-management',
-        loadComponent: () =>
-          import('./features/admin/evidence-management/evidence-management')
-            .then(m => m.EvidencesManagementComponent),
-      },
-      
-      {
-        path: 'moderator-management',
-        loadComponent: () =>
-          import('./features/admin/moderator-management/moderator-management')
-            .then(m => m.ModeratorManagementComponent),
-      },
-      
-      {
-        path: 'devices-management',
-        loadComponent: () =>
-          import('./features/admin/devices-management/devices-management')
-            .then(m => m.DeviceManagementComponent),
-      },
 
     ],
   },
@@ -307,6 +268,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/settings/settings')
             .then(m => m.AdminSettingsComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/admin/profile/profile')
+            .then(m => m.AdminProfileComponent)
+      },
+      {
+        path: 'auditoria',
+        loadComponent: () =>
+          import('./features/admin/audit/audit')
+            .then(m => m.AuditComponent)
       }
 
     ],

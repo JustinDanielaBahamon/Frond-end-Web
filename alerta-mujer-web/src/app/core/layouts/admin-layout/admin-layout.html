@@ -5,12 +5,13 @@
     [links]="links"
     sectionTitle="Administración"
     [collapsed]="sidebarCollapsed"
-    [user]="usuarioActual"
+    [user]="currentUser"
+    profileRoute="/admin/perfil"
     [showMobileAppButton]="false"
-    (logout)="cerrarSesion()">
+    (logout)="signOut()">
   </app-sidebar>
 
-  <!-- Fondo oscuro detrás del drawer (solo visible en pantallas ≤ 1024px) -->
+  <!-- Dark background behind the drawer (only visible on screens ≤ 1024px) -->
   @if (!sidebarCollapsed) {
     <div class="layout__backdrop" (click)="sidebarCollapsed = true"></div>
   }
@@ -20,6 +21,12 @@
     <app-topbar
       brand="Alerta Mujer — Admin"
       avatarLetter="A"
+      [userName]="currentUser?.name || 'Administración'"
+      [userEmail]="currentUser?.email || ''"
+      userRole="Administración"
+      profileRoute="/admin/perfil"
+      [accountLinks]="accountLinks"
+      [notifications]="notifications()"
       (sidebarToggle)="toggleSidebar()"
       (themeToggle)="toggleTheme()">
     </app-topbar>

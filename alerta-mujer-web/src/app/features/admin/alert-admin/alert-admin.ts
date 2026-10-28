@@ -1,12 +1,15 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
-import { AlertsService } from '../../../core/services/alerts.services';
-import { RiskZonesService } from '../../../core/services/risk-zones.services';
-import { Alerta, MedioActivacion } from '../../../core/models/alert.model';
-import { ZonaManual, ZonaCaliente, PuntoMapa } from '../../../core/models/zona.model';
+import { AlertsService, AdminAlertDetail } from '../../../core/services/alerts.services';
+import { GeocodingService } from '../../../core/services/geocoding.service';
+import { ZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/zones.service';
+import { ResourcesService } from '../../../core/services/resources.service';
+import { Alert, ActivationMethod } from '../../../core/models/alert.model';
+import { ManualZone, HotZone, MapPoint, PointType, POINT_TYPES, PointLayer } from '../../../core/models/map-zone.model';
 import { Modal } from '../../../shared/components/modal/modal';
 import { Chip } from '../../../shared/components/chip/chip';
 
@@ -15,233 +18,247 @@ declare const L: any;
 @Component({
   selector: 'app-alert-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, Modal, Chip],
+  imports: [TPipe, CommonModule, FormsModule, Modal, Chip],
   templateUrl: './alert-admin.html',
   styleUrl: './alert-admin.scss',
 })
 export class AlertAdminComponent implements AfterViewInit, OnDestroy {
 
   private alertsService = inject(AlertsService);
-  private riskZonesService = inject(RiskZonesService);
+  private geocoding = inject(GeocodingService);
+
+  // Detail of the chosen alert: last location, address and delivery to each contact
+  detail: AdminAlertDetail | null = null;
+  loadingDetail = false;
+  alertAddress: string | null = null;
+  private zonesService = inject(ZonesService);
+  private resourcesService = inject(ResourcesService);
   private cdr = inject(ChangeDetectorRef);
 
   // ── Mapa ─────────────────────────────────────────────────────
-  private mapa: any;
-  private marcadoresAlertas: Map<number, any> = new Map();
-  private marcadoresPuntos: { marker: any; tipo: string }[] = [];
-  private capasZonas: Map<number, any> = new Map();
-  private circulosCalor: any[] = [];
+  private map: any;
+  private alertMarkers: Map<number, any> = new Map();
+  private pointMarkers: { marker: any; layer: PointLayer }[] = [];
+  private zoneLayers: Map<number, any> = new Map();
+  private heatCircles: any[] = [];
 
-  private circuloPreview: any = null;
-  private marcadorCentro: any = null;
+  private previewCircle: any = null;
+  private centerMarker: any = null;
 
-  private readonly centroInicial: [number, number] = [4.7110, -74.0721];
+  private readonly initialCenter: [number, number] = [4.7110, -74.0721];
 
   // ── UI state ─────────────────────────────────────────────────
-  tabActivo: 'alertas' | 'zonas' = 'alertas';
+  activeTab: 'alertas' | 'zonas' = 'alertas';
   fabOpen = false;
-  filtrosOpen = true;
-  modalZona = false;
-  modalPunto = false;
-  cargando = true;
+  filtersOpen = true;
+  zoneModal = false;
+  pointModal = false;
+  loading = true;
 
-  alertaActiva: Alerta | null = null;
-  filtroMedio  = 'Todos';
-  filtroEstado = 'Todos';
-  filtroNivel  = 'Todos';
-  alertasFiltradas: Alerta[] = [];
+  activeAlert: Alert | null = null;
+  methodFilter  = 'Todos';
+  statusFilter = 'Todos';
+  levelFilter  = 'Todos';
+  filteredAlerts: Alert[] = [];
 
-  capas = { alertas: true, zonas: true, cais: true, hospitales: true, calor: true };
+  layers = { alerts: true, zones: true, cais: true, hospitals: true, support: true, heat: true };
+  alertSearch = '';
+  readonly pointTypes = Object.entries(POINT_TYPES) as [PointType, (typeof POINT_TYPES)[PointType]][];
 
   // ── Modal zona ───────────────────────────────────────────────
-  modoZona: 'pin' | 'area' = 'area';
-  esperandoClickZona = false;
+  zoneMode: 'pin' | 'area' = 'area';
+  waitingZoneClick = false;
 
-  nuevaZona = {
-    nombre: '',
-    nivel: 'Alto' as 'Alto' | 'Medio' | 'Bajo',
+  newZone = {
+    name: '',
+    level: 'Alto' as 'Alto' | 'Medio' | 'Bajo',
     lat: 0,
     lng: 0,
     radio: 300,
   };
 
-  nivelesRiesgo: { value: 'Alto' | 'Medio' | 'Bajo'; label: string }[] = [
-    { value: 'Alto',  label: '🔴 Alto'  },
-    { value: 'Medio', label: '🟠 Medio' },
-    { value: 'Bajo',  label: '🟡 Bajo'  },
+  riskLevels: { value: 'Alto' | 'Medio' | 'Bajo'; label: string }[] = [
+    { value: 'Alto',  label: 'Alto'  },
+    { value: 'Medio', label: 'Medio' },
+    { value: 'Bajo',  label: 'Bajo'  },
   ];
 
-  filtrosNivel = [
+  levelFilters = [
     { value: 'Todos', label: 'Todas'    },
-    { value: 'Alto',  label: '🔴 Alto'  },
-    { value: 'Medio', label: '🟠 Medio' },
-    { value: 'Bajo',  label: '🟡 Bajo'  },
+    { value: 'Alto',  label: 'Alto'  },
+    { value: 'Medio', label: 'Medio' },
+    { value: 'Bajo',  label: 'Bajo'  },
   ];
 
   // ── Modal punto CAI/Hospital ──────────────────────────────────
-  nuevoPunto = { tipo: 'CAI', nombre: '', lat: 0, lng: 0 };
-  esperandoClickPunto = false;
+  newPoint: { type: PointType; name: string; lat: number; lng: number } = { type: 'police_post', name: '', lat: 0, lng: 0 };
+  waitingPointClick = false;
 
-  // ── Datos — vienen vía API ─────────────────────
-  alertas: Alerta[] = [];
-  zonasManuales: ZonaManual[] = [];
-  puntosMapa: PuntoMapa[] = [];
+  // ── Data — comes from the API ─────────────────────
+  alerts: Alert[] = [];
+  manualZones: ManualZone[] = [];
+  mapPoints: MapPoint[] = [];
 
   // ── Filtros ──────────────────────────────────────────────────
-  filtrarAlertas(): void {
-    this.alertasFiltradas = this.alertas.filter(a => {
-      const m = this.filtroMedio  === 'Todos' || a.medioActivacion === this.filtroMedio;
-      const e = this.filtroEstado === 'Todos' || a.estado          === this.filtroEstado;
-      return m && e;
+  filterAlerts(): void {
+    const term = this.alertSearch.trim().toLowerCase();
+    this.filteredAlerts = this.alerts.filter(a => {
+      const m = this.methodFilter  === 'Todos' || a.activationMethod === this.methodFilter;
+      const e = this.statusFilter === 'Todos' || a.status          === this.statusFilter;
+      // Search by name, description, place or alert number
+      const b = !term || [a.name, a.description, a.location, `#${a.id}`]
+        .some(t => (t ?? '').toString().toLowerCase().includes(term));
+      return m && e && b;
     });
   }
 
   // ── Getters ──────────────────────────────────────────────────
-  get alertasPendientes(): number {
-    return this.alertas.filter(a => a.estado === 'Pendiente').length;
+  get pendingAlerts(): number {
+    return this.alerts.filter(a => a.status === 'Pendiente').length;
   }
 
-  get zonasCalientes(): ZonaCaliente[] {
-    const grupos: ZonaCaliente[] = [];
-    const procesadas = new Set<number>();
+  get hotZones(): HotZone[] {
+    const groups: HotZone[] = [];
+    const processed = new Set<number>();
 
-    this.alertas.forEach(a => {
-      if (procesadas.has(a.id)) return;
-      const cercanas = this.alertas.filter(b =>
-        !procesadas.has(b.id) &&
+    this.alerts.forEach(a => {
+      if (processed.has(a.id)) return;
+      const nearby = this.alerts.filter(b =>
+        !processed.has(b.id) &&
         Math.abs(b.lat - a.lat) < 0.004 &&
         Math.abs(b.lng - a.lng) < 0.004
       );
-      if (cercanas.length >= 2) {
-        cercanas.forEach(b => procesadas.add(b.id));
-        const lat = cercanas.reduce((s, b) => s + b.lat, 0) / cercanas.length;
-        const lng = cercanas.reduce((s, b) => s + b.lng, 0) / cercanas.length;
-        const nivel: 'Alto' | 'Medio' | 'Bajo' =
-          cercanas.length >= 5 ? 'Alto' : cercanas.length >= 3 ? 'Medio' : 'Bajo';
-        grupos.push({ nombre: `Zona ${a.ubicacion}`, lat, lng, alertas: cercanas.length, nivel });
+      if (nearby.length >= 2) {
+        nearby.forEach(b => processed.add(b.id));
+        const lat = nearby.reduce((s, b) => s + b.lat, 0) / nearby.length;
+        const lng = nearby.reduce((s, b) => s + b.lng, 0) / nearby.length;
+        const level: 'Alto' | 'Medio' | 'Bajo' =
+          nearby.length >= 5 ? 'Alto' : nearby.length >= 3 ? 'Medio' : 'Bajo';
+        groups.push({ name: `Zona ${a.location}`, lat, lng, alerts: nearby.length, level });
       }
     });
 
-    return grupos.sort((a, b) => b.alertas - a.alertas);
+    return groups.sort((a, b) => b.alerts - a.alerts);
   }
 
-  get zonasManualesFiltradas(): ZonaManual[] {
-    if (this.filtroNivel === 'Todos') return this.zonasManuales;
-    return this.zonasManuales.filter(z => z.nivel === this.filtroNivel);
+  get filteredManualZones(): ManualZone[] {
+    if (this.levelFilter === 'Todos') return this.manualZones;
+    return this.manualZones.filter(z => z.level === this.levelFilter);
   }
 
   // ── Lifecycle ────────────────────────────────────────────────
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.initMapaYData();
+      this.initMapAndData();
     }, 150);
   }
 
-  ngOnDestroy(): void { if (this.mapa) this.mapa.remove(); }
+  ngOnDestroy(): void { if (this.map) this.map.remove(); }
 
-  /** Fuerza refresco de la vista (útil para callbacks de Leaflet y HTTP) */
-  private refrescar(): void {
+  /** Forces a view refresh (useful for Leaflet and HTTP callbacks) */
+  private refresh(): void {
     this.cdr.detectChanges();
   }
 
-  // ── Medio de activación ──────────────────────────────────────
+  // ── Activation method ──────────────────────────────────────
   /** Clase CSS segura (sin tildes ni espacios) */
-  claseMedio(medio: MedioActivacion): string {
-    const map: Record<MedioActivacion, string> = {
+  methodClass(method: ActivationMethod): string {
+    const map: Record<ActivationMethod, string> = {
       'Botón de pánico':       'boton',
+      'Contacto':              'manual',
       'Widget':                'widget',
       'Movimiento sospechoso': 'movimiento',
+      'Botón de encendido':    'movimiento',
       'Manual':                'manual',
+      'Avísame si no llego':   'widget',
+      'Señal perdida':         'movimiento',
     };
-    return map[medio] ?? 'boton';
+    return map[method] ?? 'boton';
   }
 
   // ── Init mapa + carga de datos reales ──────────────────────────
-  private initMapaYData(): void {
+  private initMapAndData(): void {
     if (typeof L === 'undefined') {
       console.warn('Leaflet no cargado — agrega el CDN en index.html');
       return;
     }
 
-    this.mapa = L.map('mapa-leaflet', { center: this.centroInicial, zoom: 14 });
+    this.map = L.map('map-leaflet', { center: this.initialCenter, zoom: 14 });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap', maxZoom: 19,
-    }).addTo(this.mapa);
+    }).addTo(this.map);
 
-    this.mapa.on('click', (e: any) => this.onMapaClick(e));
+    this.map.on('click', (e: any) => this.onMapClick(e));
 
-    this.cargando = true;
+    this.loading = true;
     forkJoin({
-      alertas: this.alertsService.getAll(),
-      zonas: this.riskZonesService.getZonas(),
-      puntos: this.riskZonesService.getPuntos(),
+      alerts: this.alertsService.getAll(),
+      zones: this.zonesService.getRiskZones(),
+      points: this.resourcesService.getMapPoints(),
     }).subscribe({
-      next: ({ alertas, zonas, puntos }) => {
-        // DEBUG: quítalo cuando ya veas bien los datos
-        console.log('Primera alerta normalizada:', alertas[0]);
+      next: ({ alerts, zones, points }) => {
+        // DEBUG: remove it once the data looks right
 
-        this.alertas = alertas;
-        this.zonasManuales = zonas;
-        this.puntosMapa = puntos;
-        this.alertasFiltradas = [...this.alertas];
+        this.alerts = alerts;
+        this.manualZones = countAlertsInZones(zones, alerts);
+        this.mapPoints = points;
+        this.filterAlerts();
 
-        this.pintarAlertas();
-        this.pintarPuntos();
-        this.pintarCalor();
-        this.repintarZonasGuardadas();
+        this.paintAlerts();
+        this.paintPoints();
+        this.paintHeat();
+        this.repaintSavedZones();
 
-        this.cargando = false;
-        this.refrescar();
-        setTimeout(() => this.mapa?.invalidateSize(), 200);
+        this.loading = false;
+        this.refresh();
+        setTimeout(() => this.map?.invalidateSize(), 200);
       },
       error: (err) => {
         console.error('Error cargando datos del mapa:', err);
-        this.cargando = false;
-        this.refrescar();
+        this.loading = false;
+        this.refresh();
       }
     });
   }
 
   // ── Pintar capas ──────────────────────────────────────────────
-  private coordsValidas(lat: number, lng: number): boolean {
+  private validCoords(lat: number, lng: number): boolean {
     return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
   }
 
-  private pintarAlertas(): void {
-    this.marcadoresAlertas.forEach(m => this.mapa?.removeLayer(m));
-    this.marcadoresAlertas.clear();
+  private paintAlerts(): void {
+    this.alertMarkers.forEach(m => this.map?.removeLayer(m));
+    this.alertMarkers.clear();
 
-    this.alertas.forEach(a => {
-      if (!this.coordsValidas(a.lat, a.lng)) return;
+    this.alerts.forEach(a => {
+      if (!this.validCoords(a.lat, a.lng)) return;
 
       const marker = L.marker([a.lat, a.lng], {
-        icon: this.crearIconoPin(a.medioActivacion, a.estado === 'Atendida'),
-      }).bindTooltip(`${a.nombre}`);
+        icon: this.createPinIcon(a.activationMethod, a.status === 'Atendida'),
+      }).bindTooltip(`${a.name}`);
 
       marker.on('click', () => {
-        this.seleccionarAlerta(a);
-        this.refrescar();
+        this.selectAlert(a);
+        this.refresh();
       });
 
-      this.marcadoresAlertas.set(a.id, marker);
-      if (this.capas.alertas) marker.addTo(this.mapa);
+      this.alertMarkers.set(a.id, marker);
+      if (this.layers.alerts) marker.addTo(this.map);
     });
   }
 
-  private pintarPuntos(): void {
-    this.puntosMapa.forEach(p => this.pintarUnPunto(p));
+  private paintPoints(): void {
+    this.mapPoints.forEach(p => this.paintOnePoint(p));
   }
 
-  private pintarUnPunto(p: PuntoMapa): void {
-    if (!this.coordsValidas(p.lat, p.lng)) return;
+  private paintOnePoint(p: MapPoint): void {
+    if (!this.validCoords(p.lat, p.lng)) return;
 
-    const esCAI = p.tipo === 'CAI';
-    const emoji = esCAI ? '🚔' : '🏥';
-    const fondo = esCAI ? '#dbeafe' : '#fce7f3';
+    const { emoji, background, label, layer } = POINT_TYPES[p.type];
 
     const icon = L.divIcon({
-      html: `<div style="width:30px;height:30px;border-radius:50%;background:${fondo};
+      html: `<div style="width:30px;height:30px;border-radius:50%;background:${background};
                          border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);
                          display:flex;align-items:center;justify-content:center;font-size:15px;">${emoji}</div>`,
       className: '',
@@ -249,315 +266,360 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
       iconAnchor: [15, 15],
     });
 
-    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.nombre}`);
-    this.marcadoresPuntos.push({ marker, tipo: p.tipo });
+    const marker = L.marker([p.lat, p.lng], { icon }).bindTooltip(`${emoji} ${p.name} · ${label}`);
+    this.pointMarkers.push({ marker, layer });
 
-    const visible = esCAI ? this.capas.cais : this.capas.hospitales;
-    if (visible) marker.addTo(this.mapa);
+    if (this.layers[layer]) marker.addTo(this.map);
   }
 
-  private pintarCalor(): void {
-    this.circulosCalor.forEach(c => this.mapa?.removeLayer(c));
-    this.circulosCalor = [];
+  private paintHeat(): void {
+    this.heatCircles.forEach(c => this.map?.removeLayer(c));
+    this.heatCircles = [];
 
-    this.zonasCalientes.forEach(z => {
-      const color = this.colorPorNivel(z.nivel);
-      const circulo = L.circle([z.lat, z.lng], {
-        radius: 150 + z.alertas * 60,
+    this.hotZones.forEach(z => {
+      const color = this.colorByLevel(z.level);
+      const circle = L.circle([z.lat, z.lng], {
+        radius: 150 + z.alerts * 60,
         color,
         fillColor: color,
         fillOpacity: 0.15,
         weight: 0,
         interactive: false,
       });
-      this.circulosCalor.push(circulo);
-      if (this.capas.calor) circulo.addTo(this.mapa);
+      this.heatCircles.push(circle);
+      if (this.layers.heat) circle.addTo(this.map);
     });
   }
 
-  private repintarZonasGuardadas(): void {
-    this.zonasManuales.forEach(z => {
-      const capa = this.pintarZonaEnMapa(z);
-      this.capasZonas.set(z.id, capa);
-      if (!this.capas.zonas) this.mapa?.removeLayer(capa);
+  private repaintSavedZones(): void {
+    this.manualZones.forEach(z => {
+      const layer = this.paintZoneOnMap(z);
+      this.zoneLayers.set(z.id, layer);
+      if (!this.layers.zones) this.map?.removeLayer(layer);
     });
   }
 
   // ── Capas (toggle) ────────────────────────────────────────────
-  toggleCapa(capa: 'alertas' | 'zonas' | 'cais' | 'hospitales' | 'calor'): void {
-    if (!this.mapa) return;
-    const visible = this.capas[capa];
-    const alternar = (layer: any) => visible ? layer.addTo(this.mapa) : this.mapa.removeLayer(layer);
+  toggleLayer(layer: 'alerts' | 'zones' | 'heat' | PointLayer): void {
+    if (!this.map) return;
+    const visible = this.layers[layer];
+    const toggle = (layer: any) => visible ? layer.addTo(this.map) : this.map.removeLayer(layer);
 
-    switch (capa) {
-      case 'alertas':
-        this.marcadoresAlertas.forEach(alternar);
+    switch (layer) {
+      case 'alerts':
+        this.alertMarkers.forEach(toggle);
         break;
-      case 'zonas':
-        this.capasZonas.forEach(alternar);
+      case 'zones':
+        this.zoneLayers.forEach(toggle);
         break;
       case 'cais':
-        this.marcadoresPuntos.filter(p => p.tipo === 'CAI').forEach(p => alternar(p.marker));
+      case 'hospitals':
+      case 'support':
+        this.pointMarkers.filter(p => p.layer === layer).forEach(p => toggle(p.marker));
         break;
-      case 'hospitales':
-        this.marcadoresPuntos.filter(p => p.tipo === 'Hospital').forEach(p => alternar(p.marker));
-        break;
-      case 'calor':
-        this.circulosCalor.forEach(alternar);
+      case 'heat':
+        this.heatCircles.forEach(toggle);
         break;
     }
   }
 
-  // ── Selección / atención de alertas ───────────────────────────
-  seleccionarAlerta(alerta: Alerta): void {
-    this.alertaActiva = alerta;
-    if (this.coordsValidas(alerta.lat, alerta.lng)) {
-      this.mapa?.flyTo([alerta.lat, alerta.lng], 16, { duration: 0.6 });
+  // ── Alert selection / handling ───────────────────────────
+  selectAlert(alert: Alert): void {
+    this.activeAlert = alert;
+    if (this.validCoords(alert.lat, alert.lng)) {
+      this.map?.flyTo([alert.lat, alert.lng], 16, { duration: 0.6 });
     }
+    this.loadDetail(alert);
   }
 
-  cerrarPopup(): void {
-    this.alertaActiva = null;
+  private loadDetail(alert: Alert): void {
+    this.detail = null;
+    this.alertAddress = null;
+    this.loadingDetail = true;
+    this.alertsService.adminDetail(alert.id).subscribe({
+      next: (d) => {
+        if (this.activeAlert?.id !== alert.id) return;
+        this.detail = d;
+        this.loadingDetail = false;
+        // The address is the one of the last known location or, if none, the activation one
+        const point = d.lastLocation ?? (d.locationVisible && this.validCoords(alert.lat, alert.lng) ? alert : null);
+        if (point) {
+          this.geocoding.get(point.lat, point.lng).then((l) => {
+            if (this.activeAlert?.id !== alert.id || !l) return;
+            this.alertAddress = [l.neighborhood, l.address].filter(Boolean).join(' · ') || l.city;
+            this.refresh();
+          });
+        }
+        this.refresh();
+      },
+      error: () => {
+        this.loadingDetail = false;
+        this.refresh();
+      },
+    });
   }
 
-  atenderAlerta(alerta: Alerta): void {
-    if (alerta.estado === 'Atendida') return;
+  /** "Correo · enviado", "Push · falló"... */
+  channelText(channel: string, status: string): string {
+    const name = channel === 'email' ? 'Correo' : channel === 'push' ? 'Notificación' : channel;
+    const statuses: Record<string, string> = { sent: 'enviado', delivered: 'entregado', failed: 'falló', pending: 'pendiente' };
+    return `${name} · ${statuses[status] ?? status}`;
+  }
 
-    this.alertsService.updateEstado(alerta.id, 'Atendida').subscribe({
+  howLongAgo(date: Date | null): string {
+    if (!date) return '—';
+    const min = Math.round((Date.now() - date.getTime()) / 60000);
+    if (min < 1) return 'hace un momento';
+    if (min < 60) return `hace ${min} min`;
+    if (min < 1440) return `hace ${Math.floor(min / 60)} h`;
+    return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+  }
+
+  closePopup(): void {
+    this.activeAlert = null;
+  }
+
+  attendAlert(alert: Alert): void {
+    if (alert.status === 'Atendida') return;
+
+    this.alertsService.updateStatus(alert.id, 'Atendida').subscribe({
       next: () => {
-        alerta.estado = 'Atendida';
-        this.marcadoresAlertas.get(alerta.id)
-          ?.setIcon(this.crearIconoPin(alerta.medioActivacion, true));
-        this.filtrarAlertas();
-        this.refrescar();
+        alert.status = 'Atendida';
+        this.alertMarkers.get(alert.id)
+          ?.setIcon(this.createPinIcon(alert.activationMethod, true));
+        this.filterAlerts();
+        this.refresh();
       },
       error: (err) => console.error('Error atendiendo alerta:', err),
     });
   }
 
-  irAZona(lat: number, lng: number): void {
-    this.mapa?.flyTo([lat, lng], 15, { duration: 0.6 });
+  goToZone(lat: number, lng: number): void {
+    this.map?.flyTo([lat, lng], 15, { duration: 0.6 });
   }
 
-  limpiarVista(): void {
+  clearView(): void {
     this.fabOpen = false;
-    this.alertaActiva = null;
-    this.mapa?.flyTo(this.centroInicial, 14, { duration: 0.6 });
+    this.activeAlert = null;
+    this.map?.flyTo(this.initialCenter, 14, { duration: 0.6 });
   }
 
   // ── Click en mapa ────────────────────────────────────────────
-  private onMapaClick(e: any): void {
+  private onMapClick(e: any): void {
     const { lat, lng } = e.latlng;
 
-    if (this.modalZona && this.esperandoClickZona) {
-      this.nuevaZona.lat = parseFloat(lat.toFixed(6));
-      this.nuevaZona.lng = parseFloat(lng.toFixed(6));
-      this.esperandoClickZona = false;
-      this.actualizarPreviewZona();
-      this.refrescar();
+    if (this.zoneModal && this.waitingZoneClick) {
+      this.newZone.lat = parseFloat(lat.toFixed(6));
+      this.newZone.lng = parseFloat(lng.toFixed(6));
+      this.waitingZoneClick = false;
+      this.updateZonePreview();
+      this.refresh();
       return;
     }
 
-    if (this.modalPunto && this.esperandoClickPunto) {
-      this.nuevoPunto.lat = parseFloat(lat.toFixed(6));
-      this.nuevoPunto.lng = parseFloat(lng.toFixed(6));
-      this.refrescar();
+    if (this.pointModal && this.waitingPointClick) {
+      this.newPoint.lat = parseFloat(lat.toFixed(6));
+      this.newPoint.lng = parseFloat(lng.toFixed(6));
+      this.waitingPointClick = false; // the modal is shown again with the chosen location
+      this.refresh();
     }
   }
 
-  // ── Preview círculo en mapa al elegir área ────────────────────
-  actualizarPreviewZona(): void {
-    if (!this.mapa || this.nuevaZona.lat === 0) return;
+  // ── Circle preview on the map when choosing an area ────────────────────
+  updateZonePreview(): void {
+    if (!this.map || this.newZone.lat === 0) return;
 
-    this.limpiarPreview();
+    this.clearPreview();
 
-    if (this.modoZona === 'area') {
-      const color = this.colorPorNivel(this.nuevaZona.nivel);
-      this.circuloPreview = L.circle(
-        [this.nuevaZona.lat, this.nuevaZona.lng],
-        { radius: this.nuevaZona.radio, color, fillColor: color, fillOpacity: 0.2, weight: 2, dashArray: '6,4' }
-      ).addTo(this.mapa);
+    if (this.zoneMode === 'area') {
+      const color = this.colorByLevel(this.newZone.level);
+      this.previewCircle = L.circle(
+        [this.newZone.lat, this.newZone.lng],
+        { radius: this.newZone.radio, color, fillColor: color, fillOpacity: 0.2, weight: 2, dashArray: '6,4' }
+      ).addTo(this.map);
     }
 
-    this.marcadorCentro = L.circleMarker(
-      [this.nuevaZona.lat, this.nuevaZona.lng],
-      { radius: 6, fillColor: this.colorPorNivel(this.nuevaZona.nivel), color: '#fff', weight: 2, fillOpacity: 1 }
-    ).addTo(this.mapa);
+    this.centerMarker = L.circleMarker(
+      [this.newZone.lat, this.newZone.lng],
+      { radius: 6, fillColor: this.colorByLevel(this.newZone.level), color: '#fff', weight: 2, fillOpacity: 1 }
+    ).addTo(this.map);
 
-    this.mapa.flyTo([this.nuevaZona.lat, this.nuevaZona.lng], 15, { duration: 0.5 });
+    this.map.flyTo([this.newZone.lat, this.newZone.lng], 15, { duration: 0.5 });
   }
 
-  private limpiarPreview(): void {
-    if (this.circuloPreview)  { this.mapa?.removeLayer(this.circuloPreview);  this.circuloPreview  = null; }
-    if (this.marcadorCentro)  { this.mapa?.removeLayer(this.marcadorCentro);  this.marcadorCentro  = null; }
+  private clearPreview(): void {
+    if (this.previewCircle)  { this.map?.removeLayer(this.previewCircle);  this.previewCircle  = null; }
+    if (this.centerMarker)  { this.map?.removeLayer(this.centerMarker);  this.centerMarker  = null; }
   }
 
   // ── Abrir modal zona nueva ────────────────────────────────────
-  abrirModalZona(modo: 'pin' | 'area' = 'area'): void {
+  openZoneModal(mode: 'pin' | 'area' = 'area'): void {
     this.fabOpen = false;
-    this.modoZona = modo;
-    this.nuevaZona = { nombre: '', nivel: 'Alto', lat: 0, lng: 0, radio: 300 };
-    this.esperandoClickZona = false;
-    this.limpiarPreview();
-    this.modalZona = true;
-    this.tabActivo = 'zonas';
+    this.zoneMode = mode;
+    this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
+    this.waitingZoneClick = false;
+    this.clearPreview();
+    this.zoneModal = true;
+    this.activeTab = 'zonas';
   }
 
-  activarClickEnMapa(): void {
-    this.esperandoClickZona = true;
+  enableMapClick(): void {
+    this.waitingZoneClick = true;
   }
 
-  setNivel(value: 'Alto' | 'Medio' | 'Bajo'): void {
-    this.nuevaZona.nivel = value;
-    if (this.nuevaZona.lat !== 0) this.actualizarPreviewZona();
+  setLevel(value: 'Alto' | 'Medio' | 'Bajo'): void {
+    this.newZone.level = value;
+    if (this.newZone.lat !== 0) this.updateZonePreview();
   }
 
   onRadioChange(): void {
-    if (this.nuevaZona.lat !== 0) this.actualizarPreviewZona();
+    if (this.newZone.lat !== 0) this.updateZonePreview();
   }
 
-  cancelarModalZona(): void {
-    this.modalZona = false;
-    this.esperandoClickZona = false;
-    this.limpiarPreview();
-    this.nuevaZona = { nombre: '', nivel: 'Alto', lat: 0, lng: 0, radio: 300 };
+  cancelZoneModal(): void {
+    this.zoneModal = false;
+    this.waitingZoneClick = false;
+    this.clearPreview();
+    this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
   }
 
-  // ── Guardar zona vía API ────────────────────────────────────
-  guardarZona(): void {
-    if (!this.nuevaZona.nombre || this.nuevaZona.lat === 0) return;
+  // ── Save zone through the API ────────────────────────────────────
+  saveZone(): void {
+    if (!this.newZone.name || this.newZone.lat === 0) return;
 
-    const alertasEnZona = this.alertas.filter(a => {
-      const dLat = Math.abs(a.lat - this.nuevaZona.lat);
-      const dLng = Math.abs(a.lng - this.nuevaZona.lng);
-      const gradosAprox = this.nuevaZona.radio / 111000;
-      return dLat <= gradosAprox && dLng <= gradosAprox;
-    }).length;
+    const tempZone = {
+      centerLat: this.newZone.lat,
+      centerLng: this.newZone.lng,
+      radio: this.zoneMode === 'area' ? this.newZone.radio : undefined,
+    } as ManualZone;
+    const alertsInZone = this.alerts.filter(a => isInsideZone(tempZone, a.lat, a.lng)).length;
 
-    const payload: Omit<ZonaManual, 'id'> = {
-      nombre: this.nuevaZona.nombre,
-      nivel: this.nuevaZona.nivel,
-      metodo: this.modoZona,
-      radio: this.modoZona === 'area' ? this.nuevaZona.radio : undefined,
-      centroLat: this.nuevaZona.lat,
-      centroLng: this.nuevaZona.lng,
-      alertasEnZona,
+    const payload: Omit<ManualZone, 'id'> = {
+      name: this.newZone.name,
+      level: this.newZone.level,
+      method: this.zoneMode,
+      radio: this.zoneMode === 'area' ? this.newZone.radio : undefined,
+      centerLat: this.newZone.lat,
+      centerLng: this.newZone.lng,
+      alertsInZone,
     };
 
-    this.riskZonesService.createZona(payload).subscribe({
-      next: (zonaCreada) => {
-        const capa = this.pintarZonaEnMapa(zonaCreada);
-        this.capasZonas.set(zonaCreada.id, capa);
-        this.zonasManuales.push(zonaCreada);
-        this.zonasManuales.sort((a, b) => b.alertasEnZona - a.alertasEnZona);
+    this.zonesService.createRiskZone(payload).subscribe({
+      next: (createdZone) => {
+        const layer = this.paintZoneOnMap(createdZone);
+        this.zoneLayers.set(createdZone.id, layer);
+        this.manualZones.push(createdZone);
+        this.manualZones.sort((a, b) => b.alertsInZone - a.alertsInZone);
 
-        this.limpiarPreview();
-        this.modalZona = false;
-        this.nuevaZona = { nombre: '', nivel: 'Alto', lat: 0, lng: 0, radio: 300 };
-        this.refrescar();
+        this.clearPreview();
+        this.zoneModal = false;
+        this.newZone = { name: '', level: 'Alto', lat: 0, lng: 0, radio: 300 };
+        this.refresh();
       },
       error: (err) => console.error('Error guardando zona:', err)
     });
   }
 
-  // ── Marcar zona caliente directamente desde el panel — vía API ──
-  marcarZonaCaliente(z: ZonaCaliente): void {
-    const radio = z.alertas >= 5 ? 400 : z.alertas >= 3 ? 280 : 180;
+  // ── Mark hot zone directly from the panel — through the API ──
+  markHotZone(z: HotZone): void {
+    const radio = z.alerts >= 5 ? 400 : z.alerts >= 3 ? 280 : 180;
 
-    const payload: Omit<ZonaManual, 'id'> = {
-      nombre: z.nombre,
-      nivel: z.nivel,
-      metodo: 'area',
+    const payload: Omit<ManualZone, 'id'> = {
+      name: z.name,
+      level: z.level,
+      method: 'area',
       radio,
-      centroLat: z.lat,
-      centroLng: z.lng,
-      alertasEnZona: z.alertas,
+      centerLat: z.lat,
+      centerLng: z.lng,
+      alertsInZone: z.alerts,
     };
 
-    this.riskZonesService.createZona(payload).subscribe({
-      next: (zonaCreada) => {
-        const capa = this.pintarZonaEnMapa(zonaCreada);
-        this.capasZonas.set(zonaCreada.id, capa);
-        this.zonasManuales.push(zonaCreada);
-        this.zonasManuales.sort((a, b) => b.alertasEnZona - a.alertasEnZona);
-        this.mapa?.flyTo([zonaCreada.centroLat, zonaCreada.centroLng], 15, { duration: 0.6 });
-        this.refrescar();
+    this.zonesService.createRiskZone(payload).subscribe({
+      next: (createdZone) => {
+        const layer = this.paintZoneOnMap(createdZone);
+        this.zoneLayers.set(createdZone.id, layer);
+        this.manualZones.push(createdZone);
+        this.manualZones.sort((a, b) => b.alertsInZone - a.alertsInZone);
+        this.map?.flyTo([createdZone.centerLat, createdZone.centerLng], 15, { duration: 0.6 });
+        this.refresh();
       },
       error: (err) => console.error('Error marcando zona caliente:', err)
     });
   }
 
-  // ── Eliminar zona vía API ────────────────────────────────────
-  eliminarZona(id: number): void {
-    this.riskZonesService.deleteZona(id).subscribe({
+  // ── Delete zone through the API ────────────────────────────────────
+  deleteZone(id: number): void {
+    this.zonesService.delete(id).subscribe({
       next: () => {
-        const capa = this.capasZonas.get(id);
-        if (capa) this.mapa?.removeLayer(capa);
-        this.capasZonas.delete(id);
-        this.zonasManuales = this.zonasManuales.filter(z => z.id !== id);
-        this.refrescar();
+        const layer = this.zoneLayers.get(id);
+        if (layer) this.map?.removeLayer(layer);
+        this.zoneLayers.delete(id);
+        this.manualZones = this.manualZones.filter(z => z.id !== id);
+        this.refresh();
       },
       error: (err) => console.error('Error eliminando zona:', err)
     });
   }
 
   // ── CAI / Hospital ───────────────────────────────────────────
-  agregarPuntoCAI(): void {
+  addCaiPoint(): void {
     this.fabOpen = false;
-    this.nuevoPunto = { tipo: 'CAI', nombre: '', lat: 0, lng: 0 };
-    this.esperandoClickPunto = true;
-    this.modalPunto = true;
+    this.newPoint = { type: 'police_post', name: '', lat: 0, lng: 0 };
+    this.waitingPointClick = true;
+    this.pointModal = true;
   }
 
-  // ── Guardar punto vía API ────────────────────────────────────
-  guardarPunto(): void {
-    if (!this.nuevoPunto.nombre) return;
+  // ── Save point through the API ────────────────────────────────────
+  savePoint(): void {
+    if (!this.newPoint.name) return;
 
-    const payload: Omit<PuntoMapa, 'id'> = {
-      tipo: this.nuevoPunto.tipo as 'CAI' | 'Hospital',
-      nombre: this.nuevoPunto.nombre,
-      lat: this.nuevoPunto.lat || this.centroInicial[0],
-      lng: this.nuevoPunto.lng || this.centroInicial[1],
+    const payload: Omit<MapPoint, 'id'> = {
+      type: this.newPoint.type,
+      name: this.newPoint.name,
+      lat: this.newPoint.lat || this.initialCenter[0],
+      lng: this.newPoint.lng || this.initialCenter[1],
     };
 
-    this.riskZonesService.createPunto(payload).subscribe({
-      next: (puntoCreado) => {
-        this.puntosMapa.push(puntoCreado);
-        this.pintarUnPunto(puntoCreado);
-        this.modalPunto = false;
-        this.esperandoClickPunto = false;
-        this.refrescar();
+    this.resourcesService.createMapPoint(payload).subscribe({
+      next: (createdPoint) => {
+        this.mapPoints.push(createdPoint);
+        this.paintOnePoint(createdPoint);
+        this.pointModal = false;
+        this.waitingPointClick = false;
+        this.refresh();
       },
       error: (err) => console.error('Error guardando punto:', err)
     });
   }
 
   // ── Helpers iconos / zonas ────────────────────────────────────
-  private colorPorNivel(nivel: 'Alto' | 'Medio' | 'Bajo'): string {
-    return nivel === 'Alto' ? '#ef4444' : nivel === 'Medio' ? '#f97316' : '#eab308';
+  private colorByLevel(level: 'Alto' | 'Medio' | 'Bajo'): string {
+    return level === 'Alto' ? '#d946ef' : level === 'Medio' ? '#a855f7' : '#c084fc';
   }
 
   /**
-   * Único punto de verdad para pintar una ZonaManual en el mapa
-   * (se usaba duplicado en repintarZonasGuardadas, guardarZona y marcarZonaCaliente)
+   * Single source of truth to paint a ManualZone on the map
+   * (it was duplicated in repaintSavedZones, saveZone and markHotZone)
    */
-  private pintarZonaEnMapa(zona: ZonaManual): any {
-    const color = this.colorPorNivel(zona.nivel);
+  private paintZoneOnMap(zone: ManualZone): any {
+    const color = this.colorByLevel(zone.level);
 
-    if (zona.metodo === 'area') {
-      return L.circle(
-        [zona.centroLat, zona.centroLng],
-        { radius: zona.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
-      ).bindTooltip(`${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
+    const icon = L.divIcon({ html: this.createPinSvg(color), className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
+    const pin = L.marker([zone.centerLat, zone.centerLng], { icon }).bindTooltip(`⚠️ ${zone.name} (${zone.level})`);
+
+    if (zone.method === 'area') {
+      // The area also carries the danger pin at its center, so it can be seen even when the map is zoomed out
+      const circle = L.circle(
+        [zone.centerLat, zone.centerLng],
+        { radius: zone.radio ?? 300, color, fillColor: color, fillOpacity: 0.2, weight: 2 }
+      ).bindTooltip(`${zone.name} (${zone.level})`);
+      return L.layerGroup([circle, pin]).addTo(this.map);
     }
 
-    const svg = this.crearSvgPin(color);
-    const icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42] });
-    return L.marker([zona.centroLat, zona.centroLng], { icon })
-      .bindTooltip(`⚠️ ${zona.nombre} (${zona.nivel})`).addTo(this.mapa);
+    return pin.addTo(this.map);
   }
 
-  private crearSvgPin(color: string): string {
+  private createPinSvg(color: string): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
       <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 26 16 26S32 28 32 16C32 7.16 24.84 0 16 0z"
             fill="${color}" stroke="white" stroke-width="1.5"/>
@@ -567,16 +629,20 @@ export class AlertAdminComponent implements AfterViewInit, OnDestroy {
     </svg>`;
   }
 
-  // Color del pin según el medio de activación (gris si ya fue atendida)
-  private crearIconoPin(medio: MedioActivacion, atendida = false): any {
-    const colores: Record<MedioActivacion, string> = {
-      'Botón de pánico':       '#ef4444',
-      'Widget':                '#3b82f6',
+  // Pin color by activation method (grey if already attended)
+  private createPinIcon(method: ActivationMethod, attended = false): any {
+    const colors: Record<ActivationMethod, string> = {
+      'Botón de pánico':       '#d946ef',
+      'Contacto':              '#d946ef',
+      'Widget':                '#6d28d9',
       'Movimiento sospechoso': '#8b5cf6',
-      'Manual':                '#f59e0b',
+      'Botón de encendido':    '#a855f7',
+      'Manual':                '#9333ea',
+      'Avísame si no llego':   '#7c3aed',
+      'Señal perdida':         '#c026d3',
     };
 
-    const color = atendida ? '#9ca3af' : (colores[medio] ?? '#ef4444');
+    const color = attended ? '#9ca3af' : (colors[method] ?? '#d946ef');
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
       <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z"
             fill="${color}" stroke="white" stroke-width="1.5"/>

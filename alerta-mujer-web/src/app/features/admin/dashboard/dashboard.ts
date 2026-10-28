@@ -1,344 +1,711 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { TPipe } from '../../../core/i18n/i18n';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import * as L from 'leaflet';
 
 import { AlertsService } from '../../../core/services/alerts.services';
-import { RiskZonesService } from '../../../core/services/risk-zones.services';
+import { GeocodingService } from '../../../core/services/geocoding.service';
+import { ZonesService, countAlertsInZones, isInsideZone } from '../../../core/services/zones.service';
 import { UsersService } from '../../../core/services/users.services';
-import { Alerta } from '../../../core/models/alert.model';
-import { ZonaManual } from '../../../core/models/zona.model';
+import { Alert } from '../../../core/models/alert.model';
+import { ManualZone } from '../../../core/models/map-zone.model';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
 
-// Campos extra que vienen en db.json; opcionales para no depender del modelo
-type AlertaVM = Alerta & {
-  nombre?: string;
-  medioActivacion?: string;
+// Extra fields that come in db.json; optional so as not to depend on the model
+type AlertVM = Alert & {
+  name?: string;
+  activationMethod?: string;
   created_at?: string;
   started_at?: string;
 };
 
-export interface AlertaPorTipo {
-  tipo: string;
-  etiqueta: string;
-  cantidad: number;
-  porcentaje: number;
-  color: string;
-}
+type Period = 'hoy' | '7d' | '30d' | 'custom';
+type StatusFilter = 'Todas' | 'Pendiente' | 'Atendida' | 'Cancelada';
 
-export interface DonutSegmento {
-  tipo: string;
-  d: string;
-  color: string;
-}
-
-export interface ModoActivacion {
-  nombre: string;
-  cantidad: number;
-  porcentaje: number;
-  color: string;
-  icono: 'campana' | 'movimiento' | 'voz' | 'auto';
-}
-
-export interface RankingZona {
-  nombre: string;
-  cantidad: number;
-}
-
-export interface BurbujaZona {
-  nombre: string;
-  cantidad: number;
+export interface HourBar {
+  time: number;
+  value: number;
   x: number;
+  cx: number;
   y: number;
-  r: number;
+  h: number;
+  peak: boolean;
 }
 
-const COLOR_POR_TIPO: Record<string, string> = {
-  SOS: '#e11d48',
-  Acoso: '#7c3aed',
-  Robo: '#2563eb',
-  Medical: '#0d9488',
-};
-const COLOR_OTROS = '#f59e0b';
+export interface ChartBand {
+  name: string;
+  range: string;
+  total: number;
+  x: number;
+  w: number;
+  cx: number;
+}
 
-const ETIQUETA_POR_TIPO: Record<string, string> = {
-  SOS: 'SOS',
-  Acoso: 'Acoso',
-  Robo: 'Robo',
-  Medical: 'Emergencia médica',
-};
+export interface IncidentZone {
+  rank: number;
+  name: string;
+  address: string;
+  searching: boolean;
+  riskZone: string | null;
+  count: number;
+  percentage: number;
+  bar: number;
+  lat: number;
+  lng: number;
+}
 
-const COLORES_MODO = ['#e11d48', '#7c3aed', '#2563eb', '#0d9488', '#f59e0b'];
-const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const DEFAULT_CENTER: L.LatLngTuple = [2.9273, -75.2819];
+const DAY_MS = 86400000;
+const WEEK_DAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const LONG_DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+type TrendView = 'semana' | 'mes';
+
+interface DayBar {
+  day: string;
+  longDay: string;
+  isToday: boolean;
+  groupX: number;
+  groupWidth: number;
+  previous: number;
+  current: number | null;
+  previousX: number;
+  previousY: number;
+  previousPath: string;
+  currentX: number;
+  currentY: number;
+  currentPath: string;
+  barWidth: number;
+}
+
+/** Bar with rounded top corners (4 px) resting on the baseline. */
+function roundedBar(x: number, y: number, width: number, base: number): string {
+  const height = base - y;
+  if (height <= 0) return '';
+  const r = Math.min(4, height, width / 2);
+  return `M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + width - r} Q${x + width},${y} ${x + width},${y + r} V${base} Z`;
+}
+
+/** "3 alertas menos que la semana pasada a esta altura (−50 %)". */
+function trendSentence(current: number, previousCount: number, view: TrendView = 'semana'): string {
+  const previousLabel = view === 'mes' ? 'el mes pasado' : 'la semana pasada';
+  if (current === previousCount) {
+    if (current === 0) return view === 'mes' ? 'Sin alertas en ninguno de los dos meses hasta hoy.' : 'Sin alertas en ninguna de las dos semanas hasta hoy.';
+    return `Igual que ${previousLabel} a esta altura.`;
+  }
+  const diff = current - previousCount;
+  const n = Math.abs(diff);
+  const word = n === 1 ? 'alerta' : 'alertas';
+  const pct = previousCount > 0 ? ` (${diff > 0 ? '+' : '−'}${Math.round((n / previousCount) * 100)} %)` : '';
+  return `${n} ${word} ${diff > 0 ? 'más' : 'menos'} que ${previousLabel} a esta altura${pct}.`;
+}
+
+const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+const TIME_BANDS = [
+  { name: 'Madrugada', range: '0h – 5h', start: 0, end: 5 },
+  { name: 'Mañana', range: '6h – 11h', start: 6, end: 11 },
+  { name: 'Tarde', range: '12h – 17h', start: 12, end: 17 },
+  { name: 'Noche', range: '18h – 23h', start: 18, end: 23 },
+];
+
+// Geometry of the hourly chart (matches the 1000x275 viewBox in the HTML)
+const H_X0 = 50;
+const H_SLOT = 38.75;
+const BAR_H = 26;
+const H_TOP = 40;
+const H_BASE = 240;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [TPipe, DatePicker, CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
 
+  private cdr = inject(ChangeDetectorRef);
   private alertsService = inject(AlertsService);
-  private riskZonesService = inject(RiskZonesService);
+  private zonesService = inject(ZonesService);
   private usersService = inject(UsersService);
+  private geocoding = inject(GeocodingService);
 
-  cargando = true;
+  @ViewChild('mapaZonas') mapEl?: ElementRef<HTMLDivElement>;
+
+  loading = true;
   error = false;
+  updatedAt = new Date();
+
+  // --- Filtros ---
+  period: Period = '7d';
+  from = '';
+  to = '';
+  statusFilter: StatusFilter = 'Todas';
+
+  readonly periods: { value: Period; label: string }[] = [
+    { value: 'hoy', label: 'Hoy' },
+    { value: '7d', label: '7 días' },
+    { value: '30d', label: '30 días' },
+    { value: 'custom', label: 'Personalizado' },
+  ];
+
+  readonly statusFilters: { value: StatusFilter; label: string }[] = [
+    { value: 'Todas', label: 'Todas' },
+    { value: 'Pendiente', label: 'Pendientes' },
+    { value: 'Atendida', label: 'Atendidas' },
+    { value: 'Cancelada', label: 'Canceladas' },
+  ];
 
   // --- Stat cards ---
-  totalUsuarias = 0;
-  usuariasActivas = 0;
-  porcentajeActivas = 0;
-  totalAlertas = 0;
-  alertasActivas = 0;
-  zonasCriticas = 0;
-  alertasEnZonas = 0;
+  totalUsers = 0;
+  activeUsers = 0;
+  activePercentage = 0;
+  pendingAlerts = 0;
+  oldestPending = '';
+  attendedAlerts = 0;
+  cancelledAlerts = 0;
+  attendedPercentage = 0;
+  cancelledPercentage = 0;
 
-  // --- Tendencia (alertas por día de la semana) ---
-  tendenciaTotal = 0;
-  tendenciaTicks: { y: number; label: number }[] = [];
-  tendenciaLabels: { x: number; texto: string }[] = [];
-  tendenciaDots: { x: number; y: number; valor: number }[] = [];
-  tendenciaLinea = '';
-  tendenciaArea = '';
+  // --- Alerts by hour of the day ---
+  hourBars: HourBar[] = [];
+  hourTicks: { y: number; label: number }[] = [];
+  chartBands: ChartBand[] = [];
+  hasHourData = false;
+  peakHourText = '—';
+  peakHourDetail = 'Sin alertas en este periodo';
+  riskyBandText = '—';
+  riskyBandDetail = 'Sin alertas en este periodo';
+  calmBandText = '—';
+  calmBandDetail = 'Sin alertas en este periodo';
 
-  // --- Modos de activación ---
-  modosActivacion: ModoActivacion[] = [];
+  // --- Zones with the most incidents ---
+  incidentZones: IncidentZone[] = [];
+  selectedZone = 0;
 
-  // --- Alertas por zona ---
-  rankingZonas: RankingZona[] = [];
-  burbujasZona: BurbujaZona[] = [];
-
-  // --- Emergencias por tipo ---
-  alertasPorTipo: AlertaPorTipo[] = [];
-  donutSegs: DonutSegmento[] = [];
+  // --- Trend (this week vs. last week, or this month by weeks vs. last month) ---
+  trendView: TrendView = 'semana';
+  monthTrend = '';
+  currentTrendTotal = 0;
+  previousTrendTotal = 0;
+  previousTrendUntilToday = 0;
+  trendSentence = '';
+  trendTicks: { y: number; label: number }[] = [];
+  trendBars: DayBar[] = [];
 
   // --- Tabla ---
-  alertasRecientes: AlertaVM[] = [];
+  recentAlerts: AlertVM[] = [];
 
-  // Geometría del gráfico de tendencia (coincide con el viewBox 640x230 del HTML)
-  private readonly graf = { izq: 40, der: 620, arriba: 20, abajo: 190 };
+  // In-memory data (loaded only once; the filters do not call the backend again)
+  private all: AlertVM[] = [];
+  private apiZones: ManualZone[] = [];
+  private riskZones: ManualZone[] = [];
+  private periodList: AlertVM[] = [];
+
+  // Mapa
+  private map?: L.Map;
+  private pointsLayer = L.layerGroup();
+  private alertMarker?: L.CircleMarker;
+  private zonesVersion = 0;
+
+  // Geometry of the trend chart (matches the 640x230 viewBox in the HTML)
+  private readonly chart = { left: 40, right: 620, up: 20, down: 190 };
 
   ngOnInit(): void {
-    this.cargarDatos();
+    this.loadData();
   }
 
-  private cargarDatos(): void {
-    this.cargando = true;
+  ngOnDestroy(): void {
+    this.zonesVersion++;
+    this.map?.remove();
+  }
+
+  get currentZone(): IncidentZone | null {
+    return this.incidentZones[this.selectedZone] ?? null;
+  }
+
+  private loadData(): void {
+    this.loading = true;
     this.error = false;
 
     forkJoin({
-      alertas: this.alertsService.getAll(),
-      zonas: this.riskZonesService.getZonas(),
-      usuarios: this.usersService.getAll(),
+      alerts: this.alertsService.getAll(),
+      zones: this.zonesService.getRiskZones(),
+      users: this.usersService.getAll(),
     }).subscribe({
-      next: ({ alertas, zonas, usuarios }) => {
-        const lista = alertas as AlertaVM[];
+      next: ({ alerts, zones: apiZones, users }) => {
+        this.all = alerts as AlertVM[];
+        this.apiZones = apiZones;
 
-        this.totalUsuarias = usuarios.length;
-        this.usuariasActivas = usuarios.filter(u => this.estadoDe(u) === 'Activa').length;
-        this.porcentajeActivas = this.totalUsuarias
-          ? Math.round((this.usuariasActivas / this.totalUsuarias) * 100)
+        this.totalUsers = users.length;
+        this.activeUsers = users.filter(u => this.statusOf(u) === 'Activa').length;
+        this.activePercentage = this.totalUsers
+          ? Math.round((this.activeUsers / this.totalUsers) * 100)
           : 0;
 
-        this.totalAlertas = lista.length;
-        this.alertasActivas = lista.filter(a => a.estado === 'Pendiente').length;
-        this.zonasCriticas = zonas.length;
-        this.alertasEnZonas = zonas.reduce((suma: number, z: ZonaManual) => suma + z.alertasEnZona, 0);
-
-        this.alertasPorTipo = this.calcularAlertasPorTipo(lista);
-        this.donutSegs = this.calcularDonut();
-        this.modosActivacion = this.calcularModos(lista);
-        this.calcularZonas(lista);
-        this.calcularTendencia(lista);
-
-        this.alertasRecientes = lista.slice(-5).reverse();
-
-        this.cargando = false;
+        this.updatedAt = new Date();
+        this.loading = false;
+        this.recompute();
       },
       error: (err) => {
         console.error('Error cargando dashboard:', err);
         this.error = true;
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // ── Helpers de agregación ──────────────────────────────────────
-  private contarPor<T>(items: T[], obtenerClave: (item: T) => string): { clave: string; cantidad: number }[] {
-    const conteo: Record<string, number> = {};
-    items.forEach(item => {
-      const clave = obtenerClave(item);
-      conteo[clave] = (conteo[clave] ?? 0) + 1;
+  private statusOf(u: unknown): string | undefined {
+    return (u as { status?: string }).status;
+  }
+
+  // ── Filtros ────────────────────────────────────────────────────
+  setPeriod(p: Period): void {
+    this.period = p;
+    this.recompute();
+  }
+
+  onFrom(value: string | null): void {
+    this.from = value ?? '';
+    this.recompute();
+  }
+
+  onTo(value: string | null): void {
+    this.to = value ?? '';
+    this.recompute();
+  }
+
+  setStatusFilter(f: StatusFilter): void {
+    this.statusFilter = f;
+    this.updateRecent();
+    this.cdr.detectChanges();
+  }
+
+  private dateOf(a: AlertVM): Date | null {
+    const f = a.created_at ?? a.started_at;
+    if (!f) return null;
+    const d = new Date(f);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  private range(): { start: number; end: number } {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    switch (this.period) {
+      case 'hoy': return { start: todayStart, end: Infinity };
+      case '7d': return { start: todayStart - 6 * DAY_MS, end: Infinity };
+      case '30d': return { start: todayStart - 29 * DAY_MS, end: Infinity };
+      default:
+        return {
+          start: this.from ? new Date(this.from + 'T00:00:00').getTime() : -Infinity,
+          end: this.to ? new Date(this.to + 'T23:59:59.999').getTime() : Infinity,
+        };
+    }
+  }
+
+  private inPeriod(a: AlertVM, r: { start: number; end: number }): boolean {
+    const d = this.dateOf(a);
+    if (!d) return this.period === 'custom' && !this.from && !this.to;
+    const t = d.getTime();
+    return t >= r.start && t <= r.end;
+  }
+
+  // ── Recomputes everything with the chosen period ──────────────────────
+  private recompute(): void {
+    const r = this.range();
+    this.periodList = this.all.filter(a => this.inPeriod(a, r));
+    this.riskZones = countAlertsInZones(this.apiZones, this.periodList);
+
+    this.computeKpis(this.periodList);
+    this.computeHours(this.periodList);
+    this.computeZones(this.periodList);
+    this.computeTrend(this.all);
+    this.updateRecent();
+
+    this.alertMarker?.remove();
+    this.alertMarker = undefined;
+
+    this.cdr.detectChanges();      // paints the HTML (and leaves the map container ready)
+    this.paintMap(true);
+    void this.resolvePlaces(this.zonesVersion);
+  }
+
+  private pct(part: number, total: number): number {
+    return total ? Math.round((part / total) * 100) : 0;
+  }
+
+  // ── Stat cards ─────────────────────────────────────────────────
+  private computeKpis(list: AlertVM[]): void {
+    // "Pendientes ahora" ignores the period: an unattended alert still matters even if it is old
+    const pending = this.all.filter(a => a.status === 'Pendiente');
+    this.pendingAlerts = pending.length;
+
+    let masAntigua: AlertVM | null = null;
+    let earliestDate = Infinity;
+    pending.forEach(a => {
+      const t = this.dateOf(a)?.getTime();
+      if (t !== undefined && t < earliestDate) { earliestDate = t; masAntigua = a; }
     });
-    return Object.entries(conteo).map(([clave, cantidad]) => ({ clave, cantidad }));
+    const time = (masAntigua as AlertVM | null)?.time;
+    this.oldestPending = time ? `la más antigua: ${time.toLowerCase()}` : 'Sin pendientes';
+
+    this.attendedAlerts = list.filter(a => a.status === 'Atendida').length;
+    this.cancelledAlerts = list.filter(a => a.status === 'Cancelada').length;
+    this.attendedPercentage = this.pct(this.attendedAlerts, list.length);
+    this.cancelledPercentage = this.pct(this.cancelledAlerts, list.length);
   }
 
-  private estadoDe(u: unknown): string | undefined {
-    return (u as { estado?: string }).estado;
-  }
-
-  // ── Emergencias por tipo ───────────────────────────────────────
-  private calcularAlertasPorTipo(lista: AlertaVM[]): AlertaPorTipo[] {
-    const total = lista.length || 1;
-    return this.contarPor(lista, a => a.tipo)
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .map(({ clave, cantidad }) => ({
-        tipo: clave,
-        etiqueta: this.etiquetaTipo(clave),
-        cantidad,
-        porcentaje: Math.round((cantidad / total) * 100),
-        color: this.colorTipo(clave),
-      }));
-  }
-
-  private calcularDonut(): DonutSegmento[] {
-    const r = 60, cx = 80, cy = 80;
-    const total = this.totalAlertas || 1;
-    let inicio = -90;
-
-    return this.alertasPorTipo.map(item => {
-      const angulo = (item.cantidad / total) * 360;
-      const fin = inicio + angulo;
-      let d: string;
-
-      if (angulo >= 359.99) {
-        // un solo tipo = círculo completo (un arco de 360° no se dibuja)
-        d = `M ${cx} ${cy - r} A ${r} ${r} 0 1 1 ${cx} ${cy + r} A ${r} ${r} 0 1 1 ${cx} ${cy - r} Z`;
-      } else {
-        const grande = angulo > 180 ? 1 : 0;
-        const x1 = cx + r * Math.cos((inicio * Math.PI) / 180);
-        const y1 = cy + r * Math.sin((inicio * Math.PI) / 180);
-        const x2 = cx + r * Math.cos((fin * Math.PI) / 180);
-        const y2 = cy + r * Math.sin((fin * Math.PI) / 180);
-        d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${grande} 1 ${x2} ${y2} Z`;
-      }
-
-      inicio = fin;
-      return { tipo: item.tipo, d, color: item.color };
-    });
-  }
-
-  etiquetaTipo(tipo: string): string {
-    return ETIQUETA_POR_TIPO[tipo] ?? tipo;
-  }
-
-  colorTipo(tipo: string): string {
-    return COLOR_POR_TIPO[tipo] ?? COLOR_OTROS;
-  }
-
-  getTipoBadgeClass(tipo: string): string {
-    const map: Record<string, string> = {
-      SOS: 'badge-sos',
-      Medical: 'badge-medica',
-      Robo: 'badge-robo',
-      Acoso: 'badge-acoso',
-    };
-    return map[tipo] ?? 'badge-otros';
-  }
-
-  // ── Modos de activación ────────────────────────────────────────
-  private calcularModos(lista: AlertaVM[]): ModoActivacion[] {
-    const total = lista.length || 1;
-    return this.contarPor(lista, a => a.medioActivacion || 'Sin especificar')
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5)
-      .map(({ clave, cantidad }, i) => ({
-        nombre: clave,
-        cantidad,
-        porcentaje: Math.round((cantidad / total) * 100),
-        color: COLORES_MODO[i % COLORES_MODO.length],
-        icono: this.iconoModo(clave),
-      }));
-  }
-
-  private iconoModo(nombre: string): ModoActivacion['icono'] {
-    const n = nombre.toLowerCase();
-    if (n.includes('bot') || n.includes('pan')) return 'campana';
-    if (n.includes('mov') || n.includes('sacud') || n.includes('agit')) return 'movimiento';
-    if (n.includes('voz')) return 'voz';
-    return 'auto';
-  }
-
-  // ── Alertas por zona (mapa esquemático con lat/lng reales) ─────
-  private calcularZonas(lista: AlertaVM[]): void {
-    const grupos = new Map<string, { cantidad: number; lat: number; lng: number }>();
-
-    lista.forEach(a => {
-      const g = grupos.get(a.ubicacion) ?? { cantidad: 0, lat: 0, lng: 0 };
-      g.cantidad++;
-      g.lat += Number(a.lat) || 0;
-      g.lng += Number(a.lng) || 0;
-      grupos.set(a.ubicacion, g);
+  // ── Alerts by hour of the day ───────────────────────────────────
+  private computeHours(list: AlertVM[]): void {
+    const count = new Array<number>(24).fill(0);
+    list.forEach(a => {
+      const d = this.dateOf(a);
+      if (d) count[d.getHours()]++;
     });
 
-    const top = [...grupos.entries()]
-      .map(([nombre, g]) => ({
-        nombre,
-        cantidad: g.cantidad,
-        lat: g.lat / g.cantidad,
-        lng: g.lng / g.cantidad,
-      }))
-      .sort((a, b) => b.cantidad - a.cantidad)
+    const total = count.reduce((s, v) => s + v, 0);
+    const max = Math.max(...count);
+    const axis = Math.max(4, Math.ceil(max / 4) * 4);
+    const height = H_BASE - H_TOP;
+
+    this.hourTicks = [0, 1, 2, 3, 4].map(i => {
+      const value = (axis / 4) * i;
+      return { y: H_BASE - (value / axis) * height, label: value };
+    });
+
+    this.hourBars = count.map((value, time) => {
+      const h = (value / axis) * height;
+      const x = H_X0 + time * H_SLOT + (H_SLOT - BAR_H) / 2;
+      return { time, value, x, cx: x + BAR_H / 2, y: H_BASE - h, h, peak: value > 0 && value === max };
+    });
+
+    const totals = TIME_BANDS.map(f => count.slice(f.start, f.end + 1).reduce((s, v) => s + v, 0));
+    this.chartBands = TIME_BANDS.map((f, i) => {
+      const x = H_X0 + f.start * H_SLOT;
+      const w = (f.end - f.start + 1) * H_SLOT;
+      return { name: f.name, range: f.range, total: totals[i], x, w, cx: x + w / 2 };
+    });
+
+    this.hasHourData = total > 0;
+    if (!total) {
+      this.peakHourText = '—';
+      this.riskyBandText = '—';
+      this.calmBandText = '—';
+      this.peakHourDetail = this.riskyBandDetail = this.calmBandDetail = 'Sin alertas en este periodo';
+      return;
+    }
+
+    const plural = (n: number) => (n === 1 ? 'alerta' : 'alertas');
+
+    // Hora pico
+    const peaks = count.map((v, h) => ({ v, h })).filter(x => x.v === max).map(x => x.h);
+    this.peakHourText = peaks.slice(0, 3).map(h => `${h}h`).join(', ') + (peaks.length > 3 ? '…' : '');
+    this.peakHourDetail = `${max} ${plural(max)}${peaks.length > 1 ? ' en cada hora' : ''}`;
+
+    // Riskiest time band
+    const maxTot = Math.max(...totals);
+    const risky = TIME_BANDS.filter((_, i) => totals[i] === maxTot);
+    this.riskyBandText = risky.length === 1
+      ? `${risky[0].name} (${risky[0].range})`
+      : risky.map(f => f.name).join(' y ');
+    this.riskyBandDetail = `${maxTot} de ${total} alertas · ${this.pct(maxTot, total)}%`;
+
+    // Calmest time band
+    const minTot = Math.min(...totals);
+    const calm = TIME_BANDS.filter((_, i) => totals[i] === minTot);
+    this.calmBandText = calm.map(f => f.name).join(' y ');
+    this.calmBandDetail = `${minTot} ${plural(minTot)}${calm.length > 1 ? ' en cada una' : ''}`;
+  }
+
+  // ── Zones with the most incidents (grouped by proximity ~450 m) ──────
+  private computeZones(list: AlertVM[]): void {
+    this.zonesVersion++;
+    this.selectedZone = 0;
+
+    const cell = 0.004;
+    const groups = new Map<string, { count: number; lat: number; lng: number }>();
+
+    // Alerts without location (0,0) cannot be placed on the map
+    const withLocation = list.filter(a => a.lat || a.lng);
+    withLocation.forEach(a => {
+      const key = `${Math.round(Number(a.lat) / cell)}|${Math.round(Number(a.lng) / cell)}`;
+      const g = groups.get(key) ?? { count: 0, lat: 0, lng: 0 };
+      g.count++;
+      g.lat += Number(a.lat);
+      g.lng += Number(a.lng);
+      groups.set(key, g);
+    });
+
+    const top = [...groups.values()]
+      .map(g => ({ count: g.count, lat: g.lat / g.count, lng: g.lng / g.count }))
+      .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    this.rankingZonas = top.map(z => ({ nombre: z.nombre, cantidad: z.cantidad }));
+    const maxCount = top.length ? top[0].count : 1;
 
-    const W = 300, H = 190, padX = 55, padY = 42;
-    const lats = top.map(z => z.lat);
-    const lngs = top.map(z => z.lng);
-    const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-    const rangoLat = maxLat - minLat || 1;
-    const rangoLng = maxLng - minLng || 1;
-    const maxCant = top.length ? top[0].cantidad : 1;
-
-    this.burbujasZona = top.map(z => ({
-      nombre: z.nombre,
-      cantidad: z.cantidad,
-      x: top.length === 1 ? W / 2 : padX + ((z.lng - minLng) / rangoLng) * (W - 2 * padX),
-      y: top.length === 1 ? H / 2 - 10 : padY + (1 - (z.lat - minLat) / rangoLat) * (H - 2 * padY),
-      r: 10 + (z.cantidad / maxCant) * 14,
-    }));
+    this.incidentZones = top.map((z, i) => {
+      const riskZone = this.riskZones.find(zr => isInsideZone(zr, z.lat, z.lng))?.name ?? null;
+      return {
+        rank: i + 1,
+        name: riskZone ?? `${z.lat.toFixed(4)}, ${z.lng.toFixed(4)}`,
+        address: '',
+        searching: true,
+        riskZone,
+        count: z.count,
+        percentage: this.pct(z.count, withLocation.length),
+        bar: Math.max(8, Math.round((z.count / maxCount) * 100)),
+        lat: z.lat,
+        lng: z.lng,
+      };
+    });
   }
 
-  // ── Tendencia: alertas por día de la semana ────────────────────
-  private calcularTendencia(lista: AlertaVM[]): void {
-    const conteo: number[] = new Array(7).fill(0);
+  // Real neighborhood and address (OpenStreetMap), one by one to respect the Nominatim limit
+  private async resolvePlaces(version: number): Promise<void> {
+    for (const z of this.incidentZones) {
+      const place = await this.geocoding.get(z.lat, z.lng);
+      if (version !== this.zonesVersion) return; // the filter changed while querying
 
-    lista.forEach(a => {
-      const fecha = a.created_at ?? a.started_at;
-      if (!fecha) return;
-      const d = new Date(fecha);
-      if (isNaN(d.getTime())) return;
-      conteo[(d.getDay() + 6) % 7]++; // lunes = 0
+      if (place) {
+        const name = place.neighborhood ?? place.address ?? place.city;
+        if (name) z.name = name;
+        z.address = place.neighborhood
+          ? (place.address ?? '')
+          : (place.address ? (place.city ?? '') : '');
+      }
+      z.searching = false;
+      this.cdr.detectChanges();
+      this.paintMap(false);
+    }
+  }
+
+  selectZone(i: number): void {
+    const z = this.incidentZones[i];
+    if (!z) return;
+    this.selectedZone = i;
+    this.paintMap(false);
+    this.map?.flyTo([z.lat, z.lng], 16, { duration: 0.8 });
+    this.cdr.detectChanges();
+  }
+
+  viewOnMap(a: AlertVM): void {
+    if (!this.map || !(a.lat || a.lng)) return;
+    this.alertMarker?.remove();
+    this.alertMarker = L.circleMarker([a.lat, a.lng], {
+      radius: 10, color: '#ffffff', weight: 3, fillColor: '#c026d3', fillOpacity: 1,
+    })
+      .bindTooltip(`${this.escape(a.name ?? '')} · ${this.escape(a.time)}`)
+      .addTo(this.map);
+    this.alertMarker.openTooltip();
+    this.map.flyTo([a.lat, a.lng], 17, { duration: 0.8 });
+    this.mapEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  private paintMap(adjust: boolean): void {
+    const el = this.mapEl?.nativeElement;
+    if (!el) return;
+
+    if (!this.map) {
+      this.map = L.map(el, { center: DEFAULT_CENTER, zoom: 13 });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(this.map);
+      this.pointsLayer.addTo(this.map);
+    }
+
+    this.pointsLayer.clearLayers();
+    const points: L.LatLngTuple[] = [];
+
+    this.incidentZones.forEach((z, i) => {
+      const selected = i === this.selectedZone;
+      const color = i === 0 ? '#c026d3' : '#7c3aed';
+      points.push([z.lat, z.lng]);
+      L.circleMarker([z.lat, z.lng], {
+        radius: 9 + Math.min(z.count, 10) * 1.5,
+        color: selected ? '#ffffff' : color,
+        weight: selected ? 3 : 1.5,
+        fillColor: color,
+        fillOpacity: selected ? 0.95 : 0.55,
+      })
+        .bindTooltip(`${this.escape(z.name)} · ${z.count}`)
+        .on('click', () => this.selectZone(i))
+        .addTo(this.pointsLayer);
     });
 
-    this.tendenciaTotal = conteo.reduce((s, v) => s + v, 0);
+    setTimeout(() => this.map?.invalidateSize(), 0);
 
-    const { izq, der, arriba, abajo } = this.graf;
-    const maximo = Math.max(...conteo, 1);
-    const escala = Math.max(4, Math.ceil(maximo / 4) * 4);
-    const altoUtil = abajo - arriba;
+    if (adjust && points.length) {
+      if (points.length === 1) this.map.setView(points[0], 15);
+      else this.map.fitBounds(L.latLngBounds(points).pad(0.25));
+    }
+  }
 
-    this.tendenciaTicks = [0, 1, 2, 3, 4].map(i => {
-      const valor = (escala / 4) * i;
-      return { y: abajo - (valor / escala) * altoUtil, label: valor };
+  private escape(text: string): string {
+    return text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  }
+
+  changeTrendView(view: TrendView): void {
+    if (view === this.trendView) return;
+    this.trendView = view;
+    this.computeTrend(this.all);
+  }
+
+  // ── Trend: this week vs. last week ─────────────────────
+  private computeTrend(list: AlertVM[]): void {
+    if (this.trendView === 'mes') {
+      this.computeMonthTrend(list);
+      return;
+    }
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const today = (now.getDay() + 6) % 7; // lunes = 0
+    const monday = todayStart - today * DAY_MS;
+    const previousMonday = monday - 7 * DAY_MS;
+
+    const current = new Array<number>(7).fill(0);
+    const previous = new Array<number>(7).fill(0);
+
+    list.forEach(a => {
+      const d = this.dateOf(a);
+      if (!d) return;
+      const t = d.getTime();
+      const day = (d.getDay() + 6) % 7;
+      if (t >= monday && t < monday + 7 * DAY_MS) current[day]++;
+      else if (t >= previousMonday && t < monday) previous[day]++;
     });
 
-    this.tendenciaDots = conteo.map((valor, i) => ({
-      x: izq + (i * (der - izq)) / 6,
-      y: abajo - (valor / escala) * altoUtil,
-      valor,
-    }));
+    this.currentTrendTotal = current.reduce((s, v) => s + v, 0);
+    this.previousTrendTotal = previous.reduce((s, v) => s + v, 0);
 
-    this.tendenciaLabels = DIAS_SEMANA.map((texto, i) => ({
-      x: izq + (i * (der - izq)) / 6,
-      texto,
-    }));
+    // Fair comparison: last week only up to the same day as today
+    this.previousTrendUntilToday = previous.slice(0, today + 1).reduce((s, v) => s + v, 0);
+    this.trendSentence = trendSentence(this.currentTrendTotal, this.previousTrendUntilToday);
 
-    this.tendenciaLinea = this.tendenciaDots
-      .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-      .join(' ');
-    this.tendenciaArea = `${izq},${abajo} ${this.tendenciaLinea} ${der},${abajo}`;
+    this.drawTrend(
+      current.map((v, i) => (i <= today ? v : null)),
+      previous,
+      WEEK_DAYS,
+      LONG_DAYS,
+      today,
+      22,
+    );
+  }
+
+  /**
+   * This month by weeks (days 1–7, 8–14, 15–21, 22–28 and 29 onwards) against the same weeks
+   * of the previous month. This shows in which part of the month the alerts concentrate.
+   */
+  private computeMonthTrend(list: AlertVM[]): void {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const monthDays = new Date(year, month + 1, 0).getDate();
+    const previousMonthDays = new Date(year, month, 0).getDate();
+    const weeks = Math.max(Math.ceil(monthDays / 7), Math.ceil(previousMonthDays / 7));
+    const currentWeek = Math.floor((now.getDate() - 1) / 7);
+    const monthStart = new Date(year, month, 1).getTime();
+    const previousStart = new Date(year, month - 1, 1).getTime();
+    const monthEnd = new Date(year, month + 1, 1).getTime();
+
+    const current = new Array<number>(weeks).fill(0);
+    const previous = new Array<number>(weeks).fill(0);
+    let previousUntilToday = 0;
+
+    list.forEach(a => {
+      const d = this.dateOf(a);
+      if (!d) return;
+      const t = d.getTime();
+      const week = Math.floor((d.getDate() - 1) / 7);
+      if (t >= monthStart && t < monthEnd) current[week]++;
+      else if (t >= previousStart && t < monthStart) {
+        previous[week]++;
+        // Fair comparison: last month only up to the same day of the month
+        if (d.getDate() <= now.getDate()) previousUntilToday++;
+      }
+    });
+
+    this.monthTrend = MONTHS[month];
+    this.currentTrendTotal = current.reduce((s, v) => s + v, 0);
+    this.previousTrendTotal = previous.reduce((s, v) => s + v, 0);
+    this.previousTrendUntilToday = previousUntilToday;
+    this.trendSentence = trendSentence(this.currentTrendTotal, previousUntilToday, 'mes');
+
+    const range = (i: number) => {
+      const start = i * 7 + 1;
+      const end = Math.min(start + 6, Math.max(monthDays, previousMonthDays));
+      return `días ${start} al ${i === weeks - 1 ? 'fin de mes' : end}`;
+    };
+    this.drawTrend(
+      // Weeks that have not come yet (or that this month does not have) are not drawn
+      current.map((v, i) => (i <= currentWeek && i * 7 < monthDays ? v : null)),
+      previous,
+      current.map((_, i) => `Sem ${i + 1}`),
+      current.map((_, i) => `Semana ${i + 1} (${range(i)})`),
+      currentWeek,
+      34,
+    );
+  }
+
+  private drawTrend(
+    current: (number | null)[],
+    previous: number[],
+    labels: string[],
+    longLabels: string[],
+    todayIndex: number,
+    width: number,
+  ): void {
+    const { left, right, up, down } = this.chart;
+    const max = Math.max(...current.map(v => v ?? 0), ...previous, 1);
+    const scale = Math.max(4, Math.ceil(max / 4) * 4);
+    const yOf = (v: number) => down - (v / Math.max(scale, 1)) * (down - up);
+
+    this.trendTicks = [0, 1, 2, 3, 4].map(i => {
+      const value = (scale / 4) * i;
+      return { y: yOf(value), label: value };
+    });
+
+    const groupWidth = (right - left) / labels.length;
+    this.trendBars = labels.map((day, i) => {
+      const groupX = left + i * groupWidth;
+      const previousX = groupX + groupWidth / 2 - width - 1;
+      const currentX = groupX + groupWidth / 2 + 1;
+      // Days that have not come yet are not "zero alerts": they are not drawn
+      const currentValue = current[i];
+      return {
+        day,
+        longDay: longLabels[i],
+        isToday: i === todayIndex,
+        groupX,
+        groupWidth,
+        previous: previous[i],
+        current: currentValue,
+        previousX,
+        previousY: yOf(previous[i]),
+        previousPath: roundedBar(previousX, yOf(previous[i]), width, down),
+        currentX,
+        currentY: yOf(currentValue ?? 0),
+        currentPath: roundedBar(currentX, yOf(currentValue ?? 0), width, down),
+        barWidth: width,
+      };
+    });
+  }
+
+  // ── Tabla de alertas recientes ─────────────────────────────────
+  private updateRecent(): void {
+    // The backend sends them newest to oldest
+    const base = this.statusFilter === 'Todas'
+      ? this.periodList
+      : this.periodList.filter(a => a.status === this.statusFilter);
+    this.recentAlerts = base.slice(0, 5);
+  }
+
+  statusClass(status: string): string {
+    if (status === 'Atendida') return 'state-badge--atendida';
+    if (status === 'Cancelada') return 'state-badge--cancelled';
+    return 'state-badge--pending';
   }
 }

@@ -7,9 +7,9 @@ import { environment } from '../../../environments/environment';
 
 export interface User {
   id: number;
-  nombre: string;
+  name: string;
   email: string;
-  rol: string;
+  role: string;
   firstName?: string;
   lastName?: string;
   telephone?: string;
@@ -21,15 +21,17 @@ export interface LoginCredentials {
   password: string;
 }
 
-/* Datos que llegan desde el formulario de registro */
-export interface RegistroUsuaria {
-  nombre: string;
-  telefono: string;
-  tipoDocumento: string;
-  numeroDocumento: string;
-  fechaNacimiento: string; // DD/MM/AAAA
-  correo: string;
+/* Data coming from the registration form */
+export interface UserRecord {
+  name: string;
+  telephone: string;
+  documentType: string;
+  documentNumber: string;
+  birthDate: string; // DD/MM/AAAA
+  email: string;
   password: string;
+  /** Checked terms and privacy: the backend stores when and which version she accepted. */
+  acceptsTerms: boolean;
 }
 
 const STORAGE_KEY = 'alerta_session';
@@ -51,7 +53,7 @@ export class AuthService {
       email: credentials.email,
       password: credentials.password
     }).pipe(
-      map((response) => this.iniciarSesion(response)),
+      map((response) => this.signIn(response)),
       catchError((error) => {
         console.error('Error en login:', error);
         return throwError(() => new Error('Credenciales incorrectas'));
@@ -59,25 +61,28 @@ export class AuthService {
     );
   }
 
-  /* Registro completo: guarda a la usuaria con todos sus datos.
-     No inicia sesión: después del registro se va al login. */
-  registrar(data: RegistroUsuaria): Observable<User> {
+  /*
+ * Full registration: saves the user with all her data.
+ *      Does not sign in: after registering she goes to the login.
+ */
+  register(data: UserRecord): Observable<User> {
     return this.http.post<{token: string, user: any}>(`${environment.apiUrl}/api/auth/register`, {
-      nombre: data.nombre.trim(),
-      email: data.correo.trim(),
+      nombre: data.name.trim(),
+      email: data.email.trim(),
       password: data.password,
-      telefono: data.telefono.trim(),
-      tipoDocumento: data.tipoDocumento,
-      numeroDocumento: data.numeroDocumento.trim(),
-      fechaNacimiento: data.fechaNacimiento
+      telefono: data.telephone.trim(),
+      tipoDocumento: data.documentType,
+      numeroDocumento: data.documentNumber.trim(),
+      fechaNacimiento: data.birthDate,
+      aceptaTerminos: data.acceptsTerms
     }).pipe(
       map((response) => {
         const backendUser = response.user;
         const user: User = {
           id: backendUser.id,
-          nombre: `${backendUser.firstName} ${backendUser.lastName}`,
+          name: `${backendUser.firstName} ${backendUser.lastName}`,
           email: backendUser.email,
-          rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+          role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
           firstName: backendUser.firstName,
           lastName: backendUser.lastName,
           telephone: backendUser.telephone,
@@ -86,14 +91,26 @@ export class AuthService {
         return user;
       }),
       catchError((error) => {
-        console.error('Error en registro:', error);
-        return throwError(() => new Error('No se pudo completar el registro'));
+        console.error('Error en registro:', error?.status);
+        // 409 with fieldErrors: email, phone or document already used by another account
+        const fields: Record<string, string> | undefined = error?.status === 409 ? error?.error?.fieldErrors : undefined;
+        return throwError(() => Object.assign(new Error('No se pudo completar el registro'), { fields }));
       })
     );
   }
 
-  logout(): void {
-    this.cerrarSesionLocal();
+  /**
+   * Signs out. It first tells the backend so it is audited
+   * (voluntary or due to inactivity); if that call fails, the session is closed anyway.
+   */
+  logout(reason: 'voluntario' | 'inactividad' = 'voluntario'): void {
+    const token = this.getToken();
+    if (token) {
+      this.http.post(`${environment.apiUrl}/api/auth/logout`, { reason: reason }, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({ error: () => {} });
+    }
+    this.signOutLocally();
     this.router.navigate(['/auth/login']);
   }
 
@@ -101,24 +118,40 @@ export class AuthService {
     return this._token$.value;
   }
 
-  getRol(): string {
-    const user = this._currentUser$.value;
-    return user?.rol ?? '';
+  getCurrentUser(): User | null {
+    return this._currentUser$.value;
   }
 
-  /** Hay sesión solo si existe un token y todavía no ha vencido. */
+  getRole(): string {
+    const user = this._currentUser$.value;
+    return user?.role ?? '';
+  }
+
+  /** There is a session only if a token exists and has not expired yet. */
   isLoggedIn(): boolean {
     const token = this.getToken();
     if (!token) return false;
-    if (this.tokenVencido(token)) {
-      this.cerrarSesionLocal();
+    if (this.tokenExpired(token)) {
+      this.signOutLocally();
       return false;
     }
     return true;
   }
 
-  /** Lee el campo exp del JWT (segundos). Un token ilegible se trata como vencido. */
-  private tokenVencido(token: string): boolean {
+  /** Milliseconds left in the web session (the token expires after 24 h), or null without a session. */
+  remainingTimeMs(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' ? Math.max(0, payload.exp * 1000 - Date.now()) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Reads the JWT exp field (seconds). An unreadable token is treated as expired. */
+  private tokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
@@ -127,36 +160,47 @@ export class AuthService {
     }
   }
 
-  /** Borra la sesión sin navegar (lo usan el guard y el interceptor). */
-  cerrarSesionLocal(): void {
+  /** Clears the session without navigating (used by the guard and the interceptor). */
+  signOutLocally(): void {
     localStorage.removeItem(STORAGE_KEY);
     this._currentUser$.next(null);
     this._token$.next(null);
   }
 
-  /** Inicio de sesión con Google: el backend valida el token de Firebase y entrega el JWT. */
+  /** Updates the signed-in user's data (e.g. after editing her name) without touching the token. */
+  updateCurrentUser(changes: Partial<User>): void {
+    const current = this._currentUser$.value;
+    const token = this._token$.value;
+    if (!current || !token) return;
+    const user: User = { ...current, ...changes };
+    user.name = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || current.name;
+    this.saveSession(user, token);
+    this._currentUser$.next(user);
+  }
+
+  /** Google sign-in: the backend validates the Firebase token and returns the JWT. */
   loginWithGoogle(idToken: string): Observable<User> {
     return this.http
       .post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, { idToken })
       .pipe(
-        map((response) => this.iniciarSesion(response)),
+        map((response) => this.signIn(response)),
         catchError((error) => {
-          const mensaje = error?.error?.message === 'Account blocked'
+          const message = error?.error?.message === 'Account blocked'
             ? 'Tu cuenta está bloqueada. Contacta al administrador.'
             : 'No se pudo iniciar sesión con Google. Intenta de nuevo.';
-          return throwError(() => new Error(mensaje));
+          return throwError(() => new Error(message));
         })
       );
   }
 
-  /** Adapta la respuesta del backend al modelo User de Angular y guarda la sesión. */
-  private iniciarSesion(response: { token: string; user: any }): User {
+  /** Adapts the backend response to the Angular User model and stores the session. */
+  private signIn(response: { token: string; user: any }): User {
     const backendUser = response.user;
     const user: User = {
       id: backendUser.id,
-      nombre: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+      name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
       email: backendUser.email,
-      rol: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
+      role: backendUser.roleId === 2 ? 'Admin' : 'Usuaria',
       firstName: backendUser.firstName,
       lastName: backendUser.lastName,
       telephone: backendUser.telephone,

@@ -1,8 +1,10 @@
-/*==================================================
-=   CONFIGURACIÓN — PANEL ADMIN
-=   Usa los tokens de tokens.scss, así que cambia
-=   solo entre modo claro y oscuro.
-==================================================*/
+/*
+ * ==================================================
+ * =   SETTINGS — ADMIN PANEL
+ * =   Uses the tokens from tokens.scss, so it only changes
+ * =   between light and dark mode.
+ * ==================================================
+ */
 
 $btn-purple: #7c3aed;
 $btn-purple-hover: #6d28d9;
@@ -36,27 +38,6 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-.btn-save {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 22px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #fff;
-  background: $btn-purple;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 8px 18px rgba($btn-purple, 0.3);
-  transition: all 0.25s ease;
-
-  &:hover {
-    background: $btn-purple-hover;
-    transform: translateY(-2px);
-  }
-}
 
 /* ── Mensaje flotante ───────────────────────── */
 .toast {
@@ -128,90 +109,10 @@ $btn-purple-hover: #6d28d9;
 }
 
 /* ── Mi cuenta ──────────────────────────────── */
-.account-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px;
-  border-radius: 14px;
-  background: var(--purple-pale);
 
-  &__avatar {
-    display: grid;
-    place-items: center;
-    width: 54px;
-    height: 54px;
-    border-radius: 12px;
-    background: $btn-purple;
-    color: #fff;
-    font-size: 1.6rem;
-  }
-
-  &__name {
-    margin: 0;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  &__email {
-    margin: 2px 0 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    word-break: break-all;
-  }
-}
-
-.btn-logout {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: auto;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: var(--red);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: background 0.2s ease;
-
-  &:hover { background: var(--red-pale); }
-}
 
 /* ── Apariencia ─────────────────────────────── */
-.theme-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
 
-.theme-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 18px 10px;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  background: var(--purple-pale);
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  i { font-size: 1.4rem; }
-
-  &:hover { background: var(--purple-pale-hover); }
-
-  &--active {
-    border-color: var(--purple-mid);
-    color: var(--text-primary);
-    background: var(--purple-pale-hover);
-  }
-}
 
 /* ── Filas con flecha ───────────────────────── */
 .row-link {
@@ -225,6 +126,7 @@ $btn-purple-hover: #6d28d9;
   border-radius: 10px;
   background: transparent;
   color: var(--text-primary);
+  align-items: stretch;
   text-align: left;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -269,76 +171,8 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-/* ── Filas con interruptor ──────────────────── */
-.toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 6px;
 
-  &--box {
-    padding: 12px;
-    border-radius: 12px;
-    background: var(--purple-pale);
-  }
 
-  &__title {
-    margin: 0;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-  }
-
-  &__desc {
-    margin: 2px 0 0;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-  }
-}
-
-.switch {
-  position: relative;
-  flex-shrink: 0;
-  width: 54px;
-  height: 30px;
-  border: none;
-  border-radius: 999px;
-  background: var(--text-dim);
-  cursor: pointer;
-  transition: background 0.25s ease;
-
-  &__knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #fff;
-    transition: transform 0.25s ease;
-  }
-
-  &--on {
-    background: $btn-purple;
-
-    .switch__knob { transform: translateX(24px); }
-  }
-}
-
-.badge {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: $btn-purple;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-
-  &--off { background: var(--text-dim); }
-}
 
 /* ── Cajas informativas ─────────────────────── */
 .info-box {
@@ -370,20 +204,6 @@ $btn-purple-hover: #6d28d9;
   }
 }
 
-.version-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-
-  &__value {
-    font-family: monospace;
-    font-weight: 400;
-    color: var(--text-muted);
-  }
-}
 
 /* ── Ayuda y soporte ────────────────────────── */
 .help-box {
@@ -427,6 +247,7 @@ $btn-purple-hover: #6d28d9;
 
 .btn-help {
   display: flex;
+  text-decoration: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -444,37 +265,210 @@ $btn-purple-hover: #6d28d9;
   &:hover { background: $btn-purple-hover; }
 }
 
-/* ── Barra de estado ────────────────────────── */
-.status-bar {
+
+/* ── Formularios ────────────────────────────── */
+
+.field {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 16px 22px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--bg-card);
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  text-align: left;
+  font-size: 0.85rem;
   color: var(--text-muted);
 
-  &__left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  > span { font-weight: 600; color: var(--text-primary); }
 
-    i { color: var(--purple-deep); font-size: 1.1rem; }
-    strong { color: var(--text-primary); }
+  input,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: 2px solid var(--purple-deep);
+      outline-offset: 1px;
+    }
   }
 
-  &__right {
+  small { font-size: 0.78rem; }
+}
+
+
+.field-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #c026d3;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) { background: $btn-purple-hover; }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+/* ── Estado del sistema ─────────────────────── */
+.icon-btn {
+  margin-left: auto;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover { background: var(--bg-card-hover); }
+  i { color: inherit; font-size: 0.9rem; }
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+
+  i { color: #7c3aed; width: 18px; text-align: center; }
+  strong { margin-left: auto; font-weight: 600; text-align: right; }
+
+  &--bad i, &--bad strong { color: #c026d3; }
+}
+
+.card--wide { grid-column: 1 / -1; min-height: 0; }
+
+
+
+
+/* ── Parameters ─────────────────────────────── */
+.page-header a,
+.warning a { color: var(--purple-deep); font-weight: 600; }
+
+.warning {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(147, 51, 234, 0.12);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+
+  i { color: #9333ea; margin-top: 2px; }
+}
+
+.params-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+
+  &__actions {
+    grid-column: 1 / -1;
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .card__note { margin: 0 auto 0 0; }
+    .field-error { margin: 0 auto 0 0; }
+  }
+}
+
+.btn-secondary {
+  padding: 11px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: var(--bg-card-hover); }
+}
+
+.status-line--neutral i { color: var(--purple-deep); }
+
+/* ── Confirmation ───────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.dialog {
+  width: min(520px, 100%);
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+
+    i { color: #9333ea; }
   }
 
-  &__dot { font-size: 0.7rem; }
+  p { margin: 0 0 12px; color: var(--text-muted); font-size: 0.9rem; }
+
+  &__note { font-size: 0.82rem !important; }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+  }
+}
+
+.diff {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--bg-base);
+  }
+
+  &__field { font-size: 0.8rem; color: var(--text-muted); }
+  &__values { font-size: 0.95rem; }
+  del { color: #c026d3; }
+  strong { color: #7c3aed; }
+  i { font-size: 0.75rem; color: var(--text-muted); margin: 0 4px; }
 }
 
 /* ── Responsive ─────────────────────────────── */
@@ -486,10 +480,174 @@ $btn-purple-hover: #6d28d9;
   .settings-page { padding: 18px; }
 
   .settings-grid { grid-template-columns: 1fr; }
+  .params-form { grid-template-columns: 1fr; }
+
+
 
   .page-header {
     flex-direction: column;
 
     h1 { font-size: 1.7rem; }
+  }
+}
+
+// =============================================
+// TARJETA "¿TIENES ALGÚN PROBLEMA?": ocupa toda la tarjeta de Ayuda y soporte
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+.help-box {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 0;
+  padding: 28px 22px;
+  text-align: center;
+
+  &__top {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    font-size: 1.6rem;
+  }
+
+  &__title { font-size: 1.15rem; }
+  &__desc  { margin-top: 6px; font-size: 0.9rem; }
+
+  .btn-help { padding: 14px; }
+}
+
+// =============================================
+// MODO OSCURO — títulos de las tarjetas visibles
+// (el estilo global los pinta con un degradado morado oscuro)
+// =============================================
+:host-context([data-theme="dark"]) {
+  .card__title {
+    background: linear-gradient(90deg, #f3efff, #c4a1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    i {
+      color: #c4a1ff;
+      -webkit-text-fill-color: #c4a1ff;
+    }
+  }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE CONFIGURACIÓN (solo diseño)
+// =============================================
+
+// Las tarjetas se pueden encoger hasta el ancho de la pantalla
+.settings-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.settings-grid > * { min-width: 0; }
+
+// Textos largos bajan de línea en vez de salirse
+.page-header h1,
+.page-header p,
+.card__title,
+.warning,
+.info-box__desc,
+.help-box__desc,
+.row-link__desc,
+.card__note,
+.diff__values { overflow-wrap: anywhere; }
+
+.card__title,
+.info-box > div,
+.help-box__top > div,
+.warning > span,
+.row-link__text { min-width: 0; }
+
+// Valores de "Estado del sistema" sin partirse ("Configuradas", "03:16")
+.status-line strong { white-space: nowrap; }
+
+@media (max-width: 1100px) {
+  .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .settings-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .settings-page { padding: 12px; }
+
+  .page-header {
+    margin-bottom: 18px;
+
+    h1 { font-size: 1.45rem; }
+    p { font-size: 0.88rem; }
+  }
+
+  .settings-grid { gap: 14px; }
+
+  .card {
+    padding: 16px;
+    min-height: 0;
+
+    &__title { font-size: 1.15rem; }
+  }
+
+  .warning { padding: 10px 12px; }
+
+  // Estado del sistema: si el valor no cabe, baja debajo del nombre
+  .status-line {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  // Botones Descartar / Revisar y guardar: a lo ancho
+  .params-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .card__note,
+    .field-error { margin: 0; }
+
+    .btn-primary,
+    .btn-secondary { width: 100%; }
+  }
+
+  .help-box { padding: 20px 14px; }
+
+  // Ventana de confirmación: botones a lo ancho
+  .dialog { padding: 18px; }
+
+  .dialog__actions {
+    flex-direction: column-reverse;
+
+    button { width: 100%; }
+  }
+}
+
+// Celulares muy angostos: en "Estado del sistema" el valor va debajo
+@media (max-width: 300px) {
+  .settings-page { padding: 8px; }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .card { padding: 12px; }
+
+  .status-line strong {
+    margin-left: 28px;
+    flex-basis: 100%;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .info-box,
+  .warning { padding: 10px; }
+
+  .help-box__icon {
+    width: 52px;
+    height: 52px;
   }
 }

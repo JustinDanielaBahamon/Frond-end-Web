@@ -10,8 +10,8 @@
       </svg>
     </span>
     <div>
-      <h1 class="ah-title">Mis emergencias</h1>
-      <p class="ah-sub">Aquí puedes ver todas las alertas emitidas por la usuaria</p>
+      <h1 class="ah-title">{{ 'Mis emergencias' | t }}</h1>
+      <p class="ah-sub">{{ 'Aquí puedes ver todas las alertas emitidas por la usuaria' | t }}</p>
     </div>
   </div>
 
@@ -21,46 +21,27 @@
       <span class="ah-search-icon">🔍</span>
       <input
         type="text"
-        placeholder="Buscar por fecha, medio de activación o estado..."
+        [placeholder]="'Buscar por fecha, medio de activación o estado...' | t"
         [value]="searchTerm"
-        (input)="onBuscarChange($event)" />
+        (input)="onSearchChange($event)" />
     </div>
 
-    <div class="ah-filtro-fecha" (click)="abrirCalendario()">
-      <svg class="ah-filtro-fecha-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span class="ah-filtro-fecha-label">
-        {{ fechaFiltro ? formatearFecha(fechaFiltro) : 'Todas' }}
-      </span>
-      <input
-        #fechaInput
-        type="date"
-        class="ah-filtro-fecha-input"
-        [value]="fechaFiltro ?? ''"
-        (change)="onFechaChange($event)"
-        aria-label="Filtrar historial por día" />
-      @if (fechaFiltro) {
-        <button type="button" class="ah-filtro-fecha-clear" (click)="$event.stopPropagation(); limpiarFiltroFecha()">✕</button>
-      }
-    </div>
+    <app-date-picker class="ah-filtro-fecha-selector" label="Filtrar historial por día" [placeholder]="'Todas las fechas' | t"
+                        [value]="dateFilter" (valueChange)="onDate($event)" />
 
-    <div class="ah-filtro-tipo">
-      <svg class="ah-filtro-tipo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="ah-filter-type">
+      <svg class="ah-filter-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
       </svg>
-      <select [value]="tipoFiltro" (change)="onTipoChange($event)" aria-label="Filtrar por medio de activación">
-        <option value="Todas">Medio</option>
-        @for (medio of mediosDisponibles; track medio) {
-          <option [value]="medio">{{ medio }}</option>
+      <select [value]="typeFilter" (change)="onTypeChange($event)" [attr.aria-label]="'Filtrar por medio de activación' | t">
+        <option value="Todas">{{ 'Medio' | t }}</option>
+        @for (method of availableMethods; track method) {
+          <option [value]="method">{{ method | t }}</option>
         }
       </select>
     </div>
 
-    <button type="button" class="ah-view-toggle" aria-label="Cambiar vista" title="Vista de cuadrícula (próximamente)">
+    <button type="button" class="ah-view-toggle" [attr.aria-label]="'Cambiar vista' | t" [title]="'Vista de cuadrícula (próximamente)' | t">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1"/>
         <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -72,7 +53,7 @@
 
   <!-- ERROR -->
   @if (error) {
-    <p class="ah-error">No se pudieron cargar las alertas. Intenta de nuevo.</p>
+    <p class="ah-error">{{ 'No se pudieron cargar las alertas. Intenta de nuevo.' | t }}</p>
   }
 
   @if (!error) {
@@ -87,9 +68,9 @@
           </svg>
         </span>
         <div class="ah-stat-body">
-          <p class="ah-stat-label">Total de alertas</p>
-          <p class="ah-stat-val">{{ totalAlertas }}</p>
-          <p class="ah-stat-sub">Este mes</p>
+          <p class="ah-stat-label">{{ 'Total de alertas' | t }}</p>
+          <p class="ah-stat-val">{{ totalAlertCount | t }}</p>
+          <p class="ah-stat-sub">{{ 'Este mes' | t }}</p>
         </div>
         <span class="ah-stat-chevron">›</span>
       </div>
@@ -102,14 +83,14 @@
           </svg>
         </span>
         <div class="ah-stat-body">
-          <p class="ah-stat-label">Atendidas</p>
-          <p class="ah-stat-val">{{ alertasAtendidas }}</p>
-          <p class="ah-stat-sub">Resueltas</p>
+          <p class="ah-stat-label">{{ 'Atendidas' | t }}</p>
+          <p class="ah-stat-val">{{ attendedAlerts | t }}</p>
+          <p class="ah-stat-sub">{{ 'Resueltas' | t }}</p>
         </div>
         <span class="ah-stat-chevron">›</span>
       </div>
 
-      <div class="ah-stat ah-stat--canceladas">
+      <div class="ah-stat ah-stat--cancelled">
         <span class="ah-stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
@@ -117,9 +98,9 @@
           </svg>
         </span>
         <div class="ah-stat-body">
-          <p class="ah-stat-label">Canceladas</p>
-          <p class="ah-stat-val">{{ alertasCanceladas }}</p>
-          <p class="ah-stat-sub">Marcadas</p>
+          <p class="ah-stat-label">{{ 'Canceladas' | t }}</p>
+          <p class="ah-stat-val">{{ cancelledAlerts | t }}</p>
+          <p class="ah-stat-sub">{{ 'Marcadas' | t }}</p>
         </div>
         <span class="ah-stat-chevron">›</span>
       </div>
@@ -131,41 +112,41 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Fecha y hora</th>
-            <th>Medio de activación</th>
-            <th>Ubicación</th>
-            <th>Estado</th>
+            <th>{{ 'Fecha y hora' | t }}</th>
+            <th>{{ 'Medio de activación' | t }}</th>
+            <th>{{ 'Ubicación' | t }}</th>
+            <th>{{ 'Estado' | t }}</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          @for (alerta of alertasPagina; track alerta.id) {
-            <tr class="ah-row" [class.ah-row--expanded]="expandedAlertaId === alerta.id" (click)="toggleExpand(alerta)">
-              <td class="ah-id">#{{ alerta.id }}</td>
+          @for (alert of alertsPage; track alert.id) {
+            <tr class="ah-row" [class.ah-row--expanded]="expandedAlertId === alert.id" (click)="toggleExpand(alert)">
+              <td class="ah-id">#{{ alert.id | t }}</td>
               <td>
-                <span class="ah-fecha">{{ formatearFechaHora(alerta.tiempo).fecha }}</span>
-                <span class="ah-hora">{{ formatearFechaHora(alerta.tiempo).hora }}</span>
+                <span class="ah-date">{{ formatDateTime(alert.time).date | t }}</span>
+                <span class="ah-hour">{{ formatDateTime(alert.time).time | t }}</span>
               </td>
               <td>
-                <span class="ah-badge" [ngClass]="medioBadge[alerta.medioActivacion]">
-                  {{ alerta.medioActivacion }}
+                <span class="ah-badge" [ngClass]="methodBadge[alert.activationMethod]">
+                  {{ alert.activationMethod | t }}
                 </span>
               </td>
-              <td class="ah-ubicacion">{{ alerta.ubicacion }}</td>
+              <td class="ah-location">{{ (alert.location || 'Sin ubicación') | t }}</td>
               <td>
-                <span class="ah-badge" [ngClass]="estadoBadge[alerta.estado]">
-                  {{ alerta.estado }}
+                <span class="ah-badge" [ngClass]="statusBadge[alert.status]">
+                  {{ alert.status | t }}
                 </span>
               </td>
-              <td class="ah-acciones" (click)="$event.stopPropagation()">
-                <button class="ah-icon-btn" title="Ver detalle" (click)="toggleExpand(alerta)">👁</button>
+              <td class="ah-actions" (click)="$event.stopPropagation()">
+                <button class="ah-icon-btn" [title]="'Ver detalle' | t" (click)="toggleExpand(alert)">👁</button>
                 <div class="ah-menu-wrap">
-                  <button class="ah-icon-btn" title="Más acciones" (click)="toggleMenu(alerta.id, $event)">⋮</button>
-                  @if (menuAbiertoId === alerta.id) {
+                  <button class="ah-icon-btn" [title]="'Más acciones' | t" (click)="toggleMenu(alert.id, $event)">⋮</button>
+                  @if (openMenuId === alert.id) {
                     <div class="ah-menu">
-                      <button (click)="verEvidencias(alerta); menuAbiertoId = null">📂 Ver evidencias</button>
-                      @if (alerta.estado === 'Pendiente') {
-                        <button class="ah-menu-danger" (click)="marcarCancelada(alerta); menuAbiertoId = null">⚠️ Marcar como cancelada</button>
+                      <button (click)="viewEvidences(alert); openMenuId = null">{{ '📂 Ver evidencias' | t }}</button>
+                      @if (alert.status === 'Pendiente') {
+                        <button class="ah-menu-danger" (click)="markCancelled(alert); openMenuId = null">{{ '⚠️ Marcar como cancelada' | t }}</button>
                       }
                     </div>
                   }
@@ -173,7 +154,7 @@
               </td>
             </tr>
 
-            @if (expandedAlertaId === alerta.id) {
+            @if (expandedAlertId === alert.id) {
               <tr class="ah-expand-row">
                 <td colspan="6">
                   <div class="ah-expand-panel">
@@ -185,32 +166,32 @@
                           <line x1="12" y1="9" x2="12" y2="13"/>
                           <line x1="12" y1="17" x2="12.01" y2="17"/>
                         </svg>
-                        Información de la alerta
+                        {{ 'Información de la alerta' | t }}
                       </span>
-                      <span class="ah-expand-head-modo">Medio de activación: {{ alerta.medioActivacion || 'No registrado' }}</span>
+                      <span class="ah-expand-head-mode">{{ 'Medio de activación:' | t }} {{ (alert.activationMethod || 'No registrado') | t }}</span>
                     </div>
 
                     <div class="ah-expand-grid">
 
                       <!-- Estado / timeline -->
                       <div class="ah-expand-col">
-                        <span class="ah-expand-col-title">Estado</span>
+                        <span class="ah-expand-col-title">{{ 'Estado' | t }}</span>
                         <ul class="ah-mini-timeline">
                           <li class="ah-mini-timeline-item ah-mini-timeline-item--done">
                             <span class="ah-mini-timeline-dot"></span>
                             <div>
-                              <span class="ah-mini-timeline-label">Enviada</span>
-                              <span class="ah-mini-timeline-time">{{ formatearFechaHora(alerta.tiempo).hora }}</span>
+                              <span class="ah-mini-timeline-label">{{ 'Enviada' | t }}</span>
+                              <span class="ah-mini-timeline-time">{{ formatDateTime(alert.time).time | t }}</span>
                             </div>
                           </li>
                           <li class="ah-mini-timeline-item"
-                              [class.ah-mini-timeline-item--done]="alerta.estado === 'Atendida'"
-                              [class.ah-mini-timeline-item--pending]="alerta.estado === 'Pendiente'">
+                              [class.ah-mini-timeline-item--done]="alert.status === 'Atendida'"
+                              [class.ah-mini-timeline-item--pending]="alert.status === 'Pendiente'">
                             <span class="ah-mini-timeline-dot"></span>
                             <div>
-                              <span class="ah-mini-timeline-label">{{ alerta.estado }}</span>
+                              <span class="ah-mini-timeline-label">{{ alert.status | t }}</span>
                               <span class="ah-mini-timeline-time">
-                                {{ alerta.estado === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' }}
+                                {{ alert.status === 'Pendiente' ? 'Esperando confirmación' : 'Caso cerrado' | t }}
                               </span>
                             </div>
                           </li>
@@ -219,38 +200,38 @@
 
                       <!-- Mini mapa -->
                       <div class="ah-expand-col">
-                        <span class="ah-expand-col-title">Ubicación enviada</span>
+                        <span class="ah-expand-col-title">{{ 'Ubicación enviada' | t }}</span>
                         <div class="ah-mini-map-wrap">
-                          <div id="mini-map-{{ alerta.id }}" class="ah-mini-map"></div>
+                          <div id="mini-map-{{ alert.id | t }}" class="ah-mini-map"></div>
                           <button class="ah-mini-map-fullscreen" (click)="toggleFullscreen()">⛶</button>
                         </div>
-                        <a class="ah-mini-map-link" [href]="mapsUrl(alerta)" target="_blank" rel="noopener">
-                          Ver en Google Maps ↗
+                        <a class="ah-mini-map-link" [href]="mapsUrl(alert)" target="_blank" rel="noopener">
+                          {{ 'Ver en Google Maps ↗' | t }}
                         </a>
                       </div>
 
                       <!-- Detalles -->
                       <div class="ah-expand-col">
-                        <span class="ah-expand-col-title">Detalles</span>
+                        <span class="ah-expand-col-title">{{ 'Detalles' | t }}</span>
                         <div class="ah-expand-item">
-                          <span class="ah-expand-item-label">Medio de activación</span>
-                          <span class="ah-badge" [ngClass]="medioBadge[alerta.medioActivacion]">{{ alerta.medioActivacion }}</span>
+                          <span class="ah-expand-item-label">{{ 'Medio de activación' | t }}</span>
+                          <span class="ah-badge" [ngClass]="methodBadge[alert.activationMethod]">{{ alert.activationMethod | t }}</span>
                         </div>
                         <div class="ah-expand-item">
-                          <span class="ah-expand-item-label">Ubicación</span>
-                          <span class="ah-expand-item-value">{{ alerta.ubicacion }}</span>
+                          <span class="ah-expand-item-label">{{ 'Ubicación' | t }}</span>
+                          <span class="ah-expand-item-value">{{ alert.location | t }}</span>
                         </div>
                         <div class="ah-expand-item">
-                          <span class="ah-expand-item-label">Descripción</span>
-                          <span class="ah-expand-item-value">{{ alerta.descripcion }}</span>
+                          <span class="ah-expand-item-label">{{ 'Descripción' | t }}</span>
+                          <span class="ah-expand-item-value">{{ alert.description | t }}</span>
                         </div>
                       </div>
 
                       <!-- Evidencias -->
                       <div class="ah-expand-col">
-                        <span class="ah-expand-col-title">Evidencias</span>
-                        <button class="ah-expand-action" (click)="verEvidencias(alerta)">
-                          📂 Ver evidencias
+                        <span class="ah-expand-col-title">{{ 'Evidencias' | t }}</span>
+                        <button class="ah-expand-action" (click)="viewEvidences(alert)">
+                          {{ '📂 Ver evidencias' | t }}
                         </button>
                       </div>
 
@@ -263,24 +244,28 @@
           @empty {
             <tr>
               <td colspan="6" class="ah-empty">
-                {{ fechaFiltro ? 'No hay alertas registradas ese día.' : 'Aún no tienes alertas registradas.' }}
+                {{ dateFilter ? 'No hay alertas registradas ese día.' : 'Aún no tienes alertas registradas.' | t }}
               </td>
             </tr>
           }
         </tbody>
       </table>
 
-      @if (alertasFiltradas.length > 0) {
+      @if (filteredAlerts.length > 0) {
         <div class="ah-pagination">
           <span class="ah-pagination-info">
-            Mostrando {{ rangoInicio }}-{{ rangoFin }} de {{ alertasFiltradas.length }} resultados
+            {{ 'Mostrando' | t }} {{ rangeStart | t }}-{{ rangeEnd | t }} {{ 'de' | t }} {{ filteredAlerts.length | t }} {{ 'resultados' | t }}
           </span>
           <div class="ah-pagination-controls">
-            <button (click)="paginaAnterior()" [disabled]="currentPage === 1">‹</button>
-            @for (p of paginasVisibles; track p) {
-              <button [class.active]="p === currentPage" (click)="irAPagina(p)">{{ p }}</button>
+            <button (click)="previousPage()" [disabled]="currentPage === 1">‹</button>
+            @for (p of visiblePages; track $index) {
+              @if (p === null) {
+                <span class="ah-ellipsis" aria-hidden="true">…</span>
+              } @else {
+                <button [class.active]="p === currentPage" (click)="goToPage(p)">{{ p | t }}</button>
+              }
             }
-            <button (click)="paginaSiguiente()" [disabled]="currentPage === totalPages">›</button>
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
           </div>
         </div>
       }

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ZoneManagement } from './zone-management';
+import { ZoneManagementComponent } from './zone-management';
 
-describe('ZoneManagement', () => {
-  let component: ZoneManagement;
-  let fixture: ComponentFixture<ZoneManagement>;
+describe('ZoneManagementComponent', () => {
+  let component: ZoneManagementComponent;
+  let fixture: ComponentFixture<ZoneManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ZoneManagement],
+      imports: [ZoneManagementComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ZoneManagement);
+    fixture = TestBed.createComponent(ZoneManagementComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

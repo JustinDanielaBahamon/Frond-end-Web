@@ -1,79 +1,101 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { TPipe } from '../../../core/i18n/i18n';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Reporte, ReporteFilters, ReporteStats, Paginacion } from '../../../core/models/report.model';
+import { AlertReport, ReportFilters, ReportStats, Pagination } from '../../../core/models/report.model';
 import { ReportsService } from '../../../core/services/reports.service';
 import { AlertsService } from '../../../core/services/alerts.services';
-import { Alerta } from '../../../core/models/alert.model';
+import { Alert } from '../../../core/models/alert.model';
+import { DatePicker } from '../../../shared/components/date-picker/date-picker';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-report-management',
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, DatePicker, CommonModule, FormsModule],
   templateUrl: './report-management.html',
   styleUrl: './report-management.scss',
 })
 export class ReportManagementComponent implements OnInit, OnDestroy {
+  /** Explanation of the section; remembered if the admin hid it. */
+  showHelp = (() => {
+    try {
+      return localStorage.getItem('informes-ayuda-oculta') !== '1';
+    } catch {
+      return true;
+    }
+  })();
+
+  hideHelp(): void {
+    this.showHelp = false;
+    try { localStorage.setItem('informes-ayuda-oculta', '1'); } catch { /* modo privado */ }
+  }
+
+  showHelpAgain(): void {
+    this.showHelp = true;
+    try { localStorage.removeItem('informes-ayuda-oculta'); } catch { /* modo privado */ }
+  }
+
   private destroy$ = new Subject<void>();
   private reportsService = inject(ReportsService);
   private alertsService = inject(AlertsService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Datos
-  reportes$: Observable<Reporte[]> = this.reportsService.reportes$;
-  stats$: Observable<ReporteStats> = this.reportsService.getStats();
+  reports$: Observable<AlertReport[]> = this.reportsService.reports$;
   
-  reportesFiltrados: Reporte[] = [];
-  stats: ReporteStats = {
-    totalReportes: 0,
-    totalAlertas: 0,
-    zonasActivas: 0,
-    exportaciones: 0
+  filteredReports: AlertReport[] = [];
+  stats: ReportStats = {
+    totalReportCount: 0,
+    totalAlertCount: 0,
+    activeZones: 0,
+    exports: 0
   };
 
   // Filtros
-  filtros: ReporteFilters = {
-    busqueda: '',
-    fechaInicio: null,
-    fechaFin: null,
-    ciudad: '',
-    estado: ''
+  filters: ReportFilters = {
+    search: '',
+    startDate: null,
+    endDate: null,
+    city: '',
+    status: ''
   };
 
-  // Paginación
-  paginacion: Paginacion = {
-    paginaActual: 1,
-    elementosPorPagina: 5,
-    totalElementos: 0,
-    totalPaginas: 0
+  // Pagination
+  pagination: Pagination = {
+    currentPage: 1,
+    itemsPerPage: 5,
+    totalElements: 0,
+    totalPageCount: 0
   };
 
   // Estados UI
-  cargando = false;
+  loading = false;
   error = '';
-  mostrarModalNuevo = false;
-  mostrarModalVer = false;
-  mostrarModalImpresora = false;
-  reporteSeleccionado: Reporte | null = null;
-  reporteEditando: Reporte | null = null;
+  showNewModal = false;
+  showViewModal = false;
+  showPrinterModal = false;
+  selectedReport: AlertReport | null = null;
+  editingReport: AlertReport | null = null;
 
-  // Alertas disponibles para selección
-  alertasDisponibles: Alerta[] = [];
-  alertasSeleccionadas: number[] = []; // IDs de alertas seleccionadas
-  cargandoAlertas = false;
+  // Alerts available for selection
+  availableAlerts: Alert[] = [];
+  selectedAlerts: number[] = []; // IDs de alertas seleccionadas
+  loadingAlerts = false;
 
-  // Para formulario de nuevo reporte
-  nuevoReporte: Partial<Reporte> = {
-    nombre: '',
-    ciudad: '',
-    estado: 'Pendiente',
-    usuaria: '',
-    acontecimiento: '',
-    descripcion: ''
+  // For the new report form
+  newReport: Partial<AlertReport> = {
+    name: '',
+    city: '',
+    status: 'Pendiente',
+    user: '',
+    incident: '',
+    description: ''
   };
 
   ngOnInit(): void {
-    this.cargarDatos();
-    this.cargarAlertas();
+    this.loadData();
+    this.loadAlerts();
   }
 
   ngOnDestroy(): void {
@@ -85,40 +107,50 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // CARGA DE DATOS
   // ========================================
 
-  private cargarAlertas(): void {
-    this.cargandoAlertas = true;
+  private loadAlerts(): void {
+    this.loadingAlerts = true;
     this.alertsService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (alertas) => {
-        this.alertasDisponibles = alertas;
-        this.cargandoAlertas = false;
+      next: (alerts) => {
+        this.availableAlerts = alerts;
+        this.loadingAlerts = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando alertas:', err);
-        this.cargandoAlertas = false;
+        this.loadingAlerts = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  private cargarDatos(): void {
-    this.cargando = true;
+  private loadData(): void {
+    this.loading = true;
     
     this.reportsService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (reportes) => {
-        this.reportesFiltrados = reportes;
-        this.actualizarPaginacion();
-        this.cargando = false;
+      next: (reports) => {
+        this.filteredReports = reports;
+        this.updatePagination();
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar los reportes';
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error cargando reportes:', err);
       }
     });
 
-    this.stats$.pipe(takeUntil(this.destroy$)).subscribe({
+    this.loadStats();
+  }
+
+  private loadStats(): void {
+    this.reportsService.getStats().pipe(takeUntil(this.destroy$)).subscribe({
       next: (stats) => {
         this.stats = stats;
-      }
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando estadísticas:', err)
     });
   }
 
@@ -126,211 +158,191 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // FILTRADO
   // ========================================
 
-  aplicarFiltros(): void {
-    this.cargando = true;
-    this.paginacion.paginaActual = 1; // Resetear a primera página
+  applyFilters(): void {
+    this.loading = true;
+    this.pagination.currentPage = 1; // Reset to the first page
 
-    this.reportsService.filtrarReportes(this.filtros).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (reportes) => {
-        this.reportesFiltrados = reportes;
-        this.actualizarPaginacion();
-        this.cargando = false;
+    this.reportsService.filterReports(this.filters).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (reports) => {
+        this.filteredReports = reports;
+        this.updatePagination();
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar reportes';
-        this.cargando = false;
+        this.loading = false;
         console.error('Error filtrando:', err);
       }
     });
   }
 
-  limpiarFiltros(): void {
-    this.filtros = {
-      busqueda: '',
-      fechaInicio: null,
-      fechaFin: null,
-      ciudad: '',
-      estado: ''
+  clearFilters(): void {
+    this.filters = {
+      search: '',
+      startDate: null,
+      endDate: null,
+      city: '',
+      status: ''
     };
-    // Aplicar filtros con datos originales en lugar de filtrar con filtros vacíos
-    this.cargarDatos();
+    // Apply filters with the original data instead of filtering with empty filters
+    this.loadData();
   }
 
-  onBusquedaChange(): void {
-    // Debounce simple para búsqueda
-    setTimeout(() => this.aplicarFiltros(), 300);
+  onSearchQueryChange(): void {
+    // Simple debounce for search
+    setTimeout(() => this.applyFilters(), 300);
   }
 
   // ========================================
   // PAGINACIÓN
   // ========================================
 
-  private actualizarPaginacion(): void {
-    this.paginacion.totalElementos = this.reportesFiltrados.length;
-    this.paginacion.totalPaginas = Math.ceil(
-      this.paginacion.totalElementos / this.paginacion.elementosPorPagina
+  private updatePagination(): void {
+    this.pagination.totalElements = this.filteredReports.length;
+    this.pagination.totalPageCount = Math.ceil(
+      this.pagination.totalElements / this.pagination.itemsPerPage
     );
   }
 
-  get reportesPaginados(): Reporte[] {
-    const inicio = (this.paginacion.paginaActual - 1) * this.paginacion.elementosPorPagina;
-    const fin = inicio + this.paginacion.elementosPorPagina;
-    return this.reportesFiltrados.slice(inicio, fin);
+  get pagedReports(): AlertReport[] {
+    const start = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage;
+    const end = start + this.pagination.itemsPerPage;
+    return this.filteredReports.slice(start, end);
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina >= 1 && pagina <= this.paginacion.totalPaginas) {
-      this.paginacion.paginaActual = pagina;
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.pagination.totalPageCount) {
+      this.pagination.currentPage = page;
     }
   }
 
-  irAPrimeraPagina(): void {
-    this.cambiarPagina(1);
+  goToFirstPage(): void {
+    this.changePage(1);
   }
 
-  irAUltimaPagina(): void {
-    this.cambiarPagina(this.paginacion.totalPaginas);
+  goToLastPage(): void {
+    this.changePage(this.pagination.totalPageCount);
   }
 
-  paginaAnterior(): void {
-    this.cambiarPagina(this.paginacion.paginaActual - 1);
+  previousPage(): void {
+    this.changePage(this.pagination.currentPage - 1);
   }
 
-  paginaSiguiente(): void {
-    this.cambiarPagina(this.paginacion.paginaActual + 1);
+  nextPage(): void {
+    this.changePage(this.pagination.currentPage + 1);
   }
 
   // ========================================
   // EXPORTACIÓN
   // ========================================
 
-  descargarPDF(id: number): void {
-    this.cargando = true;
-    this.reportsService.descargarPDF(id).pipe(takeUntil(this.destroy$)).subscribe({
+  downloadPdf(id: number): void {
+    this.download(this.reportsService.downloadPdf(id), `informe-${id}.pdf`, 'Error al descargar PDF');
+  }
+
+  /** The backend returns a CSV that Excel opens directly. */
+  downloadExcel(id: number): void {
+    this.download(this.reportsService.downloadExcel(id), `informe-${id}.csv`, 'Error al descargar Excel');
+  }
+
+  private download(file$: Observable<Blob>, name: string, errorMessage: string): void {
+    this.error = '';
+    file$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
-        console.log('PDF blob recibido:', blob);
-        this.descargarArchivo(blob, `reporte_${id}.pdf`);
-        this.cargando = false;
+        this.downloadFile(blob, name);
+        this.loadStats(); // each download adds one export
       },
       error: (err) => {
-        this.error = 'Error al descargar PDF';
-        this.cargando = false;
-        console.error('Error descargando PDF:', err);
+        this.error = errorMessage;
+        this.cdr.detectChanges();
+        console.error(errorMessage, err);
       }
     });
   }
 
-  descargarExcel(id: number): void {
-    this.cargando = true;
-    this.reportsService.descargarExcel(id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (blob) => {
-        console.log('Excel blob recibido:', blob);
-        this.descargarArchivo(blob, `reporte_${id}.xlsx`);
-        this.cargando = false;
-      },
-      error: (err) => {
-        this.error = 'Error al descargar Excel';
-        this.cargando = false;
-        console.error('Error descargando Excel:', err);
-      }
-    });
-  }
-
-  generarReporteConFiltros(formato: 'PDF' | 'Excel'): void {
-    this.cargando = true;
+  generateFilteredReport(format: 'PDF' | 'Excel'): void {
+    this.loading = true;
     
-    // Crear nombre del reporte basado en filtros
-    const nombreReporte = this.generarNombreReporte();
+    // Create the report name based on the filters
+    const reportName = this.generateReportName();
     
-    const reporteACrear: Omit<Reporte, 'id'> = {
-      nombre: nombreReporte,
-      fecha: new Date(),
-      ciudad: this.filtros.ciudad || 'Todas',
-      estado: 'Pendiente',
-      generadoPor: 'Administrador',
-      formato: formato,
-      tamano: 'Calculando...',
-      descripcion: `Reporte generado con filtros: ${this.descripcionFiltros()}`
+    const reportToCreate: Omit<AlertReport, 'id'> = {
+      name: reportName,
+      date: new Date(),
+      city: this.filters.city || 'Todas',
+      status: 'Pendiente',
+      generatedBy: 'Administrador',
+      format,
+      size: '',
+      description: `Reporte generado con filtros: ${this.filtersDescription()}`,
+      // Without chosen alerts, the backend includes those in the date range
+      from: this.filters.startDate ? new Date(`${this.filters.startDate}T00:00:00`) : null,
+      to: this.filters.endDate ? new Date(`${this.filters.endDate}T23:59:59`) : null
     };
 
-    this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (reporte) => {
-        // Descargar el reporte recién creado
-        if (formato === 'PDF') {
-          this.descargarPDF(reporte.id);
+    this.reportsService.create(reportToCreate).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (report) => {
+        // Download the report just created
+        if (format === 'PDF') {
+          this.downloadPdf(report.id);
         } else {
-          this.descargarExcel(reporte.id);
+          this.downloadExcel(report.id);
         }
-        this.cargarDatos();
-        this.cargando = false;
+        this.loadData();
+        this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al generar reporte';
-        this.cargando = false;
+        this.error = err?.error?.message || 'Error al generar reporte';
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error generando reporte:', err);
       }
     });
   }
 
-  generarNombreReporte(): string {
-    const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const ciudad = this.filtros.ciudad ? this.filtros.ciudad : 'Todas';
-    const estado = this.filtros.estado ? this.filtros.estado : 'Todos';
-    return `Reporte ${ciudad} - ${estado} - ${fecha}`;
+  generateReportName(): string {
+    const date = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const city = this.filters.city ? this.filters.city : 'Todas';
+    const status = this.filters.status ? this.filters.status : 'Todos';
+    return `Reporte ${city} - ${status} - ${date}`;
   }
 
-  descripcionFiltros(): string {
-    const partes: string[] = [];
-    if (this.filtros.ciudad) partes.push(`Ciudad: ${this.filtros.ciudad}`);
-    if (this.filtros.estado) partes.push(`Estado: ${this.filtros.estado}`);
-    if (this.filtros.fechaInicio) partes.push(`Desde: ${this.formatearFecha(this.filtros.fechaInicio)}`);
-    if (this.filtros.fechaFin) partes.push(`Hasta: ${this.formatearFecha(this.filtros.fechaFin)}`);
-    if (this.filtros.busqueda) partes.push(`Búsqueda: ${this.filtros.busqueda}`);
-    return partes.length > 0 ? partes.join(', ') : 'Sin filtros';
+  filtersDescription(): string {
+    const parts: string[] = [];
+    if (this.filters.city) parts.push(`Ciudad: ${this.filters.city}`);
+    if (this.filters.status) parts.push(`Estado: ${this.filters.status}`);
+    if (this.filters.startDate) parts.push(`Desde: ${this.formatDate(this.filters.startDate)}`);
+    if (this.filters.endDate) parts.push(`Hasta: ${this.formatDate(this.filters.endDate)}`);
+    if (this.filters.search) parts.push(`Búsqueda: ${this.filters.search}`);
+    return parts.length > 0 ? parts.join(', ') : 'Sin filtros';
   }
 
-  imprimir(): void {
-    // Verificar si hay impresora conectada
-    if (this.verificarImpresora()) {
+  print(): void {
+    // Check whether a printer is connected
+    if (this.checkPrinter()) {
       window.print();
     } else {
-      this.mostrarModalImpresora = true;
+      this.showPrinterModal = true;
     }
   }
 
-  verificarImpresora(): boolean {
-    // Simulación de verificación de impresora
-    // En un entorno real, esto podría usar la API de impresión del navegador
-    // Aquí simulamos que NO hay impresora conectada para mostrar el modal
+  checkPrinter(): boolean {
+    // Printer check simulation
+    // In a real environment, this could use the browser print API
+    // Here we simulate that NO printer is connected to show the modal
     return false; // Cambiar a true para imprimir directamente
   }
 
-  cerrarModalImpresora(): void {
-    this.mostrarModalImpresora = false;
+  closePrinterModal(): void {
+    this.showPrinterModal = false;
   }
 
-  private descargarArchivo(blob: Blob, nombre: string): void {
-    console.log('Iniciando descarga:', nombre, 'Tamaño blob:', blob.size);
-    
-    if (blob.size === 0) {
-      // Crear un archivo de ejemplo si el blob está vacío
-      const contenido = `Reporte generado el ${new Date().toLocaleString('es-ES')}\n\nEste es un reporte de ejemplo generado por el sistema AlertaMujer.`;
-      const blobReal = new Blob([contenido], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blobReal);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nombre.endsWith('.pdf') ? nombre : nombre.replace('.xlsx', '.txt');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      return;
-    }
-    
+  private downloadFile(blob: Blob, name: string): void {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = nombre;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -341,144 +353,132 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // ACCIONES CRUD
   // ========================================
 
-  verReporte(reporte: Reporte): void {
-    this.reporteSeleccionado = reporte;
-    this.mostrarModalVer = true;
+  viewReport(report: AlertReport): void {
+    this.selectedReport = report;
+    this.showViewModal = true;
   }
 
-  editarReporte(reporte: Reporte): void {
-    this.reporteEditando = { ...reporte };
-    this.mostrarModalNuevo = true;
+  editReport(report: AlertReport): void {
+    this.editingReport = { ...report };
+    this.selectedAlerts = [...(report.alertIdList ?? [])];
+    this.showNewModal = true;
   }
 
-  actualizarReporte(): void {
-    if (!this.reporteEditando || !this.reporteEditando.id) {
+  updateReport(): void {
+    if (!this.editingReport || !this.editingReport.id) {
       this.error = 'No hay reporte para actualizar';
       return;
     }
 
-    this.cargando = true;
-    const reporteActualizado: Reporte = {
-      id: this.reporteEditando.id,
-      nombre: this.modeloNombre,
-      fecha: this.reporteEditando.fecha,
-      ciudad: this.modeloCiudad,
-      estado: this.modeloEstado as any,
-      usuaria: this.modeloUsuaria,
-      acontecimiento: this.modeloAcontecimiento,
-      generadoPor: this.reporteEditando.generadoPor,
-      formato: this.reporteEditando.formato, // Mantener el formato original
-      tamano: this.reporteEditando.tamano,
-      descripcion: this.modeloDescripcion
+    this.loading = true;
+    const updatedReport: AlertReport = {
+      id: this.editingReport.id,
+      name: this.nameModel,
+      date: this.editingReport.date,
+      city: this.cityModel,
+      status: this.statusModel as any,
+      user: this.userModel,
+      incident: this.incidentModel,
+      generatedBy: this.editingReport.generatedBy,
+      format: this.editingReport.format, // Mantener el formato original
+      size: this.editingReport.size,
+      description: this.descriptionModel,
+      alertIdList: [...this.selectedAlerts]
     };
 
-    console.log('Actualizando reporte:', reporteActualizado);
-
-    this.reportsService.update(reporteActualizado.id, reporteActualizado).pipe(takeUntil(this.destroy$)).subscribe({
+    this.reportsService.update(updatedReport.id, updatedReport).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        console.log('Reporte actualizado exitosamente');
-        this.cargarDatos();
-        this.cerrarModalNuevo();
-        this.cargando = false;
+        this.loadData();
+        this.closeNewModal();
+        this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al actualizar reporte';
-        this.cargando = false;
+        this.error = err?.error?.message || 'Error al actualizar reporte';
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error actualizando:', err);
       }
     });
   }
 
-  eliminarReporte(id: number): void {
+  deleteReport(id: number): void {
     if (confirm('¿Estás seguro de eliminar este reporte?')) {
-      this.cargando = true;
+      this.loading = true;
       this.reportsService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
-          this.cargarDatos();
-          this.cargando = false;
+          this.loadData();
+          this.loading = false;
         },
         error: (err) => {
-          this.error = 'Error al eliminar reporte';
-          this.cargando = false;
+          this.error = err?.error?.message || 'Error al eliminar reporte';
+          this.loading = false;
+          this.cdr.detectChanges();
           console.error('Error eliminando:', err);
         }
       });
     }
   }
 
-  crearReporte(): void {
-    this.cargando = true;
+  createReport(): void {
+    this.loading = true;
     
-    // Si hay alertas seleccionadas, generar datos basados en ellas
-    let nombre = this.modeloNombre;
-    let usuaria = this.modeloUsuaria;
-    let acontecimiento = this.modeloAcontecimiento;
-    let ciudad = this.modeloCiudad || 'No especificada';
-    let descripcion = this.modeloDescripcion;
+    // If there are selected alerts, generate data based on them
+    let name = this.nameModel;
+    let user = this.userModel;
+    let incident = this.incidentModel;
+    let city = this.cityModel || 'No especificada';
+    let description = this.descriptionModel;
 
-    if (this.alertasSeleccionadas.length > 0) {
-      const alertasSeleccionadasObj = this.alertasDisponibles.filter(a => 
-        this.alertasSeleccionadas.includes(a.id)
+    if (this.selectedAlerts.length > 0) {
+      const selectedAlertsObj = this.availableAlerts.filter(a => 
+        this.selectedAlerts.includes(a.id)
       );
       
-      if (alertasSeleccionadasObj.length > 0) {
-        // Generar nombre automático basado en alertas si no hay nombre personalizado
-        if (!nombre) {
-          const fecha = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          const tiposAlertas = [...new Set(alertasSeleccionadasObj.map(a => a.tipo))].join(', ');
-          nombre = `Reporte ${tiposAlertas} - ${fecha}`;
+      if (selectedAlertsObj.length > 0) {
+        // Generate an automatic name based on the alerts if there is no custom name
+        if (!name) {
+          const date = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const alertTypes = [...new Set(selectedAlertsObj.map(a => this.typeLabel(a.type)))].join(', ');
+          name = `Reporte ${alertTypes} - ${date}`;
         }
         
-        // Usar datos de la primera alerta seleccionada como base
-        if (!usuaria && alertasSeleccionadasObj[0].usuarioId) {
-          usuaria = `Usuario ${alertasSeleccionadasObj[0].usuarioId}`;
+        // Use the data of the first selected alert as the base
+        if (!user) {
+          user = [...new Set(selectedAlertsObj.map(a => a.name))].join(', ');
         }
-        if (!acontecimiento) {
-          acontecimiento = alertasSeleccionadasObj[0].tipo;
+        if (!incident) {
+          incident = this.typeLabel(selectedAlertsObj[0].type);
         }
-        if (!ciudad || ciudad === 'No especificada') {
-          ciudad = alertasSeleccionadasObj[0].ubicacion || 'No especificada';
-        }
-        if (!descripcion) {
-          descripcion = `Reporte basado en ${this.alertasSeleccionadas.length} alerta(s): ${alertasSeleccionadasObj.map(a => a.tipo).join(', ')}`;
+        if (!description) {
+          description = `Reporte basado en ${this.selectedAlerts.length} alerta(s)`;
         }
       }
     }
 
-    const reporteACrear: Omit<Reporte, 'id'> = {
-      nombre: nombre || 'Reporte Sin Nombre',
-      fecha: new Date(),
-      ciudad: ciudad,
-      estado: (this.modeloEstado || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
-      usuaria: usuaria,
-      acontecimiento: acontecimiento,
-      generadoPor: 'Administrador',
-      formato: 'PDF' as 'PDF' | 'Excel' | 'CSV', // Formato por defecto
-      tamano: 'Calculando...',
-      descripcion: descripcion,
-      alertasIds: this.alertasSeleccionadas.length > 0 ? this.alertasSeleccionadas : undefined
+    const reportToCreate: Omit<AlertReport, 'id'> = {
+      name: name || 'Reporte Sin Nombre',
+      date: new Date(),
+      city,
+      status: (this.statusModel || 'Pendiente') as 'Pendiente' | 'Cerrada' | 'Atendida',
+      user,
+      incident,
+      generatedBy: 'Administrador',
+      format: 'PDF' as 'PDF' | 'Excel' | 'CSV', // Formato por defecto
+      size: '',
+      description,
+      alertIdList: this.selectedAlerts.length > 0 ? this.selectedAlerts : undefined
     };
 
-    console.log('Creando reporte:', reporteACrear);
-    console.log('Valores del formulario:', {
-      nombre: this.modeloNombre,
-      ciudad: this.modeloCiudad,
-      estado: this.modeloEstado,
-      usuaria: this.modeloUsuaria,
-      acontecimiento: this.modeloAcontecimiento,
-      alertasSeleccionadas: this.alertasSeleccionadas
-    });
-    
-    this.reportsService.create(reporteACrear).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (reporteCreado) => {
-        console.log('Reporte creado exitosamente:', reporteCreado);
-        this.cargarDatos();
-        this.cerrarModalNuevo();
-        this.cargando = false;
+    this.reportsService.create(reportToCreate).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.loadData();
+        this.closeNewModal();
+        this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al crear reporte';
-        this.cargando = false;
+        this.error = err?.error?.message || 'Error al crear reporte';
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error creando:', err);
       }
     });
@@ -488,55 +488,61 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   // MODALES
   // ========================================
 
-  abrirModalNuevo(): void {
-    this.reporteEditando = null;
-    this.nuevoReporte = {
-      nombre: '',
-      ciudad: '',
-      estado: 'Pendiente',
-      usuaria: '',
-      acontecimiento: '',
-      descripcion: ''
+  openNewModal(): void {
+    this.editingReport = null;
+    this.newReport = {
+      name: '',
+      city: '',
+      status: 'Pendiente',
+      user: '',
+      incident: '',
+      description: ''
     };
-    this.alertasSeleccionadas = []; // Resetear selección de alertas
-    this.mostrarModalNuevo = true;
+    this.selectedAlerts = []; // Reset the alert selection
+    this.showNewModal = true;
   }
 
-  cerrarModalNuevo(): void {
-    this.mostrarModalNuevo = false;
-    this.reporteEditando = null;
-    this.nuevoReporte = {
-      nombre: '',
-      ciudad: '',
-      estado: 'Pendiente',
-      usuaria: '',
-      acontecimiento: '',
-      descripcion: ''
+  closeNewModal(): void {
+    this.showNewModal = false;
+    this.editingReport = null;
+    this.newReport = {
+      name: '',
+      city: '',
+      status: 'Pendiente',
+      user: '',
+      incident: '',
+      description: ''
     };
-    this.alertasSeleccionadas = [];
+    this.selectedAlerts = [];
     this.error = '';
   }
 
-  cerrarModalVer(): void {
-    this.mostrarModalVer = false;
-    this.reporteSeleccionado = null;
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedReport = null;
   }
 
   // ========================================
   // UTILIDADES
   // ========================================
 
-  getStatusClass(estado: string): string {
-    const clases: Record<string, string> = {
+  /** Readable name of the alert type the mobile app sends. */
+  typeLabel(type: string): string {
+    const labels: Record<string, string> = { main: 'Alerta SOS', mini: 'Mini alerta', reminder: 'Recordatorio' };
+    return labels[type] || type || 'Alerta';
+  }
+
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
       'Pendiente': 'pending',
       'Cerrada': 'closed',
       'Atendida': 'attended'
     };
-    return clases[estado] || 'pending';
+    return classes[status] || 'pending';
   }
 
-  formatearFecha(fecha: Date): string {
-    return new Date(fecha).toLocaleString('es-ES', {
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -545,133 +551,119 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  get paginasVisibles(): number[] {
-    const paginas: number[] = [];
-    const maxPaginasVisibles = 5;
-    const mitad = Math.floor(maxPaginasVisibles / 2);
-    
-    let inicio = Math.max(1, this.paginacion.paginaActual - mitad);
-    let fin = Math.min(this.paginacion.totalPaginas, inicio + maxPaginasVisibles - 1);
-    
-    if (fin - inicio < maxPaginasVisibles - 1) {
-      inicio = Math.max(1, fin - maxPaginasVisibles + 1);
-    }
-    
-    for (let i = inicio; i <= fin; i++) {
-      paginas.push(i);
-    }
-    
-    return paginas;
+  get visiblePages(): (number | null)[] {
+    return compactPages(this.pagination.currentPage, this.pagination.totalPageCount);
   }
 
   // Helpers para template
-  get elementoInicio(): number {
-    return (this.paginacion.paginaActual - 1) * this.paginacion.elementosPorPagina + 1;
+  get startItem(): number {
+    if (this.pagination.totalElements === 0) return 0;
+    return (this.pagination.currentPage - 1) * this.pagination.itemsPerPage + 1;
   }
 
-  get elementoFin(): number {
-    return Math.min(this.paginacion.paginaActual * this.paginacion.elementosPorPagina, this.paginacion.totalElementos);
+  get endItem(): number {
+    return Math.min(this.pagination.currentPage * this.pagination.itemsPerPage, this.pagination.totalElements);
   }
 
-  // Helpers para formularios en modales
-  get modeloNombre(): string {
-    return this.reporteEditando ? this.reporteEditando.nombre : this.nuevoReporte.nombre || '';
+  // Helpers for forms in modals
+  get nameModel(): string {
+    return this.editingReport ? this.editingReport.name : this.newReport.name || '';
   }
 
-  set modeloNombre(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.nombre = valor;
+  set nameModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.name = value;
     } else {
-      this.nuevoReporte.nombre = valor;
+      this.newReport.name = value;
     }
   }
 
-  get modeloCiudad(): string {
-    return this.reporteEditando ? this.reporteEditando.ciudad : this.nuevoReporte.ciudad || '';
+  get cityModel(): string {
+    return this.editingReport ? this.editingReport.city : this.newReport.city || '';
   }
 
-  set modeloCiudad(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.ciudad = valor;
+  set cityModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.city = value;
     } else {
-      this.nuevoReporte.ciudad = valor;
+      this.newReport.city = value;
     }
   }
 
-  get modeloEstado(): string {
-    return this.reporteEditando ? this.reporteEditando.estado : this.nuevoReporte.estado || 'Pendiente';
+  get statusModel(): string {
+    return this.editingReport ? this.editingReport.status : this.newReport.status || 'Pendiente';
   }
 
-  set modeloEstado(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.estado = valor as any;
+  set statusModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.status = value as any;
     } else {
-      this.nuevoReporte.estado = valor as any;
+      this.newReport.status = value as any;
     }
   }
 
-  get modeloUsuaria(): string {
-    return this.reporteEditando ? (this.reporteEditando.usuaria || '') : (this.nuevoReporte.usuaria || '');
+  get userModel(): string {
+    return this.editingReport ? (this.editingReport.user || '') : (this.newReport.user || '');
   }
 
-  set modeloUsuaria(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.usuaria = valor;
+  set userModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.user = value;
     } else {
-      this.nuevoReporte.usuaria = valor;
+      this.newReport.user = value;
     }
   }
 
-  get modeloAcontecimiento(): string {
-    return this.reporteEditando ? (this.reporteEditando.acontecimiento || '') : (this.nuevoReporte.acontecimiento || '');
+  get incidentModel(): string {
+    return this.editingReport ? (this.editingReport.incident || '') : (this.newReport.incident || '');
   }
 
-  set modeloAcontecimiento(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.acontecimiento = valor;
+  set incidentModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.incident = value;
     } else {
-      this.nuevoReporte.acontecimiento = valor;
+      this.newReport.incident = value;
     }
   }
 
-  get modeloDescripcion(): string {
-    return this.reporteEditando ? this.reporteEditando.descripcion || '' : this.nuevoReporte.descripcion || '';
+  get descriptionModel(): string {
+    return this.editingReport ? this.editingReport.description || '' : this.newReport.description || '';
   }
 
-  set modeloDescripcion(valor: string) {
-    if (this.reporteEditando) {
-      this.reporteEditando.descripcion = valor;
+  set descriptionModel(value: string) {
+    if (this.editingReport) {
+      this.editingReport.description = value;
     } else {
-      this.nuevoReporte.descripcion = valor;
+      this.newReport.description = value;
     }
   }
 
   // ========================================
-  // GESTIÓN DE ALERTAS
+  // ALERT MANAGEMENT
   // ========================================
 
-  toggleAlertaSeleccionada(alertaId: number): void {
-    const index = this.alertasSeleccionadas.indexOf(alertaId);
+  toggleAlertSelected(alertId: number): void {
+    const index = this.selectedAlerts.indexOf(alertId);
     if (index === -1) {
-      this.alertasSeleccionadas.push(alertaId);
+      this.selectedAlerts.push(alertId);
     } else {
-      this.alertasSeleccionadas.splice(index, 1);
+      this.selectedAlerts.splice(index, 1);
     }
   }
 
-  isAlertaSeleccionada(alertaId: number): boolean {
-    return this.alertasSeleccionadas.includes(alertaId);
+  isAlertSelected(alertId: number): boolean {
+    return this.selectedAlerts.includes(alertId);
   }
 
-  seleccionarTodasAlertas(): void {
-    this.alertasSeleccionadas = this.alertasDisponibles.map(a => a.id);
+  selectAllAlerts(): void {
+    this.selectedAlerts = this.availableAlerts.map(a => a.id);
   }
 
-  deseleccionarTodasAlertas(): void {
-    this.alertasSeleccionadas = [];
+  deselectAllAlerts(): void {
+    this.selectedAlerts = [];
   }
 
-  get alertasSeleccionadasCount(): number {
-    return this.alertasSeleccionadas.length;
+  get selectedAlertsCount(): number {
+    return this.selectedAlerts.length;
   }
 }

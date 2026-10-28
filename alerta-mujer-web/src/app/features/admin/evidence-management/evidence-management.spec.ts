@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EvidenceManagement } from './evidence-management';
+import { EvidencesManagementComponent } from './evidence-management';
 
-describe('EvidenceManagement', () => {
-  let component: EvidenceManagement;
-  let fixture: ComponentFixture<EvidenceManagement>;
+describe('EvidencesManagementComponent', () => {
+  let component: EvidencesManagementComponent;
+  let fixture: ComponentFixture<EvidencesManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EvidenceManagement],
+      imports: [EvidencesManagementComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EvidenceManagement);
+    fixture = TestBed.createComponent(EvidencesManagementComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

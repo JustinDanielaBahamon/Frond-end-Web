@@ -29,11 +29,11 @@
   }
 }
 
-/* ── Títulos de la card ─────────────────────────── */
+/* ── Card titles ─────────────────────────── */
 .card__title {
   font-size              : 2rem;
   font-weight            : 900;
-  background             : linear-gradient(90deg, #4c1675, #be185d);
+  background             : linear-gradient(90deg, #4c1675, #aa15c1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-top             : 20px;
@@ -60,7 +60,7 @@
   align-items   : center;
   gap           : 12px;
   padding-bottom: 20px;
-  border-bottom : 1.5px solid rgba(236, 72, 153, 0.15);
+  border-bottom : 1.5px solid rgba(214, 72, 236, 0.15);
 
   &__icon {
     width      : 72px;
@@ -129,13 +129,13 @@
     transition     : color var(--transition-fast);
 
     &:hover {
-      color          : #b8166e;
+      color          : #a315b9;
       text-decoration: underline;
     }
   }
 
   &__error {
-    color      : #E91E8C;
+    color      : #ce1ee9;
     font-size  : 0.85rem;
     margin-top : -0.5rem;
   }
@@ -159,20 +159,20 @@
   &__input {
     width        : 100%;
     padding      : 15px 44px 15px 46px;
-    border       : 2px solid rgba(236, 72, 153, 0.15);
+    border       : 2px solid rgba(214, 72, 236, 0.15);
     border-radius: 16px;
     font-family  : var(--font-base);
     font-size    : 0.9rem;
     color        : var(--color-text-dark);
-    background   : rgba(245, 233, 233, 0.9);
+    background   : rgba(248, 226, 252, 0.9);
     outline      : none;
     transition   : border-color var(--transition-fast), box-shadow var(--transition-fast);
 
     &::placeholder { color: #9f69da; }
 
     &:focus {
-      border-color: #db1879;
-      box-shadow  : 0 0 0 4px rgba(236, 72, 153, 0.12);
+      border-color: #c118db;
+      box-shadow  : 0 0 0 4px rgba(214, 72, 236, 0.12);
     }
   }
 
@@ -191,7 +191,7 @@
     justify-content: center;
     transition     : color var(--transition-fast);
 
-    &:hover { color: #f02389; }
+    &:hover { color: #d523f0; }
   }
 }
 
@@ -207,7 +207,7 @@
   &__mark {
     width        : 18px;
     height       : 18px;
-    border       : 2px solid rgba(236, 72, 153, 0.3);
+    border       : 2px solid rgba(214, 72, 236, 0.3);
     border-radius: 6px;
     background   : white;
     flex-shrink  : 0;
@@ -228,8 +228,8 @@
   }
 
   input:checked + .checkbox__mark {
-    background  : linear-gradient(135deg, #be185d, #ec4899);
-    border-color: #ec4899;
+    background  : linear-gradient(135deg, #aa15c1, #d648ec);
+    border-color: #d648ec;
 
     &::after { transform: rotate(45deg) scale(1); }
   }
@@ -241,7 +241,7 @@
   }
 }
 
-/* ── Botón principal ────────────────────────────── */
+/* ── Main button ────────────────────────────── */
 .btn-submit {
   display        : flex;
   align-items    : center;
@@ -251,20 +251,20 @@
   padding        : 16px;
   border         : none;
   border-radius  : 16px;
-  background     : linear-gradient(90deg, #be185d, #dd1378, #ac0c5f);
+  background     : linear-gradient(90deg, #aa15c1, #c213dd, #970cac);
   color          : white;
   font-family    : var(--font-base);
   font-size      : 1rem;
   font-weight    : 800;
   letter-spacing : 0.15em;
   cursor         : pointer;
-  box-shadow     : 0 8px 30px rgba(190, 24, 93, 0.45);
+  box-shadow     : 0 8px 30px rgba(170, 21, 193, 0.45);
   transition     : transform var(--transition-fast), box-shadow var(--transition-fast);
   margin-top     : 4px;
 
   &:hover {
     transform : translateY(-3px);
-    box-shadow: 0 12px 40px rgba(190, 24, 93, 0.55);
+    box-shadow: 0 12px 40px rgba(170, 21, 193, 0.55);
   }
 
   &:active { transform: translateY(0); }
@@ -276,7 +276,7 @@
   }
 }
 
-/* ── Wrapper páginas auth ───────────────────────── */
+/* ── Auth pages wrapper ───────────────────────── */
 .login-page,
 .register-page {
   min-height     : 100vh;
@@ -286,7 +286,7 @@
   padding        : 40px 0;
   position       : relative;
   overflow       : hidden;
-  background     : var(--gradient-bg); // el gradiente vive aquí, no en html/body global
+  background     : var(--gradient-bg); // the gradient lives here, not in the global html/body
 
   &__wrapper {
     position        : relative;

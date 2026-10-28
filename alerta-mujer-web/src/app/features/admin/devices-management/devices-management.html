@@ -6,13 +6,9 @@
   
     <header class="page-header">
       <div>
-        <h1>Gestión de Dispositivos</h1>
-        <p>Visualiza y administra los dispositivos registrados en la aplicación.</p>
+        <h1>{{ 'Gestión de Dispositivos' | t }}</h1>
+        <p>{{ 'Visualiza y administra los dispositivos registrados en la aplicación.' | t }}</p>
       </div>
-      <button class="btn-register-device" (click)="abrirModalCrear()">
-        <i class="fa-solid fa-plus"></i>
-        Registrar Dispositivo
-      </button>
     </header>
   
     <!--==========================
@@ -22,9 +18,9 @@
     <section class="stats-grid">
       <div class="stat-card purple">
         <div class="stat-info">
-          <span>Total Dispositivos</span>
-          <h2>{{ stats.totalDevices }}</h2>
-          <p>Dispositivos registrados</p>
+          <span>{{ 'Total Dispositivos' | t }}</span>
+          <h2>{{ stats.totalDevices | t }}</h2>
+          <p>{{ 'Dispositivos registrados' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-mobile-screen-button"></i>
@@ -33,10 +29,10 @@
   
       <div class="stat-card green">
         <div class="stat-info">
-          <span>Activos</span>
-          <h2>{{ stats.activeDevices }}</h2>
-          <p>{{ (stats.activeDevices / stats.totalDevices * 100) | number:
-            '1.1-1' }}% del total</p>
+          <span>{{ 'Activos' | t }}</span>
+          <h2>{{ stats.activeDevices | t }}</h2>
+          <p>{{ ((stats.activeDevices / stats.totalDevices * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-shield-halved"></i>
@@ -45,10 +41,10 @@
   
       <div class="stat-card orange">
         <div class="stat-info">
-          <span>Inactivos</span>
-          <h2>{{ stats.inactiveDevices }}</h2>
-          <p>{{ (stats.inactiveDevices / stats.totalDevices * 100) | number:
-            '1.1-1' }}% del total</p>
+          <span>{{ 'Inactivos' | t }}</span>
+          <h2>{{ stats.inactiveDevices | t }}</h2>
+          <p>{{ ((stats.inactiveDevices / stats.totalDevices * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-circle-pause"></i>
@@ -57,10 +53,10 @@
   
       <div class="stat-card red">
         <div class="stat-info">
-          <span>Bloqueados</span>
-          <h2>{{ stats.blockedDevices }}</h2>
-          <p>{{ (stats.blockedDevices / stats.totalDevices * 100) | number:
-            '1.1-1' }}% del total</p>
+          <span>{{ 'Bloqueados' | t }}</span>
+          <h2>{{ stats.blockedDevices | t }}</h2>
+          <p>{{ ((stats.blockedDevices / stats.totalDevices * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-lock"></i>
@@ -70,9 +66,9 @@
   
       <div class="stat-card blue">
         <div class="stat-info">
-          <span>Sincronizados hoy</span>
-          <h2>{{ stats.syncedToday }}</h2>
-          <p>Últimas 24 horas</p>
+          <span>{{ 'Sincronizados hoy' | t }}</span>
+          <h2>{{ stats.syncedToday | t }}</h2>
+          <p>{{ 'Últimas 24 horas' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-arrows-rotate"></i>
@@ -89,33 +85,33 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input
           type="text"
-          placeholder="ID, nombre, IMEI, teléfono o usuario..."
+          [placeholder]="'ID, nombre, IMEI, teléfono o usuario...' | t"
           [(ngModel)]="searchTerm"
           (keyup.enter)="applyFilters()"
-          aria-label="Buscar dispositivo"
+          [attr.aria-label]="'Buscar dispositivo' | t"
         />
       </div>
       <button class="btn-search" (click)="applyFilters(); $event.stopPropagation()">
         <i class="fa-solid fa-search"></i>
-        Buscar
+        {{ 'Buscar' | t }}
       </button>
   
       <div class="filter-group">
         <div class="filter-item custom-select" [class.open]="isStatusDropdownOpen">
           <div class="select-selected" (click)="toggleStatusDropdown($event)">
-            {{ getStatusLabel(filterStatus) }}
+            {{ getStatusLabel(filterStatus) | t }}
             <i class="fa-solid fa-chevron-down select-arrow"></i>
           </div>
           <div class="select-items" *ngIf="isStatusDropdownOpen">
-            <div (click)="selectStatus('all', $event)">Todos los estados</div>
-            <div (click)="selectStatus('Activo', $event)">Activo</div>
-            <div (click)="selectStatus('Inactivo', $event)">Inactivo</div>
-            <div (click)="selectStatus('Bloqueado', $event)">Bloqueado</div>
+            <div (click)="selectStatus('all', $event)">{{ 'Todos los estados' | t }}</div>
+            <div (click)="selectStatus('Activo', $event)">{{ 'Activo' | t }}</div>
+            <div (click)="selectStatus('Inactivo', $event)">{{ 'Inactivo' | t }}</div>
+            <div (click)="selectStatus('Bloqueado', $event)">{{ 'Bloqueado' | t }}</div>
           </div>
         </div>
         <button class="btn-clear-filters" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
-          Limpiar filtros
+          {{ 'Limpiar filtros' | t }}
         </button>
       </div>
     </div>
@@ -128,14 +124,14 @@
       <table>
         <thead>
           <tr>
-            <th>Dispositivo</th>
-            <th>Usuario</th>
-            <th>Tipo</th>
-            <th>IMEI / ID</th>
-            <th>Teléfono</th>
-            <th>Estado</th>
-            <th>Última sincronización</th>
-            <th>Acciones</th>
+            <th>{{ 'Dispositivo' | t }}</th>
+            <th>{{ 'Usuario' | t }}</th>
+            <th>{{ 'Tipo' | t }}</th>
+            <th>{{ 'IMEI / ID' | t }}</th>
+            <th>{{ 'Teléfono' | t }}</th>
+            <th>{{ 'Estado' | t }}</th>
+            <th>{{ 'Última sincronización' | t }}</th>
+            <th>{{ 'Acciones' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -146,38 +142,38 @@
                   <i [class]="device.icon"></i>
                 </div>
                 <div class="device-details">
-                  <span>{{ device.name }}</span>
-                  <span class="os-version">{{ device.osVersion }}</span>
+                  <span>{{ device.name | t }}</span>
+                  <span class="os-version">{{ device.osVersion | t }}</span>
                 </div>
               </div>
             </td>
             <td>
               <div class="user-info">
-                <span>{{ device.user.name }}</span>
-                <span class="user-email">{{ device.user.email }}</span>
+                <span>{{ device.user.name | t }}</span>
+                <span class="user-email">{{ device.user.email | t }}</span>
               </div>
             </td>
             <td>
               <span class="type-badge" [class]="getDeviceTypeBadgeClass(device.type)">
-                {{ device.type }}
+                {{ device.type | t }}
               </span>
             </td>
-            <td>{{ device.imei }}</td>
-            <td>{{ device.phone }}</td>
+            <td>{{ device.imei | t }}</td>
+            <td>{{ device.phone | t }}</td>
             <td>
               <span class="status-badge" [class]="getDeviceStatusBadgeClass(device.status)">
-                {{ device.status }}
+                {{ device.status | t }}
               </span>
             </td>
-            <td>{{ device.lastSync }}</td>
+            <td>{{ device.lastSync | t }}</td>
             <td class="actions-cell">
-              <button class="view" (click)="verDispositivo(device.id)" aria-label="Ver detalles del dispositivo">
+              <button class="view" (click)="viewDevice(device.id)" [attr.aria-label]="'Ver detalles del dispositivo' | t">
                 <i class="fa-solid fa-eye"></i>
               </button>
-              <button class="edit" (click)="abrirModalEditar(device.id)" aria-label="Editar dispositivo">
+              <button class="edit" (click)="openEditModal(device.id)" [attr.aria-label]="'Editar dispositivo' | t">
                 <i class="fa-solid fa-pen"></i>
               </button>
-              <button class="delete" (click)="eliminarDispositivo(device.id)" aria-label="Eliminar dispositivo">
+              <button class="delete" (click)="deleteDevice(device.id)" [attr.aria-label]="'Eliminar dispositivo' | t">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
@@ -191,27 +187,24 @@
   
       <div class="table-footer">
         <div class="table-info">
-          Mostrando
-          <strong>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ (currentPage - 1) * itemsPerPage + paginatedDevices.length }}</strong>
-          de
-          <strong>{{ filteredDevices.length }}</strong>
-          dispositivos
+          {{ 'Mostrando' | t }}
+          <strong>{{ (currentPage - 1) * itemsPerPage + 1 | t }} - {{ (currentPage - 1) * itemsPerPage + paginatedDevices.length | t }}</strong>
+          {{ 'de' | t }}
+          <strong>{{ filteredDevices.length | t }}</strong>
+          {{ 'dispositivos' | t }}
         </div>
         <div class="pagination">
-          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Página anterior">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" [attr.aria-label]="'Página anterior' | t">
             <i class="fa-solid fa-chevron-left"></i>
           </button>
-          <ng-container *ngFor="let page of getPagesArray(); trackBy: trackByIndex">
-            <button
-              class="page-btn"
-              [class.active]="currentPage === page"
-              (click)="goToPage(page)"
-              aria-label="Página {{page}}"
-            >
-              {{ page }}
-            </button>
-          </ng-container>
-          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+          @for (page of getPagesArray(); track $index) {
+            @if (page === null) {
+              <span class="page-ellipsis" aria-hidden="true">…</span>
+            } @else {
+              <button class="page-btn" [class.active]="currentPage === page" (click)="goToPage(page)" aria-label="Página {{ page | t }}">{{ page | t }}</button>
+            }
+          }
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" [attr.aria-label]="'Página siguiente' | t">
             <i class="fa-solid fa-chevron-right"></i>
           </button>
         </div>
@@ -220,218 +213,185 @@
   </div>
 
 <!-- MODAL VER DISPOSITIVO -->
-<div class="modal-overlay" *ngIf="mostrarModalVer && dispositivoSeleccionado" (click)="cerrarModalVer()">
+<div class="modal-overlay" *ngIf="showViewModal && selectedDevice" (click)="closeViewModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Detalles del Dispositivo</h2>
-      <button class="modal-close" (click)="cerrarModalVer()">
+      <h2>{{ 'Detalles del Dispositivo' | t }}</h2>
+      <button class="modal-close" (click)="closeViewModal()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     <div class="modal-body">
       <div class="device-detail">
-        <!-- Header del dispositivo con icono -->
+        <!-- Device header with icon -->
         <div class="device-header">
           <div class="device-icon-large">
-            <i [class]="dispositivoSeleccionado!.icon"></i>
+            <i [class]="selectedDevice!.icon"></i>
           </div>
           <div class="device-header-info">
-            <h3>{{ dispositivoSeleccionado!.name }}</h3>
-            <span class="os-badge">{{ dispositivoSeleccionado!.osVersion }}</span>
-            <span class="type-badge-large" [class]="getDeviceTypeBadgeClass(dispositivoSeleccionado!.type)">
-              {{ dispositivoSeleccionado!.type }}
+            <h3>{{ selectedDevice!.name | t }}</h3>
+            <span class="os-badge">{{ selectedDevice!.osVersion | t }}</span>
+            <span class="type-badge-large" [class]="getDeviceTypeBadgeClass(selectedDevice!.type)">
+              {{ selectedDevice!.type | t }}
             </span>
           </div>
         </div>
 
-        <!-- Sección de información del dispositivo -->
+        <!-- Device information section -->
         <div class="detail-section">
           <h4>
             <i class="fa-solid fa-mobile-screen"></i>
-            Información del Dispositivo
+            {{ 'Información del Dispositivo' | t }}
           </h4>
           <div class="detail-grid">
             <div class="detail-item">
-              <label>IMEI</label>
-              <p>{{ dispositivoSeleccionado!.imei }}</p>
+              <label>{{ 'IMEI' | t }}</label>
+              <p>{{ selectedDevice!.imei | t }}</p>
             </div>
             <div class="detail-item">
-              <label>Teléfono</label>
-              <p>{{ dispositivoSeleccionado!.phone }}</p>
+              <label>{{ 'Teléfono' | t }}</label>
+              <p>{{ selectedDevice!.phone | t }}</p>
             </div>
             <div class="detail-item">
-              <label>Estado</label>
-              <span class="status-badge-large" [class]="getDeviceStatusBadgeClass(dispositivoSeleccionado!.status)">
-                {{ dispositivoSeleccionado!.status }}
+              <label>{{ 'Estado' | t }}</label>
+              <span class="status-badge-large" [class]="getDeviceStatusBadgeClass(selectedDevice!.status)">
+                {{ selectedDevice!.status | t }}
               </span>
             </div>
             <div class="detail-item">
-              <label>Última Sincronización</label>
-              <p>{{ dispositivoSeleccionado!.lastSync }}</p>
+              <label>{{ 'Última Sincronización' | t }}</label>
+              <p>{{ selectedDevice!.lastSync | t }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Sección de información del usuario -->
+        <!-- App and protection: what the mobile app reports -->
+        <div class="detail-section">
+          <h4>
+            <i class="fa-solid fa-shield-heart"></i>
+            {{ 'App y protección' | t }}
+          </h4>
+          <div class="detail-grid">
+            <div class="detail-item" *ngIf="selectedDevice!.deviceName">
+              <label>{{ 'Nombre del celular' | t }}</label>
+              <p>{{ selectedDevice!.deviceName | t }}</p>
+            </div>
+            <div class="detail-item">
+              <label>{{ 'Versión de la app' | t }}</label>
+              <p>{{ (selectedDevice!.appVersion || 'Sin informar') | t }}</p>
+            </div>
+            <div class="detail-item">
+              <label>{{ 'GPS' | t }}</label>
+              <p>{{ gpsText(selectedDevice!.gpsStatus) | t }}</p>
+            </div>
+            <div class="detail-item">
+              <label>{{ 'Recibe alarmas (push)' | t }}</label>
+              <p>{{ selectedDevice!.pushTokenRegistered ? 'Sí, registrado' : 'No: no recibirá las alarmas de sus contactos' | t }}</p>
+            </div>
+            <div class="detail-item">
+              <label>{{ 'Registrado' | t }}</label>
+              <p>{{ selectedDevice!.registered | t }}</p>
+            </div>
+          </div>
+
+          <div class="permissions-device" *ngIf="selectedDevice!.permissions as permissions; else withoutPermissions">
+            <p class="permissions-device__summary">
+              {{ 'Listo para una emergencia:' | t }} <strong>{{ permissionsReady(permissions) | t }} {{ 'de' | t }} {{ permissions.length | t }}</strong>
+              <span *ngIf="selectedDevice!.permissionsUpdated"> {{ '· informado' | t }} {{ selectedDevice!.permissionsUpdated | t }}</span>
+            </p>
+            <div class="permissions-device__chips">
+              <span *ngFor="let p of permissions" class="permission-chip" [class.permission-chip--ready]="p.ready">
+                <i class="fa-solid" [class.fa-check]="p.ready" [class.fa-xmark]="!p.ready"></i> {{ p.label | t }}
+              </span>
+            </div>
+          </div>
+          <ng-template #withoutPermissions>
+            <p class="permissions-device__empty">{{ 'La app de este celular todavía no informó sus permisos (se actualiza al abrir "Permisos y protección").' | t }}</p>
+          </ng-template>
+        </div>
+
+        <!-- User information section -->
         <div class="detail-section">
           <h4>
             <i class="fa-solid fa-user"></i>
-            Información del Usuario
+            {{ 'Información del Usuario' | t }}
           </h4>
           <div class="user-card">
             <div class="user-avatar">
               <i class="fa-solid fa-user-circle"></i>
             </div>
             <div class="user-details">
-              <p class="user-name">{{ dispositivoSeleccionado!.user.name }}</p>
-              <p class="user-email">{{ dispositivoSeleccionado!.user.email }}</p>
+              <p class="user-name">{{ selectedDevice!.user.name | t }}</p>
+              <p class="user-email">{{ selectedDevice!.user.email | t }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModalVer(); $event.stopPropagation()">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CREAR DISPOSITIVO -->
-<div class="modal-overlay" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Registrar Nuevo Dispositivo</h2>
-      <button class="modal-close" (click)="cerrarModalCrear(); $event.stopPropagation()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form (ngSubmit)="crearDispositivo(dispositivoSeleccionado!)">
-        <div class="form-group">
-          <label>Nombre del dispositivo</label>
-          <input type="text" name="name" [(ngModel)]="dispositivoSeleccionado!.name" required>
-        </div>
-        <div class="form-group">
-          <label>Versión del sistema operativo</label>
-          <input type="text" name="osVersion" [(ngModel)]="dispositivoSeleccionado!.osVersion" required>
-        </div>
-        <div class="form-group">
-          <label>Tipo</label>
-          <div class="custom-select" [class.open]="isTypeDropdownOpenCrear">
-            <div class="select-selected" (click)="toggleTypeDropdownCrear($event)">
-              {{ dispositivoSeleccionado!.type }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isTypeDropdownOpenCrear">
-              <div (click)="selectTypeCrear('Android', $event)">Android</div>
-              
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>IMEI</label>
-          <input type="text" name="imei" [(ngModel)]="dispositivoSeleccionado!.imei" required>
-        </div>
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" name="phone" [(ngModel)]="dispositivoSeleccionado!.phone" required>
-        </div>
-        <div class="form-group">
-          <label>Estado</label>
-          <div class="custom-select" [class.open]="isStatusDropdownOpenCrear">
-            <div class="select-selected" (click)="toggleStatusDropdownCrear($event)">
-              {{ dispositivoSeleccionado!.status }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isStatusDropdownOpenCrear">
-              <div (click)="selectStatusCrear('Activo', $event)">Activo</div>
-              <div (click)="selectStatusCrear('Inactivo', $event)">Inactivo</div>
-              <div (click)="selectStatusCrear('Bloqueado', $event)">Bloqueado</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Nombre del usuario</label>
-          <input type="text" name="userName" [(ngModel)]="dispositivoSeleccionado!.user.name" required>
-        </div>
-        <div class="form-group">
-          <label>Email del usuario</label>
-          <input type="email" name="userEmail" [(ngModel)]="dispositivoSeleccionado!.user.email" required>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalCrear(); $event.stopPropagation()">Cancelar</button>
-          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">Registrar</button>
-        </div>
-      </form>
+      <button class="btn-secondary" (click)="closeViewModal(); $event.stopPropagation()">{{ 'Cerrar' | t }}</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL EDITAR DISPOSITIVO -->
-<div class="modal-overlay" *ngIf="mostrarModalEditar && dispositivoSeleccionado" (click)="cerrarModalEditar()">
+<div class="modal-overlay" *ngIf="showEditModal && selectedDevice" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Editar Dispositivo</h2>
-      <button class="modal-close" (click)="cerrarModalEditar(); $event.stopPropagation()">
+      <h2>{{ 'Editar Dispositivo' | t }}</h2>
+      <button class="modal-close" (click)="closeEditModal(); $event.stopPropagation()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="actualizarDispositivo(dispositivoSeleccionado!)">
+      <form (ngSubmit)="updateDevice(selectedDevice!)">
+        <!-- The phone and user data come from the mobile app; here only the status is changed. -->
         <div class="form-group">
-          <label>Nombre del dispositivo</label>
-          <input type="text" name="name" [(ngModel)]="dispositivoSeleccionado!.name" required>
+          <label>{{ 'Nombre del dispositivo' | t }}</label>
+          <input type="text" name="name" readonly [ngModel]="selectedDevice!.name" required>
         </div>
         <div class="form-group">
-          <label>Versión del sistema operativo</label>
-          <input type="text" name="osVersion" [(ngModel)]="dispositivoSeleccionado!.osVersion" required>
+          <label>{{ 'Versión del sistema operativo' | t }}</label>
+          <input type="text" name="osVersion" readonly [ngModel]="selectedDevice!.osVersion" required>
         </div>
         <div class="form-group">
-          <label>Tipo</label>
-          <div class="custom-select" [class.open]="isTypeDropdownOpenEditar">
-            <div class="select-selected" (click)="toggleTypeDropdownEditar($event)">
-              {{ dispositivoSeleccionado!.type }}
+          <label>{{ 'Tipo' | t }}</label>
+          <input type="text" name="type" readonly [ngModel]="selectedDevice!.type">
+        </div>
+        <div class="form-group">
+          <label>{{ 'IMEI' | t }}</label>
+          <input type="text" name="imei" readonly [ngModel]="selectedDevice!.imei" required>
+        </div>
+        <div class="form-group">
+          <label>{{ 'Teléfono' | t }}</label>
+          <input type="text" name="phone" readonly [ngModel]="selectedDevice!.phone" required>
+        </div>
+        <div class="form-group">
+          <label>{{ 'Estado' | t }}</label>
+          <div class="custom-select" [class.open]="isEditStatusDropdownOpen">
+            <div class="select-selected" (click)="toggleEditStatusDropdown($event)">
+              {{ selectedDevice!.status | t }}
               <i class="fa-solid fa-chevron-down select-arrow"></i>
             </div>
-            <div class="select-items" *ngIf="isTypeDropdownOpenEditar">
-              <div (click)="selectTypeEditar('Android', $event)">Android</div>
-              
+            <div class="select-items" *ngIf="isEditStatusDropdownOpen">
+              <div (click)="selectEditStatus('Activo', $event)">{{ 'Activo' | t }}</div>
+              <div (click)="selectEditStatus('Inactivo', $event)">{{ 'Inactivo' | t }}</div>
+              <div (click)="selectEditStatus('Bloqueado', $event)">{{ 'Bloqueado' | t }}</div>
+              <div (click)="selectEditStatus('Perdido', $event)">{{ 'Perdido' | t }}</div>
             </div>
           </div>
         </div>
         <div class="form-group">
-          <label>IMEI</label>
-          <input type="text" name="imei" [(ngModel)]="dispositivoSeleccionado!.imei" required>
+          <label>{{ 'Nombre del usuario' | t }}</label>
+          <input type="text" name="userName" readonly [ngModel]="selectedDevice!.user.name" required>
         </div>
         <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" name="phone" [(ngModel)]="dispositivoSeleccionado!.phone" required>
-        </div>
-        <div class="form-group">
-          <label>Estado</label>
-          <div class="custom-select" [class.open]="isStatusDropdownOpenEditar">
-            <div class="select-selected" (click)="toggleStatusDropdownEditar($event)">
-              {{ dispositivoSeleccionado!.status }}
-              <i class="fa-solid fa-chevron-down select-arrow"></i>
-            </div>
-            <div class="select-items" *ngIf="isStatusDropdownOpenEditar">
-              <div (click)="selectStatusEditar('Activo', $event)">Activo</div>
-              <div (click)="selectStatusEditar('Inactivo', $event)">Inactivo</div>
-              <div (click)="selectStatusEditar('Bloqueado', $event)">Bloqueado</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Nombre del usuario</label>
-          <input type="text" name="userName" [(ngModel)]="dispositivoSeleccionado!.user.name" required>
-        </div>
-        <div class="form-group">
-          <label>Email del usuario</label>
-          <input type="email" name="userEmail" [(ngModel)]="dispositivoSeleccionado!.user.email" required>
+          <label>{{ 'Email del usuario' | t }}</label>
+          <input type="email" name="userEmail" readonly [ngModel]="selectedDevice!.user.email" required>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalEditar(); $event.stopPropagation()">Cancelar</button>
-          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">Guardar Cambios</button>
+          <button type="button" class="btn-secondary" (click)="closeEditModal(); $event.stopPropagation()">{{ 'Cancelar' | t }}</button>
+          <button type="submit" class="btn-primary" (click)="$event.stopPropagation()">{{ 'Guardar Cambios' | t }}</button>
         </div>
       </form>
     </div>

@@ -15,7 +15,15 @@
   gap: 18px;
 }
 
-.dash-header { display: flex; flex-direction: column; gap: 4px; }
+.dash-header { display: flex; flex-direction: column; gap: 12px; }
+
+.dash-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
 .dash-title {
   font-size: 1.6rem;
@@ -27,7 +35,7 @@
 .dash-sub {
   font-size: 0.85rem;
   color: $text-muted;
-  margin: 0;
+  margin: 4px 0 0;
 }
 
 .dash-loading,
@@ -46,6 +54,69 @@
   font-size: 0.82rem;
   padding: 1rem;
   list-style: none;
+}
+
+.note {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: $text-dim;
+}
+
+// =============================================
+// FILTROS (periodo y estado)
+// =============================================
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  &--dates { gap: 16px; }
+}
+
+.filter-button {
+  min-height: 38px;
+  padding: 8px 16px;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: transparent;
+  color: $text-muted;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: $purple-mid;
+    color: $purple-deep;
+  }
+
+  &.is-active {
+    background: linear-gradient(135deg, var(--accent-grad-from, #{$purple-deep}), var(--accent-grad-to, #{$purple-mid}));
+    border-color: transparent;
+    color: #fff;
+  }
+}
+
+.date-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text-muted;
+}
+
+.date-input {
+  padding: 7px 10px;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  color: $text-primary;
+  font-family: inherit;
+  font-size: 0.82rem;
 }
 
 // =============================================
@@ -139,6 +210,12 @@
       font-size: 0.75rem;
       color: $text-dim;
     }
+
+    &--filters {
+      flex-wrap: wrap;
+
+      .filters--table { margin-left: auto; }
+    }
   }
 
   &__icon {
@@ -158,8 +235,68 @@
 
 .charts-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
+  align-items: start;
+}
+
+// =============================================
+// ALERTS BY HOUR OF THE DAY
+// =============================================
+.hours-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: $bg-base;
+
+  &__label { font-size: 0.74rem; font-weight: 600; color: $text-muted; }
+  &__value { font-size: 1.15rem; font-weight: 800; color: $text-primary; }
+  &__sub   { font-size: 0.74rem; color: $text-dim; }
+}
+
+.hours-scroll { overflow-x: auto; }
+
+.hours-svg {
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  display: block;
+}
+
+.band-bg {
+  fill: $purple-pale;
+  opacity: 0.35;
+
+  &--alt { opacity: 0.6; }
+  &--night { fill: $red-pale; opacity: 0.8; }
+}
+
+.band-label {
+  fill: $text-muted;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hour-bar {
+  fill: $purple-mid;
+
+  &--peak { fill: $red; }
+}
+
+.hour-valor {
+  fill: $text-primary;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 // =============================================
@@ -182,178 +319,150 @@
   font-size: 11px;
 }
 
-.trend-area { fill: color-mix(in srgb, #{$purple-mid} 22%, transparent); }
 
-.trend-line {
-  fill: none;
-  stroke: $purple-deep;
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-}
 
-.trend-dot {
-  fill: $bg-card;
-  stroke: $purple-deep;
-  stroke-width: 2;
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: $text-muted;
+
+  &__line {
+    display: inline-block;
+    width: 22px;
+    height: 0;
+    margin-right: 8px;
+    vertical-align: middle;
+    border-top: 3px solid $purple-deep;
+
+    &--prev { border-top: 2px dashed $text-dim; }
+  }
 }
 
 // =============================================
-// MODOS DE ACTIVACIÓN
+// ZONES WITH THE MOST INCIDENTS
 // =============================================
-.modos-list {
+.zones-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.zone-map-wrap { min-width: 0; }
+
+.zone-map {
+  position: relative;
+  z-index: 0;
+  isolation: isolate; // prevents the map from rendering over the top bar or the modals
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  overflow: hidden;
+}
+
+.map-leaflet {
+  width: 100%;
+  height: 340px;
+}
+
+.zone-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: $bg-base;
+
+  &__label  { font-size: 0.74rem; font-weight: 600; color: $text-muted; }
+  &__name { font-size: 1.05rem; font-weight: 800; color: $text-primary; }
+  &__meta   { font-size: 0.78rem; color: $text-muted; }
+}
+
+.zone-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.modo {
-  display: flex;
+.zone-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
   align-items: center;
   gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  color: $text-primary;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
 
-  &__icon {
-    width: 34px;
-    height: 34px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &:hover { background: $bg-card-hover; }
 
-    svg { width: 16px; height: 16px; }
+  &.is-active {
+    border-color: $purple-mid;
+    background: $purple-pale;
   }
 
-  &__body { flex: 1; min-width: 0; }
+  &__text { min-width: 0; }
 
-  &__top {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 5px;
-  }
-
-  &__nombre {
-    flex: 1;
-    font-size: 0.82rem;
-    font-weight: 600;
+  &__name {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 700;
     color: $text-primary;
+  }
+
+  &__address {
+    display: block;
+    font-size: 0.76rem;
+    color: $text-muted;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  &__pct { font-size: 0.78rem; color: $text-muted; }
-
-  &__cant {
-    width: 28px;
-    text-align: right;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: $purple-deep;
-  }
-
   &__bar {
-    height: 8px;
+    display: block;
+    height: 7px;
+    margin-top: 8px;
     border-radius: 99px;
-    background: $purple-pale;
+    background: $bg-base;
     overflow: hidden;
   }
 
   &__fill {
     display: block;
     height: 100%;
-    min-width: 4px;
     border-radius: 99px;
-  }
-}
+    background: $purple-mid;
 
-// =============================================
-// ALERTAS POR ZONA
-// =============================================
-.zonas-body {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 16px;
-  align-items: center;
-}
-
-.zona-mapa svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.map-bg { fill: $purple-pale; }
-
-.map-grid {
-  stroke: $border;
-  stroke-width: 0.6;
-  opacity: 0.6;
-}
-
-.bubble {
-  stroke-width: 1.5;
-
-  &--1 { fill: color-mix(in srgb, #{$red} 40%, transparent);          stroke: $red; }
-  &--2 { fill: color-mix(in srgb, #{$amber} 40%, transparent);        stroke: $amber; }
-  &--3 { fill: color-mix(in srgb, #{$purple-deep} 35%, transparent);  stroke: $purple-deep; }
-  &--4 { fill: color-mix(in srgb, #{$purple-mid} 35%, transparent);   stroke: $purple-mid; }
-}
-
-.bubble-label {
-  fill: $text-primary;
-  font-size: 10px;
-  font-weight: 700;
-  paint-order: stroke;
-  stroke: $bg-card;
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-
-.zona-ranking {
-  &__title {
-    margin: 0 0 8px;
-    font-size: 0.74rem;
-    font-weight: 700;
-    color: $text-muted;
-  }
-
-  ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid $border;
-    font-size: 0.82rem;
-
-    &:last-child { border-bottom: none; }
-  }
-
-  &__nombre {
-    flex: 1;
-    color: $text-primary;
-    font-weight: 600;
+    &--top { background: $red; }
   }
 
   &__cant {
+    font-size: 0.82rem;
     font-weight: 800;
     color: $purple-deep;
+    white-space: nowrap;
   }
 }
 
 .rank {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
   border-radius: 50%;
   color: #fff;
@@ -363,89 +472,16 @@
   align-items: center;
   justify-content: center;
 
-  &--1 { background: #e11d48; }
-  &--2 { background: #f59e0b; }
+  &--1 { background: #c026d3; }
+  &--2 { background: #9333ea; }
   &--3 { background: #7c3aed; }
-  &--4 { background: #2563eb; }
-  &--5 { background: #0d9488; }
+  &--4 { background: #5b21b6; }
+  &--5 { background: #8b5cf6; }
 }
 
 // =============================================
-// EMERGENCIAS POR TIPO
+// TABLA
 // =============================================
-.tipos-body {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.donut-svg {
-  width: 170px;
-  height: 170px;
-  flex-shrink: 0;
-
-  path {
-    stroke: $bg-card;
-    stroke-width: 2;
-  }
-}
-
-.donut-hole { fill: $bg-card; }
-
-.donut-total {
-  fill: $text-primary;
-  font-size: 26px;
-  font-weight: 800;
-}
-
-.donut-caption {
-  fill: $text-muted;
-  font-size: 11px;
-}
-
-.tipos-legend {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  min-width: 0;
-
-  li {
-    display: grid;
-    grid-template-columns: 12px 1fr auto auto;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 0;
-    font-size: 0.82rem;
-  }
-
-  &__nombre { color: $text-primary; }
-  &__pct { color: $text-muted; }
-
-  &__cant {
-    min-width: 28px;
-    text-align: right;
-    font-weight: 700;
-    color: $purple-deep;
-  }
-}
-
-.legend-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-}
-
-// =============================================
-// BOTTOM ROW
-// =============================================
-.bottom-row {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr;
-  gap: 16px;
-  align-items: start;
-}
-
 .table-wrap { overflow-x: auto; }
 
 table {
@@ -482,93 +518,62 @@ table {
   }
 }
 
-.dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.tipo-badge {
-  display: inline-block;
-  padding: 3px 9px;
+// Status: told apart by shape and color (circle, diamond, square)
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
   border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 700;
-
-  &.badge-sos    { background: $red-pale; color: $red; }
-  &.badge-acoso  { background: $purple-pale; color: $purple-deep; }
-  &.badge-robo   { background: color-mix(in srgb, #2563eb 16%, transparent); color: #3b82f6; }
-  &.badge-medica { background: color-mix(in srgb, #0d9488 16%, transparent); color: #14b8a6; }
-  &.badge-otros  { background: $amber-pale; color: $amber; }
-}
-
-.estado-badge {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 100px;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  background: $amber-pale;
-  color: $amber;
 
-  &.active {
+  &__icon {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    background: currentColor;
+  }
+
+  &--pending {
+    background: $red-pale;
+    color: $red;
+    .state-badge__icon { border-radius: 50%; }
+  }
+
+  &--atendida {
     background: $green-pale;
     color: $green;
+    .state-badge__icon { border-radius: 2px; transform: rotate(45deg); }
+  }
+
+  &--cancelled {
+    background: $bg-base;
+    color: $text-muted;
+    border: 1px solid $border;
+    .state-badge__icon { border-radius: 2px; }
   }
 }
 
-// ── Accesos Rápidos ───────────────────────────
-.accesos-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 14px;
-}
-
-.accesos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.acceso-btn {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 14px;
-  border-radius: $radius-sm;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: $purple-deep;
   font-family: inherit;
-  border: 1.5px solid transparent;
-  transition: all 0.15s;
-  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 
-  svg { flex-shrink: 0; }
+  &:hover { text-decoration: underline; }
 }
 
-.acceso-primary {
-  background: linear-gradient(135deg, var(--accent-grad-from, #{$purple-deep}), var(--accent-grad-to, #{$purple-mid}));
-  color: #fff;
-  box-shadow: 0 4px 14px color-mix(in srgb, #{$purple-deep} 30%, transparent);
+// ── Quick access ───────────────────────────
 
-  &:hover { filter: brightness(1.08); }
-}
 
-.acceso-secondary {
-  background: $bg-card;
-  border-color: $border;
-  color: $text-muted;
 
-  &:hover {
-    background: $bg-card-hover;
-    border-color: $purple-mid;
-    color: $purple-deep;
-  }
-}
+
 
 // =============================================
 // RESPONSIVE
@@ -576,12 +581,313 @@ table {
 @media (max-width: 1200px) {
   .stats-row { grid-template-columns: 1fr 1fr; }
   .charts-row { grid-template-columns: 1fr; }
-  .bottom-row { grid-template-columns: 1fr; }
+  .zones-body { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 700px) {
   .dashboard { padding: 16px; }
   .stats-row { grid-template-columns: 1fr; }
-  .zonas-body { grid-template-columns: 1fr; }
-  .tipos-body { flex-direction: column; }
+  .map-leaflet { height: 260px; }
+  .dash-card__header--filters .filters--table { margin-left: 0; }
+}
+
+// =============================================
+// BAR TREND (colors validated for CVD in light and dark)
+// =============================================
+:host {
+  --serie-actual: #6d28d9;
+  --serie-previa: #a78bfa;
+}
+
+:host-context([data-theme='dark']) {
+  --serie-actual: #9f67fa;
+  --serie-previa: #6d28d9;
+}
+
+.trend-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  margin: 4px 0 10px;
+
+  &__item { display: flex; flex-direction: column; }
+  &__valor { font-size: 1.8rem; font-weight: 800; line-height: 1.1; color: $text-primary; }
+  &__valor--previa { color: $text-muted; }
+  &__label { font-size: 0.75rem; color: $text-muted; }
+  &__sentence { flex: 1 1 240px; margin: 0; font-size: 0.9rem; font-weight: 700; color: $text-primary; }
+}
+
+.trend-bar {
+  fill: var(--serie-actual);
+  &--previa { fill: var(--serie-previa); }
+}
+
+.trend-hit { fill: transparent; }
+
+.trend-day:hover .trend-hit { fill: $border; opacity: 0.35; }
+
+.trend-valor {
+  fill: $text-muted;
+  font-size: 11px;
+  font-weight: 700;
+  &--actual { fill: $text-primary; }
+}
+
+.axis-text--today { fill: $text-primary; font-weight: 800; }
+
+.legend__bar {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+  background: var(--serie-actual);
+  &--previa { background: var(--serie-previa); }
+}
+
+.legend__note { margin-left: auto; font-style: italic; }
+
+// =============================================
+// ATAJOS
+// =============================================
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.atajo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid $border;
+  border-radius: 24px;
+  background: $bg-card;
+  color: $text-primary;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  i { font-size: 1.1rem; color: $purple-deep; }
+  &:hover { border-color: $purple-deep; }
+
+  &--urgent {
+    border-color: transparent;
+    background: linear-gradient(135deg, #7c3aed, #a21caf);
+    color: #fff;
+    i { color: #fff; }
+  }
+}
+
+// Week / Month selector of the trend chart
+.trend-vista {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+// =============================================
+// GRÁFICOS CON TAMAÑO FIJO EN PANTALLAS CHICAS
+// No se encogen: mantienen su tamaño y se mueven
+// hacia los lados (como una tabla). En PC se ven igual que antes.
+// =============================================
+.hours-scroll,
+.trend-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px; // espacio para la barra de desplazamiento
+
+  // Barra de desplazamiento visible y delgada
+  scrollbar-width: thin;
+  scrollbar-color: $purple-mid transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: $purple-mid;
+    border-radius: 3px;
+  }
+}
+
+// Alertas por hora: tamaño real del dibujo (textos a 12 px)
+.hours-svg { min-width: 1000px; }
+
+// Tendencia: tamaño real del dibujo (textos a 11 px)
+.trend-svg { min-width: 640px; }
+
+// =============================================
+// RESPONSIVE COMPLETO DEL DASHBOARD (celular y tablet)
+// Solo diseño: los botones, filtros y datos funcionan igual
+// =============================================
+
+// La tabla también con la barrita morada para moverla de lado
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: $purple-mid transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: $purple-mid; border-radius: 3px; }
+}
+
+@media (max-width: 700px) {
+  .dash-title { font-size: 1.35rem; }
+
+  .dash-card { padding: 14px; }
+
+  // Encabezados con botones (tendencia y alertas recientes):
+  // ícono + título en una fila y los botones debajo, a lo ancho
+  .dash-card__header--filters {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+
+    > .trend-vista,
+    > .filters--table {
+      grid-column: 1 / -1;
+      margin-left: 0;
+    }
+  }
+
+  .trend-vista .filter-button { flex: 1; }
+
+  // Filtros de estado de la tabla: 4 iguales en una fila
+  .filters--table {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    .filter-button { padding: 8px 6px; }
+  }
+
+  // Periodo (Hoy / 7 días / 30 días / Personalizado): 4 iguales en una fila
+  .dash-top > .filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+
+    .filter-button { padding: 8px 6px; }
+  }
+
+  // Fechas personalizadas: una debajo de la otra
+  .filters--dates {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .date-label { justify-content: space-between; }
+
+  // Tarjetas de números: 2 por fila, ícono arriba y número debajo
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+
+      svg { width: 19px; height: 19px; }
+    }
+
+    &__value { font-size: 1.6rem; }
+  }
+
+  // Atajos: 2 por fila, del mismo ancho
+  .atajos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .atajo {
+    justify-content: center;
+    padding: 9px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  // Hora pico / franja más riesgosa / más tranquila: más compactas
+  .hours-stats { gap: 8px; }
+  .mini-stat { padding: 10px 12px; }
+
+  // Leyenda del gráfico de tendencia: la nota va abajo, a la izquierda
+  .legend { gap: 8px 16px; }
+  .legend__note { margin-left: 0; flex-basis: 100%; }
+
+  // Resumen de la tendencia: números un poco más compactos
+  .trend-summary {
+    gap: 10px 20px;
+
+    &__valor { font-size: 1.5rem; }
+    &__sentence { flex-basis: 100%; }
+  }
+
+  // Zonas: el número no empuja el nombre
+  .zone-item {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .zone-detail__meta { overflow-wrap: anywhere; }
+}
+
+// Celulares chicos
+@media (max-width: 480px) {
+  .dash-top > .filters,
+  .filters--table { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+// Celulares muy angostos: todo en una columna
+@media (max-width: 360px) {
+  .dashboard { padding: 12px; }
+  .stats-row { grid-template-columns: 1fr; }
+
+  .stat-card {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .atajos { grid-template-columns: 1fr; }
+}
+
+// =============================================
+// PANTALLAS MUY ANGOSTAS: "Hora pico", "Franja más riesgosa" y
+// "Franja más tranquila" ya no se salen de la tarjeta
+// (antes tenían un ancho mínimo de 210 px)
+// =============================================
+.hours-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+
+  > * { min-width: 0; }
+}
+
+.mini-stat__value,
+.mini-stat__sub,
+.stat-card__label,
+.stat-card__sub,
+.dash-card__header h3,
+.dash-card__header p { overflow-wrap: anywhere; }
+
+@media (max-width: 300px) {
+  .dashboard { padding: 8px; }
+  .dash-card { padding: 10px; }
+  .dash-card__header { gap: 8px; }
+  .dash-card__icon { width: 32px; height: 32px; }
+  .dash-card__header--filters { grid-template-columns: 32px minmax(0, 1fr); }
+  .mini-stat { padding: 8px 10px; }
+  .mini-stat__value { font-size: 1rem; }
+  .dash-top > .filters,
+  .filters--table { grid-template-columns: 1fr; }
 }

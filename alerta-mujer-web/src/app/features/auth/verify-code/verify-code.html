@@ -7,7 +7,7 @@
   
     <div class="verify-code-page__wrapper">
   
-      <!-- Sección Visual Izquierda con Elementos Decorativos -->
+      <!-- Left visual section with decorative elements -->
       <div class="verify-code-page__visual">
         <div class="halo halo--1"></div>
         <div class="halo halo--2"></div>
@@ -31,98 +31,103 @@
           <ellipse cx="64" cy="95" rx="12" ry="5" transform="rotate(-45 64 95)"/>
           <ellipse cx="70" cy="60" rx="10" ry="4" transform="rotate(47 70 60)"/>
         </svg>
-        <img class="hero-image" src="login.png" alt="Alerta Mujer">
+        <img class="hero-image" src="login.png" [alt]="'Alerta Mujer' | t">
         <span class="spark spark--1">✦</span>
         <span class="spark spark--2">✦</span>
         <span class="spark spark--3">✦</span>
         <span class="spark spark--4">✦</span>
       </div>
   
-      <!-- Tarjeta Principal de Verificación -->
+      <!-- Main verification card -->
       <app-card class="card">
   
-        <!-- Sección de Marca (Logo y Nombre) -->
+        <!-- Brand section (logo and name) -->
         <div class="brand">
           <div class="brand__icon">
-            <img src="logo.png" alt="Logo Alerta Mujer">
+            <img src="logo.png" [alt]="'Logo Alerta Mujer' | t">
           </div>
           <div class="brand__text">
             <span class="brand__name">
-              ALERTA
+              {{ 'ALERTA' | t }}
               <br>
-              <strong>MUJER</strong>
+              <strong>{{ 'MUJER' | t }}</strong>
             </span>
             <span class="brand__tagline">
-              Seguridad para todas
+              {{ 'Seguridad para todas' | t }}
             </span>
           </div>
         </div>
   
-        <!-- Icono de Característica (Escudo) -->
+        <!-- Feature icon (shield) -->
         <div class="feature-icon">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
   
-        <!-- Título y Subtítulo de la Tarjeta -->
+        <!-- Card title and subtitle -->
         <h1 class="card__title">
-          Verifica tu <span class="card__title--accent">código</span>
+          {{ 'Verifica tu' | t }} <span class="card__title--accent">{{ 'código' | t }}</span>
         </h1>
         <p class="card__subtitle">
-          {{ mensajeEnvio }}
+          {{ 'Enviamos un código de 6 dígitos a' | t }} <strong>{{ maskedEmail() | t }}</strong>{{ '. Vence en 15 minutos. Si no lo ves, revisa la carpeta de spam.' | t }}
         </p>
   
-        <!-- Formulario de Verificación de Código -->
-        <form class="form" (ngSubmit)="verificarCodigo()">
+        <!-- Code verification form -->
+        <form class="form" (ngSubmit)="verifyCode()">
   
-          <!-- Campos de Entrada para el Código OTP -->
+          <!-- Input fields for the OTP code -->
           <div class="code-inputs">
-            <input
-              *ngFor="let digito of codigo; let i = index; trackBy: trackByIndex"
-              #codeInput
-              class="code-input"
-              type="text"
-              inputmode="numeric"
-              maxlength="1"
-              [name]="'codigo' + i"
-              [value]="digito"
-              (input)="onInput($event, i)"
-              (keydown)="onKeyDown($event, i)"
-              (paste)="onPaste($event)"
-              aria-label="Dígito {{i + 1}} del código de verificación">
+            @for (digit of code(); track $index) {
+              <input
+                class="code-input"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                [name]="'codigo' + $index"
+                [value]="digit"
+                (input)="onInput($event, $index)"
+                (keydown)="onKeyDown($event)"
+                (paste)="onPaste($event)"
+                [attr.aria-label]="'Dígito ' + ($index + 1) + ' del código'">
+            }
           </div>
-  
-          <!-- Sección de Temporizador y Reenvío de Código -->
+
+          @if (error()) {
+            <p class="code-error" role="alert">{{ error() | t }}</p>
+          } @else if (notice()) {
+            <p class="code-notice" role="status">{{ notice() | t }}</p>
+          }
+
+          <!-- Timer and code resend section -->
           <div class="timer-section">
             <span class="timer">
-              {{ tiempoFormateado }}
+              {{ canResend() ? '¿No te llegó?' : 'Reenviar en ' + formattedTime() | t }}
             </span>
             <button
               type="button"
               class="resend-link"
-              [class.resend-link--disabled]="!puedeReenviar"
-              [disabled]="!puedeReenviar"
-              (click)="reenviarCodigo()">
-              Reenviar código
+              [class.resend-link--disabled]="!canResend()"
+              [disabled]="!canResend()"
+              (click)="resendCode()">
+              {{ 'Reenviar código' | t }}
             </button>
           </div>
-  
-          <!-- Botón de Verificación -->
+          <!-- Verification button -->
           <button
             class="btn-submit"
             type="submit"
-            [disabled]="!codigoCompleto">
+            [disabled]="!fullCode() || verifying()">
             <i class="fa-solid fa-shield-halved"></i>
-            VERIFICAR CÓDIGO
+            {{ verifying() ? 'VERIFICANDO…' : 'VERIFICAR CÓDIGO' | t }}
           </button>
-  
         </form>
   
-        <!-- Pie de Tarjeta (Cambiar Método de Recuperación) -->
+        <!-- Card footer (change recovery method) -->
         <p class="card__footer">
           <span
             class="form__link"
-            (click)="cambiarMetodo()">
-            Cambiar método de recuperación
+            (click)="changeEmail()">
+            {{ 'Usar otro correo' | t }}
           </span>
         </p>
   

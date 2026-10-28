@@ -1,30 +1,32 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { TPipe } from '../../../core/i18n/i18n';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DeviceService, Device, DeviceStats } from '../../../core/services/device.service';
+import { DeviceService, Device, DeviceStats, DevicePermission } from '../../../core/services/device.service';
 import { Observable, Subject } from 'rxjs';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-device-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule],
   templateUrl: './devices-management.html',
   styleUrls: ['./devices-management.scss']
 })
 export class DeviceManagementComponent implements OnInit, OnDestroy {
 
-  // Propiedades para la visualización de datos
+  // Properties for data display
   devices: Device[] = [];
   filteredDevices: Device[] = [];
 
-  // Propiedades para filtros y paginación
+  // Properties for filters and pagination
   searchTerm: string = '';
   filterStatus: string = 'all';
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
 
-  // Estadísticas
+  // Stats
   stats$: Observable<DeviceStats>;
   stats: DeviceStats = {
     totalDevices: 0,
@@ -35,29 +37,26 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   };
 
   // Estados UI
-  cargando = false;
+  loading = false;
   error = '';
-  dispositivoSeleccionado: Device | null = null;
-  mostrarModalVer = false;
-  mostrarModalEditar = false;
-  mostrarModalCrear = false;
+  selectedDevice: Device | null = null;
+  showViewModal = false;
+  showEditModal = false;
   
   // Estados de dropdowns personalizados
   isStatusDropdownOpen = false;
-  isTypeDropdownOpenCrear = false;
-  isStatusDropdownOpenCrear = false;
-  isTypeDropdownOpenEditar = false;
-  isStatusDropdownOpenEditar = false;
+  isEditTypeDropdownOpen = false;
+  isEditStatusDropdownOpen = false;
   
-  // Handler para cerrar dropdowns al hacer clic fuera
+  // Handler to close dropdowns when clicking outside
   private clickHandler: (() => void) | null = null;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private deviceService: DeviceService) {
+  constructor(private deviceService: DeviceService, private cdr: ChangeDetectorRef) {
     this.stats$ = this.deviceService.stats$;
     
-    // Cerrar dropdowns al hacer clic fuera de ellos
+    // Close dropdowns when clicking outside them
     this.clickHandler = () => {
       this.isStatusDropdownOpen = false;
     };
@@ -65,13 +64,25 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cargarDatos();
+    this.loadData();
+  }
+
+  permissionsReady(permissions: DevicePermission[]): number {
+    return permissions.filter((p) => p.ready).length;
+  }
+
+  gpsText(status?: string | null): string {
+    // Valores de identity.device.gps_status
+    const texts: Record<string, string> = {
+      active: 'Encendido', inactive: 'Apagado', denied: 'Sin permiso', unknown: 'Desconocido',
+    };
+    return status ? texts[status] ?? status : 'Sin informar';
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Remover listener de clic para evitar memory leaks
+    // Remove the click listener to avoid memory leaks
     if (this.clickHandler) {
       document.removeEventListener('click', this.clickHandler);
     }
@@ -81,54 +92,57 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // CARGA DE DATOS
   // ========================================
 
-  private cargarDatos(): void {
-    this.cargando = true;
+  private loadData(): void {
+    this.loading = true;
     
     this.deviceService.getAll().subscribe({
       next: (devices) => {
         this.devices = devices;
         this.filteredDevices = devices;
         this.updatePagination();
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar los dispositivos';
-        this.cargando = false;
+        this.loading = false;
         console.error('Error cargando dispositivos:', err);
+        this.cdr.detectChanges();
       }
     });
 
     this.stats$.subscribe({
       next: (stats) => {
-        console.log('Estadísticas actualizadas:', stats);
         this.stats = stats;
+        this.cdr.detectChanges();
       }
     });
   }
 
   /**
-   * Aplica los filtros de búsqueda y estado a la lista
+   * Applies the search and status filters to the list
    */
   applyFilters(): void {
-    this.cargando = true;
-    this.currentPage = 1; // Resetear a primera página
+    this.loading = true;
+    this.currentPage = 1; // Reset to the first page
 
-    const filtros = {
-      busqueda: this.searchTerm,
-      estado: this.filterStatus,
-      fechaInicio: null,
-      fechaFin: null
+    const filters = {
+      search: this.searchTerm,
+      status: this.filterStatus,
+      startDate: null,
+      endDate: null
     };
 
-    this.deviceService.filtrarDispositivos(filtros).subscribe({
+    this.deviceService.filterDevices(filters).subscribe({
       next: (devices) => {
         this.filteredDevices = devices;
         this.updatePagination();
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al filtrar dispositivos';
-        this.cargando = false;
+        this.loading = false;
         console.error('Error filtrando:', err);
       }
     });
@@ -143,7 +157,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Lógica de paginación
+  // Pagination logic
   get paginatedDevices(): Device[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredDevices.slice(startIndex, startIndex + this.itemsPerPage);
@@ -171,24 +185,21 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  getPagesArray(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
+  getPagesArray(): (number | null)[] {
+    return compactPages(this.currentPage, this.totalPages);
   }
 
   /**
-   * Helper para asignar la clase CSS correcta al badge de estado del dispositivo
+   * Helper that assigns the right CSS class to the device status badge
    */
-  getDeviceStatusBadgeClass(status: 'Activo' | 'Inactivo' | 'Bloqueado'): string {
+  getDeviceStatusBadgeClass(status: Device['status']): string {
     switch (status) {
       case 'Activo':
         return 'status-active';
       case 'Inactivo':
         return 'status-inactive';
       case 'Bloqueado':
+      case 'Perdido':
         return 'status-blocked';
       default:
         return '';
@@ -196,14 +207,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Helper para asignar la clase CSS correcta al badge de tipo de dispositivo
+   * Helper that assigns the right CSS class to the device type badge
    */
   getDeviceTypeBadgeClass(type: 'Android'): string {
     return 'badge-android';
   }
 
   /**
-   * Función trackBy para optimizar el rendimiento de las listas de Angular
+   * trackBy function to optimize the performance of Angular lists
    */
   trackByIndex(index: number): number {
     return index;
@@ -214,16 +225,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   /**
-   * Ver detalles de un dispositivo
+   * View the details of a device
    */
-  verDispositivo(id: number): void {
-    console.log('verDispositivo llamado con ID:', id);
+  viewDevice(id: number): void {
     this.deviceService.getById(id).subscribe({
       next: (device) => {
-        console.log('Dispositivo cargado:', device);
-        this.dispositivoSeleccionado = device;
-        this.mostrarModalVer = true;
-        console.log('Modal ver debería mostrarse');
+        this.selectedDevice = device;
+        this.showViewModal = true;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar el dispositivo';
@@ -233,56 +242,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Abrir modal para crear un nuevo dispositivo
+   * Open the modal to edit a device
    */
-  abrirModalCrear(): void {
-    console.log('abrirModalCrear llamado');
-    this.dispositivoSeleccionado = {
-      id: 0,
-      name: '',
-      osVersion: '',
-      user: { name: '', email: '' },
-      type: 'Android',
-      imei: '',
-      phone: '',
-      status: 'Activo',
-      lastSync: '',
-      icon: 'fa-brands fa-android'
-    };
-    this.mostrarModalCrear = true;
-    console.log('Modal crear debería mostrarse');
-  }
-
-  /**
-   * Crear un nuevo dispositivo
-   */
-  crearDispositivo(device: Omit<Device, 'id'>): void {
-    this.cargando = true;
-    this.deviceService.create(device).subscribe({
-      next: (nuevoDevice) => {
-        this.cargarDatos();
-        this.mostrarModalCrear = false;
-        this.cargando = false;
-      },
-      error: (err) => {
-        this.error = 'Error al crear dispositivo';
-        this.cargando = false;
-        console.error('Error creando dispositivo:', err);
-      }
-    });
-  }
-
-  /**
-   * Abrir modal para editar un dispositivo
-   */
-  abrirModalEditar(id: number): void {
-    console.log('abrirModalEditar llamado con ID:', id);
+  openEditModal(id: number): void {
     this.deviceService.getById(id).subscribe({
       next: (device) => {
-        console.log('Dispositivo cargado para editar:', device);
-        this.dispositivoSeleccionado = device;
-        this.mostrarModalEditar = true;
-        console.log('Modal editar debería mostrarse');
+        this.selectedDevice = device;
+        this.showEditModal = true;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Error al cargar el dispositivo';
@@ -294,17 +261,18 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   /**
    * Actualizar un dispositivo
    */
-  actualizarDispositivo(device: Device): void {
-    this.cargando = true;
+  updateDevice(device: Device): void {
+    this.loading = true;
     this.deviceService.update(device.id, device).subscribe({
       next: () => {
-        this.cargarDatos();
-        this.mostrarModalEditar = false;
-        this.cargando = false;
+        this.loadData();
+        this.showEditModal = false;
+        this.loading = false;
       },
       error: (err) => {
         this.error = 'Error al actualizar dispositivo';
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error actualizando dispositivo:', err);
       }
     });
@@ -313,17 +281,18 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   /**
    * Eliminar un dispositivo
    */
-  eliminarDispositivo(id: number): void {
+  deleteDevice(id: number): void {
     if (confirm('¿Estás seguro de eliminar este dispositivo?')) {
-      this.cargando = true;
+      this.loading = true;
       this.deviceService.delete(id).subscribe({
         next: () => {
-          this.cargarDatos();
-          this.cargando = false;
+          this.loadData();
+          this.loading = false;
         },
         error: (err) => {
           this.error = 'Error al eliminar dispositivo';
-          this.cargando = false;
+          this.loading = false;
+          this.cdr.detectChanges();
           console.error('Error eliminando dispositivo:', err);
         }
       });
@@ -331,18 +300,19 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cambiar estado de un dispositivo
+   * Change the status of a device
    */
-  cambiarEstadoDispositivo(id: number, nuevoEstado: 'Activo' | 'Inactivo' | 'Bloqueado'): void {
-    this.cargando = true;
-    this.deviceService.cambiarEstado(id, nuevoEstado).subscribe({
+  changeDeviceStatus(id: number, newStatus: Device['status']): void {
+    this.loading = true;
+    this.deviceService.changeStatus(id, newStatus).subscribe({
       next: () => {
-        this.cargarDatos();
-        this.cargando = false;
+        this.loadData();
+        this.loading = false;
       },
       error: (err) => {
         this.error = 'Error al cambiar estado';
-        this.cargando = false;
+        this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error cambiando estado:', err);
       }
     });
@@ -352,19 +322,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // MODALES
   // ========================================
 
-  cerrarModalVer(): void {
-    this.mostrarModalVer = false;
-    this.dispositivoSeleccionado = null;
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedDevice = null;
   }
 
-  cerrarModalEditar(): void {
-    this.mostrarModalEditar = false;
-    this.dispositivoSeleccionado = null;
-  }
-
-  cerrarModalCrear(): void {
-    this.mostrarModalCrear = false;
-    this.dispositivoSeleccionado = null;
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedDevice = null;
   }
 
   // ========================================
@@ -376,76 +341,48 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
   }
 
-  selectStatus(estado: string, event: Event): void {
+  selectStatus(status: string, event: Event): void {
     event.stopPropagation();
-    this.filterStatus = estado;
+    this.filterStatus = status;
     this.isStatusDropdownOpen = false;
-    console.log('Seleccionado estado:', estado);
     this.applyFilters();
   }
 
-  getStatusLabel(estado: string): string {
-    switch (estado) {
+  getStatusLabel(status: string): string {
+    switch (status) {
       case 'all': return 'Todos los estados';
       case 'Activo': return 'Activo';
       case 'Inactivo': return 'Inactivo';
       case 'Bloqueado': return 'Bloqueado';
-      default: return estado;
+      default: return status;
     }
-  }
-
-  // Dropdowns para modal crear
-  toggleTypeDropdownCrear(event: Event): void {
-    event.stopPropagation();
-    this.isTypeDropdownOpenCrear = !this.isTypeDropdownOpenCrear;
-  }
-
-  selectTypeCrear(tipo: string, event: Event): void {
-    event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.type = tipo as 'Android';
-    }
-    this.isTypeDropdownOpenCrear = false;
-  }
-
-  toggleStatusDropdownCrear(event: Event): void {
-    event.stopPropagation();
-    this.isStatusDropdownOpenCrear = !this.isStatusDropdownOpenCrear;
-  }
-
-  selectStatusCrear(estado: string, event: Event): void {
-    event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.status = estado as 'Activo' | 'Inactivo' | 'Bloqueado';
-    }
-    this.isStatusDropdownOpenCrear = false;
   }
 
   // Dropdowns para modal editar
-  toggleTypeDropdownEditar(event: Event): void {
+  toggleEditTypeDropdown(event: Event): void {
     event.stopPropagation();
-    this.isTypeDropdownOpenEditar = !this.isTypeDropdownOpenEditar;
+    this.isEditTypeDropdownOpen = !this.isEditTypeDropdownOpen;
   }
 
-  selectTypeEditar(tipo: string, event: Event): void {
+  selectEditType(type: string, event: Event): void {
     event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.type = tipo as 'Android';
+    if (this.selectedDevice) {
+      this.selectedDevice.type = type as 'Android';
     }
-    this.isTypeDropdownOpenEditar = false;
+    this.isEditTypeDropdownOpen = false;
   }
 
-  toggleStatusDropdownEditar(event: Event): void {
+  toggleEditStatusDropdown(event: Event): void {
     event.stopPropagation();
-    this.isStatusDropdownOpenEditar = !this.isStatusDropdownOpenEditar;
+    this.isEditStatusDropdownOpen = !this.isEditStatusDropdownOpen;
   }
 
-  selectStatusEditar(estado: string, event: Event): void {
+  selectEditStatus(status: string, event: Event): void {
     event.stopPropagation();
-    if (this.dispositivoSeleccionado) {
-      this.dispositivoSeleccionado.status = estado as 'Activo' | 'Inactivo' | 'Bloqueado';
+    if (this.selectedDevice) {
+      this.selectedDevice.status = status as Device['status'];
     }
-    this.isStatusDropdownOpenEditar = false;
+    this.isEditStatusDropdownOpen = false;
   }
 
 }

@@ -100,8 +100,8 @@
     cursor: not-allowed;
   }
   
-  &--primario {
-    background: #380759;
+  &--primary {
+    background: var(--color-acento);
     color: #fff;
   }
   
@@ -123,9 +123,9 @@
   border-radius: 50px;
   white-space: nowrap;
 
-  &--exito { background: rgba(16, 185, 129, 0.15); color: #059669; }
-  &--advertencia { background: rgba(217, 119, 6, 0.15); color: #b45309; }
-  &--peligro { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+  &--success { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--warning { background: rgba(147, 6, 217, 0.15); color: #7b09b4; }
+  &--danger { background: rgba(192, 38, 211, 0.15); color: #cb1ce6; }
   &--neutral { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
 }
 
@@ -137,8 +137,8 @@
   padding: 0.75rem;
   margin-bottom: 1rem;
   border-radius: 10px;
-  background: rgba(8, 145, 178, 0.08);
-  border: 1px solid rgba(8, 145, 178, 0.2);
+  background: rgba(91, 33, 182, 0.08);
+  border: 1px solid rgba(91, 33, 182, 0.2);
   font-size: var(--font-size-xs);
   color: var(--color-texto-secundario);
   line-height: 1.4;
@@ -197,16 +197,6 @@
 }
 
 // ── ITEMS DE PERMISOS ───────────────────────────────
-.device-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 1rem 0.75rem;
-  border-radius: 12px;
-  background: var(--color-fondo);
-}
 
 .device-item__icon {
   width: 40px;
@@ -218,9 +208,9 @@
   font-size: 1.2rem;
   flex-shrink: 0;
   
-  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--danger { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
   &--neutral { background: rgba(107, 114, 128, 0.12); color: #6b7280; }
 }
 
@@ -276,21 +266,8 @@
   color: var(--color-texto-secundario);
 }
 
-// ── INFORMACIÓN DEL DISPOSITIVO ─────────────────────
-.device-info-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
+// ── DEVICE INFORMATION ─────────────────────
 
-.device-info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0.75rem;
-  border-radius: 10px;
-  background: var(--color-fondo);
-}
 
 .device-info-item__label {
   font-size: var(--font-size-xs);
@@ -323,10 +300,10 @@
   font-size: 1.2rem;
   flex-shrink: 0;
 
-  &--exito { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-  &--advertencia { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--peligro { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-  &--acento { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--danger { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
+  &--accent { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
 }
 
 .device-feature-item__body {
@@ -374,10 +351,10 @@
   font-size: 1rem;
   flex-shrink: 0;
 
-  &--info { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
-  &--warning { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-  &--error { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-  &--success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  &--info { background: rgba(91, 33, 182, 0.12); color: #5b21b6; }
+  &--warning { background: rgba(147, 6, 217, 0.12); color: #9306d9; }
+  &--error { background: rgba(192, 38, 211, 0.12); color: #c026d3; }
+  &--success { background: rgba(89, 16, 185, 0.12); color: #5910b9; }
 }
 
 .device-activity-item__body {
@@ -473,7 +450,7 @@
   gap: 8px;
   padding: 1rem;
   border-radius: 12px;
-  background: #380759;
+  background: var(--color-acento);
   border: none;
   color: #fff;
   font-size: var(--font-size-sm);
@@ -509,5 +486,529 @@
   .device-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+
+// ── Mis celulares ──────────────────────────────
+.device-phones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-phone {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+
+  &:hover {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.18);
+  }
+
+  &--pc .device-phone__icon {
+    background: linear-gradient(135deg, #6d28d9, #3b0764);
+  }
+
+  &__chevron {
+    color: var(--color-texto-secundario, #6b5b95);
+  }
+
+  border: 1px solid var(--color-borde, #e5ddff);
+  border-radius: 12px;
+  background: var(--color-fondo, rgba(124, 58, 237, 0.06));
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: #fff;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__name {
+    font-weight: 700;
+    color: var(--color-texto-principal, #1f1535);
+  }
+
+  &__meta {
+    font-size: 12.5px;
+    color: var(--color-texto-secundario, #6b5b95);
+  }
+
+  &__last {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+
+// ── Device detail ──────────────────
+.dd-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(20, 8, 40, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.dd-modal {
+  width: min(480px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  border-radius: 18px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #1f1535);
+  border: 1px solid var(--border, #e4dcf7);
+  box-shadow: 0 24px 60px rgba(76, 29, 149, 0.35);
+}
+
+.dd-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 20px 8px;
+
+  h2 { margin: 0; font-size: 18px; font-weight: 700; }
+  p { margin: 2px 0 0; font-size: 13px; color: var(--text-muted, #6b5b95); }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #a855f7, #6d28d9);
+    color: #fff;
+    font-size: 22px;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+  }
+}
+
+.dd-close {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted, #6b5b95);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.dd-list {
+  margin: 0;
+  padding: 8px 20px;
+}
+
+.dd-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border, #eee7fb);
+  font-size: 14px;
+
+  &:last-child { border-bottom: 0; }
+
+  dt { color: var(--text-muted, #6b5b95); }
+  dd { margin: 0; font-weight: 600; text-align: right; }
+}
+
+.dd-note {
+  margin: 4px 20px 20px;
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(168, 85, 247, 0.1);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-primary, #1f1535);
+}
+
+// ── PHONE PERMISSIONS (reported by the app) ───────
+.device-perm-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(192, 38, 211, 0.35);
+  background: rgba(192, 38, 211, 0.08);
+  color: var(--color-texto-principal);
+  font-size: var(--font-size-sm);
+
+  i { font-size: 22px; color: #a21caf; }
+  div { display: flex; flex-direction: column; gap: 2px; }
+  span { color: var(--color-texto-secundario); }
+}
+
+.device-perm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--color-borde);
+  background: var(--color-superficie);
+  transition: background 0.2s;
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    font-size: 20px;
+    background: rgba(107, 114, 128, 0.12);
+    color: #6b7280;
+  }
+
+  &__body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  &__title { font-weight: 700; font-size: var(--font-size-sm); color: var(--color-texto-principal); }
+  &__desc { font-size: var(--font-size-xs); color: var(--color-texto-secundario); }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    white-space: nowrap;
+    background: rgba(192, 38, 211, 0.12);
+    color: #a21caf;
+  }
+
+  &--ok {
+    border: 1.5px solid transparent;
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+
+    .device-perm__icon { background: rgba(255, 255, 255, 0.18); color: #fff; }
+    .device-perm__title { color: #fff; }
+    .device-perm__desc { color: rgba(255, 255, 255, 0.8); }
+    .device-perm__status { background: rgba(255, 255, 255, 0.2); color: #fff; }
+  }
+
+  &__date {
+    margin: 12px 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-texto-secundario);
+  }
+}
+
+// ── TEST RESULT (same window as the detail) ───
+.dd-modal--ok .dd-head__icon { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
+.dd-modal--aviso .dd-head__icon { background: linear-gradient(135deg, #c026d3, #7e22ce); }
+.dd-modal--error .dd-head__icon { background: linear-gradient(135deg, #a21caf, #4c1d95); }
+
+.dd-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 20px 12px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-decoration: none;
+}
+
+.dd-ok {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 4px 20px 20px;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.device-principal {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+
+// =============================================
+// BOTONES Y TARJETAS CON EL COLOR DEL MÓDULO ACTIVO DE LA BARRA LATERAL
+// + LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$dv-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+
+// Mismo morado (no tan brillante) que el módulo activo
+.device-perm--ok,
+.device-btn--primary,
+.device-action-btn,
+.device-principal,
+.dd-ok { background: $dv-accent !important; }
+
+// Modo claro: el morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  .device-panel,
+  .device-btn--icon,
+  .device-permissions-note,
+  .device-list-item--highlight,
+  .device-test-btn,
+  .device-phone,
+  .dd-modal { border: 2px solid var(--am-line, #6d5bb8) !important; }
+
+  .device-perm { border: 2px dashed var(--am-line, #6d5bb8) !important; }
+  .device-perm--ok { border: 2px solid transparent !important; }
+
+  .dd-row { border-bottom: 2px solid var(--am-line-soft, #8878c6) !important; }
+  .dd-row:last-child { border-bottom: 0 !important; }
+
+  .device-perm-notice { border-width: 2px !important; }
+
+  // Los mismos colores de antes al pasar el mouse
+  .device-phone:hover { border-color: #a855f7 !important; }
+  .device-test-btn:hover:not(:disabled) { border-color: var(--color-principal) !important; }
+
+  // Textos de los botones de prueba que casi no se leían en modo claro
+  .device-test-btn { color: var(--purple-deep, #5b21b6); }
+  .device-test-btn:hover:not(:disabled) { color: #fff; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .device-panel,
+  .device-btn--icon,
+  .device-permissions-note,
+  .device-list-item--highlight,
+  .device-test-btn,
+  .device-phone,
+  .dd-modal { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .device-perm { border: 2px dashed var(--border, #4c3a80) !important; }
+  .device-perm--ok { border: 2px solid transparent !important; }
+
+  .dd-row { border-bottom: 2px solid var(--border, #4c3a80) !important; }
+  .dd-row:last-child { border-bottom: 0 !important; }
+
+  .device-perm-notice { border-width: 2px !important; }
+
+  // Los mismos colores de antes al pasar el mouse
+  .device-phone:hover { border-color: #a855f7 !important; }
+  .device-test-btn:hover:not(:disabled) { border-color: var(--color-principal) !important; }
+
+  // Etiquetas ("21 h 3 min", "Activo") que no se veían en modo oscuro
+  .device-badge--success { background: rgba(183, 155, 245, 0.18); color: #c4a1ff; }
+  .device-badge--warning { background: rgba(215, 140, 255, 0.18); color: #d98cff; }
+  .device-badge--neutral { color: var(--text-muted, #a8a0c4); }
+}
+
+
+// =============================================
+// CELULAR: sin márgenes dobles, las filas de servicios ponen la
+// etiqueta debajo del texto y las tarjetas van una por fila
+// =============================================
+@media (max-width: 600px) {
+  .device-wrap { padding: 0; }
+
+  .device-list-item {
+    flex-wrap: wrap;
+    row-gap: 6px;
+
+    .device-badge { margin-left: auto; }
+  }
+
+  .device-list-item__body { flex-basis: calc(100% - 40px); }
+}
+
+@media (max-width: 480px) {
+  .device-grid--4col,
+  .device-grid--5col { grid-template-columns: 1fr; }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE "ESTADO DEL DISPOSITIVO"
+// (nada se sale de su tarjeta en ningún tamaño de pantalla)
+// =============================================
+
+// Las tarjetas de las cuadrículas se pueden encoger (antes empujaban hacia afuera)
+.device-row > *,
+.device-grid > *,
+.device-test-grid > *,
+.device-actions-grid > * { min-width: 0; }
+
+// Permisos: caben las que quepan por fila (3 en PC, 2 en tablet, 1 en celular)
+.device-grid--3col {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+}
+
+// Tarjeta de permiso: si no cabe, el "Listo / Falta" baja debajo del texto
+.device-perm {
+  flex-wrap: wrap;
+  row-gap: 8px;
+
+  &__body { flex: 1 1 130px; }
+  &__status { margin-left: auto; }
+}
+
+.device-perm__title,
+.device-perm__desc,
+.device-list-item__label,
+.device-list-item__details,
+.device-feature-item__value,
+.device-activity-item__message,
+.device-phone__name,
+.device-phone__meta,
+.device-subtitle { overflow-wrap: anywhere; }
+
+// Mis dispositivos: la etiqueta "Recibe alertas" baja si el nombre no cabe
+.device-phone {
+  flex-wrap: wrap;
+  row-gap: 8px;
+
+  &__body { flex: 1 1 150px; }
+  .device-badge { margin-left: auto; }
+}
+
+// Encabezado: el título no empuja el botón de refrescar
+.device-header > :first-child { min-width: 0; }
+
+// Ventana de detalle: los valores largos bajan de línea
+.dd-row dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+// Celular
+@media (max-width: 600px) {
+  .device-panel { padding: 0.9rem; }
+  .device-title { font-size: 1.3rem; }
+  .device-panel__title { font-size: 1rem; }
+  .device-perm-notice,
+  .device-permissions-note { padding: 10px; }
+  .device-feature-item { padding: 0.75rem; }
+  .device-test-btn { padding: 1rem 0.75rem; }
+}
+
+// Celular chico: sin la flechita de "ver más" (la tarjeta completa se sigue pudiendo tocar)
+@media (max-width: 420px) {
+  .device-phone__chevron { display: none; }
+}
+
+// Celulares muy angostos
+@media (max-width: 360px) {
+  .device-panel { padding: 0.75rem; }
+  .device-perm,
+  .device-phone,
+  .device-list-item { padding: 10px; gap: 10px; }
+  .device-perm__icon,
+  .device-phone__icon { width: 34px; height: 34px; font-size: 17px; }
+  .dd-head { padding: 16px 16px 8px; }
+  .dd-list { padding: 8px 16px; }
+}
+
+// Texto de los botones de pruebas: centrado y sin salirse
+.device-test-btn span { max-width: 100%; text-align: center; overflow-wrap: break-word; }
+
+// =============================================
+// CELULARES MUY ANGOSTOS: cada cajita en columna
+// (ícono arriba, texto a lo ancho, etiqueta debajo)
+// =============================================
+@media (max-width: 480px) {
+  .device-wrap { padding: 0.75rem 0; }
+  .device-header > :first-child { width: 100%; }
+}
+
+@media (max-width: 300px) {
+  .device-wrap { gap: 0.85rem; }
+  .device-title { font-size: 1.15rem; }
+  .device-panel { padding: 0.6rem; }
+  .device-panel__title { font-size: 0.95rem; align-items: flex-start; overflow-wrap: anywhere; min-width: 0; }
+
+  // Ícono del título arriba y el texto debajo
+  .device-header .page-title-row { flex-direction: column; gap: 8px; }
+
+  .device-permissions-note,
+  .device-perm-notice { flex-direction: column; gap: 6px; }
+
+  // Permisos, servicios, dispositivos, funcionalidades y actividad
+  .device-perm,
+  .device-list-item,
+  .device-phone,
+  .device-feature-item,
+  .device-activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .device-perm__body,
+  .device-list-item__body,
+  .device-phone__body,
+  .device-feature-item__body,
+  .device-activity-item__body {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  // Etiquetas (Listo, Activo, Sin notificaciones, 23 h 50 min…) sin salirse
+  .device-perm__status,
+  .device-badge {
+    margin-left: 0;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .device-perm-notice div { min-width: 0; width: 100%; }
+  .device-feature-item__label,
+  .device-activity-item__time { overflow-wrap: anywhere; }
+  .device-perm-notice strong,
+  .device-perm-notice span { overflow-wrap: anywhere; }
+
+  // Botones de pruebas y acciones: ícono arriba y texto centrado
+  .device-test-btn,
+  .device-action-btn {
+    flex-direction: column;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+
+    span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
   }
 }

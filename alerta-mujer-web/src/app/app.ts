@@ -9,5 +9,5 @@ import { AccentColorService } from './core/theme/accent-color.service';
   styleUrl: './app.scss',
 })
 export class App {
-  private readonly accentColorService = inject(AccentColorService); // fuerza su creación al arrancar
+  private readonly accentColorService = inject(AccentColorService); // forces its creation at startup
 }

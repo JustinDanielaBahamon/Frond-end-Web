@@ -8,15 +8,15 @@
     
                 <div class="footer-logo">
     
-                    <img src="./logo.png" alt="Logo">
+                    <img src="./logo.png" [alt]="'Logo' | t">
     
-                    <h3>Alerta Mujer</h3>
+                    <h3>{{ 'Alerta Mujer' | t }}</h3>
     
                 </div>
     
                 <p>
-                    Tu seguridad es nuestra misión.<br>
-                    Juntas somos más fuertes.
+                    {{ 'Tu seguridad es nuestra misión.' | t }}<br>
+                    {{ 'Juntas somos más fuertes.' | t }}
                 </p>
     
             </div>
@@ -25,17 +25,17 @@
     
             <div class="footer-links">
     
-                <h4>Enlaces</h4>
+                <h4>{{ 'Enlaces' | t }}</h4>
     
-                <a href="">Inicio</a>
+                <a href="">{{ 'Inicio' | t }}</a>
     
-                <a href="">Nosotros</a>
+                <a href="">{{ 'Nosotros' | t }}</a>
     
-                <a href="">Servicios</a>
+                <a href="">{{ 'Servicios' | t }}</a>
     
-                <a href="">FAQ</a>
+                <a href="">{{ 'FAQ' | t }}</a>
     
-                <a href="">Contacto</a>
+                <a href="">{{ 'Contacto' | t }}</a>
     
             </div>
     
@@ -43,13 +43,13 @@
     
             <div class="footer-links">
     
-                <h4>Legal</h4>
+                <h4>{{ 'Legal' | t }}</h4>
     
-                <a href="">Política de Privacidad</a>
+                <a href="">{{ 'Política de Privacidad' | t }}</a>
     
-                <a href="">Términos y Condiciones</a>
+                <a href="">{{ 'Términos y Condiciones' | t }}</a>
     
-                <a href="">Aviso Legal</a>
+                <a href="">{{ 'Aviso Legal' | t }}</a>
     
             </div>
     
@@ -57,7 +57,7 @@
     
             <div class="footer-social">
     
-                <h4>Síguenos</h4>
+                <h4>{{ 'Síguenos' | t }}</h4>
     
                 <div class="social-icons">
     
@@ -79,7 +79,7 @@
     
         <p class="copyright">
     
-            © 2025 Alerta Mujer. Todos los derechos reservados.
+            {{ '© 2025 Alerta Mujer. Todos los derechos reservados.' | t }}
     
         </p>
     

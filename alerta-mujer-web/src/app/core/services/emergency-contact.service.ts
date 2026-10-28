@@ -2,55 +2,62 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ContactoEmergencia, EmergencyContactApi } from '../models/emergency-contact.model';
+import { EmergencyContact, EmergencyContactApi } from '../models/emergency-contact.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmergencyContactService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/api/contacts`;
 
-  // Transforma EmergencyContactApi del backend a ContactoEmergencia del frontend
-  private mapApiToContact(api: EmergencyContactApi): ContactoEmergencia {
+  // Transforms the backend EmergencyContactApi into the frontend EmergencyContact
+  private mapApiToContact(api: EmergencyContactApi): EmergencyContact {
     return {
       id: api.id,
-      usuarioId: api.userProfileId,
-      nombre: api.contactName,
-      telefono: api.telephone,
-      relacion: api.relationship || 'Otro',
-      prioridad: 1, // El backend no tiene prioridad, valor por defecto
-      activo: true, // El backend no tiene activo, valor por defecto
+      userId: api.userProfileId,
+      name: api.contactName,
+      telephone: api.telephone,
+      email: api.email,
+      relationship: api.relationship || 'Otro',
+      photo: api.photo || null,
     };
   }
 
-  // Transforma ContactoEmergencia del frontend al formato del backend
-  private mapContactToApi(contacto: Omit<ContactoEmergencia, 'id'>): any {
+  // Transforms the frontend EmergencyContact into the backend format
+  private mapContactToApi(contact: Omit<EmergencyContact, 'id'>): any {
     return {
-      // No enviamos userProfileId, el backend lo establece automáticamente
-      contactName: contacto.nombre,
-      telephone: contacto.telefono,
-      relationship: contacto.relacion,
+      // We do not send userProfileId, the backend sets it automatically
+      contactName: contact.name,
+      telephone: contact.telephone,
+      // The email is the channel through which the contact receives the notice when an alert is activated
+      email: contact.email?.trim() || null,
+      relationship: contact.relationship,
+      photo: contact.photo || undefined,
     };
   }
 
-  getByUsuario(usuarioId: number): Observable<ContactoEmergencia[]> {
-    return this.http.get<EmergencyContactApi[]>(`${this.url}/user/${usuarioId}`).pipe(
+  getByUser(userId: number): Observable<EmergencyContact[]> {
+    return this.http.get<EmergencyContactApi[]>(`${this.url}/user/${userId}`).pipe(
       map(contacts => contacts.map(c => this.mapApiToContact(c)))
     );
   }
 
-  create(contacto: Omit<ContactoEmergencia, 'id'>): Observable<ContactoEmergencia> {
-    const apiData = this.mapContactToApi(contacto);
+  create(contact: Omit<EmergencyContact, 'id'>): Observable<EmergencyContact> {
+    const apiData = this.mapContactToApi(contact);
     return this.http.post<EmergencyContactApi>(this.url, apiData).pipe(
       map(api => this.mapApiToContact(api))
     );
   }
 
-  update(id: number, contacto: Partial<ContactoEmergencia>): Observable<ContactoEmergencia> {
+  update(id: number, contact: Partial<EmergencyContact>): Observable<EmergencyContact> {
     const apiData: any = {};
-    if (contacto.nombre !== undefined) apiData.contactName = contacto.nombre;
-    if (contacto.telefono !== undefined) apiData.telephone = contacto.telefono;
-    if (contacto.relacion !== undefined) apiData.relationship = contacto.relacion;
-    return this.http.patch<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
+    if (contact.name !== undefined) apiData.contactName = contact.name;
+    if (contact.telephone !== undefined) apiData.telephone = contact.telephone;
+    if (contact.relationship !== undefined) apiData.relationship = contact.relationship;
+    if (contact.email !== undefined) apiData.email = contact.email?.trim() || null;
+    // "" removes the photo; without the field it is left untouched
+    if (contact.photo !== undefined) apiData.photo = contact.photo ?? '';
+    // The backend exposes PUT (not PATCH) and only changes the sent fields
+    return this.http.put<EmergencyContactApi>(`${this.url}/${id}`, apiData).pipe(
       map(api => this.mapApiToContact(api))
     );
   }

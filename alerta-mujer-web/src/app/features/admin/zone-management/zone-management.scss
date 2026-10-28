@@ -1,0 +1,771 @@
+@use '../../../shared/styles/variables.scss' as *;
+
+$blue:   #6d28d9;
+$orange: #a855f7;
+$yellow: #c084fc;
+
+// Soft background of the given color, valid in light and dark
+@function tint($color, $pct: 16%) {
+  @return color-mix(in srgb, #{$color} #{$pct}, transparent);
+}
+
+// =============================================
+// PÁGINA
+// =============================================
+.risk-zones {
+  padding: 30px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  background: $bg-base;
+  color: $text-primary;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+
+  h1 { margin: 0; font-size: 2rem; font-weight: 700; color: $text-primary; }
+  p  { margin: 5px 0 0; font-size: 0.92rem; color: $text-muted; }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, $purple-deep 0%, $pink 100%);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 18px tint($purple-deep, 35%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px tint($purple-deep, 45%);
+  }
+}
+
+// =============================================
+// ESTADÍSTICAS
+// =============================================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px;
+  background: $bg-card;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+
+  .stat-info {
+    min-width: 0;
+
+    span { font-size: 0.85rem; color: $text-muted; }
+    h2   { margin: 8px 0 0; font-size: 2rem; font-weight: 700; color: $text-primary; }
+  }
+
+  .stat-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    color: #fff;
+  }
+
+  &.purple .stat-icon { background: $purple-deep; }
+  &.red    .stat-icon { background: $red; }
+  &.green  .stat-icon { background: $green; }
+  &.blue   .stat-icon { background: $blue; }
+}
+
+// =============================================
+// FILTROS
+// =============================================
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  padding: 16px 20px;
+  background: $bg-card;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  background: $bg-base;
+
+  i { margin-right: 10px; color: $text-muted; }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: $text-primary;
+    font-size: 0.9rem;
+    font-family: inherit;
+
+    &::placeholder { color: $text-dim; }
+  }
+
+  &:focus-within { border-color: $purple-deep; }
+}
+
+.toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  padding: 8px 14px;
+  border: 1.5px solid $border;
+  border-radius: 999px;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+  &.active { border-color: transparent; background: $purple-deep; color: #fff; }
+}
+
+// =============================================
+// TABLA
+// =============================================
+.table-card {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: $bg-card;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+
+  table { width: 100%; min-width: 760px; border-collapse: collapse; }
+  thead { background: $purple-pale; }
+
+  th {
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: $text-muted;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 16px 20px;
+    border-top: 1px solid $border;
+    font-size: 0.88rem;
+    color: $text-muted;
+  }
+
+  tbody tr { transition: background-color 0.15s; }
+  tbody tr:hover { background: $bg-card-hover; }
+}
+
+.zone-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.zone-avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: $purple-pale;
+  color: $purple-deep;
+
+  &.red    { background: tint($red);    color: $red; }
+  &.yellow { background: tint($yellow); color: $yellow; }
+  &.orange { background: tint($orange); color: $orange; }
+  &.green  { background: tint($green);  color: $green; }
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.badge-red    { background: tint($red);    color: $red; }
+  &.badge-yellow { background: tint($yellow); color: $yellow; }
+  &.badge-orange { background: tint($orange); color: $orange; }
+  &.badge-green  { background: tint($green);  color: $green; }
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  &.active   { color: $green; }
+  &.review   { color: $blue; }
+  &.inactive { color: $text-dim; }
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid $border;
+    border-radius: 8px;
+    background: $bg-card;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover { background: $purple-pale; color: $purple-deep; border-color: $purple-deep; }
+    &:last-child:hover { background: $red-pale; color: $red; border-color: $red; }
+  }
+}
+
+.empty-state {
+  padding: 32px 20px !important;
+  text-align: center;
+  color: $text-muted;
+
+  p { margin: 0 0 12px; }
+}
+
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid $border;
+  font-size: 0.85rem;
+  color: $text-muted;
+
+  strong { color: $text-primary; }
+}
+
+.pagination { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.page-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) { background: $bg-card-hover; color: $text-primary; }
+  &.active { border-color: transparent; background: $purple-deep; color: #fff; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+// =============================================
+// MODALES DE ZONA (nueva / editar / ver)
+// =============================================
+.btn-secondary {
+  padding: 10px 18px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+// On mobile .btn-primary takes the full width; inside the modal it does not
+.btn-primary.btn-modal { width: auto; }
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.form-optional {
+  font-weight: 500;
+  color: $text-dim;
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-base;
+  color: $text-primary;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: $purple-deep; }
+}
+
+.form-hint {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  color: $text-muted;
+}
+
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  background: $red-pale;
+  color: $red;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+// Option buttons (type / status / quick radii)
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  &--girls { margin-top: 8px; }
+}
+
+.option {
+  padding: 8px 12px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; color: $text-primary; }
+
+  &--activa {
+    border-color: transparent;
+    color: #fff;
+
+    &:hover { color: #fff; }
+  }
+
+  &--activa.option--red     { background: $red; }
+  &--activa.option--orange  { background: $orange; }
+  &--activa.option--yellow  { background: $yellow; color: #3b0764; }
+  &--activa.option--green   { background: $green; }
+  &--activa.option--neutral { background: $purple-deep; }
+}
+
+// Mapa dentro del modal
+.zone-map {
+  height: 260px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.zone-map-info {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: $text-muted;
+}
+
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.radio-slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: $purple-deep;
+}
+
+.radio-value {
+  min-width: 64px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+// Detalle (ojo)
+.zone-detail__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h3 { margin: 0; font-size: 1.05rem; color: $text-primary; }
+  p  { margin: 2px 0 0; font-size: 0.82rem; color: $text-muted; }
+}
+
+.zone-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 0 0 18px;
+
+  dt {
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $text-dim;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.88rem;
+    color: $text-primary;
+  }
+}
+
+.zone-detail__date {
+  display: block;
+  margin-top: 2px;
+  color: $text-dim;
+}
+
+.zone-sin-location {
+  margin: 0;
+  padding: 14px;
+  border: 1.5px dashed $border;
+  border-radius: $radius-sm;
+  font-size: 0.82rem;
+  color: $text-muted;
+}
+
+// Map in dark mode: darkens the OpenStreetMap tiles
+:host-context([data-theme='dark']) .zone-map ::ng-deep {
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+  .leaflet-control-attribution { background: rgba(36, 29, 61, 0.8); color: #a8a0c4; a { color: #b79bf5; } }
+  .leaflet-control-zoom a { background: #241d3d; color: #ede9fe; border-color: #4c3a80; }
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+
+// ── Laptop / tablet grande ≤ 1100px ──────────
+@media (max-width: 1100px) {
+  .risk-zones { padding: 24px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .table-card {
+    th { padding: 12px 14px; }
+    td { padding: 14px; }
+  }
+}
+
+// ── Tablet ≤ 900px ───────────────────────────
+@media (max-width: 900px) {
+  .page-header h1 { font-size: 1.7rem; }
+}
+
+// ── Mobile ≤ 768px: table → cards ──────────
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .search-box {
+    flex: 1 1 100%;
+    min-width: 0;
+
+    input { font-size: 16px; } // avoids the automatic iOS zoom
+  }
+
+  // Chips: a single line with horizontal scroll
+  .toolbar-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .chip { flex-shrink: 0; white-space: nowrap; }
+
+  // Cada fila pasa a ser una tarjeta
+  .table-card {
+    overflow: hidden;
+
+    table {
+      display: block;
+      min-width: 0;
+    }
+
+    // The header is hidden visually but stays for screen readers
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody { display: block; }
+
+    tbody tr {
+      display: block;
+      padding: 14px 16px 12px;
+      border-top: 1px solid $border;
+
+      &:first-child { border-top: none; }
+    }
+
+    td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      border-top: none;
+      text-align: right;
+
+      // Label of each value (comes from data-label in the HTML)
+      &[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $text-dim;
+      }
+    }
+
+    // Zone name as the card header
+    td.cell-zone {
+      justify-content: flex-start;
+      text-align: left;
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px dashed $border;
+    }
+
+    // Actions at the bottom of the card
+    td.cell-acc {
+      justify-content: flex-end;
+      margin-top: 6px;
+      padding-top: 12px;
+      border-top: 1px solid $border;
+    }
+
+    td.empty-state {
+      display: block;
+      text-align: center;
+    }
+  }
+
+  // Bigger action buttons for the finger
+  .actions { gap: 8px; }
+  .actions button { width: 40px; height: 40px; }
+
+  // Pie de tabla centrado
+  .table-footer {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 14px;
+  }
+
+  .pagination { justify-content: center; }
+  .page-btn { min-width: 36px; height: 36px; }
+}
+
+// ── Mobile ≤ 640px ────────────────────────────
+@media (max-width: 640px) {
+  .risk-zones { padding: 16px 14px 28px; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 18px;
+
+    h1 { font-size: 1.4rem; }
+    p  { font-size: 0.85rem; }
+  }
+
+  .btn-primary { width: 100%; min-height: 44px; }
+
+  // Compact stats in 2 columns
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 14px;
+
+    .stat-info {
+      span { font-size: 0.74rem; }
+      h2   { margin-top: 4px; font-size: 1.5rem; }
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+    }
+  }
+
+  // Modales
+  .form-input { font-size: 16px; }
+  .option { padding: 10px 14px; }
+
+  .btn-secondary,
+  .btn-primary.btn-modal {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}
+
+// ── Small mobile ≤ 480px ────────────────────
+@media (max-width: 480px) {
+  .zone-detail__grid { grid-template-columns: 1fr; }
+  .zone-map { height: 220px; }
+}
+
+// ── Very small mobile ≤ 380px ────────────────
+@media (max-width: 380px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+
+// =============================================
+// LÍNEAS MÁS VISIBLES (igual que el Dashboard)
+// Solo estilos: no cambia nada del HTML ni del TS
+// =============================================
+
+// Tarjetas con borde morado, como las del Dashboard
+// (en modo claro, admin-lines-light.scss lo sube a 2px y usa el morado de líneas)
+.stat-card,
+.toolbar,
+.table-card {
+  border: 1px solid $border;
+}
+
+// Modo oscuro: líneas internas más gruesas
+:host-context([data-theme="dark"]) {
+  .search-box,
+  .chip,
+  .page-btn,
+  .actions button {
+    border-width: 2px;
+  }
+
+  .table-footer { border-top: 2px solid $border; }
+
+  // Encabezado y separadores de filas (escritorio)
+  @media (min-width: 769px) {
+    .table-card th { border-bottom: 2px solid $border; }
+    .table-card td { border-top: 2px solid $border; }
+    .table-card tbody tr:first-child td { border-top: none; }
+  }
+
+  // Celular: separador entre tarjetas de zona
+  @media (max-width: 768px) {
+    .table-card tbody tr { border-top-width: 2px; }
+    .table-card td.cell-acc { border-top-width: 2px; }
+  }
+}
+
+// =============================================
+// BOTÓN "NUEVA ZONA": mismo morado del módulo activo del sidebar
+// (solo el del encabezado; los botones de los modales no cambian)
+// =============================================
+.page-header .btn-primary {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent);
+  }
+}

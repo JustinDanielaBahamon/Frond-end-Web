@@ -1,0 +1,234 @@
+<div class="navbar-container">
+
+    <!-- LOGO -->
+    <div class="navbar-logo">
+        <img src="logo.png" [alt]="'Logo' | t">
+        <span>{{ 'Alerta Mujer' | t }}</span>
+    </div>
+
+    <!-- LINKS DESKTOP -->
+    <nav class="navbar-links">
+
+        <a href="#inicio" class="active-link">
+            {{ 'Inicio' | t }}
+        </a>
+
+        <a href="#funciones">
+            {{ 'Funciones' | t }}
+        </a>
+
+        <a href="#como-funciona">
+            {{ 'Cómo funciona' | t }}
+        </a>
+
+        <a href="#testimonios">
+            {{ 'Testimonios' | t }}
+        </a>
+
+        <a href="#descargar">
+            {{ 'Descargar app' | t }}
+        </a>
+
+        <a href="#faq">
+            {{ 'FAQ' | t }}
+        </a>
+
+        <a href="#contacto">
+            {{ 'Contacto' | t }}
+        </a>
+
+    </nav>
+
+    <!-- ACCIONES -->
+    <div class="navbar-actions">
+
+        <div class="language-selector">
+
+            <button
+                class="language-btn"
+                (click)="toggleIdiomsMenu()">
+
+                @if (currentLanguage === 'ES') {
+                    <img src="https://flagcdn.com/es.svg" class="flag-nav" alt="">
+                }
+
+                @if (currentLanguage === 'EN') {
+                    <img src="https://flagcdn.com/us.svg" class="flag-nav" alt="">
+                }
+
+                @if (currentLanguage === 'FR') {
+                    <img src="https://flagcdn.com/fr.svg" class="flag-nav" alt="">
+                }
+
+                @if (currentLanguage === 'PT') {
+                    <img src="https://flagcdn.com/br.svg" class="flag-nav" alt="">
+                }
+
+                <span>
+                    {{ currentLanguage | t }}
+                    <i class="fa-solid fa-caret-down"></i>
+                </span>
+
+            </button>
+
+            @if(languageMenuOpen){
+
+                <div class="language-menu">
+
+                    <ul>
+
+                        <li (click)="changeIdiom('ES')">
+                            <img src="https://flagcdn.com/es.svg" class="flag-dropdown" alt="">
+                            {{ 'ES' | t }}
+                        </li>
+
+                        <li (click)="changeIdiom('EN')">
+                            <img src="https://flagcdn.com/us.svg" class="flag-dropdown" alt="">
+                            {{ 'EN' | t }}
+                        </li>
+
+                        <li (click)="changeIdiom('FR')">
+                            <img src="https://flagcdn.com/fr.svg" class="flag-dropdown" alt="">
+                            {{ 'FR' | t }}
+                        </li>
+
+                        <li (click)="changeIdiom('PT')">
+                            <img src="https://flagcdn.com/br.svg" class="flag-dropdown" alt="">
+                            {{ 'PT' | t }}
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            }
+
+        </div>
+
+        <button
+            (click)="themeService.toggleTheme()"
+            class="theme-toggle"
+            [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+            {{ themeService.currentTheme() === 'dark' ? '☀️' : '🌙' | t }}
+        </button>
+
+        <!-- HAMBURGUESA -->
+    <button
+        class="hamburger-btn"
+        (click)="toggleMobileMenu()">
+
+        @if(!menuMobileOpen){
+            <i class="fa-solid fa-bars"></i>
+        } @else {
+            <i class="fa-solid fa-xmark"></i>
+        }
+
+    </button>
+
+        <button class="login-btn desktop-btn"  routerLink="/auth/login">
+            {{ 'Iniciar sesión' | t }}
+        </button>
+
+        <button class="register-btn desktop-btn" routerLink="/auth/register">
+            {{ 'Regístrate' | t }}
+        </button>
+
+    </div>
+
+    
+
+</div>
+
+@if(menuMobileOpen){
+
+<div class="mobile-menu">
+
+    <a href="#inicio" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-house"></i>
+        {{ 'Inicio' | t }}
+    </a>
+    
+    <a href="#funciones" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-shield-heart"></i>
+        {{ 'Funciones' | t }}
+    </a>
+    
+    <a href="#como-funciona" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-circle-play"></i>
+        {{ 'Cómo funciona' | t }}
+    </a>
+    
+    <a href="#testimonios" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-star"></i>
+        {{ 'Testimonios' | t }}
+    </a>
+
+    <a href="#descargar" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        {{ 'Descargar app' | t }}
+    </a>
+    
+    <a href="#faq" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-circle-question"></i>
+        {{ 'FAQ' | t }}
+    </a>
+    
+    <a href="#contacto" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-envelope"></i>
+        {{ 'Contacto' | t }}
+    </a>
+
+     <div class="mobile-divider"></div>
+    <h4 class="button-language-mobil" style="margin-left: 16px; " (click)="toggleIdiomsMenuMobile()" ><i class="fa-solid fa-globe " style="margin-right: 0px;"></i> {{ 'Idioma' | t }}</h4>
+    @if(languageMenuOpenMobile){
+        <div class="mobile-language-options">
+
+    <button (click)="changeIdiom('ES')">
+        <img
+            src="https://flagcdn.com/es.svg"
+            class="flag-mobile"
+            [alt]="'ES' | t">
+        {{ 'Español' | t }}
+    </button>
+
+    <button (click)="changeIdiom('EN')">
+        <img
+            src="https://flagcdn.com/us.svg"
+            class="flag-mobile"
+            [alt]="'EN' | t">
+        {{ 'English' | t }}
+    </button>
+
+    <button (click)="changeIdiom('FR')">
+        <img
+            src="https://flagcdn.com/fr.svg"
+            class="flag-mobile"
+            [alt]="'FR' | t">
+        {{ 'Français' | t }}
+    </button>
+
+    <button (click)="changeIdiom('PT')">
+        <img
+            src="https://flagcdn.com/br.svg"
+            class="flag-mobile"
+            [alt]="'PT' | t">
+        {{ 'Português' | t }}
+    </button>
+
+    </div>
+    }
+    
+
+    <div class="mobile-divider"></div>
+
+    <button class="login-btn mobile-btn"  routerLink="/auth/login">
+        {{ 'Iniciar sesión' | t }}
+    </button>
+
+    <button class="register-btn mobile-btn" routerLink="/auth/register">
+        {{ 'Regístrate' | t }}
+    </button>
+
+</div>
+
+}

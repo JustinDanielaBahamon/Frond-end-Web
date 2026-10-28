@@ -1,0 +1,584 @@
+// Assistance — theme tokens (light and dark), same visual language as Evidence and Location
+
+$card: var(--bg-card, #241d3d);
+$soft: var(--purple-pale, #30293d);
+$border: var(--border, #4c3a80);
+$text: var(--text-primary, #ede9fe);
+$muted: var(--text-muted, #a8a0c4);
+$accent: var(--purple-mid, #aa86ea);
+$accent-strong: var(--purple-deep, #9463e9);
+$danger: #c026d3;
+$call: #7c3aed;
+
+:host { display: block; }
+
+[hidden] { display: none !important; }
+
+.as-page { display: flex; flex-direction: column; gap: 1.25rem; }
+.as-muted { margin: 0; font-size: 0.82rem; color: $muted; }
+.as-help { margin: 1rem 0 0; font-size: 0.78rem; color: $muted; strong { color: $text; } }
+
+// ── Encabezado ────────────────────────────────────
+.as-titlebar { display: flex; align-items: center; gap: 0.85rem; }
+
+.as-titlebar-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: $accent-strong;
+  color: #fff;
+
+  svg { width: 18px; height: 18px; }
+}
+
+.as-title { margin: 0; font-size: 1.5rem; font-weight: 800; color: $text; }
+.as-sub { margin: 0.15rem 0 0; font-size: 0.85rem; color: $muted; }
+
+// ── SOS ───────────────────────────────────────────
+.as-sos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(192, 38, 211, 0.45);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(192, 38, 211, 0.16), rgba(192, 38, 211, 0.05));
+}
+
+.as-sos-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  strong { font-size: 1rem; color: $text; }
+  span { font-size: 0.82rem; color: $muted; }
+}
+
+.as-sos-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.3rem;
+  border: none;
+  border-radius: 999px;
+  background: $danger;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(192, 38, 211, 0.35);
+  transition: filter 0.15s, transform 0.15s;
+
+  svg { width: 18px; height: 18px; }
+  &:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  &:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+}
+
+.as-alert {
+  padding: 0.7rem 0.95rem;
+  border: 1px solid;
+  border-radius: 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  &--error { background: rgba(230, 113, 248, 0.12); border-color: rgba(230, 113, 248, 0.4); color: #e671f8; }
+  &--info { background: $soft; border-color: $border; color: $text; }
+}
+
+// ── Tabs ──────────────────────────────────────
+.as-subtabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.3rem;
+  background: $soft;
+  border: 1px solid $border;
+  border-radius: 0.75rem;
+}
+
+.as-subtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.55rem;
+  background: transparent;
+  color: $muted;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { color: $text; }
+  &--active { background: $card; color: $text; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+}
+
+.as-count {
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: $accent-strong;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+// ── Lines ────────────────────────────────────────
+.as-lines { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+
+.as-line {
+  --cat: #{$accent};
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border: 1px solid $border;
+  border-top: 3px solid var(--cat);
+  border-radius: 1rem;
+  background: $card;
+}
+
+.as-line-head { display: flex; align-items: center; gap: 0.7rem; }
+
+.as-line-icon, .as-item-icon {
+  width: 2.3rem;
+  height: 2.3rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--cat, #{$accent}) 18%, transparent);
+  color: var(--cat, #{$accent});
+
+  svg { width: 17px; height: 17px; }
+}
+
+.as-line-titles {
+  min-width: 0;
+  h2 { margin: 0; font-size: 0.95rem; font-weight: 800; color: $text; }
+  span { font-size: 0.72rem; font-weight: 700; color: var(--cat); }
+}
+
+.as-line-desc { margin: 0; font-size: 0.8rem; line-height: 1.45; color: $muted; }
+.as-line-number { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.03em; color: $text; font-variant-numeric: tabular-nums; }
+.as-line-actions { display: flex; gap: 0.5rem; margin-top: auto; }
+
+// ── Botones ───────────────────────────────────────
+.as-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s, border-color 0.15s;
+
+  svg { width: 15px; height: 15px; }
+  &--call { flex: 1; background: $call; color: #fff; &:hover { filter: brightness(1.1); } }
+  &--ghost { background: transparent; border-color: $border; color: $text; &:hover { border-color: $accent; } }
+  &--sm { flex: none; padding: 0.4rem 0.75rem; font-size: 0.76rem; }
+}
+
+.as-link {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  padding: 0;
+  color: $accent;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+.as-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: $muted;
+  cursor: pointer;
+
+  svg { width: 14px; height: 14px; }
+  &:hover { color: #e671f8; border-color: #e671f8; }
+}
+
+// ── Centros ───────────────────────────────────────
+.as-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.15rem;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  min-width: 0;
+}
+
+.as-centers {
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 960px) { grid-template-columns: 1fr; }
+}
+
+.as-toolbar { display: flex; gap: 0.5rem; }
+
+.as-search {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid $border;
+  border-radius: 0.65rem;
+  background: $soft;
+
+  &:focus-within { border-color: $accent; }
+  svg { width: 16px; height: 16px; flex-shrink: 0; color: $muted; }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0;
+    border: none;
+    background: transparent;
+    color: $text;
+    font: inherit;
+    font-size: 0.84rem;
+    outline: none;
+    &::placeholder { color: $muted; opacity: 0.8; }
+  }
+}
+
+.as-filters { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.as-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid $border;
+  border-radius: 999px;
+  background: transparent;
+  color: $muted;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  span { font-weight: 800; opacity: 0.75; }
+  &:hover { color: $text; }
+  &.active { color: $text; border-color: var(--cat, #{$accent}); background: color-mix(in srgb, var(--cat, #{$accent}) 16%, transparent); }
+}
+
+.as-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--cat, #{$accent}); }
+
+.as-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; max-height: 560px; overflow-y: auto; }
+
+.as-item, .as-call {
+  --cat: #{$accent};
+  flex-shrink: 0;
+  border: 1px solid $border;
+  border-radius: 0.8rem;
+  background: $soft;
+  transition: border-color 0.15s;
+
+  &:hover, &--selected { border-color: var(--cat); }
+}
+
+.as-item { display: flex; flex-direction: column; }
+
+.as-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem 0.4rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.as-item-text { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.12rem; }
+.as-item-name { font-size: 0.86rem; font-weight: 700; color: $text; }
+.as-item-type { font-size: 0.72rem; font-weight: 800; color: var(--cat); }
+.as-item-meta { font-size: 0.72rem; font-weight: 600; color: $muted; line-height: 1.35; }
+
+.as-item-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; padding: 0 0.75rem 0.65rem; }
+
+.as-call {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem;
+
+  .as-item-actions { padding: 0; }
+}
+
+.as-empty {
+  padding: 1.25rem 1rem;
+  border: 1px dashed $border;
+  border-radius: 0.8rem;
+  color: $muted;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.as-map-wrap {
+  position: sticky;
+  top: 1rem;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  overflow: hidden;
+
+  @media (max-width: 960px) { position: relative; top: 0; order: -1; }
+}
+
+.as-map {
+  width: 100%;
+  height: max(460px, calc(100vh - 300px));
+  background: $soft;
+
+  @media (max-width: 960px) { height: 340px; }
+}
+
+:host ::ng-deep .as-map.leaflet-container { font-family: inherit; }
+
+:host ::ng-deep .as-pin {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--pin);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  &--active { box-shadow: 0 0 0 5px color-mix(in srgb, var(--pin) 35%, transparent), 0 2px 8px rgba(0, 0, 0, 0.4); }
+}
+
+:host ::ng-deep .as-you {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #7c3aed;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.25);
+}
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Modo claro: el morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  .as-subtabs,
+  .as-line,
+  .as-btn--ghost,
+  .as-icon-btn,
+  .as-card,
+  .as-search,
+  .as-filter,
+  .as-item,
+  .as-call,
+  .as-map-wrap,
+  .as-alert--info { border: 2px solid #6d5bb8 !important; }
+
+  .as-empty { border: 2px dashed #6d5bb8 !important; }
+
+  // La raya de color de arriba de cada línea de ayuda se queda igual
+  .as-line { border-top: 3px solid var(--cat) !important; }
+
+  // Los mismos colores de antes al pasar el mouse / seleccionar
+  .as-btn--ghost:hover,
+  .as-search:focus-within { border-color: $accent !important; }
+
+  .as-icon-btn:hover { border-color: #e671f8 !important; }
+
+  .as-filter.active { border-color: var(--cat, #{$accent}) !important; }
+
+  .as-item:hover,
+  .as-item--selected,
+  .as-call:hover,
+  .as-call--selected { border-color: var(--cat) !important; }
+
+  .as-sos { border-width: 2px !important; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .as-subtabs,
+  .as-line,
+  .as-btn--ghost,
+  .as-icon-btn,
+  .as-card,
+  .as-search,
+  .as-filter,
+  .as-item,
+  .as-call,
+  .as-map-wrap,
+  .as-alert--info { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .as-empty { border: 2px dashed var(--border, #4c3a80) !important; }
+
+  // La raya de color de arriba de cada línea de ayuda se queda igual
+  .as-line { border-top: 3px solid var(--cat) !important; }
+
+  // Los mismos colores de antes al pasar el mouse / seleccionar
+  .as-btn--ghost:hover,
+  .as-search:focus-within { border-color: $accent !important; }
+
+  .as-icon-btn:hover { border-color: #e671f8 !important; }
+
+  .as-filter.active { border-color: var(--cat, #{$accent}) !important; }
+
+  .as-item:hover,
+  .as-item--selected,
+  .as-call:hover,
+  .as-call--selected { border-color: var(--cat) !important; }
+
+  .as-sos { border-width: 2px !important; }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE ASISTENCIA (solo diseño)
+// =============================================
+
+// Títulos y textos largos bajan de línea en vez de salirse
+.as-titlebar > div,
+.as-sos-text,
+.as-line-titles { min-width: 0; }
+
+.as-title,
+.as-sub,
+.as-sos-text strong,
+.as-sos-text span,
+.as-line-titles h2,
+.as-line-titles span,
+.as-line-desc,
+.as-help,
+.as-item-name,
+.as-item-meta,
+.as-empty { overflow-wrap: break-word; }
+
+// Los números largos (018000…) bajan de línea si no caben
+.as-line-number { overflow-wrap: anywhere; }
+
+// Tarjetas de líneas: nunca más anchas que la pantalla
+.as-lines { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.as-line { min-width: 0; }
+
+// Centros: lista y mapa nunca más anchos que la pantalla
+@media (max-width: 960px) {
+  .as-centers { grid-template-columns: minmax(0, 1fr); }
+}
+
+.as-item-main { width: 100%; }
+.as-item-actions { flex-wrap: wrap; }
+
+// Tablet / celular
+@media (max-width: 600px) {
+  // Pestañas: ocupan todo el ancho, una al lado de la otra
+  .as-subtabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-self: stretch;
+  }
+
+  .as-subtab {
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem 0.4rem;
+  }
+
+  .as-toolbar { flex-wrap: wrap; }
+  .as-toolbar .as-btn { flex: 1 1 100%; }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .as-titlebar { align-items: flex-start; }
+  .as-title { font-size: 1.3rem; }
+
+  // Aviso "¿Estás en peligro?": el botón 123 a lo ancho
+  .as-sos {
+    padding: 0.9rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .as-sos-btn { justify-content: center; }
+
+  .as-line,
+  .as-card { padding: 0.9rem; }
+
+  .as-line-number { font-size: 1.35rem; }
+
+  // "Copiar número" a lo ancho
+  .as-line-actions .as-btn { flex: 1 1 auto; }
+
+  .as-map { height: 280px; }
+}
+
+// Celulares chicos: las pestañas una debajo de la otra
+@media (max-width: 360px) {
+  .as-subtabs { grid-template-columns: minmax(0, 1fr); }
+
+  .as-subtab { justify-content: space-between; text-align: left; padding: 0.5rem 0.75rem; }
+
+  .as-item-actions { justify-content: flex-start; }
+  .as-item-actions .as-btn { flex: 1 1 100%; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .as-title { font-size: 1.15rem; }
+  .as-title,
+  .as-sub { overflow-wrap: anywhere; }
+
+  // El ícono del título arriba y el texto debajo
+  .as-titlebar { flex-direction: column; gap: 0.5rem; }
+
+  .as-line,
+  .as-card,
+  .as-sos { padding: 0.7rem; }
+
+  .as-line-head { flex-direction: column; align-items: flex-start; }
+  .as-line-number { font-size: 1.15rem; }
+
+  .as-sos-btn { padding: 0.65rem 0.8rem; }
+
+  .as-btn { white-space: normal; text-align: center; }
+
+  .as-item-main { flex-direction: column; gap: 0.45rem; }
+
+  // Mis llamadas: el botón de borrar baja a la derecha
+  .as-call { flex-wrap: wrap; }
+  .as-call .as-item-text { flex: 1 1 100%; }
+  .as-call .as-item-actions { margin-left: auto; }
+}

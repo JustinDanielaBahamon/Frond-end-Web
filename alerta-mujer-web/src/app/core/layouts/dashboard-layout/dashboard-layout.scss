@@ -1,0 +1,250 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+}
+
+// Body: column with a fixed topbar on top + main with its own scroll
+.layout__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: #f3eeff;
+}
+
+// The only scrolling element
+.layout__main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #f3eeff;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .layout { flex-direction: column; height: auto; overflow: visible; }
+  .layout__body { height: auto; overflow: visible; }
+  .layout__main { padding: 1rem; overflow-y: visible; }
+
+  .ah-stats { grid-template-columns: repeat(2, 1fr); }
+
+  .ah-table {
+    th:nth-child(4),
+    td:nth-child(4) { display: none; }
+    th, td { padding: 10px 8px; }
+  }
+
+  .bottom-nav { display: flex !important; }
+}
+
+@media (max-width: 480px) {
+  .ah-title { font-size: 1.2rem; }
+
+  .ah-table {
+    font-size: 0.78rem;
+    th:nth-child(5),
+    td:nth-child(5) { display: none; }
+  }
+}
+
+// ── BOTTOM NAV (mobile only)
+.bottom-nav {
+  display: none;
+  background: #2d1457;
+  justify-content: space-around;
+  padding: 8px 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: color 0.15s;
+
+    i { font-size: 20px; }
+    &:hover { color: rgba(255,255,255,0.8); }
+    &--active { color: #e879f9; }
+  }
+}
+
+/*
+ * The dark mode of this layout NO longer lives here.
+ *    It lives in app/shared/styles/theme/dashboard-dark.scss,
+ *    under the block:
+ *    [data-theme="dark"] {
+ *      .layout__body,
+ *      .layout__main { background: var(--bg-base) !important; }
+ *      .bottom-nav { ... }
+ *    }
+ *    Do not add any "body.dark-mode" or
+ *    "[data-theme='dark']" block here — all the dashboard dark mode
+ *    is centralized in that single theme file.
+ */
+
+/* Notice: a contact of the user activated an alert (visible across the whole panel) */
+.notice-contact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #6d28d9, #c026d3);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+
+  &__pulse {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fff;
+    animation: aviso-pulso 1.6s infinite;
+  }
+
+  &__text { flex: 1; }
+  &__action { font-weight: 800; white-space: nowrap; }
+}
+
+@keyframes aviso-pulso {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) { .notice-contact__pulse { animation: none; } }
+
+// ── "Your phone changed places" notice ──────────────
+.notice-movement {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(91, 33, 182, 0.3);
+
+  > i { font-size: 1.4rem; }
+
+  &__text {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    small { display: block; opacity: 0.8; font-size: 0.75rem; }
+  }
+
+  &__action {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  &__close {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+}
+
+
+// =============================================
+// BARRA LATERAL COMO MENÚ DESLIZABLE EN PANTALLAS CHICAS (igual que el admin)
+// =============================================
+.layout app-sidebar {
+  flex-shrink: 0; // la barra no se encoge cuando el contenido es angosto
+}
+
+// Fondo oscuro detrás del menú: oculto en escritorio
+.layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999; // debajo del menú (1000)
+  }
+}
+
+
+// Celular: un poco menos de margen alrededor de cada módulo
+@media (max-width: 600px) {
+  .layout__main { padding: 0.75rem; }
+}
+
+// =============================================
+// CELULARES CHICOS: avisos de arriba y barra de abajo sin salirse de la pantalla
+// (solo diseño: no cambia nada del HTML ni del TS)
+// =============================================
+.notice-contact__text,
+.notice-movement__text { min-width: 0; overflow-wrap: break-word; }
+
+@media (max-width: 480px) {
+  // "Andrea activó una alerta… Ver seguimiento →": el enlace baja a su propia línea
+  .notice-contact {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+
+  .notice-contact__text { flex: 1 1 140px; }
+
+  .notice-contact__action {
+    flex-basis: 100%;
+    text-align: right;
+    white-space: normal;
+  }
+
+  // "Tu celular se desplazó…": el botón "Ver en el mapa" baja si no cabe
+  .notice-movement { flex-wrap: wrap; }
+  .notice-movement__text { flex: 1 1 140px; }
+}
+
+@media (max-width: 360px) {
+  // Barra de abajo (Inicio / Alertas / Ubicación): botones más compactos
+  .bottom-nav__item {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 2px;
+    text-align: center;
+  }
+}
+
+// =============================================
+// BARRA DE ABAJO SIEMPRE PEGADA AL FONDO DE LA PANTALLA (celular)
+// Cuando la página tiene poco contenido, la barra ya no sube:
+// el contenido ocupa el espacio que sobra y la barra queda abajo.
+// =============================================
+@media (max-width: 768px) {
+  .layout__body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .layout__main { flex: 1 0 auto; }
+}

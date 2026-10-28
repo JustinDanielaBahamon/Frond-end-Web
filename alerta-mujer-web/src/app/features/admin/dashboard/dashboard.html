@@ -1,0 +1,363 @@
+<div class="dashboard">
+
+  <!-- ===== HEADER + FILTROS DE FECHA ===== -->
+  <div class="dash-header">
+    <div class="dash-top">
+      <div>
+        <h1 class="dash-title">{{ 'Dashboard de un vistazo' | t }}</h1>
+        <p class="dash-sub">{{ 'Información general del sistema y estado actual de la plataforma. Actualizado a las' | t }} {{ (updatedAt | date:'HH:mm:ss') | t }}.</p>
+      </div>
+
+      <div class="filters" role="group" [attr.aria-label]="'Periodo' | t">
+        @for (p of periods; track p.value) {
+          <button type="button" class="filter-button" [class.is-active]="period === p.value" (click)="setPeriod(p.value)">
+            {{ p.label | t }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (period === 'custom') {
+      <div class="filters filters--dates">
+        <label class="date-label">{{ 'Desde' | t }}
+          <app-date-picker label="Desde" [value]="from" [max]="to || null" [clearable]="false" (valueChange)="onFrom($event)" />
+        </label>
+        <label class="date-label">{{ 'Hasta' | t }}
+          <app-date-picker label="Hasta" [value]="to" [min]="from || null" [clearable]="false" (valueChange)="onTo($event)" />
+        </label>
+      </div>
+    }
+  </div>
+
+  @if (error) {
+    <p class="dash-error">{{ 'No se pudieron cargar los datos del dashboard.' | t }}</p>
+  }
+
+  @if (loading) {
+    <p class="dash-loading">{{ 'Cargando datos...' | t }}</p>
+  }
+
+  @if (!loading && !error) {
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-row">
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">{{ 'Pendientes ahora' | t }}</span>
+          <span class="stat-card__value">{{ (pendingAlerts | number) | t }}</span>
+          <span class="stat-card__sub">{{ oldestPending | t }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">{{ 'Usuarias activas' | t }}</span>
+          <span class="stat-card__value">{{ (activeUsers | number) | t }}</span>
+          <span class="stat-card__sub">{{ activePercentage | t }}{{ '% del total' | t }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">{{ 'Atendidas' | t }}</span>
+          <span class="stat-card__value">{{ (attendedAlerts | number) | t }}</span>
+          <span class="stat-card__sub">{{ attendedPercentage | t }}{{ '% de las alertas' | t }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">{{ 'Canceladas' | t }}</span>
+          <span class="stat-card__value">{{ (cancelledAlerts | number) | t }}</span>
+          <span class="stat-card__sub">{{ cancelledPercentage | t }}{{ '% · posibles falsas alarmas' | t }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SHORTCUTS TO ENTER URGENTLY ===== -->
+    <nav class="atajos" [attr.aria-label]="'Atajos' | t">
+      <a class="atajo" [class.atajo--urgent]="pendingAlerts > 0" routerLink="/admin/alertas">
+        <i class="ti ti-urgent" aria-hidden="true"></i>
+        <span>{{ pendingAlerts > 0 ? pendingAlerts + (pendingAlerts === 1 ? ' alerta activa' : ' alertas activas') : 'Alertas' | t }}</span>
+      </a>
+      <a class="atajo" routerLink="/admin/usuarios"><i class="ti ti-user-off" aria-hidden="true"></i><span>{{ 'Bloquear una cuenta' | t }}</span></a>
+      <a class="atajo" routerLink="/admin/zone-management"><i class="ti ti-map-pin-exclamation" aria-hidden="true"></i><span>{{ 'Zonas de riesgo' | t }}</span></a>
+      <a class="atajo" routerLink="/admin/report-management"><i class="ti ti-flag" aria-hidden="true"></i><span>{{ 'Reportes' | t }}</span></a>
+    </nav>
+
+    <!-- ===== ALERTS BY HOUR OF THE DAY ===== -->
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <span class="dash-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </span>
+        <div>
+          <h3>{{ 'Alertas por hora del día' | t }}</h3>
+          <p>{{ 'Cuántas alertas se registraron en cada hora, agrupadas por franja del día' | t }}</p>
+        </div>
+      </div>
+
+      <div class="hours-stats">
+        <div class="mini-stat">
+          <span class="mini-stat__label">{{ 'Hora pico' | t }}</span>
+          <span class="mini-stat__value">{{ peakHourText | t }}</span>
+          <span class="mini-stat__sub">{{ peakHourDetail | t }}</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat__label">{{ 'Franja más riesgosa' | t }}</span>
+          <span class="mini-stat__value">{{ riskyBandText | t }}</span>
+          <span class="mini-stat__sub">{{ riskyBandDetail | t }}</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat__label">{{ 'Franja más tranquila' | t }}</span>
+          <span class="mini-stat__value">{{ calmBandText | t }}</span>
+          <span class="mini-stat__sub">{{ calmBandDetail | t }}</span>
+        </div>
+      </div>
+
+      @if (hasHourData) {
+        <div class="hours-scroll">
+          <svg class="hours-svg" viewBox="0 0 1000 275" role="img"
+               aria-label="Barras de alertas por hora del día, agrupadas en madrugada, mañana, tarde y noche">
+            @for (f of chartBands; track f.name; let i = $index) {
+              <rect class="band-bg" [class.band-bg--alt]="i % 2 === 1" [class.band-bg--night]="f.name === 'Noche'"
+                    [attr.x]="f.x" y="30" [attr.width]="f.w" height="210" />
+              <text class="band-label" [attr.x]="f.cx" y="20" text-anchor="middle">{{ f.name | t }} · {{ f.range | t }}</text>
+            }
+            @for (t of hourTicks; track t.label) {
+              <line class="grid-line" x1="50" [attr.y1]="t.y" x2="980" [attr.y2]="t.y" />
+              <text class="axis-text" x="40" [attr.y]="t.y + 4" text-anchor="end">{{ t.label | t }}</text>
+            }
+            @for (b of hourBars; track b.time) {
+              @if (b.value > 0) {
+                <rect class="hour-bar" [class.hour-bar--peak]="b.peak" [attr.x]="b.x" [attr.y]="b.y"
+                      width="26" [attr.height]="b.h" rx="4" />
+                <text class="hour-valor" [attr.x]="b.cx" [attr.y]="b.y - 6" text-anchor="middle">{{ b.value | t }}</text>
+              }
+              <text class="axis-text" [attr.x]="b.cx" y="260" text-anchor="middle">{{ b.time | t }}h</text>
+            }
+          </svg>
+        </div>
+        <p class="note">{{ 'Eje vertical: número de alertas. En rojo, las horas con más alertas.' | t }}</p>
+      } @else {
+        <p class="empty">{{ 'No hay alertas con fecha en este periodo.' | t }}</p>
+      }
+    </div>
+
+    <!-- ===== ZONES WITH THE MOST INCIDENTS ===== -->
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <span class="dash-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </span>
+        <div>
+          <h3>{{ 'Zonas con más incidentes' | t }}</h3>
+          <p>{{ 'Dónde se activan más alertas. Toca una zona de la lista o un punto del mapa.' | t }}</p>
+        </div>
+      </div>
+
+      <div class="zones-body">
+        <div class="zone-map-wrap">
+          <div class="zone-map">
+            <div #zonesMap class="map-leaflet"></div>
+          </div>
+
+          @if (currentZone; as z) {
+            <div class="zone-detail">
+              <span class="zone-detail__label">{{ 'Punto seleccionado' | t }}</span>
+              <span class="zone-detail__name">{{ z.name | t }}</span>
+              <span class="zone-detail__meta">
+                {{ (z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible')) | t }}
+                · {{ z.count | t }} {{ z.count === 1 ? 'alerta' : 'alertas' | t }}
+                · {{ (z.lat | number:'1.4-4') | t }}, {{ (z.lng | number:'1.4-4') | t }}
+              </span>
+              @if (z.riskZone) {
+                <span class="zone-detail__meta">{{ 'Dentro de la zona de riesgo:' | t }} {{ z.riskZone | t }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <ul class="zone-list">
+          @for (z of incidentZones; track z.rank; let i = $index) {
+            <li>
+              <button type="button" class="zone-item" [class.is-active]="i === selectedZone" (click)="selectZone(i)">
+                <span class="rank" [ngClass]="'rank--' + z.rank">{{ z.rank | t }}</span>
+                <span class="zone-item__text">
+                  <span class="zone-item__name">{{ z.name | t }}</span>
+                  <span class="zone-item__address">{{ (z.address || (z.searching ? 'Buscando dirección…' : 'Dirección no disponible')) | t }}</span>
+                  <span class="zone-item__bar">
+                    <span class="zone-item__fill" [class.zone-item__fill--top]="i === 0" [style.width.%]="z.bar"></span>
+                  </span>
+                </span>
+                <span class="zone-item__cant">{{ z.count | t }} · {{ z.percentage | t }}%</span>
+              </button>
+            </li>
+          } @empty {
+            <li class="empty">{{ 'Sin alertas con ubicación en este periodo.' | t }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===== TREND: THIS WEEK VS. LAST WEEK ===== -->
+    <div class="dash-card">
+      <div class="dash-card__header dash-card__header--filters">
+        <span class="dash-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </span>
+        <div>
+          @if (trendView === 'semana') {
+            <h3>{{ '¿Hay más o menos alertas que la semana pasada?' | t }}</h3>
+            <p>{{ 'Alertas de cada día de esta semana junto a las del mismo día de la semana anterior' | t }}</p>
+          } @else {
+            <h3>{{ '¿En qué semanas del mes hay más alertas?' | t }}</h3>
+            <p>{{ 'Alertas de cada semana de' | t }} {{ monthTrend | t }} {{ 'junto a las de la misma semana del mes anterior' | t }}</p>
+          }
+        </div>
+        <div class="trend-vista" role="group" [attr.aria-label]="'Ver la tendencia por' | t">
+          <button type="button" class="filter-button" [class.is-active]="trendView === 'semana'" [attr.aria-pressed]="trendView === 'semana'" (click)="changeTrendView('semana')">{{ 'Semana' | t }}</button>
+          <button type="button" class="filter-button" [class.is-active]="trendView === 'mes'" [attr.aria-pressed]="trendView === 'mes'" (click)="changeTrendView('mes')">{{ 'Mes' | t }}</button>
+        </div>
+      </div>
+
+      @if (currentTrendTotal + previousTrendTotal > 0) {
+        <div class="trend-summary">
+          <div class="trend-summary__item">
+            <span class="trend-summary__valor">{{ currentTrendTotal | t }}</span>
+            <span class="trend-summary__label">{{ trendView === 'mes' ? 'este mes' : 'esta semana' | t }} {{ '(hasta hoy)' | t }}</span>
+          </div>
+          <div class="trend-summary__item">
+            <span class="trend-summary__valor trend-summary__valor--previa">{{ previousTrendUntilToday | t }}</span>
+            <span class="trend-summary__label">{{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' | t }}{{ ', mismos días' | t }}</span>
+          </div>
+          <p class="trend-summary__sentence">{{ trendSentence | t }}</p>
+        </div>
+
+        <!-- Contenedor con scroll horizontal: el gráfico mantiene su tamaño en pantallas chicas -->
+        <div class="trend-scroll">
+          <svg class="trend-svg" viewBox="0 0 640 230" role="img"
+               [attr.aria-label]="(trendView === 'mes' ? 'Alertas por semana del mes. ' : 'Alertas por día. ') + trendSentence">
+            @for (t of trendTicks; track t.label) {
+              <line class="grid-line" x1="40" [attr.y1]="t.y" x2="620" [attr.y2]="t.y" />
+              <text class="axis-text" x="30" [attr.y]="t.y + 3" text-anchor="end">{{ t.label | t }}</text>
+            }
+            @for (b of trendBars; track b.day) {
+              <g class="trend-day" [class.trend-dia--hoy]="b.isToday">
+                <title>{{ b.longDay | t }}: {{ b.current === null ? 'aún no llega' : b.current + (trendView === 'mes' ? ' este mes' : ' esta semana') | t }} · {{ b.previous | t }} {{ trendView === 'mes' ? 'el mes pasado' : 'la semana pasada' | t }}</title>
+                <rect class="trend-hit" [attr.x]="b.groupX" y="20" [attr.width]="b.groupWidth" height="170" />
+                @if (b.previous > 0) {
+                  <path class="trend-bar trend-bar--previa" [attr.d]="b.previousPath" />
+                  <text class="trend-valor" [attr.x]="b.previousX + b.barWidth / 2" [attr.y]="b.previousY - 6" text-anchor="middle">{{ b.previous | t }}</text>
+                }
+                @if (b.current) {
+                  <path class="trend-bar" [attr.d]="b.currentPath" />
+                  <text class="trend-valor trend-valor--actual" [attr.x]="b.currentX + b.barWidth / 2" [attr.y]="b.currentY - 6" text-anchor="middle">{{ b.current | t }}</text>
+                }
+                <text class="axis-text" [class.axis-text--today]="b.isToday" [attr.x]="b.groupX + b.groupWidth / 2" y="210" text-anchor="middle">{{ b.isToday ? (trendView === 'mes' ? 'Esta sem.' : 'Hoy') : b.day | t }}</text>
+              </g>
+            }
+          </svg>
+        </div>
+        <div class="legend">
+          <span><span class="legend__bar"></span>{{ trendView === 'mes' ? 'Este mes' : 'Esta semana' | t }}</span>
+          <span><span class="legend__bar legend__bar--previa"></span>{{ trendView === 'mes' ? 'Mes anterior' : 'Semana anterior' | t }}</span>
+          <span class="legend__note">{{ 'Pasa el cursor sobre' | t }} {{ trendView === 'mes' ? 'una semana' : 'un día' | t }} {{ 'para ver el detalle.' | t }}</span>
+        </div>
+      } @else {
+        <p class="empty">{{ 'Aún no hay alertas con fecha en' | t }} {{ trendView === 'mes' ? 'estos dos meses' : 'estas dos semanas' | t }}.</p>
+      }
+    </div>
+
+    <!-- ===== ALERTAS RECIENTES ===== -->
+    <div class="dash-card table-card">
+      <div class="dash-card__header dash-card__header--filters">
+        <span class="dash-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </span>
+        <div>
+          <h3>{{ 'Alertas recientes' | t }}</h3>
+          <p>{{ 'Últimas alertas registradas en la plataforma' | t }}</p>
+        </div>
+
+        <div class="filters filters--table" role="group" [attr.aria-label]="'Estado de la alerta' | t">
+          @for (f of statusFilters; track f.value) {
+            <button type="button" class="filter-button" [class.is-active]="statusFilter === f.value" (click)="setStatusFilter(f.value)">
+              {{ f.label | t }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'Hora' | t }}</th>
+              <th>{{ 'Usuaria' | t }}</th>
+              <th>{{ 'Estado' | t }}</th>
+              <th>{{ 'Ubicación' | t }}</th>
+              <th>{{ 'Acción' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of recentAlerts; track $index) {
+              <tr>
+                <td>{{ a.time | t }}</td>
+                <td>{{ a.name | t }}</td>
+                <td>
+                  <span class="state-badge" [ngClass]="statusClass(a.status)">
+                    <span class="state-badge__icon"></span>{{ a.status | t }}
+                  </span>
+                </td>
+                <td>
+                  @if (a.lat || a.lng) {
+                    <button type="button" class="link-btn" (click)="viewOnMap(a)">{{ 'Ver en mapa' | t }}</button>
+                  } @else {
+                    —
+                  }
+                </td>
+                <td><a class="link-btn" routerLink="/admin/alertas">{{ 'Detalle' | t }}</a></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty">{{ 'No hay alertas para este filtro.' | t }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+
+</div>

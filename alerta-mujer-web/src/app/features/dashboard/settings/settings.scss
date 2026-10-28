@@ -1,0 +1,769 @@
+@use '../../../shared/styles/variables' as v;
+
+.settings {
+  --am-accent: #{v.$purple-deep};
+  --am-accent-soft: #{v.$purple-pale};
+  --am-bg-card: #{v.$bg-card};
+  --am-bg-page: #{v.$bg-base};
+  --am-text-primary: #{v.$text-primary};
+  --am-text-secondary: #{v.$text-muted};
+  --am-border: #{v.$border};
+  --am-danger: #{v.$red};
+  --am-radius: #{v.$radius-card};
+
+  display: block;
+  padding: 24px;
+  background: var(--am-bg-page);
+  color: var(--am-text-primary);
+
+  &__header {
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+    }
+
+    p {
+      margin: 4px 0 0;
+      color: var(--am-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__footer {
+    margin-top: 24px;
+    background: var(--am-accent-soft);
+    border-radius: var(--am-radius);
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: var(--font-size-sm);
+      flex: 1 1 160px;
+
+      i {
+        color: var(--am-accent);
+        font-size: 1.2rem;
+      }
+
+      strong {
+        display: block;
+      }
+
+      span {
+        color: var(--am-text-secondary);
+      }
+
+      &--highlight {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.settings-card {
+  background: var(--am-bg-card);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+    }
+  }
+
+  &__label {
+    font-size: var(--font-size-sm);
+    color: var(--am-text-secondary);
+    margin: 12px 0 8px;
+  }
+
+  &__banner {
+    margin-top: 12px;
+    background: var(--am-accent-soft);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: var(--font-size-sm);
+
+    i {
+      color: var(--am-accent);
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+
+    strong {
+      display: block;
+    }
+
+    span {
+      color: var(--am-text-secondary);
+    }
+
+    &--support {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .btn-primary {
+        margin-top: 10px;
+        align-self: stretch;
+      }
+    }
+  }
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--am-accent);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.account-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--am-border);
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--am-accent-soft);
+    color: var(--am-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  strong {
+    display: block;
+    font-size: var(--font-size-lg);
+  }
+
+  span {
+    font-size: var(--font-size-sm);
+    color: var(--am-text-secondary);
+  }
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--am-border);
+  padding: 12px 0;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--am-text-primary);
+  cursor: pointer;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  strong {
+    display: block;
+    font-weight: 600;
+  }
+
+  span {
+    display: block;
+    color: var(--am-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  > i:first-child {
+    color: var(--am-accent);
+  }
+
+  &--link {
+    justify-content: space-between;
+
+    > i:last-child {
+      color: var(--am-text-secondary);
+      margin-left: auto;
+    }
+  }
+
+  &--toggle {
+    justify-content: space-between;
+  }
+
+  &--danger {
+    color: var(--am-danger);
+    justify-content: flex-start;
+
+    i {
+      color: var(--am-danger);
+    }
+  }
+
+  &__value {
+    color: var(--am-text-secondary);
+    font-size: var(--font-size-xs);
+    margin-left: auto;
+  }
+}
+
+// --- Toggle switch ---
+.switch {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--am-border);
+  border: none;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease;
+  }
+
+  &.on {
+    background: var(--am-accent);
+
+    .switch__thumb {
+      transform: translateX(18px);
+    }
+  }
+}
+
+// --- Tema claro/oscuro ---
+.theme-options {
+  display: flex;
+  gap: 12px;
+}
+
+.theme-option {
+  flex: 1;
+  background: none;
+  border: 2px solid var(--am-border);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  color: var(--am-text-secondary);
+
+  &.active {
+    border-color: var(--am-accent);
+    color: var(--am-accent);
+  }
+}
+
+.theme-preview {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+
+  &--light {
+    background: linear-gradient(135deg, #fdf2f8, #f5cffb);
+  }
+
+  &--dark {
+    background: linear-gradient(135deg, #1e1b2e, #3a1f36);
+  }
+}
+
+// --- Colores de acento ---
+.color-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+
+  &.active {
+    border-color: var(--am-text-primary);
+    outline: 2px solid var(--am-accent-soft);
+  }
+}
+
+// --- Font size ---
+// (Removed - feature eliminated per user request)
+
+// --- Status pill (bloqueo de app) ---
+.status-pill {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  background: var(--am-border);
+  color: var(--am-text-secondary);
+
+  &--active {
+    background: var(--am-accent-soft);
+    color: var(--am-accent);
+  }
+}
+
+.btn-primary {
+  background: var(--am-accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.settings-card__note {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--am-text-secondary);
+}
+
+a.setting-row {
+  text-decoration: none;
+  color: inherit;
+}
+
+.privacy-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  li {
+    display: flex;
+    gap: 10px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--am-text-secondary);
+  }
+
+  i {
+    color: var(--am-accent);
+    font-size: 18px;
+    margin-top: 1px;
+  }
+}
+
+// Delete account: same row, in the accent color so it stands out
+.setting-row--destructive {
+  justify-content: space-between;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--am-accent);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+  }
+}
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos)
+// =============================================
+:host-context(html:not([data-theme="dark"])) {
+  .settings-card { border: 2px solid var(--am-line, #6d5bb8) !important; }
+  .account-profile,
+  .setting-row { border-bottom: 2px solid var(--am-line-soft, #8878c6) !important; }
+  .setting-row:last-of-type { border-bottom: none !important; }
+}
+
+:host-context([data-theme="dark"]) {
+  .settings-card { border: 2px solid var(--border, #4c3a80) !important; }
+  .account-profile,
+  .setting-row { border-bottom: 2px solid var(--border, #4c3a80) !important; }
+  .setting-row:last-of-type { border-bottom: none !important; }
+}
+
+// =============================================
+// APARIENCIA: TEMA CON VISTA PREVIA Y COLORES MÁS GRANDES
+// (las tarjetas Claro / Oscuro llenan el espacio de la tarjeta)
+// =============================================
+$us-accent: var(--accent-grad-to, #7c39ef);
+
+.theme-options {
+  min-height: 200px;
+}
+
+.theme-option {
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  color: var(--am-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover { border-color: $us-accent; }
+
+  &.active {
+    border-color: $us-accent;
+    color: var(--am-text-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, #{$us-accent} 25%, transparent),
+                0 8px 24px color-mix(in srgb, #{$us-accent} 25%, transparent);
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+
+    > i:first-child { color: $us-accent; font-size: 1.15rem; }
+  }
+
+  &__check {
+    margin-left: auto;
+    color: $us-accent;
+    font-size: 1.3rem;
+  }
+}
+
+:host-context(html:not([data-theme="dark"])) .theme-option { border-color: var(--am-line, #6d5bb8); }
+:host-context([data-theme="dark"]) .theme-option { border-color: var(--border, #4c3a80); }
+:host-context(html) .theme-option.active,
+:host-context(html) .theme-option:hover { border-color: $us-accent; }
+
+// Mini ventana del panel
+.theme-preview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  height: auto;
+  min-height: 110px;
+  padding: 10px;
+  border-radius: 12px;
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    > span { width: 10px; height: 10px; border-radius: 50%; }
+
+    .theme-preview__pill {
+      width: 40px;
+      height: 8px;
+      margin-left: auto;
+      border-radius: 4px;
+    }
+  }
+
+  &__body { display: flex; flex: 1; gap: 8px; }
+  &__side { width: 22%; border-radius: 6px; }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+
+    > span {
+      height: 6px;
+      border-radius: 3px;
+
+      &:first-child { width: 80%; }
+      &:last-child  { width: 55%; }
+    }
+  }
+
+  &--light {
+    background: #f7f5fc;
+    border: 1px solid #e4def5;
+
+    .theme-preview__bar > span:nth-child(1) { background: #fb7185; }
+    .theme-preview__bar > span:nth-child(2) { background: #fbbf24; }
+    .theme-preview__bar > span:nth-child(3) { background: #34d399; }
+    .theme-preview__pill { background: #ddd6ee !important; }
+    .theme-preview__side { background: #f1e8fd; }
+    .theme-preview__main { background: #ebe7f3; > span { background: #cfc8df; } }
+  }
+
+  &--dark {
+    background: #120d1f;
+    border: 1px solid #2e2550;
+
+    .theme-preview__bar > span:nth-child(1) { background: #c026d3; }
+    .theme-preview__bar > span:nth-child(2) { background: #a855f7; }
+    .theme-preview__bar > span:nth-child(3) { background: #34d399; }
+    .theme-preview__pill { background: #3b2f63 !important; }
+    .theme-preview__side { background: #241b3d; border: 1px solid #3b2f63; }
+    .theme-preview__main {
+      background: #1c1530;
+      border: 1px solid #3b2f63;
+      > span:first-child { background: #7c5bd6; }
+      > span:last-child  { background: #a21caf; }
+    }
+  }
+}
+
+// Colores principales: más grandes y con check en el elegido
+.color-swatches { gap: 14px; }
+
+.swatch {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border: 3px solid var(--am-bg-card);
+  box-shadow: 0 0 0 2px var(--am-border);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover { transform: scale(1.08); }
+
+  &.active {
+    border-color: var(--am-bg-card);
+    outline: none;
+    box-shadow: 0 0 0 3px $us-accent, 0 6px 16px color-mix(in srgb, #{$us-accent} 35%, transparent);
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .theme-options { min-height: 0; }
+  .theme-preview { min-height: 80px; }
+}
+
+// =============================================
+// LETRA MÁS GRANDE (antes casi todo estaba en 12.5 px,
+// más chica que en los demás módulos)
+// =============================================
+.settings__header p { font-size: 0.95rem; }
+
+.settings-card__header h2 { font-size: 1.1rem; }
+.settings-card__label { font-size: 0.95rem; }
+
+.account-profile {
+  strong { font-size: 1.15rem; }
+  span { font-size: 0.95rem; }
+}
+
+// Texto de cada opción ("Cambiar contraseña", "Correo electrónico"…)
+.setting-row {
+  font-size: 0.95rem;
+
+  > span:not(.setting-row__value) { font-size: 0.95rem; }
+  strong { font-size: 0.95rem; }
+
+  // Descripción debajo del título de la opción
+  div > span { font-size: 0.85rem; line-height: 1.4; }
+}
+
+// Valor de la derecha (correo, teléfono, versión): si no cabe, baja a la siguiente línea
+.setting-row:has(.setting-row__value) {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.setting-row .setting-row__value {
+  font-size: 0.875rem;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.setting-row.setting-row--destructive span { font-size: 0.95rem; }
+
+.settings-card__note { font-size: 0.85rem; }
+.privacy-list li { font-size: 0.9rem; }
+.theme-option__label { font-size: 1rem; }
+.settings__footer .footer-item { font-size: 0.95rem; }
+
+// =============================================
+// RESPONSIVE COMPLETO DE AJUSTES (solo diseño)
+// =============================================
+
+// Pantallas medianas (con el menú al lado) y celular: dos columnas
+// que nunca son más anchas que la pantalla
+@media (max-width: 1279px) {
+  .settings__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .settings-card,
+  .theme-option { min-width: 0; }
+  .theme-option__label { flex-wrap: wrap; min-width: 0; }
+}
+
+@media (max-width: 640px) {
+  .settings__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Textos largos bajan de línea en vez de salirse
+.settings__header > div,
+.account-profile > div,
+.setting-row > div,
+.setting-row > span,
+.privacy-list li > span,
+.footer-item > div,
+.footer-item > span { min-width: 0; }
+
+.settings__header h1,
+.settings__header p,
+.settings-card__header h2,
+.account-profile strong,
+.setting-row strong,
+.setting-row span,
+.settings-card__note,
+.privacy-list li,
+.footer-item { overflow-wrap: break-word; }
+
+// El correo es una sola palabra larga: si no cabe, baja donde sea
+@media (max-width: 1279px) {
+  .account-profile span { overflow-wrap: anywhere; }
+}
+
+.account-profile .avatar { flex-shrink: 0; }
+
+// Franja de abajo: cada cuadrito se ajusta al ancho
+.settings__footer .footer-item { flex: 1 1 min(100%, 160px); }
+.settings__footer .footer-item i { flex-shrink: 0; }
+
+// Tablet / celular
+@media (max-width: 768px) {
+  .settings { padding: 16px 8px; }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .settings { padding: 12px 0; }
+  .settings-card { padding: 16px; }
+  .settings__footer { padding: 16px; gap: 14px; }
+
+  // El valor (correo, teléfono, versión) baja debajo del texto
+  .setting-row:has(.setting-row__value) .setting-row__value {
+    flex-basis: 100%;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .setting-row:has(> i:first-child) .setting-row__value { padding-left: 26px; }
+}
+
+// Celulares chicos: Claro y Oscuro uno debajo del otro
+@media (max-width: 360px) {
+  .theme-options { flex-direction: column; }
+  .theme-preview { min-height: 70px; }
+
+  .swatch { width: 36px; height: 36px; }
+  .color-swatches { gap: 10px; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .settings__header { flex-direction: column; gap: 8px; }
+  .settings__header h1 { font-size: 1.25rem; }
+  .settings__header h1,
+  .settings__header p,
+  .settings-card__header h2,
+  .setting-row strong,
+  .setting-row span { overflow-wrap: anywhere; }
+
+  .settings-card { padding: 12px; }
+  .settings-card__header h2 { font-size: 1rem; align-items: flex-start; }
+
+  // Foto arriba, nombre y correo debajo
+  .account-profile { flex-direction: column; align-items: flex-start; }
+
+  .setting-row { gap: 8px; }
+
+  // Sin la flechita de la derecha (toda la fila se sigue pudiendo tocar)
+  .setting-row--link > i:last-child:not(:first-child) { display: none; }
+  .setting-row:has(> i:first-child) .setting-row__value { padding-left: 0; }
+
+  // Interruptores: el texto arriba y el interruptor debajo
+  .setting-row--toggle { flex-wrap: wrap; }
+  .setting-row--toggle > div { flex: 1 1 100%; }
+
+  // Tus datos: ícono arriba y el texto a lo ancho
+  .privacy-list li { flex-direction: column; gap: 4px; }
+
+  // Franja de abajo: ícono arriba y texto debajo
+  .settings__footer { padding: 12px; }
+  .settings__footer .footer-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .settings__footer .footer-item strong,
+  .settings__footer .footer-item span { overflow-wrap: anywhere; }
+}

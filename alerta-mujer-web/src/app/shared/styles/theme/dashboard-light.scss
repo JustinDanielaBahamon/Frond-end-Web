@@ -1,0 +1,63 @@
+$light: 'html:not([data-theme=\"dark\"])';
+
+#{$light} app-topbar {
+  .topbar { border-bottom: 1px solid #9d8fd6 !important; }
+
+  .topbar__btn { border-color: #9d8fd6 !important; }
+
+  .profile-menu {
+    border: 1px solid #b8aee0 !important;
+    box-shadow: 0 8px 32px rgba(45, 11, 94, 0.22) !important;
+  }
+
+  .profile-menu__divider { background: #b8aee0 !important; }
+
+  .settings-pill { border-color: #9d8fd6 !important; }
+}
+#{$light} app-dashboard-layout {
+
+  /* Screens that use var(--border, ...) become darker */
+  --border: #9d8fd6;
+
+  .layout__main {
+
+    /* ── Asistencia ─────────────────────────────── */
+    .as-panel,
+    .as-line-card,
+    .as-recurso-card,
+    .as-info-card,
+    .as-tip-card,
+    .as-saved-card,
+    .as-app-card,
+    .as-btn--ghost,
+    .as-search,
+    .as-filter-btn,
+    .as-chip,
+    .as-icon-btn,
+    .as-pill-btn { border-color: #9d8fd6 !important; }
+
+    .as-center-item,
+    .as-saved-item { border-bottom-color: #b8aee0 !important; }
+
+    /* ── Contactos de emergencia ────────────────── */
+    .ec-menu,
+    .ec-field select,
+    .ec-btn--ghost { border-color: #9d8fd6 !important; }
+
+    .ec-table tbody tr { border-top-color: #b8aee0 !important; }
+
+    /* ── Inicio ─────────────────────────────────── */
+    .home-mini-map { border-color: #9d8fd6 !important; }
+    .home-emergency__detail { border-top-color: #b8aee0 !important; }
+
+    /* ── Historial de alertas ───────────────────── */
+    .ah-search { border-color: #9d8fd6 !important; }
+
+    /* ── Buttons that used --purple-pale as a border ── */
+    .lf-add-btn,
+    .mu-btn,
+    .load-more-btn,
+    .calendar-today-btn,
+    .lh-full-btn { border-color: #9d8fd6 !important; }
+  }
+}

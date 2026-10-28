@@ -1,0 +1,398 @@
+<div class="evidences-management">
+
+    <!--==========================
+        PAGE HEADER
+    ==========================-->
+  
+    <header class="page-header">
+      <div>
+        <h1>{{ 'Gestión de Evidencias' | t }}</h1>
+        <p>{{ 'Visualiza, administra y gestiona las evidencias enviadas en las alertas.' | t }}</p>
+      </div>
+    </header>
+  
+    <!--==========================
+        STAT CARDS
+    ==========================-->
+  
+    <section class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-info">
+          <span>{{ 'Total Evidencias' | t }}</span>
+          <h2>{{ totalEvidences | t }}</h2>
+          <p>{{ 'En total registradas' | t }}</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-image"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card green">
+        <div class="stat-info">
+          <span>{{ 'Evidencias Verificadas' | t }}</span>
+          <h2>{{ verifiedEvidences | t }}</h2>
+          <p>{{ ((verifiedEvidences / totalEvidences * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card orange">
+        <div class="stat-info">
+          <span>{{ 'Pendientes de Revisión' | t }}</span>
+          <h2>{{ pendingEvidences | t }}</h2>
+          <p>{{ ((pendingEvidences / totalEvidences * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card red">
+        <div class="stat-info">
+          <span>{{ 'Rechazadas' | t }}</span>
+          <h2>{{ rejectedEvidences | t }}</h2>
+          <p>{{ ((rejectedEvidences / totalEvidences * 100) | number:
+            '1.1-1') | t }}{{ '% del total' | t }}</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-xmark"></i>
+        </div>
+      </div>
+  
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <span>{{ 'Descargas' | t }}</span>
+          <h2>{{ totalDownloads | t }}</h2>
+          <p>{{ 'Total realizadas' | t }}</p>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-download"></i>
+        </div>
+      </div>
+    </section>
+  
+    <!--==========================
+        TOOLBAR (FILTERS)
+    ==========================-->
+  
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          [placeholder]="'Buscar por nombre, descripción, ID, usuario...' | t"
+          [(ngModel)]="searchTermEvidence"
+          [attr.aria-label]="'Buscar evidencia' | t"
+        />
+      </div>
+  
+      <div class="filter-group">
+        <div class="filter-item custom-select" [class.open]="isEvidenceTypeDropdownOpen">
+          <div class="select-selected" (click)="toggleEvidenceTypeDropdown($event)">
+            {{ getEvidenceTypeLabel(filterEvidenceType) | t }}
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+          <div class="select-items" *ngIf="isEvidenceTypeDropdownOpen">
+            <div (click)="selectEvidenceType('all', $event)">{{ 'Todos los tipos' | t }}</div>
+            <div (click)="selectEvidenceType('foto', $event)">{{ 'Imagen' | t }}</div>
+            <div (click)="selectEvidenceType('video', $event)">{{ 'Video' | t }}</div>
+            <div (click)="selectEvidenceType('audio', $event)">{{ 'Audio' | t }}</div>
+            <div (click)="selectEvidenceType('documento', $event)">{{ 'Documento' | t }}</div>
+          </div>
+        </div>
+        <div class="filter-item custom-select" [class.open]="isStatusDropdownOpen">
+          <div class="select-selected" (click)="toggleStatusDropdown($event)">
+            {{ getStatusLabel(filterStatus) | t }}
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+          <div class="select-items" *ngIf="isStatusDropdownOpen">
+            <div (click)="selectStatus('all', $event)">{{ 'Todos los estados' | t }}</div>
+            <div (click)="selectStatus('Verificada', $event)">{{ 'Verificada' | t }}</div>
+            <div (click)="selectStatus('Pendiente', $event)">{{ 'Pendiente' | t }}</div>
+            <div (click)="selectStatus('Rechazada', $event)">{{ 'Rechazada' | t }}</div>
+          </div>
+        </div>
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          {{ 'Limpiar filtros' | t }}
+        </button>
+        <button class="btn-search" (click)="applyFilters(); $event.stopPropagation()">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          {{ 'Buscar' | t }}
+        </button>
+      </div>
+    </div>
+  
+    <!--==========================
+        EVIDENCE TABLE
+    ==========================-->
+  
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'Vista previa' | t }}</th>
+            <th>{{ 'Nombre de la evidencia' | t }}</th>
+            <th>{{ 'Usuario' | t }}</th>
+            <th>{{ 'Alerta relacionada' | t }}</th>
+            <th>{{ 'Tipo' | t }}</th>
+            <th>{{ 'Fecha' | t }}</th>
+            <th>{{ 'Estado' | t }}</th>
+            <th>{{ 'Acciones' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let evidence of paginatedEvidences; trackBy: trackByIndex">
+            <td>
+              <div class="evidence-preview">
+                <div class="preview-thumbnail"
+                  [ngClass]="{
+                    'video-icon': evidence.type === 'video',
+                    'audio-icon': evidence.type === 'audio',
+                    'document-icon': evidence.type === 'documento'
+                  }"
+                >
+                  <img *ngIf="evidence.type === 'foto' && evidence.fileUrl" [src]="evidence.fileUrl" [alt]="'Preview' | t" />
+                  <i *ngIf="evidence.type === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="evidence.type === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="evidence.type === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="evidence.type === 'foto' && !evidence.fileUrl" class="fa-solid fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="evidence-details">
+                <span class="evidence-name">{{ evidence.name | t }}</span>
+                <span class="evidence-id-size">{{ 'ID:' | t }} {{ evidence.id | t }} - {{ evidence.size | t }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ evidence.userName | t }}</span>
+                <span class="user-email">{{ evidence.userEmail | t }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="alert-related">
+                <span class="alert-id">{{ evidence.alertId | t }}</span>
+                <span class="alert-type-city">{{ evidence.alertType | t }}<ng-container *ngIf="evidence.alertCity"> - {{ evidence.alertCity | t }}</ng-container></span>
+              </div>
+            </td>
+            <td>
+              <span class="type-badge" [class]="getEvidenceTypeBadgeClass(evidence.type)">
+                {{ getEvidenceTypeDisplay(evidence.type) | t }}
+              </span>
+            </td>
+            <td>{{ (evidence.date | date:'dd/MM/yyyy') | t }}<br>{{ evidence.time | t }}</td>
+            <td>
+              <span class="status-badge" [class]="getEvidenceStatusBadgeClass(evidence.status)">
+                {{ evidence.status | t }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="view" (click)="viewEvidence(evidence)" [attr.aria-label]="'Ver evidencia' | t">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button class="download" (click)="downloadEvidence(evidence.id)" [attr.aria-label]="'Descargar evidencia' | t">
+                <i class="fa-solid fa-download"></i>
+              </button>
+              <button class="delete" (click)="deleteEvidence(evidence.id)" [attr.aria-label]="'Eliminar evidencia' | t">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!--==========================
+          PAGINATION
+      ==========================-->
+  
+      <div class="table-footer">
+        <div class="table-info">
+          {{ 'Mostrando' | t }}
+          <strong>{{ (currentPage - 1) * itemsPerPage + 1 | t }} - {{ (currentPage - 1) * itemsPerPage + paginatedEvidences.length | t }}</strong>
+          {{ 'de' | t }}
+          <strong>{{ filteredEvidences.length | t }}</strong>
+          {{ 'evidencias' | t }}
+        </div>
+        <div class="pagination">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1" [attr.aria-label]="'Página anterior' | t">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          @for (page of getPagesArray(); track $index) {
+            @if (page === null) {
+              <span class="page-ellipsis" aria-hidden="true">…</span>
+            } @else {
+              <button class="page-btn" [class.active]="currentPage === page" (click)="goToPage(page)" aria-label="Página {{ page | t }}">{{ page | t }}</button>
+            }
+          }
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" [attr.aria-label]="'Página siguiente' | t">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VER EVIDENCIA -->
+  @if (showViewModal && selectedEvidence) {
+    <div class="modal-overlay" (click)="closeViewModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ 'Detalle de Evidencia' | t }}</h2>
+          <button class="modal-close" (click)="closeViewModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="evidence-detail">
+            <!-- Header con preview y estado -->
+            <div class="detail-header">
+              <div class="evidence-preview-large">
+                <div class="preview-thumbnail-large"
+                  [ngClass]="{
+                    'video-icon': selectedEvidence.type === 'video',
+                    'audio-icon': selectedEvidence.type === 'audio',
+                    'document-icon': selectedEvidence.type === 'documento'
+                  }"
+                >
+                  <img *ngIf="selectedEvidence.type === 'foto' && selectedEvidence.fileUrl" [src]="selectedEvidence.fileUrl" [alt]="'Preview' | t" />
+                  <i *ngIf="selectedEvidence.type === 'video'" class="fa-solid fa-video"></i>
+                  <i *ngIf="selectedEvidence.type === 'audio'" class="fa-solid fa-headphones"></i>
+                  <i *ngIf="selectedEvidence.type === 'documento'" class="fa-solid fa-file-pdf"></i>
+                  <i *ngIf="selectedEvidence.type === 'foto' && !selectedEvidence.fileUrl" class="fa-solid fa-image"></i>
+                </div>
+              </div>
+              <div class="detail-info">
+                <h3>{{ selectedEvidence.name | t }}</h3>
+                <div class="detail-meta">
+                  <span class="status-badge" [class]="getEvidenceStatusBadgeClass(selectedEvidence.status)">
+                    {{ selectedEvidence.status | t }}
+                  </span>
+                  <span class="type-badge" [class]="getEvidenceTypeBadgeClass(selectedEvidence.type)">
+                    {{ getEvidenceTypeDisplay(selectedEvidence.type) | t }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Main information in a grid -->
+            <div class="detail-section">
+              <h4>{{ 'Información de la Evidencia' | t }}</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>{{ 'ID' | t }}</label>
+                  <p>{{ selectedEvidence.id | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Fecha' | t }}</label>
+                  <p>{{ (selectedEvidence.date | date:'dd/MM/yyyy') | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Hora' | t }}</label>
+                  <p>{{ selectedEvidence.time | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Tamaño' | t }}</label>
+                  <p>{{ selectedEvidence.size | t }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- User information -->
+            <div class="detail-section">
+              <h4>{{ 'Información del Usuario' | t }}</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>{{ 'Nombre' | t }}</label>
+                  <p>{{ selectedEvidence.userName | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Email' | t }}</label>
+                  <p>{{ selectedEvidence.userEmail | t }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alert information -->
+            <div class="detail-section">
+              <h4>{{ 'Alerta Relacionada' | t }}</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>{{ 'ID Alerta' | t }}</label>
+                  <p>{{ selectedEvidence.alertId | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Tipo' | t }}</label>
+                  <p>{{ selectedEvidence.alertType | t }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>{{ 'Ubicación de la alerta' | t }}</label>
+                  <p>{{ (selectedEvidence.location || 'Sin ubicación') | t }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional information -->
+            @if (selectedEvidence.location || selectedEvidence.activationMethod || selectedEvidence.duration) {
+              <div class="detail-section">
+                <h4>{{ 'Información Adicional' | t }}</h4>
+                <div class="detail-grid">
+                  @if (selectedEvidence.location) {
+                    <div class="detail-item">
+                      <label>{{ 'Ubicación' | t }}</label>
+                      <p>{{ selectedEvidence.location | t }}</p>
+                    </div>
+                  }
+                  @if (selectedEvidence.activationMethod) {
+                    <div class="detail-item">
+                      <label>{{ 'Método de Activación' | t }}</label>
+                      <p>{{ selectedEvidence.activationMethod | t }}</p>
+                    </div>
+                  }
+                  @if (selectedEvidence.duration) {
+                    <div class="detail-item">
+                      <label>{{ 'Duración' | t }}</label>
+                      <p>{{ selectedEvidence.duration | t }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            class="btn-action download" 
+            (click)="downloadEvidence(selectedEvidence.id)"
+          >
+            <i class="fa-solid fa-download"></i>
+            {{ 'Descargar' | t }}
+          </button>
+          <button 
+            class="btn-action verify" 
+            (click)="changeEvidenceStatus(selectedEvidence.id, 'Verificada')"
+            [disabled]="selectedEvidence.status === 'Verificada'"
+          >
+            <i class="fa-solid fa-check"></i>
+            {{ 'Verificar' | t }}
+          </button>
+          <button 
+            class="btn-action reject" 
+            (click)="changeEvidenceStatus(selectedEvidence.id, 'Rechazada')"
+            [disabled]="selectedEvidence.status === 'Rechazada'"
+          >
+            <i class="fa-solid fa-xmark"></i>
+            {{ 'Rechazar' | t }}
+          </button>
+          <button class="btn-secondary" (click)="closeViewModal()">{{ 'Cerrar' | t }}</button>
+        </div>
+      </div>
+    </div>
+  }
+  

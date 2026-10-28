@@ -1,0 +1,533 @@
+.sidebar {
+  width: 300px;
+  min-width: 300px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 1.5rem 1rem;
+  gap: 0;
+  overflow: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
+
+  // 🎨 Main sidebar color (follows the chosen accent color)
+  background: var(--sidebar-bg, #380759);
+
+  &--collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+  }
+
+  // ── Marca ──────────────────────────────
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  &__brand-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  &__brand-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__brand-name {
+    margin: 0;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  &__brand-tagline {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.678);
+    font-size: 0.7rem;
+  }
+
+  // ── Section / divider ──────────────────
+  &__header {
+    margin-bottom: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  &__divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple-mid, #C2A0F2), var(--accent-grad-to, #b108b1), transparent);
+    border-radius: 2px;
+  }
+
+  &__section {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.658);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 0.75rem;
+  }
+
+  // ── Nav (the only area that scrolls if there are many links) ──
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    // The thin violet bar comes from styles.scss
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    // Without the browser white outline on click; with the keyboard, a violet ring
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px #c084fc;
+    }
+
+    &--active {
+      // 🎨 Active module indicator — gradient with the accent color
+      background: linear-gradient(135deg, var(--accent-grad-from, #7630D9), var(--accent-grad-to, #D948B2));
+      color: #fff;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #D948B2) 35%, transparent);
+
+      .sidebar__link-icon { color: #F2F2F2; }
+    }
+  }
+
+  &__link-icon {
+    width: 16px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    transition: color 0.15s ease;
+  }
+
+  &__spacer {
+    flex-shrink: 0;
+    height: 1rem;
+  }
+
+  // ── Mobile app button ─────────────────────
+  &__mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--accent-grad-to, #D948B2), var(--accent-grad-from, #7630D9));
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+
+    &:hover { opacity: 0.88; }
+  }
+
+  // ── Usuario ──────────────────────────────
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+  }
+
+  &__user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__user-info {
+    overflow: hidden;
+    flex: 1;
+  }
+
+  &__user-link {
+    display: block;
+    margin: -6px 0;
+    padding: 6px 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+
+    &:hover,
+    &--active { background: rgba(255, 255, 255, 0.08); }
+  }
+
+  &__user-name {
+    margin: 0;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user-email {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__logout-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: color-mix(in srgb, var(--accent-grad-to, #aa15c1) 25%, transparent);
+      color: var(--purple-mid, #e372f4);
+    }
+  }
+
+  // Tablet
+  @media (max-width: 1024px) {
+    width: 90px;
+    min-width: 90px;
+    padding: 1rem 6px;
+
+    &__brand-text, &__user-info, &__mobile-btn span { display: none; }
+    &__section { font-size: 0.6rem; }
+    &__link {
+      font-size: 0.75rem;
+      padding: 9px 4px;
+      justify-content: center;
+      text-align: center;
+
+      span { display: none; }
+    }
+
+    &__user {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+
+  // Mobile
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  /*
+ * ==================================================
+ *   =        ADMIN VARIANT — warm palette             =
+ *      Enabled by adding the "sidebar--admin" class
+ *      next to "sidebar" on the <aside>, without touching
+ *      the user palette above.
+ *   ==================================================
+ */
+
+  &--admin {
+    background: #3b0764; // dark warm brown, instead of the user purple
+
+    .sidebar__divider {
+      background: linear-gradient(90deg, #b324fb, #a00cea, transparent);
+    }
+
+    .sidebar__link--active {
+      background: linear-gradient(135deg, #9306d9, #a00cea); // amber → orange
+      box-shadow: 0 4px 14px rgba(160, 12, 234, 0.35);
+
+      .sidebar__link-icon { color: #fff7ed; }
+    }
+
+    .sidebar__mobile-btn {
+      background: linear-gradient(90deg, #a00cea, #9306d9);
+    }
+
+    .sidebar__logout-btn:hover {
+      background: rgba(160, 12, 234, 0.25);
+      color: #cf74fd;
+    }
+  }
+}
+
+/*
+ * ==================================================
+ * =   ADMIN: sidebar as a drawer (off-canvas)         =
+ * =   ≤ 1024px. Only applies with class="sidebar--admin" =
+ * =   on <app-sidebar>, the user one does not change.      =
+ * ==================================================
+ */
+@media (max-width: 1024px) {
+  :host(.sidebar--admin) .sidebar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 280px;
+    min-width: 0; // before 280px: it beat max-width and the drawer overflowed the screen
+    max-width: 85vw;
+    padding: 1.5rem 1rem;
+    z-index: 1000;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s ease, visibility 0s linear 0s;
+
+    // Closed: slides off the screen
+    &.sidebar--collapsed {
+      width: 280px;
+      min-width: 0;
+      padding: 1.5rem 1rem;
+      transform: translateX(-100%);
+      box-shadow: none;
+      visibility: hidden;
+      transition: transform 0.3s ease, visibility 0s linear 0.3s;
+    }
+  }
+
+  // Undoes the tablet "narrow bar" rules so it shows fully
+  :host(.sidebar--admin) .sidebar__brand-text {
+    display: block;
+    min-width: 0;
+  }
+
+  :host(.sidebar--admin) .sidebar__user-info {
+    display: block;
+  }
+
+  // Brand texts wrap instead of being cut
+  :host(.sidebar--admin) .sidebar__brand-name,
+  :host(.sidebar--admin) .sidebar__brand-tagline {
+    overflow-wrap: anywhere;
+  }
+
+  :host(.sidebar--admin) .sidebar__section {
+    font-size: 0.7rem;
+  }
+
+  // No horizontal scroll in the module list
+  :host(.sidebar--admin) .sidebar__nav {
+    overflow-x: hidden;
+  }
+
+  // Module names wrap onto several lines if they do not fit
+  :host(.sidebar--admin) .sidebar__link {
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    padding: 11px 14px;
+
+    span {
+      display: inline;
+      flex: 1;
+      min-width: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  :host(.sidebar--admin) .sidebar__user {
+    flex-direction: row;
+    gap: 10px;
+  }
+}
+
+/*
+ * ==================================================
+ * =   Group titles inside the menu                    =
+ * =   (only show when a link has "group")             =
+ * ==================================================
+ */
+.sidebar__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 1.2rem 0 0.4rem;
+  padding: 0 4px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #c4a1ff; // lavanda: se distingue de los módulos (blanco/gris)
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+
+  // Thin line after the title, so it reads as a separator
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(196, 161, 255, 0.35), transparent);
+  }
+
+  &:first-child { margin-top: 0; }
+}
+
+// Tabler icons (outline) of the admin menu: a bit bigger than Font Awesome
+.sidebar__link-icon.ti {
+  width: 20px;
+  font-size: 1.15rem;
+}
+
+
+/*
+ * ==================================================
+ * =   USUARIA: misma barra deslizable que el admin    =
+ * =   ≤ 1024px. Se activa con class="sidebar--drawer"  =
+ * =   en <app-sidebar> (dashboard-layout.html)         =
+ * ==================================================
+ */
+@media (max-width: 1024px) {
+  :host(.sidebar--drawer) .sidebar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 280px;
+    min-width: 0;
+    max-width: 85vw;
+    padding: 1.5rem 1rem;
+    z-index: 1000;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s ease, visibility 0s linear 0s;
+
+    // Cerrada: se desliza fuera de la pantalla
+    &.sidebar--collapsed {
+      width: 280px;
+      min-width: 0;
+      padding: 1.5rem 1rem;
+      transform: translateX(-100%);
+      box-shadow: none;
+      visibility: hidden;
+      transition: transform 0.3s ease, visibility 0s linear 0.3s;
+    }
+  }
+
+  // Se ve completa (deshace la "barra angosta" de tablet)
+  :host(.sidebar--drawer) .sidebar__brand-text {
+    display: block;
+    min-width: 0;
+  }
+
+  :host(.sidebar--drawer) .sidebar__user-info {
+    display: block;
+  }
+
+  :host(.sidebar--drawer) .sidebar__brand-name,
+  :host(.sidebar--drawer) .sidebar__brand-tagline {
+    overflow-wrap: anywhere;
+  }
+
+  :host(.sidebar--drawer) .sidebar__section {
+    font-size: 0.7rem;
+  }
+
+  // La lista de módulos baja con scroll si no cabe, sin scroll de lado
+  :host(.sidebar--drawer) .sidebar__nav {
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  // Cada opción: ícono + texto, el texto baja de línea si no cabe
+  :host(.sidebar--drawer) .sidebar__link {
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    padding: 11px 14px;
+
+    span {
+      display: inline;
+      flex: 1;
+      min-width: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  :host(.sidebar--drawer) .sidebar__mobile-btn {
+    flex-shrink: 0;
+  }
+
+  :host(.sidebar--drawer) .sidebar__user {
+    flex-direction: row;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+}
+
+// Celulares bajitos: opciones un poco más compactas para que quepan
+@media (max-width: 1024px) and (max-height: 700px) {
+  :host(.sidebar--drawer) .sidebar {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  :host(.sidebar--drawer) .sidebar__brand {
+    margin-bottom: 0.75rem;
+  }
+
+  :host(.sidebar--drawer) .sidebar__link {
+    padding: 8px 12px;
+  }
+
+  :host(.sidebar--drawer) .sidebar__group {
+    margin: 0.7rem 0 0.25rem;
+  }
+}

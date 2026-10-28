@@ -1,0 +1,105 @@
+$line:      #6d5bb8;   // main borders and lines
+$line-soft: #8878c6;   // separadores entre filas
+
+$adm: 'html:not([data-theme=\"dark\"]):not(#_) app-admin-layout .layout__main';
+$mods: ':is(app-device-management, app-moderator-management, app-evidences-management, app-report-management)';
+
+/* ── Barra superior del admin ─────────────────── */
+html:not([data-theme="dark"]):not(#_) app-admin-layout app-topbar {
+  .topbar { border-bottom: 2px solid $line !important; }
+  .topbar__btn { border: 2px solid $line !important; }
+  .profile-menu { border: 2px solid $line !important; }
+  .profile-menu__divider { height: 2px !important; background: $line-soft !important; }
+  .settings-pill { border-width: 2px !important; border-color: $line !important; }
+}
+
+#{$adm} {
+
+  /* Color base que usan usuarios, alertas, zonas y dashboard */
+  --border: #{$line};
+  .mini-stat, .search-input, .filter-select, .chip, .action-btn,
+  .bulk-btn, .page-btn, .per-page-select, .btn-secondary,
+  .btn-clear-filter, .btn-clear-filters, .alerts-count,
+  .panel-select, .btn-attend, .zone-auto-card, .zone-manual-card,
+  .btn-add-zone, .btn-mark-zone, .map-box, .fab-option,
+  .filters-layers, .radio-preset-btn, .level-btn, .search-box,
+  .form-input, .form-control, .option, .zone-map, .stat-card,
+  .dash-card, .toolbar, .modal-content, .select-selected,
+  .select-items, .date-range-picker, .os-badge, .btn-action,
+  .btn-small, .alerts-list, .alert-item, .description-box,
+  .user-card, .table-card {
+    border-width: 2px !important;
+  }
+
+  app-user input:not([type='checkbox']),
+  .form-group input:not([type='checkbox']),
+  .form-group select,
+  .form-group textarea,
+  .toolbar select,
+  .toolbar input[type='date'],
+  textarea { border-width: 2px !important; }
+
+  /* Cards with a thick top stripe: the 3px on top is kept */
+  app-user .table-card,
+  app-alert-admin .alerts-panel { border-width: 2px !important; border-top-width: 3px !important; }
+
+  #{$mods} {
+    .stat-card, .toolbar, .table-card, .modal-content {
+      border-color: $line !important;
+    }
+
+    .search-box:not(:focus-within),
+    .select-selected, .select-items, .date-range-picker, .os-badge,
+    .btn-clear-filters, .btn-action, .btn-small,
+    .alerts-list, .alert-item,
+    .toolbar select:not(:focus),
+    .toolbar input[type='date']:not(:focus),
+    .form-group input:not(:focus),
+    .form-group select:not(:focus),
+    .form-group textarea:not(:focus),
+    textarea:not(:focus) { border-color: $line !important; }
+  }
+
+  table thead th { border-bottom: 2px solid $line !important; }
+
+  .table-footer,
+  .modal-footer,
+  .filters-body { border-top: 2px solid $line !important; }
+
+  /* This line only existed in Moderators and Reports (filters in another row) */
+  :is(app-moderator-management, app-report-management) .filter-group {
+    border-top: 2px solid $line !important;
+  }
+
+  /* Table without rows: do not repeat the line between the header and the footer */
+  .table-card:not(:has(tbody tr)) .table-footer { border-top: none !important; }
+
+  .modal-header,
+  .panel-tabs,
+  .panel-filters,
+  .zones-section,
+  .zone-add-row,
+  .detail-hero { border-bottom: 2px solid $line !important; }
+
+  .detail-section h4 { border-bottom: 2px solid $line !important; }
+
+  /*
+ * Row separators: desktop only
+ *      (on mobile the table turns into cards)
+ */
+  @media (min-width: 769px) {
+    table tbody tr {
+      border-bottom: 2px solid $line-soft !important;
+
+      &:last-child { border-bottom: none !important; }
+
+      td { border-top: 2px solid $line-soft !important; }
+    }
+
+    table tbody tr:first-child td { border-top-color: $line !important; }
+  }
+
+  /* Dashboard: lists (the last item of each list has no line) */
+  app-dashboard li { border-bottom: 2px solid $line-soft !important; }
+  app-dashboard li:last-child { border-bottom: none !important; }
+}

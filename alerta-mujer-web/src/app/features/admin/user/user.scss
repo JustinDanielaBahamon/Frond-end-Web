@@ -1,0 +1,1098 @@
+@use 'sass:color';
+@use '../../../shared/styles/variables.scss' as *;
+
+// =============================================
+// PAGE WRAPPER
+// =============================================
+.users-page {
+  padding: 28px 28px 40px;
+  background: $bg-base;
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: $text-primary;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+// =============================================
+// HEADER
+// =============================================
+.users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.users-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: $text-primary;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.users-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $bg-card;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  padding: 8px 16px;
+  min-width: 64px;
+
+  &__value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: $purple-deep;
+  }
+
+  &__label {
+    font-size: 0.68rem;
+    color: $text-muted;
+    font-weight: 500;
+  }
+
+  &--green .mini-stat__value { color: $green; }
+  &--red   .mini-stat__value { color: $red; }
+  &--amber .mini-stat__value { color: $amber; }
+}
+
+// =============================================
+// TOOLBAR
+// =============================================
+.users-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $text-dim;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 36px 10px 38px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  color: $text-primary;
+  background: $bg-card;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &::placeholder { color: $text-dim; }
+
+  &:focus {
+    outline: none;
+    border-color: $purple-deep;
+    box-shadow: 0 0 0 3px rgba($purple-deep, 0.12);
+  }
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-dim;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+
+  &:hover { color: $text-primary; }
+}
+
+.filter-wrap {
+  flex-shrink: 0;
+}
+
+.filter-select {
+  padding: 10px 14px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  color: $text-muted;
+  background: $bg-card;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+
+  &:focus {
+    outline: none;
+    border-color: $purple-deep;
+  }
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, $purple-deep, #6d28d9);
+  color: #fff;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba($purple-deep, 0.3);
+  transition: filter 0.2s, transform 0.15s;
+
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+// =============================================
+// FILTER CHIPS
+// =============================================
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  app-chip { flex-shrink: 0; }
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1.5px solid $border;
+  border-radius: 100px;
+  background: $bg-card;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $bg-card-hover;
+    color: $text-primary;
+  }
+
+  &--active {
+    background: $purple-pale;
+    border-color: $purple-deep;
+    color: $purple-deep;
+    font-weight: 600;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__count {
+    background: rgba(0,0,0,0.07);
+    border-radius: 100px;
+    padding: 1px 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+}
+
+// =============================================
+// TABLE CARD
+// =============================================
+.table-card {
+  background: $bg-card;
+  border: 1.5px solid $border;
+  border-top: 3px solid $purple-mid;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+// Horizontal scroll when space is tight (tablets / laptops with sidebar)
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// "Seleccionar todas": only shown on mobile (see media query)
+.select-all-mobile {
+  display: none;
+}
+
+table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  table-layout: fixed;
+
+  // Anchos fijos por columna
+  col.col-check   { width: 40px; }
+  col.col-name  { width: 22%; }
+  col.col-email   { width: 22%; }
+  col.col-date   { width: 11%; }
+  col.col-alerts { width: 9%; }
+  col.col-activ   { width: 14%; }
+  col.col-status  { width: 13%; }
+  col.col-acc     { width: 9%; }
+
+  thead tr th {
+    text-align: left;
+    padding: 11px 10px;
+    color: $text-dim;
+    font-weight: 600;
+    font-size: 0.72rem;
+    border-bottom: 1px solid $border;
+    white-space: nowrap;
+    background: $bg-base;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba($border, 0.7);
+    transition: background 0.15s;
+
+    &:hover       { background: $bg-card-hover; }
+    &:last-child  { border-bottom: none; }
+
+    &.row--blocked {
+      background: rgba($red-pale, 0.35);
+      &:hover { background: rgba($red-pale, 0.5); }
+    }
+
+    td {
+      padding: 11px 10px;
+      color: $text-muted;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  input[type="checkbox"] {
+    accent-color: $purple-deep;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+}
+
+// ── Celda Nombre ────────────────────────────
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+
+  &--lg {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: $text-primary;
+  font-size: 0.85rem;
+}
+
+.user-role {
+  font-size: 0.7rem;
+  color: $text-dim;
+}
+
+.email-cell {
+  font-size: 0.8rem;
+  color: $purple-deep;
+}
+
+// ── Badge alertas ────────────────────────────
+.alerts-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: $purple-pale;
+  color: $purple-deep;
+
+  &--high {
+    background: $red-pale;
+    color: $red;
+  }
+}
+
+.muted { color: $text-dim; font-size: 0.78rem; }
+
+// ── Estado badges ────────────────────────────
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.state--active {
+    background: $green-pale;
+    color: $green;
+  }
+
+  &.state--inactiva {
+    background: $amber-pale;
+    color: $amber;
+  }
+
+  &.state--blocked {
+    background: $red-pale;
+    color: $red;
+  }
+}
+
+// ── Acciones ─────────────────────────────────
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-sm;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: $text-muted;
+
+  &:hover { border-color: $purple-mid; color: $purple-deep; background: $purple-pale; }
+
+  &--view {
+    &:hover { border-color: $purple-mid; color: $purple-deep; background: $purple-pale; }
+  }
+
+  &--reset {
+    &:hover { border-color: #6d28d9; color: #4c1d95; background: #eff6ff; }
+  }
+
+  &--block {
+    &:hover { border-color: $red; color: $red; background: $red-pale; }
+  }
+
+  &--unblock {
+    border-color: $green;
+    color: $green;
+    background: $green-pale;
+    &:hover { filter: brightness(0.92); }
+  }
+}
+
+// ── Empty state ──────────────────────────────
+.empty-state {
+  text-align: center !important;
+  padding: 48px 20px !important;
+  color: $text-dim;
+
+  svg { display: block; margin: 0 auto 12px; opacity: 0.5; }
+
+  p { margin: 0 0 14px; font-size: 0.88rem; }
+}
+
+.btn-clear-filter {
+  padding: 8px 20px;
+  border: 1.5px solid $purple-light;
+  border-radius: $radius-sm;
+  background: $purple-pale;
+  color: $purple-deep;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+
+  &:hover { background: $purple-pale-hover; }
+}
+
+// =============================================
+// TABLE FOOTER
+// =============================================
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 16px;
+  border-top: 1px solid $border;
+  gap: 12px;
+  background: $bg-base;
+  flex-wrap: wrap;
+}
+
+// ── Acciones masivas ─────────────────────────
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.bulk-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $purple-deep;
+}
+
+.bulk-btn {
+  padding: 7px 14px;
+  border-radius: $radius-sm;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid $border;
+  background: $bg-card;
+  color: $text-muted;
+  transition: all 0.15s;
+
+  &:hover { background: $bg-card-hover; }
+
+  &--danger {
+    background: $red-pale;
+    border-color: $red;
+    color: $red;
+
+    &:hover { background: $red-pale-hover; }
+  }
+}
+
+// ── Pagination ───────────────────────────────
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pagination__info {
+  font-size: 0.78rem;
+  color: $text-muted;
+  margin-right: 4px;
+}
+
+.pagination__controls {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  color: $text-muted;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+
+  &:hover:not(:disabled) { background: $bg-card-hover; color: $purple-deep; border-color: $purple-mid; }
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  &--active {
+    background: $purple-deep;
+    border-color: $purple-deep;
+    color: #fff;
+    font-weight: 700;
+  }
+}
+
+.per-page-select {
+  padding: 6px 28px 6px 10px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.78rem;
+  color: $text-muted;
+  background: $bg-card;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+
+  &:focus { outline: none; border-color: $purple-deep; }
+}
+
+// =============================================
+// MODALS (the modal itself lives in
+// shared/components/modal/modal.scss)
+// =============================================
+
+// ── Detalle modal ────────────────────────────
+.detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $border;
+}
+
+.detail-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 4px;
+}
+
+.detail-email {
+  font-size: 0.82rem;
+  color: $purple-deep;
+  margin: 0 0 8px;
+  word-break: break-all;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: $text-dim;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-value {
+  font-size: 0.85rem;
+  color: $text-primary;
+  font-weight: 500;
+}
+
+// ── Secciones del detalle ────────────────────
+.detail-section {
+  margin: 20px 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $purple-deep;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: $text-dim;
+}
+
+.detail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    background: $bg-base;
+
+    strong { font-size: 0.83rem; color: $text-primary; }
+    span   { font-size: 0.76rem; color: $text-muted; }
+  }
+}
+
+// ── Formulario ───────────────────────────────
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: $text-dim;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: $text-primary;
+    background: $bg-card;
+
+    &:focus {
+      outline: none;
+      border-color: $purple-deep;
+      box-shadow: 0 0 0 3px rgba($purple-deep, 0.12);
+    }
+
+    &.ng-invalid.ng-touched { border-color: $red; }
+  }
+}
+
+.form-error {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: $red;
+  background: $red-pale;
+  border-radius: $radius-sm;
+}
+
+// ── Confirm modal ────────────────────────────
+.confirm-text {
+  font-size: 0.9rem;
+  color: $text-primary;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.confirm-sub {
+  font-size: 0.82rem;
+  color: $text-muted;
+  margin: 0;
+  padding: 10px 12px;
+  background: $red-pale;
+  border-radius: $radius-sm;
+  border-left: 3px solid $red;
+}
+
+// =============================================
+// MODAL FOOTER BUTTONS
+// (Cerrar / Editar / Cancelar / Guardar / Restablecer / Bloquear)
+// They use tokens, so they switch between light and dark mode by themselves.
+// =============================================
+.btn-secondary,
+.btn-primary,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// Secondary: border + high-contrast text (almost white in dark, dark in light)
+.btn-secondary {
+  border: 1.5px solid $border;
+  background: $bg-card;
+  color: $text-primary;
+
+  &:hover:not(:disabled) { background: $bg-card-hover; border-color: $purple-deep; }
+}
+
+// Primary: purple-pink gradient with white text in both modes
+.btn-primary {
+  border: none;
+  background: linear-gradient(90deg, $purple-deep 0%, $pink 100%);
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(1.1); }
+}
+
+// Danger: solid red with white text in both modes
+.btn-danger {
+  border: none;
+  background: #c026d3;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: #a21caf; }
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+
+// ── Tablet ≤ 1024px ──────────────────────────
+@media (max-width: 1024px) {
+  .users-page { padding: 20px 20px 32px; }
+}
+
+// ── Mobile ≤ 768px: table → cards ──────────
+@media (max-width: 768px) {
+  .users-page { padding: 16px 14px 28px; }
+
+  // Header: title on top, stats in a row of 4
+  .users-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .users-title { font-size: 1.25rem; }
+
+  .users-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .mini-stat {
+    min-width: 0;
+    padding: 8px 6px;
+
+    &__value { font-size: 1.1rem; }
+    &__label { font-size: 0.62rem; }
+  }
+
+  // Toolbar apilada, ancho completo
+  .users-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .search-wrap { min-width: 0; flex: none; width: 100%; }
+  .filter-wrap { width: 100%; }
+  .filter-select { width: 100%; box-sizing: border-box; }
+  .btn-add { width: 100%; justify-content: center; }
+
+  // 16px avoids the automatic iOS zoom when focusing inputs
+  .search-input,
+  .filter-select,
+  .form-field input { font-size: 16px; }
+
+  .search-input,
+  .filter-select { padding-top: 12px; padding-bottom: 12px; }
+
+  // Chips: a single line with horizontal scroll
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  // Select all (replaces the thead checkbox)
+  .select-all-mobile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: $bg-base;
+    border-bottom: 1px solid $border;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-muted;
+    cursor: pointer;
+
+    input {
+      accent-color: $purple-deep;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+  }
+
+  .table-wrap { overflow-x: visible; }
+
+  // Cada fila pasa a ser una tarjeta
+  table {
+    display: block;
+    min-width: 0;
+    table-layout: auto;
+
+    colgroup { display: none; }
+
+    // The header is hidden visually but stays for screen readers
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody { display: block; }
+
+    tbody tr {
+      display: block;
+      position: relative;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid $border;
+
+      td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-align: right;
+
+        // Label of each value (comes from data-label in the HTML)
+        &[data-label]::before {
+          content: attr(data-label);
+          flex-shrink: 0;
+          text-align: left;
+          font-size: 0.68rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: $text-dim;
+        }
+      }
+
+      // Checkbox at the top right of the card
+      td.cell-check {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        padding: 0;
+      }
+
+      // Name + avatar as the card header
+      td.cell-name {
+        justify-content: flex-start;
+        text-align: left;
+        padding: 0 34px 10px 0;
+        margin-bottom: 4px;
+        border-bottom: 1px dashed $border;
+      }
+
+      td.email-cell { word-break: break-all; }
+
+      // Actions at the bottom of the card
+      td.cell-acc {
+        justify-content: flex-end;
+        margin-top: 6px;
+        padding-top: 12px;
+        border-top: 1px solid $border;
+      }
+
+      td.empty-state {
+        display: block;
+        text-align: center;
+      }
+    }
+
+    input[type="checkbox"] { width: 18px; height: 18px; }
+  }
+
+  // Bigger action buttons for the finger
+  .actions-cell { gap: 8px; }
+  .action-btn { width: 40px; height: 40px; }
+
+  // Pie de tabla centrado y apilado
+  .table-footer {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    padding: 12px 14px;
+  }
+
+  .bulk-actions {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .bulk-btn { justify-content: center; padding: 10px 14px; }
+
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pagination__info { margin-right: 0; text-align: center; }
+  .pagination__controls { justify-content: center; }
+  .page-btn { min-width: 36px; height: 36px; }
+
+  .per-page-select {
+    font-size: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  // Modales
+  .detail-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+
+  .btn-secondary,
+  .btn-primary,
+  .btn-danger {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}
+
+// ── Small mobile ≤ 480px ────────────────────
+@media (max-width: 480px) {
+  .users-stats { grid-template-columns: repeat(2, 1fr); }
+
+  .detail-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+// ── Moderation and extended detail ─────────────────────
+.notice-panel { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: rgba(124, 58, 237, 0.12); color: var(--text-primary); font-weight: 600; }
+.phone { margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
+.phone__header { display: flex; flex-direction: column; gap: 2px; font-size: 13px; span { color: var(--text-muted); font-size: 12px; } }
+.phone__permissions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.permission { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(192, 38, 211, 0.12); color: #a21caf; }
+.permission--ok { background: rgba(124, 58, 237, 0.15); color: #6d28d9; }
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
+  li { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-left: 3px solid #7c3aed; border-radius: 8px; background: rgba(124, 58, 237, 0.06); font-size: 13px; }
+  span { font-size: 12px; color: var(--text-muted); } }
+.history__note { font-style: italic; }
+.link-btn { align-self: flex-start; padding: 0; border: none; background: none; color: #7c3aed; font-weight: 700; cursor: pointer; }
+.evidence-img { max-width: 100%; margin-top: 8px; border-radius: 10px; border: 1px solid var(--border); }
+.evidence { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0;
+  img { width: 90px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); } }
+.evidence__button { cursor: pointer; }
+.form-help { font-size: 12px; color: var(--text-muted); margin: 4px 0 0; }
+.btn-danger-outline { margin-right: auto; padding: 9px 14px; border: 1.5px solid #a21caf; border-radius: 10px; background: transparent; color: #a21caf; font-weight: 700; cursor: pointer; }
+
+// =============================================
+// CELULAR: los 4 cuadros de arriba (Total, Activas, Bloqueadas,
+// Inactivas) uno debajo del otro, a lo ancho, para que no se vean chicos.
+// Cada cuadro: nombre a la izquierda y número a la derecha.
+// =============================================
+@media (max-width: 480px) {
+  .users-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .mini-stat {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+
+    &__value { font-size: 1.5rem; line-height: 1; }
+    &__label { font-size: 0.9rem; font-weight: 700; }
+  }
+}

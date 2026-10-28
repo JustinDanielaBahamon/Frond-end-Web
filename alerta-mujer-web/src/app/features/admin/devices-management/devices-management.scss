@@ -1,0 +1,1316 @@
+/*==================================================
+=            GLOBAL STYLES & UTILITIES
+==================================================*/
+
+// Define variables for consistent styling
+$color-primary: #7e22ce; // Purple
+$color-primary-light: #f3e8ff; // Light Purple
+$color-secondary: #d946ef; // Pink
+$color-accent: #7c3aed; // Blue
+$color-text-dark: #2d0b5e;
+$color-text-medium: #4c1d95;
+$color-text-light: #6b7280;
+$color-background: #f8f7fc;
+$color-white: #ffffff;
+$color-border: #e0e0e0;
+$color-table-header: #faf7ff;
+
+
+$badge-android-bg: #f3e8ff;
+$badge-android-text: #7e22ce;
+
+$badge-green-bg: #f3e8ff;
+$badge-green-text: #7e22ce;
+
+$badge-red-bg: #f3e8ff;
+$badge-red-text: #7e22ce;
+
+
+// Specific colors for badges and status
+$badge-android-bg: #f3e8ff;
+$badge-android-text: #7e22ce;
+
+$status-active-color: #7e22ce;
+$status-inactive-color: #7e22ce;
+$status-blocked-color: #7e22ce;
+
+// Shadows
+$shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 25px 70px rgba(88, 28, 135, 0.18);
+
+// Mixin for common card styles
+@mixin card-base {
+  background: $color-white;
+  border-radius: 15px;
+  box-shadow: $shadow-md;
+  padding: 25px;
+}
+
+// Mixin for button styles
+@mixin button-base {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/*==================================================
+=            DEVICE MANAGEMENT PAGE
+==================================================*/
+
+.device-management {
+  padding: 30px;
+  background: $color-background;
+  min-height: 100vh;
+}
+
+/*======================================
+=            PAGE HEADERA
+======================================*/
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: $color-text-dark;
+  }
+
+  p {
+    margin-top: 5px;
+    color: $color-text-light;
+    font-size: 0.95rem;
+  }
+
+  .btn-register-device {
+    @include button-base;
+    background: #4c1d95;
+    color: $color-white;
+    box-shadow: 0 10px 20px rgba($color-primary, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px rgba($color-primary, 0.4);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+/*======================================
+=            STAT CARDS
+======================================*/
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+
+  .stat-card {
+    @include card-base;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+
+    .stat-info {
+      span {
+        color: $color-text-light;
+        font-size: 0.85rem;
+      }
+
+      h2 {
+        margin-top: 8px;
+        font-size: 2rem;
+        font-weight: 700;
+        color: $color-text-dark;
+      }
+
+      p {
+        font-size: 0.75rem;
+        color: $color-text-light;
+        margin-top: 4px;
+      }
+    }
+
+    .stat-icon {
+      width: 55px;
+      height: 55px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      color: $color-white;
+    }
+
+    &.purple .stat-icon {
+      background: $color-primary;
+    }
+    &.green .stat-icon {
+      background: $color-primary;
+    }
+    &.orange .stat-icon {
+      background: $color-primary;
+    }
+    &.red .stat-icon {
+      background: $color-primary;
+    }
+    &.blue .stat-icon {
+      background: $color-primary;
+    }
+  }
+}
+
+/*======================================
+=            TOOLBAR (FILTERS)
+======================================*/
+
+.toolbar {
+  @include card-base;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding:  20px;
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    height: 45px;
+    background: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 20px 15px;
+    border: 1px solid $color-border;
+
+    i {
+      color: $color-text-light;
+      margin-right: 12px;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      color: $color-text-dark;
+      outline: none;
+
+      &::placeholder {
+        color: $color-text-light;
+      }
+    }
+  }
+
+  .btn-search {
+    @include button-base;
+    background: $color-primary;
+    color: $color-white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    height: 45px;
+
+    &:hover {
+      background: darken($color-primary, 10%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    i {
+      color: $color-white;
+    }
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .filter-item {
+      position: relative;
+      flex: 1;
+      min-width: 150px;
+
+      select {
+        @include button-base;
+        background: #f9fafb;
+        border: 1px solid $color-border;
+        color: $color-text-dark;
+        appearance: none; // Remove default arrow
+        padding-right: 35px; // Space for custom arrow
+        width: 100%;
+
+        &:hover {
+          border-color: $color-primary;
+        }
+      }
+
+      &::after {
+        content: '\f078'; // FontAwesome chevron-down
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $color-text-light;
+        pointer-events: none;
+      }
+    }
+
+    // Custom dropdown styles
+    .custom-select {
+      position: relative;
+
+      .select-selected {
+        @include button-base;
+        background: #f9fafb;
+        border: 1px solid $color-border;
+        color: $color-text-dark;
+        padding-right: 35px;
+        width: 100%;
+        cursor: pointer;
+        justify-content: space-between;
+
+        &:hover {
+          border-color: $color-primary;
+        }
+
+        .select-arrow {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          transition: transform 0.3s ease;
+        }
+      }
+
+      &.open .select-arrow {
+        transform: translateY(-50%) rotate(180deg);
+      }
+
+      .select-items {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: $color-white;
+        border: 1px solid $color-border;
+        border-radius: 8px;
+        box-shadow: $shadow-md;
+        z-index: 1000;
+        margin-top: 4px;
+        overflow: hidden;
+        animation: slideDown 0.2s ease;
+
+        div {
+          padding: 12px 15px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          font-size: 0.9rem;
+          color: $color-text-dark;
+
+          &:hover {
+            background: $color-primary-light;
+            color: $color-primary;
+          }
+
+          &:first-child {
+            border-radius: 8px 8px 0 0;
+          }
+
+          &:last-child {
+            border-radius: 0 0 8px 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .btn-clear-filters {
+    @include button-base;
+    background: none;
+    border: 1px solid $color-border;
+    color: $color-text-light;
+
+    &:hover {
+      background: $color-primary-light;
+      color: $color-primary;
+    }
+  }
+}
+
+/*======================================
+=            DEVICE TABLE
+======================================*/
+
+.table-card {
+  @include card-base;
+  padding: 0;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: $color-table-header;
+
+      th {
+        padding: 15px 20px;
+        text-align: left;
+        color: $color-text-medium;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+    }
+
+    tbody {
+      tr {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #fcfaff;
+        }
+
+        td {
+          padding: 18px 20px;
+          border-top: 1px solid $color-border;
+          color: $color-text-light;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.device-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: $color-text-dark;
+
+  .device-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: $color-primary-light;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $color-primary;
+    font-size: 1rem;
+  }
+
+  .device-details {
+    display: flex;
+    flex-direction: column;
+
+    span.os-version {
+      font-size: 0.75rem;
+      color: $color-text-light;
+      font-weight: 400;
+    }
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+
+  span.user-email {
+    font-size: 0.75rem;
+    color: $color-text-light;
+  }
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &.badge-android {
+    background: $badge-android-bg;
+    color: $badge-android-text;
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  &.status-active {
+    color: $status-active-color;
+    &::before { background: $status-active-color; }
+  }
+  &.status-inactive {
+    color: $status-inactive-color;
+    &::before { background: $status-inactive-color; }
+  }
+  &.status-blocked {
+    color: $status-blocked-color;
+    &::before { background: $status-blocked-color; }
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+
+  button {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: $color-text-light;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-primary-light;
+      color: $color-primary;
+    }
+
+    &.view:hover { background: $badge-android-bg; color: $badge-android-text; }
+    &.edit:hover { background: $badge-green-bg; color: $badge-green-text; }
+    &.delete:hover { background: $badge-red-bg; color: $badge-red-text; }
+  }
+}
+
+/*======================================
+=            PAGINATION
+======================================*/
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid $color-border;
+
+  .table-info {
+    font-size: 0.85rem;
+    color: $color-text-light;
+
+    strong {
+      color: $color-text-dark;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    gap: 8px;
+
+    .page-btn {
+      @include button-base;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #f3f4f6;
+      color: $color-text-medium;
+
+      &:hover {
+        background: $color-primary-light;
+        color: $color-primary;
+      }
+
+      &.active {
+        background: $color-primary;
+        color: $color-white;
+      }
+    }
+
+    .page-ellipsis {
+      display: flex;
+      align-items: flex-end;
+      color: $color-text-light;
+      font-weight: 600;
+      padding-bottom: 5px;
+    }
+  }
+}
+
+/*======================================
+=            RESPONSIVE DESIGN
+======================================*/
+
+@media (max-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-box {
+      width: 100%;
+    }
+
+    .filter-group {
+      width: 100%;
+      justify-content: space-between;
+
+      .filter-item {
+        flex: 1 1 auto;
+        min-width: unset;
+      }
+    }
+  }
+
+  .table-card {
+    table {
+      min-width: 1000px; // Ensure table is scrollable horizontally
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+
+    .btn-register-device {
+      width: 100%;
+    }
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-management {
+    padding: 28px;
+  }
+
+  .table-footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .stats-grid .stat-card .stat-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .toolbar .search-box input {
+    font-size: 0.85rem;
+  }
+
+  .table-card table thead th,
+  .table-card table tbody td {
+    padding: 12px 15px;
+    font-size: 0.8rem;
+  }
+
+  .device-info .device-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .device-info .device-details span.os-version {
+    font-size: 0.7rem;
+  }
+
+  .user-info span.user-email {
+    font-size: 0.7rem;
+  }
+
+  .type-badge {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  .status-badge {
+    font-size: 0.65rem;
+  }
+
+  .actions-cell button {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .table-footer .table-info,
+  .table-footer .pagination .page-btn {
+    font-size: 0.75rem;
+  }
+
+  .table-footer .pagination .page-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/*======================================
+=            MODALS
+======================================*/
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.modal-content {
+  background: $color-white;
+  border-radius: 15px;
+  box-shadow: $shadow-lg;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid $color-border;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: $color-text-dark;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: $color-text-light;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 25px;
+  border-top: 1px solid $color-border;
+}
+
+.device-detail {
+  .device-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, $color-primary-light 0%, #ffffff 100%);
+    border-radius: 12px;
+    margin-bottom: 24px;
+
+    .device-icon-large {
+      width: 70px;
+      height: 70px;
+      background: #4c1d95;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      color: $color-white;
+      box-shadow: $shadow-md;
+    }
+
+    .device-header-info {
+      flex: 1;
+
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $color-text-dark;
+      }
+
+      .os-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: $color-white;
+        border: 1px solid $color-border;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: $color-text-medium;
+        margin-right: 8px;
+      }
+
+      .type-badge-large {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .detail-section {
+    margin-bottom: 24px;
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: $color-text-dark;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid $color-primary-light;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $color-primary;
+      }
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $color-text-medium;
+        margin-bottom: 4px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: $color-text-dark;
+      }
+
+      .status-badge-large {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: $color-primary-light;
+      border-radius: 12px;
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        background: #4c1d95;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.8rem;
+        color: $color-white;
+      }
+
+      .user-details {
+        .user-name {
+          margin: 0 0 4px 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: $color-text-dark;
+        }
+
+        .user-email {
+          margin: 0;
+          font-size: 0.9rem;
+          color: $color-text-medium;
+        }
+      }
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $color-text-dark;
+    margin-bottom: 8px;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: $color-text-dark;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &::placeholder {
+      color: $color-text-light;
+    }
+  }
+
+  .custom-select {
+    position: relative;
+    width: 100%;
+
+    .select-selected {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid $color-border;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: $color-text-dark;
+      background: #f9fafb;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: $color-primary;
+      }
+
+      .select-arrow {
+        color: $color-text-light;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    &.open .select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .select-items {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: $color-white;
+      border: 1px solid $color-border;
+      border-radius: 8px;
+      box-shadow: $shadow-md;
+      z-index: 1000;
+      margin-top: 4px;
+      overflow: hidden;
+      animation: slideDown 0.2s ease;
+
+      div {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.95rem;
+        color: $color-text-dark;
+
+        &:hover {
+          background: $color-primary-light;
+          color: $color-primary;
+        }
+
+        &:first-child {
+          border-radius: 8px 8px 0 0;
+        }
+
+        &:last-child {
+          border-radius: 0 0 8px 8px;
+        }
+      }
+    }
+  }
+}
+
+.btn-primary,
+.btn-secondary {
+  @include button-base;
+}
+
+.btn-primary {
+  background: #7e22ce;
+  color: $color-white;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($color-primary, 0.4);
+  }
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: $color-text-medium;
+
+  &:hover {
+    background: $color-primary-light;
+    color: $color-primary;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/*======================================
+=            MODAL RESPONSIVE
+======================================*/
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+
+    h2 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 15px 20px;
+    flex-direction: column-reverse;
+
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+  }
+
+  .device-detail .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header {
+    padding: 12px 15px;
+
+    h2 {
+      font-size: 1rem;
+    }
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .modal-footer {
+    padding: 12px 15px;
+    gap: 8px;
+  }
+}
+
+/* Animation for dropdown */
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Permissions the app reports (device detail)
+.permissions-device {
+  margin-top: 14px;
+
+  &__summary {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #6b5b95);
+
+    strong { color: var(--text-primary, #2e1065); }
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__empty {
+    margin: 12px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #6b5b95);
+  }
+}
+
+.permission-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px dashed #a855f7;
+  color: #7e22ce;
+
+  &--ready {
+    border-style: solid;
+    border-color: #7c3aed;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: #fff;
+  }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE DISPOSITIVOS (solo diseño)
+// =============================================
+
+// Buscador: se ajusta al ancho (antes pedía mínimo 200 px)
+.toolbar .search-box {
+  min-width: 0;
+  box-sizing: border-box;
+
+  input { min-width: 0; width: 100%; }
+}
+
+.toolbar .btn-search { min-width: 0; }
+
+// Tarjetas de números: se pueden encoger sin salirse
+.stats-grid > * { min-width: 0; }
+
+.stats-grid .stat-card .stat-info {
+  min-width: 0;
+
+  span,
+  p { overflow-wrap: anywhere; }
+}
+
+// Nombre del dispositivo: no se aprieta contra la columna de al lado
+.device-info .device-details { min-width: 150px; }
+
+// Tabla: mantiene su tamaño y se mueve hacia los lados con barrita morada
+.table-card {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+
+  table thead th { white-space: nowrap; }
+}
+
+// El pie de la tabla (páginas) se queda fijo aunque muevas la tabla
+.table-card .table-footer {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+}
+
+// Tablet: tarjetas de números de a 2 y filtros a lo ancho
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .stats-grid .stat-card { padding: 16px 18px; }
+
+  .page-header { margin-bottom: 22px; }
+  .toolbar { margin-bottom: 22px; }
+
+  .toolbar .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+
+    .filter-item,
+    .btn-clear-filters { width: 100%; min-width: 0; }
+  }
+
+  .table-footer {
+    align-items: center;
+    text-align: center;
+
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}
+
+// Celular: tarjetas una por fila, compactas
+@media (max-width: 480px) {
+  .device-management { padding: 12px; }
+
+  .page-header {
+    h1 { font-size: 1.45rem; overflow-wrap: anywhere; }
+    p { font-size: 0.85rem; }
+  }
+
+  .stats-grid { grid-template-columns: 1fr; }
+
+  .stats-grid .stat-card {
+    padding: 14px 16px;
+    gap: 12px;
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+  }
+
+  .toolbar { padding: 14px; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .device-management { padding: 8px; }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .stats-grid .stat-card {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .toolbar {
+    padding: 10px;
+
+    .search-box { padding: 10px; }
+  }
+
+  .table-footer .pagination .page-btn {
+    width: 28px;
+    height: 28px;
+  }
+}

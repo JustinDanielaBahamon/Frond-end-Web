@@ -1,0 +1,40 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; // the sidebar never moves with the scroll
+
+  app-sidebar {
+    flex-shrink: 0; // prevents the sidebar from shrinking when the content is narrow
+  }
+}
+
+.layout__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; // prevents wide content (tables) from pushing the whole layout
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout__main {
+  flex: 1;
+  min-height: 0; // needed for overflow-y to work inside a flex column
+  overflow-y: auto;
+  background: var(--bg-base, #f9fafb);
+}
+
+// Drawer dark background: hidden on desktop
+.layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999; // debajo del drawer (1000)
+  }
+}

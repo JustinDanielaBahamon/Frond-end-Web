@@ -1,0 +1,206 @@
+/* ======================================
+   HERO (Modificado para ser Banner)
+====================================== */
+.container-hero {
+    position: relative;
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 80px 60px;
+
+    background-image: linear-gradient(var(--hero-overlay-from), var(--hero-overlay-to)), var(--hero-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    transition: background-image 0.3s ease;
+}
+
+/*
+ * Framing adjustment for the dark theme only:
+ *    landingoscuro.png has a different ratio than bannerHero.png,
+ *    so "cover" crops differently. We push the focus a bit
+ *    up so the phone/the woman is not lost.
+ */
+[data-theme="dark"] .container-hero {
+    background-position: center top;
+}
+
+/* ======================================
+   INFORMACIÓN
+====================================== */
+.container-information {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+}
+
+.container-texts {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.text-banner {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--hero-heading);
+    margin: 0;
+}
+
+.text-banner span {
+    color: var(--hero-accent);
+}
+
+.container-text-second {
+    max-width: 520px;
+}
+
+.container-text-second p {
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--hero-body-text);
+    margin: 0;
+    font-weight: 800;
+}
+
+/* ======================================
+   BOTONES
+====================================== */
+.container-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.start-btn {
+    height: 52px;
+    padding: 0 28px;
+    border: none;
+    border-radius: 12px;
+    background: var(--hero-btn-primary-bg);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px var(--hero-btn-primary-shadow);
+}
+
+.learn-btn {
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 12px;
+    border: 2px solid var(--hero-btn-secondary-border);
+    background: transparent;
+    color: var(--hero-btn-secondary-text);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.learn-btn:hover {
+    background: var(--hero-btn-primary-bg);
+    color: white;
+}
+
+/* ======================================
+   ESTADÍSTICAS
+====================================== */
+.container-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.container-stats p {
+    margin: 0;
+    color: var(--hero-stats-text);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.img-stats img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--hero-img-border);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* ======================================
+   RESPONSIVE (TABLET)
+====================================== */
+@media (max-width: 1200px) {
+    .container-hero {
+        padding: 60px 40px;
+        min-height: 60vh;
+    }
+
+    .text-banner {
+        font-size: 52px;
+    }
+}
+
+/* ======================================
+   RESPONSIVE (MOBILE)
+====================================== */
+@media (max-width: 900px) {
+    .container-hero {
+        justify-content: center;
+        text-align: center;
+        padding: 80px 70px;
+        background-image: linear-gradient(var(--hero-overlay-mobile), var(--hero-overlay-mobile)), var(--hero-bg-image);
+        min-height: 58vh;
+    }
+
+    .container-information {
+        max-width: 100%;
+    }
+
+    .container-text-second {
+        max-width: 100%;
+    }
+
+    .container-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .container-stats {
+        justify-content: center;
+    }
+
+    .text-banner {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 500px) {
+    .container-hero {
+        min-height: 68vh;
+        padding: 23px 14%;
+    }
+
+    .text-banner {
+        font-size: 34px;
+    }
+
+    .container-text-second p {
+        font-size: 16px;
+    }
+
+    .start-btn,
+    .learn-btn {
+        width: 100%;
+    }
+}

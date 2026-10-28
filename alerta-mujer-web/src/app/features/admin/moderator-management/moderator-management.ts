@@ -1,0 +1,522 @@
+import { TPipe } from '../../../core/i18n/i18n';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { ModeratorService, Report } from '../../../core/services/moderator.service';
+import { UsersService } from '../../../core/services/users.services';
+import { DeletionRequests } from './deletion-requests/deletion-requests';
+import { compactPages } from '../../../shared/utils/pagination';
+
+@Component({
+  selector: 'app-moderator-management',
+  imports: [TPipe, CommonModule, FormsModule, DeletionRequests],
+  templateUrl: './moderator-management.html',
+  styleUrl: './moderator-management.scss',
+})
+export class ModeratorManagementComponent implements OnInit, OnDestroy {
+  reports: Report[] = [];
+  allReports: Report[] = []; // Keep all the reports for filtering
+  filteredReports: Report[] = []; // Reportes filtrados actuales
+  stats = {
+    pendingReports: 0,
+    resolvedCases: 0,
+    sanctionedUsers: 0
+  };
+
+  currentPage = 1;
+  totalPages = 1;
+  itemsPerPage = 7;
+  totalItems = 0;
+
+  get pages(): (number | null)[] {
+    return compactPages(this.currentPage, this.totalPages);
+  }
+
+  // Estados UI
+  showViewModal = false;
+  showEditModal = false;
+  showAddModal = false;
+  selectedReport: Report | null = null;
+  newReport: Partial<Report> | null = null;
+
+  // Filtros
+  searchTerm = '';
+  filterReason = '';
+  filterSeverity = '';
+  filterStatus = '';
+  filterDate = '';
+
+  // Custom dropdown states (toolbar filters)
+  isReasonDropdownOpen = false;
+  isSeverityDropdownOpen = false;
+  isStatusDropdownOpen = false;
+
+  // Edit modal dropdown states
+  isEditReasonDropdownOpen = false;
+  isEditSeverityDropdownOpen = false;
+  isEditStatusDropdownOpen = false;
+
+  private destroy$ = new Subject<void>();
+
+  caseEvidence: string | null = null;
+
+  constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef,
+              private usersService: UsersService) {
+    // Cerrar dropdowns al hacer clic fuera
+    this.clickHandler = () => {
+      this.isReasonDropdownOpen = false;
+      this.isSeverityDropdownOpen = false;
+      this.isStatusDropdownOpen = false;
+    };
+    document.addEventListener('click', this.clickHandler);
+  }
+
+  ngOnInit(): void {
+    this.loadReports();
+    this.loadStats();
+  }
+
+  viewCaseEvidence(r: Report): void {
+    this.usersService.caseEvidenceOf(Number(r.id)).subscribe({
+      next: (e) => {
+        this.caseEvidence = e;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.clickHandler) {
+      document.removeEventListener('click', this.clickHandler);
+    }
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ========================================
+  // CARGAR DATOS DEL SERVICIO
+  // ========================================
+
+  loadReports(): void {
+    this.moderatorService.getAll().subscribe(reports => {
+      this.allReports = reports;
+      this.filteredReports = reports;
+      this.reports = reports;
+      this.totalItems = reports.length;
+      this.totalPages = Math.ceil(reports.length / this.itemsPerPage);
+      this.calculateStats();
+      this.applyFilters();
+      this.cdr.detectChanges();
+    });
+  }
+
+  loadStats(): void {
+    this.calculateStats();
+  }
+
+  calculateStats(): void {
+    const reports = this.allReports;
+    this.stats = {
+      pendingReports: reports.filter(r => r.status === 'Pendiente').length,
+      resolvedCases: reports.filter(r => r.status === 'Resuelto').length,
+      // Distinct users with at least one resolved report
+      sanctionedUsers: new Set(reports.filter(r => r.status === 'Resuelto').map(r => r.userEmail)).size
+    };
+  }
+
+  private clickHandler: (() => void) | null = null;
+
+  // ========================================
+  // DROPDOWNS PERSONALIZADOS
+  // ========================================
+
+  toggleReasonDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isReasonDropdownOpen = !this.isReasonDropdownOpen;
+  }
+
+  selectReason(reason: string, event: Event): void {
+    event.stopPropagation();
+    this.filterReason = reason;
+    this.isReasonDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  getReasonLabel(reason: string): string {
+    switch (reason) {
+      case '': return 'Motivo de reporte';
+      case 'all': return 'Todos';
+      case 'spam': return 'Spam';
+      case 'acoso': return 'Acoso';
+      case 'contenido-inapropiado': return 'Contenido inapropiado';
+      case 'discurso-odio': return 'Discurso de odio';
+      case 'falsificacion': return 'Falsificación';
+      default: return reason;
+    }
+  }
+
+  toggleSeverityDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isSeverityDropdownOpen = !this.isSeverityDropdownOpen;
+  }
+
+  selectSeverity(severity: string, event: Event): void {
+    event.stopPropagation();
+    this.filterSeverity = severity;
+    this.isSeverityDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  getSeverityLabel(severity: string): string {
+    switch (severity) {
+      case '': return 'Gravedad';
+      case 'all': return 'Todas';
+      case 'baja': return 'Baja';
+      case 'media': return 'Media';
+      case 'alta': return 'Alta';
+      case 'critica': return 'Crítica';
+      default: return severity;
+    }
+  }
+
+  toggleStatusDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
+  }
+
+  selectStatus(status: string, event: Event): void {
+    event.stopPropagation();
+    this.filterStatus = status;
+    this.isStatusDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  // Methods to edit the selected report
+  toggleEditReasonDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isEditReasonDropdownOpen = !this.isEditReasonDropdownOpen;
+    this.isEditSeverityDropdownOpen = false;
+    this.isEditStatusDropdownOpen = false;
+  }
+
+  toggleEditSeverityDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isEditSeverityDropdownOpen = !this.isEditSeverityDropdownOpen;
+    this.isEditReasonDropdownOpen = false;
+    this.isEditStatusDropdownOpen = false;
+  }
+
+  toggleEditStatusDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isEditStatusDropdownOpen = !this.isEditStatusDropdownOpen;
+    this.isEditReasonDropdownOpen = false;
+    this.isEditSeverityDropdownOpen = false;
+  }
+
+  updateReportReason(reason: string, event: Event): void {
+    event.stopPropagation();
+    if (this.selectedReport) {
+      this.selectedReport.reason = reason;
+    }
+    this.isEditReasonDropdownOpen = false;
+  }
+
+  updateReportSeverity(severity: string, event: Event): void {
+    event.stopPropagation();
+    if (this.selectedReport) {
+      this.selectedReport.severity = severity;
+    }
+    this.isEditSeverityDropdownOpen = false;
+  }
+
+  updateReportStatus(status: string, event: Event): void {
+    event.stopPropagation();
+    if (this.selectedReport) {
+      this.selectedReport.status = status;
+    }
+    this.isEditStatusDropdownOpen = false;
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case '': return 'Estado';
+      case 'all': return 'Todos';
+      case 'pendiente': return 'Pendiente';
+      case 'en-revision': return 'En revisión';
+      case 'resuelto': return 'Resuelto';
+      case 'rechazado': return 'Rechazado';
+      default: return status;
+    }
+  }
+
+  // ========================================
+  // FILTROS Y BÚSQUEDA
+  // ========================================
+
+  applyFilters(): void {
+
+    this.filteredReports = this.allReports.filter(report => {
+      // Filter by search term (ID, user, reason, severity, status)
+      if (this.searchTerm) {
+        const searchLower = this.searchTerm.toLowerCase();
+        const matchesSearch =
+          report.id.toLowerCase().includes(searchLower) ||
+          report.userName.toLowerCase().includes(searchLower) ||
+          report.userEmail.toLowerCase().includes(searchLower) ||
+          report.reason.toLowerCase().includes(searchLower) ||
+          report.severity.toLowerCase().includes(searchLower) ||
+          report.status.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // Filtrar por motivo
+      if (this.filterReason && this.filterReason !== 'all') {
+        const reasonMap: { [key: string]: string } = {
+          'spam': 'Spam',
+          'acoso': 'Acoso',
+          'contenido-inapropiado': 'Contenido inapropiado',
+          'discurso-odio': 'Discurso de odio',
+          'falsificacion': 'Falsificación'
+        };
+        if (report.reason !== reasonMap[this.filterReason]) return false;
+      }
+
+      // Filtrar por gravedad
+      if (this.filterSeverity && this.filterSeverity !== 'all') {
+        const severityMap: { [key: string]: string } = {
+          'baja': 'Baja',
+          'media': 'Media',
+          'alta': 'Alta',
+          'critica': 'Crítica'
+        };
+        if (report.severity !== severityMap[this.filterSeverity]) return false;
+      }
+
+      // Filtrar por estado
+      if (this.filterStatus && this.filterStatus !== 'all') {
+        const statusMap: { [key: string]: string } = {
+          'pendiente': 'Pendiente',
+          'en-revision': 'En revisión',
+          'resuelto': 'Resuelto',
+          'rechazado': 'Rechazado'
+        };
+        if (report.status !== statusMap[this.filterStatus]) return false;
+      }
+
+      // Filtrar por fecha
+      if (this.filterDate) {
+        const filterDate = new Date(this.filterDate);
+        const reportDate = new Date(report.date);
+        if (reportDate.toDateString() !== filterDate.toDateString()) return false;
+      }
+
+      return true;
+    });
+
+    // Update the visible reports with pagination
+    this.totalItems = this.filteredReports.length;
+    this.totalPages = Math.ceil(this.filteredReports.length / this.itemsPerPage);
+    this.currentPage = 1; // Reset to the first page
+    this.updatePaginatedReports();
+
+  }
+
+  updatePaginatedReports(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.reports = this.filteredReports.slice(startIndex, endIndex);
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.filterReason = '';
+    this.filterSeverity = '';
+    this.filterStatus = '';
+    this.filterDate = '';
+    this.applyFilters();
+  }
+
+  // ========================================
+  // ACCIONES DE REPORTES
+  // ========================================
+
+  openAddReportModal(): void {
+    this.newReport = {
+      userName: '',
+      userEmail: '',
+      reason: '',
+      severity: '',
+      date: new Date().toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      status: 'Pendiente',
+      description: ''
+    };
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.newReport = null;
+  }
+
+  saveNewReport(): void {
+    if (this.newReport && this.newReport.userName && this.newReport.userEmail && this.newReport.reason && this.newReport.severity && this.newReport.description) {
+      const reportWithoutId: Omit<Report, 'id'> = {
+        userName: this.newReport.userName,
+        userEmail: this.newReport.userEmail,
+        reason: this.newReport.reason,
+        severity: this.newReport.severity,
+        date: this.newReport.date || new Date().toLocaleString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        status: this.newReport.status || 'Pendiente',
+        description: this.newReport.description
+      };
+
+      this.moderatorService.create(reportWithoutId).subscribe({
+        next: () => {
+          this.loadReports();
+          this.closeAddModal();
+        },
+        error: (err) => {
+          console.error('Error creando reporte:', err);
+          alert(err?.error?.message || 'No se pudo crear el reporte');
+        }
+      });
+    }
+  }
+
+  viewReport(reportId: string): void {
+    this.selectedReport = this.reports.find(r => r.id === reportId) || null;
+    if (this.selectedReport) {
+      this.showViewModal = true;
+    }
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedReport = null;
+    this.caseEvidence = null;
+  }
+
+  openEditModal(reportId: string): void {
+    // A copy is edited: when cancelling, the table must not change
+    const report = this.reports.find(r => r.id === reportId);
+    this.selectedReport = report ? { ...report } : null;
+    if (this.selectedReport) {
+      this.showEditModal = true;
+    }
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedReport = null;
+  }
+
+  updateReport(): void {
+    if (this.selectedReport) {
+      this.moderatorService.update(this.selectedReport.id, this.selectedReport).subscribe({
+        next: () => {
+          this.closeEditModal();
+          this.loadReports();
+        },
+        error: (err) => {
+          console.error('Error actualizando reporte:', err);
+          alert(err?.error?.message || 'No se pudo actualizar el reporte');
+        }
+      });
+    }
+  }
+
+
+  approveReport(reportId: string): void {
+    const report = this.allReports.find(r => r.id === reportId);
+    if (report) {
+      this.moderatorService.update(reportId, { ...report, status: 'Resuelto' }).subscribe(() => this.loadReports());
+    }
+  }
+
+  deleteReport(reportId: string): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
+      this.moderatorService.delete(reportId).subscribe(() => this.loadReports());
+    }
+  }
+
+  // ========================================
+  // HELPERS PARA CLASES CSS
+  // ========================================
+
+  formatUserNameForAvatar(userName: string): string {
+    return userName.replace(/ /g, '+');
+  }
+
+  getMinValue(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  getSeverityClass(severity: string): string {
+    switch (severity.toLowerCase()) {
+      case 'baja': return 'low';
+      case 'media': return 'medium';
+      case 'alta': return 'high';
+      case 'crítica': return 'critical';
+      default: return 'low';
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'pendiente': return 'pending';
+      case 'en revisión': return 'in-review';
+      case 'resuelto': return 'resolved';
+      case 'rechazado': return 'rejected';
+      default: return 'pending';
+    }
+  }
+
+  getReasonClass(reason: string): string {
+    switch (reason.toLowerCase()) {
+      case 'spam': return 'orange';
+      case 'acoso': return 'red';
+      case 'contenido inapropiado': return 'blue';
+      case 'discurso de odio': return 'purple';
+      case 'falsificación': return 'green';
+      default: return 'red';
+    }
+  }
+
+  // ========================================
+  // PAGINACIÓN
+  // ========================================
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedReports();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedReports();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedReports();
+    }
+  }
+}

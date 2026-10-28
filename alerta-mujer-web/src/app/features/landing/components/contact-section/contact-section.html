@@ -1,0 +1,120 @@
+<div class="container-contacts">
+
+    <div class="text-contacts">
+        <h1>{{ 'Contáctanos' | t }}</h1>
+        <p>{{ 'Estamos aquí para ayudarte' | t }}</p>
+    </div>
+
+    <div class="container-content">
+
+        <!-- ================= FORMULARIO ================= -->
+
+        <div class="form">
+
+            <div class="text-form">
+                <h1>{{ 'Formulario' | t }}</h1>
+            </div>
+
+            <form>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            [placeholder]="'Nombre completo' | t">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <input
+                            type="email"
+                            class="form-control"
+                            [placeholder]="'Correo electrónico' | t">
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <textarea
+                        class="form-control"
+                        rows="5"
+                        [placeholder]="'Mensaje' | t"></textarea>
+
+                </div>
+
+                <button type="submit" class="btn-contact">
+                    {{ 'Enviar mensaje' | t }}
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- ================= CONTACTO ================= -->
+
+        <div class="contacts">
+
+            <div class="contact-info">
+
+                <div class="contact-item">
+
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+
+                    <div>
+                        <h5>{{ 'Correo electrónico' | t }}</h5>
+                        <p>{{ 'hola@alertamujer.com' | t }}</p>
+                    </div>
+
+                </div>
+
+                <div class="contact-item">
+
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+
+                    <div>
+                        <h5>{{ 'Teléfono' | t }}</h5>
+                        <p>+57 300 123 4567</p>
+                    </div>
+
+                </div>
+
+                <div class="contact-item">
+
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+
+                    <div>
+                        <h5>{{ 'Ubicación' | t }}</h5>
+                        <p>{{ 'Bogotá, Colombia' | t }}</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="contact-image">
+
+                <img
+                    src="./logoContacts.png"
+                    [alt]="'Contacto' | t"
+                    class="img-contact-light">
+
+                <img
+                    src="./logoContactsoscuro.png"
+                    [alt]="'Contacto' | t"
+                    class="img-contact-dark">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

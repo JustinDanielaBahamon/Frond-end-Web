@@ -1,0 +1,73 @@
+<aside class="sidebar"
+  [class.sidebar--collapsed]="collapsed">
+
+  <div class="sidebar__brand">
+    <div class="sidebar__brand-icon">
+      <img [src]="brandLogo" [alt]="'Alerta Mujer' | t" class="sidebar__brand-logo" />
+    </div>
+    <div class="sidebar__brand-text">
+      <p class="sidebar__brand-name">{{ brandName | t }}</p>
+      <p class="sidebar__brand-tagline">{{ brandTagline | t }}</p>
+    </div>
+  </div>
+
+  <div class="sidebar__header">
+    <p class="sidebar__section">{{ sectionTitle | t }}</p>
+    <div class="sidebar__divider"></div>
+  </div>
+
+  <nav class="sidebar__nav">
+    @for (link of links; track link.route) {
+      @if (link.group) {
+        <p class="sidebar__group">{{ link.group | t }}</p>
+      }
+      <a
+        [routerLink]="link.route"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
+        class="sidebar__link">
+        @if (link.icon) {
+          <i class="sidebar__link-icon" [class]="link.icon"></i>
+        }
+        <span>{{ link.label | t }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar__spacer"></div>
+
+  @if (showMobileAppButton) {
+    <a [href]="mobileAppUrl" target="_blank" rel="noopener" download class="sidebar__mobile-btn">
+      <i class="fa-solid fa-download"></i>
+      {{ 'Descargar app móvil' | t }}
+    </a>
+  }
+
+  @if (user) {
+    <div class="sidebar__user">
+      @if (user.avatarUrl) {
+        <img [src]="user.avatarUrl" class="sidebar__user-avatar" [alt]="user.name" />
+      }
+      @if (profileRoute) {
+        <a class="sidebar__user-info sidebar__user-link" [routerLink]="profileRoute"
+           routerLinkActive="sidebar__user-link--active" [title]="'Mi perfil' | t">
+          <p class="sidebar__user-name">{{ user.name | t }}</p>
+          <p class="sidebar__user-email">{{ user.email | t }}</p>
+        </a>
+      } @else {
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ user.name | t }}</p>
+          <p class="sidebar__user-email">{{ user.email | t }}</p>
+        </div>
+      }
+      <button class="sidebar__logout-btn" [title]="'Cerrar sesión' | t" (click)="logout.emit()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  }
+</aside>

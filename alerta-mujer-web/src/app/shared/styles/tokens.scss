@@ -1,0 +1,183 @@
+/* ── Tokens de color ────────────────────────────────── */
+:root {
+  /* Purples - unified purple-pink-lilac palette */
+  --color-purple-deep : #5b21b6;
+  --color-purple      : #7c3aed;
+  --color-purple-mid  : #a78bfa;
+  --color-purple-light: #c4b5fd;
+  --color-purple-pale : #ede9fe;
+
+  /* Rosas */
+  --color-pink          : #d648ec;
+  --color-pink-hot      : #cb1ce6;
+  --color-pink-light    : #f5cffb;
+
+  /* Lilas */
+  --color-lilac         : #c084fc;
+  --color-lilac-light   : #e9d5ff;
+
+  /* Textos */
+  --color-text-dark     : #1e1a3c;
+  --color-text-mid      : #4b5563;
+  --color-text-muted    : #6b7280;
+  --color-text-dim      : #9ca3af;
+
+  /* Superficies */
+  --color-white         : #ffffff;
+  --color-card-bg       : #ffffff;
+  --color-input-bg      : #f9fafb;
+
+  /* Bordes */
+  --color-border        : #c4b5fd;
+  --color-border-focus  : var(--color-purple);
+
+  /* Gradientes */
+  --gradient-bg  : linear-gradient(135deg, #ede9fe 0%, #f5cffb 50%, #ede9fe 100%);
+  --gradient-btn : linear-gradient(90deg, #7c3aed 0%, #d648ec 100%);
+
+  /* Sombras (auth) */
+  --shadow-card       : 0 24px 60px rgba(124, 58, 237, 0.15), 0 4px 16px rgba(124, 58, 237, 0.08);
+  --shadow-btn        : 0 8px 24px rgba(214, 72, 236, 0.35);
+  --shadow-btn-hover  : 0 12px 32px rgba(214, 72, 236, 0.45);
+  --shadow-card-badge : 0 12px 36px rgba(124, 58, 237, 0.18);
+
+  /* Typography */
+  --font-base : 'Nunito', sans-serif;
+
+  /* Type scale */
+  --font-size-xs : 0.75rem;   /* Support texts, dates, small labels */
+  --font-size-sm : 0.875rem;  /* Textos de cuerpo */
+  --font-size-base: 1rem;     /* Base */
+  --font-size-lg : 1.125rem;  /* Subtitles */
+  --font-size-xl : 1.25rem;   /* Panel titles */
+  --font-size-2xl: 1.5rem;    /* Main titles */
+  --font-size-3xl: 1.875rem;  /* Big titles */
+
+  /* Radios */
+  --radius-card     : 28px;
+  --radius-input    : 14px;
+  --radius-btn      : 50px;
+  --radius-checkbox : 5px;
+
+  /* Transiciones */
+  --transition-fast   : 0.2s ease;
+  --transition-normal : 0.3s ease;
+
+  /* ══════════════════════════════════════════════
+     Tokens del PANEL ADMIN / DASHBOARD (alertas, zonas, etc.)
+     ══════════════════════════════════════════════ */
+  --bg-base       : #f5f4ff;
+  --bg-card       : #ffffff;
+  --bg-card-hover : #f0eeff;
+  --border        : #c4b5fd;
+  --text-primary  : #1e1a3c;
+  --text-muted    : #6b7280;
+  --text-dim      : #9ca3af;
+
+  --purple-deep       : #5b21b6;
+  --purple-mid        : #7c3aed;
+  --purple-light      : #c4b5fd;
+  --purple-pale       : #ede9fe;
+  --purple-pale-hover : #e0d8fc;
+  --pink              : #d648ec;
+
+  --green         : #5316a3;
+  --green-pale    : #eadcfc;
+  --red           : #cb1ce6;
+  --red-light     : #eaa3f5;
+  --red-pale      : #fae2fe;
+  --red-pale-hover: #f6c9fd;
+  --amber         : #9306d9;
+  --amber-pale    : #ecc7fe;
+
+  --dash-shadow-card : 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.10);
+  --dash-radius-card : 12px;
+  --dash-radius-sm   : 6px;
+
+  /* ══════════════════════════════════════════════
+     Navbar landing
+     ══════════════════════════════════════════════ */
+  --navbar-bg           : #f6f5fc;
+  --navbar-bg-mobile    : #f0eff6;
+  --navbar-bg-mobile-sm : #ffffff;
+  --navbar-text         : #290f67;
+  --navbar-purple       : #7c3aed;
+  --navbar-border       : #ddd;
+  --navbar-divider      : #ececec;
+  --navbar-shadow       : rgba(0, 0, 0, .05);
+  --navbar-hover-bg     : rgba(124, 58, 237, .15);
+  --navbar-btn-bg       : #f7f7f7;
+
+  /* ══════════════════════════════════════════════
+     Hero landing
+     ══════════════════════════════════════════════ */
+  --hero-bg-image       : url('/bannerHero.png');
+  --hero-overlay-from   : rgb(255 255 255 / 40%);
+  --hero-overlay-to     : rgb(255 255 255 / 59%);
+  --hero-overlay-mobile : rgb(255, 255, 255);
+  --hero-heading        : #290f67;
+  --hero-accent         : #7c3aed;
+  --hero-body-text      : #000000;
+  --hero-stats-text     : #290f67;
+  --hero-btn-primary-bg      : #7c3aed;
+  --hero-btn-primary-shadow  : rgba(124, 58, 237, .25);
+  --hero-btn-secondary-border: #7c3aed;
+  --hero-btn-secondary-text  : #7c3aed;
+  --hero-img-border      : #ffffff;
+}
+
+/* Modo oscuro — Morado oscuro base + rosa/lila acentos */
+[data-theme="dark"] {
+  --bg-base       : #1a1428;
+  --bg-card       : #241d3d;
+  --bg-card-hover : #2e2647;
+  --border        : #4c3a80;
+  --text-primary  : #ede9fe;
+  --text-muted    : #a8a0c4;
+  --text-dim      : #766e94;
+
+  --purple-deep       : #9d6ff0;
+  --purple-mid        : #b79bf5;
+  --purple-light      : #6d4fae;
+  --purple-pale       : #2b204a;
+  --purple-pale-hover : #342659;
+  --pink              : #ea5fff;
+
+  --green         : #8a49df;
+  --green-pale    : #2a1846;
+  --red           : #e671f8;
+  --red-light     : #d239e9;
+  --red-pale      : #3d1347;
+  --red-pale-hover: #4d1a5a;
+  --amber         : #b324fb;
+  --amber-pale    : #33124a;
+
+  --dash-shadow-card : 0 0 0 1.5px var(--border), 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Navbar landing en oscuro */
+  --navbar-bg           : #1a1428;
+  --navbar-bg-mobile    : #241d3d;
+  --navbar-bg-mobile-sm : #1a1428;
+  --navbar-text         : #ede9fe;
+  --navbar-purple       : #b79bf5;
+  --navbar-border       : #4c3a80;
+  --navbar-divider      : #4c3a80;
+  --navbar-shadow       : rgba(0, 0, 0, .35);
+  --navbar-hover-bg     : rgba(183, 121, 232, .18);
+  --navbar-btn-bg       : #241d3d;
+
+  /* Hero landing en oscuro */
+  --hero-bg-image       : url('/landingoscuro.png');
+  --hero-overlay-from   : rgb(10 6 20 / 45%);
+  --hero-overlay-to     : rgb(10 6 20 / 70%);
+  --hero-overlay-mobile : rgb(10, 6, 20);
+  --hero-heading        : #ffffff;
+  --hero-accent         : #d47ee8;
+  --hero-body-text      : #d8d3e8;
+  --hero-stats-text     : #c4b5fd;
+  --hero-btn-primary-bg      : #9d6ff0;
+  --hero-btn-primary-shadow  : rgba(157, 111, 240, .35);
+  --hero-btn-secondary-border: #9d6ff0;
+  --hero-btn-secondary-text  : #b79bf5;
+  --hero-img-border      : #7c3aed;
+}

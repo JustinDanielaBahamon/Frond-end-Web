@@ -1,0 +1,39 @@
+<div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <app-sidebar
+    class="sidebar--admin"
+    [links]="links"
+    sectionTitle="Administración"
+    [collapsed]="sidebarCollapsed"
+    [user]="currentUser"
+    profileRoute="/admin/perfil"
+    [showMobileAppButton]="false"
+    (logout)="signOut()">
+  </app-sidebar>
+
+  <!-- Dark background behind the drawer (only visible on screens ≤ 1024px) -->
+  @if (!sidebarCollapsed) {
+    <div class="layout__backdrop" (click)="sidebarCollapsed = true"></div>
+  }
+
+  <div class="layout__body">
+
+    <app-topbar
+      brand="Alerta Mujer — Admin"
+      avatarLetter="A"
+      [userName]="currentUser?.name || 'Administración'"
+      [userEmail]="currentUser?.email || ''"
+      userRole="Administración"
+      profileRoute="/admin/perfil"
+      [accountLinks]="accountLinks"
+      [notifications]="notifications()"
+      (sidebarToggle)="toggleSidebar()"
+      (themeToggle)="toggleTheme()">
+    </app-topbar>
+
+    <main class="layout__main">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>

@@ -1,0 +1,481 @@
+/* --- CONTENEDOR PRINCIPAL Y DISEÑO --- */
+.navbar-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background-color: var(--navbar-bg);
+    box-shadow: 0 2px 10px var(--navbar-shadow);
+}
+
+/* --- LOGOTIPO --- */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-logo img {
+    height: 45px;
+}
+
+.navbar-logo span {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navbar-text);
+}
+
+/* --- NAVIGATION LINKS --- */
+.navbar-links {
+    display: flex;
+    gap: 35px;
+    align-items: center;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: var(--navbar-text);
+    font-weight: 800;
+    font-size: 16px;
+    position: relative;
+    padding: 6px 0;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.navbar-links a:hover {
+    color: var(--navbar-purple) !important;
+    transform: translateY(-2px);
+    text-shadow: 0 2px 4px var(--navbar-hover-bg);
+}
+
+/* --- ACTION BUTTONS (LOGIN AND REGISTER) --- */
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.login-btn {
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 17px;
+    border: 1px solid var(--navbar-purple);
+    background: transparent;
+    color: var(--navbar-purple);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-btn:hover{
+    background-color: var(--navbar-purple);
+    color: white;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px var(--navbar-hover-bg);
+    text-shadow: 0 2px 4px var(--navbar-hover-bg);
+    border: none;
+    outline: none;
+}
+
+.register-btn {
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 17px;
+    border: none;
+    background: var(--navbar-purple);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- TOGGLE DE TEMA --- */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--navbar-border);
+    background: transparent;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--navbar-purple);
+    background: var(--navbar-hover-bg);
+}
+
+/* --- SELECTOR DE IDIOMAS --- */
+.language-selector {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.language-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--navbar-border);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--navbar-text);
+}
+
+/* Dropdown menu */
+.language-selector .language-menu {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    min-width: 130px;
+    background-color: var(--navbar-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .15);
+    z-index: 999;
+    padding: 5px 0;
+}
+
+.language-selector .language-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.language-selector .language-menu ul li {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 16px !important;
+    color: var(--navbar-text) !important;
+    border-radius: 0px;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.language-selector .language-menu ul li:hover {
+    background-color: var(--navbar-hover-bg) !important;
+    color: var(--navbar-purple) !important;
+    padding-left: 22px !important;
+}
+
+/* --- BANDERAS (SVG) --- */
+.flag-nav, .flag-dropdown {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.flag-nav {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* =======================================
+   HAMBURGUESA
+======================================= */
+
+.hamburger-btn{
+    display:none;
+    border:none;
+    background:transparent;
+    font-size:30px;
+    color: var(--navbar-purple);
+    cursor:pointer;
+}
+
+/*
+ * =======================================
+ *    MOBILE MENU
+ * =======================================
+ */
+
+.mobile-menu{
+    display:none;
+}
+
+.mobile-divider{
+    width:100%;
+    height:1px;
+    background: var(--navbar-divider);
+}
+
+.mobile-language{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.mobile-language h4{
+    color: var(--navbar-text);
+    font-size:16px;
+    font-weight:700;
+}
+
+.mobile-language-options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.mobile-language-options button{
+    height:45px;
+    border:none;
+    border-radius:12px;
+    background: var(--navbar-btn-bg);
+    cursor:pointer;
+    font-weight:600;
+    text-align:left;
+    padding:0 19px;
+    color: var(--navbar-text);
+}
+
+.mobile-language-options button:hover{
+    background: var(--navbar-purple);
+    color:white;
+}
+
+/* =======================================
+   RESPONSIVE 1150px
+======================================= */
+@media(max-width:1350px){
+
+    .button-language-mobil{
+        display: none !important;
+    }
+
+    .mobile-language-options{
+        display: none;
+    }
+
+    .navbar-links{
+        display:none;
+    }
+
+    .hamburger-btn{
+        display:block;
+    }
+
+    .navbar-actions{
+        gap:10px;
+    }
+
+    .desktop-btn{
+        display:none;
+    }
+
+    .mobile-menu{
+        display:flex;
+        flex-direction:column;
+        gap:20px;
+        padding:25px;
+        background-color: var(--navbar-bg-mobile);
+        box-shadow:0 5px 20px rgba(0,0,0,.08);
+    }
+
+    .mobile-menu a{
+        text-decoration: none;
+        color: var(--navbar-text);
+        font-weight: 600;
+
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+
+        border-radius: 12px;
+
+        transition: all .25s ease;
+    }
+
+    .mobile-menu a:hover{
+        background: var(--navbar-purple);
+        color: white;
+
+        transform: translateX(8px);
+
+        box-shadow: 0 4px 12px var(--navbar-hover-bg);
+    }
+
+    .mobile-menu a:hover i{
+        color: white;
+    }
+    .language-btn{
+        margin-right: 20px;
+    }
+    .fa-solid{
+        margin-right: 10px;
+    }
+}
+
+
+@media(max-width:900px){
+
+    .navbar-container {
+        padding: 0 20px;
+    }
+
+    .navbar-container {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        background-color: var(--navbar-bg-mobile-sm);
+        box-shadow: 0 2px 10px var(--navbar-shadow);
+    }
+
+    .mobile-menu{
+        display:flex;
+        flex-direction:column;
+        gap:20px;
+        padding:25px;
+        background-color: var(--navbar-bg-mobile-sm);
+        box-shadow:0 5px 20px rgba(0,0,0,.08);
+    }
+
+}
+
+
+@media(max-width:570px){
+
+    .button-language-mobil{
+        display: flex !important;
+    }
+
+    .mobile-language-options{
+        display: grid;
+    }
+
+    .language-btn{
+        display: none;
+    }
+    .flag-mobile{
+        width: 22px;
+        height: 22px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        margin-right: 10px;
+
+        box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    }
+    .mobile-language-options button{
+        display: flex;
+        align-items: center;
+
+        height: 45px;
+
+        border: none;
+
+        border-radius: 12px;
+
+        background: var(--navbar-btn-bg);
+
+        cursor: pointer;
+
+        font-weight: 600;
+
+        padding: 0 15px;
+
+        transition: all .25s ease;
+    }
+}
+
+
+
+/* =======================================
+   BARRA SIN SALTOS DE LÍNEA
+   Ningún texto se parte en dos renglones y los espacios se
+   ajustan al ancho de la pantalla (antes, entre 1351px y 1450px,
+   "Cómo funciona", "Descargar app" e "Iniciar sesión" se partían).
+   Solo estilos: no cambia nada del HTML ni del TS.
+======================================= */
+.navbar-container {
+    gap: clamp(12px, 1.6vw, 32px);
+    padding: 0 clamp(16px, 2.4vw, 40px);
+}
+
+.navbar-logo,
+.navbar-links,
+.navbar-actions {
+    flex-shrink: 0;
+}
+
+.navbar-logo span,
+.navbar-links a,
+.language-btn,
+.language-btn span,
+.login-btn,
+.register-btn {
+    white-space: nowrap;
+}
+
+.navbar-logo span {
+    font-size: clamp(20px, 1.7vw, 28px);
+}
+
+.navbar-links {
+    gap: clamp(14px, 1.7vw, 35px);
+}
+
+.navbar-links a {
+    font-size: clamp(14px, 1.05vw, 16px);
+}
+
+.navbar-actions {
+    gap: clamp(8px, .9vw, 15px);
+}
+
+.language-btn {
+    font-size: clamp(14px, 1.05vw, 16px);
+    padding: 6px 10px;
+}
+
+
+/* Portátiles (1351px a 1500px): un poco más compacto para que quepa
+   también en idiomas con textos largos (francés, portugués) */
+@media (min-width: 1351px) and (max-width: 1500px) {
+    .navbar-container {
+        gap: 12px;
+        padding: 0 18px;
+    }
+
+    .navbar-logo img {
+        height: 38px;
+    }
+
+    .navbar-logo span {
+        font-size: 20px;
+    }
+
+    .navbar-links {
+        gap: 13px;
+    }
+
+    .navbar-links a {
+        font-size: 14px;
+    }
+
+    .navbar-actions {
+        gap: 8px;
+    }
+
+    .login-btn,
+    .register-btn {
+        height: 42px;
+        padding: 0 12px;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+}

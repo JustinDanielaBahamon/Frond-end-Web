@@ -1,0 +1,986 @@
+.ah-wrap {
+  padding: 1.5rem;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+// TÍTULO
+.ah-titlebar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+
+  &-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(203, 28, 230, 0.12);
+    color: var(--pink, #cb1ce6);
+
+    svg { width: 20px; height: 20px; }
+  }
+}
+
+// Same typographic pattern as the other screens (see assistance.scss: .as-title)
+.ah-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--text-primary, #111827);
+  margin: 0;
+}
+
+.ah-sub {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-muted, #4b5563);
+  margin: 2px 0 0;
+}
+
+// TOOLBAR
+.ah-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ah-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1.5px solid #d8cce3;
+  border-radius: 12px;
+  padding: 0 16px;
+  flex: 1 1 260px;
+  min-width: 220px;
+  height: 44px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: #ce1ee9;
+    box-shadow: 0 0 0 3px rgba(206, 30, 233, 0.1);
+  }
+
+  &-icon {
+    font-size: 16px;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    font-size: var(--font-size-sm);
+    outline: none;
+    flex: 1;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    color: #000000;
+
+    &::placeholder {
+      color: #8b8b93;
+      font-weight: 400;
+    }
+  }
+}
+
+.ah-filter-date,
+.ah-filter-type {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid var(--border, #c4b5fd);
+  color: var(--text-primary, #1a1a1a);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ah-filter-date {
+  &-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--purple-mid, #7c3aed);
+    flex-shrink: 0;
+  }
+
+  &-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    border: none;
+  }
+
+  &-clear {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, #6b6b76);
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 2px;
+
+    &:hover { color: var(--red, #cb1ce6); }
+  }
+}
+
+.ah-filter-type {
+  &-icon {
+    width: 15px;
+    height: 15px;
+    color: var(--purple-mid, #7c3aed);
+    flex-shrink: 0;
+  }
+
+  select {
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-weight: 700;
+    color: inherit;
+    outline: none;
+    cursor: pointer;
+  }
+}
+
+.ah-view-toggle {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid var(--border, #c4b5fd);
+  color: var(--purple-mid, #7c3aed);
+  cursor: pointer;
+
+  svg { width: 16px; height: 16px; }
+  &:hover { background: var(--purple-pale, #f5f3ff); }
+}
+
+// STATS — white card + color accent on the left + round icon
+// Total / Atendidas / Canceladas
+.ah-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+
+  .ah-stat {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border, #ede9fe);
+    border-left: 4px solid transparent;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+
+    &--total      { border-left-color:  #560c79; }
+    &--atendidas  { border-left-color: #2e1065; }
+    &--cancelled { border-left-color: #c90fe6 }
+
+    .ah-stat-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #fff;
+
+      svg { width: 20px; height: 20px; }
+    }
+
+    &--total .ah-stat-icon      { background: linear-gradient(135deg, #560c79, #9236ad); }
+    &--atendidas .ah-stat-icon  { background: linear-gradient(135deg,  #2e1065, #5506bd); }
+    &--cancelled .ah-stat-icon { background: linear-gradient(135deg,  #c90fe6, #e55bfa ); }
+
+    .ah-stat-body { min-width: 0; }
+
+    .ah-stat-label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: #000000;
+      margin: 0 0 2px;
+    }
+
+    .ah-stat-val {
+      font-family: 'Nunito', sans-serif;
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+      margin: 0;
+      color: var(--text-primary, #1a1a1a);
+    }
+
+    // before 0.68rem / #4b4b55: too small and low contrast
+    .ah-stat-sub {
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      color: var(--text-dim, #374151);
+      margin: 2px 0 0;
+    }
+
+    .ah-stat-chevron {
+      margin-left: auto;
+      color: var(--text-dim, #c4b5fd);
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// TABLA
+.ah-table-wrap {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #c4b5fd);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ah-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+
+  // It used var(--purple-pale, #2d1457) before: that variable is used across the app
+  // as a LIGHT background (pale lavender), so here the header looked washed out and
+  // the white text was barely readable. Now it uses its own mid purple,
+  // consistent with the app accents (--purple-mid / --purple-deep).
+  thead tr {
+    background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
+  }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border, #ede9fe);
+    color: var(--text-primary, #1a1a1a);
+    font-weight: 500;
+    vertical-align: middle;
+  }
+
+  .ah-id    { color: var(--pink,  #c90fe6); font-weight: 700; }
+  .ah-date { display: block; font-weight: 700; color: var(--text-primary, #1a1a1a); }
+  // before 0.75rem with an almost black color on already black text: contrast raised with a readable mid grey
+  .ah-hour  { display: block; font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted, #4b5563); }
+  .ah-location { font-size: var(--font-size-sm); font-weight: 600; color: #1f2937; }
+}
+
+
+
+// BADGES — activation method
+.ah-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+
+  &.badge-button      { background: rgba(203, 28, 230, 0.18); color: #c90fe6; }
+  &.badge-widget     { background: var(--purple-pale, #e6dbfe); color: var(--purple-deep, #481ab3); }
+  &.badge-movement { background: var(--amber-pale, #ecc7fe); color: var(--amber, #660e92); }
+  &.badge-manual     { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
+
+  // BADGES — estado
+  &.badge-ok        { background: rgb(5 141 50 / 98%); color: #ffffff; }
+  &.badge-pending { background: rgba(139, 92, 246, 0.18); color: #5b21b6; }
+  &.badge-false     { background: rgba(89, 16, 185, 0.18); color: #360478; }
+}
+
+// Actions (eye + three-dot menu)
+.ah-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ah-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted, #7c3aed);
+  cursor: pointer;
+  font-size: 0.95rem;
+
+  &:hover { background: var(--purple-pale, #f5f3ff); color: var(--purple-deep, #5b21b6); }
+}
+
+.ah-menu-wrap { position: relative; display: inline-block; }
+
+.ah-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 200px;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #e9d5ff);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+
+  button {
+    text-align: left;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    cursor: pointer;
+
+    &:hover { background: var(--purple-pale, #f5f3ff); color: var(--purple-deep, #5b21b6); }
+  }
+
+  &-danger, .ah-menu-danger { color: var(--red, #a712be) !important; }
+}
+
+// Fila expandida
+.ah-expand-row td {
+  padding: 0;
+  border-bottom: 1px solid var(--border, #ede9fe);
+  background: var(--purple-pale, #fdf4ff);
+}
+
+.ah-expand-panel { padding: 1.1rem 1.5rem 1.4rem; }
+
+.ah-expand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--purple-deep, #5b21b6);
+
+    svg { width: 16px; height: 16px; }
+  }
+
+  // antes 0.78rem / #4b4b55: ligero refuerzo de contraste
+  &-mode {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--text-muted, #374151);
+  }
+}
+
+.ah-expand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.ah-expand-col-title {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #374151);
+  margin-bottom: 0.6rem;
+}
+
+.ah-mini-timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+
+.ah-mini-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
+
+  &:last-child { padding-bottom: 0; }
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 12px;
+    width: 2px;
+    height: calc(100% - 4px);
+    background: var(--border, #e9d5ff);
+  }
+
+  div { display: flex; flex-direction: column; min-width: 0; }
+}
+
+.ah-mini-timeline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim, #d1d5db);
+  margin-top: 4px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3); }
+.ah-mini-timeline-item--pending .ah-mini-timeline-dot {
+  background: var(--amber, #a00cea);
+  box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.15);
+}
+
+.ah-mini-timeline-label { font-size: var(--font-size-sm); font-weight: 700; color: var(--text-primary, #1a1a1a); }
+// before 0.72rem / #4b4b55: size and contrast raised a bit
+.ah-mini-timeline-time { font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted, #374151); }
+
+.ah-mini-map-wrap {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9d5ff);
+}
+
+.ah-mini-map { height: 220px; width: 100%; }
+
+.ah-mini-map-fullscreen {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1000;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #000);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover { background: var(--purple-pale, #f5f3ff); }
+}
+
+.ah-mini-map-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--purple-mid, #7c3aed);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+.ah-expand-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.7rem;
+  border-bottom: 1px solid var(--border, #ede9fe);
+
+  &:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+}
+
+// before 0.7rem / #4b4b55: label too small
+.ah-expand-item-label { font-size: var(--font-size-xs); color: var(--text-muted, #374151); font-weight: 700; }
+.ah-expand-item-value { font-size: var(--font-size-sm); color: var(--text-primary, #1a1a1a); font-weight: 700; }
+
+.ah-expand-action {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e9d5ff);
+  background: var(--bg-card, #fff);
+  color: var(--purple-deep, #5b21b6);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { background: var(--purple-pale, #f5f3ff); }
+}
+
+// PAGINACIÓN
+.ah-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid var(--border, #ede9fe);
+
+  &-info { font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted, #374151); }
+
+  &-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    button {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      border: 1px solid var(--border, #e9d5ff);
+      border-radius: 8px;
+      background: var(--bg-card, #fff);
+      color: var(--text-primary, #1a1a1a);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      cursor: pointer;
+
+      &:hover:not(:disabled) { background: var(--purple-pale, #f5f3ff); }
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+      &.active {
+        background: var(--purple-mid, #7c3aed);
+        border-color: var(--purple-mid, #7c3aed);
+        color: #fff;
+      }
+    }
+  }
+}
+
+.ah-error,
+.ah-empty {
+  text-align: center;
+  color: var(--text-muted, #374151);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 1.5rem;
+}
+
+.ah-error { color: var(--red, #cb1ce6); }
+
+/* ==================================================
+   MODO OSCURO — MIS EMERGENCIAS (scope local al componente)
+   ================================================== */
+
+/*
+ * :host-context allows selecting based on the state of ancestors
+ *    while keeping the Angular component scope
+ */
+
+:host-context([data-theme="dark"]) {
+  /* Table header with a purple-fuchsia gradient */
+  .ah-table thead tr {
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  }
+
+  /* Title icon */
+  .ah-titlebar-icon {
+    background: var(--purple-mid, #7c3aed) !important;
+    color: #ffffff !important;
+  }
+
+  /* Textos */
+  .ah-title { color: var(--text-primary) !important; }
+  .ah-sub { color: var(--text-muted) !important; }
+
+  /* Toolbar - search and filters */
+  .ah-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &-icon { color: var(--text-muted) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+
+    &:focus-within {
+      border-color: var(--pink) !important;
+      box-shadow: 0 0 0 3px rgba(203, 28, 230, 0.15) !important;
+    }
+  }
+
+  .ah-filter-date,
+  .ah-filter-type {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &-icon { color: var(--purple-mid) !important; }
+  }
+
+  .ah-filter-date-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+
+  .ah-view-toggle {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* Stats - cards with fixed accents, same as light mode */
+  .ah-stat {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &--total      { border-left-color: #560c79 !important; }
+    &--atendidas  { border-left-color: #2e1065 !important; }
+    &--cancelled { border-left-color: #c90fe6 !important; }
+
+    .ah-stat-label { color: var(--text-muted) !important; }
+    .ah-stat-val { color: var(--text-primary) !important; }
+    .ah-stat-sub { color: var(--text-dim) !important; }
+    .ah-stat-chevron { color: var(--text-dim) !important; }
+  }
+
+  /* Tabla */
+  .ah-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .ah-table {
+    th { color: #fff !important; border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
+
+    td {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    .ah-id { color: var(--pink) !important; }
+    .ah-date { color: var(--text-primary) !important; }
+    .ah-hour { color: var(--text-muted) !important; }
+    .ah-location { color: var(--text-primary) !important; }
+  }
+
+  /* Badges */
+  .ah-badge {
+    &.badge-button      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
+    &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &.badge-movement { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+
+    &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
+    &.badge-pending { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-false     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
+  }
+
+  /* Action icons */
+  .ah-icon-btn {
+    color: var(--text-muted) !important;
+    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .ah-menu {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+
+    button {
+      color: var(--text-primary) !important;
+      &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    }
+
+    &-danger, .ah-menu-danger { color: var(--red) !important; }
+  }
+
+  /* Fila expandida */
+  .ah-expand-row td {
+    background: var(--purple-pale) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  .ah-expand-head-title { color: var(--purple-mid) !important; }
+  .ah-expand-head-mode { color: var(--text-muted) !important; }
+  .ah-expand-col-title { color: var(--text-muted) !important; }
+
+  .ah-mini-timeline-item:not(:last-child)::after { background: var(--border) !important; }
+  .ah-mini-timeline-dot { background: var(--text-dim) !important; }
+  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3) !important; }
+  .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
+    background: var(--amber) !important;
+    box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.2) !important;
+  }
+
+  .ah-mini-timeline-label { color: var(--text-primary) !important; }
+  .ah-mini-timeline-time { color: var(--text-muted) !important; }
+
+  .ah-mini-map-wrap { border-color: var(--border) !important; }
+
+  .ah-mini-map-fullscreen {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .ah-mini-map-link { color: var(--purple-mid) !important; }
+
+  .ah-expand-item { border-bottom-color: var(--border) !important; }
+  .ah-expand-item-label { color: var(--text-muted) !important; }
+  .ah-expand-item-value { color: var(--text-primary) !important; }
+
+  .ah-expand-action {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* Pagination */
+  .ah-pagination {
+    border-top-color: var(--border) !important;
+
+    &-info { color: var(--text-muted) !important; }
+
+    &-controls button {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+
+      &:hover:not(:disabled) { background: var(--purple-pale) !important; }
+
+      &.active {
+        background: var(--purple-mid) !important;
+        border-color: var(--purple-mid) !important;
+        color: #fff !important;
+      }
+    }
+  }
+
+  .ah-error,
+  .ah-empty { color: var(--text-muted) !important; }
+  .ah-error { color: var(--red) !important; }
+}
+
+// =============================================
+// AJUSTES DE DISEÑO — color de botones, líneas y modo oscuro
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$ah-line: #6d5bb8;       // mismo morado de líneas del panel admin
+$ah-line-soft: #8878c6;  // separadores entre filas
+$ah-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+
+// ── Encabezado de la tabla y página activa: morado del sidebar ──
+.ah-table thead tr { background: $ah-accent; }
+
+.ah-pagination-controls button.active {
+  background: $ah-accent;
+  border-color: transparent;
+  color: #fff;
+}
+
+// ── Líneas más gruesas (2px, como en el admin) ──
+.ah-search,
+.ah-filter-date,
+.ah-filter-type,
+.ah-view-toggle,
+.ah-table-wrap {
+  border-width: 2px;
+  border-color: $ah-line;
+}
+
+.ah-toolbar .ah-search { border-color: $ah-line !important; }
+
+.ah-stats .ah-stat {
+  border-top: 2px solid $ah-line;
+  border-right: 2px solid $ah-line;
+  border-bottom: 2px solid $ah-line;
+}
+
+// La línea va en la fila completa (así no se corta en la columna de acciones)
+.ah-table td { border-bottom: none; }
+.ah-table tbody tr { border-bottom: 2px solid $ah-line-soft; }
+.ah-table tbody tr:last-child { border-bottom: none; }
+.ah-pagination { border-top: 2px solid $ah-line; }
+.ah-pagination-controls button { border: 2px solid $ah-line; }
+
+// ── Modo oscuro ──
+:host-context([data-theme="dark"]) {
+
+  // Mismo grosor, con el borde oscuro del tema
+  .ah-search,
+  .ah-filter-date,
+  .ah-filter-type,
+  .ah-view-toggle,
+  .ah-table-wrap,
+  .ah-pagination-controls button { border-color: var(--border) !important; }
+
+  .ah-toolbar .ah-search { border-color: var(--border) !important; }
+
+  .ah-stats .ah-stat {
+    border-top-color: var(--border) !important;
+    border-right-color: var(--border) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  .ah-table tbody tr { border-bottom-color: var(--border); }
+  .ah-table td { border-bottom: none !important; }
+  .ah-pagination { border-top-color: var(--border); }
+
+  // El tema oscuro global pinta el encabezado en lila/rosado: aquí va el morado del sidebar
+  .ah-table thead tr { background: $ah-accent !important; }
+
+  .ah-pagination-controls button.active {
+    background: $ah-accent !important;
+    color: #fff !important;
+  }
+
+  // Lista del filtro "Medio": las opciones se veían en blanco sobre blanco
+  .ah-filter-type select {
+    color-scheme: dark;
+
+    option {
+      background: var(--bg-card, #241d3d);
+      color: var(--text-primary, #ede9fe);
+    }
+  }
+
+  // Estado "Cancelada" más legible
+  .ah-badge.badge-false {
+    background: rgba(157, 111, 240, 0.18) !important;
+    color: #c4a1ff !important;
+  }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE MIS EMERGENCIAS (solo diseño)
+// =============================================
+
+// Título y descripción: bajan de línea en vez de salirse
+.ah-titlebar > div { min-width: 0; }
+.ah-title,
+.ah-sub { overflow-wrap: break-word; }
+
+// Buscador: se ajusta al ancho (antes pedía mínimo 220 px)
+.ah-search {
+  min-width: 0;
+
+  input { min-width: 0; width: 100%; }
+}
+
+// Tarjetas Total / Atendidas / Canceladas: nunca más anchas que la pantalla
+.ah-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+
+.ah-stat-label,
+.ah-stat-sub { overflow-wrap: break-word; }
+
+// Tabla: antes se cortaba (no se veían Estado ni Acciones).
+// Ahora mantiene su tamaño y se mueve hacia los lados con barrita morada
+.ah-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+}
+
+.ah-table th { white-space: nowrap; }
+
+// La paginación se queda fija abajo aunque muevas la tabla
+.ah-pagination {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .ah-table { min-width: 760px; }
+
+  .ah-table td:not(.ah-location) { white-space: nowrap; }
+}
+
+// Celular
+@media (max-width: 600px) {
+  .ah-wrap { padding: 0.75rem; }
+
+  // Filtros a lo ancho: buscador, fecha y medio uno debajo del otro
+  .ah-toolbar > .ah-search,
+  .ah-toolbar > .ah-filtro-fecha-selector,
+  .ah-toolbar > .ah-filter-type {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .ah-toolbar > .ah-filtro-fecha-selector {
+    display: block;
+    width: 100%;
+  }
+
+  .ah-filter-type select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Pie de la tabla centrado
+  .ah-pagination {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ah-pagination-controls { flex-wrap: wrap; justify-content: center; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .ah-wrap { padding: 0.5rem; }
+
+  .ah-title { font-size: 1.3rem; }
+
+  .ah-stats .ah-stat {
+    padding: 0.75rem;
+    gap: 8px;
+
+    .ah-stat-icon {
+      width: 34px;
+      height: 34px;
+    }
+
+    .ah-stat-chevron { display: none; }
+  }
+
+  .ah-search { padding: 0 10px; }
+}

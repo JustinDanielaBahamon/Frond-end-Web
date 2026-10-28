@@ -1,0 +1,1088 @@
+/*==================================================
+=            MODO OSCURO — SIDEBAR                  =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .sidebar {
+    background: var(--sidebar-bg, #280142) !important;
+
+    &__brand-name {
+      color: var(--text-primary) !important;
+    }
+
+    &__brand-tagline {
+      color: var(--text-muted) !important;
+    }
+
+    &__section {
+      color: var(--text-muted) !important;
+    }
+
+    &__divider {
+      background: linear-gradient(90deg, var(--purple-mid), var(--accent-grad-to), transparent) !important;
+    }
+
+    &__link {
+      color: var(--text-muted) !important;
+      border-bottom-color: var(--border) !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        color: var(--text-primary) !important;
+      }
+
+      &--active {
+        background: linear-gradient(135deg, var(--accent-grad-from), var(--accent-grad-to)) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to) 35%, transparent) !important;
+
+        .sidebar__link-icon {
+          color: #F2F2F2 !important;
+        }
+      }
+    }
+
+    &__link-icon {
+      color: var(--text-dim) !important;
+    }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — TOPBAR                   =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .topbar {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &__brand { color: var(--text-primary) !important; }
+    &__greeting-hi { color: var(--text-primary) !important; }
+    &__greeting-page { color: var(--purple-mid) !important; }
+    &__btn { background: var(--purple-pale) !important; }
+    &__username { color: var(--text-primary) !important; }
+  }
+
+  .settings-section__title { color: var(--purple-mid) !important; }
+
+  .account-btn {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+
+    &__name { color: var(--text-primary) !important; }
+    &__role, &__chevron { color: var(--purple-mid) !important; }
+  }
+
+  .account-menu {
+    &__name { color: var(--text-primary) !important; }
+    &__email { color: var(--text-muted) !important; }
+  }
+
+  .settings-pill {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &--active {
+      background: var(--purple-deep) !important;
+      border-color: var(--purple-deep) !important;
+      color: #fff !important;
+    }
+  }
+
+  .topbar__hamburger:hover {
+    background: var(--purple-pale) !important;
+  }
+
+  .profile-menu {
+    background: var(--bg-card) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+
+    &__item {
+      color: var(--text-primary) !important;
+
+      svg { stroke: var(--text-primary) !important; }
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        color: var(--text-primary) !important;
+
+        svg { stroke: var(--purple-mid) !important; }
+      }
+
+      &--danger {
+        color: var(--red) !important;
+        svg { stroke: var(--red) !important; }
+
+        &:hover {
+          background: var(--red-pale) !important;
+          color: var(--red) !important;
+          svg { stroke: var(--red) !important; }
+        }
+      }
+    }
+
+    &__divider { background: var(--border) !important; }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — LAYOUT / BOTTOM NAV      =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .layout__body,
+  .layout__main {
+    background: var(--bg-base) !important;
+  }
+
+  .bottom-nav {
+    background: var(--bg-card) !important;
+
+    &__item {
+      color: var(--text-dim) !important;
+      &:hover { color: var(--text-primary) !important; }
+      &--active { color: var(--pink) !important; }
+    }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — DASHBOARD HOME           =
+==================================================*/
+
+[data-theme="dark"] {
+
+  /* ── 1. Variables del componente ───────────────── */
+  app-dashboard {
+    --color-principal: var(--purple-mid, #a78bfa);      // textos e iconos morados (legibles en oscuro)
+    --color-principal-claro: var(--purple-mid, #a78bfa);
+    --color-fondo: rgba(124, 58, 237, 0.08);            // inner tiles, hover, device circle
+    --color-superficie: var(--bg-card, #15112b);        // card background
+    --color-borde: var(--border, #2e2657);
+    --color-texto-principal: var(--text-primary, #f3efff);
+    --color-texto-secundario: var(--text-muted, #a79cc8);
+  }
+
+  /* ── 2. Botones ────────────────────────────────── */
+  .home-btn--primary {
+    // mismo degradado del login / sidebar activo
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(217, 72, 178, 0.3) !important;
+  }
+
+  .home-btn--outline {
+    background: transparent !important;
+    border-color: #7c3aed !important;
+    color: var(--purple-mid, #a78bfa) !important;
+
+    i { color: var(--purple-mid, #a78bfa) !important; }
+
+    &:hover { background: rgba(124, 58, 237, 0.15) !important; }
+  }
+
+  .home-icon-btn:hover {
+    color: var(--purple-mid, #a78bfa) !important;
+  }
+
+  /* ── 3. Badge "Conectado" / "Atendida" ─────────── */
+  .home-badge--success {
+    background: rgba(89, 16, 185, 0.2) !important;
+    color: #782dda !important;
+  }
+
+  /* ── 4. Estado de seguridad (5 fichas) ─────────── */
+  .home-security-item {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--border, #2e2657) !important;
+
+    &__icon {
+      background: rgba(124, 58, 237, 0.25) !important;
+      color: #c4b5fd !important;
+    }
+
+    &__valor { color: var(--text-primary, #f3efff) !important; }
+    &__description { color: var(--text-muted, #a79cc8) !important; }
+  }
+
+  /* ── 5. Mi dispositivo ─────────────────────────── */
+  .home-device-icon {
+    background: rgba(124, 58, 237, 0.18) !important;
+    color: #a78bfa !important;
+  }
+
+    /*
+ * ── 6. Solid icons (activity, emergency, shortcuts) ─
+ *         Same style as the image: solid color box
+ *         with the light icon on top.
+ */
+  .home-activity-item__icon,
+  .home-access__icon {
+
+    &--danger     { background: var(--pink) !important; color: #fff !important; }
+    &--principal   { background: #7c3aed !important; color: #ede9fe !important; }
+    &--success       { background: #5910b9 !important; color: #ecfdf5 !important; }
+    &--accent      { background: #5b21b6 !important; color: #ecfeff !important; }
+    &--warning { background: #9306d9 !important; color: #fffbeb !important; }
+  }
+
+  .home-emergency__icon {
+    background: var(--pink) !important;
+    color: #fff !important;
+  }
+
+  /* ── 7. Actividad reciente ─────────────────────── */
+  .home-activity-item {
+    &:hover { background: rgba(124, 58, 237, 0.12) !important; }
+    &__chevron { color: var(--text-dim, #7d739e) !important; }
+  }
+
+  /* ── 8. Última emergencia ──────────────────────── */
+  .home-emergency__detail {
+    border-top-color: var(--border, #2e2657) !important;
+
+    i { color: var(--purple-mid, #a78bfa) !important; }
+  }
+
+  /* ── 9. Mini-mapa ──────────────────────────────── */
+  .home-mini-map {
+    border-color: var(--border, #2e2657) !important;
+  }
+
+  .home-mini-map__pin {
+    color: #a78bfa !important;
+  }
+
+  /* ── 10. Shortcuts and quick actions ────────────── */
+  .home-access:hover,
+  .home-action-item:hover {
+    background: rgba(124, 58, 237, 0.12) !important;
+  }
+
+  .home-action-item__chevron {
+    color: var(--text-dim, #7d739e) !important;
+  }
+}
+
+/*
+ * ==================================================
+ * =       DARK MODE — PHONE LOCATION        =
+ *    (scoped with .pl-page so it does not clash with .card,
+ *    .dropdown-menu, etc. of other modules)
+ * ==================================================
+ */
+
+[data-theme="dark"] {
+
+  .pl-page {
+
+    /* ── Tailwind utilities used inline in the template ─ */
+    .text-gray-800 { color: var(--text-primary) !important; }
+    .text-gray-500 { color: var(--text-muted) !important; }
+    .text-gray-400 { color: var(--text-dim) !important; }
+    .text-red-500  { color: var(--red) !important; }
+
+    /* ── Cards ───────────────────────────────────── */
+    .card {
+      background: var(--bg-card) !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .card-title {
+      color: var(--purple-mid) !important;
+    }
+
+    .address-text,
+    .info-value {
+      color: var(--text-primary) !important;
+    }
+
+    .info-label {
+      color: var(--text-muted) !important;
+    }
+
+    /* ── Historial ───────────────────────────────── */
+    .history-item {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+      }
+    }
+
+    .history-num {
+      color: var(--text-primary) !important;
+    }
+
+    .history-time {
+      color: var(--text-muted) !important;
+    }
+
+    .load-more-btn {
+      border-color: var(--border) !important;
+      background: var(--purple-pale) !important;
+      color: var(--purple-mid) !important;
+
+      &:hover {
+        background: var(--purple-pale-hover) !important;
+      }
+    }
+
+    /* ── Filtros ─────────────────────────────────── */
+    .filter-btn {
+      border-color: var(--border) !important;
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+
+      &:hover {
+        border-color: var(--purple-mid) !important;
+      }
+    }
+
+    .dropdown-menu {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .dropdown-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background: var(--purple-pale) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+
+    /* ── Mapa ────────────────────────────────────── */
+    .map-container {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .fullscreen-btn {
+      background: rgba(30, 24, 51, 0.85) !important;
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background: var(--bg-card-hover) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+  }
+}
+
+/*
+ * ==================================================
+ * =   DARK MODE — MAP (filter over OSM tiles)     =
+ *    Only affects .leaflet-tile-pane; markers, popups,
+ *    polylines and controls are NOT affected because
+ *    they live in another pane of the Leaflet DOM.
+ * ==================================================
+ */
+
+[data-theme="dark"] {
+
+  .pl-page .map-container {
+
+    .leaflet-tile-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+    }
+
+    /* Controles de zoom (+ / -) */
+    .leaflet-control-zoom a {
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border) !important;
+
+      &:hover {
+        background: var(--bg-card-hover) !important;
+      }
+    }
+
+    /* Popups when clicking a marker */
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: var(--bg-card) !important;
+      color: var(--text-primary) !important;
+    }
+
+    .leaflet-popup-content {
+      color: var(--text-primary) !important;
+    }
+  }
+}
+
+/*
+ * ==================================================
+ * =            DARK MODE — EVIDENCE (ev-*)        =
+ *    Fully replaces the previous
+ *    "MODO OSCURO — EVIDENCIAS" block: that one used selectors
+ *    from a previous version of the component (.ev-stats,
+ *    .ev-banner, .ev-pill, .ev-card__nombre, .ev-modal)
+ *    that no longer exist in the current .scss (ev-toolbar,
+ *    ev-tabs, ev-search, ev-card-thumb, ev-detail, etc.).
+ * ==================================================
+ */
+
+[data-theme="dark"] {
+
+  .ev-error {
+    color: var(--red, #e671f8) !important;
+  }
+
+  /* ── Toolbar: tabs + search + filter ───────── */
+  .ev-tabs {
+    background: var(--bg-card) !important;
+  }
+
+  .ev-tab {
+    color: var(--text-muted) !important;
+
+    &--active {
+      background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+      color: #fff !important;
+    }
+  }
+
+  .ev-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    svg { color: var(--purple-mid) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+  }
+
+  .ev-filter-btn {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Section header ────────────────────── */
+  .ev-section-title { color: var(--text-primary) !important; }
+  .ev-section-sub { color: var(--text-muted) !important; }
+
+  .ev-sort {
+    background-color: var(--bg-card) !important;
+    border-color: var(--purple-mid) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Card gallery ──────────────────────── */
+  .ev-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    &--active {
+      border-color: var(--purple-mid) !important;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35) !important;
+    }
+  }
+
+  .ev-card-type { color: var(--text-primary) !important; }
+  .ev-card-date,
+  .ev-card-location { color: var(--text-muted) !important; }
+
+  .ev-card-alert { color: var(--pink) !important; }
+  .ev-card-detail { color: var(--purple-mid) !important; }
+
+  .type-video { background: linear-gradient(135deg, var(--purple-pale), var(--purple-deep)) !important; color: var(--purple-mid) !important; }
+  .type-photo  { background: linear-gradient(135deg, var(--amber-pale, #3b0764), #660e92) !important; color: #b324fb !important; }
+  .type-audio { background: linear-gradient(135deg, #2a0f6a, #350e90) !important; color: #a667f9 !important; }
+
+  .ev-empty,
+  .ev-muted { color: var(--text-dim) !important; }
+
+  /* ── Banner de privacidad ─────────────────────── */
+  .ev-privacy-banner {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+
+    svg { color: var(--purple-mid) !important; }
+
+    strong { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .ev-privacy-link { color: var(--pink) !important; }
+
+  /* ── Panel de detalle ─────────────────────────── */
+  .ev-detail {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .ev-detail-back { color: var(--purple-mid) !important; }
+
+  .ev-detail-titlebar h3 { color: var(--text-primary) !important; }
+
+  .ev-detail-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .ev-detail-badge {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .ev-detail-thumb-more {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .ev-detail-thumb--active { border-color: var(--purple-mid) !important; }
+
+  .ev-detail-row {
+    border-bottom-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .ev-detail-label { color: var(--text-muted) !important; }
+
+  .ev-download-btn {
+    background: var(--purple-deep) !important;
+    color: #fff !important;
+  }
+
+  .ev-fullscreen-btn {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Lightbox (already dark by design, unchanged) ─ */
+}
+/*==================================================
+=            MODO OSCURO — MIS EMERGENCIAS (ah-*)    =
+==================================================*/
+
+[data-theme="dark"] {
+
+  /* Title icon */
+  .ah-titlebar-icon {
+    background: var(--purple-mid, #7c3aed) !important;
+    color: #ffffff !important;
+  }
+
+  .ah-title { color: var(--text-primary) !important; }
+  .ah-sub { color: var(--text-muted) !important; }
+
+  /* ── Toolbar ─────────────────────────────────── */
+  .ah-search {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &-icon { color: var(--text-muted) !important; }
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+
+    &:focus-within {
+      border-color: var(--pink) !important;
+      box-shadow: 0 0 0 3px rgba(203, 28, 230, 0.15) !important;
+    }
+  }
+
+  .ah-filter-date,
+  .ah-filter-type {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &-icon { color: var(--purple-mid) !important; }
+  }
+
+  .ah-filter-date-clear { color: var(--text-muted) !important; &:hover { color: var(--red) !important; } }
+
+  .ah-view-toggle {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Stats (Total / Atendidas / Canceladas) ──── */
+  .ah-stat {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+
+    &--total      { border-left-color: #560c79 !important; }
+    &--atendidas  { border-left-color: #2e1065 !important; }
+    &--cancelled { border-left-color: #c90fe6 !important; }
+
+    .ah-stat-label { color: var(--text-muted) !important; }
+    .ah-stat-val { color: var(--text-primary) !important; }
+    .ah-stat-sub { color: var(--text-dim) !important; }
+    .ah-stat-chevron { color: var(--text-dim) !important; }
+  }
+
+  /* ── Tabla ───────────────────────────────────── */
+  .ah-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .ah-table {
+    thead tr {
+      background: linear-gradient(135deg, var(--purple-deep), var(--purple-mid)) !important;
+    }
+
+    th { color: #fff !important; border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
+
+    td {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    .ah-id { color: var(--pink) !important; }
+    .ah-date { color: var(--text-primary) !important; }
+    .ah-hour { color: var(--text-muted) !important; }
+    .ah-location { color: var(--text-primary) !important; }
+  }
+
+  /* ── Badges — activation method and status ────── */
+  .ah-badge {
+    &.badge-button      { background: rgba(203, 28, 230, 0.22) !important; color: var(--pink) !important; }
+    &.badge-widget     { background: var(--purple-pale) !important; color: var(--purple-deep) !important; }
+    &.badge-movement { background: var(--amber-pale) !important; color: var(--amber) !important; }
+    &.badge-manual     { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+
+    &.badge-ok        { background: var(--green, #5316a3) !important; color: #fff !important; }
+    &.badge-pending { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    &.badge-false     { background: var(--green-pale) !important; color: var(--green, #5316a3) !important; }
+  }
+
+  /* ── Actions (eye / menu) ───────────────────── */
+  .ah-icon-btn {
+    color: var(--text-muted) !important;
+    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .ah-menu {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+
+    button {
+      color: var(--text-primary) !important;
+      &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+    }
+
+    &-danger, .ah-menu-danger { color: var(--red) !important; }
+  }
+
+  /* ── Fila expandida ──────────────────────────── */
+  .ah-expand-row td {
+    background: var(--purple-pale) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  .ah-expand-head-title {
+    color: var(--purple-mid) !important;
+  }
+
+  .ah-expand-head-mode { color: var(--text-muted) !important; }
+  .ah-expand-col-title { color: var(--text-muted) !important; }
+
+  .ah-mini-timeline-item:not(:last-child)::after {
+    background: var(--border) !important;
+  }
+
+  .ah-mini-timeline-dot { background: var(--text-dim) !important; }
+  .ah-mini-timeline-item--done .ah-mini-timeline-dot { background: var(--green, #5316a3) !important; }
+  .ah-mini-timeline-item--pending .ah-mini-timeline-dot {
+    background: var(--amber) !important;
+    box-shadow: 0 0 0 3px rgba(160, 12, 234, 0.2) !important;
+  }
+
+  .ah-mini-timeline-label { color: var(--text-primary) !important; }
+  .ah-mini-timeline-time { color: var(--text-muted) !important; }
+
+  .ah-mini-map-wrap { border-color: var(--border) !important; }
+
+  .ah-mini-map-fullscreen {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .ah-mini-map-link { color: var(--purple-mid) !important; }
+
+  .ah-expand-item { border-bottom-color: var(--border) !important; }
+  .ah-expand-item-label { color: var(--text-muted) !important; }
+  .ah-expand-item-value { color: var(--text-primary) !important; }
+
+  .ah-expand-action {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--purple-mid) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Pagination ──────────────────────────────── */
+  .ah-pagination {
+    border-top-color: var(--border) !important;
+
+    &-info { color: var(--text-muted) !important; }
+
+    &-controls button {
+      background: var(--bg-card) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+
+      &:hover:not(:disabled) { background: var(--purple-pale) !important; }
+
+      &.active {
+        background: var(--purple-mid) !important;
+        border-color: var(--purple-mid) !important;
+        color: #fff !important;
+      }
+    }
+  }
+
+  .ah-error,
+  .ah-empty { color: var(--text-muted) !important; }
+  .ah-error { color: var(--red) !important; }
+}
+
+/*==================================================
+=      MODO OSCURO — CONTACTOS DE EMERGENCIA (ec-*)  =
+==================================================*/
+
+[data-theme="dark"] {
+
+  .ec-table thead {
+    background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  }
+
+  .ec-title { color: var(--text-primary) !important; }
+  .ec-sub { color: var(--text-muted) !important; }
+
+  /* ── Banners (info arriba / nota abajo) ───────── */
+  .ec-info-banner,
+  .ec-footer-banner {
+    background: var(--purple-pale) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    svg { color: var(--purple-mid) !important; }
+  }
+
+  /* ── Tabla ─────────────────────────────────────── */
+  .ec-table-wrap {
+    background: var(--bg-card) !important;
+    border-color: var(--purple-mid) !important;
+  }
+
+  .ec-table {
+    tbody tr {
+      border-top-color: var(--border) !important;
+      &:hover { background: var(--purple-pale) !important; }
+    }
+
+    td { color: var(--text-primary) !important; }
+  }
+
+  .ec-name { color: var(--text-primary) !important; }
+
+  .ec-priority {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .ec-badge {
+    &--active   { background: rgba(83, 22, 163, 0.22) !important; color: #8a49df !important; }
+    &--inactivo { background: rgba(203, 28, 230, 0.22) !important; color: #e671f8 !important; }
+  }
+
+  .ec-icon-btn {
+    color: var(--text-muted) !important;
+    &:hover { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
+  }
+
+  .ec-menu {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+
+    button {
+      color: var(--text-primary) !important;
+      &:hover { background: var(--purple-pale) !important; }
+    }
+  }
+
+  .ec-menu-danger { color: var(--red) !important; }
+
+  .ec-empty,
+  .ec-muted { color: var(--text-dim) !important; }
+
+  /* ── Modal (agregar / editar) ──────────────────── */
+  .ec-modal {
+    background: var(--bg-card) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .ec-modal-header {
+    h3 { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .ec-modal-close {
+    color: var(--text-dim) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .ec-field-label { color: var(--text-muted) !important; }
+
+  .ec-field input,
+  .ec-field select {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &:focus { border-color: var(--purple-mid) !important; }
+  }
+
+  .ec-toggle-row { background: var(--bg-base) !important; }
+
+  .ec-toggle-label { color: var(--text-primary) !important; }
+  .ec-toggle-sub { color: var(--text-muted) !important; }
+
+  .ec-switch { background: var(--border) !important; &--on { background: var(--purple-mid) !important; } }
+
+  .ec-danger-zone {
+    background: rgba(203, 28, 230, 0.1) !important;
+    border-color: rgba(203, 28, 230, 0.35) !important;
+  }
+
+  .ec-danger-head p { color: var(--text-dim) !important; }
+
+  .ec-danger-confirm p { color: var(--text-primary) !important; }
+
+  .ec-btn--ghost {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+}
+
+/*==================================================
+=            MODO OSCURO — ASISTENCIA (as-*)        =
+==================================================*/
+
+[data-theme="dark"] {
+
+  /* ── Header ────────────────────────────────────── */
+  .as-header-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-title { color: var(--text-primary) !important; }
+  .as-sub { color: var(--text-muted) !important; }
+
+  .as-header-banner {
+  background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+  color: #fff !important;
+
+  svg { color: #fff !important; }
+}
+
+  /* ── Tabs ──────────────────────────────────────── */
+  .as-tabs {
+    background: var(--bg-card) !important;
+  }
+
+  .as-tab {
+    color: var(--text-muted) !important;
+
+    &--active {
+      background: linear-gradient(135deg, #7630D9, #D948B2) !important;
+      color: #fff !important;
+    }
+  }
+
+  /* ── Panels (container of each tab) ─────────── */
+  .as-panel {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .as-panel-head-icon { color: var(--purple-mid) !important; }
+  .as-panel-title { color: var(--text-primary) !important; }
+  .as-panel-sub { color: var(--text-muted) !important; }
+
+  .as-muted,
+  .as-empty { color: var(--text-dim) !important; }
+
+  /* ── Help lines ──────────────────────────────── */
+  .as-line-card {
+    border-color: var(--border) !important;
+  }
+
+  .as-line-name { color: var(--text-muted) !important; }
+  .as-line-number { color: var(--text-primary) !important; }
+  .as-line-desc { color: var(--text-dim) !important; }
+
+  .as-btn--ghost {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  /* ── Centros cercanos ─────────────────────────────── */
+  .as-search {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+
+    input {
+      color: var(--text-primary) !important;
+      &::placeholder { color: var(--text-dim) !important; }
+    }
+  }
+
+  .as-filter-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:hover { background: var(--purple-pale) !important; }
+  }
+
+  .as-chip {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-muted) !important;
+
+    &--active {
+      background: var(--purple-mid) !important;
+      border-color: var(--purple-mid) !important;
+      color: #fff !important;
+    }
+  }
+
+  .as-map {
+    background: var(--bg-base) !important;
+  }
+
+  .as-center-item {
+    border-bottom-color: var(--border) !important;
+  }
+
+  .as-center-name { color: var(--text-primary) !important; }
+  .as-center-desc { color: var(--text-dim) !important; }
+  .as-center-meta { color: var(--text-muted) !important; }
+
+  .as-icon-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-dim) !important;
+    &:hover { background: var(--purple-pale) !important; }
+    &--active { color: var(--purple-mid) !important; border-color: var(--purple-mid) !important; }
+  }
+
+  .as-pill-btn {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+
+    &--ghost { background: var(--bg-card) !important; }
+  }
+
+  /* ── Mis recursos ─────────────────────────────────── */
+  .as-recurso-card {
+    border-color: var(--border) !important;
+  }
+
+  .as-recurso-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-recurso-name { color: var(--text-primary) !important; }
+  .as-recurso-sub { color: var(--text-dim) !important; }
+
+  /* ── Sidebar derecho (tarjetas) ───────────────────── */
+  .as-info-card,
+  .as-tip-card,
+  .as-saved-card,
+  .as-app-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .as-info-illustration {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-info-card h3 { color: var(--text-primary) !important; }
+  .as-info-card p { color: var(--text-muted) !important; }
+
+  .as-tip-card {
+    background: var(--purple-pale) !important;
+    svg { color: var(--purple-mid) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .as-saved-head h3 { color: var(--text-primary) !important; }
+
+  .as-saved-item {
+    border-bottom-color: var(--border) !important;
+  }
+
+  .as-saved-icon {
+    background: var(--purple-pale) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  .as-saved-name { color: var(--text-primary) !important; }
+  .as-saved-sub { color: var(--text-dim) !important; }
+  .as-saved-empty { color: var(--text-dim) !important; }
+
+  .as-app-card {
+    background: linear-gradient(135deg, var(--purple-pale), var(--bg-card)) !important;
+
+    strong { color: var(--text-primary) !important; }
+    p { color: var(--text-muted) !important; }
+  }
+
+  .as-app-link {
+    background: var(--bg-base) !important;
+    border-color: var(--purple-mid) !important;
+    color: var(--purple-mid) !important;
+  }
+
+  /* ── Footer strip ─────────────────────────────────── */
+  .as-footer-strip {
+    background: linear-gradient(135deg, var(--purple-pale), var(--bg-card)) !important;
+  }
+
+  .as-footer-item {
+    color: var(--text-muted) !important;
+    svg { color: var(--purple-mid) !important; }
+    strong { color: var(--text-primary) !important; }
+  }
+
+  .as-footer-signature { color: var(--purple-mid) !important; }
+}

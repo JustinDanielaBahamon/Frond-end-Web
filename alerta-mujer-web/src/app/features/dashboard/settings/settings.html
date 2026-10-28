@@ -1,0 +1,245 @@
+<section class="settings">
+  <header class="settings__header page-title-row">
+    <span class="page-title-icon"><i class="ti ti-settings"></i></span>
+    <div>
+      <h1>{{ 'Ajustes' | t }}</h1>
+      <p>{{ 'Personaliza la aplicación según tus necesidades.' | t }}</p>
+    </div>
+  </header>
+
+  <div class="settings__grid">
+
+    <!-- CUENTA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-user-circle"></i> {{ 'Cuenta' | t }}</h2>
+      </div>
+
+      <div class="account-profile">
+        <div class="avatar">
+          @if (user().avatarUrl) {
+            <img [src]="user().avatarUrl" [alt]="user().name" />
+          } @else {
+            <i class="ti ti-user"></i>
+          }
+        </div>
+        <div>
+          <strong>{{ user().name | t }}</strong>
+          <span>{{ user().email | t }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="setting-row setting-row--link" (click)="changingPassword.set(true)">
+        <i class="ti ti-lock"></i>
+        <span>{{ 'Cambiar contraseña' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+      <div class="setting-row">
+        <i class="ti ti-mail"></i>
+        <span>{{ 'Correo electrónico' | t }}</span>
+        <span class="setting-row__value">{{ user().email | t }}</span>
+      </div>
+      <div class="setting-row">
+        <i class="ti ti-phone"></i>
+        <span>{{ 'Número de teléfono' | t }}</span>
+        <span class="setting-row__value">{{ (user().phone || 'Sin registrar') | t }}</span>
+      </div>
+      <p class="settings-card__note">{{ 'Tu nombre, teléfono y foto se editan desde la app móvil, en Perfil.' | t }}</p>
+    </article>
+
+    <!-- APARIENCIA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-palette"></i> {{ 'Apariencia' | t }}</h2>
+      </div>
+
+      <p class="settings-card__label">{{ 'Tema' | t }}</p>
+      <div class="theme-options">
+        <button type="button" class="theme-option" [class.active]="theme() === 'light'" (click)="toggleTheme('light')">
+          <!-- Mini vista previa del panel en modo claro (solo decorativa) -->
+          <span class="theme-preview theme-preview--light" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-sun"></i> {{ 'Claro' | t }}
+            @if (theme() === 'light') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
+        </button>
+        <button type="button" class="theme-option" [class.active]="theme() === 'dark'" (click)="toggleTheme('dark')">
+          <!-- Mini vista previa del panel en modo oscuro (solo decorativa) -->
+          <span class="theme-preview theme-preview--dark" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-moon"></i> {{ 'Oscuro' | t }}
+            @if (theme() === 'dark') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
+        </button>
+      </div>
+
+      <p class="settings-card__label">{{ 'Color principal' | t }}</p>
+      <div class="color-swatches">
+        @for (color of accentColors; track color.value) {
+          <button
+            type="button"
+            class="swatch"
+            [class.active]="selectedColor() === color.value"
+            [style.background]="color.value"
+            [attr.aria-label]="color.name"
+            (click)="selectColor(color.value)">
+          </button>
+        }
+      </div>
+    </article>
+
+    <!-- NOTIFICACIONES -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-bell"></i> {{ 'Notificaciones' | t }}</h2>
+      </div>
+
+      @for (item of notifications(); track item.key) {
+        <div class="setting-row setting-row--toggle">
+          <div>
+            <strong>{{ item.label | t }}</strong>
+            <span>{{ item.description | t }}</span>
+          </div>
+          <button
+            type="button"
+            class="switch"
+            [class.on]="item.enabled"
+            role="switch"
+            [attr.aria-checked]="item.enabled"
+            (click)="toggleNotification(item.key)">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+      }
+    </article>
+
+    <!-- PRIVACIDAD -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-shield-lock"></i> {{ 'Tus datos' | t }}</h2>
+      </div>
+      <ul class="privacy-list">
+        <li><i class="ti ti-map-pin"></i><span>{{ 'Tu ubicación del día a día solo la ves tú. Cuando activas una alerta, tus contactos de emergencia reciben tu nombre y ven tu ubicación en tiempo real mientras la alerta está activa y hasta 2 horas después.' | t }}</span></li>
+        <li><i class="ti ti-folder"></i><span>{{ 'Las fotos, videos y audios de una alerta los ven tú y los contactos que recibieron esa alerta, mientras su enlace está activo. La administración de AlertaMujer también puede revisarlos para moderar el servicio.' | t }}</span></li>
+        <li><i class="ti ti-trash-x"></i><span>{{ 'El historial de ubicaciones se borra solo: lo del día a día a los 7 días y los recorridos de tus alertas a los 30.' | t }}</span></li>
+        <li><i class="ti ti-device-mobile"></i><span>{{ 'Los permisos de ubicación, notificaciones y micrófono se cambian en los ajustes de tu celular.' | t }}</span></li>
+      </ul>
+      <a class="setting-row setting-row--link" routerLink="/auth/privacy">
+        <span>{{ 'Leer la política de privacidad' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <button type="button" class="setting-row setting-row--link setting-row--destructive" (click)="deletingAccount.set(true)">
+        <span><i class="ti ti-trash"></i> {{ 'Eliminar mi cuenta y mis datos' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+    </article>
+
+    <!-- EMERGENCIA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-urgent"></i> {{ 'Emergencia' | t }}</h2>
+      </div>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/emergency-contacts">
+        <i class="ti ti-users"></i>
+        <div>
+          <strong>{{ 'Contactos de emergencia' | t }}</strong>
+          <span>{{ 'Quiénes reciben tu alerta y tu ubicación.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/alert-history">
+        <i class="ti ti-history"></i>
+        <div>
+          <strong>{{ 'Mis alertas' | t }}</strong>
+          <span>{{ 'Historial de las alertas que has activado.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/ubicacion/zonas-auxiliares">
+        <i class="ti ti-map-pin"></i>
+        <div>
+          <strong>{{ 'Zonas y puntos de ayuda' | t }}</strong>
+          <span>{{ 'Zonas de riesgo, zonas seguras y lugares donde pedir ayuda.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/assistance">
+        <i class="ti ti-lifebuoy"></i>
+        <div>
+          <strong>{{ 'Líneas de ayuda' | t }}</strong>
+          <span>{{ 'Números de emergencia y centros de atención.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+    </article>
+
+    <!-- SOPORTE Y AYUDA -->
+    <article class="settings-card">
+      <div class="settings-card__header">
+        <h2><i class="ti ti-headset"></i> {{ 'Soporte y ayuda' | t }}</h2>
+      </div>
+
+      <a class="setting-row setting-row--link" routerLink="/auth/terms">
+        <span>{{ 'Términos y condiciones' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/auth/privacy">
+        <span>{{ 'Política de privacidad' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <div class="setting-row">
+        <span>{{ 'Información de la aplicación' | t }}</span>
+        <span class="setting-row__value">{{ 'Versión 1.0.0' | t }}</span>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- BANNER INFERIOR -->
+  <footer class="settings__footer">
+    <div class="footer-item footer-item--highlight">
+      <i class="ti ti-shield-check"></i>
+      <span>{{ 'Tu seguridad, en tus manos' | t }}</span>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-moon"></i>
+      <div>
+        <strong>{{ 'Modo claro / oscuro' | t }}</strong>
+        <span>{{ 'Elige el tema que prefieras.' | t }}</span>
+      </div>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-palette"></i>
+      <div>
+        <strong>{{ 'Personaliza colores' | t }}</strong>
+        <span>{{ 'Hazla única con tu color favorito.' | t }}</span>
+      </div>
+    </div>
+    <div class="footer-item">
+      <i class="ti ti-bell"></i>
+      <div>
+        <strong>{{ 'Notificaciones' | t }}</strong>
+        <span>{{ 'Mantente siempre informada.' | t }}</span>
+      </div>
+    </div>
+  </footer>
+
+  @if (changingPassword()) {
+    <app-password-change (close)="changingPassword.set(false)" />
+  }
+  @if (deletingAccount()) {
+    <app-delete-account (close)="deletingAccount.set(false)" />
+  }
+</section>

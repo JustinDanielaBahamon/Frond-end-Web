@@ -1,0 +1,9 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  [class]="'btn btn--' + variant + ' btn--' + size"
+  (click)="onClick()"
+>
+  <app-spinner *ngIf="loading" size="sm" />
+  <ng-content />
+</button>

@@ -1,0 +1,276 @@
+@if (error) {
+  <p class="ec-error">{{ 'No se pudieron cargar tus contactos de emergencia.' | t }}</p>
+}
+
+@if (!error) {
+<div class="ec-wrap" (click)="closeMenu()">
+
+  <div class="ec-header">
+    <div class="page-title-row">
+      <span class="page-title-icon"><i class="ti ti-users"></i></span>
+      <div>
+        <h1 class="ec-title">{{ 'Contactos de emergencia' | t }}</h1>
+        <p class="ec-sub">{{ 'Gestiona las personas que recibirán tus alertas.' | t }}</p>
+      </div>
+    </div>
+    <button type="button" class="ec-add-btn" (click)="$event.stopPropagation(); openAddModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      {{ 'Agregar contacto' | t }}
+    </button>
+  </div>
+
+  <div class="ec-info-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    {{ 'En caso de emergencia, todos tus contactos recibirán una notificación simultánea.' | t }}
+  </div>
+
+  @if (loading) {
+    <p class="ec-muted">{{ 'Cargando contactos...' | t }}</p>
+  } @else {
+    <div class="ec-table-wrap">
+      <table class="ec-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{{ 'Nombre' | t }}</th>
+            <th>{{ 'Teléfono' | t }}</th>
+            <th>{{ 'Correo' | t }}</th>
+            <th>{{ 'Relación' | t }}</th>
+            <th>{{ 'Acciones' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of contacts; track c.id) {
+            <tr>
+              <td>
+                @if (c.photo) {
+                  <img class="ec-avatar ec-avatar--photo" [src]="c.photo" [alt]="'Foto de ' + c.name" />
+                } @else {
+                  <span class="ec-avatar">{{ initials(c.name) | t }}</span>
+                }
+              </td>
+              <td class="ec-name">{{ c.name | t }}</td>
+              <td>{{ c.telephone | t }}</td>
+              <td class="ec-email">{{ (c.email || '-') | t }}</td>
+              <td>{{ c.relationship | t }}</td>
+              <td>
+                <div class="ec-actions">
+                  <button type="button" class="ec-icon-btn" [title]="'Editar' | t" (click)="$event.stopPropagation(); openEditModal(c)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <div class="ec-menu-wrap">
+                    <button type="button" class="ec-icon-btn" [title]="'Más acciones' | t" (click)="$event.stopPropagation(); toggleMenu(c.id)">⋮</button>
+                    @if (menuOpen === c.id) {
+                      <div class="ec-menu" (click)="$event.stopPropagation()">
+                        <button type="button" (click)="openEditModal(c)">{{ 'Editar' | t }}</button>
+                        <button type="button" class="ec-menu-danger" (click)="deleteFromMenu(c)">{{ 'Eliminar' | t }}</button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="ec-empty">{{ 'Aún no tienes contactos de emergencia registrados.' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ec-footer-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <p>
+        {{ 'Todos tus contactos reciben un aviso cuando activas una alerta. Agrega su correo para que les llegue el enlace con tu ubicación.' | t }}
+      </p>
+    </div>
+  }
+</div>
+}
+
+<!-- MODAL AGREGAR -->
+@if (addModalOpen) {
+  <div class="ec-modal-bg" (click)="closeAddModal()">
+    <div class="ec-modal" (click)="$event.stopPropagation()">
+      <div class="ec-modal-header">
+        <div>
+          <h3>{{ 'Agregar contacto' | t }}</h3>
+          <p>{{ 'Completa la información del contacto que recibirá tus alertas de emergencia.' | t }}</p>
+        </div>
+        <button type="button" class="ec-modal-close" (click)="closeAddModal()">✕</button>
+      </div>
+
+      <div class="ec-modal-body">
+        <div class="ec-photo">
+          @if (addForm.photo) {
+            <img class="ec-photo-img" [src]="addForm.photo" [alt]="'Foto del contacto' | t" />
+          } @else {
+            <span class="ec-photo-vacia">{{ (initials(addForm.name) || '?') | t }}</span>
+          }
+          <div class="ec-photo-actions">
+            <label class="ec-photo-button">
+              <i class="ti ti-camera" aria-hidden="true"></i> {{ addForm.photo ? 'Cambiar foto' : 'Poner foto' | t }}
+              <input type="file" accept="image/*" hidden (change)="choosePhoto($event, addForm)" />
+            </label>
+            @if (addForm.photo) {
+              <button type="button" class="ec-photo-remove" (click)="removePhoto(addForm)">{{ 'Quitar' | t }}</button>
+            }
+            @if (photoError) { <span class="ec-photo-error">{{ photoError | t }}</span> }
+          </div>
+        </div>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ 'Nombre completo *' | t }}
+          </span>
+          <input type="text" [placeholder]="'Ej. Ana González' | t" [(ngModel)]="addForm.name" name="nombre" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            {{ 'Teléfono *' | t }}
+          </span>
+          <input type="tel" [placeholder]="'Ej. 300 123 4567' | t" [(ngModel)]="addForm.telephone" name="telefono" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            {{ 'Correo electrónico' | t }}
+          </span>
+          <input type="email" [placeholder]="'Ej. contacto@ejemplo.com' | t" [(ngModel)]="addForm.email" name="email" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {{ 'Relación *' | t }}
+          </span>
+          <select [(ngModel)]="addForm.relationship" name="relacion">
+            <option value="" disabled selected>{{ 'Selecciona una relación' | t }}</option>
+            @for (r of relationships; track r) { <option [value]="r">{{ r | t }}</option> }
+          </select>
+        </label>
+
+      </div>
+
+      <div class="ec-modal-actions">
+        <button type="button" class="ec-btn ec-btn--ghost" (click)="closeAddModal()">{{ 'Cancelar' | t }}</button>
+        <button type="button" class="ec-btn ec-btn--primary" [disabled]="!addFormValid || savingAdd" (click)="saveNewContact()">
+          {{ savingAdd ? 'Guardando...' : 'Guardar contacto' | t }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL EDITAR -->
+@if (editModalOpen && editingContact) {
+  <div class="ec-modal-bg" (click)="closeEditModal()">
+    <div class="ec-modal" (click)="$event.stopPropagation()">
+      <div class="ec-modal-header">
+        <div>
+          <h3>{{ 'Editar contacto' | t }}</h3>
+          <p>{{ 'Modifica la información del contacto.' | t }}</p>
+        </div>
+        <button type="button" class="ec-modal-close" (click)="closeEditModal()">✕</button>
+      </div>
+
+      <div class="ec-modal-body">
+        <div class="ec-photo">
+          @if (editForm.photo) {
+            <img class="ec-photo-img" [src]="editForm.photo" [alt]="'Foto del contacto' | t" />
+          } @else {
+            <span class="ec-photo-vacia">{{ (initials(editForm.name) || '?') | t }}</span>
+          }
+          <div class="ec-photo-actions">
+            <label class="ec-photo-button">
+              <i class="ti ti-camera" aria-hidden="true"></i> {{ editForm.photo ? 'Cambiar foto' : 'Poner foto' | t }}
+              <input type="file" accept="image/*" hidden (change)="choosePhoto($event, editForm)" />
+            </label>
+            @if (editForm.photo) {
+              <button type="button" class="ec-photo-remove" (click)="removePhoto(editForm)">{{ 'Quitar' | t }}</button>
+            }
+            @if (photoError) { <span class="ec-photo-error">{{ photoError | t }}</span> }
+          </div>
+        </div>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ 'Nombre completo *' | t }}
+          </span>
+          <input type="text" [(ngModel)]="editForm.name" name="nombreEditar" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            {{ 'Teléfono *' | t }}
+          </span>
+          <input type="tel" [(ngModel)]="editForm.telephone" name="telefonoEditar" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            {{ 'Correo electrónico' | t }}
+          </span>
+          <input type="email" [(ngModel)]="editForm.email" name="emailEditar" />
+        </label>
+
+        <label class="ec-field">
+          <span class="ec-field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {{ 'Relación *' | t }}
+          </span>
+          <select [(ngModel)]="editForm.relationship" name="relacionEditar">
+            @for (r of relationships; track r) { <option [value]="r">{{ r | t }}</option> }
+          </select>
+        </label>
+
+
+        <div class="ec-danger-zone">
+          <div class="ec-danger-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <div>
+              <strong>{{ 'Eliminar contacto' | t }}</strong>
+              <p>{{ 'Esta acción no se puede deshacer.' | t }}</p>
+            </div>
+          </div>
+
+          @if (!confirmingDelete) {
+            <button type="button" class="ec-danger-btn" (click)="askDeleteConfirmation()">{{ 'Eliminar contacto' | t }}</button>
+          } @else {
+            <div class="ec-danger-confirm">
+              <p>{{ '¿Seguro que quieres eliminar a' | t }} <strong>{{ editingContact.name | t }}</strong>?</p>
+              <div class="ec-danger-confirm-actions">
+                <button type="button" class="ec-btn ec-btn--ghost" (click)="cancelDelete()">{{ 'Cancelar' | t }}</button>
+                <button type="button" class="ec-danger-btn ec-danger-btn--confirm" [disabled]="deleting" (click)="confirmDelete()">
+                  {{ deleting ? 'Eliminando...' : 'Sí, eliminar' | t }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="ec-modal-actions">
+        <button type="button" class="ec-btn ec-btn--ghost" (click)="closeEditModal()">{{ 'Cancelar' | t }}</button>
+        <button type="button" class="ec-btn ec-btn--primary" [disabled]="!editFormValid || savingEdit" (click)="saveChanges()">
+          {{ savingEdit ? 'Guardando...' : 'Guardar cambios' | t }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

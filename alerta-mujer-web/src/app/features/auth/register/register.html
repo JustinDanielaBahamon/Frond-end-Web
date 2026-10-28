@@ -1,0 +1,262 @@
+<div class="register-page">
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+
+  <div class="register-page__wrapper">
+
+    <app-card class="card">
+
+      <div class="brand">
+        <div class="brand__icon">
+          <img src="logo.png" [alt]="'Logo' | t">
+        </div>
+        <div class="brand__text">
+          <span class="brand__name">
+            {{ 'ALERTA' | t }}<br><strong>{{ 'MUJER' | t }}</strong>
+          </span>
+          <span class="brand__tagline">{{ 'Seguridad para todas' | t }}</span>
+        </div>
+      </div>
+
+      <h1 class="card__title">{{ 'Únete a nosotros,' | t }} <span style="color:#ae10df">{{ 'crea tu cuenta' | t }}</span></h1>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="proceed()" novalidate>
+
+        <!-- Nombre completo -->
+        <div class="form__group">
+          <div class="field">
+            <span class="field__icon"><i class="fa-regular fa-user"></i></span>
+            <input
+              type="text"
+              formControlName="name"
+              class="field__input"
+              [class.is-invalid]="invalid('name')"
+              [placeholder]="'Nombre completo' | t"
+              autocomplete="name">
+          </div>
+          @if (invalid('name')) {
+            <p class="field__error">{{ message('name') | t }}</p>
+          }
+        </div>
+
+        <!-- Phone + Birth date -->
+        <div class="form__row">
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-solid fa-phone"></i></span>
+              <input
+                type="tel"
+                formControlName="telephone"
+                class="field__input"
+                [class.is-invalid]="invalid('telephone')"
+                [placeholder]="'Teléfono' | t"
+                autocomplete="tel">
+            </div>
+            @if (invalid('telephone')) {
+              <p class="field__error">{{ message('telephone') | t }}</p>
+            }
+          </div>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-regular fa-calendar"></i></span>
+              <input
+                type="text"
+                formControlName="birthDate"
+                class="field__input"
+                [class.is-invalid]="invalid('birthDate')"
+                [placeholder]="'DD/MM/AAAA' | t"
+                maxlength="10"
+                inputmode="numeric"
+                autocomplete="bday"
+                (input)="onDateInput($event)">
+            </div>
+            @if (invalid('birthDate')) {
+              <p class="field__error">{{ message('birthDate') | t }}</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Document type + Document number -->
+        <div class="form__row">
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-regular fa-id-card"></i></span>
+              <select
+                formControlName="documentType"
+                class="field__input field__input--select"
+                [class.is-empty]="!form.controls.documentType.value"
+                [class.is-invalid]="invalid('documentType')">
+                <option value="" disabled>{{ 'Tipo de documento' | t }}</option>
+                @for (type of documentTypes; track type) {
+                  <option [value]="type">{{ type | t }}</option>
+                }
+              </select>
+              <span class="field__chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+            @if (invalid('documentType')) {
+              <p class="field__error">{{ message('documentType') | t }}</p>
+            }
+          </div>
+
+          <div class="form__group">
+            <div class="field">
+              <span class="field__icon"><i class="fa-solid fa-hashtag"></i></span>
+              <input
+                type="text"
+                formControlName="documentNumber"
+                class="field__input"
+                [class.is-invalid]="invalid('documentNumber')"
+                [placeholder]="'Número de documento' | t">
+            </div>
+            @if (invalid('documentNumber')) {
+              <p class="field__error">{{ message('documentNumber') | t }}</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Correo -->
+        <div class="form__group">
+          <div class="field">
+            <span class="field__icon"><i class="fa-regular fa-envelope"></i></span>
+            <input
+              type="email"
+              formControlName="email"
+              class="field__input"
+              [class.is-invalid]="invalid('email')"
+              [placeholder]="'Correo electrónico' | t"
+              autocomplete="email">
+          </div>
+          @if (invalid('email')) {
+            <p class="field__error">{{ message('email') | t }}</p>
+          }
+        </div>
+
+        <!-- Password + Confirm password -->
+        <div class="form__row">
+
+          <div class="form__group">
+            <div class="field field--password">
+              <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                class="field__input"
+                [class.is-invalid]="invalid('password')"
+                [placeholder]="'Contraseña' | t"
+                autocomplete="new-password">
+              <button
+                type="button"
+                class="field__eye"
+                [attr.aria-label]="'Mostrar u ocultar contraseña' | t"
+                (click)="showPassword.set(!showPassword())">
+                <i [class]="showPassword() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              </button>
+            </div>
+            @if (invalid('password')) {
+              <p class="field__error">{{ message('password') | t }}</p>
+            }
+          </div>
+
+          <div class="form__group">
+            <div class="field field--password">
+              <span class="field__icon"><i class="fa-solid fa-lock"></i></span>
+              <input
+                [type]="showConfirm() ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                class="field__input"
+                [class.is-invalid]="invalid('confirmPassword')"
+                [placeholder]="'Confirmar contraseña' | t"
+                autocomplete="new-password">
+              <button
+                type="button"
+                class="field__eye"
+                [attr.aria-label]="'Mostrar u ocultar confirmación' | t"
+                (click)="showConfirm.set(!showConfirm())">
+                <i [class]="showConfirm() ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              </button>
+            </div>
+            @if (invalid('confirmPassword')) {
+              <p class="field__error">{{ message('confirmPassword') | t }}</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Checkbox: Terms and conditions -->
+        <div class="terms-row">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              [checked]="acceptsTerms()"
+              (click)="onTermsClick($event)"
+              (change)="onTermsChange($event)">
+            <span class="checkbox__mark"></span>
+            <span class="checkbox__label">{{ 'Acepto los Términos y condiciones' | t }}</span>
+          </label>
+          <button type="button" class="form__link terms-row__link" (click)="openTerms()">
+            {{ 'Leer términos' | t }}
+          </button>
+        </div>
+        @if (termsNotice()) {
+          <p class="field__error">{{ 'Debes leer los términos primero' | t }}</p>
+        }
+
+        <!-- Checkbox: Privacy policy -->
+        <div class="terms-row">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              [checked]="acceptsPrivacy()"
+              (click)="onPrivacyClick($event)"
+              (change)="onPrivacyChange($event)">
+            <span class="checkbox__mark"></span>
+            <span class="checkbox__label">{{ 'Acepto la Política de privacidad' | t }}</span>
+          </label>
+          <button type="button" class="form__link terms-row__link" (click)="openPrivacy()">
+            {{ 'Leer política' | t }}
+          </button>
+        </div>
+        @if (privacyNotice()) {
+          <p class="field__error">{{ 'Debes leer la política primero' | t }}</p>
+        }
+
+        <!-- Mensajes generales -->
+        @if (acceptanceError()) {
+          <p class="field__error">{{ 'Debes aceptar términos y privacidad' | t }}</p>
+        }
+
+        @if (serverError()) {
+          <p class="field__error">{{ serverError() | t }}</p>
+        }
+
+        @if (success()) {
+          <div class="form__success">
+            <i class="fa-solid fa-circle-check"></i>
+            {{ '¡Registro exitoso! Te llevamos al inicio de sesión…' | t }}
+          </div>
+        }
+
+        <button type="submit" class="btn-submit" [disabled]="loading() || success()">
+          <i class="fa-solid fa-shield-halved"></i>
+          {{ 'Continuar' | t }}
+        </button>
+
+      </form>
+
+      <p class="card__footer">
+        {{ '¿Ya tienes cuenta?' | t }}
+        <span class="form__link" (click)="irALogin()">{{ 'Inicia sesión' | t }}</span>
+      </p>
+
+    </app-card>
+
+    <div class="register-page__visual">
+      <img src="register.png" [alt]="'Alerta Mujer' | t">
+    </div>
+  </div>
+</div>

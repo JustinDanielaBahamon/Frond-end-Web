@@ -1,0 +1,603 @@
+// register.component.scss
+// Page layout + Alerta Mujer visual identity applied.
+// IMPORTANT: app-card does not set its size here (that lives in the
+// shared component shared/components/card, which is not touched). The spacings
+// below were kept to the minimum so the card size does not grow
+// compared to the first version — only colors/style are applied.
+
+.register-page {
+  /*
+ * CHANGE: before height: 100vh. Now the page grows if the form is
+ *      taller than the screen, so it is not cut.
+ */
+  min-height : 100vh;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  padding        : 56px;      // even air on the 4 sides, same as login
+  box-sizing     : border-box;
+  position       : relative;
+  overflow       : hidden;
+  // "atardecer estrellado" en tonos pastel → violeta saturado: recorre
+  // the WHOLE page, soft and pink on the left (behind the card)
+  // and more intense and violet on the right (behind the image), as
+  // in the reference
+  background     :
+    // scattered little stars (small, faint dots)
+    radial-gradient(circle at 78% 15%, rgba(255,255,255,0.9) 0px, rgba(255,255,255,0.9) 1.5px, transparent 2px),
+    radial-gradient(circle at 85% 30%, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 1px,   transparent 1.5px),
+    radial-gradient(circle at 65% 10%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    radial-gradient(circle at 92% 55%, rgba(255,255,255,0.9) 0px, rgba(255,255,255,0.9) 1.5px, transparent 2px),
+    radial-gradient(circle at 73% 68%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    radial-gradient(circle at 60% 45%, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px,   transparent 1.5px),
+    radial-gradient(circle at 95% 80%, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 1.5px, transparent 2px),
+    radial-gradient(circle at 55% 85%, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px,   transparent 1.5px),
+    radial-gradient(circle at 80% 92%, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1px,   transparent 1.5px),
+    // pink lighting glow, top-left, behind the
+    // card — it is what gives the reference that warm shine
+    radial-gradient(circle at 22% 12%, rgba(250, 214, 255, 0.55) 0%, transparent 42%),
+    // glow behind the image, a bit more present than before
+    radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.45) 0%, transparent 55%),
+    // base gradient: pale pink-lavender top-left → lilac-magenta
+    // vivid bottom-right — stays in the lilac/pink family, without falling into
+    // en azul-violeta oscuro
+    linear-gradient(
+      130deg,
+      #ffffff 0%,
+      #f8f8f8 12%,
+      #ffffff 26%,
+      #b146f8 40%,
+      #af30eb 54%,
+      #e8b6f5 66%,
+      #672f7e 78%,
+      #3c225e 90%,
+      #30074b 100%
+    );
+
+  .bg-orb {
+    position      : fixed;
+    border-radius : 50%;
+    filter        : blur(80px);
+    opacity       : 0.35;
+    pointer-events: none;
+    z-index       : 0;
+
+    &--1 {
+      width      : 520px; height: 520px;
+      background : radial-gradient(circle, #E896D9, transparent);  // rosa-lila, refuerza
+                                                                     // the warm lighting
+                                                                     // from the top corner
+      top: -120px; left: -120px;
+    }
+    &--2 {
+      width      : 420px; height: 420px;
+      background : radial-gradient(circle, #A557C4, transparent);  // lila-magenta, combina
+                                                                     // with the end of the
+                                                                     // degradado, sin irse
+                                                                     // a azul
+      bottom: -100px; right: 10%;
+    }
+  }
+
+  &__wrapper {
+    position       : relative;
+    z-index        : 1;
+    display        : flex;
+    align-items    : center;   // same as the original: does NOT affect the card size
+    justify-content: center;
+    gap            : 40px;
+    width          : 100%;
+    max-width      : 1300px;
+    margin         : 0 auto;
+    /* CHANGE: max-height: 100% was removed so the card can be taller */
+  }
+
+  &__visual {
+    flex           : 1.4;              // before: 1 → more space for the image
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    overflow       : visible;
+    position       : relative;
+    // no own background, padding or box-shadow: the panel does NOT
+    // look like a card/block — the color comes from the pastel gradient
+    // of the page background (above), which already extends here
+
+    // calm blue-lavender glow behind the image — matches the
+    // calm background gradient, without creating a hard border/silhouette
+    &::before {
+      content       : '';
+      position      : absolute;
+      width         : 85%;
+      height        : 85%;
+      background    : radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(191, 176, 230, 0.35) 45%, rgba(143, 135, 201, 0.15) 70%, transparent 85%);
+      filter        : blur(70px);
+      z-index       : 0;
+      pointer-events: none;
+    }
+
+    img {
+      position     : relative;
+      z-index      : 1;
+      width        : auto;
+      height       : 80vh;               // altura fija respecto al viewport,
+                                          // fully independent from the card
+      max-height   : 620px;              // tope razonable en pantallas muy altas
+      max-width    : 100%;
+      object-fit   : contain;            // keeps the proportion, without distorting or cropping
+      border-radius: 28px;
+      filter       : drop-shadow(0 20px 45px rgba(91, 33, 182, 0.22));  // sombra suave,
+                                                                          // without forcing brightness/saturation
+    }
+  }
+}
+
+/*
+ * NEW: the registration card has less padding so 8 fields
+ *    do not make it too tall. .register-page .card is used with !important
+ *    because card.scss (shared component) also uses !important.
+ */
+.register-page .card {
+  padding: 32px 40px 28px !important;
+}
+
+// ── Marca (logo + nombre) ────────────────────────────
+.brand {
+  display     : flex;
+  align-items : center;
+  gap         : 12px;
+  padding-bottom: 12px;
+  margin-bottom : 12px;
+  border-bottom : 1px solid rgba(124, 58, 237, 0.12);
+
+  &__icon {
+    width         : 48px;
+    height        : 48px;
+    border-radius : 50%;
+    overflow      : hidden;
+    flex-shrink   : 0;
+    background    : radial-gradient(circle at 35% 30%, #3a1768, #1a0b2e 75%);
+    border        : 2px solid #a835e2;
+    box-shadow    : 0 0 0 3px rgba(168, 53, 226, 0.15);
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__text {
+    display        : flex;
+    flex-direction : column;
+    line-height    : 1.15;
+  }
+
+  &__name {
+    font-size   : 1rem;
+    font-weight : 800;
+    letter-spacing: 0.03em;
+    color       : var(--color-pink, #ce1ee9);
+
+    strong {
+      display     : block;
+      font-size   : 1.15rem;
+      color       : #2d1457;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  &__tagline {
+    margin-top  : 2px;
+    font-size   : 0.65rem;
+    font-weight : 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color       : var(--color-purple, #7c3aed);
+  }
+}
+
+// ── Titles ───────────────────────────────────────────
+.card__title {
+  font-size   : 1.4rem;
+  font-weight : 800;
+  color       : #2d1457;
+  line-height : 1.2;
+  margin-bottom: 14px;   /* CHANGE: before 4px; there is no subtitle below anymore */
+  position    : relative;
+
+  .highlight {
+    color: var(--color-pink, #ce1ee9);
+  }
+
+  &-icon {
+    color: var(--color-pink, #ce1ee9);
+    font-size: 0.85rem;
+    margin-left: 4px;
+  }
+}
+
+.card__subtitle {
+  font-size   : 0.88rem;
+  color       : #6b5b8a;
+  margin-bottom: 10px;
+
+  strong { color: #4c2a91; }
+}
+
+// ── Divisor decorativo con guiones ───────────────────
+.form__divider {
+  display     : flex;
+  align-items : center;
+  gap         : 10px;
+  margin-bottom: 12px;
+  color       : var(--color-pink, #ce1ee9);
+  opacity     : 0.6;
+
+  span {
+    flex-grow : 1;
+    height    : 1px;
+    background: repeating-linear-gradient(
+      to right, currentColor 0 6px, transparent 6px 10px
+    );
+  }
+
+  i { font-size: 0.55rem; }
+}
+
+// ── Formulario enmarcado (borde punteado tipo mockup) ─
+// padding reduced to the minimum needed for the frame
+// to show without growing the total card height
+.form--framed {
+  border        : 1.5px dashed rgba(196, 166, 224, 0.55);  // defined lilac, more
+                                                           // visible than the purple
+                                                           // tenue anterior
+  border-radius : 16px;
+  padding       : 14px 14px;
+  background    : rgba(238, 241, 251, 0.5);
+}
+
+// ── Grid de 2 columnas ────────────────────────────────
+.form__row {
+  display              : grid;
+  grid-template-columns: 1fr 1fr;
+  gap                  : 12px;
+  align-items          : start;   /* CHANGE: each column grows with its error */
+}
+
+/* NEW: group = field + its error message below */
+.form__group {
+  margin-bottom: 10px;
+
+  .field { margin-bottom: 0; }
+}
+
+// ── Campos ────────────────────────────────────────────
+.field {
+  position      : relative;
+  margin-bottom : 10px;
+
+  &__icon {
+    position  : absolute;
+    left      : 14px;
+    top       : 50%;
+    transform : translateY(-50%);
+    color     : #6B3FA0;  // dark purple, before #9b7fd4 got lost
+                           // on the light input background
+    font-size : 0.9rem;
+  }
+
+  &__input {
+    width        : 100%;
+    padding      : 10px 14px 10px 40px;
+    border-radius: 10px;
+    border       : 1.5px solid #C4A6E0;  // defined lilac, the outline shows
+                                          // of the card without needing a shadow
+    background   : #eef1fb;
+    font-size    : 0.88rem;
+    color        : #2d1457;
+    transition   : border-color .2s, box-shadow .2s;
+
+    &::placeholder { color: #a99fd1; }
+
+    &:hover {
+      border-color: #B48EDA;  // a touch darker on hover
+    }
+
+    &:focus {
+      outline    : none;
+      background : #ffffff;
+      border-color: var(--color-purple, #7c3aed);
+      box-shadow : 0 0 0 3px rgba(124, 58, 237, 0.14);
+    }
+  }
+}
+
+/* NUEVO: campo con error → borde rojo */
+.field__input.is-invalid {
+  border-color: #ca19e5;
+
+  &:focus {
+    border-color: #ca19e5;
+    box-shadow  : 0 0 0 3px rgba(202, 25, 229, 0.14);
+  }
+}
+
+/* NEW: red error message under each field */
+.field__error {
+  color      : #ca19e5;
+  font-size  : 0.78rem;
+  line-height: 1.3;
+  margin     : 4px 0 0 6px;
+}
+
+/* NEW: password fields (leave room for the eye button) */
+.field--password .field__input {
+  padding-right: 40px;
+}
+
+/* NEW: document type dropdown */
+.field__input--select {
+  appearance        : none;
+  -webkit-appearance: none;
+  cursor            : pointer;
+  padding-right     : 34px;
+
+  /* While nothing is chosen, it looks like a placeholder */
+  &.is-empty { color: #a99fd1; }
+
+  option {
+    color     : #2d1457;
+    background: #ffffff;
+  }
+}
+
+.field__chevron {
+  position      : absolute;
+  right         : 14px;
+  top           : 50%;
+  transform     : translateY(-50%);
+  color         : #6B3FA0;
+  font-size     : 0.7rem;
+  pointer-events: none;
+}
+
+// ── Error message ────────────────────────────────────
+.form__error {
+  color      : #ce1ee9;
+  font-size  : 0.82rem;
+  margin-top : -0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+/* NUEVO: mensaje de registro exitoso */
+.form__success {
+  display      : flex;
+  align-items  : center;
+  gap          : 8px;
+  margin       : 8px 0;
+  padding      : 10px 12px;
+  border-radius: 10px;
+  border       : 1.5px solid #6922c5;
+  background   : rgba(105, 34, 197, 0.12);
+  color        : #431580;
+  font-size    : 0.85rem;
+  font-weight  : 700;
+}
+
+// ── Terms checkbox ─────────────────────────────────
+/* CHANGE: now each checkbox goes in a row (.terms-row) next to its link */
+.checkbox {
+  display     : flex;
+  align-items : center;
+  gap         : 8px;
+  margin      : 0;
+  cursor      : pointer;
+  font-size   : 0.8rem;
+  color       : #6b5b8a;
+
+  input { accent-color: var(--color-pink, #ce1ee9); margin-top: 2px; }
+}
+
+/* NEW: more visible checkbox border */
+.checkbox__mark {
+  border-color: #C4A6E0;
+}
+
+/* NEW: row with the checkbox on the left and the "Leer ..." link on the right */
+.terms-row {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  gap            : 10px;
+  margin         : 4px 0;
+}
+
+.form__link {
+  color       : var(--color-pink, #ce1ee9);
+  font-weight : 700;
+  cursor      : pointer;
+
+  &:hover { text-decoration: underline; }
+}
+
+/* NEW: the "Leer ..." link is a <button>; its button look is removed */
+.terms-row__link {
+  background : none;
+  border     : none;
+  padding    : 0;
+  font-size  : 0.78rem;
+  white-space: nowrap;
+}
+
+// ── Main button ───────────────────────────────────
+.btn-submit__wrap {
+  position    : relative;
+  display     : flex;
+  align-items : center;
+  justify-content: center;
+}
+
+.btn-submit {
+  width         : 100%;
+  padding       : 13px;
+  border        : none;
+  border-radius : 12px;
+  background    : linear-gradient(90deg, #6D28D9, var(--color-pink, #ce1ee9));
+  color         : #fff;
+  font-weight   : 800;
+  letter-spacing: 0.04em;
+  font-size     : 0.92rem;
+  display       : flex;
+  align-items   : center;
+  justify-content: center;
+  gap           : 10px;
+  cursor        : pointer;
+  box-shadow    : 0 10px 24px rgba(147, 51, 234, 0.35);
+  transition    : transform .15s, box-shadow .15s, opacity .15s;
+  margin-top    : 10px;   /* NEW: a bit of air above the button */
+
+  &:hover:not(:disabled) {
+    transform : translateY(-2px);
+    box-shadow: 0 14px 28px rgba(206, 30, 233, 0.4);
+  }
+
+  &:disabled {
+    opacity   : 0.5;
+    cursor    : not-allowed;
+    box-shadow: none;
+  }
+}
+
+.btn-submit__tick {
+  position: absolute;
+  top: -6px;
+  width: 14px;
+  height: 2px;
+  background: var(--color-pink, #ce1ee9);
+  opacity: 0.5;
+  transform: rotate(-25deg);
+
+  &--left  { left: 6px; }
+  &--right { right: 6px; transform: rotate(25deg); }
+}
+
+// ── Footer con flecha decorativa ──────────────────────
+.card__footer {
+  position    : relative;
+  text-align  : center;
+  margin-top  : 10px;
+  font-size   : 0.85rem;
+  color       : #6b5b8a;
+}
+
+.card__footer-arrow {
+  position: absolute;
+  width   : 42px;
+  height  : 28px;
+  right   : -10px;
+  bottom  : 20px;
+  color   : #2d1457;
+  opacity : 0.7;
+  transform: scaleX(-1);
+}
+
+// ── Responsive ───────────────────────────────────────
+
+// Tablets / medium screens: the image shrinks instead of hiding,
+// so both panels fit without the image looking huge or cut
+@media (max-width: 1100px) {
+  .register-page {
+    padding: 32px;
+  }
+
+  .register-page__wrapper {
+    gap: 24px;
+  }
+
+  .register-page__visual img {
+    height    : 55vh;
+    max-height: 440px;
+  }
+}
+
+// Mobile: the image is hidden and everything goes to a single column,
+// same as login
+@media (max-width: 760px) {
+  .register-page {
+    height        : auto;
+    min-height    : 100vh;
+    padding       : 24px 16px;
+    overflow-y    : auto;   // prevents the content from being cut on screens
+                             // cortas o con teclado abierto
+  }
+
+  .register-page__wrapper {
+    flex-direction: column;
+    padding       : 0;
+    gap           : 28px;
+  }
+
+  .register-page__visual { display: none; }
+
+  .form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .card__footer-arrow { display: none; }
+
+  /* NEW: on mobile the card takes the whole available width */
+  .register-page .card {
+    width    : 100%;
+    max-width: 580px;
+    padding  : 24px 20px !important;
+  }
+}
+
+// Very small phones: reduces the air around a bit more
+@media (max-width: 380px) {
+  .register-page {
+    padding: 16px 12px;
+  }
+}
+
+[data-theme="dark"] {
+
+  .card{
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    box-shadow:
+      0 32px 80px rgba(0, 0, 0, .5),
+      0 0 0 1px rgba(157, 111, 240, .15) inset !important;
+  }
+
+  /* NEW: errors, success and dropdown in dark mode */
+  .field__error {
+    color: #e971fb;
+  }
+
+  .field__input.is-invalid {
+    border-color: #e971fb !important;
+  }
+
+  .form__success {
+    color: #8a49df;
+    background: rgba(105, 34, 197, 0.12);
+  }
+
+  .field__input--select {
+    &.is-empty { color: var(--text-dim) !important; }
+
+    option {
+      color: var(--text-primary);
+      background: var(--bg-card);
+    }
+  }
+
+  .field__chevron {
+    color: var(--purple-mid);
+  }
+
+  .checkbox__mark {
+    border-color: var(--purple-mid) !important;
+  }
+
+  /* ... the rest of your block that you already have ... */
+}

@@ -1,0 +1,32 @@
+<div class="descarga">
+    <div class="descarga-text">
+        <span class="descarga-chip"><i class="fa-brands fa-android"></i> {{ 'Disponible para Android' | t }}</span>
+        <h2>{{ 'Lleva AlertaMujer en tu celular' | t }}</h2>
+        <p class="descarga-sub">
+            {{ 'Pide ayuda en segundos con el botón de alerta o agitando el teléfono, comparte tu ubicación en tiempo real y graba evidencias automáticamente.' | t }}
+        </p>
+
+        <a class="descarga-btn" [href]="apkUrl" download="AlertaMujer.apk" rel="noopener">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>
+                <strong>{{ 'Descargar app' | t }}</strong>
+                <small>{{ 'Archivo APK · Android' | t }}</small>
+            </span>
+        </a>
+
+        <ol class="descarga-steps">
+            @for (step of steps; track step.text; let i = $index) {
+                <li>
+                    <span class="step-index">{{ i + 1 | t }}</span>
+                    <i [class]="step.icon"></i>
+                    <span>{{ step.text | t }}</span>
+                </li>
+            }
+        </ol>
+    </div>
+
+    <div class="descarga-image">
+        <img src="./logoDonwload.png" [alt]="'AlertaMujer en el celular' | t" class="img-download-light">
+        <img src="./logoDonwloadoscuro.png" [alt]="'AlertaMujer en el celular' | t" class="img-download-dark">
+    </div>
+</div>

@@ -1,0 +1,331 @@
+<div class="home-wrap">
+
+  <!-- ESTADO DE SEGURIDAD + MI DISPOSITIVO -->
+  <div class="home-row home-row--top">
+
+    <!-- ESTADO DE TU SEGURIDAD -->
+    <div class="home-panel home-panel--estado">
+      <div class="home-panel__header">
+        <div>
+          <h2 class="home-panel__title">
+            @if (overallStatus(); as eg) {
+              <span class="state-dot" [ngClass]="'state-dot--' + eg.color"></span>
+            }
+            {{ 'Estado de tu seguridad' | t }}
+          </h2>
+          @if (overallStatus(); as eg) {
+            <p class="home-panel__subtitle"
+               [ngClass]="{
+                 'home-panel__subtitle--warning': eg.color === 'amarillo',
+                 'home-panel__subtitle--danger': eg.color === 'rojo'
+               }">
+              {{ eg.level | t }} • {{ eg.percentage | t }}{{ '% configurado' | t }}
+            </p>
+          } @else {
+            <p class="home-panel__subtitle">{{ 'Cargando...' | t }}</p>
+          }
+        </div>
+        <button class="home-btn home-btn--outline" routerLink="/dashboard/emergency-contacts">
+          {{ 'Ver contactos' | t }}
+        </button>
+      </div>
+
+      @if (isLoadingStatus()) {
+        <div class="home-security-grid">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="home-security-item" style="opacity: 0.5;">
+              <div class="home-security-item__icon">
+                <i class="ti ti-loader-2" style="animation: spin 1s linear infinite;"></i>
+              </div>
+              <p class="home-security-item__valor">...</p>
+              <p class="home-security-item__description">{{ 'Cargando' | t }}</p>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="home-security-grid">
+          @for (item of securityStatus(); track item.description) {
+            <div class="home-security-item" [title]="item.tooltip || ''">
+              <div class="home-security-item__icon">
+                <i class="ti {{ item.icon | t }}"></i>
+              </div>
+              <p class="home-security-item__valor">{{ item.value | t }}</p>
+              <p class="home-security-item__description">{{ item.description | t }}</p>
+              @if (item.configured) {
+                <span class="home-security-item__check home-security-item__check--success">
+                  <i class="ti ti-check"></i>
+                </span>
+              } @else {
+                <span class="home-security-item__check home-security-item__check--warning">
+                  <i class="ti ti-alert-triangle"></i>
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- MI DISPOSITIVO -->
+    <div class="home-panel home-panel--dispositivo">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-device-mobile"></i> {{ 'Mi dispositivo' | t }}
+        </h2>
+      </div>
+
+      <div class="home-device-body">
+        @if (myPhone(); as phone) {
+          <div class="home-device-info">
+            <p class="home-device-row">
+              <span class="home-device-label">{{ 'Celular:' | t }}</span>
+              <span class="home-device-value">{{ phoneName(phone) | t }}</span>
+            </p>
+            <p class="home-device-row">
+              <span class="home-device-label">{{ 'Alertas:' | t }}</span>
+              <span class="home-badge" [ngClass]="phone.fcmToken ? 'home-badge--success' : 'home-badge--advertencia'">
+                {{ phone.fcmToken ? 'Las recibe' : 'Sin notificaciones' | t }}
+              </span>
+            </p>
+            <p class="home-device-row">
+              <span class="home-device-label">{{ 'Última conexión:' | t }}</span>
+              <span class="home-device-value">{{ lastConnection(phone) | t }}</span>
+            </p>
+          </div>
+        } @else if (phonesLoaded()) {
+          <p class="home-device-value">{{ 'No tienes un celular vinculado. Inicia sesión en la app móvil.' | t }}</p>
+        } @else {
+          <p class="home-device-value">{{ 'Cargando…' | t }}</p>
+        }
+        <div class="home-device-icon">
+          <i class="ti ti-device-mobile"></i>
+        </div>
+      </div>
+
+      <a class="home-btn home-btn--primary home-btn--block" routerLink="/dashboard/device">
+        {{ 'Ver detalles del dispositivo' | t }} <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- LOCATION MAP (FULL WIDTH) -->
+  <div class="home-row home-row--full">
+    <div class="home-panel home-panel--map">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-map-pin"></i> {{ 'Última ubicación de mi celular' | t }}
+        </h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button 
+            class="home-btn home-btn--refresh" 
+            (click)="refreshLocation()"
+            [disabled]="isRefreshing()"
+            [title]="'Pedir al celular su ubicación actual' | t">
+            <i class="ti" [class.ti-loader-2]="isRefreshing()" [class.ti-refresh]="!isRefreshing()"></i>
+            {{ isRefreshing() ? 'Preguntando al celular…' : 'Actualizar ubicación' | t }}
+          </button>
+          @if (lastLocation()) {
+            <button class="home-btn" type="button" (click)="centerOnPhone()" [title]="'Llevar el mapa a donde está el celular' | t">
+              <i class="ti ti-current-location"></i> {{ 'Centrar en mi celular' | t }}
+            </button>
+          }
+          <a class="home-link" routerLink="/dashboard/ubicacion">
+            {{ 'Ver mapa completo' | t }} <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      @if (locationNotice()) {
+        <p class="home-notice">{{ locationNotice() | t }}</p>
+      }
+      <div id="home-mini-map" class="home-full-map"></div>
+
+      <!-- LEYENDA DEL MAPA -->
+      <div class="home-map-legend">
+        <h3 class="home-map-legend__title">
+          <i class="ti ti-info-circle"></i> {{ 'Guía del mapa' | t }}
+        </h3>
+        <div class="home-map-legend__grid">
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 2px solid white;">
+              📍
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Mi celular' | t }}</strong>
+              <span>{{ 'Última ubicación que envió tu celular' | t }}</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #cb1ce6; border: 2px solid #8f12a2;">
+              ⚠️
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Zona de riesgo' | t }}</strong>
+              <span>{{ 'Áreas con precaución especial' | t }}</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #5316a3; border: 2px solid #431580;">
+              🛡️
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Zona segura' | t }}</strong>
+              <span>{{ 'Lugares con vigilancia permanente' | t }}</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #9333ea; border: 2px solid #7e22ce;">
+              👮
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Estación de policía' | t }}</strong>
+              <span>{{ 'Ayuda inmediata disponible' | t }}</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #733bf6; border: 2px solid #6025eb;">
+              🏥
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Centro de asistencia' | t }}</strong>
+              <span>{{ 'Hospitales y Cruz Roja' | t }}</span>
+            </div>
+          </div>
+          <div class="home-map-legend__item">
+            <div class="home-map-legend__icon" style="background: #500ee9; border: 2px solid #3d02c7;">
+              🆘
+            </div>
+            <div class="home-map-legend__text">
+              <strong>{{ 'Punto de ayuda' | t }}</strong>
+              <span>{{ 'Información y asistencia ciudadana' | t }}</span>
+            </div>
+          </div>
+        </div>
+        <p class="home-map-legend__note">
+          <i class="ti ti-click"></i> {{ 'Haz clic en cualquier marcador para ver más información' | t }}
+        </p>
+      </div>
+
+      @if (lastLocation(); as u) {
+        <div class="home-map-info">
+          <div class="home-map-info__item">
+            <i class="ti ti-map-pin"></i>
+            <div>
+              <p class="home-map-info__label">{{ 'Dirección' | t }}</p>
+              <p class="home-map-info__value">{{ u.address | t }}</p>
+            </div>
+          </div>
+          <div class="home-map-info__item">
+            <i class="ti ti-clock"></i>
+            <div>
+              <p class="home-map-info__label">{{ 'Fecha y hora' | t }}</p>
+              <p class="home-map-info__value">{{ u.date | t }}</p>
+            </div>
+          </div>
+          <div class="home-map-info__item">
+            <i class="ti ti-compass"></i>
+            <div>
+              <p class="home-map-info__label">{{ 'Coordenadas' | t }}</p>
+              <p class="home-map-info__value">{{ u.coordinates | t }}</p>
+            </div>
+          </div>
+          <div class="home-map-info__item">
+            <i class="ti ti-target"></i>
+            <div>
+              <p class="home-map-info__label">{{ 'Precisión' | t }}</p>
+              <p class="home-map-info__value">{{ u.precision | t }}</p>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <p class="home-notice">{{ 'Tu celular todavía no ha enviado su ubicación. Abre la app móvil con la ubicación activada.' | t }}</p>
+      }
+    </div>
+  </div>
+
+  <!-- ÚLTIMA EMERGENCIA -->
+  <div class="home-row home-row--single">
+    <div class="home-panel home-panel--emergency">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">
+          <i class="ti ti-alert-octagon"></i> {{ 'Última emergencia' | t }}
+        </h2>
+        @if (lastEmergency(); as e) {
+          <span class="home-badge home-badge--success">{{ e.status | t }}</span>
+        }
+      </div>
+
+      @if (lastEmergency(); as e) {
+        <div class="home-emergency">
+          <div class="home-emergency__date-row">
+            <div class="home-emergency__icon"><i class="ti ti-alert-octagon"></i></div>
+            <div>
+              <p class="home-emergency__date">{{ e.date | t }}</p>
+              <p class="home-emergency__hour">{{ e.time | t }}</p>
+            </div>
+          </div>
+
+          <div class="home-emergency__detail">
+            <i class="ti ti-map-pin"></i>
+            <div>
+              <p class="home-emergency__detail-label">{{ 'Ubicación' | t }}</p>
+              <p class="home-emergency__detail-valor">{{ e.location | t }}</p>
+            </div>
+          </div>
+
+          <div class="home-emergency__detail">
+            <i class="ti ti-activity"></i>
+            <div>
+              <p class="home-emergency__detail-label">{{ 'Activada mediante' | t }}</p>
+              <p class="home-emergency__detail-valor">{{ e.activatedBy | t }}</p>
+            </div>
+          </div>
+
+          <div class="home-emergency__detail">
+            <i class="ti ti-users"></i>
+            <div>
+              <p class="home-emergency__detail-label">{{ 'Contactos notificados' | t }}</p>
+              <p class="home-emergency__detail-valor">
+                {{ e.notifiedContacts === null ? '…' : e.notifiedContacts + (e.notifiedContacts === 1 ? ' contacto' : ' contactos') | t }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <a class="home-btn home-btn--primary home-btn--block" routerLink="/dashboard/alert-history">
+          {{ 'Ver mis emergencias' | t }}
+        </a>
+      } @else if (loadedAlerts()) {
+        <p class="home-notice">{{ 'No has activado ninguna alerta. Cuando lo hagas, aquí verás la más reciente.' | t }}</p>
+      } @else {
+        <p class="home-notice">{{ 'Cargando…' | t }}</p>
+      }
+    </div>
+  </div>
+
+  <!-- QUICK ACCESS + QUICK ACTIONS -->
+  <div class="home-row home-row--bottom">
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="home-panel">
+      <div class="home-panel__header">
+        <h2 class="home-panel__title-sm">{{ 'Accesos rápidos' | t }}</h2>
+      </div>
+      <div class="home-shortcuts-grid">
+        @for (access of quickAccess; track access.label) {
+          <a class="home-access" [routerLink]="access.route">
+            <div class="home-access__icon home-access__icon--principal">
+              <i class="ti {{ access.icon | t }}"></i>
+            </div>
+            <p class="home-access__label">{{ access.label | t }}</p>
+            <p class="home-access__sub">{{ access.sub | t }}</p>
+          </a>
+        }
+      </div>
+    </div>
+
+
+  </div>
+
+</div>

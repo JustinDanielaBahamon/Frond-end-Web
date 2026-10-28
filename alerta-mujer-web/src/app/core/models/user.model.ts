@@ -1,15 +1,14 @@
-export interface Usuario {
+export interface ManagedUser {
   id: string;
-  nombre: string;
+  name: string;
   email: string;
-  correo?: string;
-  telefono: string;
-  fechaRegistro: string;
-  alertas: number;
-  ultimaActividad: string;
-  estado: 'Activa' | 'Inactiva' | 'Bloqueada por Fraude';
-  rol: string;
-  contactoEmergencia?: string;
+  telephone: string;
+  registeredAt: string;
+  alerts: number;
+  lastActivity: string;
+  status: 'Activa' | 'Inactiva' | 'Bloqueada por Fraude';
+  role: string;
+  emergencyContact?: string;
   avatarColor: string;
   role_id?: number;
   first_name?: string;

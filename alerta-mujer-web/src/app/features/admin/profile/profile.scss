@@ -1,0 +1,516 @@
+/*==================================================
+=   MI PERFIL — PANEL ADMIN (tokens de tokens.scss)
+==================================================*/
+
+$btn-purple: #7c3aed;
+$btn-purple-hover: #6d28d9;
+
+.profile-page {
+  padding: 30px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  h1 { margin: 0 0 4px; font-size: 1.8rem; font-weight: 800; }
+  p { margin: 0; color: var(--text-muted); }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #c026d3);
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid #c026d3;
+  border-radius: 12px;
+  background: transparent;
+  color: #c026d3;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { background: rgba(192, 38, 211, 0.1); }
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1000;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  &--error { background: #c026d3; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--dash-shadow-card);
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    i { color: var(--purple-deep); }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+
+  > span { font-weight: 600; color: var(--text-primary); }
+  small { font-size: 0.78rem; }
+
+  input,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+
+    &:focus { outline: 2px solid var(--purple-deep); outline-offset: 1px; }
+    &:disabled { opacity: 0.6; }
+  }
+}
+
+.label { margin: 4px 0 0; font-size: 0.85rem; font-weight: 600; }
+.muted { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+
+.btn-primary {
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: $btn-purple;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: $btn-purple-hover; }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -4px;
+
+  &__bar {
+    display: flex;
+    flex: 1;
+    gap: 4px;
+
+    span { flex: 1; height: 5px; border-radius: 3px; background: var(--border); }
+  }
+
+  small { min-width: 70px; text-align: right; color: var(--text-muted); }
+
+  @for $i from 1 through 4 {
+    &[data-nivel="#{$i}"] .strength__bar span:nth-child(-n + #{$i}) {
+      background: nth((#c026d3, #9333ea, #8b5cf6, #7c3aed), $i);
+    }
+  }
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+
+  &--active { border-color: $btn-purple; background: rgba(124, 58, 237, 0.15); }
+}
+
+.note {
+  display: flex;
+  gap: 8px;
+  margin: auto 0 0;
+  padding-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+
+  i { color: var(--purple-deep); margin-top: 2px; }
+}
+
+.activity {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border);
+
+    &:last-child { border-bottom: none; }
+
+    strong { display: block; font-size: 0.9rem; }
+    small { color: var(--text-muted); font-size: 0.78rem; }
+
+    &--bad strong { color: #c026d3; }
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .profile-page { padding: 16px; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .form__row { grid-template-columns: 1fr; }
+}
+
+
+// =============================================
+// MODO OSCURO — títulos y textos visibles
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+:host-context([data-theme="dark"]) {
+
+  // Títulos de cada tarjeta ("Sesión y apariencia", "Mi actividad reciente"...)
+  // El estilo global los pinta con un degradado morado oscuro: aquí van en lila claro
+  .card__title {
+    background: linear-gradient(90deg, #f3efff, #c4a1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    i {
+      color: #c4a1ff;
+      -webkit-text-fill-color: #c4a1ff;
+    }
+  }
+
+  // "Tema"
+  .label { color: var(--text-primary); }
+
+  // Tipo de cada actividad ("Inicio de sesión", "Cierre de sesión"...)
+  .activity__item strong { color: var(--text-primary); }
+  .activity__item--bad strong { color: var(--red); }
+}
+
+
+// =============================================
+// SELECTOR DE TEMA CON VISTA PREVIA
+// (las tarjetas Claro / Oscuro llenan el espacio de la tarjeta)
+// =============================================
+.theme-options {
+  flex: 1;
+  min-height: 210px;
+}
+
+.theme-btn {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-width: 2px;
+  border-radius: 16px;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover { border-color: var(--purple-deep); }
+
+  &--active {
+    border-color: var(--purple-deep);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--purple-deep) 25%, transparent),
+                0 8px 24px color-mix(in srgb, var(--purple-deep) 25%, transparent);
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+
+    > i:first-child { color: var(--purple-deep); font-size: 1.1rem; }
+  }
+
+  &__check {
+    margin-left: auto;
+    color: var(--purple-deep);
+    font-size: 1.3rem;
+  }
+}
+
+// Mini ventana del panel
+.theme-preview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 110px;
+  padding: 10px;
+  border-radius: 12px;
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    > span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .theme-preview__pill {
+      width: 40px;
+      height: 8px;
+      margin-left: auto;
+      border-radius: 4px;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+  }
+
+  &__side {
+    width: 22%;
+    border-radius: 6px;
+  }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+
+    > span {
+      height: 6px;
+      border-radius: 3px;
+
+      &:first-child { width: 80%; }
+      &:last-child  { width: 55%; }
+    }
+  }
+
+  // Colores de la vista previa clara
+  &--light {
+    background: #f7f5fc;
+    border: 1px solid #e4def5;
+
+    .theme-preview__bar > span:nth-child(1) { background: #fb7185; }
+    .theme-preview__bar > span:nth-child(2) { background: #fbbf24; }
+    .theme-preview__bar > span:nth-child(3) { background: #34d399; }
+    .theme-preview__pill { background: #ddd6ee !important; }
+    .theme-preview__side { background: #f1e8fd; }
+    .theme-preview__main { background: #ebe7f3; > span { background: #cfc8df; } }
+  }
+
+  // Colores de la vista previa oscura
+  &--dark {
+    background: #120d1f;
+    border: 1px solid #2e2550;
+
+    .theme-preview__bar > span:nth-child(1) { background: #c026d3; }
+    .theme-preview__bar > span:nth-child(2) { background: #a855f7; }
+    .theme-preview__bar > span:nth-child(3) { background: #34d399; }
+    .theme-preview__pill { background: #3b2f63 !important; }
+    .theme-preview__side { background: #241b3d; border: 1px solid #3b2f63; }
+    .theme-preview__main {
+      background: #1c1530;
+      border: 1px solid #3b2f63;
+      > span:first-child { background: #7c5bd6; }
+      > span:last-child  { background: #a21caf; }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .theme-options { min-height: 0; }
+  .theme-preview { min-height: 80px; }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE MI PERFIL (solo diseño)
+// =============================================
+
+// Las tarjetas y sus partes se pueden encoger sin salirse
+.grid > *,
+.identity,
+.identity > div,
+.theme-btn,
+.activity__item > div { min-width: 0; }
+
+.identity h1,
+.identity p,
+.card__title,
+.activity__item small { overflow-wrap: anywhere; }
+
+// Tema Claro / Oscuro: las dos tarjetas caben en el ancho disponible
+.theme-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .profile-page { padding: 12px; }
+
+  .grid { gap: 14px; }
+
+  .identity {
+    gap: 12px;
+
+    h1 { font-size: 1.4rem; }
+
+    &__avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 1.15rem;
+    }
+  }
+
+  .card {
+    padding: 16px;
+
+    &__title { font-size: 1.1rem; }
+  }
+
+  // Mi actividad reciente: la fecha e IP van debajo de cada registro
+  .activity__item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .activity__meta {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    white-space: normal;
+  }
+}
+
+// Celulares chicos: Claro y Oscuro uno debajo del otro
+@media (max-width: 360px) {
+  .theme-options { grid-template-columns: minmax(0, 1fr); }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .profile-page { padding: 8px; }
+
+  .card { padding: 12px; }
+
+  .identity {
+    flex-direction: column;
+    align-items: flex-start;
+
+    h1 { font-size: 1.2rem; }
+  }
+
+  .theme-btn { padding: 10px; }
+}

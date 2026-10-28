@@ -1,3 +1,4 @@
+import { TPipe } from '../../../core/i18n/i18n';
 import { Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -21,7 +22,7 @@ export interface LocationTab {
 @Component({
   selector: 'app-location-tabs',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [TPipe, RouterLink, RouterLinkActive],
   templateUrl: './location-tabs.html',
   styleUrl: './location-tabs.scss'
 })

@@ -1,18 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { TPipe } from '../../../core/i18n/i18n';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ModeratorService, Report } from '../../../core/services/moderator.service';
+import { UsersService } from '../../../core/services/users.services';
+import { DeletionRequests } from './deletion-requests/deletion-requests';
+import { compactPages } from '../../../shared/utils/pagination';
 
 @Component({
   selector: 'app-moderator-management',
-  imports: [CommonModule, FormsModule],
+  imports: [TPipe, CommonModule, FormsModule, DeletionRequests],
   templateUrl: './moderator-management.html',
   styleUrl: './moderator-management.scss',
 })
 export class ModeratorManagementComponent implements OnInit, OnDestroy {
   reports: Report[] = [];
-  allReports: Report[] = []; // Guardar todos los reportes para filtrado
+  allReports: Report[] = []; // Keep all the reports for filtering
   filteredReports: Report[] = []; // Reportes filtrados actuales
   stats = {
     pendingReports: 0,
@@ -21,16 +25,20 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   };
 
   currentPage = 1;
-  totalPages = 5;
+  totalPages = 1;
   itemsPerPage = 7;
-  totalItems = 32;
+  totalItems = 0;
+
+  get pages(): (number | null)[] {
+    return compactPages(this.currentPage, this.totalPages);
+  }
 
   // Estados UI
-  mostrarModalVer = false;
-  mostrarModalEditar = false;
-  mostrarModalAgregar = false;
-  reporteSeleccionado: Report | null = null;
-  nuevoReporte: Partial<Report> | null = null;
+  showViewModal = false;
+  showEditModal = false;
+  showAddModal = false;
+  selectedReport: Report | null = null;
+  newReport: Partial<Report> | null = null;
 
   // Filtros
   searchTerm = '';
@@ -39,19 +47,22 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   filterStatus = '';
   filterDate = '';
 
-  // Estados de dropdowns personalizados (filtros del toolbar)
+  // Custom dropdown states (toolbar filters)
   isReasonDropdownOpen = false;
   isSeverityDropdownOpen = false;
   isStatusDropdownOpen = false;
 
-  // Estados de dropdowns del modal de editar
+  // Edit modal dropdown states
   isEditReasonDropdownOpen = false;
   isEditSeverityDropdownOpen = false;
   isEditStatusDropdownOpen = false;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private moderatorService: ModeratorService) {
+  caseEvidence: string | null = null;
+
+  constructor(private moderatorService: ModeratorService, private cdr: ChangeDetectorRef,
+              private usersService: UsersService) {
     // Cerrar dropdowns al hacer clic fuera
     this.clickHandler = () => {
       this.isReasonDropdownOpen = false;
@@ -64,6 +75,15 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadReports();
     this.loadStats();
+  }
+
+  viewCaseEvidence(r: Report): void {
+    this.usersService.caseEvidenceOf(Number(r.id)).subscribe({
+      next: (e) => {
+        this.caseEvidence = e;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -86,6 +106,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       this.totalItems = reports.length;
       this.totalPages = Math.ceil(reports.length / this.itemsPerPage);
       this.calculateStats();
+      this.applyFilters();
+      this.cdr.detectChanges();
     });
   }
 
@@ -98,7 +120,8 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.stats = {
       pendingReports: reports.filter(r => r.status === 'Pendiente').length,
       resolvedCases: reports.filter(r => r.status === 'Resuelto').length,
-      sanctionedUsers: reports.filter(r => r.status === 'Resuelto').length
+      // Distinct users with at least one resolved report
+      sanctionedUsers: new Set(reports.filter(r => r.status === 'Resuelto').map(r => r.userEmail)).size
     };
   }
 
@@ -169,7 +192,7 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Métodos para editar reporte seleccionado
+  // Methods to edit the selected report
   toggleEditReasonDropdown(event: Event): void {
     event.stopPropagation();
     this.isEditReasonDropdownOpen = !this.isEditReasonDropdownOpen;
@@ -193,24 +216,24 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
 
   updateReportReason(reason: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.reason = reason;
+    if (this.selectedReport) {
+      this.selectedReport.reason = reason;
     }
     this.isEditReasonDropdownOpen = false;
   }
 
   updateReportSeverity(severity: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.severity = severity;
+    if (this.selectedReport) {
+      this.selectedReport.severity = severity;
     }
     this.isEditSeverityDropdownOpen = false;
   }
 
   updateReportStatus(status: string, event: Event): void {
     event.stopPropagation();
-    if (this.reporteSeleccionado) {
-      this.reporteSeleccionado.status = status;
+    if (this.selectedReport) {
+      this.selectedReport.status = status;
     }
     this.isEditStatusDropdownOpen = false;
   }
@@ -232,16 +255,9 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
   // ========================================
 
   applyFilters(): void {
-    console.log('Aplicando filtros:', {
-      searchTerm: this.searchTerm,
-      filterReason: this.filterReason,
-      filterSeverity: this.filterSeverity,
-      filterStatus: this.filterStatus,
-      filterDate: this.filterDate
-    });
 
     this.filteredReports = this.allReports.filter(report => {
-      // Filtrar por término de búsqueda (ID, usuario, motivo, gravedad, estado)
+      // Filter by search term (ID, user, reason, severity, status)
       if (this.searchTerm) {
         const searchLower = this.searchTerm.toLowerCase();
         const matchesSearch =
@@ -298,13 +314,12 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       return true;
     });
 
-    // Actualizar reportes visibles con paginación
+    // Update the visible reports with pagination
     this.totalItems = this.filteredReports.length;
     this.totalPages = Math.ceil(this.filteredReports.length / this.itemsPerPage);
-    this.currentPage = 1; // Resetear a primera página
+    this.currentPage = 1; // Reset to the first page
     this.updatePaginatedReports();
 
-    console.log('Reportes filtrados:', this.filteredReports.length);
   }
 
   updatePaginatedReports(): void {
@@ -320,15 +335,14 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
     this.filterStatus = '';
     this.filterDate = '';
     this.applyFilters();
-    console.log('Filtros limpiados');
   }
 
   // ========================================
   // ACCIONES DE REPORTES
   // ========================================
 
-  abrirModalAgregarReporte(): void {
-    this.nuevoReporte = {
+  openAddReportModal(): void {
+    this.newReport = {
       userName: '',
       userEmail: '',
       reason: '',
@@ -343,107 +357,98 @@ export class ModeratorManagementComponent implements OnInit, OnDestroy {
       status: 'Pendiente',
       description: ''
     };
-    this.mostrarModalAgregar = true;
+    this.showAddModal = true;
   }
 
-  cerrarModalAgregar(): void {
-    this.mostrarModalAgregar = false;
-    this.nuevoReporte = null;
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.newReport = null;
   }
 
-  guardarNuevoReporte(): void {
-    if (this.nuevoReporte && this.nuevoReporte.userName && this.nuevoReporte.userEmail && this.nuevoReporte.reason && this.nuevoReporte.severity && this.nuevoReporte.description) {
-      const reporteSinId: Omit<Report, 'id'> = {
-        userName: this.nuevoReporte.userName,
-        userEmail: this.nuevoReporte.userEmail,
-        reason: this.nuevoReporte.reason,
-        severity: this.nuevoReporte.severity,
-        date: this.nuevoReporte.date || new Date().toLocaleString('es-ES', {
+  saveNewReport(): void {
+    if (this.newReport && this.newReport.userName && this.newReport.userEmail && this.newReport.reason && this.newReport.severity && this.newReport.description) {
+      const reportWithoutId: Omit<Report, 'id'> = {
+        userName: this.newReport.userName,
+        userEmail: this.newReport.userEmail,
+        reason: this.newReport.reason,
+        severity: this.newReport.severity,
+        date: this.newReport.date || new Date().toLocaleString('es-ES', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
         }),
-        status: this.nuevoReporte.status || 'Pendiente',
-        description: this.nuevoReporte.description
+        status: this.newReport.status || 'Pendiente',
+        description: this.newReport.description
       };
 
-      this.moderatorService.create(reporteSinId).subscribe(() => {
-        this.loadReports();
-        this.cerrarModalAgregar();
-        console.log('Reporte agregado exitosamente');
-      });
-    }
-  }
-
-  verReporte(reportId: string): void {
-    console.log('Ver reporte:', reportId);
-    this.reporteSeleccionado = this.reports.find(r => r.id === reportId) || null;
-    if (this.reporteSeleccionado) {
-      this.mostrarModalVer = true;
-    }
-  }
-
-  cerrarModalVer(): void {
-    this.mostrarModalVer = false;
-    this.reporteSeleccionado = null;
-  }
-
-  abrirModalEditar(reportId: string): void {
-    console.log('Abrir modal editar:', reportId);
-    this.reporteSeleccionado = this.reports.find(r => r.id === reportId) || null;
-    if (this.reporteSeleccionado) {
-      this.mostrarModalEditar = true;
-    }
-  }
-
-  cerrarModalEditar(): void {
-    this.mostrarModalEditar = false;
-    this.reporteSeleccionado = null;
-  }
-
-  actualizarReporte(): void {
-    if (this.reporteSeleccionado) {
-      console.log('Actualizando reporte:', this.reporteSeleccionado.id);
-      this.moderatorService.update(this.reporteSeleccionado.id, this.reporteSeleccionado).subscribe(() => {
-        const index = this.allReports.findIndex(r => r.id === this.reporteSeleccionado!.id);
-        if (index !== -1 && this.reporteSeleccionado) {
-          this.allReports[index] = this.reporteSeleccionado;
-          this.calculateStats();
-          this.applyFilters();
+      this.moderatorService.create(reportWithoutId).subscribe({
+        next: () => {
+          this.loadReports();
+          this.closeAddModal();
+        },
+        error: (err) => {
+          console.error('Error creando reporte:', err);
+          alert(err?.error?.message || 'No se pudo crear el reporte');
         }
-        this.cerrarModalEditar();
       });
     }
   }
 
   viewReport(reportId: string): void {
-    this.verReporte(reportId);
+    this.selectedReport = this.reports.find(r => r.id === reportId) || null;
+    if (this.selectedReport) {
+      this.showViewModal = true;
+    }
   }
 
-  approveReport(reportId: string): void {
-    console.log('Aprobar reporte:', reportId);
-    const report = this.allReports.find(r => r.id === reportId);
-    if (report) {
-      report.status = 'Resuelto';
-      this.moderatorService.update(reportId, report).subscribe(() => {
-        this.calculateStats();
-        this.applyFilters();
-        console.log('Reporte aprobado:', reportId);
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedReport = null;
+    this.caseEvidence = null;
+  }
+
+  openEditModal(reportId: string): void {
+    // A copy is edited: when cancelling, the table must not change
+    const report = this.reports.find(r => r.id === reportId);
+    this.selectedReport = report ? { ...report } : null;
+    if (this.selectedReport) {
+      this.showEditModal = true;
+    }
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.selectedReport = null;
+  }
+
+  updateReport(): void {
+    if (this.selectedReport) {
+      this.moderatorService.update(this.selectedReport.id, this.selectedReport).subscribe({
+        next: () => {
+          this.closeEditModal();
+          this.loadReports();
+        },
+        error: (err) => {
+          console.error('Error actualizando reporte:', err);
+          alert(err?.error?.message || 'No se pudo actualizar el reporte');
+        }
       });
     }
   }
 
+
+  approveReport(reportId: string): void {
+    const report = this.allReports.find(r => r.id === reportId);
+    if (report) {
+      this.moderatorService.update(reportId, { ...report, status: 'Resuelto' }).subscribe(() => this.loadReports());
+    }
+  }
+
   deleteReport(reportId: string): void {
-    console.log('Eliminar reporte:', reportId);
     if (confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
-      this.moderatorService.delete(reportId).subscribe(() => {
-        this.allReports = this.allReports.filter(r => r.id !== reportId);
-        this.calculateStats();
-        this.applyFilters();
-        console.log('Reporte eliminado:', reportId);
-      });
+      this.moderatorService.delete(reportId).subscribe(() => this.loadReports());
     }
   }
 

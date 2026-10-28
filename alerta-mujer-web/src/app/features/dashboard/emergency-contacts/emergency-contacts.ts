@@ -1,92 +1,88 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { TPipe } from '../../../core/i18n/i18n';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmergencyContactService } from '../../../core/services/emergency-contact.service';
-import { ContactoEmergencia } from '../../../core/models/emergency-contact.model';
+import { EmergencyContact } from '../../../core/models/emergency-contact.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { shrinkPhoto } from '../../../core/utils/photo';
 
-const RELACIONES = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
+const RELATIONSHIPS = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Hijo/a', 'Amigo/a', 'Otro'];
 
-const PRIORIDADES = [
-  { value: 1, label: '1 - Más importante' },
-  { value: 2, label: '2 - Importante' },
-  { value: 3, label: '3 - Media' },
-  { value: 4, label: '4 - Baja' },
-  { value: 5, label: '5 - Menos importante' },
-];
-
-type ContactoForm = {
-  nombre: string;
-  telefono: string;
-  relacion: string;
-  prioridad: number;
-  activo: boolean;
+type ContactForm = {
+  name: string;
+  telephone: string;
+  email?: string;
+  relationship: string;
+  photo: string | null;
 };
 
-const FORM_VACIO = (): ContactoForm => ({
-  nombre: '',
-  telefono: '',
-  relacion: '',
-  prioridad: 1,
-  activo: true,
+const EMPTY_FORM = (): ContactForm => ({
+  name: '',
+  telephone: '',
+  email: '',
+  relationship: '',
+  photo: null,
 });
 
 @Component({
   selector: 'app-emergency-contacts',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule],
+  imports: [TPipe, CommonModule, NgClass, FormsModule],
   templateUrl: './emergency-contacts.html',
   styleUrl: './emergency-contacts.scss',
 })
 export class EmergencyContacts implements OnInit {
   private contactService = inject(EmergencyContactService);
   private authService = inject(AuthService);
+  // The app does not use zone.js: after each server response the view change must be signaled
+  private cdr = inject(ChangeDetectorRef);
 
-  private usuarioId = 0;
+  private userId = 0;
 
   loading = true;
   error = false;
 
-  contactos: ContactoEmergencia[] = [];
+  contacts: EmergencyContact[] = [];
 
-  relaciones = RELACIONES;
-  prioridades = PRIORIDADES;
+  relationships = RELATIONSHIPS;
 
-  menuAbierto: number | null = null;
+  menuOpen: number | null = null;
 
-  modalAgregarAbierto = false;
-  formAgregar: ContactoForm = FORM_VACIO();
-  guardandoAgregar = false;
+  addModalOpen = false;
+  addForm: ContactForm = EMPTY_FORM();
+  savingAdd = false;
 
-  modalEditarAbierto = false;
-  contactoEditando: ContactoEmergencia | null = null;
-  formEditar: ContactoForm = FORM_VACIO();
-  guardandoEditar = false;
-  confirmandoEliminar = false;
-  eliminando = false;
+  editModalOpen = false;
+  editingContact: EmergencyContact | null = null;
+  editForm: ContactForm = EMPTY_FORM();
+  savingEdit = false;
+  confirmingDelete = false;
+  deleting = false;
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe((usuario: any) => {
-      if (!usuario) { this.error = true; this.loading = false; return; }
-      this.usuarioId = usuario.id;
-      this.cargarContactos();
+    this.authService.currentUser$.subscribe((user: any) => {
+      if (!user) { this.error = true; this.loading = false; this.cdr.markForCheck(); return; }
+      this.userId = user.id;
+      this.loadContacts();
     });
   }
 
-  private cargarContactos() {
+  private loadContacts() {
     this.loading = true;
     this.error = false;
-    this.contactService.getByUsuario(this.usuarioId).subscribe({
+    this.contactService.getByUser(this.userId).subscribe({
       next: (data) => {
-        this.contactos = data.sort((a, b) => a.prioridad - b.prioridad);
+        this.contacts = data;
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.error = true; this.loading = false; },
+      error: () => { this.error = true; this.loading = false; this.cdr.markForCheck(); },
     });
   }
 
-  iniciales(nombre: string): string {
-    return nombre
+  initials(name: string): string {
+    return name
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
@@ -94,149 +90,162 @@ export class EmergencyContacts implements OnInit {
       .join('');
   }
 
-  toggleMenu(id: number) {
-    this.menuAbierto = this.menuAbierto === id ? null : id;
+  photoError = '';
+
+  async choosePhoto(event: Event, form: ContactForm) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // permite volver a elegir la misma foto
+    if (!file) return;
+    this.photoError = '';
+    try {
+      form.photo = await shrinkPhoto(file);
+    } catch (e) {
+      this.photoError = e instanceof Error ? e.message : 'No se pudo usar la foto';
+    }
+    this.cdr.markForCheck();
   }
 
-  cerrarMenu() {
-    this.menuAbierto = null;
+  removePhoto(form: ContactForm) {
+    form.photo = null;
+  }
+
+  toggleMenu(id: number) {
+    this.menuOpen = this.menuOpen === id ? null : id;
+  }
+
+  closeMenu() {
+    this.menuOpen = null;
   }
 
   // --- Agregar ---
 
-  abrirModalAgregar() {
-    this.formAgregar = FORM_VACIO();
-    this.modalAgregarAbierto = true;
+  openAddModal() {
+    this.addForm = EMPTY_FORM();
+    this.addModalOpen = true;
   }
 
-  cerrarModalAgregar() {
-    if (this.guardandoAgregar) return;
-    this.modalAgregarAbierto = false;
+  closeAddModal() {
+    if (this.savingAdd) return;
+    this.addModalOpen = false;
   }
 
-  get formAgregarValido(): boolean {
-    return !!this.formAgregar.nombre.trim()
-      && !!this.formAgregar.telefono.trim()
-      && !!this.formAgregar.relacion;
+  get addFormValid(): boolean {
+    return !!this.addForm.name.trim()
+      && !!this.addForm.telephone.trim()
+      && !!this.addForm.relationship;
   }
 
-  guardarNuevoContacto() {
-    if (!this.formAgregarValido || this.guardandoAgregar) return;
+  saveNewContact() {
+    if (!this.addFormValid || this.savingAdd) return;
 
-    this.guardandoAgregar = true;
-    const nuevo: Omit<ContactoEmergencia, 'id'> = {
-      usuarioId: this.usuarioId,
-      nombre: this.formAgregar.nombre.trim(),
-      telefono: this.formAgregar.telefono.trim(),
-      relacion: this.formAgregar.relacion,
-      prioridad: this.formAgregar.prioridad,
-      activo: this.formAgregar.activo,
+    this.savingAdd = true;
+    const newOne: Omit<EmergencyContact, 'id'> = {
+      userId: this.userId,
+      name: this.addForm.name.trim(),
+      telephone: this.addForm.telephone.trim(),
+      email: this.addForm.email?.trim(),
+      relationship: this.addForm.relationship,
+      photo: this.addForm.photo,
     };
 
-    this.contactService.create(nuevo).subscribe({
-      next: (creado) => {
-        this.contactos = [...this.contactos, creado].sort((a, b) => a.prioridad - b.prioridad);
-        this.guardandoAgregar = false;
-        this.modalAgregarAbierto = false;
+    this.contactService.create(newOne).subscribe({
+      next: (created) => {
+        this.contacts = [...this.contacts, created];
+        this.savingAdd = false;
+        this.addModalOpen = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoAgregar = false; },
+      error: () => { this.savingAdd = false; this.cdr.markForCheck(); },
     });
   }
 
   // --- Editar ---
 
-  abrirModalEditar(contacto: ContactoEmergencia) {
-    this.cerrarMenu();
-    this.contactoEditando = contacto;
-    this.formEditar = {
-      nombre: contacto.nombre,
-      telefono: contacto.telefono,
-      relacion: contacto.relacion,
-      prioridad: contacto.prioridad,
-      activo: contacto.activo,
+  openEditModal(contact: EmergencyContact) {
+    this.closeMenu();
+    this.editingContact = contact;
+    this.editForm = {
+      name: contact.name,
+      telephone: contact.telephone,
+      email: contact.email,
+      relationship: contact.relationship,
+      photo: contact.photo ?? null,
     };
-    this.confirmandoEliminar = false;
-    this.modalEditarAbierto = true;
+    this.confirmingDelete = false;
+    this.editModalOpen = true;
   }
 
-  cerrarModalEditar() {
-    if (this.guardandoEditar || this.eliminando) return;
-    this.modalEditarAbierto = false;
-    this.contactoEditando = null;
-    this.confirmandoEliminar = false;
+  closeEditModal() {
+    if (this.savingEdit || this.deleting) return;
+    this.editModalOpen = false;
+    this.editingContact = null;
+    this.confirmingDelete = false;
   }
 
-  get formEditarValido(): boolean {
-    return !!this.formEditar.nombre.trim()
-      && !!this.formEditar.telefono.trim()
-      && !!this.formEditar.relacion;
+  get editFormValid(): boolean {
+    return !!this.editForm.name.trim()
+      && !!this.editForm.telephone.trim()
+      && !!this.editForm.relationship;
   }
 
-  guardarCambios() {
-    if (!this.contactoEditando || !this.formEditarValido || this.guardandoEditar) return;
+  saveChanges() {
+    if (!this.editingContact || !this.editFormValid || this.savingEdit) return;
 
-    this.guardandoEditar = true;
-    const id = this.contactoEditando.id;
-    const cambios: Partial<ContactoEmergencia> = {
-      nombre: this.formEditar.nombre.trim(),
-      telefono: this.formEditar.telefono.trim(),
-      relacion: this.formEditar.relacion,
-      prioridad: this.formEditar.prioridad,
-      activo: this.formEditar.activo,
+    this.savingEdit = true;
+    const id = this.editingContact.id;
+    const changes: Partial<EmergencyContact> = {
+      name: this.editForm.name.trim(),
+      telephone: this.editForm.telephone.trim(),
+      email: this.editForm.email?.trim(),
+      relationship: this.editForm.relationship,
+      photo: this.editForm.photo,
     };
 
-    this.contactService.update(id, cambios).subscribe({
-      next: (actualizado) => {
-        this.contactos = this.contactos
-          .map(c => (c.id === id ? actualizado : c))
-          .sort((a, b) => a.prioridad - b.prioridad);
-        this.guardandoEditar = false;
-        this.modalEditarAbierto = false;
-        this.contactoEditando = null;
+    this.contactService.update(id, changes).subscribe({
+      next: (updated) => {
+        this.contacts = this.contacts
+          .map(c => (c.id === id ? updated : c));
+        this.savingEdit = false;
+        this.editModalOpen = false;
+        this.editingContact = null;
+        this.cdr.markForCheck();
       },
-      error: () => { this.guardandoEditar = false; },
+      error: () => { this.savingEdit = false; this.cdr.markForCheck(); },
     });
   }
 
-  pedirConfirmacionEliminar() {
-    this.confirmandoEliminar = true;
+  askDeleteConfirmation() {
+    this.confirmingDelete = true;
   }
 
-  cancelarEliminar() {
-    this.confirmandoEliminar = false;
+  cancelDelete() {
+    this.confirmingDelete = false;
   }
 
-  confirmarEliminar() {
-    if (!this.contactoEditando || this.eliminando) return;
+  confirmDelete() {
+    if (!this.editingContact || this.deleting) return;
 
-    this.eliminando = true;
-    const id = this.contactoEditando.id;
+    this.deleting = true;
+    const id = this.editingContact.id;
 
     this.contactService.delete(id).subscribe({
       next: () => {
-        this.contactos = this.contactos.filter(c => c.id !== id);
-        this.eliminando = false;
-        this.modalEditarAbierto = false;
-        this.contactoEditando = null;
-        this.confirmandoEliminar = false;
+        this.contacts = this.contacts.filter(c => c.id !== id);
+        this.deleting = false;
+        this.editModalOpen = false;
+        this.editingContact = null;
+        this.confirmingDelete = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.eliminando = false; },
+      error: () => { this.deleting = false; this.cdr.markForCheck(); },
     });
   }
 
-  // --- Acciones rápidas desde el menú ---
+  // --- Quick actions from the menu ---
 
-  toggleActivo(contacto: ContactoEmergencia) {
-    this.cerrarMenu();
-    this.contactService.update(contacto.id, { activo: !contacto.activo }).subscribe({
-      next: (actualizado) => {
-        this.contactos = this.contactos.map(c => (c.id === contacto.id ? actualizado : c));
-      },
-    });
-  }
-
-  eliminarDesdeMenu(contacto: ContactoEmergencia) {
-    this.abrirModalEditar(contacto);
-    this.pedirConfirmacionEliminar();
+  deleteFromMenu(contact: EmergencyContact) {
+    this.openEditModal(contact);
+    this.askDeleteConfirmation();
   }
 }

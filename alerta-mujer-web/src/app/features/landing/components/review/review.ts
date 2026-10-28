@@ -1,3 +1,4 @@
+import { TPipe } from '../../../../core/i18n/i18n';
 import { Component, ElementRef, ViewChild, HostListener, AfterViewInit, OnDestroy, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -10,7 +11,7 @@ interface Testimonial {
 @Component({
   selector: 'app-review',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './review.html',
   styleUrl: './review.scss'
 })

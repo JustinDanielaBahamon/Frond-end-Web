@@ -1,0 +1,152 @@
+<!-- Icon by category (inline SVG, same as the rest of the module) -->
+<ng-template #icon let-c>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    @switch (c) {
+      @case ('riesgo') { <path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/> }
+      @case ('segura') { <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/> }
+      @case ('policia') { <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/> }
+      @case ('salud') { <path d="M12 5v14M5 12h14"/> }
+      @case ('apoyo') { <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/> }
+      @default { <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/> }
+    }
+  </svg>
+</ng-template>
+
+@if (error()) {
+  <div class="za-alert" role="alert">{{ error() | t }}</div>
+}
+
+<div class="za-grid">
+  <!-- ══════════ COLUMNA IZQUIERDA ══════════ -->
+  <div class="za-left">
+
+    <!-- Quick call -->
+    @if (lines().length > 0) {
+      <section class="za-card za-card--sos">
+        <h2 class="za-card-title">{{ '¿Necesitas ayuda ya? Llama desde tu celular' | t }}</h2>
+        <div class="za-lines">
+          @for (l of lines(); track l.key) {
+            <div class="za-line" [title]="l.description ?? l.name">
+              <span class="za-line-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: 'linea' }" /></span>
+              <span class="za-line-text">
+                <strong>{{ l.telephone | t }}</strong>
+                <span>{{ l.name | t }}</span>
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Estado respecto a las zonas -->
+    <section class="za-card">
+      <header class="za-card-header">
+        <h2 class="za-card-title">{{ 'Zonas cerca de ti' | t }}</h2>
+        @if (locationStatus() === 'ok') {
+          <button class="za-link" (click)="centerOnMe()">{{ 'Ver dónde estoy' | t }}</button>
+        }
+      </header>
+
+      @switch (locationStatus()) {
+        @case ('ok') {
+          @for (z of currentZones(); track z.key) {
+            <div class="za-banner" [style.--cat]="categories[z.category].color">
+              <strong>{{ z.category === 'riesgo' ? 'Precaución:' : 'Estás en:' | t }}</strong>
+              {{ z.category === 'riesgo' ? 'estás dentro de la zona de riesgo' : categories[z.category].label.toLowerCase() | t }}
+              "{{ z.name | t }}".
+            </div>
+          } @empty {
+            <p class="za-muted">{{ 'No estás dentro de ninguna zona registrada. La lista está ordenada de la más cercana a la más lejana.' | t }}</p>
+          }
+        }
+        @case ('buscando') { <p class="za-muted">{{ 'Buscando tu ubicación…' | t }}</p> }
+        @case ('denegada') {
+          <p class="za-muted">{{ 'No pudimos acceder a tu ubicación. Actívala en el navegador para ver distancias.' | t }}</p>
+          <button class="za-btn" (click)="useMyLocation()">{{ 'Reintentar' | t }}</button>
+        }
+        @default {
+          <p class="za-muted">{{ 'Usa tu ubicación para ordenar los puntos por cercanía y saber si estás en una zona de riesgo.' | t }}</p>
+          <button class="za-btn za-btn--primary" (click)="useMyLocation()">{{ 'Usar mi ubicación' | t }}</button>
+        }
+      }
+    </section>
+
+    <!-- Lista -->
+    <section class="za-card">
+      <header class="za-card-header">
+        <h2 class="za-card-title">{{ 'Puntos de ayuda y zonas' | t }}</h2>
+        <span class="za-chip">{{ points().length | t }}</span>
+      </header>
+
+      <div class="za-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" [placeholder]="'Buscar por nombre, dirección o tipo' | t" [attr.aria-label]="'Buscar zonas y puntos de ayuda' | t"
+               [ngModel]="search()" (ngModelChange)="search.set($event)" />
+      </div>
+
+      <div class="za-filters">
+        <button class="za-filter" [class.active]="filter() === null" (click)="filter.set(null)">
+          {{ 'Todas' | t }} <span>{{ points().length | t }}</span>
+        </button>
+        @for (c of categoryList; track c) {
+          @if (count()[c] > 0) {
+            <button class="za-filter" [class.active]="filter() === c" [style.--cat]="categories[c].color"
+                    (click)="filter.set(filter() === c ? null : c)">
+              <i class="za-dot"></i>{{ categories[c].label | t }} <span>{{ count()[c] | t }}</span>
+            </button>
+          }
+        }
+      </div>
+
+      @if (loading()) {
+        <p class="za-muted">{{ 'Cargando zonas…' | t }}</p>
+      } @else {
+        <ul class="za-list">
+          @for (p of filtered(); track p.key) {
+            <li class="za-item" [class.za-item--selected]="selected() === p.key" [style.--cat]="categories[p.category].color">
+              <button class="za-item-main" (click)="viewOnMap(p)" [disabled]="p.lat == null" [title]="p.lat == null ? 'Sin ubicación en el mapa' : 'Ver en el mapa'">
+                <span class="za-item-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: p.category }" /></span>
+                <span class="za-item-text">
+                  <span class="za-item-name">{{ p.name | t }}</span>
+                  <span class="za-item-type">{{ categories[p.category].label | t }}{{ distanceFormat(p) ? ' · a ' + distanceFormat(p) : '' | t }}</span>
+                  @if (p.address || p.city) {
+                    <span class="za-item-meta">{{ p.address | t }}{{ p.address && p.city ? ', ' : '' | t }}{{ p.city | t }}</span>
+                  }
+                  @if (p.description) {
+                    <span class="za-item-meta">{{ p.description | t }}</span>
+                  }
+                </span>
+              </button>
+              @if (p.telephone) {
+                <span class="za-call" [attr.aria-label]="'Teléfono de ' + p.name">
+                  <ng-container *ngTemplateOutlet="icon; context: { $implicit: 'linea' }" />
+                  {{ p.telephone | t }}
+                </span>
+              }
+            </li>
+          } @empty {
+            <li class="za-empty">
+              {{ (search() || filter() ? 'Nada coincide con la búsqueda.' : 'Todavía no hay zonas registradas.') | t }}
+            </li>
+          }
+        </ul>
+        <p class="za-help">{{ 'Las zonas y los puntos de ayuda los registra el equipo administrador de AlertaMujer.' | t }}</p>
+      }
+    </section>
+  </div>
+
+  <!-- ══════════ COLUMNA DERECHA: MAPA ══════════ -->
+  <div class="za-map-wrap">
+    <div class="za-map" #mapContainer></div>
+    <div class="za-legend">
+      @for (c of categoryList; track c) {
+        @if (c !== 'linea' && count()[c] > 0) {
+          <span><i class="za-dot" [style.--cat]="categories[c].color"></i>{{ categories[c].label | t }}</span>
+        }
+      }
+      @if (myPosition()) {
+        <span><i class="za-dot za-dot--you"></i>{{ 'Tú' | t }}</span>
+      }
+    </div>
+  </div>
+</div>

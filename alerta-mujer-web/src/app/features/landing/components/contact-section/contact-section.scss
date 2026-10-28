@@ -21,7 +21,7 @@ CONTACTO
 
     font-size:42px;
 
-    color:#1b2d5b;
+    color:#2e1065;
 
     font-weight:900;
 
@@ -94,7 +94,7 @@ textarea.form-control{
     box-shadow:none;
 }
 
-.btn-contacto{
+.btn-contact{
 
     width:100%;
 
@@ -115,7 +115,7 @@ textarea.form-control{
     transition:.3s;
 }
 
-.btn-contacto:hover{
+.btn-contact:hover{
 
     background:#6d20a5;
 }
@@ -187,7 +187,7 @@ CONTACTO
 
     font-weight:800;
 
-    color:#1b2d5b;
+    color:#2e1065;
 }
 
 .contact-item p{
@@ -279,7 +279,7 @@ MOBILE
     gap: 19px;
 }
 
-/* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+/* 🌟 We make the last item (the third one) span 2 columns */
 .contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
     grid-column: span 2; 
 }
@@ -301,7 +301,7 @@ MOBILE
         gap: 19px;
     }
 
-    /* 🌟 Hacemos que el último elemento (el tercero) use 2 columnas */
+    /* 🌟 We make the last item (the third one) span 2 columns */
 .contact-info[_ngcontent-ng-c871230503] .contact-item:last-child {
     grid-column: span 1; 
 }

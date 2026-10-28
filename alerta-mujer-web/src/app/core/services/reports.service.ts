@@ -1,188 +1,203 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, delay } from 'rxjs';
-import { Reporte, ReporteFilters, ReporteStats } from '../models/report.model';
+import { Observable, of, BehaviorSubject, map, tap } from 'rxjs';
+import { AlertReport, ReportFilters, ReportStats } from '../models/report.model';
 import { environment } from '../../../environments/environment';
+
+/** Report as /api/admin/reports returns it. */
+interface ReportApi {
+  id: number;
+  name: string;
+  city: string | null;
+  status: 'pending' | 'attended' | 'closed';
+  userLabel: string | null;
+  event: string | null;
+  description: string | null;
+  format: 'PDF' | 'EXCEL';
+  alertIds: number[];
+  fromDate: string | null;
+  toDate: string | null;
+  alertStatus: string | null;
+  alertCount: number;
+  exportCount: number | null;
+  createdByName: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+interface StatsApi {
+  totalReports: number;
+  totalAlerts: number;
+  activeZones: number;
+  exports: number;
+}
+
+const API_STATUS: Record<AlertReport['status'], ReportApi['status']> = {
+  Pendiente: 'pending',
+  Atendida: 'attended',
+  Cerrada: 'closed'
+};
+const WEB_STATUS: Record<ReportApi['status'], AlertReport['status']> = {
+  pending: 'Pendiente',
+  attended: 'Atendida',
+  closed: 'Cerrada'
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportsService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/zone-reports`;
-  
-  // Sin datos mock - se cargarán desde el backend
-  private reportesSubject = new BehaviorSubject<Reporte[]>([]);
-  reportes$ = this.reportesSubject.asObservable();
+  private apiUrl = `${environment.apiUrl}/api/admin/reports`;
 
-  private statsSubject = new BehaviorSubject<ReporteStats>({
-    totalReportes: 0,
-    totalAlertas: 0,
-    zonasActivas: 0,
-    exportaciones: 0
-  });
-  stats$ = this.statsSubject.asObservable();
+  // Last list received from the backend; the filters are applied on it
+  private reportsSubject = new BehaviorSubject<AlertReport[]>([]);
+  reports$ = this.reportsSubject.asObservable();
 
-  // ========================================
-  // MÉTODOS API (Conectar al backend)
-  // ========================================
-
-  /**
-   * Obtener todos los reportes
-   */
-  getAll(): Observable<Reporte[]> {
-    return this.http.get<Reporte[]>(this.apiUrl);
+  getAll(): Observable<AlertReport[]> {
+    return this.http.get<ReportApi[]>(this.apiUrl).pipe(
+      map(list => list.map(r => this.fromApi(r))),
+      tap(reports => this.reportsSubject.next(reports))
+    );
   }
 
-  /**
-   * Obtener reporte por ID
-   */
-  getById(id: number): Observable<Reporte> {
-    return this.http.get<Reporte>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<AlertReport> {
+    return this.http.get<ReportApi>(`${this.apiUrl}/${id}`).pipe(map(r => this.fromApi(r)));
   }
 
-  /**
-   * Crear nuevo reporte
-   */
-  create(reporte: Omit<Reporte, 'id'>): Observable<Reporte> {
-    return this.http.post<Reporte>(this.apiUrl, reporte);
+  create(report: Omit<AlertReport, 'id'>): Observable<AlertReport> {
+    return this.http.post<ReportApi>(this.apiUrl, this.toApi(report)).pipe(map(r => this.fromApi(r)));
   }
 
-  /**
-   * Actualizar reporte
-   */
-  update(id: number, reporte: Reporte): Observable<Reporte> {
-    return this.http.put<Reporte>(`${this.apiUrl}/${id}`, reporte);
+  update(id: number, report: AlertReport): Observable<AlertReport> {
+    return this.http.put<ReportApi>(`${this.apiUrl}/${id}`, this.toApi(report)).pipe(map(r => this.fromApi(r)));
   }
 
-  /**
-   * Eliminar reporte
-   */
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  /**
-   * Obtener estadísticas
-   */
-  getStats(): Observable<ReporteStats> {
-    // TODO: Conectar al backend
-    // return this.http.get<ReporteStats>(`${this.apiUrl}/stats`);
-    return this.statsSubject;
+  getStats(): Observable<ReportStats> {
+    return this.http.get<StatsApi>(`${this.apiUrl}/stats`).pipe(
+      map(s => ({
+        totalReportCount: s.totalReports,
+        totalAlertCount: s.totalAlerts,
+        activeZones: s.activeZones,
+        exports: s.exports
+      }))
+    );
   }
 
   // ========================================
-  // MÉTODOS DE FILTRADO
+  // FILTER METHODS
   // ========================================
 
-  /**
-   * Filtrar reportes según criterios
-   */
-  filtrarReportes(filtros: ReporteFilters): Observable<Reporte[]> {
-    let reportesFiltrados = [...this.reportesSubject.value];
+  filterReports(filters: ReportFilters): Observable<AlertReport[]> {
+    let filteredReports = [...this.reportsSubject.value];
 
-    // Filtro de búsqueda
-    if (filtros.busqueda) {
-      const busquedaLower = filtros.busqueda.toLowerCase();
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        reporte.nombre.toLowerCase().includes(busquedaLower) ||
-        reporte.ciudad.toLowerCase().includes(busquedaLower) ||
-        reporte.generadoPor.toLowerCase().includes(busquedaLower)
+    if (filters.search) {
+      const search = this.normalize(filters.search);
+      filteredReports = filteredReports.filter(report =>
+        this.normalize(report.name).includes(search) ||
+        this.normalize(report.city).includes(search) ||
+        this.normalize(report.generatedBy).includes(search)
       );
     }
 
-    // Filtro por rango de fechas
-    if (filtros.fechaInicio) {
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        reporte.fecha >= filtros.fechaInicio!
-      );
+    // <input type="date"> gives 'yyyy-MM-dd'; compared by local day
+    if (filters.startDate) {
+      const from = this.startOfDay(filters.startDate);
+      filteredReports = filteredReports.filter(report => report.date >= from);
+    }
+    if (filters.endDate) {
+      const to = this.startOfDay(filters.endDate);
+      to.setDate(to.getDate() + 1);
+      filteredReports = filteredReports.filter(report => report.date < to);
     }
 
-    if (filtros.fechaFin) {
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        reporte.fecha <= filtros.fechaFin!
-      );
+    if (filters.city && filters.city !== 'all') {
+      const city = this.normalize(filters.city);
+      filteredReports = filteredReports.filter(report => this.normalize(report.city) === city);
     }
 
-    // Filtro por ciudad
-    if (filtros.ciudad && filtros.ciudad !== 'all' && filtros.ciudad !== '') {
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        reporte.ciudad.toLowerCase() === filtros.ciudad.toLowerCase()
-      );
+    if (filters.status && filters.status !== 'all') {
+      filteredReports = filteredReports.filter(report => report.status === filters.status);
     }
 
-    // Filtro por estado
-    if (filtros.estado && filtros.estado !== 'all' && filtros.estado !== '') {
-      reportesFiltrados = reportesFiltrados.filter(reporte =>
-        reporte.estado === filtros.estado
-      );
-    }
-
-    return of(reportesFiltrados).pipe(delay(200));
+    return of(filteredReports);
   }
 
   // ========================================
-  // MÉTODOS DE EXPORTACIÓN
+  // EXPORT METHODS
   // ========================================
 
-  /**
-   * Descargar reporte en PDF
-   */
-  descargarPDF(id: number): Observable<Blob> {
-    // TODO: Conectar al backend
-    // return this.http.get(`${this.apiUrl}/${id}/pdf`, { responseType: 'blob' });
-    console.log(`Descargando PDF del reporte ${id}`);
-    return of(new Blob()).pipe(delay(1000));
+  downloadPdf(id: number): Observable<Blob> {
+    return this.export(id, 'pdf');
   }
 
-  /**
-   * Descargar reporte en Excel
-   */
-  descargarExcel(id: number): Observable<Blob> {
-    // TODO: Conectar al backend
-    // return this.http.get(`${this.apiUrl}/${id}/excel`, { responseType: 'blob' });
-    console.log(`Descargando Excel del reporte ${id}`);
-    return of(new Blob()).pipe(delay(1000));
+  /** Excel receives a CSV (separated by ';' and in UTF-8) that it opens directly. */
+  downloadExcel(id: number): Observable<Blob> {
+    return this.export(id, 'csv');
   }
 
-  /**
-   * Descargar reporte en CSV
-   */
-  descargarCSV(id: number): Observable<Blob> {
-    // TODO: Conectar al backend
-    // return this.http.get(`${this.apiUrl}/${id}/csv`, { responseType: 'blob' });
-    console.log(`Descargando CSV del reporte ${id}`);
-    return of(new Blob()).pipe(delay(1000));
+  downloadCsv(id: number): Observable<Blob> {
+    return this.export(id, 'csv');
   }
 
-  /**
-   * Generar reporte nuevo
-   */
-  generarReporte(tipo: string, filtros: ReporteFilters): Observable<Reporte> {
-    // TODO: Conectar al backend
-    // return this.http.post<Reporte>(`${this.apiUrl}/generar`, { tipo, filtros });
-    const nuevoReporte: Omit<Reporte, 'id'> = {
-      nombre: `Reporte de ${tipo} - ${new Date().toLocaleDateString('es-ES')}`,
-      fecha: new Date(),
-      ciudad: filtros.ciudad || 'Todas',
-      estado: 'Pendiente',
-      generadoPor: 'Administrador',
-      formato: 'PDF',
-      tamano: 'Calculando...',
-      descripcion: `Reporte generado automáticamente con filtros aplicados`
+  private export(id: number, format: 'pdf' | 'csv'): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/export`, { params: { format }, responseType: 'blob' });
+  }
+
+  // ========================================
+  // TRADUCCIÓN API <-> WEB
+  // ========================================
+
+  private fromApi(r: ReportApi): AlertReport {
+    return {
+      id: r.id,
+      name: r.name,
+      date: new Date(r.createdAt),
+      city: r.city ?? 'No especificada',
+      status: WEB_STATUS[r.status] ?? 'Pendiente',
+      user: r.userLabel ?? undefined,
+      incident: r.event ?? undefined,
+      generatedBy: r.createdByName || 'Administración',
+      format: r.format === 'EXCEL' ? 'Excel' : 'PDF',
+      size: `${r.alertCount} alerta${r.alertCount === 1 ? '' : 's'}`,
+      description: r.description ?? undefined,
+      alertIdList: r.alertIds,
+      from: r.fromDate ? new Date(r.fromDate) : null,
+      to: r.toDate ? new Date(r.toDate) : null,
+      exports: r.exportCount ?? 0
     };
-    
-    return this.create(nuevoReporte);
   }
 
-  /**
-   * Imprimir reporte (funcionalidad local)
-   */
-  imprimirReporte(id: number): void {
-    const reporte = this.reportesSubject.value.find(r => r.id === id);
-    if (reporte) {
-      console.log('Imprimiendo reporte:', reporte.nombre);
-      window.print();
+  private toApi(r: Omit<AlertReport, 'id'>) {
+    return {
+      name: r.name,
+      city: r.city,
+      status: API_STATUS[r.status],
+      userLabel: r.user ?? null,
+      event: r.incident ?? null,
+      description: r.description ?? null,
+      format: r.format === 'PDF' ? 'PDF' : 'EXCEL',
+      alertIds: r.alertIdList ?? null,
+      fromDate: r.from ? new Date(r.from).toISOString() : null,
+      toDate: r.to ? new Date(r.to).toISOString() : null
+    };
+  }
+
+
+  private startOfDay(value: Date | string): Date {
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const [a, m, d] = value.split('-').map(Number);
+      return new Date(a, m - 1, d);
     }
+    const f = new Date(value);
+    return new Date(f.getFullYear(), f.getMonth(), f.getDate());
+  }
+
+  private normalize(text: string | undefined | null): string {
+    return (text ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   }
 }

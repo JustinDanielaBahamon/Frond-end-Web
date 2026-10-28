@@ -1,37 +1,41 @@
-/*==================================================
-=   RESPONSIVE COMPARTIDO — PANEL ADMIN
-=   Reportes · Evidencias · Moderadores · Dispositivos
-
-   Se incluye AL FINAL del .scss de cada módulo:
-
-     @use '../../../shared/styles/admin-responsive' as responsive;
-     @include responsive.admin-responsive('nombre-clase-raiz');
-
-   - Tablet (≤1024px): la tabla hace scroll horizontal y
-     el pie de paginación se queda fijo a la izquierda.
-   - Móvil (≤768px): cada fila de la tabla pasa a ser una
-     tarjeta (usa el atributo data-label de cada <td>).
-   - ≤600px: los modales se abren como "hoja" desde abajo.
-
-   Los colores usan los tokens (--border, --text-muted) con
-   valor de respaldo, así funcionan en modo claro y oscuro.
-==================================================*/
+/*
+ * ==================================================
+ * =   SHARED RESPONSIVE — ADMIN PANEL
+ * =   Reports · Evidence · Moderators · Devices
+ *
+ *    Included AT THE END of each module .scss:
+ *
+ *      @use '../../../shared/styles/admin-responsive' as responsive;
+ *      @include responsive.admin-responsive('root-class-name');
+ *
+ *    - Tablet (≤1024px): the table scrolls horizontally and
+ *      the pagination footer stays fixed on the left.
+ *    - Mobile (≤768px): each table row becomes a
+ *      card (uses the data-label attribute of each <td>).
+ *    - ≤600px: modals open as a "sheet" from the bottom.
+ *
+ *    Colors use the tokens (--border, --text-muted) with a
+ *    fallback value, so they work in light and dark mode.
+ * ==================================================
+ */
 
 @mixin admin-responsive(
   $root,
-  $table-min: 1000px,        // ancho mínimo de la tabla en tablet
-  $clear-full-row: false,    // botón "Limpiar filtros" ocupa toda la fila
-  $footer-direction: column  // orden de botones del modal en móvil
+  $table-min: 1000px,        // minimum table width on tablet
+  $clear-full-row: false,    // the "Limpiar filtros" button takes the whole row
+  $footer-direction: column  // order of the modal buttons on mobile
 ) {
 
-  /* ── El botón X de los modales se posiciona dentro del modal ── */
+  /* ── The modals X button is positioned inside the modal ── */
   .modal-content {
     position: relative;
   }
 
-  /*==================================================
-  =   ≤ 1100px — tarjetas de estadísticas en 2 columnas
-  ==================================================*/
+  /*
+ * ==================================================
+ *   =   ≤ 1100px — stat cards in 2 columns
+ *   ==================================================
+ */
   @media (max-width: 1100px) {
     .stats-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -55,7 +59,7 @@
       min-width: 0;
     }
 
-    /* Filtros en cuadrícula de 2 columnas */
+    /* Filters in a 2-column grid */
     .toolbar {
       .search-box {
         min-width: 0;
@@ -92,7 +96,7 @@
       }
     }
 
-    /* Tabla con scroll horizontal + pie de página siempre visible */
+    /* Table with horizontal scroll + footer always visible */
     .table-card {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -143,7 +147,7 @@
       }
     }
 
-    /* Estadísticas: 2 por fila */
+    /* Stats: 2 per row */
     .stats-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
@@ -196,7 +200,7 @@
         min-width: 0;
       }
 
-      /* Encabezado oculto visualmente (sigue disponible para lectores de pantalla) */
+      /* Header hidden visually (still available for screen readers) */
       table thead {
         display: block;
         position: absolute;
@@ -244,7 +248,7 @@
         border-top: 1px dashed var(--border, #e2e8f0);
       }
 
-      /* Etiqueta de cada dato (sale del atributo data-label) */
+      /* Label of each value (comes from the data-label attribute) */
       table tbody tr td[data-label]::before {
         content: attr(data-label);
         flex: 0 0 38%;
@@ -257,20 +261,20 @@
         color: var(--text-muted, #6b7280);
       }
 
-      /* Celdas sin etiqueta (mensajes de "cargando" / "sin datos") */
+      /* Cells without a label ("cargando" / "sin datos" messages) */
       table tbody tr td:not([data-label]) {
         display: block;
         text-align: center;
       }
 
-      /* Contenido de cada celda: ocupa el espacio restante y va a la derecha */
+      /* Content of each cell: takes the remaining space and goes to the right */
       table tbody tr td > div,
       table tbody tr td > span {
         min-width: 0;
         text-align: right;
       }
 
-      /* Celda de botones de acción */
+      /* Action buttons cell */
       table tbody tr td.actions-cell {
         justify-content: flex-end;
       }
@@ -283,7 +287,7 @@
         justify-content: flex-end;
       }
 
-      /* Pie de tabla + paginación */
+      /* Table footer + pagination */
       .table-footer {
         position: static;
         flex-direction: column;
@@ -378,7 +382,7 @@
       grid-template-columns: minmax(0, 1fr);
     }
 
-    /* Modal como "hoja" que sube desde abajo */
+    /* Modal as a "sheet" that slides up from the bottom */
     .modal-overlay {
       padding: 0;
       align-items: flex-end;
@@ -401,9 +405,11 @@
     }
   }
 
-  /*==================================================
-  =   ≤ 480px — MÓVIL PEQUEÑO
-  ==================================================*/
+  /*
+ * ==================================================
+ *   =   ≤ 480px — SMALL MOBILE
+ *   ==================================================
+ */
   @media (max-width: 480px) {
     .#{$root} {
       padding: 12px;

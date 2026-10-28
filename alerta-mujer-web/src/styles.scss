@@ -15,3 +15,135 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+// OpenStreetMap base map darkened for dark mode (Leaflet, layer with className)
+.leaflet-tile-pane .tiles-oscuras,
+img.tiles-oscuras {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
+// Icon next to the title of each module of the user panel (same style as "Mis emergencias")
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.page-title-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #a855f7, #6d28d9);
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+}
+
+// ── Barras de desplazamiento ──────────────────────────────────────
+// Thin, without arrows and violet across the whole web (before, the system bar showed up, white and
+// with arrows, over the dark backgrounds). Chrome/Edge use the ::-webkit-* pseudo-elements;
+// Firefox, the standard properties. They are not combined: in Chrome, scrollbar-width overrides ::-webkit-*.
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.6) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a855f7, #7c3aed);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c084fc, #a855f7);
+  background-clip: padding-box;
+}
+
+/* Abbreviated pagination ellipsis (1 … 8 9 10 … 24) */
+.page-ellipsis,
+.ah-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  opacity: 0.6;
+  font-weight: 700;
+  user-select: none;
+}
+
+
+// =============================================
+// EL COLOR PRINCIPAL (Ajustes → Apariencia) PINTA TODO EL PANEL
+// Solo estilos: el selector de color ya guarda el color en
+// --accent-grad-from / --accent-grad-to / --purple-deep; aquí hacemos que
+// los fondos, bordes e íconos del panel (admin y usuaria) también lo usen.
+// =============================================
+
+// Modo oscuro: fondos y bordes con un toque del color elegido
+[data-theme="dark"] :is(app-dashboard-layout, app-admin-layout) {
+  --bg-base: color-mix(in srgb, var(--accent-grad-from, #561bbb) 8%, #15131b);
+  --bg-card: color-mix(in srgb, var(--accent-grad-from, #561bbb) 15%, #1b1d27);
+  --bg-card-hover: color-mix(in srgb, var(--accent-grad-from, #561bbb) 18%, #25282e);
+  --border: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 30%, #373a50);
+}
+
+// Modo claro: fondos, bordes y líneas gruesas con el color elegido
+html:not([data-theme="dark"]) :is(app-dashboard-layout, app-admin-layout) {
+  --bg-base: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 18%, #fbfbfd);
+  --bg-card: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 7%, #ffffff);
+  --bg-card-hover: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 20%, #f8f8fb);
+  --border: color-mix(in srgb, var(--purple-deep, #621fd6) 35%, #bdcbd6);
+  --am-line: color-mix(in srgb, var(--purple-deep, #621fd6) 40%, #7483a4);
+  --am-line-soft: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #989ebf);
+  --am-line-light: color-mix(in srgb, var(--purple-deep, #621fd6) 30%, #b6bfd6);
+  --am-line-faint: color-mix(in srgb, var(--purple-deep, #621fd6) 20%, #ced2e3);
+}
+
+// Modo claro: la barra de arriba también con un toque del color elegido
+html:not([data-theme="dark"]) app-topbar .topbar {
+  background: color-mix(in srgb, var(--accent-grad-to, #7c39ef) 9%, #ffffff);
+}
+
+// Modo claro: el fondo de la página de la usuaria (antes un lila fijo)
+html:not([data-theme="dark"]) app-dashboard-layout :is(.layout__body, .layout__main) {
+  background: var(--bg-base);
+}
+
+// Ícono al lado del título de cada módulo
+.page-title-icon {
+  background: linear-gradient(135deg, var(--accent-grad-to, #7c39ef), var(--accent-grad-from, #561bbb));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent);
+}
+
+// Íconos de la barra de arriba (menú, campana, tema)
+app-topbar .topbar__hamburger svg,
+app-topbar .topbar__btn svg {
+  stroke: var(--accent-grad-to, #7c39ef);
+}
+
+// Barras de desplazamiento
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-grad-to, #a855f7), var(--accent-grad-from, #7c3aed));
+  background-clip: padding-box;
+}

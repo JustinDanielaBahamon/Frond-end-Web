@@ -1,4 +1,4 @@
-<ng-template #icono let-t>
+<ng-template #icon let-t>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     @switch (t) {
       @case ('photo') { <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/> }
@@ -10,165 +10,248 @@
 </ng-template>
 
 <div class="ev-page">
-  <!-- Encabezado (mismo patrón que "Mis emergencias") -->
+  <!-- Header (same pattern as "Mis emergencias") -->
   <header class="ev-titlebar">
     <span class="ev-titlebar-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
     </span>
     <div class="ev-titlebar-text">
-      <h1 class="ev-title">Evidencias</h1>
-      <p class="ev-sub">Fotos, videos, audios y documentos asociados a tus alertas. Solo tú puedes verlos.</p>
+      <h1 class="ev-title">{{ 'Evidencias' | t }}</h1>
+      <p class="ev-sub">{{ 'Fotos, videos y audios de tus alertas. Los ven tú y los contactos que recibieron cada alerta mientras su enlace está activo.' | t }}</p>
     </div>
-    <button class="ev-btn ev-btn--primary" (click)="abrirSubida()">
+    <button class="ev-btn ev-btn--primary" (click)="openUpload()" [disabled]="!currentAlert()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-      Subir evidencia
+      {{ 'Subir evidencia' | t }}
     </button>
   </header>
 
   @if (error()) {
     <div class="ev-alert ev-alert--error" role="alert">
-      {{ error() }} <button class="ev-link" (click)="cargar()">Reintentar</button>
+      {{ error() | t }} <button class="ev-link" (click)="load()">{{ 'Reintentar' | t }}</button>
     </div>
   }
-  @if (aviso()) {
-    <div class="ev-alert ev-alert--success" role="status">{{ aviso() }}</div>
+  @if (notice()) {
+    <div class="ev-alert ev-alert--success" role="status">{{ notice() | t }}</div>
   }
 
   <div class="ev-grid">
-    <!-- ══════════ LISTA ══════════ -->
+    <!-- ══════════ ALERTAS Y SUS EVIDENCIAS ══════════ -->
     <section class="ev-card ev-list-card">
-      <div class="ev-filters" role="tablist">
-        <button role="tab" class="ev-filter" [class.active]="filtro() === 'todas'" (click)="filtro.set('todas')">
-          Todas <span>{{ evidencias().length }}</span>
-        </button>
-        @for (t of listaTipos; track t) {
-          <button role="tab" class="ev-filter" [class.active]="filtro() === t" (click)="filtro.set(t)" [disabled]="conteo()[t] === 0">
-            <ng-container *ngTemplateOutlet="icono; context: { $implicit: t }" />{{ tipos[t].plural }} <span>{{ conteo()[t] }}</span>
-          </button>
-        }
+      <div class="ev-alerts-head">
+        <span class="ev-label">{{ 'Tus alertas' | t }}</span>
+        <label class="ev-check">
+          <input type="checkbox" [ngModel]="onlyWithEvidence()" (ngModelChange)="onlyWithEvidence.set($event); resolveAddresses()" />
+          {{ 'Solo con evidencias' | t }}
+        </label>
+      </div>
+      <div class="ev-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" [placeholder]="'Buscar por fecha, barrio o estado' | t" [attr.aria-label]="'Buscar alertas' | t"
+               [ngModel]="searchAlert()" (ngModelChange)="searchAlert.set($event); resolveAddresses()" />
       </div>
 
-      <div class="ev-toolbar">
-        <div class="ev-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="search" placeholder="Buscar por nombre, tipo, fecha o alerta (#12)" aria-label="Buscar evidencias"
-                 [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
-        </div>
-        <select class="ev-select" aria-label="Orden" [ngModel]="orden()" (ngModelChange)="orden.set($event)">
-          <option value="recientes">Más recientes</option>
-          <option value="antiguas">Más antiguas</option>
-        </select>
-      </div>
-
-      @if (cargando()) {
-        <p class="ev-muted">Cargando evidencias…</p>
-      } @else if (evidencias().length === 0 && !error()) {
-        <div class="ev-empty">
-          <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'document' }" />
-          <p>Aún no tienes evidencias</p>
-          <span>Cuando actives una alerta, aquí aparecerán sus grabaciones. También puedes subir un archivo y asociarlo a una alerta.</span>
-          <button class="ev-btn ev-btn--ghost" (click)="abrirSubida()">Subir evidencia</button>
-        </div>
+      @if (loading()) {
+        <p class="ev-muted">{{ 'Cargando evidencias…' | t }}</p>
       } @else {
-        <div class="ev-groups">
-          @for (g of grupos(); track g.alertId) {
-            <div class="ev-group">
-              <div class="ev-group-head">
-                <span class="ev-group-title">Alerta #{{ g.alertId }}</span>
-                <span class="ev-group-meta">{{ fechaCorta(g.alerta?.inicio ?? null) }} · {{ estado(g.alerta?.estado) }}</span>
-              </div>
-              @for (e of g.items; track e.id) {
-                <button class="ev-item" [class.ev-item--selected]="seleccionada()?.id === e.id" (click)="ver(e)">
-                  <span class="ev-thumb ev-thumb--{{ e.tipo }}">
-                    @if (miniatura(e); as src) {
-                      <img [src]="src" alt="" />
+        <ul class="ev-alerts" role="listbox" [attr.aria-label]="'Alertas' | t">
+          @for (a of filteredAlerts(); track a.id) {
+            <li>
+              <button class="ev-alert-item" role="option" [attr.aria-selected]="alertId() === a.id"
+                      [class.ev-alert-item--active]="alertId() === a.id" (click)="chooseAlert(a.id)">
+                <span class="ev-alert-item-date">
+                  <strong>{{ (a.start | date: 'd') | t }}</strong>
+                  <small>{{ (a.start | date: 'MMM') | t }}</small>
+                </span>
+                <span class="ev-alert-item-text">
+                  <span class="ev-alert-item-title">{{ shortDate(a.start) | t }} · {{ time(a.start) | t }}</span>
+                  <span class="ev-alert-item-place">{{ (addresses()[a.id] || (a.lat != null ? 'Buscando la dirección…' : 'Sin ubicación')) | t }}</span>
+                </span>
+                <span class="ev-alert-item-meta">
+                  <span class="ev-chip ev-chip--{{ a.status | t }}">{{ status(a.status) | t }}</span>
+                  @if (a.keep) { <span class="ev-chip ev-chip--conservada" [title]="'Evidencias conservadas' | t">{{ 'Conservada' | t }}</span> }
+                  <span class="ev-alert-item-count">{{ a.count | t }} {{ a.count === 1 ? 'archivo' : 'archivos' | t }}</span>
+                </span>
+              </button>
+            </li>
+          } @empty {
+            <li class="ev-muted ev-alerts-empty">
+              {{ alertList().length === 0 ? 'Aún no tienes alertas. Cuando actives una, aquí aparecerán sus grabaciones.' : 'Ninguna alerta coincide con la búsqueda.' | t }}
+            </li>
+          }
+        </ul>
+
+        @if (currentAlert(); as alert) {
+          <div class="ev-de-alert">
+            <div class="ev-keep" [class.ev-keep--on]="alert.keep">
+              <span class="ev-keep-text">
+                @if (alert.keep) {
+                  <strong>{{ 'Evidencias conservadas' | t }}</strong>
+                  <small>{{ 'No se borran hasta que tú lo hagas ·' | t }} {{ totalKept() | t }} {{ 'de' | t }} {{ maxKept | t }} {{ 'alertas conservadas.' | t }}</small>
+                } @else {
+                  <strong>{{ 'Se borran a los' | t }} {{ retentionDays | t }} {{ 'días' | t }}</strong>
+                  <small>
+                    @if (totalKept() < maxKept) {
+                      {{ '¿Las necesitas para una denuncia? Consérvalas (' | t }}{{ totalKept() | t }} {{ 'de' | t }} {{ maxKept | t }} {{ 'usadas).' | t }}
                     } @else {
-                      <ng-container *ngTemplateOutlet="icono; context: { $implicit: e.tipo }" />
+                      {{ 'Ya conservas' | t }} {{ maxKept | t }} {{ 'alertas: deja de conservar otra para guardar esta.' | t }}
                     }
-                  </span>
-                  <span class="ev-item-text">
-                    <span class="ev-item-name">{{ e.nombreArchivo }}</span>
-                    <span class="ev-item-meta">{{ tipos[e.tipo].etiqueta }} · {{ tamano(e.tamanoBytes) }} · {{ fechaCorta(e.fecha) }}</span>
-                  </span>
+                  </small>
+                }
+              </span>
+              <button class="ev-btn" [class.ev-btn--primary]="!alert.keep" [class.ev-btn--ghost]="alert.keep"
+                      [disabled]="savingKeep() || (!alert.keep && totalKept() >= maxKept)" (click)="toggleKeep(alert)">
+                {{ alert.keep ? 'Dejar de conservar' : 'Conservar' | t }}
+              </button>
+            </div>
+            <div class="ev-filters" role="tablist">
+              <button role="tab" class="ev-filter" [class.active]="filter() === 'todas'" (click)="filter.set('todas')">
+                {{ 'Todas' | t }} <span>{{ count().photo + count().video + count().audio + count().document | t }}</span>
+              </button>
+              @for (t of visibleTypes(); track t) {
+                <button role="tab" class="ev-filter" [class.active]="filter() === t" (click)="filter.set(t)">
+                  <ng-container *ngTemplateOutlet="icon; context: { $implicit: t }" />{{ types[t].plural | t }} <span>{{ count()[t] | t }}</span>
                 </button>
               }
             </div>
-          } @empty {
-            <p class="ev-muted">Nada coincide con la búsqueda.</p>
-          }
-        </div>
+
+            <!-- The app records in ~45 s parts: here they are played in a row, as a single recording -->
+            @if (count().video > 1 || count().audio > 1) {
+              <div class="ev-continua">
+                <span class="ev-continua-text">
+                  <strong>{{ 'Grabación completa' | t }}</strong>
+                  <small>{{ 'La app graba por partes. Aquí puedes verlas seguidas, sin abrir una por una.' | t }}</small>
+                </span>
+                <span class="ev-continua-buttons">
+                  @if (count().video > 1) {
+                    <button class="ev-btn ev-btn--primary" [disabled]="loadingContinuous()" (click)="showContinuous('video')">
+                      {{ 'Ver video completo (' | t }}{{ count().video | t }} {{ 'partes)' | t }}
+                    </button>
+                  }
+                  @if (count().audio > 1) {
+                    <button class="ev-btn ev-btn--ghost" [disabled]="loadingContinuous()" (click)="showContinuous('audio')">
+                      {{ 'Escuchar audio completo (' | t }}{{ count().audio | t }} {{ 'partes)' | t }}
+                    </button>
+                  }
+                </span>
+              </div>
+            }
+
+            <div class="ev-tiles">
+              @for (e of filtered(); track e.id) {
+                <button class="ev-tile" [class.ev-tile--selected]="selected()?.id === e.id" (click)="show(e)" [title]="e.fileName">
+                  <span class="ev-thumb ev-thumb--{{ e.type | t }}">
+                    @if (thumbnail(e); as src) {
+                      <img [src]="src" alt="" />
+                    } @else {
+                      <ng-container *ngTemplateOutlet="icon; context: { $implicit: e.type }" />
+                    }
+                  </span>
+                  <span class="ev-tile-name">{{ e.fileName | t }}</span>
+                  <span class="ev-tile-meta">{{ types[e.type].label | t }} · {{ time(e.date) | t }}</span>
+                </button>
+              } @empty {
+                <div class="ev-empty ev-empty--compact">
+                  <p>{{ 'Esta alerta no tiene evidencias' | t }}</p>
+                  <button class="ev-btn ev-btn--ghost" (click)="openUpload()">{{ 'Agregar una' | t }}</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
       }
     </section>
 
     <!-- ══════════ DETALLE ══════════ -->
     <section class="ev-card ev-detail">
-      @if (seleccionada(); as e) {
-        <div class="ev-viewer ev-viewer--{{ e.tipo }}">
-          @if (cargandoVisor()) {
-            <p class="ev-muted">Cargando archivo…</p>
+      @if (loadingContinuous()) {
+        <p class="ev-muted">{{ 'Juntando las partes de la grabación…' | t }}</p>
+      } @else if (continua(); as c) {
+        <div class="ev-detail-head">
+          <h2 class="ev-detail-title">{{ c.type === 'video' ? 'Video completo' : 'Audio completo' | t }} · {{ c.parts.length | t }} {{ 'partes' | t }}</h2>
+        </div>
+        <app-continuous-player [type]="c.type" [parts]="c.parts" />
+        <p class="ev-muted">{{ 'Para descargar o ver la huella de una parte, elígela en la lista.' | t }}</p>
+      } @else if (selected(); as e) {
+        <div class="ev-viewer ev-viewer--{{ e.type | t }}">
+          @if (loadingViewer()) {
+            <p class="ev-muted">{{ 'Cargando archivo…' | t }}</p>
           } @else if (errorVisor()) {
-            <p class="ev-error">{{ errorVisor() }}</p>
-          } @else if (!e.tieneArchivo) {
-            <p class="ev-muted">Esta evidencia no tiene un archivo guardado en el servidor.</p>
+            <p class="ev-error">{{ errorVisor() | t }}</p>
+          } @else if (!e.hasFile) {
+            <p class="ev-muted">{{ 'Esta evidencia no tiene un archivo guardado en el servidor.' | t }}</p>
           } @else if (urlVisor(); as src) {
-            @switch (e.tipo) {
-              @case ('photo') { <img [src]="src" [alt]="e.nombreArchivo" /> }
+            @switch (e.type) {
+              @case ('photo') { <img [src]="src" [alt]="e.fileName" /> }
               @case ('video') { <video [src]="src" controls playsinline preload="metadata"></video> }
               @case ('audio') {
                 <div class="ev-audio">
-                  <span class="ev-audio-icon"><ng-container *ngTemplateOutlet="icono; context: { $implicit: 'audio' }" /></span>
+                  <span class="ev-audio-icon"><ng-container *ngTemplateOutlet="icon; context: { $implicit: 'audio' }" /></span>
                   <audio [src]="src" controls preload="metadata"></audio>
                 </div>
               }
               @default {
                 <div class="ev-doc">
-                  <ng-container *ngTemplateOutlet="icono; context: { $implicit: 'document' }" />
-                  <p>Los documentos se abren al descargarlos.</p>
+                  <ng-container *ngTemplateOutlet="icon; context: { $implicit: 'document' }" />
+                  <p>{{ 'Los documentos se abren al descargarlos.' | t }}</p>
                 </div>
               }
             }
           }
         </div>
 
-        <h2 class="ev-detail-title">{{ e.nombreArchivo }}</h2>
+        @if (editingName()) {
+          <form class="ev-rename" (submit)="$event.preventDefault(); saveName(e)">
+            <input class="ev-rename-input" maxlength="80" [attr.aria-label]="'Nuevo nombre' | t" [ngModel]="newName()" (ngModelChange)="newName.set($event)" name="nombre" />
+            <button type="submit" class="ev-btn ev-btn--primary" [disabled]="!newName().trim() || savingName()">{{ 'Guardar' | t }}</button>
+            <button type="button" class="ev-btn ev-btn--ghost" (click)="closeEdit()">{{ 'Cancelar' | t }}</button>
+          </form>
+        } @else {
+          <div class="ev-detail-head">
+            <h2 class="ev-detail-title">{{ e.fileName | t }}</h2>
+            <button class="ev-icon-btn" [title]="'Cambiar nombre' | t" [attr.aria-label]="'Cambiar el nombre' | t" (click)="editName(e)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+        }
 
         <dl class="ev-meta">
-          <div><dt>Tipo</dt><dd>{{ tipos[e.tipo].etiqueta }}</dd></div>
-          <div><dt>Tamaño</dt><dd>{{ tamano(e.tamanoBytes) }}</dd></div>
-          <div><dt>Guardada</dt><dd>{{ fechaLarga(e.fecha) }}</dd></div>
-          <div><dt>Alerta</dt><dd>#{{ e.alertId }} · {{ estado(e.alerta?.estado) }}</dd></div>
-          @if (e.alerta?.inicio) {
-            <div><dt>Inicio de la alerta</dt><dd>{{ fechaLarga(e.alerta!.inicio) }}</dd></div>
+          <div><dt>{{ 'Tipo' | t }}</dt><dd>{{ types[e.type].label | t }}</dd></div>
+          <div><dt>{{ 'Tamaño' | t }}</dt><dd>{{ size(e.sizeBytes) | t }}</dd></div>
+          <div><dt>{{ 'Guardada' | t }}</dt><dd>{{ longDate(e.date) | t }}</dd></div>
+          <div><dt>{{ 'Se borra' | t }}</dt><dd>{{ currentAlert()?.keep ? 'Conservada' : shortDate(deletionDate(e)) | t }}</dd></div>
+          <div><dt>{{ 'Alerta' | t }}</dt><dd>{{ shortDate(e.alert?.start ?? null) | t }} · {{ status(e.alert?.status) | t }}</dd></div>
+          @if (e.alert?.start) {
+            <div><dt>{{ 'Inicio de la alerta' | t }}</dt><dd>{{ longDate(e.alert!.start) | t }}</dd></div>
           }
-          @if (mapaUrl(e); as mapa) {
-            <div><dt>Ubicación</dt><dd><a class="ev-link" [href]="mapa" target="_blank" rel="noopener">Ver en el mapa</a></dd></div>
+          @if (currentAlert()?.lat != null) {
+            <div><dt>{{ 'Ubicación' | t }}</dt><dd>{{ (addresses()[e.alertId] || 'Lugar de la alerta') | t }} · <button class="ev-link" (click)="openMap()">{{ 'Ver en el mapa' | t }}</button></dd></div>
           }
         </dl>
 
         @if (e.sha256) {
           <div class="ev-hash">
             <div>
-              <span class="ev-hash-label">Huella SHA-256</span>
-              <code>{{ e.sha256 }}</code>
-              <span class="ev-hash-help">Si alguien modifica el archivo, esta huella deja de coincidir. Sirve como prueba de integridad.</span>
+              <span class="ev-hash-label">{{ 'Huella SHA-256' | t }}</span>
+              <code>{{ e.sha256 | t }}</code>
+              <span class="ev-hash-help">{{ 'Si alguien modifica el archivo, esta huella deja de coincidir. Sirve como prueba de integridad.' | t }}</span>
             </div>
-            <button class="ev-icon-btn" title="Copiar huella" aria-label="Copiar huella SHA-256" (click)="copiarHuella(e)">
+            <button class="ev-icon-btn" [title]="'Copiar huella' | t" [attr.aria-label]="'Copiar huella SHA-256' | t" (click)="copyFingerprint(e)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
           </div>
         }
 
         <div class="ev-actions">
-          <button class="ev-btn ev-btn--primary" (click)="descargar(e)" [disabled]="!e.tieneArchivo">
+          <button class="ev-btn ev-btn--primary" (click)="download(e)" [disabled]="!e.hasFile">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Descargar
+            {{ 'Descargar' | t }}
           </button>
-          <button class="ev-btn ev-btn--danger" (click)="eliminar(e)">Eliminar</button>
+          <button class="ev-btn ev-btn--danger" (click)="delete(e)">{{ 'Eliminar' | t }}</button>
         </div>
       } @else {
         <div class="ev-empty">
-          <p>Selecciona una evidencia</p>
-          <span>Aquí podrás verla, reproducirla o descargarla.</span>
+          <p>{{ 'Selecciona una evidencia' | t }}</p>
+          <span>{{ 'Aquí podrás verla, reproducirla o descargarla.' | t }}</span>
         </div>
       }
     </section>
@@ -176,58 +259,71 @@
 </div>
 
 <!-- ══════════ SUBIR EVIDENCIA ══════════ -->
-@if (subirVisible()) {
-  <div class="ev-modal-overlay" (click)="cerrarSubida()">
+@if (uploadVisible()) {
+  <div class="ev-modal-overlay" (click)="closeUpload()">
     <div class="ev-modal" role="dialog" aria-modal="true" aria-labelledby="ev-subir-titulo" (click)="$event.stopPropagation()">
       <header class="ev-modal-header">
-        <h3 id="ev-subir-titulo">Subir evidencia</h3>
-        <button class="ev-icon-btn" aria-label="Cerrar" (click)="cerrarSubida()" [disabled]="progreso() !== null">
+        <h3 id="ev-subir-titulo">{{ 'Subir evidencia' | t }}</h3>
+        <button class="ev-icon-btn" [attr.aria-label]="'Cerrar' | t" (click)="closeUpload()" [disabled]="progress() !== null">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </header>
 
-      @if (misAlertas().length === 0) {
-        <p class="ev-muted">Las evidencias se asocian a una alerta y todavía no tienes ninguna. Cuando actives una alerta desde la app móvil podrás adjuntarle archivos.</p>
-      } @else {
-        <label class="ev-field">
-          <span class="ev-label">Alerta</span>
-          <select class="ev-select" [ngModel]="alertaElegida()" (ngModelChange)="alertaElegida.set(+$event)">
-            @for (a of misAlertas(); track a.id) {
-              <option [value]="a.id">#{{ a.id }} · {{ fechaLarga(a.inicio) }} · {{ estado(a.estado) }}</option>
-            }
-          </select>
-        </label>
+      @if (currentAlert(); as alert) {
+        <p class="ev-destination">
+          {{ 'Se agregará a la alerta del' | t }} <strong>{{ longDate(alert.start) | t }}</strong>
+          @if (addresses()[alert.id]; as place) { {{ 'en' | t }} {{ place | t }} }.
+          <span>{{ 'Para otra alerta, elígela primero en la lista.' | t }}</span>
+        </p>
 
-        <label class="ev-drop" [class.ev-drop--over]="arrastrando()" [class.ev-drop--ready]="archivo()"
-               (dragover)="$event.preventDefault(); arrastrando.set(true)" (dragleave)="arrastrando.set(false)" (drop)="soltar($event)">
-          <input type="file" [accept]="aceptados" (change)="elegirArchivo($event)" />
+        <label class="ev-drop" [class.ev-drop--over]="dragging()" [class.ev-drop--ready]="file()"
+               (dragover)="$event.preventDefault(); dragging.set(true)" (dragleave)="dragging.set(false)" (drop)="drop($event)">
+          <input type="file" [accept]="accepted" (change)="chooseFile($event)" />
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-          @if (archivo(); as f) {
-            <strong>{{ f.name }}</strong>
-            <span>{{ tamano(f.size) }} · haz clic para cambiarlo</span>
+          @if (file(); as f) {
+            <strong>{{ f.name | t }}</strong>
+            <span>{{ size(f.size) | t }} {{ '· haz clic para cambiarlo' | t }}</span>
           } @else {
-            <strong>Arrastra un archivo o haz clic para elegirlo</strong>
-            <span>Foto, video, audio o PDF · máximo {{ maxMb }} MB</span>
+            <strong>{{ 'Arrastra un archivo o haz clic para elegirlo' | t }}</strong>
+            <span>{{ 'Foto, video o audio · máximo' | t }} {{ maxMb | t }} {{ 'MB' | t }}</span>
           }
         </label>
 
-        @if (progreso() !== null) {
-          <div class="ev-progress" role="progressbar" [attr.aria-valuenow]="progreso()" aria-valuemin="0" aria-valuemax="100">
-            <span [style.width.%]="progreso()"></span>
+        @if (progress() !== null) {
+          <div class="ev-progress" role="progressbar" [attr.aria-valuenow]="progress()" aria-valuemin="0" aria-valuemax="100">
+            <span [style.width.%]="progress()"></span>
           </div>
         }
       }
 
-      @if (errorSubida()) {
-        <p class="ev-error">{{ errorSubida() }}</p>
+      @if (uploadError()) {
+        <p class="ev-error">{{ uploadError() | t }}</p>
       }
 
       <footer class="ev-modal-footer">
-        <button class="ev-btn ev-btn--ghost" (click)="cerrarSubida()" [disabled]="progreso() !== null">Cancelar</button>
-        <button class="ev-btn ev-btn--primary" (click)="subir()" [disabled]="!archivo() || !alertaElegida() || progreso() !== null">
-          {{ progreso() !== null ? 'Subiendo ' + progreso() + '%' : 'Subir' }}
+        <button class="ev-btn ev-btn--ghost" (click)="closeUpload()" [disabled]="progress() !== null">{{ 'Cancelar' | t }}</button>
+        <button class="ev-btn ev-btn--primary" (click)="upload()" [disabled]="!file() || !alertId() || progress() !== null">
+          {{ progress() !== null ? 'Subiendo ' + progress() + '%' : 'Subir' | t }}
         </button>
       </footer>
+    </div>
+  </div>
+}
+
+<!-- ══════════ ALERT MAP ══════════ -->
+@if (mapVisible()) {
+  <div class="ev-modal-overlay" (click)="closeMap()">
+    <div class="ev-modal ev-modal--map" role="dialog" aria-modal="true" aria-labelledby="ev-mapa-titulo" (click)="$event.stopPropagation()">
+      <header class="ev-modal-header">
+        <div>
+          <h3 id="ev-mapa-titulo">{{ 'Lugar de la alerta' | t }}</h3>
+          <p class="ev-muted">{{ (currentAlert() ? addresses()[currentAlert()!.id] || longDate(currentAlert()!.start) : '') | t }}</p>
+        </div>
+        <button class="ev-icon-btn" [attr.aria-label]="'Cerrar' | t" (click)="closeMap()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div #alertMap class="ev-map"></div>
     </div>
   </div>
 }

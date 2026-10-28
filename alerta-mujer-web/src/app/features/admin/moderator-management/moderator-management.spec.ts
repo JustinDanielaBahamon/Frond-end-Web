@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModeratorManagement } from './moderator-management';
+import { ModeratorManagementComponent } from './moderator-management';
 
-describe('ModeratorManagement', () => {
-  let component: ModeratorManagement;
-  let fixture: ComponentFixture<ModeratorManagement>;
+describe('ModeratorManagementComponent', () => {
+  let component: ModeratorManagementComponent;
+  let fixture: ComponentFixture<ModeratorManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModeratorManagement],
+      imports: [ModeratorManagementComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ModeratorManagement);
+    fixture = TestBed.createComponent(ModeratorManagementComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

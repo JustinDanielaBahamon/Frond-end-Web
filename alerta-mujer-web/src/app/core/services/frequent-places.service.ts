@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { FrequentPlace } from '../models/frequent-place.model';
 
-/** Forma en que el backend (/api/frequent-locations) envía y recibe un lugar frecuente. */
+/** Shape in which the backend (/api/frequent-locations) sends and receives a frequent place. */
 interface FrequentLocationApi {
   id: number;
   userProfileId: number;
@@ -25,7 +25,7 @@ export class FrequentPlaceService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/api/frequent-locations`;
 
-  /** userId = id de la usuaria autenticada (users.id). */
+  /** userId = id of the authenticated user (users.id). */
   getByUser(userId: number): Observable<FrequentPlace[]> {
     return this.http
       .get<FrequentLocationApi[]>(`${this.baseUrl}/user/${userId}`)
@@ -33,7 +33,7 @@ export class FrequentPlaceService {
   }
 
   create(place: Omit<FrequentPlace, 'id'>): Observable<FrequentPlace> {
-    // No enviamos userId/userProfileId: el backend toma la dueña del token
+    // We do not send userId/userProfileId: the backend takes the owner from the token
     return this.http
       .post<FrequentLocationApi>(this.baseUrl, this.toApi(place))
       .pipe(map((api) => this.fromApi(api)));
@@ -49,7 +49,7 @@ export class FrequentPlaceService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  // El backend no guarda type ni isMain; se devuelven con valores por defecto.
+  // The backend does not store type or isMain; they are returned with default values.
   private fromApi(api: FrequentLocationApi): FrequentPlace {
     return {
       id: api.id,
@@ -68,7 +68,7 @@ export class FrequentPlaceService {
     };
   }
 
-  /** Solo incluye los campos presentes, para que PATCH no sobrescriba lo demás. */
+  /** Only includes the present fields, so PATCH does not overwrite the rest. */
   private toApi(place: Partial<FrequentPlace>): Partial<FrequentLocationApi> {
     const body: Partial<FrequentLocationApi> = {
       name: place.name,

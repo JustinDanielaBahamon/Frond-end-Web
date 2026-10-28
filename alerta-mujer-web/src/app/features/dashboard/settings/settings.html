@@ -1,7 +1,10 @@
 <section class="settings">
-  <header class="settings__header">
-    <h1>Ajustes</h1>
-    <p>Personaliza la aplicación según tus necesidades.</p>
+  <header class="settings__header page-title-row">
+    <span class="page-title-icon"><i class="ti ti-settings"></i></span>
+    <div>
+      <h1>{{ 'Ajustes' | t }}</h1>
+      <p>{{ 'Personaliza la aplicación según tus necesidades.' | t }}</p>
+    </div>
   </header>
 
   <div class="settings__grid">
@@ -9,8 +12,7 @@
     <!-- CUENTA -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-user-circle"></i> Cuenta</h2>
-        <button type="button" class="link-btn" (click)="onEditProfile()">Editar perfil</button>
+        <h2><i class="ti ti-user-circle"></i> {{ 'Cuenta' | t }}</h2>
       </div>
 
       <div class="account-profile">
@@ -22,52 +24,68 @@
           }
         </div>
         <div>
-          <strong>{{ user().name }}</strong>
-          <span>{{ user().email }}</span>
+          <strong>{{ user().name | t }}</strong>
+          <span>{{ user().email | t }}</span>
         </div>
       </div>
 
-      <button type="button" class="setting-row setting-row--link">
+      <button type="button" class="setting-row setting-row--link" (click)="changingPassword.set(true)">
         <i class="ti ti-lock"></i>
-        <span>Cambiar contraseña</span>
+        <span>{{ 'Cambiar contraseña' | t }}</span>
         <i class="ti ti-chevron-right"></i>
       </button>
-      <button type="button" class="setting-row setting-row--link">
+      <div class="setting-row">
         <i class="ti ti-mail"></i>
-        <span>Correo electrónico</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
+        <span>{{ 'Correo electrónico' | t }}</span>
+        <span class="setting-row__value">{{ user().email | t }}</span>
+      </div>
+      <div class="setting-row">
         <i class="ti ti-phone"></i>
-        <span>Número de teléfono</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-
-      <button type="button" class="setting-row setting-row--danger" (click)="onDeleteAccount()">
-        <i class="ti ti-trash"></i>
-        <span>Eliminar cuenta</span>
-      </button>
+        <span>{{ 'Número de teléfono' | t }}</span>
+        <span class="setting-row__value">{{ (user().phone || 'Sin registrar') | t }}</span>
+      </div>
+      <p class="settings-card__note">{{ 'Tu nombre, teléfono y foto se editan desde la app móvil, en Perfil.' | t }}</p>
     </article>
 
     <!-- APARIENCIA -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-palette"></i> Apariencia</h2>
+        <h2><i class="ti ti-palette"></i> {{ 'Apariencia' | t }}</h2>
       </div>
 
-      <p class="settings-card__label">Tema</p>
+      <p class="settings-card__label">{{ 'Tema' | t }}</p>
       <div class="theme-options">
         <button type="button" class="theme-option" [class.active]="theme() === 'light'" (click)="toggleTheme('light')">
-          <span class="theme-preview theme-preview--light"></span>
-          <span>Claro</span>
+          <!-- Mini vista previa del panel en modo claro (solo decorativa) -->
+          <span class="theme-preview theme-preview--light" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-sun"></i> {{ 'Claro' | t }}
+            @if (theme() === 'light') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
         </button>
         <button type="button" class="theme-option" [class.active]="theme() === 'dark'" (click)="toggleTheme('dark')">
-          <span class="theme-preview theme-preview--dark"></span>
-          <span>Oscuro</span>
+          <!-- Mini vista previa del panel en modo oscuro (solo decorativa) -->
+          <span class="theme-preview theme-preview--dark" aria-hidden="true">
+            <span class="theme-preview__bar"><span></span><span></span><span></span><span class="theme-preview__pill"></span></span>
+            <span class="theme-preview__body">
+              <span class="theme-preview__side"></span>
+              <span class="theme-preview__main"><span></span><span></span></span>
+            </span>
+          </span>
+          <span class="theme-option__label">
+            <i class="ti ti-moon"></i> {{ 'Oscuro' | t }}
+            @if (theme() === 'dark') { <i class="ti ti-circle-check theme-option__check"></i> }
+          </span>
         </button>
       </div>
 
-      <p class="settings-card__label">Color principal</p>
+      <p class="settings-card__label">{{ 'Color principal' | t }}</p>
       <div class="color-swatches">
         @for (color of accentColors; track color.value) {
           <button
@@ -80,33 +98,19 @@
           </button>
         }
       </div>
-
-      <p class="settings-card__label">Tamaño de letra</p>
-      <div class="font-size-options">
-        @for (size of fontSizes; track size) {
-          <button
-            type="button"
-            class="font-size-option"
-            [class.active]="selectedFontSize() === size"
-            (click)="selectFontSize(size)">
-            <span [class]="'font-size-option__sample font-size-option__sample--' + size">Aa</span>
-            <span class="font-size-option__label">{{ size }}</span>
-          </button>
-        }
-      </div>
     </article>
 
     <!-- NOTIFICACIONES -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-bell"></i> Notificaciones</h2>
+        <h2><i class="ti ti-bell"></i> {{ 'Notificaciones' | t }}</h2>
       </div>
 
       @for (item of notifications(); track item.key) {
         <div class="setting-row setting-row--toggle">
           <div>
-            <strong>{{ item.label }}</strong>
-            <span>{{ item.description }}</span>
+            <strong>{{ item.label | t }}</strong>
+            <span>{{ item.description | t }}</span>
           </div>
           <button
             type="button"
@@ -124,130 +128,80 @@
     <!-- PRIVACIDAD -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-shield-lock"></i> Privacidad</h2>
+        <h2><i class="ti ti-shield-lock"></i> {{ 'Tus datos' | t }}</h2>
       </div>
-
-      <div class="setting-row setting-row--toggle">
-        <div>
-          <strong>Permitir ubicación en segundo plano</strong>
-          <span>Mejora la precisión de tu ubicación.</span>
-        </div>
-        <button
-          type="button"
-          class="switch"
-          [class.on]="backgroundLocation()"
-          role="switch"
-          [attr.aria-checked]="backgroundLocation()"
-          (click)="toggleBackgroundLocation()">
-          <span class="switch__thumb"></span>
-        </button>
-      </div>
-
-      <button type="button" class="setting-row setting-row--link">
-        <div>
-          <strong>Uso de datos</strong>
-          <span>Wi-Fi y datos móviles</span>
-        </div>
+      <ul class="privacy-list">
+        <li><i class="ti ti-map-pin"></i><span>{{ 'Tu ubicación del día a día solo la ves tú. Cuando activas una alerta, tus contactos de emergencia reciben tu nombre y ven tu ubicación en tiempo real mientras la alerta está activa y hasta 2 horas después.' | t }}</span></li>
+        <li><i class="ti ti-folder"></i><span>{{ 'Las fotos, videos y audios de una alerta los ven tú y los contactos que recibieron esa alerta, mientras su enlace está activo. La administración de AlertaMujer también puede revisarlos para moderar el servicio.' | t }}</span></li>
+        <li><i class="ti ti-trash-x"></i><span>{{ 'El historial de ubicaciones se borra solo: lo del día a día a los 7 días y los recorridos de tus alertas a los 30.' | t }}</span></li>
+        <li><i class="ti ti-device-mobile"></i><span>{{ 'Los permisos de ubicación, notificaciones y micrófono se cambian en los ajustes de tu celular.' | t }}</span></li>
+      </ul>
+      <a class="setting-row setting-row--link" routerLink="/auth/privacy">
+        <span>{{ 'Leer la política de privacidad' | t }}</span>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <button type="button" class="setting-row setting-row--link setting-row--destructive" (click)="deletingAccount.set(true)">
+        <span><i class="ti ti-trash"></i> {{ 'Eliminar mi cuenta y mis datos' | t }}</span>
         <i class="ti ti-chevron-right"></i>
       </button>
-
-      <button type="button" class="setting-row setting-row--link">
-        <div>
-          <strong>Personalización de datos</strong>
-          <span>Controla qué información compartes.</span>
-        </div>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-
-      <div class="settings-card__banner">
-        <i class="ti ti-shield-check"></i>
-        <div>
-          <strong>Tu privacidad es importante</strong>
-          <span>Puedes ajustar qué información compartes y cómo se usa.</span>
-        </div>
-      </div>
     </article>
 
-    <!-- SEGURIDAD -->
+    <!-- EMERGENCIA -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-shield"></i> Seguridad</h2>
+        <h2><i class="ti ti-urgent"></i> {{ 'Emergencia' | t }}</h2>
       </div>
-
-      <button type="button" class="setting-row setting-row--link">
+      <a class="setting-row setting-row--link" routerLink="/dashboard/emergency-contacts">
+        <i class="ti ti-users"></i>
         <div>
-          <strong>Bloqueo de la aplicación</strong>
-          <span>Usa un PIN o huella para acceder.</span>
+          <strong>{{ 'Contactos de emergencia' | t }}</strong>
+          <span>{{ 'Quiénes reciben tu alerta y tu ubicación.' | t }}</span>
         </div>
-        <span class="status-pill" [class.status-pill--active]="appLockActive()">
-          {{ appLockActive() ? 'Activado' : 'Desactivado' }}
-        </span>
-      </button>
-
-      <div class="setting-row setting-row--toggle">
-        <div>
-          <strong>Autenticación biométrica</strong>
-          <span>Huella dactilar o reconocimiento facial.</span>
-        </div>
-        <button
-          type="button"
-          class="switch"
-          [class.on]="biometricAuth()"
-          role="switch"
-          [attr.aria-checked]="biometricAuth()"
-          (click)="toggleBiometricAuth()">
-          <span class="switch__thumb"></span>
-        </button>
-      </div>
-
-      <button type="button" class="setting-row setting-row--link">
-        <div>
-          <strong>Tiempo de bloqueo automático</strong>
-          <span>Después de inactividad.</span>
-        </div>
-        <span class="setting-row__value">{{ autoLockTime() }}</span>
         <i class="ti ti-chevron-right"></i>
-      </button>
-
-      <div class="settings-card__banner">
-        <i class="ti ti-shield-check"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/alert-history">
+        <i class="ti ti-history"></i>
         <div>
-          <strong>Tu seguridad es nuestra prioridad</strong>
-          <span>Mantén tu cuenta protegida en todo momento.</span>
+          <strong>{{ 'Mis alertas' | t }}</strong>
+          <span>{{ 'Historial de las alertas que has activado.' | t }}</span>
         </div>
-      </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/ubicacion/zonas-auxiliares">
+        <i class="ti ti-map-pin"></i>
+        <div>
+          <strong>{{ 'Zonas y puntos de ayuda' | t }}</strong>
+          <span>{{ 'Zonas de riesgo, zonas seguras y lugares donde pedir ayuda.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/dashboard/assistance">
+        <i class="ti ti-lifebuoy"></i>
+        <div>
+          <strong>{{ 'Líneas de ayuda' | t }}</strong>
+          <span>{{ 'Números de emergencia y centros de atención.' | t }}</span>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </a>
     </article>
 
     <!-- SOPORTE Y AYUDA -->
     <article class="settings-card">
       <div class="settings-card__header">
-        <h2><i class="ti ti-headset"></i> Soporte y ayuda</h2>
+        <h2><i class="ti ti-headset"></i> {{ 'Soporte y ayuda' | t }}</h2>
       </div>
 
-      <button type="button" class="setting-row setting-row--link">
-        <span>Centro de ayuda</span>
+      <a class="setting-row setting-row--link" routerLink="/auth/terms">
+        <span>{{ 'Términos y condiciones' | t }}</span>
         <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
-        <span>Términos y condiciones</span>
+      </a>
+      <a class="setting-row setting-row--link" routerLink="/auth/privacy">
+        <span>{{ 'Política de privacidad' | t }}</span>
         <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
-        <span>Política de privacidad</span>
-        <i class="ti ti-chevron-right"></i>
-      </button>
-      <button type="button" class="setting-row setting-row--link">
-        <span>Información de la aplicación</span>
-        <span class="setting-row__value">Versión 1.0.0</span>
-      </button>
-
-      <div class="settings-card__banner settings-card__banner--support">
-        <i class="ti ti-headset"></i>
-        <div>
-          <strong>¿Necesitas ayuda?</strong>
-          <span>Estamos aquí para apoyarte.</span>
-        </div>
-        <button type="button" class="btn-primary" (click)="onContactSupport()">Contactar soporte</button>
+      </a>
+      <div class="setting-row">
+        <span>{{ 'Información de la aplicación' | t }}</span>
+        <span class="setting-row__value">{{ 'Versión 1.0.0' | t }}</span>
       </div>
     </article>
 
@@ -257,35 +211,35 @@
   <footer class="settings__footer">
     <div class="footer-item footer-item--highlight">
       <i class="ti ti-shield-check"></i>
-      <span>Tu seguridad, en tus manos</span>
+      <span>{{ 'Tu seguridad, en tus manos' | t }}</span>
     </div>
     <div class="footer-item">
       <i class="ti ti-moon"></i>
       <div>
-        <strong>Modo claro / oscuro</strong>
-        <span>Elige el tema que prefieras.</span>
+        <strong>{{ 'Modo claro / oscuro' | t }}</strong>
+        <span>{{ 'Elige el tema que prefieras.' | t }}</span>
       </div>
     </div>
     <div class="footer-item">
       <i class="ti ti-palette"></i>
       <div>
-        <strong>Personaliza colores</strong>
-        <span>Hazla única con tu color favorito.</span>
-      </div>
-    </div>
-    <div class="footer-item">
-      <i class="ti ti-text-size"></i>
-      <div>
-        <strong>Tamaño de letra</strong>
-        <span>Mejora la legibilidad.</span>
+        <strong>{{ 'Personaliza colores' | t }}</strong>
+        <span>{{ 'Hazla única con tu color favorito.' | t }}</span>
       </div>
     </div>
     <div class="footer-item">
       <i class="ti ti-bell"></i>
       <div>
-        <strong>Notificaciones</strong>
-        <span>Mantente siempre informada.</span>
+        <strong>{{ 'Notificaciones' | t }}</strong>
+        <span>{{ 'Mantente siempre informada.' | t }}</span>
       </div>
     </div>
   </footer>
+
+  @if (changingPassword()) {
+    <app-password-change (close)="changingPassword.set(false)" />
+  }
+  @if (deletingAccount()) {
+    <app-delete-account (close)="deletingAccount.set(false)" />
+  }
 </section>

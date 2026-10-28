@@ -20,7 +20,7 @@ export interface ResourceCall {
   status?: 'completada' | 'no_respondida' | 'fallida';
   createdAt?: string;
 }
-/** Recurso tal como lo devuelve el backend (/api/resources). */
+/** Resource as the backend returns it (/api/resources). */
 export interface EmergencyResourceApi {
   id: number;
   name: string;

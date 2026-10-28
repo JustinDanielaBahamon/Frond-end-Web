@@ -4,7 +4,7 @@
 
 .ec-error {
   text-align: center;
-  color: var(--red, #dc2626);
+  color: var(--red, #cb1ce6);
   font-size: var(--font-size-sm);
   padding: 1.5rem;
 }
@@ -82,7 +82,7 @@
     td:last-child  { border-bottom-right-radius: 12px; }
   }
 
-  // antes: var(--purple-pale, #f9f8ff) — casi blanco, sin contraste con la tarjeta
+  // before: var(--purple-pale, #f9f8ff) — almost white, no contrast with the card
   thead {
     background: linear-gradient(135deg, var(--purple-deep, #5b21b6), var(--purple-mid, #7c3aed));
 
@@ -124,9 +124,9 @@
   font-size: var(--font-size-xs);
 }
 
-.ec-nombre { font-weight: 700; color: #111827; }
+.ec-name { font-weight: 700; color: #111827; }
 
-.ec-prioridad {
+.ec-priority {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,8 +146,8 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
 
-  &--activo   { background: rgba(16, 185, 129, 0.15); color: #059669; }
-  &--inactivo { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
+  &--active   { background: rgba(89, 16, 185, 0.15); color: #440596; }
+  &--inactivo { background: rgba(203, 28, 230, 0.12); color: #cb1ce6; }
 }
 
 .ec-actions {
@@ -203,7 +203,7 @@
   }
 }
 
-.ec-menu-danger { color: #dc2626 !important; }
+.ec-menu-danger { color: #cb1ce6 !important; }
 
 .ec-empty, .ec-muted {
   text-align: center;
@@ -348,8 +348,8 @@
 }
 
 .ec-danger-zone {
-  border: 1px solid rgba(220, 38, 38, 0.25);
-  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(203, 28, 230, 0.25);
+  background: rgba(203, 28, 230, 0.05);
   border-radius: 12px;
   padding: 14px;
   margin-top: 4px;
@@ -361,8 +361,8 @@
   gap: 8px;
   margin-bottom: 10px;
 
-  svg { width: 17px; height: 17px; color: #dc2626; flex-shrink: 0; margin-top: 1px; }
-  strong { display: block; font-size: var(--font-size-sm); color: #dc2626; }
+  svg { width: 17px; height: 17px; color: #cb1ce6; flex-shrink: 0; margin-top: 1px; }
+  strong { display: block; font-size: var(--font-size-sm); color: #cb1ce6; }
   p { margin: 1px 0 0; font-size: var(--font-size-xs); color: #9ca3af; }
 }
 
@@ -370,20 +370,20 @@
   width: 100%;
   padding: 9px;
   border-radius: 10px;
-  border: 1.5px solid rgba(220, 38, 38, 0.35);
-  background: rgba(220, 38, 38, 0.08);
-  color: #dc2626;
+  border: 1.5px solid rgba(203, 28, 230, 0.35);
+  background: rgba(203, 28, 230, 0.08);
+  color: #cb1ce6;
   font-family: 'Nunito', sans-serif;
   font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
 
-  &:hover { background: rgba(220, 38, 38, 0.15); }
+  &:hover { background: rgba(203, 28, 230, 0.15); }
 
   &--confirm {
-    background: #dc2626;
+    background: #cb1ce6;
     color: #fff;
-    border-color: #dc2626;
+    border-color: #cb1ce6;
 
     &:hover { opacity: 0.9; }
     &:disabled { opacity: 0.6; cursor: default; }
@@ -436,4 +436,269 @@
 @media (max-width: 700px) {
   .ec-table-wrap { overflow-x: auto; }
   .ec-table { min-width: 640px; }
+}
+// ── Contact photos ──────────────────────────────
+.ec-avatar--photo {
+  object-fit: cover;
+  border: 2px solid #ede9fe;
+}
+
+.ec-photo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  margin-bottom: 4px;
+  border-radius: 14px;
+  background: #f5f3ff;
+}
+
+.ec-photo-img,
+.ec-photo-vacia {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ec-photo-img {
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.ec-photo-vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.ec-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ec-photo-button,
+.ec-photo-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ec-photo-button {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.ec-photo-remove {
+  border: 1px solid #c4b5fd;
+  background: #fff;
+  color: #6d28d9;
+}
+
+.ec-photo-error {
+  width: 100%;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: #a21caf;
+}
+
+
+// =============================================
+// BOTONES CON EL COLOR DEL MÓDULO ACTIVO DE LA BARRA LATERAL
+// + LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+$ec-accent: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+$ec-line: #6d5bb8;        // morado de líneas del panel admin
+$ec-line-soft: #8878c6;   // líneas entre filas de la tabla
+
+// Botones: mismo morado (no tan brillante) que el módulo activo
+.ec-add-btn,
+.ec-btn--primary,
+.ec-photo-button { background: $ec-accent !important; }
+
+// Títulos de la tabla: el mismo morado (claro y oscuro)
+.ec-table thead { background: $ec-accent !important; }
+
+// Modo claro
+:host-context(html:not([data-theme="dark"])) {
+  .ec-info-banner,
+  .ec-footer-banner,
+  .ec-table-wrap,
+  .ec-menu,
+  .ec-field input,
+  .ec-field select,
+  .ec-btn--ghost,
+  .ec-photo-remove { border: 2px solid $ec-line !important; }
+
+  .ec-table tbody tr { border-top: 2px solid $ec-line-soft !important; }
+
+  .ec-field input:focus,
+  .ec-field select:focus { border-color: #7c3aed !important; }
+
+  .ec-danger-zone,
+  .ec-danger-btn { border-width: 2px !important; }
+}
+
+// Modo oscuro: mismo grosor con el borde oscuro del tema
+:host-context([data-theme="dark"]) {
+  .ec-info-banner,
+  .ec-footer-banner,
+  .ec-table-wrap,
+  .ec-menu,
+  .ec-field input,
+  .ec-field select,
+  .ec-btn--ghost,
+  .ec-photo-remove { border: 2px solid var(--border, #4c3a80) !important; }
+
+  .ec-table tbody tr { border-top: 2px solid var(--border, #4c3a80) !important; }
+
+  .ec-field input:focus,
+  .ec-field select:focus { border-color: var(--purple-mid, #aa86ea) !important; }
+
+  .ec-danger-zone,
+  .ec-danger-btn { border-width: 2px !important; }
+
+  // Caja de la foto: oscura para que contraste con el modo oscuro
+  .ec-photo {
+    background: var(--purple-pale, #2b204a) !important;
+    border: 2px solid var(--border, #4c3a80);
+  }
+
+  .ec-photo-img { border-color: var(--bg-card, #241d3d); }
+
+  .ec-photo-remove {
+    background: transparent !important;
+    color: var(--purple-mid, #b79bf5) !important;
+  }
+}
+
+// =============================================
+// RESPONSIVE COMPLETO DE CONTACTOS (solo diseño)
+// =============================================
+
+// Título, descripción y avisos: los textos bajan de línea en vez de salirse
+.page-title-row > div { min-width: 0; }
+
+.ec-title,
+.ec-sub,
+.ec-info-banner,
+.ec-footer-banner,
+.ec-modal-header h3,
+.ec-modal-header p,
+.ec-danger-confirm p { overflow-wrap: break-word; }
+
+.ec-footer-banner p,
+.ec-modal-header > div { min-width: 0; }
+
+// La tabla mantiene su tamaño y se mueve de lado (con barra morada)
+@media (max-width: 700px) {
+  .ec-table-wrap {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed transparent;
+
+    &::-webkit-scrollbar { height: 8px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 999px; }
+  }
+
+  .ec-table { min-width: 680px; }
+  .ec-table th,
+  .ec-table td { white-space: nowrap; }
+
+  // El menú ⋮ de la última fila abre hacia arriba para que no quede cortado
+  .ec-table tbody tr:last-child:not(:first-child) .ec-menu {
+    top: auto;
+    bottom: 36px;
+  }
+}
+
+// Tablet / celular: menos espacio a los lados
+@media (max-width: 768px) {
+  .ec-wrap { padding: 1rem 0.5rem; }
+}
+
+// Celular
+@media (max-width: 480px) {
+  .ec-wrap { padding: 0.75rem 0; }
+
+  // "Agregar contacto" a lo ancho
+  .ec-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ec-info-banner,
+  .ec-footer-banner { padding: 10px 12px; }
+
+  // Ventanas de agregar / editar
+  .ec-modal-bg { padding: 0.6rem; }
+  .ec-modal-header { padding: 16px 16px 10px; }
+  .ec-modal-body { padding: 4px 16px 8px; }
+  .ec-modal-actions { padding: 14px 16px 16px; }
+
+  .ec-photo {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ec-field input,
+  .ec-field select { min-width: 0; width: 100%; }
+}
+
+// Celulares chicos: botones de las ventanas uno debajo del otro
+@media (max-width: 360px) {
+  .ec-title { font-size: 1.35rem; }
+
+  .ec-modal-actions,
+  .ec-danger-confirm-actions { flex-direction: column-reverse; }
+
+  .ec-photo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ec-photo-actions { justify-content: center; }
+}
+
+// Celulares muy angostos
+@media (max-width: 300px) {
+  .page-title-row { gap: 8px; }
+  .page-title-icon { width: 32px; height: 32px; }
+  .ec-title { font-size: 1.15rem; }
+  .ec-title,
+  .ec-sub { overflow-wrap: anywhere; }
+
+  // El ícono del aviso arriba y el texto a lo ancho
+  .ec-info-banner,
+  .ec-footer-banner {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ec-add-btn {
+    height: auto;
+    min-height: 40px;
+    padding: 8px 10px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .ec-btn,
+  .ec-danger-btn,
+  .ec-photo-button,
+  .ec-photo-remove { white-space: normal; text-align: center; justify-content: center; }
 }

@@ -1,10 +1,10 @@
 @use '../../../shared/styles/variables.scss' as *;
 
-$blue:   #3b82f6;
-$orange: #f97316;
-$yellow: #eab308;
+$blue:   #6d28d9;
+$orange: #a855f7;
+$yellow: #c084fc;
 
-// Fondo suave del color dado, válido en claro y oscuro
+// Soft background of the given color, valid in light and dark
 @function tint($color, $pct: 16%) {
   @return color-mix(in srgb, #{$color} #{$pct}, transparent);
 }
@@ -344,7 +344,7 @@ $yellow: #eab308;
   filter: none;
 }
 
-// En móvil .btn-primary ocupa todo el ancho; dentro del modal no
+// On mobile .btn-primary takes the full width; inside the modal it does not
 .btn-primary.btn-modal { width: auto; }
 
 .form-group { margin-bottom: 16px; }
@@ -357,7 +357,7 @@ $yellow: #eab308;
   color: $text-primary;
 }
 
-.form-opcional {
+.form-optional {
   font-weight: 500;
   color: $text-dim;
 }
@@ -394,16 +394,16 @@ $yellow: #eab308;
   font-weight: 600;
 }
 
-// Botones de opción (tipo / estado / radios rápidos)
-.opciones {
+// Option buttons (type / status / quick radii)
+.options {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 
-  &--chicas { margin-top: 8px; }
+  &--girls { margin-top: 8px; }
 }
 
-.opcion {
+.option {
   padding: 8px 12px;
   border: 1.5px solid $border;
   border-radius: $radius-sm;
@@ -424,22 +424,22 @@ $yellow: #eab308;
     &:hover { color: #fff; }
   }
 
-  &--activa.opcion--red     { background: $red; }
-  &--activa.opcion--orange  { background: $orange; }
-  &--activa.opcion--yellow  { background: $yellow; color: #422006; }
-  &--activa.opcion--green   { background: $green; }
-  &--activa.opcion--neutral { background: $purple-deep; }
+  &--activa.option--red     { background: $red; }
+  &--activa.option--orange  { background: $orange; }
+  &--activa.option--yellow  { background: $yellow; color: #3b0764; }
+  &--activa.option--green   { background: $green; }
+  &--activa.option--neutral { background: $purple-deep; }
 }
 
 // Mapa dentro del modal
-.zona-mapa {
+.zone-map {
   height: 260px;
   border: 1.5px solid $border;
   border-radius: $radius-sm;
   overflow: hidden;
 }
 
-.zona-mapa-info {
+.zone-map-info {
   margin: 6px 0 0;
   font-size: 0.78rem;
   color: $text-muted;
@@ -466,7 +466,7 @@ $yellow: #eab308;
 }
 
 // Detalle (ojo)
-.zona-detalle__head {
+.zone-detail__head {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -476,7 +476,7 @@ $yellow: #eab308;
   p  { margin: 2px 0 0; font-size: 0.82rem; color: $text-muted; }
 }
 
-.zona-detalle__grid {
+.zone-detail__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
@@ -498,13 +498,13 @@ $yellow: #eab308;
   }
 }
 
-.zona-detalle__fecha {
+.zone-detail__date {
   display: block;
   margin-top: 2px;
   color: $text-dim;
 }
 
-.zona-sin-ubicacion {
+.zone-sin-location {
   margin: 0;
   padding: 14px;
   border: 1.5px dashed $border;
@@ -513,8 +513,8 @@ $yellow: #eab308;
   color: $text-muted;
 }
 
-// Mapa en modo oscuro: oscurece los tiles de OpenStreetMap
-:host-context([data-theme='dark']) .zona-mapa ::ng-deep {
+// Map in dark mode: darkens the OpenStreetMap tiles
+:host-context([data-theme='dark']) .zone-map ::ng-deep {
   .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
   .leaflet-control-attribution { background: rgba(36, 29, 61, 0.8); color: #a8a0c4; a { color: #b79bf5; } }
   .leaflet-control-zoom a { background: #241d3d; color: #ede9fe; border-color: #4c3a80; }
@@ -540,7 +540,7 @@ $yellow: #eab308;
   .page-header h1 { font-size: 1.7rem; }
 }
 
-// ── Móvil ≤ 768px: tabla → tarjetas ──────────
+// ── Mobile ≤ 768px: table → cards ──────────
 @media (max-width: 768px) {
   .toolbar {
     padding: 12px;
@@ -551,10 +551,10 @@ $yellow: #eab308;
     flex: 1 1 100%;
     min-width: 0;
 
-    input { font-size: 16px; } // evita el zoom automático de iOS
+    input { font-size: 16px; } // avoids the automatic iOS zoom
   }
 
-  // Chips: una sola línea con scroll horizontal
+  // Chips: a single line with horizontal scroll
   .toolbar-actions {
     flex-wrap: nowrap;
     width: 100%;
@@ -577,7 +577,7 @@ $yellow: #eab308;
       min-width: 0;
     }
 
-    // El encabezado se oculta visualmente pero queda para lectores de pantalla
+    // The header is hidden visually but stays for screen readers
     thead {
       position: absolute;
       width: 1px;
@@ -606,7 +606,7 @@ $yellow: #eab308;
       border-top: none;
       text-align: right;
 
-      // Etiqueta de cada dato (viene de data-label en el HTML)
+      // Label of each value (comes from data-label in the HTML)
       &[data-label]::before {
         content: attr(data-label);
         flex-shrink: 0;
@@ -619,8 +619,8 @@ $yellow: #eab308;
       }
     }
 
-    // Nombre de la zona como encabezado de la tarjeta
-    td.cell-zona {
+    // Zone name as the card header
+    td.cell-zone {
       justify-content: flex-start;
       text-align: left;
       padding-bottom: 10px;
@@ -628,7 +628,7 @@ $yellow: #eab308;
       border-bottom: 1px dashed $border;
     }
 
-    // Acciones al pie de la tarjeta
+    // Actions at the bottom of the card
     td.cell-acc {
       justify-content: flex-end;
       margin-top: 6px;
@@ -642,7 +642,7 @@ $yellow: #eab308;
     }
   }
 
-  // Botones de acción más grandes para el dedo
+  // Bigger action buttons for the finger
   .actions { gap: 8px; }
   .actions button { width: 40px; height: 40px; }
 
@@ -658,7 +658,7 @@ $yellow: #eab308;
   .page-btn { min-width: 36px; height: 36px; }
 }
 
-// ── Móvil ≤ 640px ────────────────────────────
+// ── Mobile ≤ 640px ────────────────────────────
 @media (max-width: 640px) {
   .risk-zones { padding: 16px 14px 28px; }
 
@@ -673,7 +673,7 @@ $yellow: #eab308;
 
   .btn-primary { width: 100%; min-height: 44px; }
 
-  // Estadísticas compactas en 2 columnas
+  // Compact stats in 2 columns
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -698,7 +698,7 @@ $yellow: #eab308;
 
   // Modales
   .form-input { font-size: 16px; }
-  .opcion { padding: 10px 14px; }
+  .option { padding: 10px 14px; }
 
   .btn-secondary,
   .btn-primary.btn-modal {
@@ -707,13 +707,65 @@ $yellow: #eab308;
   }
 }
 
-// ── Móvil pequeño ≤ 480px ────────────────────
+// ── Small mobile ≤ 480px ────────────────────
 @media (max-width: 480px) {
-  .zona-detalle__grid { grid-template-columns: 1fr; }
-  .zona-mapa { height: 220px; }
+  .zone-detail__grid { grid-template-columns: 1fr; }
+  .zone-map { height: 220px; }
 }
 
-// ── Móvil muy pequeño ≤ 380px ────────────────
+// ── Very small mobile ≤ 380px ────────────────
 @media (max-width: 380px) {
   .stats-grid { grid-template-columns: 1fr; }
+}
+
+// =============================================
+// LÍNEAS MÁS VISIBLES (igual que el Dashboard)
+// Solo estilos: no cambia nada del HTML ni del TS
+// =============================================
+
+// Tarjetas con borde morado, como las del Dashboard
+// (en modo claro, admin-lines-light.scss lo sube a 2px y usa el morado de líneas)
+.stat-card,
+.toolbar,
+.table-card {
+  border: 1px solid $border;
+}
+
+// Modo oscuro: líneas internas más gruesas
+:host-context([data-theme="dark"]) {
+  .search-box,
+  .chip,
+  .page-btn,
+  .actions button {
+    border-width: 2px;
+  }
+
+  .table-footer { border-top: 2px solid $border; }
+
+  // Encabezado y separadores de filas (escritorio)
+  @media (min-width: 769px) {
+    .table-card th { border-bottom: 2px solid $border; }
+    .table-card td { border-top: 2px solid $border; }
+    .table-card tbody tr:first-child td { border-top: none; }
+  }
+
+  // Celular: separador entre tarjetas de zona
+  @media (max-width: 768px) {
+    .table-card tbody tr { border-top-width: 2px; }
+    .table-card td.cell-acc { border-top-width: 2px; }
+  }
+}
+
+// =============================================
+// BOTÓN "NUEVA ZONA": mismo morado del módulo activo del sidebar
+// (solo el del encabezado; los botones de los modales no cambian)
+// =============================================
+.page-header .btn-primary {
+  background: linear-gradient(135deg, var(--accent-grad-from, #561bbb), var(--accent-grad-to, #7c39ef));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 35%, transparent);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-grad-to, #7c39ef) 45%, transparent);
+  }
 }

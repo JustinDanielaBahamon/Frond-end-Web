@@ -30,7 +30,7 @@
   .bg-orb--1 {
     width: 550px;
     height: 550px;
-    background: radial-gradient(circle, #8b5cf6, transparent); /* Púrpura */
+    background: radial-gradient(circle, #8b5cf6, transparent); /* Purple */
     top: -180px;
     left: -150px;
     animation-delay: 0s;
@@ -39,7 +39,7 @@
   .bg-orb--2 {
     width: 480px;
     height: 480px;
-    background: radial-gradient(circle, #ec4899, transparent); /* Rosa */
+    background: radial-gradient(circle, #d648ec, transparent); /* Rosa */
     right: -150px;
     bottom: -150px;
     animation-delay: 5s;
@@ -48,7 +48,7 @@
   .bg-orb--3 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, #6366f1, transparent); /* Azul */
+    background: radial-gradient(circle, #8e63f1, transparent); /* Azul */
     left: 50%;
     top: 45%;
     transform: translate(-50%, -50%);
@@ -94,7 +94,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #8b5cf6; /* Fondo para la sección visual */
+    background-color: #8b5cf6; /* Background for the visual section */
   }
   
   .hero-image {
@@ -238,7 +238,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899); /* Degradado coherente */
+    background: linear-gradient(135deg, #8b5cf6, #d648ec); /* Degradado coherente */
     color: white;
     font-size: 2.2rem;
     box-shadow: 0 18px 45px rgba(139, 92, 246, 0.25);
@@ -258,7 +258,7 @@
   }
   
   .card__title--accent {
-    color: #ec4899; /* Color rosa */
+    color: #d648ec; /* Color rosa */
   }
   
   .card__subtitle {
@@ -279,16 +279,19 @@
     gap: 20px;
   }
   
+  // Six boxes that share the card width (before they overflowed on the sides)
   .code-inputs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 52px));
     justify-content: center;
-    gap: 15px;
+    gap: 8px;
     margin-bottom: 30px;
   }
-  
+
   .code-input {
-    width: 55px;
-    height: 65px;
+    width: 100%;
+    min-width: 0;
+    height: 60px;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     text-align: center;
@@ -327,7 +330,7 @@
   .resend-link {
     background: none;
     border: none;
-    color: #8b5cf6; /* Color primario para el enlace */
+    color: #8b5cf6; /* Primary color for the link */
     cursor: pointer;
     font-size: 0.95rem;
     font-weight: 600;
@@ -350,7 +353,7 @@
   ======================================*/
   
   .btn-submit {
-    background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%);
+    background: linear-gradient(90deg, #8b5cf6 0%, #d648ec 100%);
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -445,12 +448,11 @@
     }
   
     .code-inputs {
-      gap: 10px;
+      gap: 6px;
     }
   
     .code-input {
-      width: 45px;
-      height: 55px;
+      height: 52px;
       font-size: 1.5rem;
     }
   
@@ -460,3 +462,19 @@
     }
   }
   
+
+.code-error,
+.code-notice {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 13px;
+}
+
+.code-error { color: #c026d3; }
+.code-notice { color: #7c3aed; }
+
+// The global dark mode rule paints <strong> almost white, but this card stays light
+.verify-code-page .card__subtitle strong {
+  color: #7c3aed !important;
+  font-weight: 700;
+}

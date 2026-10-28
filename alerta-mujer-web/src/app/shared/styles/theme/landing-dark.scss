@@ -1,6 +1,8 @@
-/* ======================================
-   IMÁGENES LIGHT/DARK — defaults (fuera de [data-theme])
-====================================== */
+/*
+ * ======================================
+ *    LIGHT/DARK IMAGES — defaults (outside [data-theme])
+ * ======================================
+ */
 
 .img-work-dark,
 .img-download-dark,
@@ -140,7 +142,7 @@
     color: var(--purple-deep) !important;
   }
 
-  /* Imagen "por qué elegir" */
+  /* "Por qué elegir" image */
   .img-work-light { display: none !important; }
   .img-work-dark  { display: block !important; }
 }
@@ -275,12 +277,12 @@
     box-shadow: 0 0 0 .2rem rgba(168,85,247,.15);
   }
 
-  .btn-contacto {
+  .btn-contact {
     background: var(--purple-deep) !important;
     color: white !important;
   }
 
-  .btn-contacto:hover {
+  .btn-contact:hover {
     background: var(--purple-mid) !important;
   }
 

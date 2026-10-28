@@ -6,15 +6,39 @@
   
     <header class="page-header">
       <div>
-        <h1>Gestión de Reportes</h1>
-        <p>Visualiza, filtra y genera reportes del sistema.</p>
+        <h1>{{ 'Gestión de Reportes' | t }}</h1>
+        <p>{{ 'Visualiza, filtra y genera reportes del sistema.' | t }}</p>
       </div>
-      <button class="btn-new-report" (click)="abrirModalNuevo()">
+      <button class="btn-new-report" (click)="openNewModal()">
         <i class="fa-solid fa-plus"></i>
-        Nuevo Reporte
+        {{ 'Nuevo Reporte' | t }}
       </button>
     </header>
   
+    <!-- What this section is (can be hidden) -->
+    @if (showHelp) {
+      <section class="help-reports" [attr.aria-label]="'Cómo funcionan los informes' | t">
+        <div class="help-reports__icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="help-reports__text">
+          <h2>{{ '¿Para qué sirven los informes?' | t }}</h2>
+          <p>{{ 'Un informe junta alertas para revisarlas o entregarlas, por ejemplo en una revisión mensual o a una entidad aliada. Puedes elegirlas una por una o usar filtros de fechas y estado; con filtros, cada descarga trae las alertas que los cumplen en ese momento. La ciudad, la usuaria y el acontecimiento describen el informe en el documento.' | t }}</p>
+          <ol>
+            <li><strong>{{ 'Nuevo reporte:' | t }}</strong> {{ 'elige las alertas o los filtros y ponle un nombre que diga qué contiene.' | t }}</li>
+            <li><strong>{{ 'PDF:' | t }}</strong> {{ 'para leer o imprimir. Trae un resumen por estado y por forma de activación, y la lista de alertas.' | t }}</li>
+            <li><strong>{{ 'Excel (CSV):' | t }}</strong> {{ 'para filtrar, ordenar o hacer gráficas. Se abre directamente en Excel.' | t }}</li>
+          </ol>
+          <p class="help-reports__notice"><i class="fa-solid fa-lock"></i> {{ 'Los informes contienen datos personales: compártelos solo con quien deba verlos y bórralos cuando ya no se necesiten.' | t }}</p>
+        </div>
+        <button class="help-reports__close" (click)="hideHelp()" [attr.aria-label]="'Ocultar la explicación' | t">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </section>
+    } @else {
+      <button class="help-reports__show" (click)="showHelpAgain()">
+        <i class="fa-solid fa-circle-info"></i> {{ '¿Cómo funcionan los informes?' | t }}
+      </button>
+    }
+
     <!--==========================
         STAT CARDS
     ==========================-->
@@ -22,9 +46,9 @@
     <section class="stats-grid">
       <div class="stat-card purple">
         <div class="stat-info">
-          <span>Total Reportes</span>
-          <h2>{{ stats.totalReportes }}</h2>
-          <p>Generados en total</p>
+          <span>{{ 'Total Reportes' | t }}</span>
+          <h2>{{ stats.totalReportCount | t }}</h2>
+          <p>{{ 'Generados en total' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-file-lines"></i>
@@ -33,9 +57,9 @@
   
       <div class="stat-card blue">
         <div class="stat-info">
-          <span>Exportaciones</span>
-          <h2>{{ stats.exportaciones }}</h2>
-          <p>Reportes exportados</p>
+          <span>{{ 'Exportaciones' | t }}</span>
+          <h2>{{ stats.exports | t }}</h2>
+          <p>{{ 'Reportes exportados' | t }}</p>
         </div>
         <div class="stat-icon">
           <i class="fa-solid fa-cloud-arrow-down"></i>
@@ -52,10 +76,10 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input 
           type="text" 
-          placeholder="Buscar reporte..." 
-          aria-label="Buscar reporte"
-          [(ngModel)]="filtros.busqueda"
-          (input)="onBusquedaChange()"
+          [placeholder]="'Buscar reporte...' | t" 
+          [attr.aria-label]="'Buscar reporte' | t"
+          [(ngModel)]="filters.search"
+          (input)="onSearchQueryChange()"
         />
       </div>
   
@@ -63,58 +87,46 @@
   
       <div class="filter-group">
         <div class="filter-item">
-          <label>Fecha Inicial</label>
-          <input 
-            type="date" 
-            class="select-date" 
-            aria-label="Fecha inicial"
-            [(ngModel)]="filtros.fechaInicio"
-            (change)="aplicarFiltros()"
-          >
+          <label>{{ 'Fecha Inicial' | t }}</label>
+          <app-date-picker label="Fecha inicial" [(ngModel)]="filters.startDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
-          <label>Fecha Final</label>
-          <input 
-            type="date" 
-            class="select-date" 
-            aria-label="Fecha final"
-            [(ngModel)]="filtros.fechaFin"
-            (change)="aplicarFiltros()"
-          >
+          <label>{{ 'Fecha Final' | t }}</label>
+          <app-date-picker label="Fecha final" [(ngModel)]="filters.endDate" (valueChange)="applyFilters()" />
         </div>
         <div class="filter-item">
-          <label>Lugar de Alerta</label>
+          <label>{{ 'Lugar de Alerta' | t }}</label>
           <select 
-            aria-label="Filtrar por Ciudad"
-            [(ngModel)]="filtros.ciudad"
-            (change)="aplicarFiltros()"
+            [attr.aria-label]="'Filtrar por Ciudad' | t"
+            [(ngModel)]="filters.city"
+            (change)="applyFilters()"
           >
-            <option value="">Todas</option>
-            <option value="all">Todas</option>
-            <option value="neiva">Neiva</option>
-            <option value="bogota">Bogotá</option>
-            <option value="cali">Cali</option>
-            <option value="medellin">Medellín</option>
-            <option value="barranquilla">Barranquilla</option>
+            <option value="">{{ 'Todas' | t }}</option>
+            <option value="all">{{ 'Todas' | t }}</option>
+            <option value="neiva">{{ 'Neiva' | t }}</option>
+            <option value="bogota">{{ 'Bogotá' | t }}</option>
+            <option value="cali">{{ 'Cali' | t }}</option>
+            <option value="medellin">{{ 'Medellín' | t }}</option>
+            <option value="barranquilla">{{ 'Barranquilla' | t }}</option>
           </select>
         </div>
         <div class="filter-item">
-          <label>Estado</label>
+          <label>{{ 'Estado' | t }}</label>
           <select 
-            aria-label="Filtrar por Estado"
-            [(ngModel)]="filtros.estado"
-            (change)="aplicarFiltros()"
+            [attr.aria-label]="'Filtrar por Estado' | t"
+            [(ngModel)]="filters.status"
+            (change)="applyFilters()"
           >
-            <option value="">Todos</option>
-            <option value="all">Todos</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Cerrada">Cerrada</option>
-            <option value="Atendida">Atendida</option>
+            <option value="">{{ 'Todos' | t }}</option>
+            <option value="all">{{ 'Todos' | t }}</option>
+            <option value="Pendiente">{{ 'Pendiente' | t }}</option>
+            <option value="Cerrada">{{ 'Cerrada' | t }}</option>
+            <option value="Atendida">{{ 'Atendida' | t }}</option>
           </select>
         </div>
-        <button class="btn-clear-filters" (click)="limpiarFiltros()">
+        <button class="btn-clear-filters" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
-          Limpiar filtros
+          {{ 'Limpiar filtros' | t }}
         </button>
       </div>
     </div>
@@ -128,77 +140,77 @@
             <table>
             <thead>
               <tr>
-                <th>Nombre del Reporte</th>
-                <th>Fecha</th>
-                <th>Ciudad</th>
-                <th>Usuaria</th>
-                <th>Acontecimiento</th>
-                <th>Estado</th>
-                <th>Generado por</th>
-                <th>Acciones</th>
+                <th>{{ 'Nombre del Reporte' | t }}</th>
+                <th>{{ 'Fecha' | t }}</th>
+                <th>{{ 'Ciudad' | t }}</th>
+                <th>{{ 'Usuaria' | t }}</th>
+                <th>{{ 'Acontecimiento' | t }}</th>
+                <th>{{ 'Estado' | t }}</th>
+                <th>{{ 'Generado por' | t }}</th>
+                <th>{{ 'Acciones' | t }}</th>
               </tr>
             </thead>
             <tbody>
-              @if (cargando) {
+              @if (loading) {
                 <tr>
                   <td colspan="7" style="text-align: center; padding: 40px;">
                     <div class="loading-spinner">
                       <i class="fa-solid fa-spinner fa-spin"></i>
-                      <p>Cargando reportes...</p>
+                      <p>{{ 'Cargando reportes...' | t }}</p>
                     </div>
                   </td>
                 </tr>
-              } @else if (reportesPaginados.length === 0) {
+              } @else if (pagedReports.length === 0) {
                 <tr>
                   <td colspan="7" style="text-align: center; padding: 40px;">
                     <div class="no-data">
                       <i class="fa-solid fa-folder-open"></i>
-                      <p>No se encontraron reportes</p>
-                      <button class="btn-clear-filters" (click)="limpiarFiltros()">
-                        Limpiar filtros
+                      <p>{{ 'No se encontraron reportes' | t }}</p>
+                      <button class="btn-clear-filters" (click)="clearFilters()">
+                        {{ 'Limpiar filtros' | t }}
                       </button>
                     </div>
                   </td>
                 </tr>
               } @else {
-                @for (reporte of reportesPaginados; track reporte.id) {
+                @for (report of pagedReports; track report.id) {
                   <tr>
                     <td>
                       <div class="report-name">
                         <div class="report-icon">
                           <i class="fa-solid fa-file-lines"></i>
                         </div>
-                        {{ reporte.nombre }}
+                        {{ report.name | t }}
                       </div>
                     </td>
-                    <td>{{ formatearFecha(reporte.fecha) }}</td>
-                    <td>{{ reporte.ciudad }}</td>
-                    <td>{{ reporte.usuaria || '-' }}</td>
-                    <td>{{ reporte.acontecimiento || '-' }}</td>
+                    <td>{{ formatDate(report.date) | t }}</td>
+                    <td>{{ report.city | t }}</td>
+                    <td>{{ (report.user || '-') | t }}</td>
+                    <td>{{ (report.incident || '-') | t }}</td>
                     <td>
-                      <span class="status {{ getStatusClass(reporte.estado) }}">{{ reporte.estado }}</span>
+                      <span class="status {{ getStatusClass(report.status) | t }}">{{ report.status | t }}</span>
                     </td>
-                    <td>{{ reporte.generadoPor }}</td>
+                    <td>{{ report.generatedBy | t }}</td>
                     <td>
                       <div class="actions">
                         <button 
                           class="view" 
-                          aria-label="Ver reporte"
-                          (click)="verReporte(reporte)"
+                          [attr.aria-label]="'Ver reporte' | t"
+                          (click)="viewReport(report)"
                         >
                           <i class="fa-solid fa-eye"></i>
                         </button>
                         <button 
                           class="edit" 
-                          aria-label="Editar reporte"
-                          (click)="editarReporte(reporte)"
+                          [attr.aria-label]="'Editar reporte' | t"
+                          (click)="editReport(report)"
                         >
                           <i class="fa-solid fa-pen"></i>
                         </button>
                         <button 
                           class="delete" 
-                          aria-label="Eliminar reporte"
-                          (click)="eliminarReporte(reporte.id)"
+                          [attr.aria-label]="'Eliminar reporte' | t"
+                          (click)="deleteReport(report.id)"
                         >
                           <i class="fa-solid fa-trash"></i>
                         </button>
@@ -216,50 +228,35 @@
       
           <div class="table-footer">
             <div class="table-info">
-              Mostrando
-              <strong>{{ elementoInicio }} - {{ elementoFin }}</strong>
-              de
-              <strong>{{ paginacion.totalElementos }}</strong>
-              reportes
+              {{ 'Mostrando' | t }}
+              <strong>{{ startItem | t }} - {{ endItem | t }}</strong>
+              {{ 'de' | t }}
+              <strong>{{ pagination.totalElements | t }}</strong>
+              {{ 'reportes' | t }}
             </div>
             <div class="pagination">
               <button 
                 class="page-btn" 
-                aria-label="Página anterior"
-                (click)="paginaAnterior()"
-                [disabled]="paginacion.paginaActual === 1"
+                [attr.aria-label]="'Página anterior' | t"
+                (click)="previousPage()"
+                [disabled]="pagination.currentPage === 1"
               >
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
               
-              @for (pagina of paginasVisibles; track pagina) {
-                <button 
-                  class="page-btn" 
-                  [class.active]="pagina === paginacion.paginaActual"
-                  (click)="cambiarPagina(pagina)"
-                >
-                  {{ pagina }}
-                </button>
+              @for (page of visiblePages; track $index) {
+                @if (page === null) {
+                  <span class="page-ellipsis" aria-hidden="true">…</span>
+                } @else {
+                  <button class="page-btn" [class.active]="page === pagination.currentPage" (click)="changePage(page)">{{ page | t }}</button>
+                }
               }
-              
-              @if (paginacion.totalPaginas > 5) {
-                <span class="page-ellipsis">...</span>
-              }
-              
-              @if (paginacion.totalPaginas > 5 && !paginasVisibles.includes(paginacion.totalPaginas)) {
-                <button 
-                  class="page-btn" 
-                  (click)="irAUltimaPagina()"
-                >
-                  {{ paginacion.totalPaginas }}
-                </button>
-              }
-              
+
               <button 
                 class="page-btn" 
-                aria-label="Página siguiente"
-                (click)="paginaSiguiente()"
-                [disabled]="paginacion.paginaActual === paginacion.totalPaginas"
+                [attr.aria-label]="'Página siguiente' | t"
+                (click)="nextPage()"
+                [disabled]="pagination.currentPage === pagination.totalPageCount"
               >
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
@@ -271,12 +268,12 @@
   </div>
 
   <!-- MODAL NUEVO/EDITAR REPORTE -->
-  @if (mostrarModalNuevo) {
-    <div class="modal-overlay" (click)="cerrarModalNuevo()">
+  @if (showNewModal) {
+    <div class="modal-overlay" (click)="closeNewModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>{{ reporteEditando ? 'Editar Reporte' : 'Nuevo Reporte' }}</h2>
-          <button class="modal-close" (click)="cerrarModalNuevo()">
+          <h2>{{ editingReport ? 'Editar Reporte' : 'Nuevo Reporte' | t }}</h2>
+          <button class="modal-close" (click)="closeNewModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -284,65 +281,65 @@
           @if (error) {
             <div class="error-message">
               <i class="fa-solid fa-circle-exclamation"></i>
-              {{ error }}
+              {{ error | t }}
             </div>
           }
           
           <form class="report-form">
             <div class="form-group">
-              <label>Nombre del Reporte</label>
+              <label>{{ 'Nombre del Reporte' | t }}</label>
               <input 
                 type="text" 
                 name="nombre"
-                [(ngModel)]="modeloNombre"
-                (ngModelChange)="modeloNombre = $event"
-                placeholder="Ej: Reporte de Alertas - Enero 2024"
+                [(ngModel)]="nameModel"
+                (ngModelChange)="nameModel = $event"
+                [placeholder]="'Ej: Reporte de Alertas - Enero 2024' | t"
               >
             </div>
 
             <!-- Selector de Alertas -->
-            <div class="form-group alertas-selector">
+            <div class="form-group alerts-selector">
               <label>
-                Seleccionar Alertas 
-                <span class="alertas-count">({{ alertasSeleccionadasCount }} seleccionadas)</span>
+                {{ 'Seleccionar Alertas' | t }} 
+                <span class="alerts-count">({{ selectedAlertsCount | t }} {{ 'seleccionadas)' | t }}</span>
               </label>
-              <div class="alertas-actions">
-                <button type="button" class="btn-small" (click)="seleccionarTodasAlertas()">
-                  Seleccionar todas
+              <div class="alerts-actions">
+                <button type="button" class="btn-small" (click)="selectAllAlerts()">
+                  {{ 'Seleccionar todas' | t }}
                 </button>
-                <button type="button" class="btn-small" (click)="deseleccionarTodasAlertas()">
-                  Deseleccionar todas
+                <button type="button" class="btn-small" (click)="deselectAllAlerts()">
+                  {{ 'Deseleccionar todas' | t }}
                 </button>
               </div>
               
-              @if (cargandoAlertas) {
-                <div class="loading-alertas">
+              @if (loadingAlerts) {
+                <div class="loading-alerts">
                   <i class="fa-solid fa-spinner fa-spin"></i>
-                  Cargando alertas...
+                  {{ 'Cargando alertas...' | t }}
                 </div>
-              } @else if (alertasDisponibles.length === 0) {
-                <div class="no-alertas">
+              } @else if (availableAlerts.length === 0) {
+                <div class="no-alerts">
                   <i class="fa-solid fa-folder-open"></i>
-                  <p>No hay alertas disponibles</p>
+                  <p>{{ 'No hay alertas disponibles' | t }}</p>
                 </div>
               } @else {
-                <div class="alertas-list">
-                  @for (alerta of alertasDisponibles; track alerta.id) {
-                    <div class="alerta-item" [class.selected]="isAlertaSeleccionada(alerta.id)">
+                <div class="alerts-list">
+                  @for (alert of availableAlerts; track alert.id) {
+                    <div class="alert-item" [class.selected]="isAlertSelected(alert.id)">
                       <input 
                         type="checkbox" 
-                        [id]="'alerta-' + alerta.id"
-                        [checked]="isAlertaSeleccionada(alerta.id)"
-                        (change)="toggleAlertaSeleccionada(alerta.id)"
+                        [id]="'alerta-' + alert.id"
+                        [checked]="isAlertSelected(alert.id)"
+                        (change)="toggleAlertSelected(alert.id)"
                       >
-                      <label [for]="'alerta-' + alerta.id" class="alerta-label">
-                        <div class="alerta-info">
-                          <span class="alerta-tipo">{{ alerta.tipo }}</span>
-                          <span class="alerta-ubicacion">{{ alerta.ubicacion }}</span>
-                          <span class="alerta-fecha">{{ alerta.tiempo }}</span>
+                      <label [for]="'alerta-' + alert.id" class="alert-label">
+                        <div class="alert-data">
+                          <span class="alert-type">{{ typeLabel(alert.type) | t }} · {{ alert.name | t }}</span>
+                          <span class="alert-location">{{ alert.location | t }}</span>
+                          <span class="alert-date">{{ alert.time | t }}</span>
                         </div>
-                        <span class="alerta-estado status {{ getStatusClass(alerta.estado) }}">
-                          {{ alerta.estado }}
+                        <span class="alert-status status {{ getStatusClass(alert.status) | t }}">
+                          {{ alert.status | t }}
                         </span>
                       </label>
                     </div>
@@ -353,83 +350,83 @@
             
             <div class="form-row">
               <div class="form-group">
-                <label>Ciudad</label>
+                <label>{{ 'Ciudad' | t }}</label>
                 <select 
                   name="ciudad"
-                  [(ngModel)]="modeloCiudad"
-                  (ngModelChange)="modeloCiudad = $event"
+                  [(ngModel)]="cityModel"
+                  (ngModelChange)="cityModel = $event"
                 >
-                  <option value="">Seleccionar</option>
-                  <option value="Neiva">Neiva</option>
-                  <option value="Bogotá">Bogotá</option>
-                  <option value="Cali">Cali</option>
-                  <option value="Medellín">Medellín</option>
-                  <option value="Barranquilla">Barranquilla</option>
+                  <option value="">{{ 'Seleccionar' | t }}</option>
+                  <option value="Neiva">{{ 'Neiva' | t }}</option>
+                  <option value="Bogotá">{{ 'Bogotá' | t }}</option>
+                  <option value="Cali">{{ 'Cali' | t }}</option>
+                  <option value="Medellín">{{ 'Medellín' | t }}</option>
+                  <option value="Barranquilla">{{ 'Barranquilla' | t }}</option>
                 </select>
               </div>
               
               <div class="form-group">
-                <label>Estado</label>
+                <label>{{ 'Estado' | t }}</label>
                 <select 
                   name="estado"
-                  [(ngModel)]="modeloEstado"
-                  (ngModelChange)="modeloEstado = $event"
+                  [(ngModel)]="statusModel"
+                  (ngModelChange)="statusModel = $event"
                 >
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Cerrada">Cerrada</option>
-                  <option value="Atendida">Atendida</option>
+                  <option value="Pendiente">{{ 'Pendiente' | t }}</option>
+                  <option value="Cerrada">{{ 'Cerrada' | t }}</option>
+                  <option value="Atendida">{{ 'Atendida' | t }}</option>
                 </select>
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label>Usuaria</label>
+                <label>{{ 'Usuaria' | t }}</label>
                 <input 
                   type="text" 
                   name="usuaria"
-                  [(ngModel)]="modeloUsuaria"
-                  (ngModelChange)="modeloUsuaria = $event"
-                  placeholder="Nombre de la usuaria"
+                  [(ngModel)]="userModel"
+                  (ngModelChange)="userModel = $event"
+                  [placeholder]="'Nombre de la usuaria' | t"
                 >
               </div>
               
               <div class="form-group">
-                <label>Acontecimiento</label>
+                <label>{{ 'Acontecimiento' | t }}</label>
                 <input 
                   type="text" 
                   name="acontecimiento"
-                  [(ngModel)]="modeloAcontecimiento"
-                  (ngModelChange)="modeloAcontecimiento = $event"
-                  placeholder="Descripción breve del acontecimiento"
+                  [(ngModel)]="incidentModel"
+                  (ngModelChange)="incidentModel = $event"
+                  [placeholder]="'Descripción breve del acontecimiento' | t"
                 >
               </div>
             </div>
             
             <div class="form-group">
-              <label>Descripción</label>
+              <label>{{ 'Descripción' | t }}</label>
               <textarea 
                 name="descripcion"
-                [(ngModel)]="modeloDescripcion"
-                (ngModelChange)="modeloDescripcion = $event"
-                placeholder="Descripción detallada del reporte..."
+                [(ngModel)]="descriptionModel"
+                (ngModelChange)="descriptionModel = $event"
+                [placeholder]="'Descripción detallada del reporte...' | t"
                 rows="3"
               ></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrarModalNuevo()">Cancelar</button>
+          <button type="button" class="btn-secondary" (click)="closeNewModal()">{{ 'Cancelar' | t }}</button>
           <button 
             type="button"
             class="btn-primary" 
-            (click)="reporteEditando ? actualizarReporte() : crearReporte()"
-            [disabled]="cargando"
+            (click)="editingReport ? updateReport() : createReport()"
+            [disabled]="loading"
           >
-            @if (cargando) {
+            @if (loading) {
               <i class="fa-solid fa-spinner fa-spin"></i>
             }
-            {{ reporteEditando ? 'Actualizar' : 'Agregar' }}
+            {{ editingReport ? 'Actualizar' : 'Agregar' | t }}
           </button>
         </div>
       </div>
@@ -437,12 +434,12 @@
   }
 
   <!-- MODAL VER REPORTE -->
-  @if (mostrarModalVer && reporteSeleccionado) {
-    <div class="modal-overlay" (click)="cerrarModalVer()">
+  @if (showViewModal && selectedReport) {
+    <div class="modal-overlay" (click)="closeViewModal()">
       <div class="modal-content modal-large" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Detalle del Reporte</h2>
-          <button class="modal-close" (click)="cerrarModalVer()">
+          <h2>{{ 'Detalle del Reporte' | t }}</h2>
+          <button class="modal-close" (click)="closeViewModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -453,50 +450,50 @@
                 <i class="fa-solid fa-file-lines"></i>
               </div>
               <div class="detail-info">
-                <h3>{{ reporteSeleccionado.nombre }}</h3>
-                <span class="status {{ getStatusClass(reporteSeleccionado.estado) }}">{{ reporteSeleccionado.estado }}</span>
+                <h3>{{ selectedReport.name | t }}</h3>
+                <span class="status {{ getStatusClass(selectedReport.status) | t }}">{{ selectedReport.status | t }}</span>
               </div>
             </div>
             
             <div class="detail-grid">
               <div class="detail-item">
-                <label>ID</label>
-                <p>{{ reporteSeleccionado.id }}</p>
+                <label>{{ 'ID' | t }}</label>
+                <p>{{ selectedReport.id | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Fecha</label>
-                <p>{{ formatearFecha(reporteSeleccionado.fecha) }}</p>
+                <label>{{ 'Fecha' | t }}</label>
+                <p>{{ formatDate(selectedReport.date) | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Ciudad</label>
-                <p>{{ reporteSeleccionado.ciudad }}</p>
+                <label>{{ 'Ciudad' | t }}</label>
+                <p>{{ selectedReport.city | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Usuaria</label>
-                <p>{{ reporteSeleccionado.usuaria || '-' }}</p>
+                <label>{{ 'Usuaria' | t }}</label>
+                <p>{{ (selectedReport.user || '-') | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Acontecimiento</label>
-                <p>{{ reporteSeleccionado.acontecimiento || '-' }}</p>
+                <label>{{ 'Acontecimiento' | t }}</label>
+                <p>{{ (selectedReport.incident || '-') | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Generado por</label>
-                <p>{{ reporteSeleccionado.generadoPor }}</p>
+                <label>{{ 'Generado por' | t }}</label>
+                <p>{{ selectedReport.generatedBy | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Formato</label>
-                <p>{{ reporteSeleccionado.formato }}</p>
+                <label>{{ 'Formato' | t }}</label>
+                <p>{{ selectedReport.format | t }}</p>
               </div>
               <div class="detail-item">
-                <label>Tamaño</label>
-                <p>{{ reporteSeleccionado.tamano }}</p>
+                <label>{{ 'Tamaño' | t }}</label>
+                <p>{{ selectedReport.size | t }}</p>
               </div>
             </div>
             
-            @if (reporteSeleccionado.descripcion) {
+            @if (selectedReport.description) {
               <div class="detail-description">
-                <label>Descripción</label>
-                <p>{{ reporteSeleccionado.descripcion }}</p>
+                <label>{{ 'Descripción' | t }}</label>
+                <p>{{ selectedReport.description | t }}</p>
               </div>
             }
           </div>
@@ -504,51 +501,51 @@
         <div class="modal-footer">
           <button 
             class="btn-action pdf" 
-            (click)="descargarPDF(reporteSeleccionado.id)"
+            (click)="downloadPdf(selectedReport.id)"
           >
             <i class="fa-solid fa-file-pdf"></i>
-            Descargar PDF
+            {{ 'Descargar PDF' | t }}
           </button>
           <button 
             class="btn-action excel" 
-            (click)="descargarExcel(reporteSeleccionado.id)"
+            (click)="downloadExcel(selectedReport.id)"
           >
             <i class="fa-solid fa-file-excel"></i>
-            Descargar Excel
+            {{ 'Descargar Excel' | t }}
           </button>
           <button 
             class="btn-action print" 
-            (click)="imprimir()"
+            (click)="print()"
           >
             <i class="fa-solid fa-print"></i>
-            Imprimir
+            {{ 'Imprimir' | t }}
           </button>
-          <button class="btn-secondary" (click)="cerrarModalVer()">Cerrar</button>
+          <button class="btn-secondary" (click)="closeViewModal()">{{ 'Cerrar' | t }}</button>
         </div>
       </div>
     </div>
   }
 
   <!-- MODAL ALERTA IMPRESORA -->
-  @if (mostrarModalImpresora) {
-    <div class="modal-overlay modal-impresora" (click)="cerrarModalImpresora()">
+  @if (showPrinterModal) {
+    <div class="modal-overlay modal-impresora" (click)="closePrinterModal()">
       <div class="modal-content modal-impresora-content" (click)="$event.stopPropagation()">
         <div class="modal-header modal-impresora-header">
           <div class="impresora-icon">
             <i class="fa-solid fa-print"></i>
           </div>
-          <h2>¡No se ha encontrado impresora!</h2>
-          <button class="modal-close" (click)="cerrarModalImpresora()">
+          <h2>{{ '¡No se ha encontrado impresora!' | t }}</h2>
+          <button class="modal-close" (click)="closePrinterModal()">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
         <div class="modal-body modal-impresora-body">
-          <p>No se ha encontrado dispositivos para imprimir. Conecta tu impresora e inténtalo de nuevo.</p>
-          <p class="mensaje-final">¡Ten lindo día!!</p>
+          <p>{{ 'No se ha encontrado dispositivos para imprimir. Conecta tu impresora e inténtalo de nuevo.' | t }}</p>
+          <p class="message-final">{{ '¡Ten lindo día!!' | t }}</p>
         </div>
         <div class="modal-footer modal-impresora-footer">
-          <button class="btn-primary" (click)="cerrarModalImpresora()">
-            Entendido
+          <button class="btn-primary" (click)="closePrinterModal()">
+            {{ 'Entendido' | t }}
           </button>
         </div>
       </div>

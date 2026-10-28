@@ -1,0 +1,392 @@
+// Help zones — same visual language as the rest of the location module
+// (theme tokens: works in light and dark)
+
+$card: var(--bg-card, #241d3d);
+$soft: var(--purple-pale, #30293d);
+$border: var(--border, #4c3a80);
+$text: var(--text-primary, #ede9fe);
+$muted: var(--text-muted, #a8a0c4);
+$accent: var(--purple-mid, #aa86ea);
+$accent-strong: var(--purple-deep, #9463e9);
+$grad: linear-gradient(135deg, var(--accent-grad-from, #7c3aed), var(--accent-grad-to, #c026d3));
+$danger: #e671f8;
+$sos: #a70bf5;
+
+:host { display: block; }
+
+.za-alert {
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid rgba(230, 113, 248, 0.4);
+  border-radius: 0.75rem;
+  background: rgba(230, 113, 248, 0.12);
+  color: $danger;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+// ── Layout ────────────────────────────────────────
+.za-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 960px) { grid-template-columns: 1fr; }
+}
+
+.za-left { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+
+.za-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.15rem;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 1rem;
+
+  &--sos { border-color: color-mix(in srgb, #{$sos} 45%, transparent); }
+}
+
+.za-card-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.za-card-title { margin: 0; font-size: 1rem; font-weight: 700; color: $text; }
+
+.za-chip {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: $soft;
+  color: $accent;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.za-muted { margin: 0; font-size: 0.8rem; line-height: 1.45; color: $muted; }
+.za-help { margin: 0; font-size: 0.72rem; color: $muted; text-align: center; }
+
+.za-link {
+  border: none;
+  background: none;
+  color: $accent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+.za-btn {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid $border;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: $text;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { border-color: $accent; }
+  &--primary { border: none; background: $grad; color: #fff; &:hover { filter: brightness(1.08); } }
+}
+
+// ── Quick call ────────────────────────────────
+.za-lines { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; }
+
+.za-line {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid color-mix(in srgb, #{$sos} 35%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, #{$sos} 10%, transparent);
+  color: $text;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover { background: color-mix(in srgb, #{$sos} 18%, transparent); border-color: $sos; }
+}
+
+.za-line-icon {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $sos;
+  color: #1a1428;
+
+  svg { width: 15px; height: 15px; }
+}
+
+.za-line-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  strong { font-size: 0.92rem; letter-spacing: 0.02em; }
+  span { font-size: 0.7rem; color: $muted; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+// ── Estado de zonas ───────────────────────────────
+.za-banner {
+  --cat: #{$accent};
+  padding: 0.7rem 0.85rem;
+  border-left: 3px solid var(--cat);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--cat) 12%, transparent);
+  color: $text;
+  font-size: 0.8rem;
+  line-height: 1.4;
+
+  strong { color: var(--cat); }
+}
+
+// ── Search and filters ────────────────────────────
+.za-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid $border;
+  border-radius: 0.65rem;
+  background: $soft;
+
+  &:focus-within { border-color: $accent; }
+  svg { width: 16px; height: 16px; flex-shrink: 0; color: $muted; }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0;
+    border: none;
+    background: transparent;
+    color: $text;
+    font: inherit;
+    font-size: 0.84rem;
+    outline: none;
+    &::placeholder { color: $muted; opacity: 0.8; }
+  }
+}
+
+.za-filters { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.za-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid $border;
+  border-radius: 999px;
+  background: transparent;
+  color: $muted;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  span { font-weight: 800; opacity: 0.75; }
+  &:hover { color: $text; }
+  &.active { color: $text; border-color: var(--cat, #{$accent}); background: color-mix(in srgb, var(--cat, #{$accent}) 16%, transparent); }
+}
+
+.za-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cat, #{$accent});
+
+  &--you { background: #8e63f1; box-shadow: 0 0 0 2px #fff; }
+}
+
+// ── Lista ─────────────────────────────────────────
+.za-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.za-item {
+  --cat: #{$accent};
+  flex-shrink: 0; // inside a scrolling list it must not be squashed
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $border;
+  border-radius: 0.8rem;
+  background: $soft;
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  &:hover, &--selected { border-color: var(--cat); }
+}
+
+.za-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled { cursor: default; }
+}
+
+.za-item-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--cat) 18%, transparent);
+  color: var(--cat);
+
+  svg { width: 16px; height: 16px; }
+}
+
+.za-item-text { min-width: 0; display: flex; flex-direction: column; gap: 0.12rem; }
+.za-item-name { font-size: 0.86rem; font-weight: 700; color: $text; }
+.za-item-type { font-size: 0.72rem; font-weight: 800; color: var(--cat); }
+.za-item-meta { font-size: 0.72rem; font-weight: 600; color: $muted; line-height: 1.35; }
+
+.za-call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem;
+  border-top: 1px solid $border;
+  color: $sos;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+
+  svg { width: 14px; height: 14px; }
+  &:hover { background: color-mix(in srgb, #{$sos} 12%, transparent); }
+}
+
+.za-empty {
+  padding: 1.25rem 1rem;
+  border: 1px dashed $border;
+  border-radius: 0.8rem;
+  color: $muted;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+// ── Mapa ──────────────────────────────────────────
+.za-map-wrap {
+  position: sticky;
+  top: 1rem;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  overflow: hidden;
+
+  @media (max-width: 960px) { position: relative; top: 0; order: -1; }
+}
+
+.za-map {
+  width: 100%;
+  height: max(480px, calc(100vh - 230px));
+  background: $soft;
+
+  @media (max-width: 960px) { height: 360px; }
+}
+
+:host ::ng-deep .za-map.leaflet-container { font-family: inherit; }
+
+.za-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  max-width: calc(100% - 24px);
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.8rem;
+  background: rgba(26, 20, 40, 0.85);
+  color: #f5f3ff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+
+  span { display: inline-flex; align-items: center; gap: 0.3rem; }
+}
+
+:host ::ng-deep .za-pin {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--pin);
+  border: 2px solid #fff;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  svg { width: 55%; height: 55%; }
+  &--active { border-width: 3px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--pin) 35%, transparent), 0 2px 8px rgba(0, 0, 0, 0.4); }
+}
+
+:host ::ng-deep .za-you {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #8e63f1;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(142, 99, 241, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+:host ::ng-deep .za-popup { min-width: 180px; font-family: inherit; }
+:host ::ng-deep .za-popup-type { font-size: 0.72rem; font-weight: 800; }
+:host ::ng-deep .za-popup-name { margin: 0.15rem 0 0.25rem; font-size: 0.92rem; font-weight: 800; }
+:host ::ng-deep .za-popup-row { font-size: 0.78rem; color: #4b4b55; margin-top: 0.15rem; }
+:host ::ng-deep .za-popup-call {
+  display: inline-block;
+  margin-top: 0.45rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: #a70bf5;
+  color: #1a1428 !important;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+
+// =============================================
+// LÍNEAS MÁS GRUESAS (2px, como en el admin)
+// (solo estilos: no cambia nada del HTML ni del TS)
+// =============================================
+
+// Modo claro: el mismo morado de líneas del panel admin
+:host-context(html:not([data-theme="dark"])) {
+  --border: #6d5bb8;
+
+  // Contadores que casi no se leían en modo claro
+  .za-chip { color: $accent-strong; }
+}
+
+// Mismo color y estado de antes, solo más gruesas (claro y oscuro)
+.za-card,
+.za-btn:not(.za-btn--primary),
+.za-search,
+.za-filter,
+.za-item,
+.za-empty,
+.za-map-wrap { border-width: 2px; }
+
+.za-call { border-top-width: 2px; }

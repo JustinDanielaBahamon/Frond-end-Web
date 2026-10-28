@@ -1,17 +1,19 @@
-/*==================================================
-=   MODO OSCURO — PANEL ADMIN
-=   Dispositivos · Moderadores · Evidencias · Reportes
+/*
+ * ==================================================
+ * =   DARK MODE — ADMIN PANEL
+ * =   Devices · Moderators · Evidence · Reports
+ *
+ *    These 4 modules have their colors hard-coded
+ *    in their .scss (#fff, #f8f7fc, #2d0b5e...), that is why they
+ *    did not react to the theme. Here they are overridden using
+ *    the tokens from tokens.scss, same as dashboard-dark.
+ * ==================================================
+ */
 
-   Estos 4 módulos tienen los colores escritos a mano
-   en su .scss (#fff, #f8f7fc, #2d0b5e...), por eso no
-   reaccionaban al tema. Aquí se sobreescriben usando
-   los tokens de tokens.scss, igual que dashboard-dark.
-==================================================*/
-
-// Estilos comunes a los 4 módulos (misma estructura HTML)
+// Styles shared by the 4 modules (same HTML structure)
 @mixin admin-dark($root) {
 
-  /* ── Fondo de la página ─────────────────────── */
+  /* ── Page background ─────────────────────── */
   .#{$root} {
     background: var(--bg-base) !important;
     color: var(--text-primary);
@@ -52,11 +54,11 @@
     .stat-change {
       &.positive { color: var(--green) !important; }
       &.negative { color: var(--red) !important; }
-      .vs-ayer   { color: var(--text-muted) !important; }
+      .vs-yesterday   { color: var(--text-muted) !important; }
     }
   }
 
-  /* ── Toolbar: búsqueda y filtros ────────────── */
+  /* ── Toolbar: search and filters ────────────── */
   .toolbar {
 
     .search-box {
@@ -169,7 +171,7 @@
     background: var(--purple-pale) !important;
   }
 
-  /* ── Contenido de las celdas ────────────────── */
+  /* ── Cell content ────────────────── */
   .device-info,
   .report-name { color: var(--text-primary) !important; }
 
@@ -189,11 +191,11 @@
   .evidence-id-size,
   .alert-type-city { color: var(--text-muted) !important; }
 
-  // el puntito de estado toma el color del texto del estado
+  // the status dot takes the color of the status text
   .status::before,
   .status-badge::before { background: currentColor !important; }
 
-  /* ── Botones de acción de cada fila ─────────── */
+  /* ── Action buttons of each row ─────────── */
   .actions button,
   .actions-cell button {
     background: var(--purple-pale) !important;
@@ -205,7 +207,7 @@
     }
   }
 
-  /* ── Pie de tabla y paginación ──────────────── */
+  /* ── Table footer and pagination ──────────────── */
   .table-footer {
     border-top-color: var(--border) !important;
 
@@ -327,9 +329,11 @@
   .user-card { background: var(--purple-pale) !important; }
 }
 
-/*==================================================
-=   GESTIÓN DE DISPOSITIVOS
-==================================================*/
+/*
+ * ==================================================
+ * =   DEVICE MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-device-management {
   @include admin-dark('device-management');
@@ -346,9 +350,11 @@
   }
 }
 
-/*==================================================
-=   GESTIÓN DE MODERADORES
-==================================================*/
+/*
+ * ==================================================
+ * =   MODERATOR MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-moderator-management {
   @include admin-dark('moderator-management');
@@ -357,9 +363,9 @@
   .severity {
     &.red,    &.critical { background: var(--red-pale) !important;   color: var(--red) !important; }
     &.orange, &.high     { background: var(--amber-pale) !important; color: var(--amber) !important; }
-    &.yellow, &.medium   { background: rgba(234, 179, 8, 0.18) !important; color: #facc15 !important; }
+    &.yellow, &.medium   { background: rgba(192, 132, 252, 0.18) !important; color: #e9d5ff !important; }
     &.green,  &.low      { background: var(--green-pale) !important; color: var(--green) !important; }
-    &.blue   { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.blue   { background: rgba(109, 40, 217, 0.2) !important; color: #c4b5fd !important; }
     &.purple { background: var(--purple-pale) !important; color: var(--purple-mid) !important; }
   }
 
@@ -371,15 +377,123 @@
   }
 
   .actions button {
-    &.view:hover    { background: rgba(59, 130, 246, 0.2) !important; color: #60a5fa !important; }
+    &.view:hover    { background: rgba(109, 40, 217, 0.2) !important; color: #c4b5fd !important; }
     &.approve:hover { background: var(--green-pale) !important; color: var(--green) !important; }
     &.reject:hover  { background: var(--red-pale) !important;   color: var(--red) !important; }
   }
 }
 
-/*==================================================
-=   GESTIÓN DE EVIDENCIAS
-==================================================*/
+/*
+ * ==================================================
+ * =   MODERATOR MANAGEMENT — modales en modo oscuro
+ * =   (fondo oscuro y textos legibles; solo estilos)
+ * ==================================================
+ */
+[data-theme='dark'] app-moderator-management {
+
+  /* Encabezado de los 3 modales (ver / agregar / editar) */
+  .modal-header {
+    background: var(--bg-card) !important;
+    border-bottom: 2px solid var(--border) !important;
+
+    h2,
+    .modal-header-text h2 { color: var(--text-primary) !important; }
+
+    /* Título de "Ver" y "Editar": mismo tamaño que el de "Agregar" */
+    > h2 {
+      margin: 0 !important;
+      font-size: 1.35rem !important;
+      font-weight: 800 !important;
+    }
+
+    .modal-header-text p { color: var(--text-muted) !important; }
+
+    .modal-close {
+      background: var(--purple-pale) !important;
+      color: var(--text-muted) !important;
+
+      &:hover {
+        background: var(--purple-pale-hover) !important;
+        color: var(--purple-mid) !important;
+      }
+    }
+  }
+
+  /* Modal "Ver": tarjeta de arriba */
+  .report-detail .report-header {
+    background: linear-gradient(135deg, var(--purple-pale) 0%, var(--bg-card) 100%) !important;
+    border: 1px solid var(--border) !important;
+
+    .report-header-info {
+      h3 { color: var(--text-primary) !important; }
+
+      .date-badge {
+        background: var(--bg-base) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+
+        &::before { color: var(--purple-mid) !important; }
+      }
+
+      .status-badge-large {
+        background: var(--bg-base) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--purple-mid) !important;
+
+        &::before { background: var(--purple-mid) !important; }
+      }
+    }
+  }
+
+  /* Modal "Ver": chips de motivo y gravedad */
+  .report-detail .detail-section .detail-item {
+    .badge-large,
+    .severity-badge-large {
+      background: var(--purple-pale) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--purple-mid) !important;
+
+      &::before { background: var(--purple-mid) !important; }
+    }
+  }
+
+  /* Modal "Ver": caja de descripción */
+  .report-detail .detail-section .description-box {
+    background: var(--bg-base) !important;
+    border-color: var(--border) !important;
+
+    &:hover { border-color: var(--purple-mid) !important; }
+
+    p { color: var(--text-primary) !important; }
+  }
+
+  /* Modal "Ver": nombre y correo de la usuaria */
+  .report-detail .detail-section .user-card .user-details {
+    .user-name  { color: var(--text-primary) !important; }
+    .user-email { color: var(--text-muted) !important; }
+  }
+
+  /* Modal "Ver": "Registrado por" y "Resolución" */
+  .case-extra {
+    color: var(--text-muted) !important;
+
+    strong { color: var(--text-primary) !important; }
+  }
+
+  /* Modal "Agregar": títulos de cada sección */
+  .form-section h4 {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border) !important;
+
+    i { color: var(--purple-mid) !important; }
+  }
+}
+
+/*
+ * ==================================================
+ * =   EVIDENCE MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-evidences-management {
   @include admin-dark('evidences-management');
@@ -406,9 +520,11 @@
   }
 }
 
-/*==================================================
-=   GESTIÓN DE REPORTES
-==================================================*/
+/*
+ * ==================================================
+ * =   REPORT MANAGEMENT
+ * ==================================================
+ */
 
 [data-theme='dark'] app-report-management {
   @include admin-dark('reports-management');
@@ -430,16 +546,16 @@
     &:hover { background: var(--purple-pale-hover) !important; }
   }
 
-  /* ── Selector de alertas del formulario ─────── */
-  .alertas-selector {
+  /* ── Form alert selector ─────── */
+  .alerts-selector {
     label { color: var(--purple-mid) !important; }
 
-    .alertas-count {
+    .alerts-count {
       background: var(--purple-pale) !important;
       color: var(--purple-mid) !important;
     }
 
-    .alertas-actions .btn-small {
+    .alerts-actions .btn-small {
       background: var(--bg-base) !important;
       border-color: var(--border) !important;
       color: var(--purple-mid) !important;
@@ -450,16 +566,16 @@
       }
     }
 
-    .loading-alertas,
-    .no-alertas {
+    .loading-alerts,
+    .no-alerts {
       background: var(--bg-base) !important;
       color: var(--text-muted) !important;
     }
 
-    .alertas-list {
+    .alerts-list {
       border-color: var(--border) !important;
 
-      .alerta-item {
+      .alert-item {
         background: var(--bg-base) !important;
         border-color: var(--border) !important;
 
@@ -471,15 +587,15 @@
 
         &.selected { box-shadow: 0 0 0 2px rgba(183, 155, 245, 0.18) !important; }
 
-        .alerta-tipo      { color: var(--text-primary) !important; }
-        .alerta-ubicacion,
-        .alerta-fecha     { color: var(--text-muted) !important; }
+        .alert-type      { color: var(--text-primary) !important; }
+        .alert-location,
+        .alert-date     { color: var(--text-muted) !important; }
       }
     }
   }
 
-  /* ── Modal "no se encontró impresora" ───────── */
+  /* ── "No printer found" modal ───────── */
   .modal-impresora-header h2 { color: var(--text-primary) !important; }
   .modal-impresora-body p    { color: var(--text-muted) !important; }
-  .modal-impresora-body .mensaje-final { color: var(--purple-mid) !important; }
+  .modal-impresora-body .message-final { color: var(--purple-mid) !important; }
 }

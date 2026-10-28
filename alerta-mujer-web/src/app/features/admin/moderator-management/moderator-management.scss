@@ -7,8 +7,8 @@
 // Define variables for consistent styling
 $color-primary:       #7e22ce; // Purple
 $color-primary-light: #f3e8ff;
-$color-secondary:     #ec4899; // Pink
-$color-accent:        #6366f1; // Blue
+$color-secondary:     #d946ef; // Pink
+$color-accent:        #7c3aed; // Blue
 $color-text-dark:     #2d0b5e;
 $color-text-medium:   #4c1d95;
 $color-text-light:    #2d0b5e;
@@ -147,7 +147,7 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
           color: $badge-purple-text;
         }
 
-        .vs-ayer {
+        .vs-yesterday {
           color: $color-text-light;
           font-weight: 500;
         }
@@ -1307,76 +1307,6 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
 =            RESPONSIVE DESIGN
 ======================================*/
 
-@media (max-width: 1024px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .toolbar {
-    .filter-group {
-      flex-wrap: wrap;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-
-    h1 {
-      font-size: 1.8rem;
-    }
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .toolbar {
-    .search-box {
-      min-width: 100%;
-    }
-
-    .btn-search {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .filter-group {
-      flex-direction: column;
-      align-items: stretch;
-
-      .filter-item {
-        min-width: 100%;
-      }
-    }
-  }
-
-  .table-card {
-    .table-responsive {
-      overflow-x: auto;
-    }
-
-    table {
-      min-width: 600px;
-    }
-  }
-
-  .table-footer {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-
-    .pagination {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
-}
-
 @media (max-width: 576px) {
   .moderator-management {
     padding: 27px;
@@ -1410,15 +1340,6 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
 
   .toolbar {
     padding: 20px;
-  }
-
-  .actions {
-    flex-direction: column;
-    gap: 6px;
-
-    button {
-      width: 100%;
-    }
   }
 
   /* Modal Responsive */
@@ -1528,16 +1449,43 @@ $shadow-xl: 0 15px 35px rgba(126, 34, 206, 0.2);
   }
 }
 
-/* Tablet/móvil: las cajas de búsqueda respetan su alto de 50px */
+/* Tablet/mobile: the search boxes keep their 50px height */
 @media (max-width: 1024px) {
   .toolbar .search-box {
     flex: 0 0 auto;
   }
 }
 
-/* Móvil pequeño: se oculta el avatar para que el correo no se parta */
+/* Small mobile: the avatar is hidden so the email does not wrap */
 @media (max-width: 480px) {
   .table-card table tbody tr td .user-info .user-avatar {
     display: none;
   }
 }
+
+/* Buscador: el campo no se sale en pantallas angostas */
+.toolbar .search-box input { min-width: 0; width: 100%; }
+
+/* Tarjetas: botones de acción en fila y etiquetas que no se salen */
+@media (max-width: 768px) {
+  .table-card .actions { flex-direction: row; flex-wrap: wrap; }
+  .table-card td > span { max-width: 100%; white-space: normal; }
+}
+
+/* Celulares muy angostos: el nombre del dato arriba y el valor debajo */
+@media (max-width: 360px) {
+  .table-card table tbody tr td[data-label] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    text-align: left;
+
+    &::before { flex: none; max-width: 100%; }
+    > div, > span { text-align: left; }
+  }
+
+  .table-card table tbody tr td .user-info { justify-content: flex-start; }
+  .table-card .actions { justify-content: flex-start; }
+}
+.case-extra { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; p { margin: 0; } }
+.case-evidence { max-width: 100%; border-radius: 10px; border: 1px solid #c4b5fd; }

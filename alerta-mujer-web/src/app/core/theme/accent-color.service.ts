@@ -6,6 +6,8 @@ const DEFAULT_ACCENT = '#7c3aed'; // = --purple-deep original
 
 interface Hsl { h: number; s: number; l: number; }
 
+const RETIRED_COLORS = ['#3b08b2', '#d844ef'];
+
 @Injectable({ providedIn: 'root' })
 export class AccentColorService {
   private readonly themeService = inject(ThemeService);
@@ -14,8 +16,8 @@ export class AccentColorService {
   readonly currentAccent = this.accent.asReadonly();
 
   constructor() {
-    // se re-ejecuta si cambia el color O si cambia claro/oscuro,
-    // para recalcular la rampa con luminosidades correctas
+    // runs again if the color OR light/dark changes,
+    // to recompute the ramp with the right lightness values
     effect(() => {
       const hex = this.accent();
       const theme = this.themeService.currentTheme();
@@ -29,7 +31,10 @@ export class AccentColorService {
   }
 
   private getInitialAccent(): string {
-    return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_ACCENT;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    // Colors no longer offered: whoever had them chosen goes back to the app violet
+    if (!saved || RETIRED_COLORS.includes(saved.toLowerCase())) return DEFAULT_ACCENT;
+    return saved;
   }
 
   private applyAccent(hex: string, theme: 'light' | 'dark'): void {

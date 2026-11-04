@@ -24,6 +24,12 @@ describe('ReviewComponent', () => {
     expect(component.testimonials.length).toBe(5);
   });
 
+  it('usa avatares ilustrados propios y no fotos externas de personas reales', () => {
+    for (const t of component.testimonials) {
+      expect(t.image).toMatch(/^\/avatars\/[a-z-]+\.svg$/);
+    }
+  });
+
   it('should initialize with currentIndex 0', () => {
     expect(component.currentIndex).toBe(0);
   });

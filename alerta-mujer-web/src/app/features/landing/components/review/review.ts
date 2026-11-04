@@ -19,27 +19,27 @@ export class ReviewComponent implements AfterViewInit, OnDestroy {
   testimonials: Testimonial[] = [
     {
       name: 'Valeria R.',
-      image: 'https://randomuser.me/api/portraits/women/44.jpg',
+      image: '/avatars/valeria.svg',
       comment: 'Alerta Mujer me ha dado la tranquilidad que necesitaba. Saber que mis seres queridos pueden ayudarme en cualquier momento no tiene precio.'
     },
     {
       name: 'Camila G.',
-      image: 'https://randomuser.me/api/portraits/women/12.jpg',
+      image: '/avatars/camila.svg',
       comment: 'La aplicación es muy intuitiva y me encanta compartir mi ubicación cuando salgo sola.'
     },
     {
       name: 'Sofía M.',
-      image: 'https://randomuser.me/api/portraits/women/50.jpg',
+      image: '/avatars/sofia.svg',
       comment: 'Ahora mi familia sabe dónde estoy en cualquier momento. Me siento muchísimo más segura.'
     },
     {
       name: 'Laura P.',
-      image: 'https://randomuser.me/api/portraits/women/36.jpg',
+      image: '/avatars/laura.svg',
       comment: 'Una aplicación indispensable para todas las mujeres.'
     },
     {
       name: 'Mariana C.',
-      image: 'https://randomuser.me/api/portraits/women/28.jpg',
+      image: '/avatars/mariana.svg',
       comment: 'La recomiendo totalmente. Muy fácil de usar.'
     }
   ];
